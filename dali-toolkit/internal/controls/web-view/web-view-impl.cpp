@@ -462,6 +462,11 @@ void WebView::Resume()
   {
     DALI_LOG_DEBUG_INFO("WebView[%p] Resume()\n", this);
     mWebEngine.Resume();
+
+    if(Dali::Accessibility::IsUp())
+    {
+      SetKeyInputFocus();
+    }
   }
 }
 
@@ -1569,6 +1574,13 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
 
   if(mRemoteChild.GetAddress())
   {
+    auto actor   = GetInternalActor();
+    auto control = Toolkit::Control::DownCast(actor);
+    if(DALI_LIKELY(control))
+    {
+      control.SetKeyInputFocus();
+    }
+
     // DoGetChildren is called at most once per every OnChildrenChanged.
     // We have only one OnChildrenChanged in this case, so EmbedSocket will be called only once.
     Accessibility::Bridge::GetCurrentBridge()->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());

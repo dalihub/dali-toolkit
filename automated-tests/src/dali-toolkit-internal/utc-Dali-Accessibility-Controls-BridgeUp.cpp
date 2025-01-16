@@ -2409,3 +2409,29 @@ int UtcDaliDumpTree(void)
 
   END_TEST;
 }
+
+int UtcDaliWebViewCheckResumeOnAccessibilityMode(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC(true);
+
+  WebView view = WebView::New();
+  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
+  view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
+  DALI_TEST_CHECK(view);
+
+  application.GetScene().Add(view);
+  application.SendNotification();
+  application.Render();
+
+  view.Resume();
+  DALI_TEST_CHECK(view.HasKeyInputFocus());
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
