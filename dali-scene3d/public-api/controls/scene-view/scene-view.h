@@ -150,30 +150,11 @@ public:
     };
   };
 
-  /**
-   * @brief The enumerations used for checking capture success
-   * @SINCE_2_3.25
-   */
-  enum class CaptureFinishState
-  {
-    SUCCEEDED, ///< Succeeded to capture
-    FAILED     ///< Failed to capture by time out
-  };
-
 public:
-  struct CaptureResult
-  {
-    int32_t                 captureId;
-    Dali::Toolkit::ImageUrl imageUrl;
-    CaptureFinishState      state;
-  };
-
   /**
    * @brief Typedef for capture finished signals sent by this class.
-   *
-   * @SINCE_2_3.25
    */
-  typedef Signal<void(SceneView, CaptureResult&)> CaptureFinishedSignalType;
+  typedef Signal<void(SceneView, int32_t, const Dali::Toolkit::ImageUrl&)> CaptureFinishedSignalType;
 
   /**
    * @brief Create an initialized SceneView.
@@ -507,10 +488,11 @@ public:
   /**
    * @brief Requests to capture this SceneView with the Camera.
    *
-   * @SINCE_2_3.25
    * @param[in] camera CameraActor to be used for capture.
    * @param[in] size captured size.
-   * @note The camera is required to be added in this SceneView. (Not need to be a selected camera)
+   * @note The input camera should not be used for any other purpose during Capture.
+   * (Simultaneous usage elsewhere may result in incorrect rendering.)
+   * @note The camera is required to be added in this SceneView. (But should not be a selected camera.)
    * @note If the SceneView is disconnected from Scene, the left capture requests are canceled.
    * @return capture id that id unique value to distinguish each requiest.
    */
@@ -519,7 +501,6 @@ public:
   /**
    * @brief Get capture finished signal.
    *
-   * @SINCE_2_3.25
    * @return finished signal instance.
    */
   CaptureFinishedSignalType& CaptureFinishedSignal();
