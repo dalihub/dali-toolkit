@@ -153,6 +153,7 @@ void Control::SetBackground(const Property::Map& map)
   if(visual)
   {
     mImpl->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+    mImpl->EnableCornerPropertiesOverridden(visual, true);
 
     // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
     RelayoutRequest();

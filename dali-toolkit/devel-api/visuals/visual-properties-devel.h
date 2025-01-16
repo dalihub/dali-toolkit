@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ enum Type
    * @details Name "cornerRadiusPolicy", type Property::INTEGER.
    * @see Policy::Type
    * @note By default, it is ABSOLUTE to the visual's size.
-   *       If it it RELATIVE, the corner radius value is relative to the smaller of the visual width and visual height.
+   *       If it is RELATIVE, the corner radius value is relative to the smaller of the visual width and visual height.
    */
   CORNER_RADIUS_POLICY = OPACITY + 3,
 

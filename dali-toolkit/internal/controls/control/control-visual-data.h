@@ -46,13 +46,15 @@ struct RegisteredVisual
   bool                  enabled : 1;
   bool                  pending : 1;
   bool                  overideReadyTransition : 1;
+  bool                  overrideCornerProperties : 1;
 
   RegisteredVisual(Property::Index aIndex, Toolkit::Visual::Base& aVisual, bool aEnabled, bool aPendingReplacement)
   : index(aIndex),
     visual(aVisual),
     enabled(aEnabled),
     pending(aPendingReplacement),
-    overideReadyTransition(false)
+    overideReadyTransition(false),
+    overrideCornerProperties(false)
   {
   }
 };
@@ -96,9 +98,14 @@ public:
   bool IsResourceReady() const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableReadyTransitionOverriden()
+   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableReadyTransitionOverridden()
    */
-  void EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable);
+  void EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable);
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableCornerPropertiesOverridden()
+   */
+  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Property::Map cornerProperties);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualResourceStatus()
