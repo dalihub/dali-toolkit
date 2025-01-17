@@ -229,6 +229,11 @@ public:
    */
   void ClearAnchors();
 
+  /**
+   * @brief Clears bidirectional paragraph info.
+   */
+  void ClearBidirectionalParagraphInfo();
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
