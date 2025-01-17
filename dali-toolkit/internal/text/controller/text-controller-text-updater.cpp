@@ -721,6 +721,9 @@ void Controller::TextUpdater::ResetText(Controller& controller)
   // Reset the anchors buffer.
   logicalModel->ClearAnchors();
 
+  // Reset the bidirectional paragraph info.
+  logicalModel->ClearBidirectionalParagraphInfo();
+
   // We have cleared everything including the placeholder-text
   impl.PlaceholderCleared();
 
