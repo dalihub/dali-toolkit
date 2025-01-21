@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,11 @@ struct PhysicsBulletGlesAddOn : public Dali::AddOn::AddOnBinder
   PhysicsBulletGlesAddOn()
   : Dali::AddOn::AddOnBinder(DALI_PHYSICS_BULLET_GLES_ADDON_NAME, DALI_PHYSICS_BULLET_GLES_SO)
   {
+    DALI_ASSERT_ALWAYS(CreateGlesPhysicsDebugRenderer && "CreateGlesPhysicsDebugRenderer not loaded!");
+    DALI_ASSERT_ALWAYS(DeleteGlesPhysicsDebugRenderer && "DeleteGlesPhysicsDebugRenderer not loaded!");
+    DALI_ASSERT_ALWAYS(SetViewport && "SetViewport not loaded!");
+    DALI_ASSERT_ALWAYS(Setup && "Setup not loaded!");
+    DALI_ASSERT_ALWAYS(RenderLines && "RenderLines not loaded!");
   }
 
   ~PhysicsBulletGlesAddOn() = default;
@@ -89,7 +94,7 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
 
 PhysicsDebugRenderer::~PhysicsDebugRenderer()
 {
-  if(gPhysicsBulletGlesAddOn)
+  if(gPhysicsBulletGlesAddOn && gPhysicsBulletGlesAddOn->DeleteGlesPhysicsDebugRenderer)
   {
     gPhysicsBulletGlesAddOn->DeleteGlesPhysicsDebugRenderer(mImpl);
     mImpl = nullptr;
