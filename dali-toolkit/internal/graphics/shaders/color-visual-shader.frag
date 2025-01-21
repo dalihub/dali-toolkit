@@ -407,8 +407,8 @@ void main()
       PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0);
 
       // Decrease potential range, to avoid alias make some hole.
-      gMinOutlinePotential -= gPotentialRange * 0.5;
-      gMaxOutlinePotential -= gPotentialRange * 0.5;
+      gMinOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
+      gMaxOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
 
       discardOpacity = smoothstep(gMinOutlinePotential, gMaxOutlinePotential, gPotential);
     }
