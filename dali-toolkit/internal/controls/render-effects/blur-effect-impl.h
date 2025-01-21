@@ -188,6 +188,7 @@ private:
   // Variables
   float    mDownscaleFactor;
   uint32_t mPixelRadius;
+  uint32_t mDownscaledPixelRadius;
   float    mBellCurveWidth;
 
   bool mSkipBlur : 1;

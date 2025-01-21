@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -733,7 +733,7 @@ void TextureCacheManager::RemoveHashId(const TextureCacheManager::TextureHash te
   auto hashIterator = mTextureHashContainer.find(textureHash);
   if(hashIterator != mTextureHashContainer.end())
   {
-    auto        hashIdList     = hashIterator->second;
+    auto&       hashIdList     = hashIterator->second;
     const auto& hashIdIterator = std::find(hashIdList.cbegin(), hashIdList.cend(), textureId);
     if(hashIdIterator != hashIdList.cend())
     {

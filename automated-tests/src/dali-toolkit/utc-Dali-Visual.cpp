@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4783,7 +4783,7 @@ int UtcDaliVisualBorderlineBlendModeTest(void)
     application.GetScene().Remove(actor);
   }
 
-  // Case 4 : Test which animated corner radius occur.
+  // Case 4 : Test which animated corner radius or blur radius occur.
   {
     tet_printf("Test borderline animate case\n");
     Property::Map propertyMap;
@@ -4809,6 +4809,7 @@ int UtcDaliVisualBorderlineBlendModeTest(void)
 
     Animation animation = Animation::New(0.1f);
     animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::BLUR_RADIUS), 1.0f);
     animation.Play();
 
     application.SendNotification();
@@ -4816,7 +4817,7 @@ int UtcDaliVisualBorderlineBlendModeTest(void)
     application.Render(101u); // End of animation
 
     blendModeValue = renderer.GetProperty(Renderer::Property::BLEND_MODE);
-    // BlendMode is ON_WITHOUT_CULL.
+    // BlendMode is still ON_WITHOUT_CULL.
     DALI_TEST_EQUALS(blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION);
 
     application.GetScene().Remove(actor);
@@ -5181,6 +5182,54 @@ int UtcDaliVisualGetPropertyObject02(void)
   propertyTest(visual, "type", false);
   propertyTest(visual, "transform", false);
   propertyTest(visual, "", false);
+
+  END_TEST;
+}
+int UtcDaliVisualGetPropertyObject03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetPropertyObject03 GetProperty for color visual");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map properties;
+  properties[Visual::Property::TYPE] = Visual::COLOR;
+  properties.Insert(ColorVisual::Property::MIX_COLOR, Color::RED);
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  DALI_TEST_CHECK(visual.GetType() == Visual::COLOR);
+
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+    {
+      std::ostringstream oss;
+      oss << "Test for key[" << key << "]";
+      tet_printf("%s\n", oss.str().c_str());
+    }
+
+    Dali::Property property = visual.GetPropertyObject(std::move(key));
+    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
+
+    if(expect)
+    {
+      DALI_TEST_CHECK(property.object && property.propertyIndex != Property::INVALID_INDEX);
+    }
+    else
+    {
+      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+    }
+  };
+
+  // Test to get valid objects
+  propertyTest(visual, Visual::Property::MIX_COLOR, true);
+  propertyTest(visual, Visual::Property::OPACITY, true);
+  propertyTest(visual, Visual::Transform::Property::SIZE, true);
+
+  // Test subclass only property success to get
+  propertyTest(visual, DevelColorVisual::Property::BLUR_RADIUS, true);
+  propertyTest(visual, "blurRadius", true);
+
+  propertyTest(visual, DevelVisual::Property::CORNER_RADIUS, true);
+  propertyTest(visual, DevelVisual::Property::BORDERLINE_WIDTH, true);
 
   END_TEST;
 }
@@ -6558,7 +6607,6 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   Property::Map targetPropertyMap;
   targetPropertyMap[DevelColorVisual::Property::BLUR_RADIUS] = targetBlurRadius;
   targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
-  targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = 10.0f; // Don't care. just dummy
 
   callStack.Reset();
   callStack.Enable(true);
@@ -6582,7 +6630,7 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
     dummyControl,
     {
       {"#define IS_REQUIRED_BLUR", true},
-      {"#define IS_REQUIRED_BORDERLINE", false}, // Note : We ignore borderline when blur radius occured
+      {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", true},
       {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
@@ -6602,7 +6650,6 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   Property::Map targetPropertyMap2;
   targetPropertyMap2[DevelColorVisual::Property::BLUR_RADIUS] = 0.0f;
   targetPropertyMap2[DevelVisual::Property::CORNER_RADIUS]    = Vector4::ZERO;
-  targetPropertyMap2[DevelVisual::Property::BORDERLINE_WIDTH] = 15.0f; // Don't care. just dummy
 
   // Update Properties with CornerRadius
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap2);
@@ -6622,8 +6669,8 @@ int UtcDaliVisualUpdatePropertyChangeShader03(void)
   TestShaderCodeContainSubstrings(
     dummyControl,
     {
-      {"#define IS_REQUIRED_BLUR", true},           // Note : mAlwaysUsingBlurRadius is true.
-      {"#define IS_REQUIRED_BORDERLINE", false},    // Note : We ignore borderline when blur radius occured
+      {"#define IS_REQUIRED_BLUR", true}, // Note : mAlwaysUsingBlurRadius is true.
+      {"#define IS_REQUIRED_BORDERLINE", false},
       {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
       {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
     },
@@ -6880,7 +6927,7 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
       dummyControl,
       {
         {"#define IS_REQUIRED_BLUR", true},
-        {"#define IS_REQUIRED_BORDERLINE", false}, // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_BORDERLINE", true},
         {"#define IS_REQUIRED_ROUNDED_CORNER", true},
         {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}},
         {"#define SL_VERSION_LOW", {false, true}},
@@ -6922,7 +6969,7 @@ int UtcDaliVisualUpdatePropertyChangeShader05(void)
       dummyControl,
       {
         {"#define IS_REQUIRED_BLUR", true},                     // Note : mAlwaysUsingBlurRadius is true.
-        {"#define IS_REQUIRED_BORDERLINE", false},              // Note : We ignore borderline when blur radius occured
+        {"#define IS_REQUIRED_BORDERLINE", true},               // Note : mAlwaysUsingBorderline is true.
         {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
         {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
         {"#define SL_VERSION_LOW", {false, true}},
@@ -6957,6 +7004,7 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
   static std::vector<UniformData> customUniforms =
     {
       UniformData("uCutoutWithCornerRadius", Property::Type::INTEGER),
+      UniformData("uCutoutOutside", Property::Type::INTEGER),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -6964,8 +7012,8 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  // Test (Enable/Disable) CornerRadius, (Enable/Disable) Borderline, (Enable/Disable) Blur, and 3 kind of CutoutPolicy
-  for(int testCase = 0; testCase < 2 * 2 * 2 * 3; ++testCase)
+  // Test (Enable/Disable) CornerRadius, (Enable/Disable) Borderline, (Enable/Disable) Blur, and 5 kind of CutoutPolicy
+  for(int testCase = 0; testCase < 2 * 2 * 2 * 5; ++testCase)
   {
     const bool enableCornerRadius = (testCase & 1);
     const bool enableBorderline   = (testCase & 2);
@@ -6974,7 +7022,9 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     // clang-format off
     const DevelColorVisual::CutoutPolicy::Type cutoutPolicy = (testCase / 8) == 0 ? DevelColorVisual::CutoutPolicy::NONE :
                                                               (testCase / 8) == 1 ? DevelColorVisual::CutoutPolicy::CUTOUT_VIEW :
-                                                                                    DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS;
+                                                              (testCase / 8) == 2 ? DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS :
+                                                              (testCase / 8) == 3 ? DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE :
+                                                                                    DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS;
     // clang-format on
 
     Property::Map propertyMap;
@@ -7013,7 +7063,7 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
       dummyControl,
       {
         {"#define IS_REQUIRED_BLUR", enableBlur},
-        {"#define IS_REQUIRED_BORDERLINE", !enableBlur && enableBorderline}, ///< Since borderline is ignored, due to blur enabled.
+        {"#define IS_REQUIRED_BORDERLINE", enableBorderline},
         {"#define IS_REQUIRED_ROUNDED_CORNER", enableCornerRadius},
         {"#define IS_REQUIRED_CUTOUT", cutoutPolicy != DevelColorVisual::CutoutPolicy::NONE},
       },
@@ -7022,7 +7072,8 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     if(cutoutPolicy != DevelColorVisual::CutoutPolicy::NONE)
     {
       auto& gl = application.GetGlAbstraction();
-      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS ? 1 : 0), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutOutside", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
     }
     dummyControl.Unparent();
 

@@ -139,6 +139,27 @@ public:
 
   }
 
+  void SetAutoRotationEnabled(bool enable)
+  {
+
+  }
+
+  bool IsAutoRotationEnabled() const
+  {
+    return false;
+  }
+
+  void SetLetterBoxEnabled(bool enable)
+  {
+
+  }
+
+  bool IsLetterBoxEnabled() const
+  {
+    return false;
+  }
+
+
 public:
 
   std::string mUrl;
@@ -384,6 +405,27 @@ void VideoPlayer::SceneDisconnection()
 {
   Internal::Adaptor::GetImplementation( *this ).SceneDisconnection();
 }
+
+void VideoPlayer::SetAutoRotationEnabled(bool enable)
+{
+  Internal::Adaptor::GetImplementation( *this ).SetAutoRotationEnabled(enable);
+}
+
+bool VideoPlayer::IsAutoRotationEnabled() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).IsAutoRotationEnabled();
+}
+
+void VideoPlayer::SetLetterBoxEnabled(bool enable)
+{
+  Internal::Adaptor::GetImplementation( *this ).SetLetterBoxEnabled(enable);
+}
+
+bool VideoPlayer::IsLetterBoxEnabled() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).IsLetterBoxEnabled();
+}
+
 
 } // namespace Dali;
 

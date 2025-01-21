@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, NONE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_VIEW_WITH_CORNER_RADIUS)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_OUTSIDE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_OUTSIDE_WITH_CORNER_RADIUS)
 DALI_ENUM_TO_STRING_TABLE_END(CUTOUT_POLICY)
 
 } // unnamed namespace
@@ -124,7 +126,12 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
         // Change the shader must not be occured many times. we always have to use blur feature.
         mAlwaysUsingBlurRadius = true;
 
-        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        if(!IsBorderlineRequired())
+        {
+          // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+        }
+
         // Change shader
         if(!mImpl->mCustomShader)
         {
@@ -232,8 +239,10 @@ void ColorVisual::OnInitialize()
 
   if(IsCutoutRequired())
   {
-    int cutoutWithCornerRadius = (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) ? 1 : 0;
+    int cutoutWithCornerRadius = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
+    int cutoutOutside          = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
     mImpl->mRenderer.RegisterUniqueProperty("uCutoutWithCornerRadius", cutoutWithCornerRadius);
+    mImpl->mRenderer.RegisterUniqueProperty("uCutoutOutside", cutoutOutside);
   }
 
   // Register transform properties
@@ -261,7 +270,8 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
     return Dali::Property(handle, Property::INVALID_INDEX);
   }
 
-  if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
+  if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
+     (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
   {
     const bool updateShader = !mImpl->mCustomShader && !IsBlurRequired();
 
@@ -277,7 +287,11 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
       // Change shader
       UpdateShader();
     }
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    if(!IsBorderlineRequired())
+    {
+      // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    }
     return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::BLUR_RADIUS);
   }
 

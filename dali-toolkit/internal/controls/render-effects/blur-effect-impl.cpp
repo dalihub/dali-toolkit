@@ -75,6 +75,7 @@ BlurEffectImpl::BlurEffectImpl(bool isBackground)
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
+  mDownscaledPixelRadius(static_cast<uint32_t>(BLUR_EFFECT_PIXEL_RADIUS * BLUR_EFFECT_DOWNSCALE_FACTOR)),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
   mSkipBlur(false),
   mIsBackground(isBackground)
@@ -86,6 +87,7 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
   mInternalRoot(Actor::New()),
   mDownscaleFactor(downscaleFactor),
   mPixelRadius(blurRadius),
+  mDownscaledPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
   mSkipBlur(false),
   mIsBackground(isBackground)
@@ -113,9 +115,9 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
     mPixelRadius     = fixedBlurRadius;
   }
 
-  mPixelRadius = static_cast<uint32_t>(mPixelRadius * mDownscaleFactor);
+  mDownscaledPixelRadius = static_cast<uint32_t>(mPixelRadius * mDownscaleFactor);
 
-  if(DALI_UNLIKELY((mPixelRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+  if(DALI_UNLIKELY((mDownscaledPixelRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
   {
     mSkipBlur = true;
     DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
@@ -194,8 +196,8 @@ void BlurEffectImpl::OnInitialize()
 
   // Calculate bell curve width
   {
-    const float epsilon     = 1e-2f / (mPixelRadius * 2);
-    const float localOffset = (mPixelRadius * 2) - 1;
+    const float epsilon     = 1e-2f / (mDownscaledPixelRadius * 2);
+    const float localOffset = (mDownscaledPixelRadius * 2) - 1;
 
     float lowerBoundBellCurveWidth = Math::MACHINE_EPSILON_10000;
     float upperBoundBellCurveWidth = MAXIMUM_BELL_CURVE_WIDTH;
@@ -223,7 +225,7 @@ void BlurEffectImpl::OnInitialize()
 
     // shader
     std::ostringstream fragmentStringStream;
-    fragmentStringStream << "#define NUM_SAMPLES " << (mPixelRadius >> 1) << "\n";
+    fragmentStringStream << "#define NUM_SAMPLES " << (mDownscaledPixelRadius >> 1) << "\n";
     fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
     std::string fragmentSource(fragmentStringStream.str());
 
@@ -426,7 +428,7 @@ void BlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, con
 
 void BlurEffectImpl::SetShaderConstants(uint32_t downsampledWidth, uint32_t downsampledHeight)
 {
-  const uint32_t sampleCount    = mPixelRadius >> 1; // compression
+  const uint32_t sampleCount    = mDownscaledPixelRadius >> 1; // compression
   const uint32_t kernelSize     = sampleCount * 4 - 1;
   const uint32_t halfKernelSize = kernelSize / 2 + 1; // Gaussian curve is symmetric
 

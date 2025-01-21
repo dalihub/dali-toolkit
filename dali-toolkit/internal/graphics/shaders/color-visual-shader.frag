@@ -27,6 +27,7 @@ UNIFORM_BLOCK FragBlock
 
 #if defined(IS_REQUIRED_CUTOUT)
     UNIFORM lowp int uCutoutWithCornerRadius;
+    UNIFORM lowp int uCutoutOutside;
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
@@ -40,7 +41,8 @@ UNIFORM_BLOCK SharedBlock
 
 #ifdef IS_REQUIRED_BLUR
     UNIFORM highp float blurRadius;
-#elif defined(IS_REQUIRED_BORDERLINE)
+#endif
+#ifdef IS_REQUIRED_BORDERLINE
     UNIFORM highp float borderlineWidth;
     UNIFORM highp float borderlineOffset;
     UNIFORM lowp vec4 borderlineColor;
@@ -70,8 +72,7 @@ highp float gPotential = 0.0;
 highp float gPotentialRange = 0.0;
 highp float gMaxOutlinePotential = 0.0;
 highp float gMinOutlinePotential = 0.0;
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#ifdef IS_REQUIRED_BORDERLINE
 highp float gMaxInlinePotential = 0.0;
 highp float gMinInlinePotential = 0.0;
 #endif
@@ -103,8 +104,7 @@ void calculateFragmentPosition(highp vec2 position, highp vec2 halfSizeOfRect)
 void calculatePosition(highp float currentBorderlineWidth)
 {
   gCenterPosition = -gRadius;
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#ifdef IS_REQUIRED_BORDERLINE
   gCenterPosition += currentBorderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
 #endif
   gDiff = gFragmentPosition - gCenterPosition;
@@ -151,11 +151,9 @@ void setupMinMaxPotential(highp float currentBorderlineWidth)
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
 
-#ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+#ifdef IS_REQUIRED_BORDERLINE
   gMaxInlinePotential = gMaxOutlinePotential - currentBorderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - currentBorderlineWidth;
-#else
 #endif
 
   // reduce defect near edge of rounded corner.
@@ -174,8 +172,52 @@ void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec
 }
 #endif
 
+#ifdef IS_REQUIRED_BORDERLINE
 #ifdef IS_REQUIRED_BLUR
-#elif defined(IS_REQUIRED_BORDERLINE)
+// TODO : Current logic is only for PoC! We should make clean up!
+lowp vec4 convertBorderlineColorWithBlur(lowp vec4 textureColor,highp float currentBorderlineWidth, highp float blurRadius)
+{
+  highp float potential = gPotential;
+
+  blurRadius = max(blurRadius, 0.0) + vAliasMargin;
+
+  lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineColorAlpha;
+
+  mediump float borderlineOpacity = 0.0;
+  mediump float textureOpacity = 0.0;
+
+  highp float outsideThreshold = gRadius;
+  highp float insideThreshold  = gRadius - currentBorderlineWidth;
+  highp float textureOutlineThreshold = -gCenterPosition;
+
+  // borderlineOpacity should be 0~1 whenever potential over insideThreshold
+  // and 1~0 whenever potential outsideThreshold.
+  // To combine this 2 information, we can use smoothstep and multiply function.
+
+  borderlineOpacity = smoothstep(insideThreshold - blurRadius, insideThreshold + blurRadius, potential) *
+                      (1.0 - smoothstep(outsideThreshold - blurRadius, outsideThreshold + blurRadius, potential));
+
+  textureOpacity = 1.0 - smoothstep(textureOutlineThreshold - blurRadius, textureOutlineThreshold + blurRadius, potential);
+
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineOpacity;
+  borderlineColorAlpha *= borderlineOpacity;
+  textureColor *= textureOpacity;
+
+  // Manual blend operation with premultiplied colors.
+  // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
+  // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
+  // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+  // Else, return vec4((rgb*alpha) / alpha, alpha)
+
+  lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+  lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+  return vec4(finalMultipliedRGB, finalAlpha);
+}
+#else
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
   highp float potential = gPotential;
@@ -238,6 +280,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
 }
 #endif
+#endif
 
 #ifdef IS_REQUIRED_BLUR
 #elif defined(IS_REQUIRED_ROUNDED_CORNER)
@@ -263,7 +306,7 @@ mediump float calculateCornerOpacity()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
-#if defined(SL_VERSION_LOW) || defined(IS_REQUIRED_SQUIRCLE_CORNER)
+#if defined(SL_VERSION_LOW) || defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Legacy code for low version glsl
 mediump float calculateBlurOpacity()
 {
@@ -353,6 +396,7 @@ void main()
 
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;
+  lowp int cutoutInsideOccured = 0;
 
   if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 && abs(vPositionFromCenter.y) <= uSize.y * 0.5)
   {
@@ -363,8 +407,8 @@ void main()
       PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0);
 
       // Decrease potential range, to avoid alias make some hole.
-      gMinOutlinePotential -= gPotentialRange * 0.5;
-      gMaxOutlinePotential -= gPotentialRange * 0.5;
+      gMinOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
+      gMaxOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
 
       discardOpacity = smoothstep(gMinOutlinePotential, gMaxOutlinePotential, gPotential);
     }
@@ -372,14 +416,26 @@ void main()
     {
       discardOpacity = 0.0;
     }
-
-    if(discardOpacity < 0.001)
-    {
-      discard;
-    }
 #else
-    discard;
+    cutoutInsideOccured = 1;
 #endif
+  }
+
+#if defined(IS_REQUIRED_ROUNDED_CORNER)
+  if(uCutoutOutside == 1)
+  {
+    discardOpacity = 1.0 - discardOpacity;
+  }
+
+  if(discardOpacity < 0.001)
+  {
+    cutoutInsideOccured = 1;
+  }
+#endif
+
+  if((uCutoutOutside ^ cutoutInsideOccured) == 0)
+  {
+    discard;
   }
 #endif
 
@@ -401,14 +457,22 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
+#ifdef IS_REQUIRED_BORDERLINE
+    tempBorderlineWidth = borderlineWidth;
+#endif
     calculatePosition(tempBorderlineWidth);
     calculatePotential();
+
+#ifdef IS_REQUIRED_BORDERLINE
+    gl_FragColor = convertBorderlineColorWithBlur(targetColor, tempBorderlineWidth, blurRadius);
+#else
     setupMinMaxPotential(tempBorderlineWidth);
 
     gl_FragColor = targetColor;
 
     mediump float opacity = calculateBlurOpacity();
     gl_FragColor *= opacity;
+#endif
 #else
 #if defined(IS_REQUIRED_ROUNDED_CORNER) && !defined(IS_REQUIRED_BORDERLINE)
     // skip rounded corner calculate for performance

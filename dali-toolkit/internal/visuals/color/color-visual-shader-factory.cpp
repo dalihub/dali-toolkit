@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,9 @@ constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_SQUIRCLE_CORNER_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_BORDERLINE_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_SQUIRCLE_BORDERLINE_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER,
@@ -49,6 +52,9 @@ constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::COLOR_SHADER_CUTOUT_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_CORNER_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_CORNER_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_BORDERLINE_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_BORDERLINE_BLUR_EDGE,
 };
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
 
@@ -59,10 +65,9 @@ enum ColorVisualRequireFlag
   ROUNDED_CORNER  = 1,
   SQUIRCLE_CORNER = 2,
 
-  BORDERLINE = (1) * 3,
-  BLUR       = (2) * 3,
-
-  CUTOUT = (1) * 3 * 3,
+  BORDERLINE = (1 << 0) * 3,
+  BLUR       = (1 << 1) * 3,
+  CUTOUT     = (1 << 2) * 3,
 };
 
 constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
@@ -131,7 +136,7 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
     shaderTypeFlag += ColorVisualRequireFlag::ROUNDED_CORNER;
   }
 
-  if(mColorBorderline && !mColorBlur)
+  if(mColorBorderline)
   {
     shaderTypeFlag += ColorVisualRequireFlag::BORDERLINE;
   }
@@ -163,7 +168,7 @@ void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixLi
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
   }
-  if(mColorBorderline == Borderline::ENABLED && mColorBlur == Blur::DISABLED)
+  if(mColorBorderline == Borderline::ENABLED)
   {
     vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
   }
@@ -192,7 +197,7 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
       fragmentShaderPrefixList += "#define SL_VERSION_LOW\n";
     }
   }
-  if(mColorBorderline == Borderline::ENABLED && mColorBlur == Blur::DISABLED)
+  if(mColorBorderline == Borderline::ENABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
   }
