@@ -55,6 +55,26 @@ class SceneView : public Dali::Toolkit::Internal::Control
 {
 public:
   /**
+   * Data to store Capture related objects.
+   */
+  struct CaptureData
+  {
+    int32_t                  mStartTick;
+    int32_t                  mCaptureId;                        // Unique Key to distinguish requested Captures.
+    float                    mCaptureCameraOriginalAspectRatio; // Original AspectRatio of the input cameras
+    Dali::Toolkit::ImageUrl  mCaptureUrl;                       // URL for first captured buffer, but it is Y-inverted.
+    Dali::Toolkit::ImageView mCaptureImageView;                 // ImageView to draw first capture buffer to be transfered as input for invert.
+    Dali::CameraActor        mCaptureCamera;                    // CameraActor to draw first capture buffer
+    Dali::RenderTask         mCaptureTask;                      // RenderTask that is used to capture first buffer.
+    Dali::Texture            mCaptureTexture;                   // First Captured texture, but it is Y-inverted.
+    Dali::FrameBuffer        mCaptureFrameBuffer;               // First Captured FBO, but it is Y-inverted.
+    Dali::CameraActor        mCaptureInvertCamera;              // CameraActor to invert first captured buffer by second pass.
+    Dali::RenderTask         mCaptureInvertTask;                // RenderTask to invert first captured buffer.
+    Dali::Texture            mCaptureInvertTexture;             // Result texture of second pass. This is final Texture result.
+    Dali::FrameBuffer        mCaptureInvertFrameBuffer;         // FBO for firnal Texture result
+  };
+
+  /**
    * @brief Creates a new SceneView.
    *
    * @return A public handle to the newly allocated SceneView.
@@ -454,25 +474,23 @@ private:
    */
   bool OnTimeOut();
 
-private:
   /**
-   * Data to store Capture related objects.
+   * @brief Reset CaptureData when the capture is finished or failed.
+   * @param[in] captureData CaptureData to be reset.
    */
-  struct CaptureData
-  {
-    int32_t                  mStartTick;
-    int32_t                  mCaptureId;                // Unique Key to distinguish requested Captures.
-    Dali::Toolkit::ImageUrl  mCaptureUrl;               // URL for first captured buffer, but it is Y-inverted.
-    Dali::Toolkit::ImageView mCaptureImageView;         // ImageView to draw first capture buffer to be transfered as input for invert.
-    Dali::RenderTask         mCaptureTask;              // RenderTask that is used to capture first buffer.
-    Dali::Texture            mCaptureTexture;           // First Captured texture, but it is Y-inverted.
-    Dali::FrameBuffer        mCaptureFrameBuffer;       // First Captured FBO, but it is Y-inverted.
-    Dali::CameraActor        mCaptureInvertCamera;      // CameraActor to invert first captured buffer by second pass.
-    Dali::RenderTask         mCaptureInvertTask;        // RenderTask to invert first captured buffer.
-    Dali::Texture            mCaptureInvertTexture;     // Result texture of second pass. This is final Texture result.
-    Dali::FrameBuffer        mCaptureInvertFrameBuffer; // FBO for firnal Texture result
-  };
+  void ResetCaptureData(std::shared_ptr<CaptureData> captureData);
 
+  /**
+   * @brief Reset Capture timer when there isn't any capture in progress.
+   */
+  void ResetCaptureTimer();
+
+  /**
+   * @brief Emit capture failed event on idle.
+   */
+  void OnCaptureFailedIdle();
+
+private:
   Toolkit::Visual::Base mVisual;
 
   /////////////////////////////////////////////////////////////
@@ -493,6 +511,8 @@ private:
   float                                               mSkyboxIntensity{1.0f};
   uint8_t                                             mFrameBufferMultiSamplingLevel{4u};
   Dali::Scene3D::SceneView::CaptureFinishedSignalType mCaptureFinishedSignal;
+  std::vector<int32_t>                                mFailedCaptureRequests;
+  CallbackBase*                                       mFailedCaptureCallbacks;
 
   int32_t                                                                mCaptureId{0};     // Capture ID for requested capture, this is incrementally increasing.
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> mCaptureContainer; // Container that stores CaptureData until the Capture is finished.
