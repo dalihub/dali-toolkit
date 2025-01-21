@@ -27,6 +27,7 @@ UNIFORM_BLOCK FragBlock
 
 #if defined(IS_REQUIRED_CUTOUT)
     UNIFORM lowp int uCutoutWithCornerRadius;
+    UNIFORM lowp int uCutoutOutside;
 #endif
 
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
@@ -395,6 +396,7 @@ void main()
 
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;
+  lowp int cutoutInsideOccured = 0;
 
   if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 && abs(vPositionFromCenter.y) <= uSize.y * 0.5)
   {
@@ -414,14 +416,26 @@ void main()
     {
       discardOpacity = 0.0;
     }
-
-    if(discardOpacity < 0.001)
-    {
-      discard;
-    }
 #else
-    discard;
+    cutoutInsideOccured = 1;
 #endif
+  }
+
+#if defined(IS_REQUIRED_ROUNDED_CORNER)
+  if(uCutoutOutside == 1)
+  {
+    discardOpacity = 1.0 - discardOpacity;
+  }
+
+  if(discardOpacity < 0.001)
+  {
+    cutoutInsideOccured = 1;
+  }
+#endif
+
+  if((uCutoutOutside ^ cutoutInsideOccured) == 0)
+  {
+    discard;
   }
 #endif
 

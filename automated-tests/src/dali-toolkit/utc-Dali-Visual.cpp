@@ -7004,6 +7004,7 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
   static std::vector<UniformData> customUniforms =
     {
       UniformData("uCutoutWithCornerRadius", Property::Type::INTEGER),
+      UniformData("uCutoutOutside", Property::Type::INTEGER),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -7011,8 +7012,8 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  // Test (Enable/Disable) CornerRadius, (Enable/Disable) Borderline, (Enable/Disable) Blur, and 3 kind of CutoutPolicy
-  for(int testCase = 0; testCase < 2 * 2 * 2 * 3; ++testCase)
+  // Test (Enable/Disable) CornerRadius, (Enable/Disable) Borderline, (Enable/Disable) Blur, and 5 kind of CutoutPolicy
+  for(int testCase = 0; testCase < 2 * 2 * 2 * 5; ++testCase)
   {
     const bool enableCornerRadius = (testCase & 1);
     const bool enableBorderline   = (testCase & 2);
@@ -7021,7 +7022,9 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     // clang-format off
     const DevelColorVisual::CutoutPolicy::Type cutoutPolicy = (testCase / 8) == 0 ? DevelColorVisual::CutoutPolicy::NONE :
                                                               (testCase / 8) == 1 ? DevelColorVisual::CutoutPolicy::CUTOUT_VIEW :
-                                                                                    DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS;
+                                                              (testCase / 8) == 2 ? DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS :
+                                                              (testCase / 8) == 3 ? DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE :
+                                                                                    DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS;
     // clang-format on
 
     Property::Map propertyMap;
@@ -7069,7 +7072,8 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     if(cutoutPolicy != DevelColorVisual::CutoutPolicy::NONE)
     {
       auto& gl = application.GetGlAbstraction();
-      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS ? 1 : 0), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutOutside", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
     }
     dummyControl.Unparent();
 
