@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-helper-functions.h>
 #include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
@@ -656,10 +657,27 @@ void LogicalModel::ClearAnchors()
   FreeAnchors(mAnchors);
 }
 
+void LogicalModel::ClearBidirectionalParagraphInfo()
+{
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+  if(bidirectionalSupport)
+  {
+    for(auto it = mBidirectionalParagraphInfo.Begin(),
+        endIt = mBidirectionalParagraphInfo.End();
+        it != endIt;
+        ++it)
+    {
+      auto infoIndex = it->bidirectionalInfoIndex;
+      bidirectionalSupport.DestroyInfo(infoIndex);
+    }
+  }
+}
+
 LogicalModel::~LogicalModel()
 {
   ClearFontDescriptionRuns();
   ClearEmbeddedImages();
+  ClearBidirectionalParagraphInfo();
 }
 
 LogicalModel::LogicalModel()

@@ -135,6 +135,7 @@ void AsyncTextLoader::ClearTextModelData()
   mTextModel->mLogicalModel->ClearUnderlineRuns();
   mTextModel->mLogicalModel->ClearEmbeddedImages();
   mTextModel->mLogicalModel->ClearAnchors();
+  mTextModel->mLogicalModel->ClearBidirectionalParagraphInfo();
 
   // Free the allocated memory used to store the conversion table in the bidirectional line info run.
   for(Vector<BidirectionalLineInfoRun>::Iterator it    = mTextModel->mLogicalModel->mBidirectionalLineInfo.Begin(),
