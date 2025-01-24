@@ -152,6 +152,8 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
 
       Graphics::Texture* graphicsTexture = nullptr;
 
+      const Dali::Pixel::Format pixelFormat = pixelData.GetPixelFormat();
+
       // TODO : Could we detect TEXTURE_2D or TEXTURE_CUBE case in future?
       {
         // We always need to create new one
@@ -159,7 +161,7 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
         createInfo
           .SetTextureType(Dali::Graphics::ConvertTextureType(Dali::TextureType::TEXTURE_2D))
           .SetUsageFlags(static_cast<Graphics::TextureUsageFlags>(Graphics::TextureUsageFlagBits::SAMPLE))
-          .SetFormat(Dali::Graphics::ConvertPixelFormat(pixelData.GetPixelFormat()))
+          .SetFormat(Dali::Graphics::ConvertPixelFormat(pixelFormat))
           .SetSize({pixelData.GetWidth(), pixelData.GetHeight()})
           .SetLayout(Graphics::TextureLayout::LINEAR)
           .SetData(nullptr)
@@ -174,6 +176,8 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
       {
         Graphics::TextureUpdateInfo info{};
 
+        const uint32_t bytesPerPixel = Dali::Pixel::GetBytesPerPixel(pixelFormat);
+
         info.dstTexture   = graphicsTexture;
         info.dstOffset2D  = {0u, 0u};
         info.layer        = 0u;
@@ -182,8 +186,8 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
         info.srcExtent2D  = {pixelData.GetWidth(), pixelData.GetHeight()};
         info.srcOffset    = 0;
         info.srcSize      = Dali::Integration::GetPixelDataBuffer(pixelData).bufferSize;
-        info.srcStride    = pixelData.GetStride();
-        info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelData.GetPixelFormat());
+        info.srcStride    = bytesPerPixel ? (pixelData.GetStrideBytes() / bytesPerPixel) : 0u;  ///< Note : Graphics stride use pixel scale!
+        info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelFormat);
 
         Graphics::TextureUpdateSourceInfo updateSourceInfo{};
         updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA;
