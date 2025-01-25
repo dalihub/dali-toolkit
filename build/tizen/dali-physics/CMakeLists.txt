@@ -92,6 +92,8 @@ MESSAGE(STATUS "2D sources (GLES): ${physics2d_gles_src_files}")
 MESSAGE(STATUS "3D sources: ${physics3d_src_files}")
 MESSAGE(STATUS "3D sources (GLES): ${physics3d_gles_src_files}")
 
+PKG_CHECK_MODULES(OPENGLES glesv2 egl)
+
 ADD_LIBRARY("${name}-2d" SHARED ${physics2d_src_files})
 TARGET_LINK_LIBRARIES("${name}-2d"
   ${DALICORE_LDFLAGS}
@@ -104,6 +106,7 @@ ADD_LIBRARY("${name}-2d-gles" SHARED ${physics2d_gles_src_files})
 TARGET_LINK_LIBRARIES("${name}-2d-gles"
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
+  ${OPENGLES_LDFLAGS}
   dali2-toolkit
   chipmunk
   ${COVERAGE})
@@ -122,6 +125,7 @@ ADD_LIBRARY("${name}-3d-gles" SHARED ${physics3d_gles_src_files})
 TARGET_LINK_LIBRARIES("${name}-3d-gles"
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
+  ${OPENGLES_LDFLAGS}
   dali2-toolkit
   bullet3
   ${COVERAGE})
