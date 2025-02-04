@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,27 +81,23 @@ struct AtlasRenderer::Impl
   struct Extent
   {
     Extent()
-    : mBaseLine(0.0f),
+    : mMeshRecordIndex(0u),
+      mBaseLine(0.0f),
       mLeft(0.0f),
       mRight(0.0f),
-      mUnderlinePosition(0.0f),
-      mLineThickness(0.0f),
-      mMeshRecordIndex(0u),
-      mUnderlineChunkId(0u),
-      mStrikethroughPosition(0.0f),
-      mStrikethroughChunkId(0u)
+      mLineChunkId(0u),
+      mLinePosition(0.0f),
+      mLineThickness(0.0f)
     {
     }
 
+    uint32_t mMeshRecordIndex;
     float    mBaseLine;
     float    mLeft;
     float    mRight;
-    float    mUnderlinePosition;
+    uint32_t mLineChunkId;
+    float    mLinePosition;
     float    mLineThickness;
-    uint32_t mMeshRecordIndex;
-    uint32_t mUnderlineChunkId;
-    float    mStrikethroughPosition;
-    uint32_t mStrikethroughChunkId;
   };
 
   struct MaxBlockSize
@@ -295,15 +291,19 @@ struct AtlasRenderer::Impl
                     const Vector4&           color,
                     uint16_t                 outline,
                     AtlasManager::AtlasSlot& slot,
-                    bool                     decorationlineGlyph,
-                    float                    currentUnderlinePosition,
-                    float                    currentlineThickness,
                     std::vector<MeshRecord>& meshContainer,
                     Vector<TextCacheEntry>&  newTextCache,
-                    Vector<Extent>&          extents,
-                    uint32_t                 underlineChunkId,
                     bool                     isGlyphCached,
-                    uint32_t                 strikethroughChunkId)
+                    float                    fontMetricsAscender,
+                    bool                     underlineEnabled,
+                    uint32_t                 underlineChunkId,
+                    float                    underlinePosition,
+                    float                    underlineThickness,
+                    Vector<Extent>&          underlineExtents,
+                    bool                     strikethroughEnabled,
+                    uint32_t                 strikethroughChunkId,
+                    float                    strikethroughThickness,
+                    Vector<Extent>&          strikethroughExtents)
   {
     // Generate mesh data for this quad, plugging in our supplied position
     AtlasManager::Mesh2D newMesh;
@@ -336,20 +336,23 @@ struct AtlasRenderer::Impl
 
     // Since Free Type font doesn't contain the strikethrough-position property,
     // strikethrough position will be calculated by moving the underline position upwards by half the value of the line height.
-    float strikethroughStartingYPosition = (position.y + glyph.yBearing + currentUnderlinePosition) - ((glyph.height) * HALF);
+    const float baseLine              = position.y + glyph.yBearing;
+    const float strikethroughPosition = (baseLine + underlinePosition) - (fontMetricsAscender * HALF);
 
-    // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
-    StitchTextMesh(meshContainer,
+    StitchTextMesh(slot,
+                   meshContainer,
                    newMesh,
-                   extents,
-                   position.y + glyph.yBearing,
-                   decorationlineGlyph,
-                   currentUnderlinePosition,
-                   currentlineThickness,
-                   slot,
+                   baseLine,
+                   underlineEnabled,
                    underlineChunkId,
-                   strikethroughStartingYPosition,
-                   strikethroughChunkId);
+                   underlinePosition,
+                   underlineThickness,
+                   underlineExtents,
+                   strikethroughEnabled,
+                   strikethroughChunkId,
+                   strikethroughPosition,
+                   strikethroughThickness,
+                   strikethroughExtents);
   }
 
   void CreateActors(const std::vector<MeshRecord>& meshContainer,
@@ -438,7 +441,7 @@ struct AtlasRenderer::Impl
 
     std::vector<MeshRecord> meshContainer;
     std::vector<MeshRecord> meshContainerOutline;
-    Vector<Extent>          extents;
+    Vector<Extent>          underlineExtents;
     Vector<Extent>          strikethroughExtents;
     mDepth = depth;
 
@@ -504,6 +507,7 @@ struct AtlasRenderer::Impl
     FontId lastFontId                  = 0;
     Style  style                       = STYLE_NORMAL;
     float  currentUnderlinePosition    = ZERO;
+    float  currentFontMetricsAscender  = ZERO;
     bool   thereAreUnderlinedGlyphs    = false;
     bool   thereAreStrikethroughGlyphs = false;
 
@@ -598,7 +602,8 @@ struct AtlasRenderer::Impl
             if(isGlyphStrikethrough || isGlyphUnderlined)
             {
               //The currentUnderlinePosition will be used for both Underline and/or Strikethrough
-              currentUnderlinePosition = FetchUnderlinePositionFromFontMetrics(lastDecorativeLinesFontMetrics);
+              currentUnderlinePosition   = FetchUnderlinePositionFromFontMetrics(lastDecorativeLinesFontMetrics);
+              currentFontMetricsAscender = lastDecorativeLinesFontMetrics.ascender;
             }
           }
 
@@ -672,56 +677,50 @@ struct AtlasRenderer::Impl
           {
             underlineChunkId++;
             mapUnderlineChunkIdWithProperties.insert(std::pair<uint32_t, UnderlineStyleProperties>(underlineChunkId, currentUnderlineProperties));
+            if(currentUnderlineProperties.height < 1.0f)
+            {
+              maxUnderlineHeight = 1.0f;
+            }
           }
 
           //Keep status of underlined for previous glyph to check consecutive indices
           isPreUnderlined        = isGlyphUnderlined;
           preUnderlineProperties = currentUnderlineProperties;
 
-          GenerateMesh(glyph,
-                       positionPlusOutlineOffset,
-                       color,
-                       NO_OUTLINE,
-                       slot,
-                       isGlyphUnderlined,
-                       currentUnderlinePosition,
-                       maxUnderlineHeight,
-                       meshContainer,
-                       newTextCache,
-                       extents,
-                       underlineChunkId,
-                       false,
-                       0u);
-
-          if(isGlyphStrikethrough)
+          //The new strikethrough chunk. Add new id if they are not consecutive indices (this is for Markup case)
+          // Examples: "Hello <s>World</s> Hello <s>World</s>", "<s>World</s> Hello <s>World</s>", "<s>   World</s> Hello <s>World</s>"
+          if((!isPreStrikethrough && isGlyphStrikethrough) || (isGlyphStrikethrough && (preStrikethroughProperties != currentStrikethroughProperties)))
           {
-            //The new strikethrough chunk. Add new id if they are not consecutive indices (this is for Markup case)
-            // Examples: "Hello <s>World</s> Hello <s>World</s>", "<s>World</s> Hello <s>World</s>", "<s>   World</s> Hello <s>World</s>"
-            if((!isPreStrikethrough) || (preStrikethroughProperties != currentStrikethroughProperties))
+            strikethroughChunkId++;
+            mapStrikethroughChunkIdWithProperties.insert(std::pair<uint32_t, StrikethroughStyleProperties>(strikethroughChunkId, currentStrikethroughProperties));
+            if(currentStrikethroughProperties.height < 1.0f)
             {
-              strikethroughChunkId++;
-              mapStrikethroughChunkIdWithProperties.insert(std::pair<uint32_t, StrikethroughStyleProperties>(strikethroughChunkId, currentStrikethroughProperties));
+              maxStrikethroughHeight = 1.0f;
             }
-
-            GenerateMesh(glyph,
-                         positionPlusOutlineOffset,
-                         color,
-                         NO_OUTLINE,
-                         slot,
-                         isGlyphStrikethrough,
-                         0.0f,
-                         maxStrikethroughHeight,
-                         meshContainer,
-                         newTextCache,
-                         strikethroughExtents,
-                         0u,
-                         true,
-                         strikethroughChunkId);
           }
 
           //Keep status of Strikethrough for previous glyph to check consecutive indices
           isPreStrikethrough         = isGlyphStrikethrough;
           preStrikethroughProperties = currentStrikethroughProperties;
+
+          GenerateMesh(glyph,
+                       positionPlusOutlineOffset,
+                       color,
+                       NO_OUTLINE,
+                       slot,
+                       meshContainer,
+                       newTextCache,
+                       false,
+                       currentFontMetricsAscender,
+                       isGlyphUnderlined,
+                       underlineChunkId,
+                       currentUnderlinePosition,
+                       maxUnderlineHeight,
+                       underlineExtents,
+                       isGlyphStrikethrough,
+                       strikethroughChunkId,
+                       maxStrikethroughHeight,
+                       strikethroughExtents);
 
           lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
@@ -733,15 +732,19 @@ struct AtlasRenderer::Impl
                        outlineColor,
                        outlineWidth,
                        slotOutline,
-                       false,
-                       currentUnderlinePosition,
-                       maxUnderlineHeight,
                        meshContainerOutline,
                        newTextCache,
-                       extents,
-                       0u,
                        false,
-                       0u);
+                       currentFontMetricsAscender,
+                       false,
+                       0u,
+                       currentUnderlinePosition,
+                       maxUnderlineHeight,
+                       underlineExtents,
+                       false,
+                       0u,
+                       maxStrikethroughHeight,
+                       strikethroughExtents);
         }
       }
 
@@ -758,7 +761,7 @@ struct AtlasRenderer::Impl
     if(thereAreUnderlinedGlyphs)
     {
       // Check to see if any of the text needs an underline
-      GenerateUnderlines(meshContainer, extents, viewUnderlineProperties, mapUnderlineChunkIdWithProperties);
+      GenerateUnderlines(meshContainer, underlineExtents, viewUnderlineProperties, mapUnderlineChunkIdWithProperties);
     }
 
     if(thereAreStrikethroughGlyphs)
@@ -900,17 +903,20 @@ struct AtlasRenderer::Impl
     return actor;
   }
 
-  void StitchTextMesh(std::vector<MeshRecord>& meshContainer,
+  void StitchTextMesh(AtlasManager::AtlasSlot& slot,
+                      std::vector<MeshRecord>& meshContainer,
                       AtlasManager::Mesh2D&    newMesh,
-                      Vector<Extent>&          extents,
                       float                    baseLine,
-                      bool                     decorationlineGlyph,
-                      float                    underlinePosition,
-                      float                    lineThickness,
-                      AtlasManager::AtlasSlot& slot,
+                      bool                     underlineEnabled,
                       uint32_t                 underlineChunkId,
+                      float                    underlinePosition,
+                      float                    underlineThickness,
+                      Vector<Extent>&          underlineExtents,
+                      bool                     strikethroughEnabled,
+                      uint32_t                 strikethroughChunkId,
                       float                    strikethroughPosition,
-                      uint32_t                 strikethroughChunkId)
+                      float                    strikethroughThickness,
+                      Vector<Extent>&          strikethroughExtents)
   {
     if(slot.mImageId)
     {
@@ -929,19 +935,29 @@ struct AtlasRenderer::Impl
           // Append the mesh to the existing mesh and adjust any extents
           Toolkit::Internal::AtlasMeshFactory::AppendMesh(mIt->mMesh, newMesh);
 
-          if(decorationlineGlyph)
+          if(underlineEnabled)
           {
-            AdjustExtents(extents,
+            AdjustExtents(underlineExtents,
                           meshContainer,
                           index,
+                          baseLine,
                           left,
                           right,
-                          baseLine,
-                          underlinePosition,
-                          lineThickness,
                           underlineChunkId,
+                          underlinePosition,
+                          underlineThickness);
+          }
+          if(strikethroughEnabled)
+          {
+            AdjustExtents(strikethroughExtents,
+                          meshContainer,
+                          index,
+                          baseLine,
+                          left,
+                          right,
+                          strikethroughChunkId,
                           strikethroughPosition,
-                          strikethroughChunkId);
+                          strikethroughThickness);
           }
 
           return;
@@ -954,20 +970,30 @@ struct AtlasRenderer::Impl
       meshRecord.mMesh    = newMesh;
       meshContainer.push_back(meshRecord);
 
-      if(decorationlineGlyph)
+      if(underlineEnabled)
       {
         // Adjust extents for this new meshrecord
-        AdjustExtents(extents,
+        AdjustExtents(underlineExtents,
                       meshContainer,
                       meshContainer.size() - 1u,
+                      baseLine,
                       left,
                       right,
-                      baseLine,
-                      underlinePosition,
-                      lineThickness,
                       underlineChunkId,
+                      underlinePosition,
+                      underlineThickness);
+      }
+      if(strikethroughEnabled)
+      {
+        AdjustExtents(strikethroughExtents,
+                      meshContainer,
+                      meshContainer.size() - 1u,
+                      baseLine,
+                      left,
+                      right,
+                      strikethroughChunkId,
                       strikethroughPosition,
-                      strikethroughChunkId);
+                      strikethroughThickness);
       }
     }
   }
@@ -975,14 +1001,13 @@ struct AtlasRenderer::Impl
   void AdjustExtents(Vector<Extent>&          extents,
                      std::vector<MeshRecord>& meshRecords,
                      uint32_t                 index,
+                     float                    baseLine,
                      float                    left,
                      float                    right,
-                     float                    baseLine,
-                     float                    underlinePosition,
-                     float                    lineThickness,
-                     uint32_t                 underlineChunkId,
-                     float                    strikethroughPosition,
-                     uint32_t                 strikethroughChunkId)
+                     uint32_t                 lineChunkId,
+                     float                    linePosition,
+                     float                    lineThickness)
+
   {
     bool foundExtent = false;
     for(Vector<Extent>::Iterator eIt    = extents.Begin(),
@@ -990,7 +1015,7 @@ struct AtlasRenderer::Impl
         eIt != eEndIt;
         ++eIt)
     {
-      if(Equals(baseLine, eIt->mBaseLine) && underlineChunkId == eIt->mUnderlineChunkId && strikethroughChunkId == eIt->mStrikethroughChunkId)
+      if(Equals(baseLine, eIt->mBaseLine) && lineChunkId == eIt->mLineChunkId)
       {
         foundExtent = true;
         if(left < eIt->mLeft)
@@ -1002,9 +1027,9 @@ struct AtlasRenderer::Impl
           eIt->mRight = right;
         }
 
-        if(underlinePosition > eIt->mUnderlinePosition)
+        if(linePosition > eIt->mLinePosition)
         {
-          eIt->mUnderlinePosition = underlinePosition;
+          eIt->mLinePosition = linePosition;
         }
         if(lineThickness > eIt->mLineThickness)
         {
@@ -1015,15 +1040,13 @@ struct AtlasRenderer::Impl
     if(!foundExtent)
     {
       Extent extent;
-      extent.mLeft                  = left;
-      extent.mRight                 = right;
-      extent.mBaseLine              = baseLine;
-      extent.mUnderlinePosition     = underlinePosition;
-      extent.mMeshRecordIndex       = index;
-      extent.mUnderlineChunkId      = underlineChunkId;
-      extent.mLineThickness         = lineThickness;
-      extent.mStrikethroughPosition = strikethroughPosition;
-      extent.mStrikethroughChunkId  = strikethroughChunkId;
+      extent.mMeshRecordIndex = index;
+      extent.mBaseLine        = baseLine;
+      extent.mLeft            = left;
+      extent.mRight           = right;
+      extent.mLineChunkId     = lineChunkId;
+      extent.mLinePosition    = linePosition;
+      extent.mLineThickness   = lineThickness;
       extents.PushBack(extent);
     }
   }
@@ -1071,8 +1094,6 @@ struct AtlasRenderer::Impl
                           const UnderlineStyleProperties&                     viewUnderlineProperties,
                           const std::map<uint32_t, UnderlineStyleProperties>& mapUnderlineChunkIdWithProperties)
   {
-    AtlasManager::Mesh2D newMesh;
-    unsigned short       faceIndex = 0;
 
     for(Vector<Extent>::ConstIterator eIt    = extents.Begin(),
                                       eEndIt = extents.End();
@@ -1083,7 +1104,7 @@ struct AtlasRenderer::Impl
       uint32_t               index = eIt->mMeshRecordIndex;
       Vector2                uv    = mGlyphManager.GetAtlasSize(meshRecords[index].mAtlasId);
 
-      auto pairUnderlineChunkIdWithProperties = mapUnderlineChunkIdWithProperties.find(eIt->mUnderlineChunkId);
+      auto pairUnderlineChunkIdWithProperties = mapUnderlineChunkIdWithProperties.find(eIt->mLineChunkId);
 
       const UnderlineStyleProperties underlineProperties = (pairUnderlineChunkIdWithProperties == mapUnderlineChunkIdWithProperties.end())
                                                              ? viewUnderlineProperties
@@ -1098,10 +1119,13 @@ struct AtlasRenderer::Impl
       float u           = HALF / uv.x;
       float v           = HALF / uv.y;
       float thickness   = eIt->mLineThickness;
-      float ShiftLineBy = (underlineType == Text::Underline::Type::DOUBLE) ? (thickness * ONE_AND_A_HALF) : (thickness * HALF);
-      float baseLine    = eIt->mBaseLine + eIt->mUnderlinePosition - ShiftLineBy;
+      float ShiftLineBy = (underlineType == Text::Underline::Type::DOUBLE) ? floor(thickness * ONE_AND_A_HALF) : floor(thickness * HALF);
+      float baseLine    = eIt->mBaseLine + eIt->mLinePosition - ShiftLineBy;
       float tlx         = eIt->mLeft;
       float brx         = eIt->mRight;
+
+      AtlasManager::Mesh2D newMesh;
+      unsigned short       faceIndex = 0;
 
       if(underlineType == Text::Underline::Type::DASHED)
       {
@@ -1153,8 +1177,6 @@ struct AtlasRenderer::Impl
           newMesh.mIndices.PushBack(faceIndex + 1u);
 
           faceIndex += 4;
-
-          Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
         }
       }
       else
@@ -1194,8 +1216,6 @@ struct AtlasRenderer::Impl
         newMesh.mIndices.PushBack(faceIndex + 3u);
         newMesh.mIndices.PushBack(faceIndex + 1u);
         faceIndex += 4;
-
-        Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
 
         if(underlineType == Text::Underline::Type::DOUBLE)
         {
@@ -1240,10 +1260,9 @@ struct AtlasRenderer::Impl
           newMesh.mIndices.PushBack(faceIndex + 1u);
 
           faceIndex += 4;
-
-          Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
         }
       }
+      Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
     }
   }
 
@@ -1252,8 +1271,6 @@ struct AtlasRenderer::Impl
                              const StrikethroughStyleProperties&                     viewStrikethroughProperties,
                              const std::map<uint32_t, StrikethroughStyleProperties>& mapStrikethroughChunkIdWithProperties)
   {
-    AtlasManager::Mesh2D newMesh;
-    unsigned short       faceIndex = 0;
     for(Vector<Extent>::ConstIterator eIt    = extents.Begin(),
                                       eEndIt = extents.End();
         eIt != eEndIt;
@@ -1263,7 +1280,7 @@ struct AtlasRenderer::Impl
       uint32_t               index = eIt->mMeshRecordIndex;
       Vector2                uv    = mGlyphManager.GetAtlasSize(meshRecords[index].mAtlasId);
 
-      auto pairStrikethroughChunkIdWithProperties = mapStrikethroughChunkIdWithProperties.find(eIt->mStrikethroughChunkId);
+      auto pairStrikethroughChunkIdWithProperties = mapStrikethroughChunkIdWithProperties.find(eIt->mLineChunkId);
 
       const StrikethroughStyleProperties strikethroughProperties = (pairStrikethroughChunkIdWithProperties == mapStrikethroughChunkIdWithProperties.end())
                                                                      ? viewStrikethroughProperties
@@ -1277,7 +1294,10 @@ struct AtlasRenderer::Impl
       float thickness             = eIt->mLineThickness;
       float tlx                   = eIt->mLeft;
       float brx                   = eIt->mRight;
-      float strikethroughPosition = eIt->mStrikethroughPosition;
+      float strikethroughPosition = eIt->mLinePosition;
+
+      AtlasManager::Mesh2D newMesh;
+      unsigned short       faceIndex = 0;
 
       vert.mPosition.x  = tlx;
       vert.mPosition.y  = strikethroughPosition;

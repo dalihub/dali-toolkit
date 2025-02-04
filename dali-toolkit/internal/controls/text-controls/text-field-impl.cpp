@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -680,7 +680,7 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     EmitTextChangedSignal();
   }
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
+  Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != updateTextType) ||
      !mRenderer)
@@ -696,6 +696,12 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(!mRenderer)
     {
       mRenderer = Backend::Get().NewRenderer(mRenderingBackend);
+    }
+
+    if(mRenderRequired)
+    {
+      updateTextType = static_cast<Text::Controller::UpdateTextType>(updateTextType | Text::Controller::MODEL_UPDATED);
+      mRenderRequired = false;
     }
 
     RenderText(updateTextType);
@@ -1208,7 +1214,8 @@ TextField::TextField(ControlBehaviour additionalBehaviour)
   mOldPosition(0u),
   mOldSelectionStart(0u),
   mOldSelectionEnd(0u),
-  mSelectionStarted(false)
+  mSelectionStarted(false),
+  mRenderRequired(false)
 {
 }
 
