@@ -159,10 +159,15 @@ SET(TEST_HARNESS_SOURCES
   test-text-geometry-utils.cpp
 )
 
+# Need to link directly with glesv2 and egl as we override some GL/EGL functions in toolkit-direct-rendering-egl.cpp
+# As the GLES backend is dynamically loaded, if we don't link directly then the GLES backend uses the REAL function
+# rather than the overloaded one in the test suite
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
   dali2-core
   dali2-adaptor
   dali2-toolkit
+  glesv2
+  egl
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)
@@ -189,6 +194,7 @@ ADD_CUSTOM_COMMAND(
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.h ${EXEC_NAME}.cpp ${TC_SOURCES} ${TEST_HARNESS_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
+    -Wl,--no-as-needed # Force linking to library even if linker thinks we don't need it, this ensures EGL libraries are loaded at test startup
     ${${CAPI_LIB}_LIBRARIES}
     -lpthread --coverage -ldl
 )

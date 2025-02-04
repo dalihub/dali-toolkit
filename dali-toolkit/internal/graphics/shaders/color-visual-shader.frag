@@ -396,19 +396,18 @@ void main()
 
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;
-  lowp int cutoutInsideOccured = 0;
 
   if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 && abs(vPositionFromCenter.y) <= uSize.y * 0.5)
   {
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
-    if(uCutoutWithCornerRadius > 0)
+    if(uCutoutWithCornerRadius == 1)
     {
       // Ignore borderline width
       PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0);
 
       // Decrease potential range, to avoid alias make some hole.
-      gMinOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
-      gMaxOutlinePotential += gPotentialRange * ((float)uCutoutOutside - 0.5);
+      gMinOutlinePotential += gPotentialRange * (float(uCutoutOutside) - 0.5);
+      gMaxOutlinePotential += gPotentialRange * (float(uCutoutOutside) - 0.5);
 
       discardOpacity = smoothstep(gMinOutlinePotential, gMaxOutlinePotential, gPotential);
     }
@@ -417,23 +416,19 @@ void main()
       discardOpacity = 0.0;
     }
 #else
-    cutoutInsideOccured = 1;
+    discardOpacity = 0.0;
 #endif
   }
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
+  // discardOpacity = 1.0 mean it is outside of the view.
+  // discardOpacity = 0.0 mean it is inside of the view, where we want to cutout
   if(uCutoutOutside == 1)
   {
+    // Revert cutout area if uCutoutOutside is 1
     discardOpacity = 1.0 - discardOpacity;
   }
 
   if(discardOpacity < 0.001)
-  {
-    cutoutInsideOccured = 1;
-  }
-#endif
-
-  if((uCutoutOutside ^ cutoutInsideOccured) == 0)
   {
     discard;
   }

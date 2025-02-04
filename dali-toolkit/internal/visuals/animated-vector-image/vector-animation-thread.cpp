@@ -230,7 +230,7 @@ void VectorAnimationThread::Finalize()
 /// VectorAnimationThread called
 void VectorAnimationThread::Run()
 {
-  SetThreadName("VectorAnimationThread");
+  SetThreadName("VectorManagerThread");
   mLogFactory.InstallLogFunction();
   mTraceFactory.InstallTraceFunction();
 
