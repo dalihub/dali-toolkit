@@ -434,7 +434,7 @@ void DrawUnderline(
       const uint32_t secondYRangeMax        = static_cast<uint32_t>(std::max(0, std::min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
 
       // Rewind bitmapBuffer pointer, and skip secondYRangeMin line.
-      bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + yRangeMin * glyphData.width;
+      bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + secondYRangeMin * glyphData.width;
 
       for(uint32_t y = secondYRangeMin; y < secondYRangeMax; y++)
       {
@@ -499,7 +499,7 @@ void DrawUnderline(
       const uint32_t secondYRangeMax        = static_cast<uint32_t>(std::max(0, std::min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
 
       // Rewind bitmapBuffer pointer, and skip secondYRangeMin line.
-      bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + yRangeMin * glyphData.width;
+      bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + secondYRangeMin * glyphData.width;
 
       for(uint32_t y = secondYRangeMin; y < secondYRangeMax; y++)
       {
