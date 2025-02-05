@@ -599,7 +599,6 @@ private: // Data
   uint32_t mOldSelectionEnd;
 
   bool mSelectionStarted : 1; ///< If true, emits SelectionStartedSignal at the end of OnRelayout().
-  bool mRenderRequired   : 1; ///< If true, text rendering required.
 
 protected:
   struct PropertyHandler;
