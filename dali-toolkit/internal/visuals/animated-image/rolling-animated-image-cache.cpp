@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,22 +28,27 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
-#define LOG_CACHE                                                                                                       \
-  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                   \
-  {                                                                                                                     \
-    std::ostringstream oss;                                                                                             \
-    oss << "Size:" << mQueue.Count() << " [ ";                                                                          \
-    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                  \
-    {                                                                                                                   \
-      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: " << mTextureIds[mQueue[_i].mFrameNumber] << "}, "; \
-    }                                                                                                                   \
-    oss << " ]" << std::endl;                                                                                           \
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                          \
+// clang-format off
+#define LOG_CACHE                                                              \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                          \
+  {                                                                            \
+    std::ostringstream oss;                                                    \
+    oss << "Size:" << mQueue.Count() << " [ ";                                 \
+    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                         \
+    {                                                                          \
+      oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: ";         \
+      oss << (DALI_LIKELY(mQueue[_i].mFrameNumber < mTextureIds.size()) ?      \
+              mTextureIds[mQueue[_i].mFrameNumber] :                           \
+              TextureManager::INVALID_TEXTURE_ID) << "}, ";                    \
+    }                                                                          \
+    oss << " ]" << std::endl;                                                  \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str()); \
   }
-
 #else
 #define LOG_CACHE
 #endif
+// clang-format on
+
 } // namespace
 
 namespace Dali
@@ -83,6 +88,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
   mIsSynchronousLoading(isSynchronousLoading)
 {
   mTextureIds.resize(mFrameCount);
+  mTextureIds[0] = TextureManager::INVALID_TEXTURE_ID;
   mIntervals.assign(mFrameCount, 0);
 }
 
@@ -286,7 +292,7 @@ TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 
 TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int index) const
 {
-  return mTextureIds[mQueue[index].mFrameNumber];
+  return DALI_LIKELY(mQueue[index].mFrameNumber < mTextureIds.size()) ? mTextureIds[mQueue[index].mFrameNumber] : TextureManager::INVALID_TEXTURE_ID;
 }
 
 void RollingAnimatedImageCache::PopFrontCache()
@@ -307,9 +313,12 @@ void RollingAnimatedImageCache::PopFrontCache()
 
 void RollingAnimatedImageCache::ClearCache()
 {
-  while(Dali::Adaptor::IsAvailable() && !mQueue.IsEmpty())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    PopFrontCache();
+    while(!mQueue.IsEmpty())
+    {
+      PopFrontCache();
+    }
   }
   mLoadWaitingQueue.clear();
   mLoadState = TextureManager::LoadState::NOT_STARTED;

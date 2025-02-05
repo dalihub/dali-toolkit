@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,9 +221,12 @@ void RollingImageCache::PopFrontCache()
 
 void RollingImageCache::ClearCache()
 {
-  while(Dali::Adaptor::IsAvailable() && !mQueue.IsEmpty())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    PopFrontCache();
+    while(!mQueue.IsEmpty())
+    {
+      PopFrontCache();
+    }
   }
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }

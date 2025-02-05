@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,9 +170,9 @@ void FixedImageCache::MakeReady(bool wasReady, uint32_t frameIndex, bool preMult
 
 void FixedImageCache::ClearCache()
 {
-  if(Dali::Adaptor::IsAvailable())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    for(std::size_t i = 0; i < mImageUrls.size(); ++i)
+    for(std::size_t i = 0u; i < mImageUrls.size(); ++i)
     {
       mTextureManager.RequestRemove(mImageUrls[i].mTextureId, this);
       mImageUrls[i].mTextureId = TextureManager::INVALID_TEXTURE_ID;
