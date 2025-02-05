@@ -695,13 +695,8 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     if(!mRenderer)
     {
-      mRenderer = Backend::Get().NewRenderer(mRenderingBackend);
-    }
-
-    if(mRenderRequired)
-    {
+      mRenderer      = Backend::Get().NewRenderer(mRenderingBackend);
       updateTextType = static_cast<Text::Controller::UpdateTextType>(updateTextType | Text::Controller::MODEL_UPDATED);
-      mRenderRequired = false;
     }
 
     RenderText(updateTextType);
@@ -1214,8 +1209,7 @@ TextField::TextField(ControlBehaviour additionalBehaviour)
   mOldPosition(0u),
   mOldSelectionStart(0u),
   mOldSelectionEnd(0u),
-  mSelectionStarted(false),
-  mRenderRequired(false)
+  mSelectionStarted(false)
 {
 }
 

@@ -372,7 +372,6 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -391,7 +390,6 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -428,7 +426,6 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -717,7 +714,6 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }

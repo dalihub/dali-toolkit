@@ -435,7 +435,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -454,7 +453,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -491,7 +489,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
@@ -681,7 +678,6 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       if(update)
       {
         impl.mRenderer.Reset();
-        impl.mRenderRequired = true;
       }
       break;
     }
