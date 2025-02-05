@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1787,7 +1787,7 @@ int UtcDaliImageViewPaddingProperty(void)
   // Child ImageView should be positioned dependinig on Parent ImageView's Padding value
   DALI_TEST_EQUALS(childImage.GetProperty<Vector3>(Dali::Actor::Property::POSITION), Vector3(15, 5, 0), TEST_LOCATION);
 
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -1826,7 +1826,7 @@ int UtcDaliImageViewPaddingProperty02(void)
 
   DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
 
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -1874,7 +1874,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   application.SendNotification();
   application.Render();
 
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -1922,7 +1922,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   application.SendNotification();
   application.Render();
 
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -1965,7 +1965,7 @@ int UtcDaliImageViewTransformTest01(void)
   application.SendNotification();
   application.Render();
 
-  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
   Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
   Property::Map               resultMap;
@@ -3168,7 +3168,7 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     application.SendNotification();
     application.Render();
 
-    // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+    // Check whether Image Visual transforms on ImageView::OnRelayout()
     Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
     Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
     Property::Map               resultMap;
@@ -6415,6 +6415,57 @@ int UtcDaliImageViewSvgReRasterizeDuringResourceReady01(void)
       gResourceReadySignalCounter = 0u;
     }
   }
+
+  END_TEST;
+}
+
+int UtcDaliImageViewAnimatedImageVisualWithReleasePolicy(void)
+{
+  tet_infoline("Use AnimatedImageVisual with ReleasePolicy, and Unparent+Add again. Check ResourceReady comes well");
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  ImageView imageView = ImageView::New();
+
+  Property::Map imageMap;
+  imageMap[Visual::Property::TYPE]                = Visual::IMAGE;
+  imageMap[ImageVisual::Property::URL]            = TEST_GIF_FILE_NAME;
+  imageMap[ImageVisual::Property::RELEASE_POLICY] = ImageVisual::ReleasePolicy::DESTROYED;
+
+  imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
+  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
+  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  tet_printf("Stop animation immediatly, for the stable test\n");
+  DevelControl::DoAction(imageView, ImageView::Property::IMAGE, DevelAnimatedImageVisual::Action::STOP, Property::Value());
+
+  application.GetScene().Add(imageView);
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread (wait 2 images - batch size)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  gResourceReadySignalFired = false;
+
+  tet_printf("Unparent and add scene again\n");
+  imageView.Unparent();
+  application.GetScene().Add(imageView);
+
+  tet_printf("Check whether resource ready signal emitted without Notification or wait\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  gResourceReadySignalFired = false;
 
   END_TEST;
 }

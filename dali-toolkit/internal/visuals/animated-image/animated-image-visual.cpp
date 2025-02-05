@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,11 +299,12 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
 
 AnimatedImageVisual::~AnimatedImageVisual()
 {
-  // AnimatedImageVisual destroyed so remove texture unless ReleasePolicy is set to never release
-  // If this is animated image, clear cache. Else if this is single frame image, this is affected be release policy.
-  if(mFrameCount > SINGLE_IMAGE_COUNT || mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER)
+  if(DALI_LIKELY(mImageCache))
   {
-    if(DALI_LIKELY(mImageCache))
+    // AnimatedImageVisual destroyed so remove texture unless ReleasePolicy is set to never release
+    // If this is animated image, clear cache always.
+    // Else if this is single frame image, this is affected be release policy.
+    if(mFrameCount > SINGLE_IMAGE_COUNT || mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER)
     {
       mImageCache->ClearCache();
     }
@@ -902,9 +903,23 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
 {
   mStartFirstFrame = true;
   mPlacementActor  = actor;
-  PrepareTextureSet();
-
   actor.InheritedVisibilityChangedSignal().Connect(this, &AnimatedImageVisual::OnControlInheritedVisibilityChanged);
+
+  // We should clear cached informations before mImageCache->FirstFrame();
+  // TODO : Could we remove this cache clearing code?
+  if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED)
+  {
+    if(DALI_LIKELY(mImageCache))
+    {
+      mImageCache->ClearCache(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+    }
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+
+    TextureSet textureSet = TextureSet::New();
+    mImpl->mRenderer.SetTextures(textureSet);
+  }
+
+  PrepareTextureSet();
 }
 
 void AnimatedImageVisual::DoSetOffScene(Actor& actor)
@@ -1062,6 +1077,7 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
     }
   }
 
+  mCurrentFrameIndex = FIRST_FRAME_INDEX;
   if(mImpl->mResourceStatus != Toolkit::Visual::ResourceStatus::FAILED)
   {
     if(mFrameCount > SINGLE_IMAGE_COUNT)
@@ -1074,8 +1090,6 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
     DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::READY)\n");
     ResourceReady(Toolkit::Visual::ResourceStatus::READY);
   }
-
-  mCurrentFrameIndex = FIRST_FRAME_INDEX;
 }
 
 void AnimatedImageVisual::PrepareTextureSet()
@@ -1100,7 +1114,7 @@ void AnimatedImageVisual::PrepareTextureSet()
 
 void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
 {
-  if(textureSet)
+  if(DALI_LIKELY(textureSet && textureSet.GetTextureCount() > 0u))
   {
     Texture texture = textureSet.GetTexture(0);
     if(texture)
@@ -1226,7 +1240,10 @@ bool AnimatedImageVisual::DisplayNextFrame()
         mImpl->mRenderer.SetTextures(textureSet);
         CheckMaskTexture();
       }
-      mFrameDelayTimer.SetInterval(CalculateInterval(mImageCache->GetFrameInterval(frameIndex), mFrameSpeedFactor));
+      if(mFrameDelayTimer)
+      {
+        mFrameDelayTimer.SetInterval(CalculateInterval(mImageCache->GetFrameInterval(frameIndex), mFrameSpeedFactor));
+      }
     }
 
     mCurrentFrameIndex = frameIndex;
