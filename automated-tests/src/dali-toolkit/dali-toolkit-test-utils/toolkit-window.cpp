@@ -195,6 +195,11 @@ void Window::Raise()
   GetImplementation(*this).mFocusChangeSignal.Emit(*this, true);
 }
 
+void Window::Lower()
+{
+  GetImplementation(*this).mFocusChangeSignal.Emit(*this, false);
+}
+
 void Window::Show()
 {
   GetImplementation(*this).mVisible = true;

@@ -79,6 +79,7 @@ public:
   void                                       SetBackgroundColor(const Vector4& color);
   Vector4                                    GetBackgroundColor() const;
   void                                       Raise();
+  void                                       Lower();
   void                                       Show();
   void                                       Hide();
   bool                                       IsVisible() const;
