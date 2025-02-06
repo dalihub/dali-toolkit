@@ -3,8 +3,8 @@ uniform lowp vec4 uColorFactor; // Color from material
 uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
-INPUT mediump vec2 vUV;
-INPUT lowp vec4 vColor;
+INPUT highp vec2 vUV;
+INPUT highp vec4 vColor;
 
 //INPUT highp float depth;
 //OUTPUT highp vec4 FragColor;

@@ -1,5 +1,6 @@
+precision highp float;
 varying float        vPercentage;
-varying mediump vec2 vTexCoord;
+varying highp vec2 vTexCoord;
 
 uniform sampler2D sTexture;
 uniform lowp vec4 uColor;

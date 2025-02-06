@@ -1,8 +1,8 @@
 precision highp float;
-varying mediump vec2 vTexCoord;
+varying highp vec2 vTexCoord;
 uniform sampler2D sTexture;
-uniform int uSpread;
-uniform vec2 uTexScale;
+uniform highp int uSpread;
+uniform highp vec2 uTexScale;
 
 void main()
 {

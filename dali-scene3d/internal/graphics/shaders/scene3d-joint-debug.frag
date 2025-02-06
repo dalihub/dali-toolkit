@@ -1,5 +1,5 @@
 
-precision mediump float;
+precision highp float;
 uniform lowp vec4 uColor;
 FLAT INPUT float vColor;
 

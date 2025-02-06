@@ -1,4 +1,5 @@
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+INPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
@@ -10,7 +11,7 @@ FLAT INPUT highp vec4 vCornerRadius;
 #endif
 
 // scale factor to fit start and end position of gradient.
-uniform mediump float uTextureCoordinateScaleFactor;
+uniform highp float uTextureCoordinateScaleFactor;
 
 uniform sampler2D sTexture; // sampler1D?
 uniform lowp vec4 uColor;
@@ -167,8 +168,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity *= min(1.0, borderlineWidth / gPotentialRange);
   }
 
-  lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
-  lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  highp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  highp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
   // NOTE : gradient-visual is always preMultiplied.
   borderlineColorRGB *= borderlineColorAlpha;
 
@@ -188,7 +189,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     else
     {
       // potential is in texture range.
-      lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      highp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
       textureColor.rgb *= textureAlphaScale;
     }
@@ -205,8 +206,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
-    lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
-    lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+    highp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+    highp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
     return vec4(finalMultipliedRGB, finalAlpha);
   }
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
@@ -238,7 +239,7 @@ mediump float calculateCornerOpacity()
 void main()
 {
 #ifdef RADIAL
-  mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
+  highp float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
   lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * uColor;
 #else
   lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * uColor;

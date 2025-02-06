@@ -1,10 +1,11 @@
-attribute mediump float aIndex;
-attribute mediump vec2  aPosition;
+precision highp float;
+attribute highp float aIndex;
+attribute highp vec2  aPosition;
 attribute highp   vec2  aTexCoord;
-varying   mediump vec2  vTexCoord;
-uniform   mediump mat4  uMvpMatrix;
+varying   highp vec2  vTexCoord;
+uniform   highp mat4  uMvpMatrix;
 // the gravity applied to the y direction
-uniform mediump float uGravity;
+uniform highp float uGravity;
 // xy: the emit position of the bubble; zw: the destination of the bubble.
 // The bubble is moving from (xy) to (zw plus the y drop influenced by gravity).
 uniform vec4 uStartEndPosition[NUMBER_OF_BUBBLE];

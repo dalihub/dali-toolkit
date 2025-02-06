@@ -1,7 +1,7 @@
-precision mediump float;
-varying mediump vec2 vTexCoord;
-varying mediump vec3 vIllumination;
-varying mediump float vSpecular;
+precision highp float;
+varying highp vec2 vTexCoord;
+varying highp vec3 vIllumination;
+varying highp float vSpecular;
 uniform sampler2D sDiffuse;
 uniform lowp vec4 uColor;
 

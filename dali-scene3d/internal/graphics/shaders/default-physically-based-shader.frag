@@ -16,11 +16,7 @@
 // [4] \"An Inexpensive BRDF Model for Physically based Rendering\" by Christophe Schlick
 //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
 
-#ifdef HIGHP
 precision highp float;
-#else
-precision mediump float;
-#endif
 
 #ifdef GLTF_CHANNELS
 #define METALLIC b
@@ -90,8 +86,8 @@ uniform sampler2D sSpecularColor;
 // For Light (Currently Directional Only)
 #define MAX_LIGHTS 5
 uniform mediump int uLightCount;
-uniform mediump vec3 uLightDirection[MAX_LIGHTS];
-uniform mediump vec3 uLightColor[MAX_LIGHTS];
+uniform highp vec3 uLightDirection[MAX_LIGHTS];
+uniform highp vec3 uLightColor[MAX_LIGHTS];
 
 // For Shadow Map
 uniform lowp int uIsShadowEnabled;
@@ -117,9 +113,9 @@ uniform lowp float uMask;
 uniform lowp float uAlphaThreshold;
 
 // TODO: Multiple texture coordinate will be supported.
-INPUT mediump vec2 vUV;
-INPUT lowp mat3 vTBN;
-INPUT lowp vec4 vColor;
+INPUT highp vec2 vUV;
+INPUT highp mat3 vTBN;
+INPUT highp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
 
 const float c_MinRoughness = 0.04;
@@ -167,7 +163,7 @@ void main()
 #ifdef THREE_TEX
   // The albedo may be defined from a base texture or a flat color
 #ifdef BASECOLOR_TEX
-  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  highp vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
   lowp vec4 baseColor = TEXTURE(sAlbedoAlpha, baseColorTexCoords);
   baseColor = vColor * vec4(linear(baseColor.rgb), baseColor.w) * uColorFactor;
 #else // BASECOLOR_TEX
@@ -175,25 +171,25 @@ void main()
 #endif // BASECOLOR_TEX
 
 #ifdef METALLIC_ROUGHNESS_TEX
-  mediump vec2 metalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uMetalRoughnessTextureTransform), uMetalRoughnessTextureTransformAvailable);
+  highp vec2 metalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uMetalRoughnessTextureTransform), uMetalRoughnessTextureTransformAvailable);
   lowp vec4 metrou = TEXTURE(sMetalRoughness, metalRoughnessTexCoords);
   metallic = metrou.METALLIC * metallic;
   perceptualRoughness = metrou.ROUGHNESS * perceptualRoughness;
 #endif // METALLIC_ROUGHNESS_TEX
 
 #ifdef NORMAL_TEX
-  mediump vec2 normalTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalTextureTransform), uNormalTextureTransformAvailable);
+  highp vec2 normalTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalTextureTransform), uNormalTextureTransformAvailable);
   n = TEXTURE(sNormal, normalTexCoords).rgb;
   n = normalize(vTBN * ((2.0 * n - 1.0) * vec3(uNormalScale, uNormalScale, 1.0)));
 #endif // NORMAL_TEX
 #else // THREE_TEX
-  mediump vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
+  highp vec2 baseColorTexCoords = mix(vUV, computeTextureTransform(vUV, uBaseColorTextureTransform), uBaseColorTextureTransformAvailable);
   vec4 albedoMetal = TEXTURE(sAlbedoMetal, baseColorTexCoords);
   lowp vec4 baseColor = vec4(linear(albedoMetal.rgb), 1.0) * vColor * uColorFactor;
 
   metallic = albedoMetal.METALLIC * metallic;
 
-  mediump vec2 normalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalRoughnessTextureTransform), uNormalRoughnessTextureTransformAvailable);
+  highp vec2 normalRoughnessTexCoords = mix(vUV, computeTextureTransform(vUV, uNormalRoughnessTextureTransform), uNormalRoughnessTextureTransformAvailable);
   vec4 normalRoughness = TEXTURE(sNormalRoughness, normalRoughnessTexCoords);
   perceptualRoughness = normalRoughness.ROUGHNESS * perceptualRoughness;
 
@@ -233,9 +229,9 @@ void main()
   f0 = min(f0 * uSpecularColorFactor * materialSpecularTexture.rgb, vec3(1.0));
   f0 = mix(f0, baseColor.rgb, metallic);
 
-  mediump vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
-  mediump float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
-  mediump vec3 reflection = -normalize(reflect(v, n));
+  highp vec3 v = normalize(vPositionToCamera); // Vector from surface point to camera
+  highp float NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
+  highp vec3 reflection = -normalize(reflect(v, n));
   lowp vec3 brdf = TEXTURE(sbrdfLUT, vec2(NdotV, 1.0 - perceptualRoughness)).rgb;
   vec3 Fr = max(vec3(1.0 - perceptualRoughness), f0) - f0;
   vec3 k_S = f0 + Fr * pow(1.0 - NdotV, 5.0);
@@ -305,7 +301,7 @@ void main()
 
   if(float(uIsShadowReceiving) * float(uIsShadowEnabled) * uShadowIntensity > 0.0)
   {
-    mediump float exposureFactor = 0.0;
+    highp float exposureFactor = 0.0;
 
     highp vec3 l = normalize(-uLightDirection[uShadowLightIndex]);
     highp float NdotL = dot(n, l);
@@ -316,8 +312,8 @@ void main()
 #else
       ivec2 texSize = textureSize(sShadowMap, 0);
 #endif
-      mediump vec2 texelSize = vec2(1.0) / vec2(texSize.x, texSize.y);
-      mediump vec2 pcfSample = vec2(1.0, 0.0);
+      highp vec2 texelSize = vec2(1.0) / vec2(texSize.x, texSize.y);
+      highp vec2 pcfSample = vec2(1.0, 0.0);
       for (int i = 0; i < kPcfSampleCount; ++i)
       {
         pcfSample = vec2(kCosPcfTheta * pcfSample.x - kSinPcfTheta * pcfSample.y,
@@ -335,7 +331,7 @@ void main()
     {
       if(NdotL > 0.0)
       {
-        mediump float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy).r;
+        highp float depthValue = TEXTURE(sShadowMap, positionFromLightView.xy).r;
         exposureFactor           = (depthValue < positionFromLightView.z - uShadowBias) ? 0.0 : 1.0;
       }
     }
@@ -344,13 +340,13 @@ void main()
   }
 
 #ifdef OCCLUSION
-  mediump vec2 occlusionTexCoords = mix(vUV, computeTextureTransform(vUV, uOcclusionTextureTransform), uOcclusionTextureTransformAvailable);
+  highp vec2 occlusionTexCoords = mix(vUV, computeTextureTransform(vUV, uOcclusionTextureTransform), uOcclusionTextureTransformAvailable);
   lowp float ao = TEXTURE(sOcclusion, occlusionTexCoords).r;
   color = mix(color, color * ao, uOcclusionStrength);
 #endif // OCCLUSION
 
 #ifdef EMISSIVE_TEXTURE
-  mediump vec2 emissiveTexCoords = mix(vUV, computeTextureTransform(vUV, uEmissiveTextureTransform), uEmissiveTextureTransformAvailable);
+  highp vec2 emissiveTexCoords = mix(vUV, computeTextureTransform(vUV, uEmissiveTextureTransform), uEmissiveTextureTransformAvailable);
   lowp vec3 emissive = linear(TEXTURE(sEmissive, emissiveTexCoords).rgb) * uEmissiveFactor;
 #else
   lowp vec3 emissive = uEmissiveFactor;

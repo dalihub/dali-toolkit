@@ -1,13 +1,14 @@
+precision highp float;
 attribute highp vec3 aPosition;
 attribute highp vec2 aTexCoord;
 attribute highp vec3 aNormal;
-varying mediump vec3 vIllumination;
-uniform mediump vec3 uSize;
-uniform mediump mat4 uMvpMatrix;
-uniform mediump mat4 uModelView;
-uniform mediump mat3 uNormalMatrix;
-uniform mediump mat4 uObjectMatrix;
-uniform mediump vec3 uLightPosition;
+varying highp vec3 vIllumination;
+uniform highp vec3 uSize;
+uniform highp mat4 uMvpMatrix;
+uniform highp mat4 uModelView;
+uniform highp mat3 uNormalMatrix;
+uniform highp mat4 uObjectMatrix;
+uniform highp vec3 uLightPosition;
 
 void main()
 {

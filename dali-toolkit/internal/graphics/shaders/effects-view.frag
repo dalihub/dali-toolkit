@@ -1,4 +1,5 @@
-varying mediump vec2 vTexCoord;
+precision highp float;
+varying highp vec2 vTexCoord;
 uniform sampler2D sTexture;
 uniform lowp vec4 effectColor;
 

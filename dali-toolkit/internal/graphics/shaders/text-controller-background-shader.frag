@@ -1,5 +1,6 @@
-varying mediump vec4      vColor;
-uniform lowp    vec4      uColor;
+precision highp float;
+varying highp vec4 vColor;
+uniform lowp  vec4 uColor;
 
 void main()
 {

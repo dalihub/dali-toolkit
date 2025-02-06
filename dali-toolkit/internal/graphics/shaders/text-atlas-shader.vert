@@ -1,10 +1,11 @@
-attribute   highp vec2    aPosition;
-attribute mediump vec2    aTexCoord;
-attribute mediump vec4    aColor;
-uniform   mediump vec2    uOffset;
-uniform     highp mat4    uMvpMatrix;
-varying   mediump vec2    vTexCoord;
-varying   mediump vec4    vColor;
+precision highp float;
+attribute highp vec2 aPosition;
+attribute highp vec2 aTexCoord;
+attribute highp vec4 aColor;
+uniform   highp vec2 uOffset;
+uniform   highp mat4 uMvpMatrix;
+varying   highp vec2 vTexCoord;
+varying   highp vec4 vColor;
 
 void main()
 {

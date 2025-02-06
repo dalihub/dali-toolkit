@@ -1,4 +1,5 @@
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+INPUT highp vec2 vTexCoord;
 uniform sampler2D sTexture;
 #ifdef IS_REQUIRED_STYLE
 uniform sampler2D sStyle;

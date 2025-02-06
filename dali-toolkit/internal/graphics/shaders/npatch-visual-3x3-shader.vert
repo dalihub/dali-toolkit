@@ -1,6 +1,7 @@
-attribute mediump vec2 aPosition;
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vMaskTexCoord;
+precision highp float;
+attribute highp vec2 aPosition;
+varying highp vec2 vTexCoord;
+varying highp vec2 vMaskTexCoord;
 
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;

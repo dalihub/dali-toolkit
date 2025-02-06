@@ -1,5 +1,5 @@
-precision mediump float;
-varying mediump vec3 vIllumination;
+precision highp float;
+varying highp vec3 vIllumination;
 uniform lowp vec4 uColor;
 
 void main()

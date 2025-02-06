@@ -1,17 +1,18 @@
-attribute mediump vec2 aPosition;
+precision highp float;
+attribute highp vec2 aPosition;
 
-uniform mediump mat4 uMvpMatrix;
+uniform highp mat4 uMvpMatrix;
 uniform vec3 uSize;
 uniform vec4 uTextureRect;
 
 varying vec2 vTexCoord;
 
-uniform mediump vec2 uTopLeft;
-uniform mediump vec2 uBottomRight;
+uniform highp vec2 uTopLeft;
+uniform highp vec2 uBottomRight;
 
 void main()
 {
-  mediump vec4 position = vec4(aPosition, 0.0, 1.0);
+  highp vec4 position = vec4(aPosition, 0.0, 1.0);
   position.xyz *= uSize;
   gl_Position = uMvpMatrix * position;
 

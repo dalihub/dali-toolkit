@@ -16,22 +16,22 @@
  * ([3][3]) float currentLength: The length from the current center to the curveEnd.
  */
 
-precision mediump float;
+precision highp float;
 
-attribute mediump vec2 aPosition;
+attribute highp vec2 aPosition;
 
-uniform mediump mat4 uMvpMatrix;
-uniform mediump mat3 uNormalMatrix;
-uniform mediump mat4 uModelView;
+uniform highp mat4 uMvpMatrix;
+uniform highp mat3 uNormalMatrix;
+uniform highp mat4 uModelView;
 
-uniform mat4 uCommonParameters;
+uniform highp mat4 uCommonParameters;
 
-uniform vec3 uSize;
+uniform highp vec3 uSize;
 uniform float uIsTurningBack;
 uniform float uTextureWidth;
-varying vec3 vNormal;
-varying vec4 vPosition;
-varying mediump vec2 vTexCoord;
+varying highp vec3 vNormal;
+varying highp vec4 vPosition;
+varying highp vec2 vTexCoord;
 
 void main()
 {

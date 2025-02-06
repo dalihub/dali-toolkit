@@ -1,9 +1,10 @@
-varying mediump vec2 vTexCoord;
+precision highp float;
+varying highp vec2 vTexCoord;
 uniform lowp vec4 uColor;
 uniform sampler2D sBackground;
 uniform sampler2D sBubbleShape;
-varying mediump float vPercentage;
-varying mediump vec2 vEffectTexCoord;
+varying highp float vPercentage;
+varying highp vec2 vEffectTexCoord;
 
 void main()
 {

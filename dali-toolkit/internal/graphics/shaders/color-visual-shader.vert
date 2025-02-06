@@ -1,4 +1,5 @@
-INPUT mediump vec2 aPosition;
+precision highp float;
+INPUT highp vec2 aPosition;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;

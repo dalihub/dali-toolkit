@@ -1,12 +1,12 @@
-precision mediump float;
+precision highp float;
 
-uniform mediump vec4 start_color;
-uniform mediump vec4 end_color;
-uniform mediump float gradient_offset;
+uniform highp vec4 start_color;
+uniform highp vec4 end_color;
+uniform highp float gradient_offset;
 
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vStart;
-varying mediump vec2 vEnd;
+varying highp vec2 vTexCoord;
+varying highp vec2 vStart;
+varying highp vec2 vEnd;
 
 float get_position(vec2 x, vec2 s, vec2 e)
 {

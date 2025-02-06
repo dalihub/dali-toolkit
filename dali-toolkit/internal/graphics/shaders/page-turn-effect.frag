@@ -1,13 +1,13 @@
-precision mediump float;
+precision highp float;
 
-varying mediump vec2 vTexCoord;
+varying highp vec2 vTexCoord;
 
 uniform sampler2D sTexture;
 uniform lowp vec4 uColor;
-uniform vec3 uSize;
-uniform vec2 uSpineShadowParameter;
-varying vec3 vNormal;
-varying vec4 vPosition;
+uniform highp vec3 uSize;
+uniform highp vec2 uSpineShadowParameter;
+varying highp vec3 vNormal;
+varying highp vec4 vPosition;
 
 void main()
 {

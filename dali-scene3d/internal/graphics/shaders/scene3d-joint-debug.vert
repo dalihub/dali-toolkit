@@ -1,5 +1,5 @@
 
-precision mediump float;
+precision highp float;
 uniform mat4 uMvpMatrix;
 INPUT vec3 aPosition;
 INPUT float aColor;

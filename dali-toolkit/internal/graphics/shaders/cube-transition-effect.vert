@@ -1,12 +1,13 @@
-attribute mediump vec2 aPosition;
-varying mediump vec2 vTexCoord;
-uniform mediump mat4 uMvpMatrix;
-uniform mediump vec3 uSize;
-uniform mediump vec4 uTextureRect;
+precision highp float;
+attribute highp vec2 aPosition;
+varying highp vec2 vTexCoord;
+uniform highp mat4 uMvpMatrix;
+uniform highp vec3 uSize;
+uniform highp vec4 uTextureRect;
 
 void main()
 {
-  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
+  highp vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   vertexPosition.xyz *= uSize;
   vertexPosition = uMvpMatrix * vertexPosition;
 

@@ -1,3 +1,4 @@
+precision highp float;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
@@ -176,8 +177,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity *= min(1.0, borderlineWidth / gPotentialRange);
   }
 
-  lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
-  lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  highp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  highp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
   // NOTE : color-visual is always preMultiplied.
   borderlineColorRGB *= borderlineColorAlpha;
 
@@ -197,7 +198,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     else
     {
       // potential is in texture range.
-      lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      highp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
       textureColor.rgb *= textureAlphaScale;
     }
@@ -214,8 +215,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
-    lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
-    lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+    highp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+    highp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
     return vec4(finalMultipliedRGB, finalAlpha);
   }
   return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);

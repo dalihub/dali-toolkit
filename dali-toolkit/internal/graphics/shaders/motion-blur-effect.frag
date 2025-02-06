@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 
 uniform sampler2D sTexture;
 uniform vec4 uColor;

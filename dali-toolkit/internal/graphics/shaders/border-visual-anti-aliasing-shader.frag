@@ -1,8 +1,9 @@
-INPUT mediump float vAlpha;
+precision highp float;
+INPUT highp float vAlpha;
 
 uniform lowp vec4 uColor;
 uniform lowp vec4 borderColor;
-uniform mediump float borderSize;
+uniform highp float borderSize;
 
 void main()
 {

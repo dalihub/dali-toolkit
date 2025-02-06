@@ -1,5 +1,5 @@
-precision mediump float;
-varying mediump vec2 vTexCoord;
+precision highp float;
+varying highp vec2 vTexCoord;
 uniform vec3 uSize;
 uniform vec2 uSpineShadowParameter;
 uniform sampler2D sTexture;

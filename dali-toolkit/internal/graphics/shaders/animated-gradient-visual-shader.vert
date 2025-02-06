@@ -1,15 +1,17 @@
-attribute mediump vec2 aPosition;
+precision highp float;
+
+attribute highp vec2 aPosition;
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
 
-uniform mediump vec2 start_point;
-uniform mediump vec2 end_point;
-uniform mediump vec2 rotate_center;
-uniform mediump float rotate_angle;
+uniform highp vec2 start_point;
+uniform highp vec2 end_point;
+uniform highp vec2 rotate_center;
+uniform highp float rotate_angle;
 
-varying mediump vec2 vTexCoord;
-varying mediump vec2 vStart;
-varying mediump vec2 vEnd;
+varying highp vec2 vTexCoord;
+varying highp vec2 vStart;
+varying highp vec2 vEnd;
 
 vec2 rotate(vec2 x, vec2 c, float a)
 {
@@ -28,7 +30,7 @@ vec2 rotate(vec2 x, vec2 c, float a)
 }
 
 //Visual size and offset
-uniform mediump vec2 offset;
+uniform highp vec2 offset;
 uniform highp vec2 size;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;

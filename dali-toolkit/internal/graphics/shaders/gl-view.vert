@@ -1,7 +1,8 @@
-attribute mediump vec2 aPosition;
-uniform mediump mat4   uMvpMatrix;
-uniform mediump vec3   uSize;
-varying mediump vec2   vTexCoord;
+precision highp float;
+attribute highp vec2 aPosition;
+uniform highp mat4   uMvpMatrix;
+uniform highp vec3   uSize;
+varying highp vec2   vTexCoord;
 
 void main()
 {

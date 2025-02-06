@@ -1,7 +1,7 @@
 precision highp float;
 uniform vec3 uHSVDelta;
 uniform float uIgnoreAlpha;
-varying mediump vec2 vTexCoord;
+varying highp vec2 vTexCoord;
 uniform sampler2D sTexture;
 
 float rand(vec2 co)

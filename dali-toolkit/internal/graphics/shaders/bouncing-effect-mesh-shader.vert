@@ -1,9 +1,10 @@
+precision highp float;
 // Modify the vertex position according to the bounce coefficient
-attribute mediump vec3    aPosition1;
-attribute mediump vec3    aPosition2;
-uniform   mediump mat4    uMvpMatrix;
-uniform   mediump vec3    uSize;
-uniform   mediump float   uBounceCoefficient;
+attribute highp vec3    aPosition1;
+attribute highp vec3    aPosition2;
+uniform   highp mat4    uMvpMatrix;
+uniform   highp vec3    uSize;
+uniform   highp float   uBounceCoefficient;
 
 void main()
 {

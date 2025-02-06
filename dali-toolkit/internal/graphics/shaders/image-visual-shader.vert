@@ -1,5 +1,6 @@
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
+precision highp float;
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
@@ -42,9 +43,9 @@ uniform highp vec4 cornerRadius;
 uniform mediump float cornerRadiusPolicy;
 #endif
 #ifdef IS_REQUIRED_ALPHA_MASKING
-OUTPUT  mediump vec2  vMaskTexCoord;
-uniform lowp    float cropToMask;
-uniform mediump vec2  maskTextureRatio;
+OUTPUT  highp vec2  vMaskTexCoord;
+uniform lowp  float cropToMask;
+uniform highp vec2  maskTextureRatio;
 #endif
 uniform highp vec2 extraSize;
 

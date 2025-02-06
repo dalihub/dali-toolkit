@@ -1,22 +1,23 @@
 //A simple shader that applies diffuse lighting to a mono-coloured object.
 
+precision highp float;
 attribute highp vec3 aPosition;
 attribute highp vec2 aTexCoord;
 attribute highp vec3 aNormal;
-varying mediump vec3 vIllumination;
-uniform mediump vec3 uSize;
-uniform mediump vec3 uObjectDimensions;
-uniform mediump mat4 uMvpMatrix;
-uniform mediump mat4 uModelView;
-uniform mediump mat4 uViewMatrix;
-uniform mediump mat3 uNormalMatrix;
-uniform mediump mat4 uObjectMatrix;
-uniform mediump vec3 lightPosition;
-uniform mediump vec2 uStageOffset;
+varying highp vec3 vIllumination;
+uniform highp vec3 uSize;
+uniform highp vec3 uObjectDimensions;
+uniform highp mat4 uMvpMatrix;
+uniform highp mat4 uModelView;
+uniform highp mat4 uViewMatrix;
+uniform highp mat3 uNormalMatrix;
+uniform highp mat4 uObjectMatrix;
+uniform highp vec3 lightPosition;
+uniform highp vec2 uStageOffset;
 
 //Visual size and offset
-uniform mediump vec2 offset;
-uniform mediump vec2 size;
+uniform highp vec2 offset;
+uniform highp vec2 size;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;
 uniform mediump vec2 anchorPoint;

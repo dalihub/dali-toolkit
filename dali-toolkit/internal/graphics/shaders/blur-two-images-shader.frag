@@ -2,7 +2,7 @@ precision highp float;
 uniform float uBlurStrength;
 uniform sampler2D sTexture;
 uniform sampler2D sEffect;
-varying mediump vec2 vTexCoord;
+varying highp vec2 vTexCoord;
 
 void main()
 {

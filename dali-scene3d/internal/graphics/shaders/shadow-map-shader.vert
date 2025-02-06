@@ -27,8 +27,8 @@ uniform int uBlendShapeGeometryHeight;
 #endif
 #endif
 
-OUTPUT mediump vec2 vUV;
-OUTPUT lowp vec4 vColor;
+OUTPUT highp vec2 vUV;
+OUTPUT highp vec4 vColor;
 
 uniform highp mat4 uViewMatrix;
 uniform highp mat4 uModelMatrix;

@@ -1,3 +1,4 @@
+precision highp float;
 varying highp vec2 vTexCoord;
 uniform sampler2D sTexture;
 uniform highp vec2 uSampleOffsets[NUM_SAMPLES];

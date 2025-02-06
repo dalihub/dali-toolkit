@@ -1,5 +1,6 @@
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
+precision highp float;
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
@@ -12,7 +13,7 @@ FLAT OUTPUT highp vec4 vCornerRadius;
 
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
-uniform mediump mat3 uAlignmentMatrix;
+uniform highp mat3 uAlignmentMatrix;
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Be used when we calculate anti-alias range near 1 pixel.
