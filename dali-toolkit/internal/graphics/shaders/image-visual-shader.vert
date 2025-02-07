@@ -2,8 +2,10 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
@@ -15,7 +17,7 @@ FLAT OUTPUT highp vec4 vCornerRadius;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-OUTPUT  mediump vec2  vMaskTexCoord;
+OUTPUT highp vec2  vMaskTexCoord;
 #endif
 
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER
@@ -32,27 +34,33 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp vec3 uSize;
   UNIFORM highp vec4 pixelArea;
 
-#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
-  // Be used when we calculate anti-alias range near 1 pixel.
-  UNIFORM highp vec3 uScale;
-#endif
-
-  // Visual size and offset
-  UNIFORM highp vec2   offset;
-  UNIFORM highp vec2   size;
-  UNIFORM mediump vec4 offsetSizeMode;
-  UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
-
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   UNIFORM highp vec4    cornerRadius;
   UNIFORM mediump float cornerRadiusPolicy;
 #endif
 #ifdef IS_REQUIRED_ALPHA_MASKING
-  UNIFORM lowp float   cropToMask;
-  UNIFORM mediump vec2 maskTextureRatio;
+  UNIFORM lowp  float cropToMask;
+  UNIFORM highp vec2  maskTextureRatio;
 #endif
+};
+
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+UNIFORM_BLOCK SharedBlock
+{
+  // Be used when we calculate anti-alias range near 1 pixel.
+  UNIFORM highp vec3 uScale;
+};
+#endif
+
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
+  UNIFORM highp vec2 size;
   UNIFORM highp vec2 extraSize;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
 };
 
 #ifdef IS_REQUIRED_BORDERLINE

@@ -2,14 +2,16 @@
 
 //@version 100
 
-INPUT mediump float aIndex;
-INPUT mediump vec2  aPosition;
-INPUT highp   vec2  aTexCoord;
-OUTPUT   mediump vec2  vTexCoord;
+precision highp float;
+
+INPUT highp float aIndex;
+INPUT highp vec2  aPosition;
+INPUT highp vec2  aTexCoord;
+OUTPUT highp vec2  vTexCoord;
 
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM   mediump mat4  uMvpMatrix;
+  UNIFORM highp mat4  uMvpMatrix;
 // the gravity applied to the y direction
   UNIFORM mediump float uGravity;
 // xy: the emit position of the bubble; zw: the destination of the bubble.
@@ -25,8 +27,8 @@ UNIFORM_BLOCK VertBlock
 // This UNIFORM is used to change the bubble size during running time
   UNIFORM float uDynamicScale;
 };
-OUTPUT float vPercentage;
-OUTPUT vec2  vEffectTexCoord;
+OUTPUT highp float vPercentage;
+OUTPUT highp vec2  vEffectTexCoord;
 
 void main()
 {

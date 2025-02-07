@@ -2,10 +2,11 @@
 
 //@version 100
 
-precision mediump float;
-INPUT mediump vec2 vTexCoord;
-INPUT mediump vec3 vLightDirection;
-INPUT mediump vec3 vHalfVector;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
+INPUT highp vec3 vLightDirection;
+INPUT highp vec3 vHalfVector;
 UNIFORM sampler2D sDiffuse;
 UNIFORM sampler2D sNormal;
 UNIFORM sampler2D sGloss;

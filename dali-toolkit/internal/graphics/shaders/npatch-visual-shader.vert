@@ -2,9 +2,11 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
-OUTPUT mediump vec2 vMaskTexCoord;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
+OUTPUT highp vec2 vMaskTexCoord;
 
 UNIFORM_BLOCK VertBlock
 {
@@ -12,13 +14,17 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp vec3 uSize;
   UNIFORM highp vec2 uNinePatchFactorsX[FACTOR_SIZE_X];
   UNIFORM highp vec2 uNinePatchFactorsY[FACTOR_SIZE_Y];
-  // Visual size and offset
+};
+
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
   UNIFORM highp vec2 offset;
   UNIFORM highp vec2 size;
+  UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
   UNIFORM mediump vec2 anchorPoint;
-  UNIFORM highp vec2 extraSize;
 };
 
 void main()

@@ -2,9 +2,9 @@
 
 //@version 100
 
-precision mediump float;
+precision highp float;
 
-INPUT mediump vec2 vTexCoord;
+INPUT highp vec2 vTexCoord;
 
 UNIFORM sampler2D sTexture;
 UNIFORM_BLOCK FragBlock
@@ -18,8 +18,8 @@ UNIFORM_BLOCK SharedBlock
   UNIFORM vec3 uSize;
 };
 
-INPUT vec3 vNormal;
-INPUT vec4 vPosition;
+INPUT highp vec3 vNormal;
+INPUT highp vec4 vPosition;
 
 void main()
 {

@@ -2,7 +2,9 @@
 
 //@version 100
 
-INPUT mediump vec4      vColor;
+precision highp float;
+
+INPUT highp vec4      vColor;
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp    vec4      uColor;

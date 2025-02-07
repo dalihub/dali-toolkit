@@ -2,14 +2,16 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-INPUT mediump vec2 aTexCoord;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+INPUT highp vec2 aTexCoord;
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp mat4 uMvpMatrix;
 };
-OUTPUT mediump vec2 vTexCoord;
+OUTPUT highp vec2 vTexCoord;
 
 void main()
 {

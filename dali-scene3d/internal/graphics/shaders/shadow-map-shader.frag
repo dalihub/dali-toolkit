@@ -1,3 +1,5 @@
+//@name shadow-map-shader.frag
+
 //@version 100
 
 UNIFORM_BLOCK FragBlock
@@ -8,8 +10,8 @@ UNIFORM_BLOCK FragBlock
   UNIFORM int uIsShadowCasting;
 };
 
-INPUT mediump vec2 vUV;
-INPUT lowp vec4 vColor;
+INPUT highp vec2 vUV;
+INPUT highp vec4 vColor;
 
 #ifdef THREE_TEX
 #ifdef BASECOLOR_TEX

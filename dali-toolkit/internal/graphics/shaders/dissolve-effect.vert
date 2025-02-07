@@ -2,24 +2,26 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
+precision highp float;
+
+INPUT highp vec2 aPosition;
 
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump mat4   uMvpMatrix;
-  UNIFORM vec3           uSize;
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uSize;
 
-  UNIFORM float          uPercentage;
-  UNIFORM vec3           uSaddleParam;
-  UNIFORM vec2           uTranslation;
-  UNIFORM vec2           uRotation;
-  UNIFORM float          uToNext;
+  UNIFORM highp float uPercentage;
+  UNIFORM highp vec3  uSaddleParam;
+  UNIFORM highp vec2  uTranslation;
+  UNIFORM highp vec2  uRotation;
+  UNIFORM highp float uToNext;
 };
 
 
 
-OUTPUT float          vPercentage;
-OUTPUT vec2           vTexCoord;
+OUTPUT highp float vPercentage;
+OUTPUT highp vec2  vTexCoord;
 
 void main()
 {

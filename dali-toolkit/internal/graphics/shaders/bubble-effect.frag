@@ -2,11 +2,13 @@
 
 //@version 100
 
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 UNIFORM sampler2D sBackground;
 UNIFORM sampler2D sBubbleShape;
-INPUT mediump float vPercentage;
-INPUT mediump vec2 vEffectTexCoord;
+INPUT highp float vPercentage;
+INPUT highp vec2 vEffectTexCoord;
 
 UNIFORM_BLOCK FragBlock
 {

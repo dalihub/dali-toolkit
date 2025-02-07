@@ -2,8 +2,10 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4 uMvpMatrix;
@@ -11,7 +13,6 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp vec2 uSizeRatio;
   UNIFORM highp mat2 uRotationMatrix;
 };
-OUTPUT mediump vec2 sTexCoordRect;
 
 highp vec2 getSize(highp vec2 size)
 {

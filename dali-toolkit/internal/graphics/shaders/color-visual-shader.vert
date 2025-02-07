@@ -2,7 +2,9 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
+precision highp float;
+
+INPUT highp vec2 aPosition;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
@@ -23,36 +25,38 @@ UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4 uMvpMatrix;
 
-  #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
   // Be used when we calculate anti-alias range near 1 pixel.
   UNIFORM highp vec3 uScale;
-  #endif
-
-  //Visual size and offset
-  UNIFORM highp vec2 offset;
-  UNIFORM highp vec2 size;
-  UNIFORM mediump vec4 offsetSizeMode;
-  UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+#endif
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   UNIFORM highp vec4 cornerRadius;
   UNIFORM mediump float cornerRadiusPolicy;
 #endif
+};
+
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
+  UNIFORM highp vec2 size;
   UNIFORM highp vec2 extraSize;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
 };
 
 UNIFORM_BLOCK SharedBlock
 {
-    UNIFORM highp vec3 uSize;
+  UNIFORM highp vec3 uSize;
 
 #ifdef IS_REQUIRED_BLUR
-    UNIFORM highp float blurRadius;
+  UNIFORM highp float blurRadius;
 #endif
 #ifdef IS_REQUIRED_BORDERLINE
-    UNIFORM highp float borderlineWidth;
-    UNIFORM highp float borderlineOffset;
-    UNIFORM lowp vec4 borderlineColor;
+  UNIFORM highp float borderlineWidth;
+  UNIFORM highp float borderlineOffset;
 #endif
 };
 

@@ -2,18 +2,24 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-INPUT mediump vec2 aDrift;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+INPUT highp vec2 aDrift;
 
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4 uMvpMatrix;
   UNIFORM highp vec3 uSize;
-  UNIFORM mediump float borderSize;
+  UNIFORM highp float borderSize;
+};
 
-//Visual size and offset
-  UNIFORM mediump vec2 offset;
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
   UNIFORM highp vec2 size;
+  UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
   UNIFORM mediump vec2 anchorPoint;
@@ -21,7 +27,7 @@ UNIFORM_BLOCK VertBlock
 
 vec2 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw );
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
   return (aPosition + anchorPoint)*visualSize + visualOffset + origin * uSize.xy;
 }

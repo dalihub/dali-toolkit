@@ -2,7 +2,9 @@
 
 //@version 100
 
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
@@ -25,7 +27,7 @@ UNIFORM sampler2D sTextureV;
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
 UNIFORM sampler2D sMaskTexture;
-INPUT mediump vec2 vMaskTexCoord;
+INPUT highp vec2 vMaskTexCoord;
 #endif
 
 UNIFORM_BLOCK FragBlock
@@ -35,15 +37,11 @@ UNIFORM_BLOCK FragBlock
 #endif
 
 #ifdef ATLAS_DEFAULT_WARP
-  UNIFORM mediump vec4 uAtlasRect;
+  UNIFORM highp vec4 uAtlasRect;
 
 #elif defined(ATLAS_CUSTOM_WARP)
   // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
   UNIFORM lowp vec2 wrapMode;
-#endif
-
-#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
-  UNIFORM highp vec3 uScale;
 #endif
 
   UNIFORM lowp vec4  uColor;
@@ -59,6 +57,13 @@ UNIFORM_BLOCK FragBlock
 #endif
 };
 
+#if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER)
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM highp vec3 uScale;
+};
+#endif
+
 #ifdef IS_REQUIRED_BORDERLINE
 UNIFORM_BLOCK Borderline
 {
@@ -68,9 +73,9 @@ UNIFORM_BLOCK Borderline
 #endif
 
 #ifdef ATLAS_CUSTOM_WARP
-mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )
+highp float wrapCoordinate( highp vec2 range, highp float coordinate, lowp float wrap )
 {
-  mediump float coord;
+  highp float coord;
   if( wrap > 1.5 ) /* REFLECT */
     coord = 1.0 - abs(fract(coordinate*0.5)*2.0 - 1.0);
   else /* warp is 0 or 1 */
@@ -208,7 +213,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   highp float potential = gPotential;
 
   // default opacity of borderline is 0.0
-  mediump float borderlineOpacity = 0.0;
+  highp float borderlineOpacity = 0.0;
 
   // calculate borderline opacity by potential
   if(potential > gMinInlinePotential)
@@ -220,8 +225,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity *= min(1.0, borderlineWidth / gPotentialRange);
   }
 
-  lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
-  lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  highp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  highp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
   borderlineColorRGB *= mix(1.0, borderlineColorAlpha, premultipliedAlpha);
 
   // Calculate inside of borderline when alpha is between (0.0  1.0). So we need to apply texture color.
@@ -240,7 +245,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     else
     {
       // potential is in texture range.
-      lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      highp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
       textureColor.a *= textureAlphaScale;
       textureColor.rgb *= mix(textureColor.a, textureAlphaScale, premultipliedAlpha);
     }
@@ -256,8 +261,8 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
     // Else, return vec4((rgb*alpha) / alpha, alpha)
 
-    lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
-    lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+    highp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+    highp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
     // TODO : Need to find some way without division
     return vec4(finalMultipliedRGB * mix(1.0 / finalAlpha, 1.0, premultipliedAlpha), finalAlpha);
   }
@@ -299,10 +304,10 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
   }
 #endif
 
-  lowp float y = TEXTURE(sTexture, texCoord).r;
-  lowp float u = TEXTURE(sTextureU, texCoord).r - 0.5;
-  lowp float v = TEXTURE(sTextureV, texCoord).r - 0.5;
-  lowp vec4 rgba;
+  highp float y = TEXTURE(sTexture, texCoord).r;
+  highp float u = TEXTURE(sTextureU, texCoord).r - 0.5;
+  highp float v = TEXTURE(sTextureV, texCoord).r - 0.5;
+  highp vec4 rgba;
   rgba.r = y + (1.403 * v);
   rgba.g = y - (0.344 * u) - (0.714 * v);
   rgba.b = y + (1.770 * u);
@@ -438,12 +443,12 @@ mediump vec3 ApplyDebugMixColor(mediump vec4 originColor)
 void main()
 {
 #ifdef ATLAS_DEFAULT_WARP
-  mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );
+  highp vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );
 #elif defined(ATLAS_CUSTOM_WARP)
-  mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
+  highp vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
                                 wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );
 #else
-  mediump vec2 texCoord = vTexCoord;
+  highp vec2 texCoord = vTexCoord;
 #endif
 
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
@@ -453,7 +458,7 @@ void main()
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
-  mediump vec2 maskTexCoord = vMaskTexCoord;
+  highp vec2 maskTexCoord = vMaskTexCoord;
   maskTexCoord.y = mix(maskTexCoord.y, 1.0-maskTexCoord.y, uYFlipMaskTexture);
   mediump float maskAlpha = TEXTURE(sMaskTexture, maskTexCoord).a;
   textureColor.a *= maskAlpha;
