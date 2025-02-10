@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ public:
     DISABLE_SIZE_NEGOTIATION             = CustomActorImpl::DISABLE_SIZE_NEGOTIATION,
     REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = Control::REQUIRES_KEYBOARD_NAVIGATION_SUPPORT,
     DISABLE_STYLE_CHANGE_SIGNALS         = Control::DISABLE_STYLE_CHANGE_SIGNALS,
+    DISABLE_VISUALS                      = Control::DISABLE_VISUALS,
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };

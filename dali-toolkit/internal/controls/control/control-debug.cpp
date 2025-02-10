@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,10 +292,13 @@ std::string DumpControl(const Internal::Control& control)
     oss << "\"name\":\"" << name << "\",\n";
   }
   oss << "\"id\":\"" << control.Self().GetProperty<int>(Actor::Property::ID) << "\",\n";
-  oss << "\"registeredVisuals\":\n"
-      << controlData.mVisualData->mVisuals << ",\n";
-  oss << "\"removeVisuals\":\n"
-      << controlData.mVisualData->mRemoveVisuals << ",\n";
+  if(DALI_LIKELY(controlData.mVisualData))
+  {
+    oss << "\"registeredVisuals\":\n"
+        << controlData.mVisualData->mVisuals << ",\n";
+    oss << "\"removeVisuals\":\n"
+        << controlData.mVisualData->mRemoveVisuals << ",\n";
+  }
   oss << "\"rendererCount\":" << control.Self().GetRendererCount() << ",\n";
   oss << "\"properties\":\n{\n";
   DumpProperties(oss, control.Self()) << "}\n";

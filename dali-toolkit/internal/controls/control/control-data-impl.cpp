@@ -417,12 +417,14 @@ Control::Impl::Impl(Control& controlImpl)
   mProcessorRegistered(false)
 {
   mAccessibilityData = std::make_unique<AccessibilityData>(mControlImpl);
-  mVisualData        = std::make_unique<VisualData>(*this);
 }
 
 Control::Impl::~Impl()
 {
-  mVisualData->ClearVisuals();
+  if(mVisualData)
+  {
+    mVisualData->ClearVisuals();
+  }
 
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
@@ -438,6 +440,11 @@ Control::Impl::~Impl()
     // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
     Adaptor::Get().RemoveIdle(mIdleCallback);
   }
+}
+
+void Control::Impl::InitializeVisualData()
+{
+  mVisualData = std::make_unique<Control::Impl::VisualData>(*this);
 }
 
 Control::Impl& Control::Impl::Get(Internal::Control& internalControl)
@@ -488,53 +495,70 @@ void Control::Impl::ResourceReady()
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
-  mVisualData->RegisterVisual(index, visual);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->RegisterVisual(index, visual);
+  }
 }
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
 {
-  mVisualData->RegisterVisual(index, visual, depthIndex);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->RegisterVisual(index, visual, depthIndex);
+  }
 }
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
 {
-  mVisualData->RegisterVisual(index, visual, enabled);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->RegisterVisual(index, visual, enabled);
+  }
 }
 
 void Control::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
 {
-  mVisualData->RegisterVisual(index, visual, enabled, depthIndex);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->RegisterVisual(index, visual, enabled, depthIndex);
+  }
 }
 
 void Control::Impl::UnregisterVisual(Property::Index index)
 {
-  mVisualData->UnregisterVisual(index);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->UnregisterVisual(index);
+  }
 }
 
 Toolkit::Visual::Base Control::Impl::GetVisual(Property::Index index) const
 {
-  return mVisualData->GetVisual(index);
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->GetVisual(index);
+  }
+  return Toolkit::Visual::Base();
 }
 
 bool Control::Impl::IsResourceReady() const
 {
-  return mVisualData->IsResourceReady();
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->IsResourceReady();
+  }
+  return true;
 }
 
 void Control::Impl::OnSceneConnection()
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mVisualData->mVisuals.Size());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
 
-  Actor self = mControlImpl.Self();
-
-  for(RegisteredVisualContainer::Iterator iter = mVisualData->mVisuals.Begin(); iter != mVisualData->mVisuals.End(); iter++)
+  if(DALI_LIKELY(mVisualData))
   {
-    // Check whether the visual is empty and enabled
-    if((*iter)->visual && (*iter)->enabled)
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
-      Toolkit::GetImplementation((*iter)->visual).SetOnScene(self);
-    }
+    Actor self = mControlImpl.Self();
+    mVisualData->ConnectScene(self);
   }
 
   if(mOffScreenRenderingImpl) // mOffScreenRenderingType != NONE
@@ -545,8 +569,13 @@ void Control::Impl::OnSceneConnection()
 
 void Control::Impl::OnSceneDisconnection()
 {
-  Actor self = mControlImpl.Self();
-  mVisualData->ClearScene(self);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneDisconnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
+
+  if(DALI_LIKELY(mVisualData))
+  {
+    Actor self = mControlImpl.Self();
+    mVisualData->ClearScene(self);
+  }
 
   if(mOffScreenRenderingImpl)
   {
@@ -556,28 +585,47 @@ void Control::Impl::OnSceneDisconnection()
 
 void Control::Impl::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable)
 {
-  mVisualData->EnableReadyTransitionOverriden(visual, enable);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->EnableReadyTransitionOverriden(visual, enable);
+  }
 }
 
 void Control::Impl::EnableVisual(Property::Index index, bool enable)
 {
-  mVisualData->EnableVisual(index, enable);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->EnableVisual(index, enable);
+  }
 }
 
 bool Control::Impl::IsVisualEnabled(Property::Index index) const
 {
-  return mVisualData->IsVisualEnabled(index);
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->IsVisualEnabled(index);
+  }
+  return false;
 }
 
 Toolkit::Visual::ResourceStatus Control::Impl::GetVisualResourceStatus(Property::Index index) const
 {
-  return mVisualData->GetVisualResourceStatus(index);
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->GetVisualResourceStatus(index);
+  }
+  return Toolkit::Visual::ResourceStatus::READY;
 }
 
 void Control::Impl::AddTransitions(Dali::Animation&               animation,
                                    const Toolkit::TransitionData& handle,
                                    bool                           createAnimation)
 {
+  if(DALI_UNLIKELY(!mVisualData))
+  {
+    return;
+  }
+
   // Setup a Transition from TransitionData.
   const Internal::TransitionData& transitionData = Toolkit::GetImplementation(handle);
   TransitionData::Iterator        end            = transitionData.End();
@@ -646,12 +694,18 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
 
 void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes)
 {
-  mVisualData->DoAction(visualIndex, actionId, attributes);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->DoAction(visualIndex, actionId, attributes);
+  }
 }
 
 void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
 {
-  mVisualData->DoActionExtension(visualIndex, actionId, attributes);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->DoActionExtension(visualIndex, actionId, attributes);
+  }
 }
 
 Dali::Animation Control::Impl::CreateTransition(const Toolkit::TransitionData& transitionData)
@@ -784,11 +838,14 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         else if(value.Get(url))
         {
-          // don't know the size to load
-          Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, ImageDimensions());
-          if(visual)
+          if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+            // don't know the size to load
+            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, ImageDimensions());
+            if(visual)
+            {
+              controlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+            }
           }
         }
         else if(value.Get(color))
@@ -1074,11 +1131,15 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::Control::Property::BACKGROUND:
       {
-        Property::Map         map;
-        Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::Control::Property::BACKGROUND);
-        if(visual)
+        Property::Map map;
+
+        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
         {
-          visual.CreatePropertyMap(map);
+          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::Control::Property::BACKGROUND);
+          if(visual)
+          {
+            visual.CreatePropertyMap(map);
+          }
         }
 
         value = map;
@@ -1110,11 +1171,15 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::SHADOW:
       {
-        Property::Map         map;
-        Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::SHADOW);
-        if(visual)
+        Property::Map map;
+
+        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
         {
-          visual.CreatePropertyMap(map);
+          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::SHADOW);
+          if(visual)
+          {
+            visual.CreatePropertyMap(map);
+          }
         }
 
         value = map;
@@ -1228,24 +1293,27 @@ void Control::Impl::SetState(DevelControl::State newState, bool withTransitions)
     // store that fact, e.g. in another property that FocusManager can access.
     mState = newState;
 
-    // Trigger state change and transitions
-    // Apply new style, if stylemanager is available
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-    if(styleManager)
+    if(DALI_LIKELY(mVisualData))
     {
-      const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
-
-      if(stylePtr)
+      // Trigger state change and transitions
+      // Apply new style, if stylemanager is available
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if(styleManager)
       {
-        std::string oldStateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(oldState, ControlStateTable, ControlStateTableCount);
-        std::string newStateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(newState, ControlStateTable, ControlStateTableCount);
+        const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
 
-        const StylePtr* newStateStyle = stylePtr->subStates.Find(newStateName);
-        const StylePtr* oldStateStyle = stylePtr->subStates.Find(oldStateName);
-        if(oldStateStyle && newStateStyle)
+        if(stylePtr)
         {
-          // Only change if both state styles exist
-          mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, mSubStateName);
+          std::string oldStateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(oldState, ControlStateTable, ControlStateTableCount);
+          std::string newStateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(newState, ControlStateTable, ControlStateTableCount);
+
+          const StylePtr* newStateStyle = stylePtr->subStates.Find(newStateName);
+          const StylePtr* oldStateStyle = stylePtr->subStates.Find(oldStateName);
+          if(oldStateStyle && newStateStyle)
+          {
+            // Only change if both state styles exist
+            mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, mSubStateName);
+          }
         }
       }
     }
@@ -1256,29 +1324,32 @@ void Control::Impl::SetSubState(const std::string& subStateName, bool withTransi
 {
   if(mSubStateName != subStateName)
   {
-    // Get existing sub-state visuals, and unregister them
-    Dali::CustomActor handle(mControlImpl.GetOwner());
-
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-    if(styleManager)
+    if(DALI_LIKELY(mVisualData))
     {
-      const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
-      if(stylePtr)
+      // Get existing sub-state visuals, and unregister them
+      Dali::CustomActor handle(mControlImpl.GetOwner());
+
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if(styleManager)
       {
-        // Stringify state
-        std::string stateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(mState, ControlStateTable, ControlStateTableCount);
-
-        const StylePtr* state = stylePtr->subStates.Find(stateName);
-        if(state)
+        const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
+        if(stylePtr)
         {
-          StylePtr stateStyle(*state);
+          // Stringify state
+          std::string stateName = Scripting::GetEnumerationName<Toolkit::DevelControl::State>(mState, ControlStateTable, ControlStateTableCount);
 
-          const StylePtr* newStateStyle = stateStyle->subStates.Find(subStateName);
-          const StylePtr* oldStateStyle = stateStyle->subStates.Find(mSubStateName);
-          if(oldStateStyle && newStateStyle)
+          const StylePtr* state = stylePtr->subStates.Find(stateName);
+          if(state)
           {
-            std::string empty;
-            mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, empty);
+            StylePtr stateStyle(*state);
+
+            const StylePtr* newStateStyle = stateStyle->subStates.Find(subStateName);
+            const StylePtr* oldStateStyle = stateStyle->subStates.Find(mSubStateName);
+            if(oldStateStyle && newStateStyle)
+            {
+              std::string empty;
+              mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, empty);
+            }
           }
         }
       }
@@ -1316,6 +1387,7 @@ Extents Control::Impl::GetPadding() const
 
 DevelControl::VisualEventSignalType& Control::Impl::VisualEventSignal()
 {
+  DALI_ASSERT_ALWAYS(mVisualData && "Visual Disabled control cannot use VisualEventSignal!!");
   return mVisualData->VisualEventSignal();
 }
 
@@ -1407,33 +1479,47 @@ bool Control::Impl::IsCreateAccessibleEnabled() const
 
 void Control::Impl::ApplyFittingMode(const Vector2& size)
 {
-  mVisualData->ApplyFittingMode(size);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->ApplyFittingMode(size);
+  }
 }
 
 void Control::Impl::SetShadow(const Property::Map& map)
 {
-  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(map);
-  visual.SetName("shadow");
-
-  if(visual)
+  if(DALI_LIKELY(mVisualData))
   {
-    mControlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT);
+    Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(map);
+    visual.SetName("shadow");
 
-    mControlImpl.RelayoutRequest();
+    if(visual)
+    {
+      mVisualData->RegisterVisual(Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT);
+
+      mControlImpl.RelayoutRequest();
+    }
   }
 }
 
 void Control::Impl::ClearShadow()
 {
-  mControlImpl.mImpl->mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::SHADOW);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::SHADOW);
 
-  // Trigger a size negotiation request that may be needed when unregistering a visual.
-  mControlImpl.RelayoutRequest();
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    mControlImpl.RelayoutRequest();
+  }
 }
 
 Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
 {
-  return mVisualData->GetVisualProperty(index, visualPropertyKey);
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->GetVisualProperty(index, visualPropertyKey);
+  }
+  Dali::Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
 void Control::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
@@ -1465,7 +1551,10 @@ void Control::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::Inde
 
 void Control::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
-  mVisualData->UpdateVisualProperties(properties);
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->UpdateVisualProperties(properties);
+  }
 }
 
 void Control::Impl::EmitResourceReadySignal()
@@ -1538,10 +1627,13 @@ std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::GetAcce
 
 void Control::Impl::RegisterProcessorOnce()
 {
-  if(!mProcessorRegistered)
+  if(DALI_LIKELY(mVisualData))
   {
-    Adaptor::Get().RegisterProcessorOnce(*this, true);
-    mProcessorRegistered = true;
+    if(!mProcessorRegistered)
+    {
+      Adaptor::Get().RegisterProcessorOnce(*this, true);
+      mProcessorRegistered = true;
+    }
   }
 }
 
@@ -1578,8 +1670,11 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
 
 void Control::Impl::Process(bool postProcessor)
 {
-  // Call ApplyFittingMode
-  mVisualData->ApplyFittingMode(mSize);
+  if(DALI_LIKELY(mVisualData))
+  {
+    // Call ApplyFittingMode
+    mVisualData->ApplyFittingMode(mSize);
+  }
   mProcessorRegistered = false;
 }
 

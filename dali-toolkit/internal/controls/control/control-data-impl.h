@@ -83,6 +83,11 @@ public:
   ~Impl();
 
   /**
+   * @brief Initialize private VisualData context for this impl.
+   */
+  void InitializeVisualData();
+
+  /**
    * @brief Called when a pinch is detected.
    * @param[in] actor The actor the pinch occurred on
    * @param[in] pinch The pinch gesture details
