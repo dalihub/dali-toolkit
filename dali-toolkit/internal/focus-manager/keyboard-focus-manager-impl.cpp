@@ -1131,6 +1131,11 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
       }
     }
   }
+  else if(!focusIn && mCurrentFocusedWindow.GetHandle() == window.GetRootLayer())
+  {
+    mCurrentFocusedWindow.Reset();
+    ClearFocus();
+  }
 }
 
 Toolkit::KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()
