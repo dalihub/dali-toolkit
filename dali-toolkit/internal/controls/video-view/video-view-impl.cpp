@@ -711,6 +711,7 @@ void VideoView::SetNativeImageTarget()
     textureSet.SetTexture(0u, mNativeTexture);
   }
   Self().AddRenderer(mTextureRenderer);
+  mTextureRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
 
   // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
   mVideoPlayer.SetRenderingTarget(nativeImageSourcePtr);
@@ -887,7 +888,11 @@ Dali::Shader VideoView::CreateShader()
     DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
   }
 
-  return Dali::Shader::New(vertexShader, fragmentShader);
+  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader);
+    // Initialize shader properties
+  shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
+  shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
+  return shader;
 }
 
 bool VideoView::GetStringFromProperty(const Dali::Property::Value& value, std::string& output)
@@ -953,6 +958,27 @@ VideoPlayer VideoView::GetVideoPlayer()
 {
   return mVideoPlayer;
 }
+
+void VideoView::SetAutoRotationEnabled(bool enable)
+{
+  mVideoPlayer.SetAutoRotationEnabled(enable);
+}
+
+bool VideoView::IsAutoRotationEnabled() const
+{
+  return mVideoPlayer.IsAutoRotationEnabled();
+}
+
+void VideoView::SetLetterBoxEnabled(bool enable)
+{
+  mVideoPlayer.SetLetterBoxEnabled(enable);
+}
+
+bool VideoView::IsLetterBoxEnabled() const
+{
+  return mVideoPlayer.IsLetterBoxEnabled();
+}
+
 
 } // namespace Internal
 
