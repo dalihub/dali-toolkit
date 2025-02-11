@@ -43,6 +43,11 @@ endif()
 
 if(NOT MSVC)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
+  include(CheckCCompilerFlag)
+  check_c_compiler_flag(-Wno-alloc-size-larger-than HAVE_NO_ALLOC_SIZE_LARGER_THAN)
+  if(HAVE_NO_ALLOC_SIZE_LARGER_THAN)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-alloc-size-larger-than")
+  endif()
   if(FORCE_CLANG_BLOCKS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
   endif()
