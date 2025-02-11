@@ -185,6 +185,7 @@ public: // Creation & Destruction
     DISABLE_SIZE_NEGOTIATION             = 1 << (0 + 0), ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
     REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (4 + 1), ///< True if needs to support keyboard navigation @SINCE_1_0.0
     DISABLE_STYLE_CHANGE_SIGNALS         = 1 << (4 + 2), ///< True if control should not monitor style change signals @SINCE_1_2_10
+    DISABLE_VISUALS                      = 1 << (4 + 3), ///< True if control should not use visuals @SINCE_2_3.6
   };
 
   /**

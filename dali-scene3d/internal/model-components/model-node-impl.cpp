@@ -66,7 +66,7 @@ Dali::Scene3D::ModelNode ModelNode::New()
 }
 
 ModelNode::ModelNode()
-: Control(static_cast<ControlBehaviour>(ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | ActorFlags::DISABLE_SIZE_NEGOTIATION))
+: Control(static_cast<ControlBehaviour>(ControlBehaviour::DISABLE_VISUALS | ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | ActorFlags::DISABLE_SIZE_NEGOTIATION))
 {
 }
 

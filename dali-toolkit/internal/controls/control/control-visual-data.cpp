@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,6 +237,19 @@ Control::Impl::VisualData::VisualData(Control::Impl& outer)
 
 Control::Impl::VisualData::~VisualData()
 {
+}
+
+void Control::Impl::VisualData::ConnectScene(Actor parent)
+{
+  for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
+  {
+    // Check whether the visual is empty and enabled
+    if((*iter)->visual && (*iter)->enabled)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
+      Toolkit::GetImplementation((*iter)->visual).SetOnScene(parent);
+    }
+  }
 }
 
 void Control::Impl::VisualData::ClearScene(Actor parent)

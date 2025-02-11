@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ Dali::Geometry CreatePlaneGeometry(bool flip = false)
 } // anonymous namespace
 
 Panel::Panel()
-: Control(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: Control(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
   mPanelResolution(Vector2::ZERO),
   mResolutionPropertyIndex(Property::INVALID_INDEX),
   mIsTransparent(false),
@@ -363,8 +363,7 @@ void Panel::OnInitialize()
   mDoubleSidedPlaneNode.AddModelPrimitive(doubleSidedPlanePrimitive);
 
   mResolutionPropertyIndex   = mPanelNode.RegisterProperty("resolution", mPanelResolution);
-  Constraint scaleConstraint = Constraint::New<Vector3>(mPanelNode, Dali::Actor::Property::SCALE, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                        {
+  Constraint scaleConstraint = Constraint::New<Vector3>(mPanelNode, Dali::Actor::Property::SCALE, [](Vector3& output, const PropertyInputContainer& inputs) {
     Vector3 panelSize = inputs[0]->GetVector3();
     Vector2 panelResolution = inputs[1]->GetVector2();
     output = Y_DIRECTION;
