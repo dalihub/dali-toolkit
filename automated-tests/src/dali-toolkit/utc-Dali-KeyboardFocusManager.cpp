@@ -1665,10 +1665,22 @@ int UtcDaliKeyboardFocusManagerFocusPerWindow(void)
 
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  // secondWindow loses focus.
+  secondWindow.Lower();
+  // When a window loses focus, the actor also loses focus.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // firstWindow gets focus.
   firstWindow.Raise();
+  // The actor that was focused in that window gains focus again.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
 
   secondWindow.Remove(second);
+
+  firstWindow.Lower();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
   secondWindow.Raise();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() != second);
 
