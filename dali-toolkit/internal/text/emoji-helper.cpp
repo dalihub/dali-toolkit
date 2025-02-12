@@ -132,6 +132,11 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
           isNewVariationSelectorSequence = currentRunScript != TextAbstraction::EMOJI_TEXT;
           currentCharacterScript         = TextAbstraction::EMOJI_TEXT;
         }
+        else if(TextAbstraction::IsASCIIDigits(currentCharacter))
+        {
+          // There is no variation selector.
+          isNewVariationSelectorSequence = false;
+        }
         else if(!TextAbstraction::IsZeroWidthJoiner(characterVS))
         {
           // Start of a new sequence if the next glyph is not a variation selector or zwj.
@@ -147,7 +152,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
       if(currentCharacterIndex > 0)
       {
         Character prevCharacter = *(textBuffer + currentCharacterIndex - 1);
-        if(TextAbstraction::IsEmojiVariationSequences(prevCharacter))
+        if(TextAbstraction::IsEmojiVariationSequences(prevCharacter) && !TextAbstraction::IsASCIIDigits(prevCharacter))
         {
           // The end of a variation sequence, start of a new sequence.
           isNewVariationSelectorSequence = true;
