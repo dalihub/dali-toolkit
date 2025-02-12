@@ -1097,7 +1097,6 @@ struct AtlasRenderer::Impl
                           const UnderlineStyleProperties&                     viewUnderlineProperties,
                           const std::map<uint32_t, UnderlineStyleProperties>& mapUnderlineChunkIdWithProperties)
   {
-
     for(Vector<Extent>::ConstIterator eIt    = extents.Begin(),
                                       eEndIt = extents.End();
         eIt != eEndIt;
@@ -1128,7 +1127,7 @@ struct AtlasRenderer::Impl
       float brx         = eIt->mRight;
 
       AtlasManager::Mesh2D newMesh;
-      unsigned short       faceIndex = 0;
+      uint32_t             faceIndex = 0;
 
       if(underlineType == Text::Underline::Type::DASHED)
       {
@@ -1300,7 +1299,7 @@ struct AtlasRenderer::Impl
       float strikethroughPosition = eIt->mLinePosition;
 
       AtlasManager::Mesh2D newMesh;
-      unsigned short       faceIndex = 0;
+      uint32_t             faceIndex = 0;
 
       vert.mPosition.x  = tlx;
       vert.mPosition.y  = strikethroughPosition;

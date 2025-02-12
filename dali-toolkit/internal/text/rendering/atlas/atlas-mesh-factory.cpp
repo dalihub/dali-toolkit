@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,8 +147,8 @@ void AppendMesh(Toolkit::AtlasManager::Mesh2D&       first,
                         second.mIndices.Begin(),
                         second.mIndices.End());
 
-  for(Vector<unsigned short>::Iterator it    = first.mIndices.Begin() + indicesCount,
-                                       endIt = first.mIndices.End();
+  for(Vector<uint32_t>::Iterator it    = first.mIndices.Begin() + indicesCount,
+                                 endIt = first.mIndices.End();
       it != endIt;
       ++it)
   {
