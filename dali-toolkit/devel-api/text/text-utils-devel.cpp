@@ -314,7 +314,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
                        lineBreakInfo,
                        0u,
                        numberOfCharacters,
-                       bidirectionalInfo);
+                       bidirectionalInfo,
+                       textModel->mLogicalModel->mBidirectionalLineInfo);
 
   const bool hasBidirectionalText = 0u != bidirectionalInfo.Count();
   if(hasBidirectionalText)
