@@ -1219,8 +1219,8 @@ struct Decorator::Impl : public ConnectionTracker
         const float offsetX = mHighlightPosition.x + 0.5f * mHighlightSize.width;
         const float offsetY = mHighlightPosition.y + 0.5f * mHighlightSize.height;
 
-        Vector<Vector2>        vertices;
-        Vector<unsigned short> indices;
+        Vector<Vector2>  vertices;
+        Vector<uint32_t> indices;
 
         vertices.Reserve(4u * numberOfQuads);
         indices.Reserve(6u * numberOfQuads);

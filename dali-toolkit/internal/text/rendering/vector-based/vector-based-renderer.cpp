@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ void AddVertex(Vector<Vertex2D>& vertices, float x, float y, float u, float v, c
   vertices.PushBack(meshVertex);
 }
 
-void AddTriangle(Vector<unsigned short>& indices, unsigned int v0, unsigned int v1, unsigned int v2)
+void AddTriangle(Vector<uint32_t>& indices, uint32_t v0, uint32_t v1, uint32_t v2)
 {
   indices.PushBack(v0);
   indices.PushBack(v1);
@@ -78,7 +78,7 @@ bool CreateGeometry(const Vector<GlyphInfo>&           glyphs,
                     VectorBlobAtlas&                   atlas,
                     Dali::TextAbstraction::FontClient& fontClient,
                     Vector<Vertex2D>&                  vertices,
-                    Vector<unsigned short>&            indices,
+                    Vector<uint32_t>&                  indices,
                     const Vector4* const               colorsBuffer,
                     const ColorIndex* const            colorIndicesBuffer,
                     const Vector4&                     defaultColor)
@@ -88,7 +88,7 @@ bool CreateGeometry(const Vector<GlyphInfo>&           glyphs,
 
   bool atlasFull(false);
 
-  for(unsigned int i = 0, idx = 0; i < numberOfGlyphs && !atlasFull; ++i)
+  for(uint32_t i = 0u, idx = 0u; i < numberOfGlyphs && !atlasFull; ++i)
   {
     if(glyphs[i].width > 0 &&
        glyphs[i].height > 0)
@@ -219,8 +219,8 @@ Actor VectorBasedRenderer::Render(Text::ViewInterface& view,
     const ColorIndex* const colorIndicesBuffer = view.GetColorIndices();
     const Vector4&          defaultColor       = view.GetTextColor();
 
-    Vector<Vertex2D>       vertices;
-    Vector<unsigned short> indices;
+    Vector<Vertex2D> vertices;
+    Vector<uint32_t> indices;
 
     const Vector2& controlSize = view.GetControlSize();
     float          xOffset     = -alignmentOffset + controlSize.width * -0.5f;

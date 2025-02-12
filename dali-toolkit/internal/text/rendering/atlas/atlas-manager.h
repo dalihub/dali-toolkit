@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,8 @@ public:
 
   struct Mesh2D
   {
-    Vector<Vertex2D>       mVertices; ///< container of vertices
-    Vector<unsigned short> mIndices;  ///< container of indices
+    Vector<Vertex2D> mVertices; ///< container of vertices
+    Vector<uint32_t> mIndices;  ///< container of indices
   };
 
   /**
