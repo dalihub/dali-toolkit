@@ -278,6 +278,30 @@ public:
    */
   VideoPlayer GetVideoPlayer();
 
+  /**
+   * @brief Sets auto rotation feature. If enabled, video will rotate automatically according to the video orientation.
+   * @param[in] enable Whether to enable auto rotation feature. Default is false.
+   */
+  void SetAutoRotationEnabled(bool enable);
+
+  /**
+   * @brief Checks whether auto rotation feature is enabled.
+   * @return True if auto rotation feature is enabled. Default is false.
+   */
+  bool IsAutoRotationEnabled() const;
+
+  /**
+   * @brief Sets letter box feature. If enabled, the video will play in the video player's aspect ratio.
+   * @param[in] enable Whether to enable letter box feature. Default is false.
+   */
+  void SetLetterBoxEnabled(bool enable);
+
+  /**
+   * @brief Checks whether letter box feature is enabled.
+   * @return True if letter box feature is enabled. Default is false.
+   */
+  bool IsLetterBoxEnabled() const;
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
