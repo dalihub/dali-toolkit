@@ -2734,6 +2734,13 @@ int utcDaliTextEditorEvent06(void)
   DALI_TEST_EQUALS("Hello\nworld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // For coverage
+  editor.SetProperty(TextEditor::Property::TEXT, "الاخيرالسطر1\nالاخيرالسطر2\nالاخيرالسطر3\nالاخيرالسطر4");
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("d", "", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "ኢ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
   application.ProcessEvent(GenerateKey("", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();

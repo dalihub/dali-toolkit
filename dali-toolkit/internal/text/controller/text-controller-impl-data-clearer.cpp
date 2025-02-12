@@ -65,6 +65,9 @@ void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Contr
 
         free(bidiLineInfo.visualToLogicalMap);
         bidiLineInfo.visualToLogicalMap = NULL;
+
+        free(bidiLineInfo.visualToLogicalMapSecondHalf);
+        bidiLineInfo.visualToLogicalMapSecondHalf = NULL;
       }
       model->mLogicalModel->mBidirectionalLineInfo.Clear();
     }
@@ -165,6 +168,9 @@ void ControllerImplDataClearer::ClearCharacterModelData(Controller::Impl& impl, 
 
         free(bidiLineInfo.visualToLogicalMap);
         bidiLineInfo.visualToLogicalMap = NULL;
+
+        free(bidiLineInfo.visualToLogicalMapSecondHalf);
+        bidiLineInfo.visualToLogicalMapSecondHalf = NULL;
       }
 
       model->mLogicalModel->mBidirectionalLineInfo.Erase(bidirectionalLineInfoBuffer + startRemoveIndex,
