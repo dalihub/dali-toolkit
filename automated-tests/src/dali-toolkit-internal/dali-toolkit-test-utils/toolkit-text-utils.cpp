@@ -263,7 +263,8 @@ void CreateTextModel(const std::string&                text,
                        lineBreakInfo,
                        0u,
                        characterCount,
-                       bidirectionalInfo);
+                       bidirectionalInfo,
+                       logicalModel->mBidirectionalLineInfo);
 
   // Create the paragraph info.
   logicalModel->CreateParagraphInfo(0u,

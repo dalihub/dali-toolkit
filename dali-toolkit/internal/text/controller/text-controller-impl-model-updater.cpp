@@ -306,6 +306,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
                          startIndex,
                          requestedNumberOfCharacters,
                          bidirectionalInfo,
+                         impl.mModel->mLogicalModel->mBidirectionalLineInfo,
                          (impl.mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS),
                          impl.mLayoutDirection);
 

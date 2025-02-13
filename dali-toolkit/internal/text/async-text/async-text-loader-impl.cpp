@@ -147,6 +147,9 @@ void AsyncTextLoader::ClearTextModelData()
 
     free(bidiLineInfo.visualToLogicalMap);
     bidiLineInfo.visualToLogicalMap = NULL;
+
+    free(bidiLineInfo.visualToLogicalMapSecondHalf);
+    bidiLineInfo.visualToLogicalMapSecondHalf = NULL;
   }
   mTextModel->mLogicalModel->mBidirectionalLineInfo.Clear();
 
@@ -399,6 +402,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
                        0u,
                        numberOfCharacters,
                        bidirectionalInfo,
+                       mTextModel->mLogicalModel->mBidirectionalLineInfo,
                        (mTextModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS),
                        parameters.layoutDirection);
 

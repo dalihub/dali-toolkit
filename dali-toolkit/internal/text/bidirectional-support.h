@@ -45,6 +45,7 @@ namespace Text
  * @param[in] startIndex The character from where the bidirectional info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[out] lineInfoRuns Line runs with the visual to logical conversion maps.
  * @param[in] matchLayoutDirection Whether match for layout direction or not.
  * @param[in] layoutDirection The direction of the layout.
  */
@@ -55,6 +56,7 @@ void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSu
                           CharacterIndex                         startIndex,
                           Length                                 numberOfCharacters,
                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                          Vector<BidirectionalLineInfoRun>&      lineInfoRuns,
                           bool                                   matchLayoutDirection = false,
                           Dali::LayoutDirection::Type            layoutDirection      = LayoutDirection::LEFT_TO_RIGHT);
 
