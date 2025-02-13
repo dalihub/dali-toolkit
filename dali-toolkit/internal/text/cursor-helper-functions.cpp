@@ -359,9 +359,17 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
       }
 
       // Get the script of the character.
-      const Script script = logicalModel->GetScript(characterLogicalOrderIndex);
+      const Script script                         = logicalModel->GetScript(characterLogicalOrderIndex);
+      const bool   hasLigatureMustBreak           = HasLigatureMustBreak(script);
+      bool         isCombiningDiacriticalSequence = false;
 
-      const bool   isInterglyphIndex = (numberOfCharacters > numberOfGlyphs) && HasLigatureMustBreak(script);
+      if(hasLigatureMustBreak && numberOfCharacters == 2u)
+      {
+        // Second character is combining diacritical mark.
+        isCombiningDiacriticalSequence = TextAbstraction::IsCombiningDiacriticalMarks(*(logicalModel->mText.Begin() + characterLogicalOrderIndex)) ? true : false;
+      }
+
+      const bool   isInterglyphIndex = (numberOfCharacters > numberOfGlyphs) && (hasLigatureMustBreak && !isCombiningDiacriticalSequence);
       const Length numberOfBlocks    = isInterglyphIndex ? numberOfCharacters : 1u;
       const float  glyphAdvance      = glyphMetrics.advance / static_cast<float>(numberOfBlocks);
 
