@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,6 +282,7 @@ struct Base::Impl
   bool                            mIgnoreFittingMode : 1;             ///< Whether we need to ignore fitting mode.
   bool                            mPixelAreaSetByFittingMode : 1;     ///< Whether the pixel area is set for fitting mode.
   bool                            mTransformMapSetForFittingMode : 1; ///< Whether the transformMap is set for fitting mode.
+  bool                            mTransformMapChanged : 1;           ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
 };
 
 } // namespace Visual
