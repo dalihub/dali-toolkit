@@ -1376,8 +1376,26 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
     const Script script = mModel->mLogicalModel->GetScript(index);
     if(HasLigatureMustBreak(script))
     {
-      // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ, ...
-      numberOfCharacters = 1u;
+      if(numberOfCharacters == 2u)
+      {
+        const Character* const textBuffer = mModel->mLogicalModel->mText.Begin();
+        Character              character  = *(textBuffer + index);
+
+        CharacterIndex nextIndex          = index + 1u;
+        bool           isCurrentCombining = TextAbstraction::IsCombiningDiacriticalMarks(character);
+        bool           isNextValid        = nextIndex < mModel->mLogicalModel->mText.Count();
+        bool           isNextCombining    = isNextValid && TextAbstraction::IsCombiningDiacriticalMarks(*(textBuffer + nextIndex));
+
+        if(!isCurrentCombining && !isNextCombining)
+        {
+          numberOfCharacters = 1u;
+        }
+      }
+      else
+      {
+        // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ, ...
+        numberOfCharacters = 1u;
+      }
     }
   }
   else

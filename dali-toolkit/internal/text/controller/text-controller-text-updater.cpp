@@ -553,6 +553,16 @@ bool Controller::TextUpdater::RemoveText(
       numberOfCharacters = actualNumberOfCharacters;
     }
 
+    if(HasLigatureMustBreak(script) && cursorOffset == 0) // delete key.
+    {
+      GlyphIndex glyphIndex               = *(visualModel->mCharactersToGlyph.Begin() + cursorIndex);
+      Length     actualNumberOfCharacters = *(visualModel->mCharactersPerGlyph.Begin() + glyphIndex);
+      if(actualNumberOfCharacters == 2u && TextAbstraction::IsCombiningDiacriticalMarks(*(currentText.Begin() + cursorIndex + 1u)))
+      {
+        numberOfCharacters = 2u;
+      }
+    }
+
     if((cursorIndex + numberOfCharacters) > currentText.Count())
     {
       numberOfCharacters = currentText.Count() - cursorIndex;
