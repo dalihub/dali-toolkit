@@ -1014,6 +1014,19 @@ void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
   }
 }
 
+void WebView::SetVideoHole(bool enabled, bool isWaylandWindow)
+{
+  mVideoHoleEnabled = enabled;
+
+  EnableBlendMode(!mVideoHoleEnabled);
+
+  if(mWebEngine)
+  {
+    DALI_LOG_DEBUG_INFO("WebView[%p] SetVideoHole(%d) isWaylandWindow(%d)\n", this, mVideoHoleEnabled, isWaylandWindow);
+    mWebEngine.SetVideoHole(mVideoHoleEnabled, isWaylandWindow);
+  }
+}
+
 void WebView::OnFrameRendered()
 {
   if(mFrameRenderedCallback)

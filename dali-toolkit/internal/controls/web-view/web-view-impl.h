@@ -497,6 +497,11 @@ public:
    */
   void FeedMouseWheel(bool yDirection, int step, int x, int y);
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::SetVideoHole()
+   */
+  void SetVideoHole(bool enabled, bool isWaylandWindow);
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.

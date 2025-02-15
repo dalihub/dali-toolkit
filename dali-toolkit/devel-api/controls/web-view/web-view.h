@@ -865,6 +865,13 @@ public:
   void FeedMouseWheel(bool yDirection, int step, int x, int y);
 
   /**
+   * @brief Enable video hole for a specific window type.
+   * @param[in] enabled True if enabled, false othewise.
+   * @param[in] isWaylandWindow True if wayland window, false if EFL window.
+   */
+  void SetVideoHole(bool enabled, bool isWaylandWindow);
+
+  /**
    * @brief Register DeviceConnectionChanged callback.
    *
    * @param[in] callback The callback to be called for handling device connection changed event.
@@ -877,7 +884,6 @@ public:
    * @param[in] callback The callback to be called for getting device list.
    */
   void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
-
 
 public: // Not intended for application developers
   /// @cond internal

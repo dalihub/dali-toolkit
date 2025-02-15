@@ -499,6 +499,10 @@ void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
   Dali::Toolkit::GetImpl(*this).FeedMouseWheel(yDirection, step, x, y);
 }
 
+void WebView::SetVideoHole(bool enabled, bool isWaylandWindow)
+{
+  Dali::Toolkit::GetImpl(*this).SetVideoHole(enabled, isWaylandWindow);
+}
 
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
