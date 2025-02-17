@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -556,23 +556,31 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
 
 void AnimatedVectorImageVisual::OnSetTransform()
 {
-  Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
-
-  if(IsOnScene() && visualSize != mVisualSize)
+  if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f [%p]\n", visualSize.width, visualSize.height, this);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  }
 
-    mVisualSize = visualSize;
+  if(IsOnScene())
+  {
+    Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
 
-    SetVectorImageSize();
-
-    if(mPlayState == DevelImageVisual::PlayState::PLAYING && mAnimationData.playState != DevelImageVisual::PlayState::PLAYING)
+    if(visualSize != mVisualSize)
     {
-      mAnimationData.playState = DevelImageVisual::PlayState::PLAYING;
-      mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
-    }
+      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f [%p]\n", visualSize.width, visualSize.height, this);
 
-    TriggerVectorRasterization();
+      mVisualSize = visualSize;
+
+      SetVectorImageSize();
+
+      if(mPlayState == DevelImageVisual::PlayState::PLAYING && mAnimationData.playState != DevelImageVisual::PlayState::PLAYING)
+      {
+        mAnimationData.playState = DevelImageVisual::PlayState::PLAYING;
+        mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_STATE;
+      }
+
+      TriggerVectorRasterization();
+    }
   }
 }
 

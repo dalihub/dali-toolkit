@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -246,10 +246,14 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           {
             // Unusual case. SetProperty called after OnInitialize().
             // Assume that DoAction call UPDATE_PROPERTY.
+            mImpl->mTransformMapChanged |= !map.Empty();
             mImpl->mTransform.UpdatePropertyMap(map);
 
             // Set Renderer uniforms, and change logics for subclasses.
             OnSetTransform();
+
+            // Reset flag here.
+            mImpl->mTransformMapChanged = false;
           }
           else
           {
@@ -526,6 +530,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
 void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size controlSize)
 {
   mImpl->mControlSize = controlSize;
+  mImpl->mTransformMapChanged |= !transform.Empty();
   mImpl->mTransform.UpdatePropertyMap(transform);
 
 #if defined(DEBUG_ENABLED)
@@ -535,6 +540,9 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
 #endif
 
   OnSetTransform();
+
+  // Reset flag here.
+  mImpl->mTransformMapChanged = false;
 }
 
 void Visual::Base::SetName(const std::string& name)

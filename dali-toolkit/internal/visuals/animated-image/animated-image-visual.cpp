@@ -1031,7 +1031,7 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
 
 void AnimatedImageVisual::OnSetTransform()
 {
-  if(mImpl->mRenderer)
+  if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }

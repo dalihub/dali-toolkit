@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,7 +264,7 @@ void NPatchVisual::DoSetOffScene(Actor& actor)
 
 void NPatchVisual::OnSetTransform()
 {
-  if(mImpl->mRenderer)
+  if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
@@ -432,8 +432,8 @@ Shader NPatchVisual::CreateShader()
 
   auto fragmentShader = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
                                                                                            : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType     = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                                                                           : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto shaderType = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                                                                       : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))
