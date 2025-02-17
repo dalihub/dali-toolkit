@@ -49,6 +49,8 @@ void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Contr
   {
     if(Controller::NO_OPERATION != (Controller::BIDI_INFO & operations))
     {
+      TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+      model->mLogicalModel->ClearBidirectionalParagraphInfo(bidirectionalSupport);
       model->mLogicalModel->mBidirectionalParagraphInfo.Clear();
       model->mLogicalModel->mCharacterDirections.Clear();
     }

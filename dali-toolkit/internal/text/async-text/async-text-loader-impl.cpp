@@ -126,6 +126,7 @@ void AsyncTextLoader::ClearTextModelData()
   mTextModel->mLogicalModel->mBackgroundColorRuns.Clear();
   mTextModel->mLogicalModel->mLineBreakInfo.Clear();
   mTextModel->mLogicalModel->mParagraphInfo.Clear();
+  mTextModel->mLogicalModel->ClearBidirectionalParagraphInfo(mModule.GetBidirectionalSupport());
   mTextModel->mLogicalModel->mBidirectionalParagraphInfo.Clear();
   mTextModel->mLogicalModel->mCharacterDirections.Clear();
   mTextModel->mLogicalModel->mCharacterSpacingCharacterRuns.Clear();
@@ -135,7 +136,6 @@ void AsyncTextLoader::ClearTextModelData()
   mTextModel->mLogicalModel->ClearUnderlineRuns();
   mTextModel->mLogicalModel->ClearEmbeddedImages();
   mTextModel->mLogicalModel->ClearAnchors();
-  mTextModel->mLogicalModel->ClearBidirectionalParagraphInfo();
 
   // Free the allocated memory used to store the conversion table in the bidirectional line info run.
   for(Vector<BidirectionalLineInfoRun>::Iterator it    = mTextModel->mLogicalModel->mBidirectionalLineInfo.Begin(),
