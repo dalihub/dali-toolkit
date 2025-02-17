@@ -2,18 +2,20 @@
 
 //@version 100
 
+precision highp float;
+
 INPUT highp vec3 aPosition;
 INPUT highp vec2 aTexCoord;
 INPUT highp vec3 aNormal;
-OUTPUT mediump vec3 vIllumination;
+OUTPUT highp vec3 vIllumination;
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat4 uModelView;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uObjectMatrix;
-  UNIFORM mediump vec3 uLightPosition;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp mat4 uModelView;
+  UNIFORM highp mat3 uNormalMatrix;
+  UNIFORM highp mat4 uObjectMatrix;
+  UNIFORM highp vec3 uLightPosition;
 };
 
 void main()

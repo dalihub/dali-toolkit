@@ -12,9 +12,9 @@ UNIFORM_BLOCK FragBlock
   UNIFORM lowp float uHasLightSource;
 };
 
-INPUT lowp vec2 vUV[2];
-INPUT lowp mat3 vTBN;
-INPUT lowp vec4 vColor;
+INPUT highp vec2 vUV[2];
+INPUT highp mat3 vTBN;
+INPUT highp vec4 vColor;
 INPUT highp vec3 vLightDirection;
 INPUT highp vec3 vPositionToCamera;
 

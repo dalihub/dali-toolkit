@@ -6,12 +6,12 @@ precision highp float;
 
 UNIFORM_BLOCK FragBlock
 {
-    UNIFORM float uBlurStrength;
+  UNIFORM float uBlurStrength;
 };
 
 UNIFORM sampler2D sTexture;
 UNIFORM sampler2D sEffect;
-INPUT mediump vec2 vTexCoord;
+INPUT highp vec2 vTexCoord;
 
 void main()
 {

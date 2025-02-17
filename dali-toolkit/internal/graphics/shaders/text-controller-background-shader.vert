@@ -2,9 +2,11 @@
 
 //@version 100
 
-INPUT mediump vec2    aPosition;
-INPUT mediump vec4    aColor;
-OUTPUT   mediump vec4    vColor;
+precision highp float;
+
+INPUT highp vec2    aPosition;
+INPUT highp vec4    aColor;
+OUTPUT   highp vec4    vColor;
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM   highp mat4      uMvpMatrix;
@@ -12,7 +14,7 @@ UNIFORM_BLOCK VertBlock
 
 void main()
 {
-  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  highp vec4 position = vec4( aPosition, 0.0, 1.0 );
   gl_Position = uMvpMatrix * position;
   vColor = aColor;
 }

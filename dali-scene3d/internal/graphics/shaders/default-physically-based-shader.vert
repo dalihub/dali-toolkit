@@ -1,4 +1,8 @@
+//@name default-physically-based-shader.vert
+
 //@version 100
+
+precision highp float;
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
@@ -12,8 +16,6 @@
 // loader will provide it instead.
 #define ADD_EXTRA_SKINNING_ATTRIBUTES
 #define ADD_EXTRA_WEIGHTS
-
-precision highp float;
 
 INPUT vec3 aPosition;
 INPUT vec2 aTexCoord;
@@ -45,8 +47,8 @@ UNIFORM_BLOCK VertBlock0
 {
 #ifdef MORPH
 #ifdef SL_VERSION_LOW
-  UNIFORM int uBlendShapeGeometryWidth;
-  UNIFORM int uBlendShapeGeometryHeight;
+  UNIFORM highp int uBlendShapeGeometryWidth;
+  UNIFORM highp int uBlendShapeGeometryHeight;
 #endif
 #endif
 
@@ -65,7 +67,7 @@ UNIFORM_BLOCK VertBlock0
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 256
-  UNIFORM int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
+  UNIFORM highp int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
   UNIFORM highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0
   UNIFORM highp float uBlendShapeUnnormalizeFactor;///< Factor used to unnormalize the geometry of the blend shape.
@@ -97,15 +99,15 @@ UNIFORM_BLOCK ShadowEnabled
 #define MAX_BONES 256
 UNIFORM_BLOCK Bones
 {
-  UNIFORM mat4 uBone[MAX_BONES];
+  UNIFORM highp mat4 uBone[MAX_BONES];
 };
 #endif
 #endif
 OUTPUT highp vec3 positionFromLightView;
 
-OUTPUT mediump vec2 vUV;
+OUTPUT highp vec2 vUV;
 OUTPUT highp mat3 vTBN;
-OUTPUT lowp vec4 vColor;
+OUTPUT highp vec4 vColor;
 OUTPUT highp vec3 vPositionToCamera;
 
 void main()
@@ -116,9 +118,9 @@ void main()
 
 #ifdef MORPH
 #ifdef SL_VERSION_LOW
-  int width = uBlendShapeGeometryWidth;
+  highp int width = uBlendShapeGeometryWidth;
 #else
-  int width = textureSize( sBlendShapeGeometry, 0 ).x;
+  highp int width = textureSize( sBlendShapeGeometry, 0 ).x;
 #endif
 
   highp int blendShapeBufferOffset = 0;
@@ -130,7 +132,7 @@ void main()
   highp float invertBlendShapeHeight = 1.0 / blendShapeHeight;
 #endif
 
-  for( int index = 0; index < uNumberOfBlendShapes; ++index )
+  for( highp int index = 0; index < uNumberOfBlendShapes; ++index )
   {
     highp vec3 diff = vec3(0.0);
     highp int vertexId = 0;

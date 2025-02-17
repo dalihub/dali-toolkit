@@ -1,15 +1,20 @@
+//@name skybox-equirectangular-shader.frag
+
+//@version 100
+
+precision highp float;
+
 // Fragment shader for a skybox in equirectangular projection
-precision mediump float;
 
 UNIFORM sampler2D uSkyBoxEquirectangularTexture;
 
 UNIFORM_BLOCK FragBlock
 {
-    UNIFORM vec4  uColor;
-    UNIFORM float uIntensity;
+    UNIFORM lowp  vec4  uColor;
+    UNIFORM highp float uIntensity;
 };
 
-INPUT vec3 vTexCoord;
+INPUT highp vec3 vTexCoord;
 
 // Take the sample direction as interpolated from the cube's local position,
 // and use this direction vector and the spherical to cartesian coordinate

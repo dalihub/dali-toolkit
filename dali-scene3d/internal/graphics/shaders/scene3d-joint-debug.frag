@@ -1,6 +1,9 @@
+//@name scene3d-joint-debug.frag
+
 //@version 100
 
-precision mediump float;
+precision highp float;
+
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;

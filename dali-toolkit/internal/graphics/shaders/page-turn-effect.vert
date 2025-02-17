@@ -20,30 +20,30 @@
  * ([3][3]) float currentLength: The length from the current center to the curveEnd.
  */
 
-precision mediump float;
+precision highp float;
 
-INPUT mediump vec2 aPosition;
+INPUT highp vec2 aPosition;
 
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uModelView;
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp mat3 uNormalMatrix;
+  UNIFORM highp mat4 uModelView;
 
-  UNIFORM mat4 uCommonParameters;
+  UNIFORM highp mat4 uCommonParameters;
 
   UNIFORM float uIsTurningBack;
-  UNIFORM float uTextureWidth;
+  UNIFORM highp float uTextureWidth;
 };
 
 UNIFORM_BLOCK SharedBlock
 {
-  UNIFORM vec3 uSize;
+  UNIFORM highp vec3 uSize;
 };
 
-OUTPUT vec3 vNormal;
-OUTPUT vec4 vPosition;
-OUTPUT mediump vec2 vTexCoord;
+OUTPUT highp vec3 vNormal;
+OUTPUT highp vec4 vPosition;
+OUTPUT highp vec2 vTexCoord;
 
 void main()
 {

@@ -3,26 +3,26 @@
 //@version 100
 
 INPUT highp vec3 aPosition;
-INPUT mediump vec2 aTexCoord0;
-INPUT mediump vec2 aTexCoord1;
-INPUT lowp vec3 aNormal;
-INPUT lowp vec4 aTangent;
-INPUT lowp vec4 aVertexColor;
+INPUT highp vec2 aTexCoord0;
+INPUT highp vec2 aTexCoord1;
+INPUT highp vec3 aNormal;
+INPUT highp vec4 aTangent;
+INPUT highp vec4 aVertexColor;
 
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump mat4 uModelMatrix;
-  UNIFORM mediump mat4 uViewMatrix;
-  UNIFORM mediump mat4 uProjection;
-  UNIFORM mediump vec3 uLightVector;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp mat4 uModelMatrix;
+  UNIFORM highp mat4 uViewMatrix;
+  UNIFORM highp mat4 uProjection;
+  UNIFORM highp vec3 uLightVector;
   UNIFORM lowp float uIsPointLight;
   UNIFORM lowp float uHasVertexColor;
 };
 
-OUTPUT lowp vec2 vUV[2];
-OUTPUT lowp mat3 vTBN;
-OUTPUT lowp vec4 vColor;
+OUTPUT highp vec2 vUV[2];
+OUTPUT highp mat3 vTBN;
+OUTPUT highp vec4 vColor;
 OUTPUT highp vec3 vLightDirection;
 OUTPUT highp vec3 vPositionToCamera;
 

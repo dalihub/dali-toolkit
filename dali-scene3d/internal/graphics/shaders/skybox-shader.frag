@@ -1,13 +1,17 @@
+//@name skybox-shader.frag
+
 //@version 100
+
+precision highp float;
 
 UNIFORM samplerCube   uSkyBoxTexture;
 UNIFORM_BLOCK FragBlock
 {
-  UNIFORM lowp    vec4  uColor;
-  UNIFORM mediump float uIntensity;
+  UNIFORM lowp  vec4  uColor;
+  UNIFORM highp float uIntensity;
 };
 
-INPUT mediump vec3  vTexCoord;
+INPUT highp vec3  vTexCoord;
 
 void main()
 {

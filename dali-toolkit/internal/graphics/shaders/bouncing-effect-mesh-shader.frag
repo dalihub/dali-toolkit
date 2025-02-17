@@ -2,6 +2,8 @@
 
 //@version 100
 
+precision highp float;
+
 // Use the actor color to paint every layer
 UNIFORM_BLOCK FragBlock
 {

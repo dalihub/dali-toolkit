@@ -9,7 +9,7 @@ UNIFORM_BLOCK FragBlock
   UNIFORM vec3 uHSVDelta;
 };
 
-INPUT mediump vec2 vTexCoord;
+INPUT highp vec2 vTexCoord;
 UNIFORM sampler2D sTexture;
 
 float rand(vec2 co)

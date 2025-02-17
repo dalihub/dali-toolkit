@@ -1,4 +1,8 @@
+//@name default-physically-based-shader.frag
+
 //@version 100
+
+precision highp float;
 
 // Original Code
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-frag.glsl
@@ -16,12 +20,6 @@
 //     https://github.com/KhronosGroup/glTF-Sample-Viewer/#environment-maps
 // [4] \"An Inexpensive BRDF Model for Physically based Rendering\" by Christophe Schlick
 //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
-
-#ifdef HIGHP
-precision highp float;
-#else
-precision mediump float;
-#endif
 
 #ifdef GLTF_CHANNELS
 #define METALLIC b
@@ -149,18 +147,18 @@ UNIFORM_BLOCK ShadowFragBlock
 {
   UNIFORM mediump int uShadowLightIndex;
   UNIFORM lowp int uEnableShadowSoftFiltering;
-  UNIFORM mediump float uShadowIntensity;
+  UNIFORM highp float uShadowIntensity;
   UNIFORM highp float uShadowBias;
 };
 
 // TODO: Multiple texture coordinate will be supported.
-INPUT mediump vec2 vUV;
+INPUT highp vec2 vUV;
 INPUT highp mat3 vTBN;
-INPUT lowp vec4 vColor;
+INPUT highp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
 INPUT highp vec3 positionFromLightView;
 
-const lowp float c_MinRoughness = 0.04;
+const highp float c_MinRoughness = 0.04;
 const highp float M_PI = 3.141592653589793;
 
 // These properties can be used for circular sampling for PCF

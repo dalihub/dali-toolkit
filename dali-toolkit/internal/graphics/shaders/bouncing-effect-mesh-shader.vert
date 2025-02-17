@@ -2,14 +2,16 @@
 
 //@version 100
 
+precision highp float;
+
 // Modify the vertex position according to the bounce coefficient
-INPUT mediump vec3    aPosition1;
-INPUT mediump vec3    aPosition2;
+INPUT highp vec3    aPosition1;
+INPUT highp vec3    aPosition2;
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM   mediump mat4    uMvpMatrix;
-  UNIFORM   mediump vec3    uSize;
-  UNIFORM   mediump float   uBounceCoefficient;
+  UNIFORM   highp mat4    uMvpMatrix;
+  UNIFORM   highp vec3    uSize;
+  UNIFORM   highp float   uBounceCoefficient;
 };
 
 void main()

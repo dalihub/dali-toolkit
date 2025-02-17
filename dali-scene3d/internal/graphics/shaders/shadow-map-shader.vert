@@ -1,3 +1,5 @@
+//@name shadow-map-shader.vert
+
 //@version 100
 
 #define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
@@ -35,15 +37,15 @@ UNIFORM_BLOCK Bones
 #endif
 #endif
 
-OUTPUT mediump vec2 vUV;
-OUTPUT lowp vec4 vColor;
+OUTPUT highp vec2 vUV;
+OUTPUT highp vec4 vColor;
 
 UNIFORM_BLOCK VertBlock
 {
 #ifdef MORPH
 #ifdef SL_VERSION_LOW
-  UNIFORM int uBlendShapeGeometryWidth;
-  UNIFORM int uBlendShapeGeometryHeight;
+  UNIFORM highp int uBlendShapeGeometryWidth;
+  UNIFORM highp int uBlendShapeGeometryHeight;
 #endif
 #endif
 
@@ -61,7 +63,7 @@ UNIFORM_BLOCK VertBlock
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 256
-  UNIFORM int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
+  UNIFORM highp int uNumberOfBlendShapes;///< Total number of blend shapes loaded.
   UNIFORM highp float uBlendShapeWeight[MAX_BLEND_SHAPE_NUMBER];///< The weight of each blend shape.
 #ifdef MORPH_VERSION_2_0
   UNIFORM highp float uBlendShapeUnnormalizeFactor;///< Factor used to unnormalize the geometry of the blend shape.
@@ -81,9 +83,9 @@ void main()
 #ifdef MORPH
 
 #ifdef SL_VERSION_LOW
-  int width = uBlendShapeGeometryWidth;
+  highp int width = uBlendShapeGeometryWidth;
 #else
-  int width = textureSize( sBlendShapeGeometry, 0 ).x;
+  highp int width = textureSize( sBlendShapeGeometry, 0 ).x;
 #endif
 
   highp int blendShapeBufferOffset = 0;
@@ -95,7 +97,7 @@ void main()
   highp float invertBlendShapeHeight = 1.0 / blendShapeHeight;
 #endif
 
-  for( int index = 0; index < uNumberOfBlendShapes; ++index )
+  for( highp int index = 0; index < uNumberOfBlendShapes; ++index )
   {
     highp vec3 diff = vec3(0.0);
     highp int vertexId = 0;

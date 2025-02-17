@@ -2,10 +2,11 @@
 
 //@version 100
 
-precision mediump float;
-INPUT mediump vec2 vTexCoord;
-INPUT mediump vec3 vIllumination;
-INPUT mediump float vSpecular;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
+INPUT highp vec3 vIllumination;
+INPUT highp float vSpecular;
 UNIFORM sampler2D sDiffuse;
 UNIFORM_BLOCK FragBlock
 {

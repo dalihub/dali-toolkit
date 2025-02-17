@@ -2,8 +2,9 @@
 
 //@version 100
 
-precision mediump float;
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 UNIFORM sampler2D sTexture;
 UNIFORM sampler2D sEffect;
 
@@ -24,8 +25,8 @@ vec4 ChangeSaturation(vec4 col, float sat)
 
 void main()
 {
-  mediump vec4 image;
-  mediump vec4 bloom;
+  highp vec4 image;
+  highp vec4 bloom;
   image = TEXTURE(sTexture, vTexCoord);
   bloom = TEXTURE(sEffect, vTexCoord);
   image = ChangeSaturation(image, uImageSaturation) * uImageIntensity;

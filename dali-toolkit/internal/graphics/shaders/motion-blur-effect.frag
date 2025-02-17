@@ -2,7 +2,7 @@
 
 //@version 100
 
-precision mediump float;
+precision highp float;
 
 UNIFORM sampler2D sTexture;
 UNIFORM_BLOCK FragBlock

@@ -2,7 +2,9 @@
 
 //@version 100
 
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 UNIFORM sampler2D sTexture;
 #ifdef IS_REQUIRED_STYLE
 UNIFORM sampler2D sStyle;

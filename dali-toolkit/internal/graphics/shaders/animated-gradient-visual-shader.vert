@@ -2,20 +2,22 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
+precision highp float;
+
+INPUT highp vec2 aPosition;
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4 uMvpMatrix;
   UNIFORM highp vec3 uSize;
-  UNIFORM mediump vec2 start_point;
-  UNIFORM mediump vec2 end_point;
-  UNIFORM mediump vec2 rotate_center;
-  UNIFORM mediump float rotate_angle;
+  UNIFORM highp vec2 start_point;
+  UNIFORM highp vec2 end_point;
+  UNIFORM highp vec2 rotate_center;
+  UNIFORM highp float rotate_angle;
 };
 
-OUTPUT mediump vec2 vTexCoord;
-OUTPUT mediump vec2 vStart;
-OUTPUT mediump vec2 vEnd;
+OUTPUT highp vec2 vTexCoord;
+OUTPUT highp vec2 vStart;
+OUTPUT highp vec2 vEnd;
 
 vec2 rotate(vec2 x, vec2 c, float a)
 {
@@ -33,11 +35,12 @@ vec2 rotate(vec2 x, vec2 c, float a)
   /* UnitType::USER_SPACE*/
 }
 
-//Visual size and offset
-UNIFORM_BLOCK VisualBlock
+UNIFORM_BLOCK VisualVertBlock
 {
-  UNIFORM mediump vec2 offset;
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
   UNIFORM highp vec2 size;
+  UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
   UNIFORM mediump vec2 anchorPoint;
@@ -45,7 +48,7 @@ UNIFORM_BLOCK VisualBlock
 
 vec4 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw );
+  vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy );
   return vec4( (aPosition + anchorPoint)*visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0 );
 }

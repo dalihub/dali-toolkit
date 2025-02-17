@@ -2,18 +2,18 @@
 
 //@version 100
 
-precision mediump float;
+precision highp float;
 
 UNIFORM_BLOCK FragBlock
 {
-  UNIFORM mediump vec4 start_color;
-  UNIFORM mediump vec4 end_color;
-  UNIFORM mediump float gradient_offset;
+  UNIFORM highp vec4 start_color;
+  UNIFORM highp vec4 end_color;
+  UNIFORM highp float gradient_offset;
 };
 
-INPUT mediump vec2 vTexCoord;
-INPUT mediump vec2 vStart;
-INPUT mediump vec2 vEnd;
+INPUT highp vec2 vTexCoord;
+INPUT highp vec2 vStart;
+INPUT highp vec2 vEnd;
 
 float get_position(vec2 x, vec2 s, vec2 e)
 {

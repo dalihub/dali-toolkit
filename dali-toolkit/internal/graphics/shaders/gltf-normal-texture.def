@@ -3,6 +3,6 @@
 UNIFORM sampler2D uNormalSampler;
 UNIFORM_BLOCK     FragBlockNormal
 {
-  UNIFORM float uNormalScale;
-  UNIFORM int   uNormalTexCoordIndex;
+  UNIFORM highp float uNormalScale;
+  UNIFORM highp int   uNormalTexCoordIndex;
 };

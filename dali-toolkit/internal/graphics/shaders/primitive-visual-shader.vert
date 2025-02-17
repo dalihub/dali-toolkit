@@ -4,25 +4,31 @@
 
 //A simple shader that applies diffuse lighting to a mono-coloured object.
 
+precision highp float;
+
 INPUT highp vec3 aPosition;
 INPUT highp vec2 aTexCoord;
 INPUT highp vec3 aNormal;
-OUTPUT mediump vec3 vIllumination;
+OUTPUT highp vec3 vIllumination;
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump vec3 uSize;
-  UNIFORM mediump vec3 uObjectDimensions;
-  UNIFORM mediump mat4 uMvpMatrix;
-  UNIFORM mediump mat4 uModelView;
-  UNIFORM mediump mat4 uViewMatrix;
-  UNIFORM mediump mat3 uNormalMatrix;
-  UNIFORM mediump mat4 uObjectMatrix;
-  UNIFORM mediump vec3 lightPosition;
-  UNIFORM mediump vec2 uStageOffset;
+  UNIFORM highp vec3 uSize;
+  UNIFORM highp vec3 uObjectDimensions;
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp mat4 uModelView;
+  UNIFORM highp mat4 uViewMatrix;
+  UNIFORM highp mat3 uNormalMatrix;
+  UNIFORM highp mat4 uObjectMatrix;
+  UNIFORM highp vec3 lightPosition;
+  UNIFORM highp vec2 uStageOffset;
+};
 
-//Visual size and offset
-  UNIFORM mediump vec2 offset;
-  UNIFORM mediump vec2 size;
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
+  UNIFORM highp vec2 size;
+  UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
   UNIFORM mediump vec2 anchorPoint;
@@ -30,7 +36,7 @@ UNIFORM_BLOCK VertBlock
 
 vec4 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
+  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;
   float scaleFactor = min( visualSize.x / uObjectDimensions.x, visualSize.y / uObjectDimensions.y );
   vec3 originFlipY =vec3(origin.x, -origin.y, 0.0);
   vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);

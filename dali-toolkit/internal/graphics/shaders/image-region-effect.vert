@@ -2,22 +2,24 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
+precision highp float;
+
+INPUT highp vec2 aPosition;
 
 OUTPUT vec2 vTexCoord;
 
 UNIFORM_BLOCK VertBlock
 {
-  UNIFORM mediump vec2 uTopLeft;
-  UNIFORM mediump vec2 uBottomRight;
-  UNIFORM mediump mat4 uMvpMatrix;
+  UNIFORM highp vec2 uTopLeft;
+  UNIFORM highp vec2 uBottomRight;
+  UNIFORM highp mat4 uMvpMatrix;
   UNIFORM vec3 uSize;
   UNIFORM vec4 uTextureRect;
 };
 
 void main()
 {
-  mediump vec4 position = vec4(aPosition, 0.0, 1.0);
+  highp vec4 position = vec4(aPosition, 0.0, 1.0);
   position.xyz *= uSize;
   gl_Position = uMvpMatrix * position;
 

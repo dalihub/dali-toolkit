@@ -1,6 +1,9 @@
+//@name scene3d-joint-debug.vert
+
 //@version 100
 
-precision mediump float;
+precision highp float;
+
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM mat4 uMvpMatrix;
