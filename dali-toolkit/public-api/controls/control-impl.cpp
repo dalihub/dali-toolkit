@@ -78,7 +78,7 @@ void CreateClippingRenderer(Control& controlImpl)
   {
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
 
-    if(clippingMode == ClippingMode::CLIP_CHILDREN && controlDataImpl.mVisualData->mVisuals.Empty() && self.GetRendererCount() == 0u)
+    if(clippingMode == ClippingMode::CLIP_CHILDREN && (DALI_UNLIKELY(!controlDataImpl.mVisualData) || controlDataImpl.mVisualData->mVisuals.Empty()) && self.GetRendererCount() == 0u)
     {
       controlImpl.SetBackgroundColor(Color::TRANSPARENT);
     }
@@ -153,6 +153,7 @@ void Control::SetBackground(const Property::Map& map)
   if(visual)
   {
     mImpl->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+    mImpl->EnableCornerPropertiesOverridden(visual, true);
 
     // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
     RelayoutRequest();
@@ -466,6 +467,11 @@ Control::~Control()
 
 void Control::Initialize()
 {
+  if(DALI_LIKELY(!(mImpl->mFlags & DISABLE_VISUALS)))
+  {
+    mImpl->InitializeVisualData();
+  }
+
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 

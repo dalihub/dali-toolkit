@@ -35,6 +35,7 @@ void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSu
                           CharacterIndex                         startIndex,
                           Length                                 numberOfCharacters,
                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                          Vector<BidirectionalLineInfoRun>&      lineInfoRuns,
                           bool                                   matchLayoutDirection,
                           Dali::LayoutDirection::Type            layoutDirection)
 {
@@ -128,6 +129,10 @@ void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSu
     }
   }
 
+  // Find the first bidi line index to update.
+  bool                      updateLineInfoRuns  = false;
+  BidirectionalLineRunIndex updateLineInfoIndex = 0u;
+
   // Update indices of the bidi runs.
   for(Vector<BidirectionalParagraphInfoRun>::Iterator it    = bidirectionalInfo.Begin() + bidiInfoIndex,
                                                       endIt = bidirectionalInfo.End();
@@ -136,7 +141,30 @@ void SetBidirectionalInfo(TextAbstraction::BidirectionalSupport& bidirectionalSu
   {
     BidirectionalParagraphInfoRun& run = *it;
 
+    if(!updateLineInfoRuns)
+    {
+      updateLineInfoRuns  = true;
+      updateLineInfoIndex = run.characterRun.characterIndex;
+    }
+
     run.characterRun.characterIndex += numberOfCharacters;
+  }
+
+  // Update indices of the bidi line runs.
+  if(updateLineInfoRuns)
+  {
+    bool firstLineFound = false;
+    for(auto& lineInfoRun : lineInfoRuns)
+    {
+      if(lineInfoRun.characterRun.characterIndex == updateLineInfoIndex)
+      {
+        firstLineFound = true;
+      }
+      if(firstLineFound)
+      {
+        lineInfoRun.characterRun.characterIndex += numberOfCharacters;
+      }
+    }
   }
 }
 

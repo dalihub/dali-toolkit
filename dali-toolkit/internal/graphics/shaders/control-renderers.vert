@@ -3,6 +3,7 @@
 //@version 100
 
 precision highp float;
+
 INPUT highp vec2 aPosition;
 OUTPUT highp vec2 vTexCoord;
 UNIFORM_BLOCK VertBlock

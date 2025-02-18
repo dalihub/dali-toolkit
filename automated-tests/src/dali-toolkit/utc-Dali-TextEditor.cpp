@@ -2733,7 +2733,45 @@ int utcDaliTextEditorEvent06(void)
 
   DALI_TEST_EQUALS("Hello\nworld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
 
+  editor.SetProperty(TextEditor::Property::TEXT, "ảffiff");
+  editor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 0);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 7, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 0, TEST_LOCATION);
+
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS("ffiff", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+
+
   // For coverage
+  editor.SetProperty(TextEditor::Property::TEXT, "الاخيرالسطر1\nالاخيرالسطر2\nالاخيرالسطر3\nالاخيرالسطر4");
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("d", "", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "ኢ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
   application.ProcessEvent(GenerateKey("", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();

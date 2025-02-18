@@ -2,13 +2,15 @@
 
 //@version 100
 
-INPUT mediump float vAlpha;
+precision highp float;
+
+INPUT highp float vAlpha;
 
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;
   UNIFORM lowp vec4 borderColor;
-  UNIFORM mediump float borderSize;
+  UNIFORM highp float borderSize;
 };
 
 void main()

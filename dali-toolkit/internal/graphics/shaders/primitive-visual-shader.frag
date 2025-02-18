@@ -4,8 +4,9 @@
 
 //Very simple fragment shader that merely applies the vertex shading to the color at each fragment.
 
-precision mediump float;
-INPUT mediump vec3 vIllumination;
+precision highp float;
+
+INPUT highp vec3 vIllumination;
 
 UNIFORM_BLOCK FragBlock
 {

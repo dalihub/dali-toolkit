@@ -2,8 +2,10 @@
 
 //@version 100
 
-INPUT mediump vec2 aPosition;
-OUTPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 aPosition;
+OUTPUT highp vec2 vTexCoord;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
@@ -18,38 +20,41 @@ UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4   uMvpMatrix;
   UNIFORM highp vec3   uSize;
-  UNIFORM mediump mat3 uAlignmentMatrix;
+  UNIFORM highp mat3 uAlignmentMatrix;
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
   // Be used when we calculate anti-alias range near 1 pixel.
   UNIFORM highp vec3 uScale;
 #endif
 
-  // Visual size and offset
-  UNIFORM highp vec2   offset;
-  UNIFORM highp vec2   size;
-  UNIFORM mediump vec4 offsetSizeMode;
-  UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   UNIFORM highp vec4    cornerRadius;
   UNIFORM mediump float cornerRadiusPolicy;
 #endif
 };
 
+UNIFORM_BLOCK VisualVertBlock
+{
+  //Visual size and offset
+  UNIFORM highp vec2 offset;
+  UNIFORM highp vec2 size;
+  UNIFORM highp vec2 extraSize;
+  UNIFORM mediump vec4 offsetSizeMode;
+  UNIFORM mediump vec2 origin;
+  UNIFORM mediump vec2 anchorPoint;
+};
+
 #ifdef IS_REQUIRED_BORDERLINE
-UNIFORM_BLOCK SharedBlock
+UNIFORM_BLOCK Borderline
 {
   UNIFORM highp float borderlineWidth;
   UNIFORM highp float borderlineOffset;
-  UNIFORM lowp vec4   borderlineColor;
-  UNIFORM lowp vec4   uActorColor;
 };
 #endif
 
 
 vec4 ComputeVertexPosition()
 {
-  highp vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw );
+  highp vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   highp vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)

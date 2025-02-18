@@ -139,7 +139,8 @@ bool SetBidirectionalInfoTest(const SetBidirectionalInfoData& data)
                        logicalModel->mLineBreakInfo,
                        data.startIndex,
                        data.numberOfCharacters,
-                       bidirectionalInfo);
+                       bidirectionalInfo,
+                       logicalModel->mBidirectionalLineInfo);
 
   // 4) Compare with the expected results.
   if(data.numberOfParagraphs != bidirectionalInfo.Count())

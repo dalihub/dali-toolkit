@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
@@ -196,7 +197,18 @@ void RenderEffectImpl::Activate()
       // Activate logic for subclass.
       OnActivate();
 
-      SynchronizeBackgroundCornerRadius();
+      // Set round corner. Default is to sync to owner control's BACKGROUND.
+      Vector4 cornerRadius = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
+      if(cornerRadius != Vector4::ZERO)
+      {
+        int32_t cornerRadiusPolicy = ownerControl.GetProperty<int32_t>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
+
+        Property::Map map;
+        map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
+        map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
+
+        SetCornerConstants(map);
+      }
     }
   }
 }
@@ -307,13 +319,9 @@ void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool vis
   }
 }
 
-void RenderEffectImpl::SynchronizeBackgroundCornerRadius()
+void RenderEffectImpl::SetCornerConstants(Property::Map map)
 {
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Synchronize background corner radius\n", this);
-
-  DALI_ASSERT_ALWAYS(GetOwnerControl() && "You should first SetRenderEffect(), then set its background property map");
-
-  Property::Map map = GetOwnerControl().GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Set corner radius constants to shader\n", this);
 
   Vector4 radius = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);
@@ -321,7 +329,7 @@ void RenderEffectImpl::SynchronizeBackgroundCornerRadius()
   Vector4 squareness = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS].Get(squareness);
 
-  Visual::Transform::Policy::Type policy{Visual::Transform::Policy::ABSOLUTE};
+  Toolkit::Visual::Transform::Policy::Type policy;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
 
   Renderer renderer = GetTargetRenderer();

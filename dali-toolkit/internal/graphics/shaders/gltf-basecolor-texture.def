@@ -4,5 +4,5 @@ UNIFORM sampler2D uBaseColorSampler;
 
 UNIFORM_BLOCK FragBlockBaseColor
 {
-  UNIFORM int uBaseColorTexCoordIndex;
+  UNIFORM highp int uBaseColorTexCoordIndex;
 };

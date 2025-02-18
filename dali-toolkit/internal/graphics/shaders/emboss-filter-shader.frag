@@ -3,7 +3,8 @@
 //@version 100
 
 precision highp float;
-INPUT mediump vec2 vTexCoord;
+
+INPUT highp vec2 vTexCoord;
 UNIFORM sampler2D sTexture;
 UNIFORM_BLOCK FragBlock
 {

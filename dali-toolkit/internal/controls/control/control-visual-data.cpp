@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,6 +237,19 @@ Control::Impl::VisualData::VisualData(Control::Impl& outer)
 
 Control::Impl::VisualData::~VisualData()
 {
+}
+
+void Control::Impl::VisualData::ConnectScene(Actor parent)
+{
+  for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
+  {
+    // Check whether the visual is empty and enabled
+    if((*iter)->visual && (*iter)->enabled)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
+      Toolkit::GetImplementation((*iter)->visual).SetOnScene(parent);
+    }
+  }
 }
 
 void Control::Impl::VisualData::ClearScene(Actor parent)
@@ -614,7 +627,7 @@ void Control::Impl::VisualData::EnableVisual(Property::Index index, bool enable)
   }
 }
 
-void Control::Impl::VisualData::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable)
+void Control::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableReadyTransitionOverriden(%p, %s)\n", visual, enable ? "T" : "F");
 
@@ -628,6 +641,32 @@ void Control::Impl::VisualData::EnableReadyTransitionOverriden(Toolkit::Visual::
     }
 
     (*iter)->overideReadyTransition = enable;
+  }
+}
+
+void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Property::Map cornerProperties)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", visual, enable ? "T" : "F");
+
+  RegisteredVisualContainer::Iterator iter;
+  if(FindVisual(visual, mVisuals, iter))
+  {
+    if((*iter)->overrideCornerProperties == enable)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableCornerPropertiesOverridden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), visual, enable ? "enabled" : "disabled");
+      return;
+    }
+
+    (*iter)->overrideCornerProperties = enable;
+
+    // Override corner radius if it exists
+    Vector4 cornerRadius;
+    cornerProperties[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(cornerRadius);
+
+    if(enable && cornerRadius != Vector4::ZERO)
+    {
+      visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, cornerProperties);
+    }
   }
 }
 

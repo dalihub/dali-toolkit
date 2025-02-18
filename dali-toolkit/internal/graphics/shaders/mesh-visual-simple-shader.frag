@@ -2,8 +2,9 @@
 
 //@version 100
 
-precision mediump float;
-INPUT mediump vec3 vIllumination;
+precision highp float;
+
+INPUT highp vec3 vIllumination;
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;

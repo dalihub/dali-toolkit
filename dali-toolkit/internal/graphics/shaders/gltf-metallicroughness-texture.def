@@ -4,5 +4,5 @@ UNIFORM sampler2D uMetallicRoughnessSampler;
 
 UNIFORM_BLOCK FragBlockMetRough
 {
-  UNIFORM int uMetallicRoughnessTexCoordIndex;
+  UNIFORM highp int uMetallicRoughnessTexCoordIndex;
 };

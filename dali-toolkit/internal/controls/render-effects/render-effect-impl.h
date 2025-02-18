@@ -57,6 +57,12 @@ public:
   void ClearOwnerControl();
 
   /**
+   * @brief Set shader constants of target renderer. Without an explicit call, it will pull off BACKGROUND property of the owner control.
+   * @param[in] map may include corner radius, corner radius policy, and squareness
+   */
+  void SetCornerConstants(Property::Map map);
+
+  /**
    * @brief Clones current instance.
    * @return Clone implementation
    */
@@ -196,11 +202,6 @@ private:
    * @param[in] visible Whether this actor is visible or not.
    */
   void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
-
-  /**
-   * @brief Synchronize mOwnerControl's background corner radius to the output.
-   */
-  void SynchronizeBackgroundCornerRadius();
 
 private:
   Dali::Renderer mRenderer; // An additional renderer for mOwnerControl

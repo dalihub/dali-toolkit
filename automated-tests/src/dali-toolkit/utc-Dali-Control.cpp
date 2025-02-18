@@ -1527,3 +1527,93 @@ int UtcDaliControlOffScreenRendering(void)
 
   END_TEST;
 }
+
+int UtcDaliControlNewWithDisableVisuals(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New(Control::ControlBehaviour::DISABLE_VISUALS);
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(0u, control.GetRendererCount(), TEST_LOCATION);
+
+  // Check BackgroundVisual skipped
+  control.SetBackgroundColor(Color::RED);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(0u, control.GetRendererCount(), TEST_LOCATION);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::COLOR);
+  propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
+
+  // Check Background or Shadow with property map skipped
+  control.SetProperty(Control::Property::BACKGROUND, propertyMap);
+  control.SetProperty(DevelControl::Property::SHADOW, propertyMap);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(0u, control.GetRendererCount(), TEST_LOCATION);
+
+  Toolkit::Visual::ResourceStatus resourceStatus = control.GetVisualResourceStatus(Control::Property::BACKGROUND);
+  DALI_TEST_EQUALS(control.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION);
+
+  control.ClearBackground();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(0u, control.GetRendererCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliControlCornerRadius(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetBackgroundColor(Color::RED);
+  tet_infoline("Set background visual");
+
+  application.GetScene().Add(control);
+
+  RenderEffect effect = RenderEffect::CreateBackgroundBlurEffect(0.25f, 50.0f);
+  control.SetRenderEffect(effect);
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
+
+  Vector4 vector = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, vector); // default: relative policy
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::Type::RELATIVE);
+  tet_infoline("Sync with render effects.");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4 retrievedVector;
+  control.GetProperty(DevelControl::Property::CORNER_RADIUS).Get(retrievedVector);
+  DALI_TEST_CHECK(retrievedVector == vector);
+
+  control.ClearRenderEffect();
+  control.ClearBackground();
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::NONE);
+
+  control.SetBackgroundColor(Color::YELLOW);
+  control.SetRenderEffect(effect);
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
+  tet_infoline("Late sync with render effects.");
+
+  END_TEST;
+}

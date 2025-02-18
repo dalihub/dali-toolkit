@@ -49,6 +49,8 @@ void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Contr
   {
     if(Controller::NO_OPERATION != (Controller::BIDI_INFO & operations))
     {
+      TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+      model->mLogicalModel->ClearBidirectionalParagraphInfo(bidirectionalSupport);
       model->mLogicalModel->mBidirectionalParagraphInfo.Clear();
       model->mLogicalModel->mCharacterDirections.Clear();
     }
@@ -65,6 +67,9 @@ void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Contr
 
         free(bidiLineInfo.visualToLogicalMap);
         bidiLineInfo.visualToLogicalMap = NULL;
+
+        free(bidiLineInfo.visualToLogicalMapSecondHalf);
+        bidiLineInfo.visualToLogicalMapSecondHalf = NULL;
       }
       model->mLogicalModel->mBidirectionalLineInfo.Clear();
     }
@@ -131,10 +136,31 @@ void ControllerImplDataClearer::ClearCharacterModelData(Controller::Impl& impl, 
   {
     if(Controller::NO_OPERATION != (Controller::BIDI_INFO & operations))
     {
+      uint32_t startRemoveIndex = model->mLogicalModel->mBidirectionalParagraphInfo.Count();
+      uint32_t endRemoveIndex   = startRemoveIndex;
+
       // Clear the bidirectional paragraph info.
       ClearCharacterRuns(startIndex,
                          endIndex,
-                         model->mLogicalModel->mBidirectionalParagraphInfo);
+                         model->mLogicalModel->mBidirectionalParagraphInfo,
+                         startRemoveIndex,
+                         endRemoveIndex);
+
+      BidirectionalParagraphInfoRun* bidirectionalInfoBuffer = model->mLogicalModel->mBidirectionalParagraphInfo.Begin();
+      // Free the allocated memory used to store the bidirectional info.
+      for(Vector<BidirectionalParagraphInfoRun>::Iterator it    = bidirectionalInfoBuffer + startRemoveIndex,
+                                                          endIt = bidirectionalInfoBuffer + endRemoveIndex;
+          it != endIt;
+          ++it)
+      {
+        BidirectionalParagraphInfoRun& bidiInfo = *it;
+
+        TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+        bidirectionalSupport.DestroyInfo(bidiInfo.bidirectionalInfoIndex);
+      }
+
+      model->mLogicalModel->mBidirectionalParagraphInfo.Erase(bidirectionalInfoBuffer + startRemoveIndex,
+                                                              bidirectionalInfoBuffer + endRemoveIndex);
 
       // Clear the character's directions.
       CharacterDirection* characterDirectionsBuffer = model->mLogicalModel->mCharacterDirections.Begin();
@@ -165,6 +191,9 @@ void ControllerImplDataClearer::ClearCharacterModelData(Controller::Impl& impl, 
 
         free(bidiLineInfo.visualToLogicalMap);
         bidiLineInfo.visualToLogicalMap = NULL;
+
+        free(bidiLineInfo.visualToLogicalMapSecondHalf);
+        bidiLineInfo.visualToLogicalMapSecondHalf = NULL;
       }
 
       model->mLogicalModel->mBidirectionalLineInfo.Erase(bidirectionalLineInfoBuffer + startRemoveIndex,

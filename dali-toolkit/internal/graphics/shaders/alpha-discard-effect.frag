@@ -1,12 +1,16 @@
+//@name alpha-discard-effect.frag
+
 //@version 100
 
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 
 UNIFORM sampler2D sTexture;
 
 UNIFORM_BLOCK FragBlock
 {
-UNIFORM lowp vec4 uColor;
+  UNIFORM lowp vec4 uColor;
 };
 
 

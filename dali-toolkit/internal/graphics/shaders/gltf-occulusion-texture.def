@@ -3,6 +3,6 @@
 UNIFORM sampler2D uOcclusionSampler;
 UNIFORM_BLOCK     FragBlockOcclusion
 {
-  UNIFORM int   uOcclusionTexCoordIndex;
-  UNIFORM float uOcclusionStrength;
+  UNIFORM highp int   uOcclusionTexCoordIndex;
+  UNIFORM highp float uOcclusionStrength;
 };

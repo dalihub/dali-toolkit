@@ -2,6 +2,8 @@
 
 //@version 100
 
+precision highp float;
+
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;

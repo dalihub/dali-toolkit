@@ -2,7 +2,9 @@
 
 //@version 100
 
-INPUT mediump vec2 vTexCoord;
+precision highp float;
+
+INPUT highp vec2 vTexCoord;
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uShadowColor;

@@ -3,6 +3,7 @@
 //@version 100
 
 precision highp float;
+
 INPUT highp vec2 vTexCoord;
 INPUT highp vec2 vOptRectSize;
 INPUT highp vec4 vCornerRadius;

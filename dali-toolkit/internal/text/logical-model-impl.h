@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/anchor.h>
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
+#include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/character-spacing-character-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
@@ -231,8 +232,9 @@ public:
 
   /**
    * @brief Clears bidirectional paragraph info.
+   * @param[in] bidirectionalSupport BidirectionalSupport to clear information.
    */
-  void ClearBidirectionalParagraphInfo();
+  void ClearBidirectionalParagraphInfo(TextAbstraction::BidirectionalSupport& bidirectionalSupport);
 
 protected:
   /**

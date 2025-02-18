@@ -2,14 +2,16 @@
 
 //@version 100
 
+precision highp float;
+
 UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp    vec4      uColor;
   UNIFORM lowp    vec4      textColorAnimatable;
 };
 UNIFORM         sampler2D sTexture;
-INPUT mediump vec2      vTexCoord;
-INPUT mediump vec4      vColor;
+INPUT highp vec2      vTexCoord;
+INPUT highp vec4      vColor;
 
 void main()
 {

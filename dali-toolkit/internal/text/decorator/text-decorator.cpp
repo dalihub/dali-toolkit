@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -406,6 +406,11 @@ struct Decorator::Impl : public ConnectionTracker
     {
       CreateHighlight();
       UpdateHighlight();
+
+      if(mHighlightActor)
+      {
+        container.Add(mHighlightActor, mHighlightSize);
+      }
     }
     else
     {
@@ -1214,8 +1219,8 @@ struct Decorator::Impl : public ConnectionTracker
         const float offsetX = mHighlightPosition.x + 0.5f * mHighlightSize.width;
         const float offsetY = mHighlightPosition.y + 0.5f * mHighlightSize.height;
 
-        Vector<Vector2>        vertices;
-        Vector<unsigned short> indices;
+        Vector<Vector2>  vertices;
+        Vector<uint32_t> indices;
 
         vertices.Reserve(4u * numberOfQuads);
         indices.Reserve(6u * numberOfQuads);

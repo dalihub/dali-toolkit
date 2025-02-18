@@ -83,6 +83,11 @@ public:
   ~Impl();
 
   /**
+   * @brief Initialize private VisualData context for this impl.
+   */
+  void InitializeVisualData();
+
+  /**
    * @brief Called when a pinch is detected.
    * @param[in] actor The actor the pinch occurred on
    * @param[in] pinch The pinch gesture details
@@ -152,7 +157,14 @@ public:
    * @param[in] visual The visual to ready transition overriden
    * @param[in] enable flag to set enabled or disabled.
    */
-  void EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable);
+  void EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable);
+
+  /**
+   * @brief Enables or disables overriding the given visual's corner properties to its control's
+   * @param[in] visual A registered visual
+   * @param[in] enable flat to set enabled or disabled.
+   */
+  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::EnableVisual()
@@ -396,12 +408,6 @@ public:
   */
   void RegisterProcessorOnce();
 
-  /**
-   * Set off-screen rendering.
-   * @param[in] offScreenRenderingType enum OffScreenRenderingType
-   */
-  void SetOffScreenRendering(int32_t offScreenRenderingType);
-
 protected: // From processor-interface
   /**
    * @copydoc Dali::Integration::Processor::Process()
@@ -462,6 +468,19 @@ private:
    */
   void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
+  /**
+   * Set off-screen rendering.
+   * @param[in] offScreenRenderingType enum OffScreenRenderingType
+   */
+  void SetOffScreenRendering(int32_t offScreenRenderingType);
+
+  /**
+   * Set corner radius to this control.
+   * @param[in] vector Corner radius property value
+   * @param[in] policy Corner radius policy. Default value is ABSOLUTE.
+   */
+  void SetCornerRadius(Vector4 vector, Toolkit::Visual::Transform::Policy::Type policy);
+
 public:
   Control&            mControlImpl;
   DevelControl::State mState;
@@ -479,6 +498,8 @@ public:
 
   std::string                               mStyleName;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
+  Vector4                                   mCornerRadius;       ///< The corner radius of this control
+  Toolkit::Visual::Transform::Policy::Type  mCornerRadiusPolicy; ///< The corner radius policy of this control
   RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
@@ -545,6 +566,8 @@ public:
   static const PropertyRegistration PROPERTY_29;
   static const PropertyRegistration PROPERTY_30;
   static const PropertyRegistration PROPERTY_31;
+  static const PropertyRegistration PROPERTY_32;
+  static const PropertyRegistration PROPERTY_33;
 };
 
 } // namespace Internal

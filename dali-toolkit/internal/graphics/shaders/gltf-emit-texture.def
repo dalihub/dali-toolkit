@@ -3,6 +3,6 @@
 UNIFORM sampler2D uEmissiveSampler;
 UNIFORM_BLOCK FragBlockEmissive
 {
-  UNIFORM int  uEmissiveTexCoordIndex;
-  UNIFORM vec3 uEmissiveFactor;
+  UNIFORM highp int  uEmissiveTexCoordIndex;
+  UNIFORM highp vec3 uEmissiveFactor;
 };

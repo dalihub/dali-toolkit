@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,9 +117,6 @@ Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType& AsyncImageLoader::P
 
 bool AsyncImageLoader::Cancel(uint32_t loadingTaskId)
 {
-  // Remove already completed tasks
-  RemoveCompletedTask();
-
   auto end = mLoadingTasks.end();
   for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
   {
@@ -136,9 +133,6 @@ bool AsyncImageLoader::Cancel(uint32_t loadingTaskId)
 
 void AsyncImageLoader::CancelAll()
 {
-  // Remove already completed tasks
-  RemoveCompletedTask();
-
   auto end = mLoadingTasks.end();
   for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
   {
@@ -152,6 +146,17 @@ void AsyncImageLoader::CancelAll()
 
 void AsyncImageLoader::ProcessLoadedImage(LoadingTaskPtr task)
 {
+  // Remove tasks before signal emit
+  auto end = mLoadingTasks.end();
+  for(auto iter = mLoadingTasks.begin(); iter != end; ++iter)
+  {
+    if((*iter).loadId == task->id)
+    {
+      mLoadingTasks.erase(iter);
+      break;
+    }
+  }
+
   if(mPixelBufferLoadedSignal.GetConnectionCount() > 0)
   {
     mPixelBufferLoadedSignal.Emit(task->id, task->pixelBuffers);
@@ -165,31 +170,6 @@ void AsyncImageLoader::ProcessLoadedImage(LoadingTaskPtr task)
     }
     mLoadedSignal.Emit(task->id, pixelData);
   }
-
-  mCompletedTaskIds.push_back(task->id);
-}
-
-void AsyncImageLoader::RemoveCompletedTask()
-{
-  std::uint32_t loadingTaskId;
-  auto          end              = mLoadingTasks.end();
-  auto          endCompletedIter = mCompletedTaskIds.end();
-  for(auto iterCompleted = mCompletedTaskIds.begin(); iterCompleted != endCompletedIter; ++iterCompleted)
-  {
-    loadingTaskId = (*iterCompleted);
-    for(std::vector<AsyncImageLoadingInfo>::iterator iter = mLoadingTasks.begin(); iter != end; ++iter)
-    {
-      if((*iter).loadId == loadingTaskId)
-      {
-        mLoadingTasks.erase(iter);
-        end = mLoadingTasks.end();
-        break;
-      }
-    }
-  }
-
-  // Remove cached completed tasks
-  mCompletedTaskIds.clear();
 }
 
 } // namespace Internal
