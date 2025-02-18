@@ -50,6 +50,8 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -373,6 +375,8 @@ const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "cornerRadius",             Toolkit::DevelControl::Property::CORNER_RADIUS,              Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "cornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -390,6 +394,8 @@ Control::Impl::Impl(Control& controlImpl)
   mCounterClockwiseFocusableActorId(-1),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
+  mCornerRadius(Vector4::ZERO),
+  mCornerRadiusPolicy(Toolkit::Visual::Transform::Policy::Type::ABSOLUTE),
   mRenderEffect(nullptr),
   mStartingPinchScale(nullptr),
   mMargin(0, 0, 0, 0),
@@ -583,11 +589,23 @@ void Control::Impl::OnSceneDisconnection()
   }
 }
 
-void Control::Impl::EnableReadyTransitionOverriden(Toolkit::Visual::Base& visual, bool enable)
+void Control::Impl::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
   if(DALI_LIKELY(mVisualData))
   {
-    mVisualData->EnableReadyTransitionOverriden(visual, enable);
+    mVisualData->EnableReadyTransitionOverridden(visual, enable);
+  }
+}
+
+void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable)
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    Property::Map map;
+    map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = mCornerRadius;
+    map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = mCornerRadiusPolicy;
+
+    mVisualData->EnableCornerPropertiesOverridden(visual, enable, map);
   }
 }
 
@@ -845,6 +863,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
             if(visual)
             {
               controlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+              controlImpl.mImpl->EnableCornerPropertiesOverridden(visual, true);
             }
           }
         }
@@ -1063,6 +1082,27 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::CORNER_RADIUS:
+      {
+        Vector4 vector;
+        if(value.Get(vector))
+        {
+          controlImpl.mImpl->SetCornerRadius(vector, controlImpl.mImpl->mCornerRadiusPolicy);
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY:
+      {
+        int policy;
+        if(value.Get(policy))
+        {
+          controlImpl.mImpl->SetCornerRadius(controlImpl.mImpl->mCornerRadius,
+                                             static_cast<Toolkit::Visual::Transform::Policy::Type>(policy));
+        }
+        break;
+      }
     }
   }
 }
@@ -1273,6 +1313,18 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::OFFSCREEN_RENDERING:
       {
         value = controlImpl.mImpl->mOffScreenRenderingType;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CORNER_RADIUS:
+      {
+        value = controlImpl.mImpl->mCornerRadius;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY:
+      {
+        value = static_cast<int32_t>(controlImpl.mImpl->mCornerRadiusPolicy);
         break;
       }
     }
@@ -1495,6 +1547,7 @@ void Control::Impl::SetShadow(const Property::Map& map)
     if(visual)
     {
       mVisualData->RegisterVisual(Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT);
+      EnableCornerPropertiesOverridden(visual, true);
 
       mControlImpl.RelayoutRequest();
     }
@@ -1665,6 +1718,40 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
 
     Dali::Toolkit::Control handle(mControlImpl.GetOwner());
     mOffScreenRenderingImpl->SetOwnerControl(handle);
+  }
+}
+
+void Control::Impl::SetCornerRadius(Vector4 vector, Toolkit::Visual::Transform::Policy::Type policy)
+{
+  if(vector == mCornerRadius && policy == mCornerRadiusPolicy)
+  {
+    return;
+  }
+
+  mCornerRadius       = vector;
+  mCornerRadiusPolicy = policy;
+
+  Property::Map map;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = vector;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = policy;
+
+  RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+  for(auto it = visuals.begin(); it != visuals.end(); it++)
+  {
+    if((*it)->overrideCornerProperties)
+    {
+      (*it)->visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+    }
+  }
+
+  if(mRenderEffect)
+  {
+    mRenderEffect->SetCornerConstants(map);
+  }
+
+  if(mOffScreenRenderingImpl)
+  {
+    mOffScreenRenderingImpl->SetCornerConstants(map);
   }
 }
 

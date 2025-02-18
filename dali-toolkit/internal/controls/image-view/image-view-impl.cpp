@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,8 @@ void ImageView::SetImage(const Property::Map& map)
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+    controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -229,7 +230,8 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverriden(mVisual, true);
+    controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -620,7 +622,8 @@ void ImageView::ClearTransitionAnimation()
   {
     Actor                    self            = Self();
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverriden(mVisual, false);
+    controlDataImpl.EnableReadyTransitionOverridden(mVisual, false);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
     DiscardImageViewVisual(mPreviousVisual);
   }

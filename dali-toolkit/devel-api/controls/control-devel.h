@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,7 +263,24 @@ enum
    * @details Name "offscreenRendering", type Property::INTEGER.
    * @note Default is false.
    */
-  OFFSCREEN_RENDERING
+  OFFSCREEN_RENDERING,
+
+  /**
+   * @brief The radius for the rounded corners of the control.
+   * @details Name "cornerRadius", type Property::VECTOR4, animatable
+   * @note By default, it is Vector::ZERO.
+   * @note Applies to specific visuals inside the control.
+   * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
+   */
+  CORNER_RADIUS,
+
+  /**
+   * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
+   * @details Name "cornerRadiusPolicy", type Property::INTEGER.
+   * @see Policy::Type
+   * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS_POLICY
+   */
+  CORNER_RADIUS_POLICY
 };
 
 } // namespace Property
