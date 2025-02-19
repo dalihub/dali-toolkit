@@ -62,6 +62,8 @@ AsyncTextManager::AsyncTextManager()
   numberOfLoader = std::clamp(numberOfLoader, MINIMUM_NUMBER_OF_LOADER, MAXIMUM_NUMBER_OF_LOADER);
   DALI_LOG_RELEASE_INFO("Number of async text loaders:%d\n", numberOfLoader);
 
+  mLocale = TextAbstraction::GetLocaleFull();
+
   for(int i = 0; i < numberOfLoader; i++)
   {
     Text::AsyncTextLoader loader = Text::AsyncTextLoader::New();
