@@ -257,7 +257,7 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
 MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
 : mDefaultFontPerScriptCache(),
   mValidFontsPerScriptCache(),
-  mLocale(std::string())
+  mLocale()
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
@@ -266,6 +266,8 @@ MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
+
+  mLocale = TextAbstraction::GetLocaleFull();
 
   if(connectLocaleChangedSignal && Dali::Adaptor::IsAvailable())
   {
