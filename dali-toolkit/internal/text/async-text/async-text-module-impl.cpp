@@ -50,8 +50,6 @@ AsyncTextModule::AsyncTextModule()
   mSegmentation         = TextAbstraction::Segmentation::New();
   mHyphenation          = TextAbstraction::Hyphenation::New();
   mMultilanguageSupport = Text::MultilanguageSupport::New(connnectLocaleChangedSignal);
-
-  mFontClient.InitDefaultFontDescription();
 }
 
 AsyncTextModule::~AsyncTextModule()
@@ -61,7 +59,6 @@ AsyncTextModule::~AsyncTextModule()
 void AsyncTextModule::ClearCache()
 {
   mFontClient.ClearCacheOnLocaleChanged();
-  mFontClient.InitDefaultFontDescription();
   mMultilanguageSupport.ClearCache();
 }
 

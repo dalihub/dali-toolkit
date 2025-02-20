@@ -110,6 +110,8 @@ bool AsyncTextLoader::IsModuleClearNeeded()
 // Worker thread
 void AsyncTextLoader::Initialize()
 {
+  mModule.GetFontClient().InitDefaultFontDescription();
+
   ClearTextModelData();
 
   mNumberOfCharacters = 0u;
