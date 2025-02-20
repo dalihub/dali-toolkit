@@ -302,6 +302,13 @@ public:
   void ClearModule();
 
   /**
+   * @brief Sets custom fonts directories.
+   *
+   * @param[in] customFontDirectories List of the custom font paths.
+   */
+  void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
+
+  /**
    * @brief Sets a flag indicating that module's cache clearing is needed.
    *
    * When the async text loader is available, clear is processed on the main thread.

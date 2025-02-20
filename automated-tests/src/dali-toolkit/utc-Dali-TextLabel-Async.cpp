@@ -49,6 +49,8 @@ void dali_textlabel_async_cleanup(void)
 
 namespace
 {
+const std::string DEFAULT_FONT_DIR("/resources/fonts");
+
 static int   ASYNC_TEXT_THREAD_TIMEOUT = 5;
 
 static bool  gAsyncTextRenderedCalled;
@@ -112,6 +114,16 @@ int UtcDaliToolkitTextLabelAsyncRender01(void)
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  TextAbstraction::FontDescription fontDescription;
+  std::string fontPath = pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf";
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.AddCustomFontDirectory(fontPath);
 
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK(label);
