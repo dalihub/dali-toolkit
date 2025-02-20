@@ -88,6 +88,14 @@ void AsyncTextLoader::ClearModule()
   mModule.ClearCache();
 }
 
+void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories)
+{
+  for(auto &path: customFontDirectories)
+  {
+    mModule.GetFontClient().AddCustomFontDirectory(path);
+  }
+}
+
 void AsyncTextLoader::SetModuleClearNeeded(bool clear)
 {
   Dali::Mutex::ScopedLock lock(mMutex);
