@@ -45,6 +45,11 @@ void AsyncTextLoader::ClearModule()
   GetImplementation(*this).ClearModule();
 }
 
+void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories)
+{
+  GetImplementation(*this).SetCustomFontDirectories(customFontDirectories);
+}
+
 void AsyncTextLoader::SetModuleClearNeeded(bool clear)
 {
   GetImplementation(*this).SetModuleClearNeeded(clear);
