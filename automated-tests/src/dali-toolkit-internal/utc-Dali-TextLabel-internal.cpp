@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <thread>
 
 #include <toolkit-event-thread-callback.h>
 
@@ -1491,6 +1492,8 @@ int UtcDaliTextLabelLocaleChange02(void)
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   newLocale = "label_TEST_2";
   adaptor.LocaleChangedSignal().Emit(newLocale);
