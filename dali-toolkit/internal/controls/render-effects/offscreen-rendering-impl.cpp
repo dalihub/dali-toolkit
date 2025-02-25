@@ -37,6 +37,23 @@ OffScreenRenderingImpl::OffScreenRenderingImpl(DevelControl::OffScreenRenderingT
   Initialize();
 }
 
+void OffScreenRenderingImpl::SetType(DevelControl::OffScreenRenderingType type)
+{
+  mType = type;
+
+  if(mRenderTask)
+  {
+    if(mType == DevelControl::OffScreenRenderingType::REFRESH_ALWAYS)
+    {
+      mRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+    }
+    else if(mType == DevelControl::OffScreenRenderingType::REFRESH_ONCE)
+    {
+      mRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+    }
+  }
+}
+
 RenderEffectImplPtr OffScreenRenderingImpl::Clone() const
 {
   DALI_LOG_ERROR("Cloning offscreen rendering is not allowed.\n");
@@ -63,40 +80,16 @@ void OffScreenRenderingImpl::OnActivate()
     return;
   }
 
-  // Create resources
-  Toolkit::Control control = GetOwnerControl();
-  const Size       size    = GetTargetSize();
-
-  mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height);
-  mFrameBuffer.AttachColorTexture(texture);
-
-  Integration::SceneHolder sceneHolder = GetSceneHolder();
-  RenderTaskList           taskList    = sceneHolder.GetRenderTaskList();
-  mRenderTask                          = taskList.CreateTask();
-  mRenderTask.SetSourceActor(control);
-  mRenderTask.SetCameraActor(GetCameraActor());
-  mRenderTask.SetExclusive(true);
-  mRenderTask.SetInputEnabled(false);
-  mRenderTask.SetFrameBuffer(mFrameBuffer);
-  mRenderTask.SetClearEnabled(true);
-  mRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+  CreateFrameBuffer();
+  CreateRenderTask();
+  SetType(mType);
 
   Renderer renderer = GetTargetRenderer();
   SetRendererTexture(renderer, mFrameBuffer);
 
+  Toolkit::Control control = GetOwnerControl();
   control.GetImplementation().SetCacheRenderer(renderer);
   control.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
-
-  // Set refresh rate
-  if(mType == DevelControl::OffScreenRenderingType::REFRESH_ALWAYS)
-  {
-    mRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
-  }
-  else if(mType == DevelControl::OffScreenRenderingType::REFRESH_ONCE)
-  {
-    mRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-  }
 }
 
 void OffScreenRenderingImpl::OnDeactivate()
@@ -108,6 +101,50 @@ void OffScreenRenderingImpl::OnDeactivate()
     control.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::NONE);
   }
 
+  DestroyFrameBuffer();
+  DestroyRenderTask();
+}
+
+void OffScreenRenderingImpl::OnRefresh()
+{
+  DestroyFrameBuffer();
+
+  CreateFrameBuffer();
+  mRenderTask.SetFrameBuffer(mFrameBuffer);
+}
+
+void OffScreenRenderingImpl::CreateFrameBuffer()
+{
+  const Size size = GetTargetSize();
+
+  mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height);
+  mFrameBuffer.AttachColorTexture(texture);
+}
+
+void OffScreenRenderingImpl::DestroyFrameBuffer()
+{
+  mFrameBuffer.Reset();
+}
+
+void OffScreenRenderingImpl::CreateRenderTask()
+{
+  Toolkit::Control         control     = GetOwnerControl();
+  Integration::SceneHolder sceneHolder = GetSceneHolder();
+  RenderTaskList           taskList    = sceneHolder.GetRenderTaskList();
+
+  mRenderTask = taskList.CreateTask();
+  mRenderTask.SetSourceActor(control);
+  mRenderTask.SetCameraActor(GetCameraActor());
+  mRenderTask.SetExclusive(true);
+  mRenderTask.SetInputEnabled(false);
+  mRenderTask.SetFrameBuffer(mFrameBuffer);
+  mRenderTask.SetClearEnabled(true);
+  mRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+}
+
+void OffScreenRenderingImpl::DestroyRenderTask()
+{
   auto sceneHolder = GetSceneHolder();
   if(DALI_LIKELY(sceneHolder))
   {
@@ -115,7 +152,6 @@ void OffScreenRenderingImpl::OnDeactivate()
     taskList.RemoveTask(mRenderTask);
   }
 
-  mFrameBuffer.Reset();
   mRenderTask.Reset();
 }
 

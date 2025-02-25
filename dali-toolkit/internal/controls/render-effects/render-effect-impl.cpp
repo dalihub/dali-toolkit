@@ -125,11 +125,25 @@ bool RenderEffectImpl::IsActivated() const
 
 void RenderEffectImpl::Initialize()
 {
-  mCamera = CameraActor::New();
-  mCamera.SetInvertYAxis(true);
-  mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  mCamera.SetType(Dali::Camera::FREE_LOOK);
+  if(!mCamera)
+  {
+    mCamera = CameraActor::New();
+    mCamera.SetInvertYAxis(true);
+    mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mCamera.SetType(Dali::Camera::FREE_LOOK);
+  }
+
+  if(!mRenderer)
+  {
+    mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
+    mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
+
+    Shader shader = mRenderer.GetShader();
+    shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
+    shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
+    shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
+  }
 
   OnInitialize();
 }
@@ -176,17 +190,6 @@ void RenderEffectImpl::Activate()
       return;
     }
     mPlacementSceneHolder = sceneHolder;
-
-    if(!mRenderer)
-    {
-      mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
-      mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
-
-      Shader shader = mRenderer.GetShader();
-      shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
-      shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
-      shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
-    }
 
     Vector2 size = GetTargetSize();
     if(size != Vector2::ZERO)
@@ -299,8 +302,8 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
     if(mTargetSize != targetSize && IsActivated())
     {
       UpdateTargetSize();
-      Deactivate();
-      Activate();
+      mCamera.SetPerspectiveProjection(GetTargetSize());
+      OnRefresh();
     }
   }
 }
