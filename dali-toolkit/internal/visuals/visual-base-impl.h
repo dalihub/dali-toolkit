@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,6 +292,14 @@ public:
    * @brief Set the flag to use transformMap in the FittingMode.
    */
   void SetTransformMapUsageForFittingMode(bool used);
+
+  /**
+   * @brief Sets the control size
+   * It will call SetTransformAndSize with empty transform map.
+   *
+   * @param[in] controlSize The size of the parent control for visuals that need to scale internally.
+   */
+  void SetControlSize(Size controlSize);
 
   /**
    * @brief Get the actual Visual Object.

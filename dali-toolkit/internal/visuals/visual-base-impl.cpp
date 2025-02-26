@@ -1001,6 +1001,12 @@ void Visual::Base::SetTransformMapUsageForFittingMode(bool used)
   mImpl->mTransformMapSetForFittingMode = used;
 }
 
+void Visual::Base::SetControlSize(Size controlSize)
+{
+  const static Property::Map emptyMap;
+  SetTransformAndSize(emptyMap, controlSize);
+}
+
 Visual::Base& Visual::Base::GetVisualObject()
 {
   return *this;

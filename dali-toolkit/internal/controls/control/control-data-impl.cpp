@@ -541,11 +541,16 @@ void Control::Impl::UnregisterVisual(Property::Index index)
 
 Toolkit::Visual::Base Control::Impl::GetVisual(Property::Index index) const
 {
+  return Toolkit::Visual::Base(GetVisualImplPtr(index));
+}
+
+Toolkit::Internal::Visual::Base* Control::Impl::GetVisualImplPtr(Property::Index index) const
+{
   if(DALI_LIKELY(mVisualData))
   {
-    return mVisualData->GetVisual(index);
+    return mVisualData->GetVisualImplPtr(index);
   }
-  return Toolkit::Visual::Base();
+  return nullptr;
 }
 
 bool Control::Impl::IsResourceReady() const
@@ -1175,10 +1180,10 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
         if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
         {
-          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::Control::Property::BACKGROUND);
-          if(visual)
+          const Toolkit::Internal::Visual::Base* visualImplPtr = controlImpl.mImpl->mVisualData->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
+          if(visualImplPtr)
           {
-            visual.CreatePropertyMap(map);
+            visualImplPtr->CreatePropertyMap(map);
           }
         }
 
