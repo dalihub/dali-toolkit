@@ -674,15 +674,15 @@ bool Control::OnKeyEvent(const KeyEvent& event)
 
 void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  for(unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i)
+  // When set the padding or margin on the control, child should be resized and repositioned.
+  if((mImpl->mPadding.start != 0) || (mImpl->mPadding.end != 0) || (mImpl->mPadding.top != 0) || (mImpl->mPadding.bottom != 0) ||
+     (mImpl->mMargin.start != 0) || (mImpl->mMargin.end != 0) || (mImpl->mMargin.top != 0) || (mImpl->mMargin.bottom != 0))
   {
-    Actor   child = Self().GetChildAt(i);
-    Vector2 newChildSize(size);
-
-    // When set the padding or margin on the control, child should be resized and repositioned.
-    if((mImpl->mPadding.start != 0) || (mImpl->mPadding.end != 0) || (mImpl->mPadding.top != 0) || (mImpl->mPadding.bottom != 0) ||
-       (mImpl->mMargin.start != 0) || (mImpl->mMargin.end != 0) || (mImpl->mMargin.top != 0) || (mImpl->mMargin.bottom != 0))
+    for(unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i)
     {
+      Actor   child = Self().GetChildAt(i);
+      Vector2 newChildSize(size);
+
       Extents padding = mImpl->mPadding;
 
       Dali::CustomActor           ownerActor(GetOwner());
@@ -703,8 +703,9 @@ void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
       childOffset.y += (mImpl->mMargin.top + padding.top);
 
       child.SetProperty(Actor::Property::POSITION, Vector2(childOffset.x, childOffset.y));
+
+      container.Add(child, newChildSize);
     }
-    container.Add(child, newChildSize);
   }
 
   if(Accessibility::IsUp())
