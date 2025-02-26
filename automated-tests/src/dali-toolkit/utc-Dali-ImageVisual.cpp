@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ const char* TEST_IMAGE_FILE_NAME          = TEST_RESOURCE_DIR "/gallery-small-1.
 const char* TEST_BROKEN_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/a-random-nonimage.jpg";
 const char* TEST_LARGE_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_SMALL_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/icon-edit.png";
-const char* TEST_REMOTE_IMAGE_FILE_NAME   = "https://www.tizen.org/sites/all/themes/tizen_theme/logo.png";
+const char* TEST_REMOTE_IMAGE_FILE_NAME   = "https://www.tizen.org/wp-content/themes/tizentheme/logo.png";
 const char* TEST_INVALID_FILE_NAME        = TEST_RESOURCE_DIR "/invalid.jpg";
 const char* TEST_REMOTE_INVALID_FILE_NAME = "https://www.tizen.org/invalid.png";
 const char* TEST_MASK_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/mask.png";

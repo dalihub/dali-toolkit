@@ -77,15 +77,26 @@ void GlViewRenderThread::RegisterGlCallbacks(CallbackBase* initCallback, Callbac
 {
   if(!mGlInitCallback && !mGlRenderFrameCallback && !mGlTerminateCallback)
   {
-    mGlInitCallback        = std::unique_ptr<CallbackBase>(initCallback);
-    mGlRenderFrameCallback = std::unique_ptr<CallbackBase>(renderFrameCallback);
-    mGlTerminateCallback   = std::unique_ptr<CallbackBase>(terminateCallback);
+    if(initCallback)
+    {
+      mGlInitCallback        = std::unique_ptr<CallbackBase>(initCallback);
+    }
+
+    if(renderFrameCallback)
+    {
+      mGlRenderFrameCallback = std::unique_ptr<CallbackBase>(renderFrameCallback);
+    }
+
+    if(terminateCallback)
+    {
+      mGlTerminateCallback   = std::unique_ptr<CallbackBase>(terminateCallback);
+    }
   }
 }
 
 void GlViewRenderThread::SetResizeCallback(CallbackBase* resizeCallback)
 {
-  if(!mResizeCallback)
+  if(!mResizeCallback && resizeCallback)
   {
     mResizeCallback = std::unique_ptr<CallbackBase>(resizeCallback);
   }

@@ -271,7 +271,7 @@ void BlurEffectImpl::OnActivate()
   mVerticalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
 
   // Set blur
-  CreateFrameBuffers(size, ImageDimensions(downsampledWidth, downsampledHeight));
+  CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
   CreateRenderTasks(GetSceneHolder(), ownerControl);
   SetShaderConstants(downsampledWidth, downsampledHeight);
 
@@ -286,7 +286,7 @@ void BlurEffectImpl::OnActivate()
     renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::CONTENT);
   }
   ownerControl.AddRenderer(renderer);
-  SetRendererTexture(renderer, mSourceFrameBuffer);
+  SetRendererTexture(renderer, mBlurredOutputFrameBuffer);
 
   ownerControl.Add(mInternalRoot);
 
@@ -312,25 +312,39 @@ void BlurEffectImpl::OnDeactivate()
 
   mInternalRoot.Unparent();
 
-  mInputBackgroundFrameBuffer.Reset();
-  mTemporaryFrameBuffer.Reset();
-  mSourceFrameBuffer.Reset();
-
-  auto sceneHolder = GetSceneHolder();
-  if(DALI_LIKELY(sceneHolder))
-  {
-    RenderTaskList taskList = sceneHolder.GetRenderTaskList();
-    taskList.RemoveTask(mHorizontalBlurTask);
-    taskList.RemoveTask(mVerticalBlurTask);
-    taskList.RemoveTask(mSourceRenderTask);
-  }
-
-  mHorizontalBlurTask.Reset();
-  mVerticalBlurTask.Reset();
-  mSourceRenderTask.Reset();
+  DestroyFrameBuffers();
+  DestroyRenderTasks();
 }
 
-void BlurEffectImpl::CreateFrameBuffers(const Vector2 size, const ImageDimensions downsampledSize)
+void BlurEffectImpl::OnRefresh()
+{
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    return;
+  }
+
+  mInputBackgroundFrameBuffer.Reset();
+  mTemporaryFrameBuffer.Reset();
+  mBlurredOutputFrameBuffer.Reset();
+
+  Vector2  size              = GetTargetSize();
+  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mDownscaleFactor), 1u);
+  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mDownscaleFactor), 1u);
+
+  // Set size
+  mRenderDownsampledCamera.SetPerspectiveProjection(Size(downsampledWidth, downsampledHeight));
+  mHorizontalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
+  mVerticalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
+
+  CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
+  SetShaderConstants(downsampledWidth, downsampledHeight);
+
+  mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
+  mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
+  mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
+}
+
+void BlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsampledSize)
 {
   uint32_t downsampledWidth  = downsampledSize.GetWidth();
   uint32_t downsampledHeight = downsampledSize.GetHeight();
@@ -346,9 +360,16 @@ void BlurEffectImpl::CreateFrameBuffers(const Vector2 size, const ImageDimension
   mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
 
   // buffer to draw blurred output
-  mSourceFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
-  Texture sourceTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mSourceFrameBuffer.AttachColorTexture(sourceTexture);
+  mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
+  Texture sourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
+  mBlurredOutputFrameBuffer.AttachColorTexture(sourceTexture);
+}
+
+void BlurEffectImpl::DestroyFrameBuffers()
+{
+  mInputBackgroundFrameBuffer.Reset();
+  mTemporaryFrameBuffer.Reset();
+  mBlurredOutputFrameBuffer.Reset();
 }
 
 void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
@@ -387,11 +408,27 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   mVerticalBlurTask.SetExclusive(true);
   mVerticalBlurTask.SetInputEnabled(false);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
-  mVerticalBlurTask.SetFrameBuffer(mSourceFrameBuffer);
+  mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
 
   // Clear sourceTexture as Transparent.
   mVerticalBlurTask.SetClearEnabled(true);
   mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
+}
+
+void BlurEffectImpl::DestroyRenderTasks()
+{
+  auto sceneHolder = GetSceneHolder();
+  if(DALI_LIKELY(sceneHolder))
+  {
+    RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+    taskList.RemoveTask(mHorizontalBlurTask);
+    taskList.RemoveTask(mVerticalBlurTask);
+    taskList.RemoveTask(mSourceRenderTask);
+  }
+
+  mHorizontalBlurTask.Reset();
+  mVerticalBlurTask.Reset();
+  mSourceRenderTask.Reset();
 }
 
 void BlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, const Toolkit::Control sourceControl)

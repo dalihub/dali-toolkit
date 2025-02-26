@@ -40,18 +40,60 @@ namespace Toolkit
 {
 namespace Internal
 {
+/**
+ * @brief This effect renders all children(including self) at off screen framebuffer.
+ * This effect is handleless, so initiate an instance through setting DevelControl::Property::OFFSCREEN_RENDERING
+ * The instance will be saved internally, thus outer modification is impossible.
+ */
 class OffScreenRenderingImpl : public RenderEffectImpl
 {
 public:
+  /**
+   * @brief Constructor
+   * @param[in] type Defines whether effect is enabled or not, and its refresh rate
+   */
   OffScreenRenderingImpl(DevelControl::OffScreenRenderingType type);
-  RenderEffectImplPtr       Clone() const override;
+  /**
+   * @brief Set OffScreenRenderingType explicitly
+   * @param[in] type Defines whether effect is enabled or not, and its refresh rate
+   */
+  void SetType(DevelControl::OffScreenRenderingType type);
+
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::Clone
+  RenderEffectImplPtr Clone() const override;
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
   OffScreenRenderable::Type GetOffScreenRenderableType() override;
-  void                      GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
 protected:
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnInitialize
   void OnInitialize() override;
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnActivate
   void OnActivate() override;
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnDeactivate
   void OnDeactivate() override;
+  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnRefresh
+  void OnRefresh() override;
+
+private:
+  /**
+   * @brief Initializes off screen buffer to draw subtree
+   */
+  void CreateFrameBuffer();
+  /**
+   * @brief
+   */
+  void DestroyFrameBuffer();
+
+  /**
+   * @brief Initializes render task for offscreen rendering
+   */
+  void CreateRenderTask();
+  /**
+   * @brief
+   */
+  void DestroyRenderTask();
 
 private:
   RenderTask                           mRenderTask;

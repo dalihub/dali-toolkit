@@ -1791,6 +1791,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mIsManualRendered(false),
   mManualRendered(false)
 {
+  mLocale = TextAbstraction::GetLocaleFull();
 }
 
 TextLabel::~TextLabel()

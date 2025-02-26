@@ -1703,22 +1703,26 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   }
 
   DevelControl::OffScreenRenderingType newType = static_cast<DevelControl::OffScreenRenderingType>(offScreenRenderingType);
-  if(newType != mOffScreenRenderingType)
+  if(newType == DevelControl::OffScreenRenderingType::NONE)
   {
-    // update type
-    mOffScreenRenderingType = newType;
-
-    // update effect
     if(mOffScreenRenderingImpl)
     {
       mOffScreenRenderingImpl->ClearOwnerControl();
       mOffScreenRenderingImpl.reset();
     }
-    mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(mOffScreenRenderingType);
+  }
+  else if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)
+  {
+    mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(newType);
 
     Dali::Toolkit::Control handle(mControlImpl.GetOwner());
     mOffScreenRenderingImpl->SetOwnerControl(handle);
   }
+  else
+  {
+    mOffScreenRenderingImpl->SetType(newType);
+  }
+  mOffScreenRenderingType = newType;
 }
 
 void Control::Impl::SetCornerRadius(Vector4 vector, Toolkit::Visual::Transform::Policy::Type policy)

@@ -62,9 +62,13 @@ AsyncTextManager::AsyncTextManager()
   numberOfLoader = std::clamp(numberOfLoader, MINIMUM_NUMBER_OF_LOADER, MAXIMUM_NUMBER_OF_LOADER);
   DALI_LOG_RELEASE_INFO("Number of async text loaders:%d\n", numberOfLoader);
 
+  mLocale = TextAbstraction::GetLocaleFull();
+
+  const TextAbstraction::FontPathList& customFonts = TextAbstraction::FontClient::Get().GetCustomFontDirectories();
   for(int i = 0; i < numberOfLoader; i++)
   {
     Text::AsyncTextLoader loader = Text::AsyncTextLoader::New();
+    loader.SetCustomFontDirectories(customFonts);
     mAvailableLoaders.push_back(loader);
   }
 
@@ -72,10 +76,6 @@ AsyncTextManager::AsyncTextManager()
   {
     Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &AsyncTextManager::OnLocaleChanged);
   }
-
-  // This function should be called after all AsyncTextModule(FontClient) are created.
-  TextAbstraction::FontClient::Get().ApplyCustomFontDirectories();
-  // TODO : In the near future, we may need to address potential thread-safety issues related to the FontConfig handle.
 }
 
 AsyncTextManager::~AsyncTextManager()

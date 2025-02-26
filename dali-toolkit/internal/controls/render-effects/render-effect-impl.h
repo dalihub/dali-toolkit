@@ -160,6 +160,12 @@ protected:
    */
   virtual void OnDeactivate() = 0;
 
+  /**
+   * @brief Redraws effect without deactivation
+   * @note Assumes activation
+   */
+  virtual void OnRefresh() = 0;
+
 private:
   /**
    * @brief Activates effect on ownerControl

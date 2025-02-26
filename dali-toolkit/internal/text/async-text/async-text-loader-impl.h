@@ -63,6 +63,11 @@ public:
   void ClearModule();
 
   /**
+   * @copydoc Dali::AsyncTextLoader::SetCustomFontDirectories()
+   */
+  void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
+
+  /**
    * @copydoc Dali::AsyncTextLoader::SetModuleClearNeeded()
    */
   void SetModuleClearNeeded(bool clear);

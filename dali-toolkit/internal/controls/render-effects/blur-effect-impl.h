@@ -118,14 +118,23 @@ protected:
    */
   void OnDeactivate() override;
 
+  /**
+   * @brief Redraw effect without deactivation
+   */
+  void OnRefresh() override;
+
 private:
   // Inner functions
   /**
    * @brief Sets frame buffers to draw blurred output.
-   * @param[in] size Full size of input.
    * @param[in] downsampledSize Downsampled size for performance.
    */
-  void CreateFrameBuffers(const Vector2 size, const ImageDimensions downsampledSize);
+  void CreateFrameBuffers(const ImageDimensions downsampledSize);
+
+  /**
+   * @brief Removes and destroys local frame buffers.
+   */
+  void DestroyFrameBuffers();
 
   /**
    * @brief Sets blur render tasks.
@@ -134,6 +143,11 @@ private:
    * @param[in] sourceControl Input source control
    */
   void CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
+
+  /**
+   * @brief Removes and destroys local render tasks.
+   */
+  void DestroyRenderTasks();
 
   /**
    * @brief Apply render tasks source actor, and some other options.
@@ -182,7 +196,7 @@ private:
   Actor       mVerticalBlurActor;
   RenderTask  mVerticalBlurTask;
 
-  FrameBuffer mSourceFrameBuffer; // Output. Blurred background texture for mOwnerControl and mRenderer.
+  FrameBuffer mBlurredOutputFrameBuffer;
   RenderTask  mSourceRenderTask;
 
   // Variables
