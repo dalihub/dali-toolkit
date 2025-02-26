@@ -332,7 +332,7 @@ void RenderEffectImpl::SetCornerConstants(Property::Map map)
   Vector4 squareness = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS].Get(squareness);
 
-  Toolkit::Visual::Transform::Policy::Type policy;
+  Toolkit::Visual::Transform::Policy::Type policy = Toolkit::Visual::Transform::Policy::Type::ABSOLUTE;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY].Get(policy);
 
   Renderer renderer = GetTargetRenderer();
