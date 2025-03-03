@@ -64,16 +64,16 @@ AsyncTextManager::AsyncTextManager()
 
   mLocale = TextAbstraction::GetLocaleFull();
 
-  const TextAbstraction::FontPathList& customFonts = TextAbstraction::FontClient::Get().GetCustomFontDirectories();
-  for(int i = 0; i < numberOfLoader; i++)
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    Text::AsyncTextLoader loader = Text::AsyncTextLoader::New();
-    loader.SetCustomFontDirectories(customFonts);
-    mAvailableLoaders.push_back(loader);
-  }
+    const TextAbstraction::FontPathList& customFonts = TextAbstraction::FontClient::Get().GetCustomFontDirectories();
+    for(int i = 0; i < numberOfLoader; i++)
+    {
+      Text::AsyncTextLoader loader = Text::AsyncTextLoader::New();
+      loader.SetCustomFontDirectories(customFonts);
+      mAvailableLoaders.push_back(loader);
+    }
 
-  if(Dali::Adaptor::IsAvailable())
-  {
     Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &AsyncTextManager::OnLocaleChanged);
   }
 }
