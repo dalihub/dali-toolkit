@@ -42,6 +42,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace Visual
+{
+class Base;
+}
+
 enum class TriStateProperty
 {
   AUTO = 0,
@@ -149,6 +154,16 @@ public:
    * @copydoc Dali::Toolkit::DevelControl::GetVisual()
    */
   Toolkit::Visual::Base GetVisual(Property::Index index) const;
+
+  /**
+   * @brief Get the raw pointer of visual impl.
+   * It will be used when we want to get visual infomations without increase reference counts.
+   * @note Only for internal usage.
+   *
+   * @param[in] index Index of parameter
+   * @return Raw pointer of visual base implements. nullptr if not exist.
+   */
+  Toolkit::Internal::Visual::Base* GetVisualImplPtr(Property::Index index) const;
 
   /**
    * @brief Sets the given visual to be ready transition

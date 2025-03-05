@@ -36,6 +36,11 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace Visual
+{
+class Base;
+}
+
 /**
   * @brief Struct used to store Visual within the control, index is a unique key for each visual.
   */
@@ -148,6 +153,11 @@ public:
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisual()
    */
   Toolkit::Visual::Base GetVisual(Property::Index index) const;
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualImplPtr()
+   */
+  Toolkit::Internal::Visual::Base* GetVisualImplPtr(Property::Index index) const;
 
   /**
    * @brief Get visual by its name

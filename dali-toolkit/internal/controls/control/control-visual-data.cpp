@@ -364,9 +364,11 @@ Toolkit::Visual::ResourceStatus Control::Impl::VisualData::GetVisualResourceStat
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
   {
-    const Toolkit::Visual::Base   visual     = (*iter)->visual;
-    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
-    return visualImpl.GetResourceStatus();
+    if((*iter)->visual)
+    {
+      const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
+      return visualImpl.GetResourceStatus();
+    }
   }
 
   return Toolkit::Visual::ResourceStatus::PREPARING;
@@ -578,13 +580,17 @@ void Control::Impl::VisualData::UnregisterVisual(Property::Index index)
 
 Toolkit::Visual::Base Control::Impl::VisualData::GetVisual(Property::Index index) const
 {
+  return Toolkit::Visual::Base(GetVisualImplPtr(index));
+}
+
+Toolkit::Internal::Visual::Base* Control::Impl::VisualData::GetVisualImplPtr(Property::Index index) const
+{
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
   {
-    return (*iter)->visual;
+    return (*iter)->visual ? &Toolkit::GetImplementation((*iter)->visual) : nullptr;
   }
-
-  return Toolkit::Visual::Base();
+  return nullptr;
 }
 
 Toolkit::Visual::Base Control::Impl::VisualData::GetVisual(const std::string& name) const
@@ -911,7 +917,7 @@ void Control::Impl::VisualData::UpdateVisualProperties(const std::vector<std::pa
 
 void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
 {
-  Actor self = mOuter.mControlImpl.Self();
+  Actor self;
   for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
@@ -925,17 +931,21 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
         continue;
       }
 
-      Visual::FittingMode fittingMode  = visualImpl.GetFittingMode();
-      Property::Map       transformMap = Property::Map();
+      Visual::FittingMode fittingMode = visualImpl.GetFittingMode();
 
-      // If the fittingMode is DONT_CARE, we don't need to apply fittingMode, just Set empty transformMap
+      // If the fittingMode is DONT_CARE, we don't need to apply fittingMode, just Set the size of control
       if(fittingMode == Visual::FittingMode::DONT_CARE)
       {
         if(visualImpl.GetType() != Toolkit::Visual::Type::TEXT)
         {
-          ((*iter)->visual).SetTransformAndSize(transformMap, size);
+          visualImpl.SetControlSize(size);
         }
         continue;
+      }
+
+      if(!self)
+      {
+        self = mOuter.mControlImpl.Self();
       }
 
       Extents padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
@@ -959,6 +969,8 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
         visualImpl.SetPixelAreaForFittingMode(FULL_TEXTURE_RECT);
       }
 
+      Property::Map transformMap = Property::Map();
+
       if((!zeroPadding) || // If padding is not zero
          (fittingMode != Visual::FittingMode::FILL))
       {
@@ -969,7 +981,7 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
         // Skip GetNaturalSize
         if(fittingMode != Visual::FittingMode::FILL)
         {
-          ((*iter)->visual).GetNaturalSize(naturalSize);
+          visualImpl.GetNaturalSize(naturalSize);
         }
 
         // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
@@ -1087,7 +1099,7 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
                Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
       }
 
-      ((*iter)->visual).SetTransformAndSize(transformMap, size);
+      visualImpl.SetTransformAndSize(transformMap, size);
     }
   }
 }

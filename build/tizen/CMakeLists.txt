@@ -244,6 +244,11 @@ ELSE()
 
   ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal )
 
+  CHECK_CXX_COMPILER_FLAG( -Wno-dangling-reference HAVE_NO_DANGLING_REFERENCE )
+  IF (HAVE_NO_DANGLING_REFERENCE)
+    ADD_COMPILE_OPTIONS( $<$<COMPILE_LANGUAGE:CXX>:-Wno-dangling-reference> )
+  ENDIF()
+
   IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
     ADD_COMPILE_OPTIONS( --coverage )
     SET(ENABLE_COVERAGE ON)

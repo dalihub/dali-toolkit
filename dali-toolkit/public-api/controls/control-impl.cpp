@@ -135,11 +135,11 @@ void Control::SetBackgroundColor(const Vector4& color)
   map[Toolkit::Visual::Property::TYPE]           = Toolkit::Visual::COLOR;
   map[Toolkit::ColorVisual::Property::MIX_COLOR] = color;
 
-  Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
-  if(visual && visual.GetType() == Toolkit::Visual::COLOR)
+  Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
+  if(visualImplPtr && visualImplPtr->GetType() == Toolkit::Visual::COLOR)
   {
     // Update background color only
-    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelVisual::Action::UPDATE_PROPERTY, map);
+    visualImplPtr->DoAction(DevelVisual::Action::UPDATE_PROPERTY, map);
     return;
   }
 
@@ -642,15 +642,16 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  Vector2               size(targetSize);
-  Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
-  if(visual)
+  Vector2 size(targetSize);
+
+  Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
+  if(visualImplPtr)
   {
-    visual.SetTransformAndSize(Property::Map(), size); // Send an empty map as we do not want to modify the visual's set transform
+    visualImplPtr->SetControlSize(size); // Send an empty map as we do not want to modify the visual's set transform
   }
 
   // Apply FittingMode here
-  mImpl->mSize = size;
+  mImpl->mSize = Vector2(targetSize);
   mImpl->RegisterProcessorOnce();
 }
 
@@ -674,15 +675,15 @@ bool Control::OnKeyEvent(const KeyEvent& event)
 
 void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  for(unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i)
+  // When set the padding or margin on the control, child should be resized and repositioned.
+  if((mImpl->mPadding.start != 0) || (mImpl->mPadding.end != 0) || (mImpl->mPadding.top != 0) || (mImpl->mPadding.bottom != 0) ||
+     (mImpl->mMargin.start != 0) || (mImpl->mMargin.end != 0) || (mImpl->mMargin.top != 0) || (mImpl->mMargin.bottom != 0))
   {
-    Actor   child = Self().GetChildAt(i);
-    Vector2 newChildSize(size);
-
-    // When set the padding or margin on the control, child should be resized and repositioned.
-    if((mImpl->mPadding.start != 0) || (mImpl->mPadding.end != 0) || (mImpl->mPadding.top != 0) || (mImpl->mPadding.bottom != 0) ||
-       (mImpl->mMargin.start != 0) || (mImpl->mMargin.end != 0) || (mImpl->mMargin.top != 0) || (mImpl->mMargin.bottom != 0))
+    for(unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i)
     {
+      Actor   child = Self().GetChildAt(i);
+      Vector2 newChildSize(size);
+
       Extents padding = mImpl->mPadding;
 
       Dali::CustomActor           ownerActor(GetOwner());
@@ -703,8 +704,9 @@ void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
       childOffset.y += (mImpl->mMargin.top + padding.top);
 
       child.SetProperty(Actor::Property::POSITION, Vector2(childOffset.x, childOffset.y));
+
+      container.Add(child, newChildSize);
     }
-    container.Add(child, newChildSize);
   }
 
   if(Accessibility::IsUp())
@@ -734,11 +736,11 @@ void Control::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimen
 Vector3 Control::GetNaturalSize()
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetProperty<std::string>(Dali::Actor::Property::NAME).c_str());
-  Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
-  if(visual)
+  Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
+  if(visualImplPtr)
   {
     Vector2 naturalSize;
-    visual.GetNaturalSize(naturalSize);
+    visualImplPtr->GetNaturalSize(naturalSize);
     naturalSize.width += (mImpl->mPadding.start + mImpl->mPadding.end);
     naturalSize.height += (mImpl->mPadding.top + mImpl->mPadding.bottom);
     return Vector3(naturalSize);

@@ -414,22 +414,6 @@ float ImageView::GetWidthForHeight(float height)
   }
 }
 
-void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
-{
-  Control::OnRelayout(size, container);
-  if(mVisual)
-  {
-    // mVisual is not updated util the resource is ready in the case of visual replacement.
-    // in this case, the Property Map must be initialized so that the previous value is not reused.
-    // after mVisual is updated, the correct value will be reset.
-    Toolkit::Visual::Base visual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
-    if(visual && visual != mVisual)
-    {
-      visual.SetTransformAndSize(Property::Map(), size);
-    }
-  }
-}
-
 void ImageView::OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
                                     std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
                                     Dali::Toolkit::Control                                              source,

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,11 +170,6 @@ private: // From Control
   float GetWidthForHeight(float height) override;
 
   /**
-   * @copydoc Toolkit::Control::OnRelayout()
-   */
-  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
-
-  /**
    * @copydoc Toolkit::Control::OnCreateTransitions()
    */
   virtual void OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
@@ -194,7 +189,7 @@ private:
    */
   void OnResourceReady(Toolkit::Control control);
 
-   /**
+  /**
    * @brief Create placeholder image if it set. placeholder image is shown when image view is waiting for the image to load.
    */
   void CreatePlaceholderImage();
@@ -229,17 +224,17 @@ private:
   Toolkit::Visual::Base mPreviousVisual;
   Toolkit::Visual::Base mPlaceholderVisual;
 
-  std::string     mUrl;                                    ///< the url for the image if the image came from a URL, empty otherwise
-  std::string     mPlaceholderUrl;                         ///< the url for the placeholder image if the image came from a PLACEHOLDER_IMAGE, empty otherwise
-  Property::Map   mPropertyMap;                            ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map   mShaderMap;                              ///< the Property::Map if the custom shader is set, empty otherwise
-  Property::Map   mTransitionEffectOptionMap;              ///< the Property::Map if the transition effect option is set, empty otherwise
-  ImageDimensions mImageSize;                              ///< the image size
+  std::string     mUrl;                       ///< the url for the image if the image came from a URL, empty otherwise
+  std::string     mPlaceholderUrl;            ///< the url for the placeholder image if the image came from a PLACEHOLDER_IMAGE, empty otherwise
+  Property::Map   mPropertyMap;               ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map   mShaderMap;                 ///< the Property::Map if the custom shader is set, empty otherwise
+  Property::Map   mTransitionEffectOptionMap; ///< the Property::Map if the transition effect option is set, empty otherwise
+  ImageDimensions mImageSize;                 ///< the image size
 
-  Animation       mTransitionAnimation;                    ///< the animation for transition effect
-  float           mTransitionTargetAlpha;                  ///< Keep image's alpha value
-  bool            mTransitionEffect :1;                    ///< Flag to indicate TransitionEffect is enabled
-  bool            mImageReplaced:1;                        ///< Flag to indicate image is replaced
+  Animation mTransitionAnimation;   ///< the animation for transition effect
+  float     mTransitionTargetAlpha; ///< Keep image's alpha value
+  bool      mTransitionEffect : 1;  ///< Flag to indicate TransitionEffect is enabled
+  bool      mImageReplaced : 1;     ///< Flag to indicate image is replaced
 };
 
 } // namespace Internal
