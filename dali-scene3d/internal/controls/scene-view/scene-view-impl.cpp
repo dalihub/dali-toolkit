@@ -64,7 +64,7 @@ DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "MaskContentScale", FLOAT, MASK_C
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MASK)
 DALI_TYPE_REGISTRATION_END()
 
-Property::Index    RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
+Property::Index           RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 static constexpr float    MIM_CAPTURE_SIZE        = 1.0f;
 static constexpr int32_t  DEFAULT_ORIENTATION     = 0;
 static constexpr int32_t  INVALID_INDEX           = -1;
@@ -163,8 +163,8 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
   shadowLightCamera.RemoveConstraints();
 
   // Compute ViewProjectionMatrix and store it to "tempViewProjectionMatrix" property
-  auto       tempViewProjectionMatrixIndex  = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
-  Constraint projectionMatrixConstraint = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+  auto       tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
+  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
                                                                   {
                                                                     Matrix worldMatrix = inputs[0]->GetMatrix();
                                                                     float tangentFov_2 = tanf(inputs[4]->GetFloat());
@@ -278,8 +278,7 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
                                                                     projMatrix[14] = -(near + far) / deltaZ;
                                                                     projMatrix[15] = 1.0f;
 
-                                                                    output = output * shadowCameraViewMatrix;
-                                                                  });
+                                                                    output = output * shadowCameraViewMatrix; });
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::Actor::Property::WORLD_MATRIX});
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::PROJECTION_MODE});
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::DevelCameraActor::Property::PROJECTION_DIRECTION});
@@ -847,7 +846,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     capturePossible = false;
   }
 
-  uint32_t width = std::max(1u, unsigned(size.width));
+  uint32_t width  = std::max(1u, unsigned(size.width));
   uint32_t height = std::max(1u, unsigned(size.height));
   if(width > Dali::GetMaxTextureSize() || height > Dali::GetMaxTextureSize())
   {
@@ -1147,7 +1146,7 @@ void SceneView::OnSceneDisconnection()
   }
   tempContainer.clear();
 
-  for(auto && capture : mCaptureContainer)
+  for(auto&& capture : mCaptureContainer)
   {
     ResetCaptureData(capture.second);
   }
@@ -1529,13 +1528,10 @@ void SceneView::OnCaptureFinished(Dali::RenderTask& task)
   auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
                            { return item.first == task; });
 
-  int32_t                 captureId = iter->second->mCaptureId;
-  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
-
   if(iter != mCaptureContainer.end())
   {
-    captureId = iter->second->mCaptureId;
-    imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
+    int32_t                 captureId = iter->second->mCaptureId;
+    Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::ImageUrl::New(iter->second->mCaptureInvertTexture);
     ResetCaptureData(iter->second);
     mCaptureContainer.erase(iter);
 
@@ -1550,8 +1546,8 @@ void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 bool SceneView::OnTimeOut()
 {
   mTimerTickCount++;
-  auto                     self = Self();
-  Dali::Scene3D::SceneView handle(Dali::Scene3D::SceneView::DownCast(self));
+  auto                                                                   self = Self();
+  Dali::Scene3D::SceneView                                               handle(Dali::Scene3D::SceneView::DownCast(self));
   std::vector<std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>>> tempContainer;
   for(auto&& capture : mCaptureContainer)
   {
@@ -1566,16 +1562,15 @@ bool SceneView::OnTimeOut()
     mCaptureFinishedSignal.Emit(handle, capture.second->mCaptureId, Dali::Toolkit::ImageUrl());
   }
 
-  for(auto && capture : tempContainer)
+  for(auto&& capture : tempContainer)
   {
     ResetCaptureData(capture.second);
   }
   tempContainer.clear();
 
   int32_t tickCount = mTimerTickCount;
-  auto it = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) {
-    return item.second->mStartTick + 1 < tickCount;
-  });
+  auto    it        = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
+                           { return item.second->mStartTick + 1 < tickCount; });
   mCaptureContainer.erase(it, mCaptureContainer.end());
   mCaptureContainer.shrink_to_fit();
 
