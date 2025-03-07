@@ -386,7 +386,8 @@ public:
     mIsUserInteractionEnabled(true),
     mProcessorRegistered(false),
     mTextCutout(false),
-    mRenderMode(DevelTextLabel::Render::SYNC)
+    mRenderMode(DevelTextLabel::Render::SYNC),
+    mEllipsisMode(DevelText::Ellipsize::TRUNCATE)
   {
     mModel = Model::New();
 
@@ -917,7 +918,7 @@ public:
   /**
    * @copydoc Controller::SetAutoScrollEnabled()
    */
-  void SetAutoScrollEnabled(bool enable);
+  void SetAutoScrollEnabled(bool enable, bool requestRelayout);
 
   /**
    * @copydoc Controller::SetEnableCursorBlink()
@@ -1128,7 +1129,8 @@ public:
   bool  mProcessorRegistered : 1;      ///< Whether the text controller registered into processor or not.
   bool  mTextCutout : 1;               ///< Whether the text cutout enabled.
 
-  DevelTextLabel::Render::Mode mRenderMode; ///< Render mode of the text. (SYNC, ASYNC_AUTO, ASYNC_MANUAL)
+  DevelTextLabel::Render::Mode mRenderMode;   ///< Render mode of the text. (SYNC, ASYNC_AUTO, ASYNC_MANUAL)
+  DevelText::Ellipsize::Mode   mEllipsisMode; ///< Ellipsis mode of the text. (TRUNCATE, AUTO_SCROLL)
 
 private:
   friend ControllerImplEventHandler;

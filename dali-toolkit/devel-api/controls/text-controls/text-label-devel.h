@@ -275,6 +275,19 @@ enum Type
    * @note This property is read-only.
    */
   ASYNC_LINE_COUNT,
+
+  /**
+   * @brief Ellipsis mode.
+   * @details Name "ellipsisMode", type Property::INTERGER.
+   */
+  ELLIPSIS_MODE,
+
+  /**
+   * @brief Whether the auto scroll animation is playing or not.
+   * @details Name "isScrolling", type Property::BOOLEAN.
+   * @note This property is read-only.
+   */
+  IS_SCROLLING,
 };
 
 } // namespace Property

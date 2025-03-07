@@ -153,6 +153,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "cutout",        
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderMode",                   INTEGER, RENDER_MODE                    )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "manualRendered",               BOOLEAN, MANUAL_RENDERED                )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "asyncLineCount",               INTEGER, ASYNC_LINE_COUNT               )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisMode",                 INTEGER, ELLIPSIS_MODE                  )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "isScrolling",                  BOOLEAN, IS_SCROLLING                   )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -390,25 +392,32 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
-        const bool enableAutoScroll = value.Get<bool>();
-        impl.mLastAutoScrollEnabled = enableAutoScroll;
-        // If request to auto scroll is the same as current state then do nothing.
-        if(enableAutoScroll != impl.mController->IsAutoScrollEnabled())
+        if(impl.mController->IsTextElideEnabled() && impl.mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
         {
-          // If request is disable (false) and auto scrolling is enabled then need to stop it
-          if(enableAutoScroll == false)
+          DALI_LOG_WARNING("Tried to autoscroll while in ellipsize auto scroll mode, request ignored.\n");
+        }
+        else
+        {
+          const bool enableAutoScroll = value.Get<bool>();
+          impl.mLastAutoScrollEnabled = enableAutoScroll;
+          // If request to auto scroll is the same as current state then do nothing.
+          if(enableAutoScroll != impl.mController->IsAutoScrollEnabled())
           {
-            if(impl.mTextScroller)
+            // If request is disable (false) and auto scrolling is enabled then need to stop it
+            if(enableAutoScroll == false)
             {
-              impl.mTextScroller->StopScrolling();
+              if(impl.mTextScroller)
+              {
+                impl.mTextScroller->StopScrolling();
+              }
             }
+            // If request is enable (true) then start autoscroll as not already running
+            else
+            {
+              impl.mController->SetAutoScrollEnabled(enableAutoScroll);
+            }
+            impl.mIsAsyncRenderNeeded = true;
           }
-          // If request is enable (true) then start autoscroll as not already running
-          else
-          {
-            impl.mController->SetAutoScrollEnabled(enableAutoScroll);
-          }
-          impl.mIsAsyncRenderNeeded = true;
         }
         break;
       }
@@ -490,6 +499,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
 
         impl.mController->SetTextElideEnabled(ellipsis);
         impl.mIsAsyncRenderNeeded = true;
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextLabel::Property::LINE_WRAP_MODE:
@@ -571,7 +581,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         if(!Equals(impl.mController->GetFontSizeScale(), scale))
         {
           impl.mController->SetFontSizeScale(scale);
-          impl.mIsAsyncRenderNeeded = true;
+          impl.mTextUpdateNeeded = true;
         }
         break;
       }
@@ -581,7 +591,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
         {
           impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
-          impl.mIsAsyncRenderNeeded = true;
+          impl.mTextUpdateNeeded = true;
         }
         break;
       }
@@ -593,6 +603,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel %p EllipsisPosition::Type %d\n", impl.mController.Get(), ellipsisPositionType);
           impl.mController->SetEllipsisPosition(ellipsisPositionType);
           impl.mIsAsyncRenderNeeded = true;
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -674,6 +685,23 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           {
             impl.RequestTextRelayout();
           }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS_MODE:
+      {
+        DevelText::Ellipsize::Mode ellipsisMode = static_cast<DevelText::Ellipsize::Mode>(value.Get<int>());
+        if(impl.mController->GetEllipsisMode() != ellipsisMode)
+        {
+          impl.mController->SetEllipsisMode(ellipsisMode);
+          Text::TextScrollerPtr textScroller = impl.GetTextScroller();
+          if(textScroller)
+          {
+            textScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+            textScroller->StopScrolling();
+          }
+          impl.mIsAsyncRenderNeeded = true;
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -980,6 +1008,16 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::ASYNC_LINE_COUNT:
       {
         value = impl.mAsyncLineCount;
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS_MODE:
+      {
+        value = impl.mController->GetEllipsisMode();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::IS_SCROLLING:
+      {
+        value = impl.mTextScroller && impl.mTextScroller->IsScrolling() ? true : false;
         break;
       }
     }
@@ -1406,6 +1444,25 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     mController->SetTextFitContentSize(contentSize);
   }
 
+  if(mController->IsTextElideEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
+  {
+    if(mController->IsMultiLineEnabled())
+    {
+      DALI_LOG_WARNING("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+    }
+    else
+    {
+      const Size naturalSize       = GetNaturalSize().GetVectorXY();
+      bool       autoScrollEnabled = contentSize.width < naturalSize.width ? true : false;
+      bool       requestRelayout   = false;
+
+      if(autoScrollEnabled != mController->IsAutoScrollEnabled())
+      {
+        mController->SetAutoScrollEnabled(autoScrollEnabled, requestRelayout);
+      }
+    }
+  }
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType)) || mTextUpdateNeeded)
@@ -1540,7 +1597,8 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.isTextFitArrayEnabled  = mController->IsTextFitArrayEnabled();
   parameters.textFitArray           = mController->GetTextFitArray();
   parameters.isAutoScrollEnabled    = mController->IsAutoScrollEnabled();
-  if(parameters.isAutoScrollEnabled)
+  parameters.ellipsisMode           = mController->GetEllipsisMode();
+  if(parameters.isAutoScrollEnabled || parameters.ellipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
   {
     parameters.autoScrollStopMode  = GetTextScroller()->GetStopMode();
     parameters.autoScrollSpeed     = GetTextScroller()->GetSpeed();

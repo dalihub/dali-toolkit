@@ -2767,3 +2767,62 @@ int UtcDaliToolkitTextLabelAsyncTextMultiline(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelAsyncTextEllipsisMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncTextEllipsisMode");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
+  // Set short text.
+  TextLabel label = TextLabel::New("H");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 40.f));
+
+  // Set ellipsis mode to auto scroll, but auto scroll does not work because the text is short.
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  // Set long text to scroll.
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  END_TEST;
+}

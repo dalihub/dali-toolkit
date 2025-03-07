@@ -93,7 +93,33 @@ void TextLoadingTask::Load()
     case Text::Async::RENDER_FIXED_WIDTH:
     case Text::Async::RENDER_CONSTRAINT:
     {
-      if(mParameters.isAutoScrollEnabled && !mParameters.isMultiLine)
+      if(mParameters.ellipsis && !mParameters.isMultiLine && mParameters.ellipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
+      {
+        Text::AsyncTextRenderInfo naturalSizeInfo;
+        naturalSizeInfo = mLoader.GetNaturalSize(mParameters);
+        if(mParameters.textWidth < naturalSizeInfo.renderedSize.width)
+        {
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
+          }
+#endif
+          mParameters.isAutoScrollEnabled = true;
+          mRenderInfo = mLoader.RenderAutoScroll(mParameters);
+        }
+        else
+        {
+#ifdef TRACE_ENABLED
+          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          {
+            DALI_LOG_RELEASE_INFO("RenderText, Ellipsize::AUTO_SCROLL\n");
+          }
+#endif
+          mRenderInfo = mLoader.RenderText(mParameters);
+        }
+      }
+      else if(mParameters.isAutoScrollEnabled && !mParameters.isMultiLine)
       {
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())

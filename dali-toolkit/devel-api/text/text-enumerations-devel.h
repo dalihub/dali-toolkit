@@ -145,6 +145,20 @@ enum Type
 
 } // namespace EllipsisPosition
 
+namespace Ellipsize
+{
+/**
+ * @brief Enumerations specifying ellipsize mode.
+ * @see EllipsisMode.
+ */
+enum Mode
+{
+  TRUNCATE = 0, ///< If the text exceeds the layout, it will be truncated with an ellipsis.
+  AUTO_SCROLL   ///< If the text exceeds the layout, it will be auto scroll animated.
+};
+
+} // namespace EllipsisMode
+
 } // namespace DevelText
 
 } // namespace Toolkit
