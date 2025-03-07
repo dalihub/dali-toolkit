@@ -87,6 +87,7 @@ const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
 const char* const PROPERTY_NAME_RENDER_MODE           = "renderMode";
 const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
 const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
+const char* const PROPERTY_NAME_ELLIPSIS_MODE         = "ellipsisMode";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -374,6 +375,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_RENDER_MODE) == DevelTextLabel::Property::RENDER_MODE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_MANUAL_RENDERED) == DevelTextLabel::Property::MANUAL_RENDERED);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ASYNC_LINE_COUNT) == DevelTextLabel::Property::ASYNC_LINE_COUNT);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_MODE) == DevelTextLabel::Property::ELLIPSIS_MODE);
 
   END_TEST;
 }
@@ -1072,6 +1074,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, 3);
   DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::SYNC), TEST_LOCATION);
 
+  // Check ellipsis mode property
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::TRUNCATE);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::ELLIPSIS_MODE), static_cast<int>(Toolkit::DevelText::Ellipsize::TRUNCATE), TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::ELLIPSIS_MODE), static_cast<int>(Toolkit::DevelText::Ellipsize::AUTO_SCROLL), TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
 
@@ -1719,6 +1728,74 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   {
     tet_result(TET_FAIL);
   }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelEllipsisMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisMode");
+
+  // Set short text.
+  TextLabel label = TextLabel::New("H");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 40.f));
+
+  // Set ellipsis mode to auto scroll, but auto scroll does not work because the text is short.
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
+
+  // When ellipsis mode is auto scroll, enable auto scroll does not work.
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  // Set long text to scroll.
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  // Auto scroll does not work in multi line.
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::TRUNCATE);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
 
   END_TEST;
 }
