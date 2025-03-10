@@ -1533,6 +1533,45 @@ int UtcDaliControlOffScreenRendering(void)
   END_TEST;
 }
 
+int UtcDaliControlOffScreenRenderingSizeSet(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2::ZERO);
+  application.GetScene().Add(control);
+
+  control.SetBackgroundColor(Color::RED);
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
+
+  control.SetProperty(Actor::Property::SIZE, Vector2::ZERO);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
+  tet_infoline("Size update: zero to zero");
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(100.0f, 100.0f), TEST_LOCATION);
+  tet_infoline("Size update: zero to a valid size");
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 150.0f));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(150.0f, 150.0f), TEST_LOCATION);
+  tet_infoline("Size update: size1 to size2");
+
+  control.SetProperty(Actor::Property::SIZE, Vector2::ZERO);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
+  tet_infoline("Size update: a valid size to zero");
+
+  END_TEST;
+}
+
 int UtcDaliControlNewWithDisableVisuals(void)
 {
   ToolkitTestApplication application;
