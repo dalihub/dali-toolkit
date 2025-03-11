@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ASYNC_TEXT_LOADER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,6 +295,29 @@ public:
    * @return A handle to the AsyncTextLoader.
    */
   static AsyncTextLoader New();
+
+  /**
+   * @brief Sets the locale.
+   *
+   * @param[in] locale The locale.
+   */
+  void SetLocale(const std::string& locale);
+
+  /**
+   * @brief Sets a flag indicating that module's locale updating is needed.
+   *
+   * When the async text loader is available, update is processed on the main thread.
+   *
+   * @param[in] update Whether to update the locale or not.
+   */
+  void SetLocaleUpdateNeeded(bool update);
+
+  /**
+   * @brief Whether module's locale updating is needed.
+   *
+   * @return A flag that indicates whether the locale should be updated or not.
+   */
+  bool IsLocaleUpdateNeeded();
 
   /**
    * @brief Clear the cache of the async text module.

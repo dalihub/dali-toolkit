@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,9 +86,31 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
                                          fonts);
 }
 
+const std::string& MultilanguageSupport::GetLocale()
+{
+  return GetImplementation(*this).GetLocale();
+}
+
+void MultilanguageSupport::SetLocale(const std::string& locale)
+{
+  GetImplementation(*this).SetLocale(locale);
+}
+
 void MultilanguageSupport::ClearCache()
 {
   GetImplementation(*this).ClearCache();
+}
+
+bool MultilanguageSupport::IsICULineBreakNeeded()
+{
+  return GetImplementation(*this).IsICULineBreakNeeded();
+}
+
+void MultilanguageSupport::UpdateICULineBreak(const std::string&              text,
+                                              TextAbstraction::Length         numberOfCharacters,
+                                              TextAbstraction::LineBreakInfo* breakInfo)
+{
+  GetImplementation(*this).UpdateICULineBreak(text, numberOfCharacters, breakInfo);
 }
 
 } // namespace Text

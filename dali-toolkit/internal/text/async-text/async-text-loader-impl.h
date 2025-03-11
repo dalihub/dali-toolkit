@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ASYNC_TEXT_LOADER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,21 @@ public:
    * Destructor
    */
   ~AsyncTextLoader();
+
+  /**
+   * @copydoc Dali::AsyncTextLoader::SetLocale()
+   */
+  void SetLocale(const std::string& locale);
+
+  /**
+   * @copydoc Dali::AsyncTextLoader::SetLocaleUpdateNeeded()
+   */
+  void SetLocaleUpdateNeeded(bool update);
+
+  /**
+   * @copydoc Dali::AsyncTextLoader::IsLocaleUpdateNeeded()
+   */
+  bool IsLocaleUpdateNeeded();
 
   /**
    * @copydoc Dali::AsyncTextLoader::ClearModule()
@@ -195,12 +210,14 @@ private:
   MetricsPtr            mMetrics;
   Text::Layout::Engine  mLayoutEngine;
   Text::TypesetterPtr   mTypesetter;
+  std::string           mLocale;
 
   Length                mNumberOfCharacters;
-  bool                  mFitActualEllipsis      : 1; // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
-  bool                  mIsTextDirectionRTL     : 1; // The direction of the first line after layout completion.
-  bool                  mIsTextMirrored         : 1;
-  bool                  mModuleClearNeeded      : 1;
+  bool                  mFitActualEllipsis  : 1; // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
+  bool                  mIsTextDirectionRTL : 1; // The direction of the first line after layout completion.
+  bool                  mIsTextMirrored     : 1;
+  bool                  mModuleClearNeeded  : 1;
+  bool                  mLocaleUpdateNeeded : 1;
 
   Mutex                 mMutex;
 }; // class AsyncTextLoader

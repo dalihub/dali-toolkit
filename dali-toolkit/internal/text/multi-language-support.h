@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,9 +137,37 @@ public:
                      Vector<FontRun>&                        fonts);
 
   /**
+   * @brief Gets the locale.
+   */
+  const std::string& GetLocale();
+
+  /**
+   * @brief Sets the locale.
+   * @param[in] locale The locale.
+   */
+  void SetLocale(const std::string& locale);
+
+  /**
    * @brief Clear font caches when locale changed.
    */
   void ClearCache();
+
+  /**
+   * @brief Checks if an ICU-based line break update is required for the current locale.
+   * @return If true, icu-based line breaks are required or possible.
+   */
+  bool IsICULineBreakNeeded();
+
+  /**
+   * @brief Update line break information by ICU.
+   * @remark Updates given line break information with ICU dictionary-based word wrap information that unibreak does not support.
+   * @param[in] text A string of UTF-8 characters.
+   * @param[in] numberOfCharacters The number of characters.
+   * @param[out] breakInfo The unibreak line break information buffer.
+   */
+  void UpdateICULineBreak(const std::string&              text,
+                          TextAbstraction::Length         numberOfCharacters,
+                          TextAbstraction::LineBreakInfo* breakInfo);
 
 public:
   // Default copy and move operator

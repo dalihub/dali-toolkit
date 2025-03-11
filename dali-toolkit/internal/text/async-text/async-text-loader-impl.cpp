@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,11 +61,13 @@ AsyncTextLoader::AsyncTextLoader()
 : mModule(),
   mTextModel(),
   mMetrics(),
+  mLocale(),
   mNumberOfCharacters(0u),
   mFitActualEllipsis(true),
   mIsTextDirectionRTL(false),
   mIsTextMirrored(false),
   mModuleClearNeeded(false),
+  mLocaleUpdateNeeded(false),
   mMutex()
 {
   mModule = Dali::Toolkit::Text::AsyncTextModule::New();
@@ -77,10 +79,29 @@ AsyncTextLoader::AsyncTextLoader()
   // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
   mMetrics = Metrics::New(mModule.GetFontClient());
   mLayoutEngine.SetMetrics(mMetrics);
+
+  mLocale = TextAbstraction::GetLocaleFull();
 }
 
 AsyncTextLoader::~AsyncTextLoader()
 {
+}
+
+void AsyncTextLoader::SetLocale(const std::string& locale)
+{
+  mLocale = locale;
+  mModule.GetMultilanguageSupport().SetLocale(mLocale);
+}
+
+void AsyncTextLoader::SetLocaleUpdateNeeded(bool update)
+{
+  Dali::Mutex::ScopedLock lock(mMutex);
+  mLocaleUpdateNeeded = update;
+}
+
+bool AsyncTextLoader::IsLocaleUpdateNeeded()
+{
+  return mLocaleUpdateNeeded;
 }
 
 void AsyncTextLoader::ClearModule()
@@ -317,6 +338,14 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
   lineBreakInfo.Resize(numberOfCharacters, TextAbstraction::LINE_NO_BREAK);
   SetLineBreakInfo(mModule.GetSegmentation(), utf32Characters, 0u, numberOfCharacters, lineBreakInfo);
+
+  // Check if an ICU-based line break update is required.
+  if(mModule.GetMultilanguageSupport().IsICULineBreakNeeded())
+  {
+    std::string currentText;
+    Utf32ToUtf8(mTextModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText);
+    mModule.GetMultilanguageSupport().UpdateICULineBreak(currentText, numberOfCharacters, lineBreakInfo.Begin());
+  }
 
   // Hyphenation
   if(parameters.lineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||

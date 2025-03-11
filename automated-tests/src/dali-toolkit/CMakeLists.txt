@@ -46,6 +46,7 @@ SET(TC_SOURCES
   utc-Dali-Text-CharacterSpacingSpan.cpp
   utc-Dali-Text-FontSpan.cpp
   utc-Dali-Text-BoldSpan.cpp
+  utc-Dali-Text-ICU.cpp
   utc-Dali-Text-ItalicSpan.cpp
   utc-Dali-Text-BackgroundColorSpan.cpp
   utc-Dali-Text-Range.cpp
@@ -108,6 +109,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-direct-rendering-egl.cpp
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
+  dali-toolkit-test-utils/toolkit-icu.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
   dali-toolkit-test-utils/toolkit-input-method-options.cpp
   dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp

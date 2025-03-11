@@ -831,6 +831,7 @@ void UsdLoaderImpl::Impl::GenerateTangents(MeshDefinition& meshDefinition, std::
 
 void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std::vector<UsdGeomPrimvar>& colors, VtArray<GfVec3f>& worldPosition, std::vector<uint32_t>& subIndexArray, std::vector<uint32_t>& flattenedSubTriangulatedIndices, VtArray<int>& faceVertexCounts, bool isLeftHanded)
 {
+  // Extract color data from the USD mesh primvar and map that data onto the mesh’s triangles.
   if(colors.size() > 0)
   {
     // We only support up to one color attribute
@@ -848,15 +849,16 @@ void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std:
 
       VtArray<GfVec3f> convertedColors;
 
+      // USD allows different types of interpolation for primvars (colors, normals, etc.)
       TfToken interpolation = displayColor.GetInterpolation();
       if(interpolation.GetString() == "constant")
       {
-        // Handle constant color (same color for all vertices)
+        // Handle constant color: same color for all vertices
         convertedColors = VtArray<GfVec3f>(subIndexArray.size(), rawColors[0]);
       }
       else if(interpolation.GetString() == "faceVarying")
       {
-        // Handle face-varying colors
+        // Handle face-varying colors: one value per face–vertex, i.e. each corner of a face gets its own color
         VtVec3fArray triangulatedColors = GetTriangulatedAttribute<GfVec3f>(faceVertexCounts, rawColors, isLeftHanded);
 
         for(int index : flattenedSubTriangulatedIndices)
@@ -868,7 +870,7 @@ void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std:
       }
       else if(interpolation.GetString() == "vertex")
       {
-        // Handle vertex colors
+        // Handle vertex colors: one value per vertex
         for(auto x : subIndexArray)
         {
           convertedColors.push_back(static_cast<GfVec3f>(rawColors[x]));
@@ -876,13 +878,41 @@ void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std:
       }
       else if(interpolation.GetString() == "uniform")
       {
-        // Handle uniform colors
+        // Handle uniform colors: one color per face, i.e. all vertices of a face get the same color
         GetFlattenedPrimvarValue<GfVec3f>(displayColor, rawColors);
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "rawColors (uniform): %lu, value: ", rawColors.size());
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "rawColors (uniform): %lu", rawColors.size());
 
-        for(auto x : subIndexArray)
+        // Clear any previous color data.
+        convertedColors.clear();
+
+        // Check that we have one color per face.
+        if(rawColors.size() == faceVertexCounts.size())
         {
-          convertedColors.push_back(static_cast<GfVec3f>(rawColors[x]));
+          // For each face in the original mesh, replicate its uniform color for
+          // each triangle generated from that face.
+          for(size_t faceIndex = 0; faceIndex < faceVertexCounts.size(); ++faceIndex)
+          {
+            int vertexCount = faceVertexCounts[faceIndex];
+            if(vertexCount < 3)
+            {
+              DALI_LOG_ERROR("Face %lu has fewer than 3 vertices. Skipping this face.", faceIndex);
+              continue;
+            }
+
+            // A polygon with 'vertexCount' vertices produces (vertexCount - 2) triangles.
+            int triangleCount = vertexCount - 2;
+            for(int t = 0; t < triangleCount; ++t)
+            {
+              // Each triangle has 3 vertices. Replicate the same face color for each vertex.
+              convertedColors.push_back(rawColors[faceIndex]);
+              convertedColors.push_back(rawColors[faceIndex]);
+              convertedColors.push_back(rawColors[faceIndex]);
+            }
+          }
+        }
+        else
+        {
+          DALI_LOG_ERROR("Mesh data integrity issue: raw colors (%lu) does not equal to face count (%lu).  Skipping this mesh.", rawColors.size(), faceVertexCounts.size());
         }
       }
 
