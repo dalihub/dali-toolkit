@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_UTILITIES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,9 @@ DALI_TOOLKIT_API void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int& 
  * @param[in] pixelBuffer The npatch image buffer.
  * @param[out] stretchPixelsX The horizontal stretchable pixels in the cropped image space.
  * @param[out] stretchPixelsY The vertical stretchable pixels in the cropped image space.
+ * @return True if parse success. False otherwise. If parse failed, strechPixels become empty.
  */
-DALI_TOOLKIT_API void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY);
+DALI_TOOLKIT_API bool ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY);
 
 /**
  * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.
@@ -62,6 +63,16 @@ DALI_TOOLKIT_API void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRange
  * @return true if it is a 9 patch or n patch image
  */
 DALI_TOOLKIT_API bool IsNinePatchUrl(const std::string& url);
+
+/**
+ * @brief Calculate valid stretch range from given values.
+ *
+ * @param[in] maxRangeSize The maximum point of strech range.
+ * @param[in] rangeFromZero Distance from zero point.
+ * @param[in] rangeFromMax Distance from maximum range point.
+ * @return Calculated valid range from given input.
+ */
+DALI_TOOLKIT_API Uint16Pair GetValidStrechPointFromBorder(uint32_t maxRangeSize, uint32_t rangeFromZero, uint32_t rangeFromMax);
 
 } // namespace NPatchUtility
 
