@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,10 +280,10 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>&
     info.mData->SetTextures(infoPtr->mData->GetTextures());
 
     NPatchUtility::StretchRanges stretchRangesX;
-    stretchRangesX.PushBack(Uint16Pair(border.left, ((info.mData->GetCroppedWidth() >= static_cast<unsigned int>(border.right)) ? info.mData->GetCroppedHeight() - border.right : 0)));
+    stretchRangesX.PushBack(Uint16Pair(border.left, ((info.mData->GetCroppedWidth() >= static_cast<unsigned int>(border.right)) ? info.mData->GetCroppedWidth() - border.right : 0)));
 
     NPatchUtility::StretchRanges stretchRangesY;
-    stretchRangesY.PushBack(Uint16Pair(border.top, ((info.mData->GetCroppedWidth() >= static_cast<unsigned int>(border.bottom)) ? info.mData->GetCroppedHeight() - border.bottom : 0)));
+    stretchRangesY.PushBack(Uint16Pair(border.top, ((info.mData->GetCroppedHeight() >= static_cast<unsigned int>(border.bottom)) ? info.mData->GetCroppedHeight() - border.bottom : 0)));
 
     info.mData->SetStretchPixelsX(stretchRangesX);
     info.mData->SetStretchPixelsY(stretchRangesY);
