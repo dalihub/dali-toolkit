@@ -207,6 +207,10 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   defaultFontDescription.width = parameters.fontWidth;
   defaultFontDescription.slant = parameters.fontSlant;
 
+  mTextModel->mHorizontalAlignment   = parameters.horizontalAlignment;
+  mTextModel->mVerticalAlignment     = parameters.verticalAlignment;
+  mTextModel->mVerticalLineAlignment = parameters.verticalLineAlignment;
+
 
   ////////////////////////////////////////////////////////////////////////////////
   // Update visual model.
