@@ -1941,6 +1941,14 @@ struct Engine::Impl
           hyphensCount--;
         }
 
+        if(!isMultiline)
+        {
+          // Recalculate line spacing and line height
+          LineRun& lastLineRun = *(lines.End() - 1u);
+          lastLineRun.lineSpacing = GetLineSpacing(lastLineRun.ascender + -lastLineRun.descender, layout.relativeLineSize);
+          layoutSize.height = GetLineHeight(lastLineRun, false);
+        }
+
         // No more lines to layout.
         break;
       }
