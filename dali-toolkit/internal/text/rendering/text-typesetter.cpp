@@ -929,8 +929,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     }
     case VerticalAlignment::CENTER:
     {
-      penY = static_cast<int32_t>(0.5f * (size.height - layoutSize.height));
-      penY = penY < 0.f ? 0.f : penY;
+      penY = static_cast<int32_t>(std::round(0.5f * (size.height - layoutSize.height)));
       break;
     }
     case VerticalAlignment::BOTTOM:
