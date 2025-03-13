@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace
 {
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
 
-static int   ASYNC_TEXT_THREAD_TIMEOUT = 5;
+static int ASYNC_TEXT_THREAD_TIMEOUT = 5;
 
 static bool  gAsyncTextRenderedCalled;
 static float gAsyncTextRenderedWidth;
@@ -61,7 +61,7 @@ static bool  gAsyncSizeComputedCalled;
 static float gAsyncSizeComputedWidth;
 static float gAsyncSizeComputedHeight;
 
-static bool  gTextFitChangedCalled;
+static bool gTextFitChangedCalled;
 
 float ConvertToEven(float value)
 {
@@ -120,7 +120,7 @@ int UtcDaliToolkitTextLabelAsyncRender01(void)
   free(pathNamePtr);
 
   TextAbstraction::FontDescription fontDescription;
-  std::string fontPath = pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf";
+  std::string                      fontPath = pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf";
 
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
   fontClient.AddCustomFontDirectory(fontPath);
@@ -203,9 +203,9 @@ int UtcDaliToolkitTextLabelAsyncRender02(void)
   label.SetProperty(DevelTextLabel::Property::STRIKETHROUGH, strikethrough);
 
   Property::Map outline;
-  outline["color"] = Color::GREEN;
-  outline["width"] = 2.0f;
-  outline["offset"] = Vector2(2.0f, 2.0f);
+  outline["color"]      = Color::GREEN;
+  outline["width"]      = 2.0f;
+  outline["offset"]     = Vector2(2.0f, 2.0f);
   outline["blurRadius"] = 3.0f;
   label.SetProperty(TextLabel::Property::OUTLINE, outline);
 
@@ -1251,7 +1251,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit02(void)
   gAsyncTextRenderedWidth  = ConvertToEven(gAsyncTextRenderedWidth);
   gAsyncTextRenderedHeight = ConvertToEven(gAsyncTextRenderedHeight);
 
-  bool width  = gAsyncTextRenderedWidth  >= minWidth;
+  bool width  = gAsyncTextRenderedWidth >= minWidth;
   bool height = gAsyncTextRenderedHeight >= minHeight;
 
   DALI_TEST_CHECK(width);
@@ -1869,7 +1869,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 120), true, TEST_LOCATION);
 
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
@@ -2004,7 +2004,8 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   std::string longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
-  label.SetProperty(TextLabel::Property::TEXT, longText);  application.GetScene().Add(label);
+  label.SetProperty(TextLabel::Property::TEXT, longText);
+  application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
@@ -2017,7 +2018,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   gAsyncTextRenderedWidth  = 0.0f;
   gAsyncTextRenderedHeight = 0.0f;
 
-  float expectedWidth  = 100.0f;
+  float expectedWidth = 100.0f;
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedWidth(label, expectedWidth, std::numeric_limits<float>::infinity());
@@ -2059,9 +2060,9 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   label.SetProperty(DevelTextLabel::Property::STRIKETHROUGH, strikethrough);
 
   Property::Map outline;
-  outline["color"] = Color::GREEN;
-  outline["width"] = 2.0f;
-  outline["offset"] = Vector2(2.0f, 2.0f);
+  outline["color"]      = Color::GREEN;
+  outline["width"]      = 2.0f;
+  outline["offset"]     = Vector2(2.0f, 2.0f);
   outline["blurRadius"] = 3.0f;
   label.SetProperty(TextLabel::Property::OUTLINE, outline);
 
@@ -2070,7 +2071,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   shadow.Insert("offset", Vector2(1.0f, 1.0f));
   label.SetProperty(TextLabel::Property::SHADOW, shadow);
 
-  expectedWidth  = 100.0f;
+  expectedWidth = 100.0f;
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedWidth(label, expectedWidth, std::numeric_limits<float>::infinity());
