@@ -684,10 +684,28 @@ float WebView::GetScaleFactor() const
 
 void WebView::ActivateAccessibility(bool activated)
 {
-  if(mWebEngine)
+  if(!mWebEngine)
   {
-    DALI_LOG_DEBUG_INFO("WebView[%p] ActivateAccessibility(%d)\n", this, activated);
-    mWebEngine.ActivateAccessibility(activated);
+    return;
+  }
+
+  DALI_LOG_DEBUG_INFO("WebView[%p] ActivateAccessibility(%d)\n", this, activated);
+  Actor self = Self();
+  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, !activated);
+  mWebEngine.ActivateAccessibility(activated);
+
+  auto accessible = GetAccessibleObject();
+  if(auto webviewAccessible = std::dynamic_pointer_cast<WebViewAccessible>(accessible))
+  {
+    if(!activated)
+    {
+      webviewAccessible->SetForceRefreshAddress(true);
+    }
+    else
+    {
+      webviewAccessible->SetRemoteChildAddress({});
+      webviewAccessible->OnChildrenChanged();
+    }
   }
 }
 
@@ -1611,7 +1629,7 @@ Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() cons
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
-  if(Dali::Accessibility::IsUp() && !mRemoteChild.GetAddress())
+  if(Dali::Accessibility::IsUp() && (!mRemoteChild.GetAddress() || mForceRefreshAddress))
   {
     DALI_LOG_DEBUG_INFO("Try setting address as it has not not been set on initialize.\n");
     SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
@@ -1645,6 +1663,7 @@ void WebView::WebViewAccessible::OnAccessibilityEnabled()
 
   mWebEngine.ActivateAccessibility(true);
   SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+  OnChildrenChanged();
 }
 
 void WebView::WebViewAccessible::OnAccessibilityDisabled()
@@ -1661,7 +1680,12 @@ void WebView::WebViewAccessible::OnAccessibilityDisabled()
 void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
 {
   mRemoteChild.SetAddress(address);
-  OnChildrenChanged();
+  mForceRefreshAddress = false;
+}
+
+void WebView::WebViewAccessible::SetForceRefreshAddress(bool forceRefresh)
+{
+  mForceRefreshAddress = forceRefresh;
 }
 
 } // namespace Internal
