@@ -18,6 +18,7 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
+#include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-web-engine.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
@@ -70,12 +71,16 @@ static void Wait(ToolkitTestApplication& application)
 void utc_dali_toolkit_accessibility_control_bridgeup_startup(void)
 {
   test_return_value = TET_UNDEF;
+  Test::WebEngine::SetWebViewAccessible(nullptr);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({":9.99", "root"});
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_toolkit_accessibility_control_bridgeup_cleanup(void)
 {
   test_return_value = TET_PASS;
+  Test::WebEngine::SetWebViewAccessible(nullptr);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({":9.99", "root"});
   DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
@@ -1926,6 +1931,8 @@ int UtcDaliWebViewAccessible(void)
   auto webView           = Dali::Toolkit::WebView::New();
   auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
 
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
   DALI_TEST_CHECK(webViewAccessible);
 
   auto children = webViewAccessible->GetChildren();
@@ -1955,6 +1962,139 @@ int UtcDaliWebViewAccessible(void)
 
   DALI_TEST_CHECK(address);
   DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  END_TEST;
+}
+
+int UtcDaliWebViewAccessibleEnabledAfterLoad(void)
+{
+  ToolkitTestApplication application;
+
+  auto webView           = Dali::Toolkit::WebView::New();
+  auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
+
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
+  DALI_TEST_CHECK(webViewAccessible);
+
+  auto children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  // Assuming the webengine lazy sets accessibility address on LoadUrl
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  webView.LoadUrl("http://www.somewhere.valid1.com");
+
+  // Test children still empty.
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  // Enables accessibility
+  Dali::Accessibility::TestEnableSC(true);
+
+  // Test we could get child after accessiblity enagled.
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  // Test children still empty.
+
+  auto* child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  auto address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  END_TEST;
+}
+
+int UtcDaliWebViewAccessibleActivateAccessibility(void)
+{
+  ToolkitTestApplication application;
+
+  auto webView           = Dali::Toolkit::WebView::New();
+  auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
+
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
+  DALI_TEST_CHECK(webViewAccessible);
+
+  auto children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  // Enables accessibility
+  Dali::Accessibility::TestEnableSC(true);
+
+  // Assuming the webengine lazy sets accessibility address on LoadUrl
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  // our test webengine sets accessibility address here
+  webView.LoadUrl("http://www.somewhere.valid1.com");
+
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  auto* child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  auto address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  // Disable accessibility
+  webView.ActivateAccessibility(false);
+
+  // Call GetChildren to reset children updated flag.
+  children = webViewAccessible->GetChildren();
+
+  // Change dummy bus address to check address re-validate after accessibility enabled again
+  std::string dummyBus = ":9.88";
+  DALI_TEST_NOT_EQUALS(address.GetBus(), dummyBus, 0.0f, TEST_LOCATION);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({dummyBus, "root"});
+
+  // our test webengine change accessibility address here
+  webView.LoadUrl("http://www.someanother.valid1.com");
+
+  // Enable accessibility again
+  webView.ActivateAccessibility(true);
+
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_EQUALS(address.GetBus(), dummyBus, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(false);
 

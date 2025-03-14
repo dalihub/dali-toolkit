@@ -812,6 +812,10 @@ protected:
 
     WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine);
 
+    void SetForceRefreshAddress(bool forceRefresh);
+
+    void SetRemoteChildAddress(Dali::Accessibility::Address address);
+
   protected:
     /**
      * @copydoc Dali::Accessibility::Accessible::GetAttributes()
@@ -826,10 +830,10 @@ protected:
   private:
     void OnAccessibilityEnabled();
     void OnAccessibilityDisabled();
-    void SetRemoteChildAddress(Dali::Accessibility::Address address);
 
     Dali::Accessibility::ProxyAccessible mRemoteChild;
     Dali::WebEngine&                     mWebEngine;
+    bool                                 mForceRefreshAddress{false};
   };
 
 private:
