@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -732,6 +732,10 @@ protected:
 
     WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine);
 
+    void SetForceRefreshAddress(bool forceRefresh);
+
+    void SetRemoteChildAddress(Dali::Accessibility::Address address);
+
   protected:
     /**
      * @copydoc Dali::Accessibility::Accessible::UpdateAttributes()
@@ -746,10 +750,10 @@ protected:
   private:
     void OnAccessibilityEnabled();
     void OnAccessibilityDisabled();
-    void SetRemoteChildAddress(Dali::Accessibility::Address address);
 
     Dali::Accessibility::ProxyAccessible mRemoteChild;
     Dali::WebEngine&                     mWebEngine;
+    bool                                 mForceRefreshAddress{false};
   };
 
 private:
@@ -771,8 +775,8 @@ private:
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
 
-  Vector4 mCornerRadius;                     /// < Corner radius
-  float   mCornerRadiusPolicy;               /// < Corner radius policy
+  Vector4                                                                               mCornerRadius;       /// < Corner radius
+  float                                                                                 mCornerRadiusPolicy; /// < Corner radius policy
   static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };
 

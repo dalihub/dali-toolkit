@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -560,9 +560,27 @@ float WebView::GetScaleFactor() const
 
 void WebView::ActivateAccessibility(bool activated)
 {
-  if(mWebEngine)
+  if(!mWebEngine)
   {
-    mWebEngine.ActivateAccessibility(activated);
+    return;
+  }
+
+  DALI_LOG_DEBUG_INFO("ActivateAccessibility requested %d", activated);
+  Actor self = Self();
+  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, !activated);
+  mWebEngine.ActivateAccessibility(activated);
+
+  auto accessible = GetAccessibleObject();
+  if(auto webviewAccessible = std::dynamic_pointer_cast<WebViewAccessible>(accessible))
+  {
+    if(!activated)
+    {
+      webviewAccessible->SetForceRefreshAddress(true);
+    }
+    else
+    {
+      webviewAccessible->SetRemoteChildAddress({});
+    }
   }
 }
 
@@ -1407,7 +1425,7 @@ void WebView::WebViewAccessible::UpdateAttributes(Dali::Accessibility::Attribute
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
-  if(!mRemoteChild.GetAddress())
+  if(!mRemoteChild.GetAddress() || mForceRefreshAddress)
   {
     DALI_LOG_DEBUG_INFO("Try setting address as it is not set on initialize");
     SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
@@ -1437,6 +1455,7 @@ void WebView::WebViewAccessible::OnAccessibilityEnabled()
 
   mWebEngine.ActivateAccessibility(true);
   SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+  OnChildrenChanged();
 }
 
 void WebView::WebViewAccessible::OnAccessibilityDisabled()
@@ -1453,7 +1472,12 @@ void WebView::WebViewAccessible::OnAccessibilityDisabled()
 void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
 {
   mRemoteChild.SetAddress(address);
-  OnChildrenChanged();
+  mForceRefreshAddress = false;
+}
+
+void WebView::WebViewAccessible::SetForceRefreshAddress(bool forceRefresh)
+{
+  mForceRefreshAddress = forceRefresh;
 }
 
 } // namespace Internal
