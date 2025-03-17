@@ -276,10 +276,9 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>&
     info.mData->SetTextures(infoPtr->mData->GetTextures());
 
     NPatchUtility::StretchRanges stretchRangesX;
-    stretchRangesX.PushBack(Uint16Pair(border.left, ((info.mData->GetCroppedWidth() >= static_cast<unsigned int>(border.right)) ? info.mData->GetCroppedWidth() - border.right : 0)));
-
     NPatchUtility::StretchRanges stretchRangesY;
-    stretchRangesY.PushBack(Uint16Pair(border.top, ((info.mData->GetCroppedHeight() >= static_cast<unsigned int>(border.bottom)) ? info.mData->GetCroppedHeight() - border.bottom : 0)));
+    stretchRangesX.PushBack(NPatchUtility::GetValidStrechPointFromBorder(info.mData->GetCroppedWidth(), static_cast<uint32_t>(border.left), static_cast<uint32_t>(border.right)));
+    stretchRangesY.PushBack(NPatchUtility::GetValidStrechPointFromBorder(info.mData->GetCroppedHeight(), static_cast<uint32_t>(border.top), static_cast<uint32_t>(border.bottom)));
 
     info.mData->SetStretchPixelsX(stretchRangesX);
     info.mData->SetStretchPixelsY(stretchRangesY);

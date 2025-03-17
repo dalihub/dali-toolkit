@@ -167,17 +167,25 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
   }
 
   Property::Value* borderValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER, BORDER);
-  if(borderValue && !borderValue->Get(mBorder)) // If value exists and is rect, just set mBorder
+  if(borderValue)
   {
-    // Not a rect so try vector4
-    Vector4 border;
-    if(borderValue->Get(border))
+    if(!borderValue->Get(mBorder)) // If value exists and is rect, just set mBorder
     {
-      mBorder.left   = static_cast<int>(border.x);
-      mBorder.right  = static_cast<int>(border.y);
-      mBorder.bottom = static_cast<int>(border.z);
-      mBorder.top    = static_cast<int>(border.w);
+      // Not a rect so try vector4
+      Vector4 border;
+      if(borderValue->Get(border))
+      {
+        mBorder.left   = static_cast<int>(border.x);
+        mBorder.right  = static_cast<int>(border.y);
+        mBorder.bottom = static_cast<int>(border.z);
+        mBorder.top    = static_cast<int>(border.w);
+      }
     }
+    // Ensure the range of border valid.
+    Dali::ClampInPlace(mBorder.left, 0, 0xFFFF);
+    Dali::ClampInPlace(mBorder.right, 0, 0xFFFF);
+    Dali::ClampInPlace(mBorder.bottom, 0, 0xFFFF);
+    Dali::ClampInPlace(mBorder.top, 0, 0xFFFF);
   }
 
   Property::Value* auxImage = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, AUXILIARY_IMAGE_NAME);

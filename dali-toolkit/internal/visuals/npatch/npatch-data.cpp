@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,17 +211,15 @@ void* NPatchData::GetRenderingMap() const
 
 void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied)
 {
-  if(mBorder == Rect<int>(0, 0, 0, 0))
+  if(mBorder == Rect<int>(0, 0, 0, 0) && NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY))
   {
-    NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY);
-
     // Crop the image
     pixelBuffer.Crop(1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2);
   }
   else
   {
-    mStretchPixelsX.PushBack(Uint16Pair(mBorder.left, ((pixelBuffer.GetWidth() >= static_cast<unsigned int>(mBorder.right)) ? pixelBuffer.GetWidth() - mBorder.right : 0)));
-    mStretchPixelsY.PushBack(Uint16Pair(mBorder.top, ((pixelBuffer.GetHeight() >= static_cast<unsigned int>(mBorder.bottom)) ? pixelBuffer.GetHeight() - mBorder.bottom : 0)));
+    mStretchPixelsX.PushBack(NPatchUtility::GetValidStrechPointFromBorder(pixelBuffer.GetWidth(), static_cast<uint32_t>(mBorder.left), static_cast<uint32_t>(mBorder.right)));
+    mStretchPixelsY.PushBack(NPatchUtility::GetValidStrechPointFromBorder(pixelBuffer.GetHeight(), static_cast<uint32_t>(mBorder.top), static_cast<uint32_t>(mBorder.bottom)));
   }
 
   mCroppedWidth  = pixelBuffer.GetWidth();
