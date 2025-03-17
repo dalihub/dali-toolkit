@@ -267,6 +267,8 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     case VerticalAlignment::CENTER:
     {
       penY = static_cast<int32_t>(std::round(0.5f * (size.height - layoutSize.height)));
+      penY = penY < 0.f ? 0.f : penY;
+
       break;
     }
     case VerticalAlignment::BOTTOM:
