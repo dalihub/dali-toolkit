@@ -2851,6 +2851,7 @@ int UtcDaliTextLabelHyphenWrapMode(void)
   tet_infoline(" UtcDaliTextLabelHyphenWrapMode ");
 
   int       lineCount = 0;
+  int       getLineCount = 0;
   TextLabel label     = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
@@ -2876,6 +2877,9 @@ int UtcDaliTextLabelHyphenWrapMode(void)
   */
   DALI_TEST_EQUALS(lineCount, 2, TEST_LOCATION);
 
+  getLineCount = DevelTextLabel::GetLineCount(label, 150.0f);
+  DALI_TEST_EQUALS(getLineCount, 2, TEST_LOCATION);
+
   label.SetProperty(TextLabel::Property::TEXT, "Hi Experimen");
   label.SetProperty(TextLabel::Property::LINE_WRAP_MODE, DevelText::LineWrap::MIXED);
   DALI_TEST_EQUALS(label.GetProperty<int>(TextLabel::Property::LINE_WRAP_MODE), static_cast<int>(DevelText::LineWrap::MIXED), TEST_LOCATION);
@@ -2891,6 +2895,9 @@ int UtcDaliTextLabelHyphenWrapMode(void)
     men
   */
   DALI_TEST_EQUALS(lineCount, 3, TEST_LOCATION);
+
+  getLineCount = DevelTextLabel::GetLineCount(label, 150.0f);
+  DALI_TEST_EQUALS(getLineCount, 3, TEST_LOCATION);
 
   END_TEST;
 }

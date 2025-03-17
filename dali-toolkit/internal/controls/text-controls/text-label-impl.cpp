@@ -1953,6 +1953,11 @@ void TextLabel::EnableControlBackground(const bool enable)
   }
 }
 
+int TextLabel::GetLineCount(float width)
+{
+  return mController->GetLineCount(width);
+}
+
 void TextLabel::RequestAsyncNaturalSize()
 {
   Actor                       self = Self();
