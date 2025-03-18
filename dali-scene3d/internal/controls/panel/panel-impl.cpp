@@ -302,13 +302,15 @@ void Panel::OnInitialize()
   mRootLayer = Layer::New();
   mRootLayer.SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_UI);
   // The models in the SceneView should be have independent coordinate with DALi default coordinate.
+  mRootLayer.SetProperty(Dali::Actor::Property::NAME, "PanelRootLayer");
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_POSITION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
   self.Add(mRootLayer);
 
   mPanelNode = Scene3D::ModelNode::New();
-  mPanelNode.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
+  mPanelNode.SetProperty(Dali::Actor::Property::NAME, "PanelNode");
+  mPanelNode.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
   mPanelNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mPanelNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   self.Add(mPanelNode);
@@ -319,6 +321,7 @@ void Panel::OnInitialize()
   }
 
   mContentPlaneNode = Scene3D::ModelNode::New();
+  mContentPlaneNode.SetProperty(Dali::Actor::Property::NAME, "ContentPlaneNode");
   mContentPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mContentPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mContentPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -332,6 +335,7 @@ void Panel::OnInitialize()
 
   // Back Plane
   mBackPlaneNode = Scene3D::ModelNode::New();
+  mBackPlaneNode.SetProperty(Dali::Actor::Property::NAME, "BackPlaneNode");
   mBackPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mBackPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mBackPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -351,6 +355,7 @@ void Panel::OnInitialize()
   }
 
   mDoubleSidedPlaneNode = Scene3D::ModelNode::New();
+  mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::NAME, "DoubleSidedPlaneNode");
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -430,7 +435,7 @@ void Panel::OnSceneConnection(int depth)
     mRenderTask.SetInputEnabled(true);
     mRenderTask.SetCullMode(true);
     mRenderTask.SetOrderIndex(PANEL_ORDER_INDEX);
-    mRenderTask.SetScreenToFrameBufferMappingActor(mPanelNode);
+    mRenderTask.SetScreenToFrameBufferMappingActor(mContentPlaneNode);
 
     UpdateRenderTask();
   }
@@ -647,6 +652,7 @@ void Panel::UpdateRenderTask()
     }
 
     mCamera = Dali::CameraActor::New(mPanelResolution);
+    mCamera.SetProperty(Dali::Actor::Property::NAME, "PanelCamera");
     mCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     mCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
     mCamera.SetProperty(Dali::Actor::Property::POSITION_X, mPanelResolution.x / 2.0f);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <stdlib.h>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -71,13 +73,20 @@ void AddStretchRegionsToImage(Dali::Devel::PixelBuffer pixelBuffer, uint32_t wid
   }
 }
 
-Dali::Devel::PixelBuffer CustomizeNPatch(uint32_t width, uint32_t height, const Vector4& requiredStretchBorder)
+Dali::Devel::PixelBuffer CreateEmptyPixelBuffer(uint32_t width, uint32_t height, Pixel::Format pixelFormat)
 {
-  Pixel::Format            pixelFormat = Pixel::RGBA8888;
   Dali::Devel::PixelBuffer pixelBuffer = Dali::Devel::PixelBuffer::New(width, height, pixelFormat);
 
   unsigned char* buffer = pixelBuffer.GetBuffer();
   memset(buffer, 0, width * height * Dali::Pixel::GetBytesPerPixel(pixelFormat));
+
+  return pixelBuffer;
+}
+
+Dali::Devel::PixelBuffer CustomizeNPatch(uint32_t width, uint32_t height, const Vector4& requiredStretchBorder)
+{
+  Pixel::Format            pixelFormat = Pixel::RGBA8888;
+  Dali::Devel::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(width, height, pixelFormat);
 
   InitialiseRegionsToZeroAlpha(pixelBuffer, width, height, pixelFormat);
 
@@ -243,15 +252,15 @@ int UtcDaliNPatchUtilityParseBorders(void)
   tet_infoline("UtcDaliNPatchUtilityParseBorders");
 
   /* Stretch region left(2) top(2) right (2) bottom (2)
-    *    ss
-    *  OOOOOO
-    *  OOOOOOc
-    * sOOooOOc
-    * sOOooOOc
-    *  OOOOOOc
-    *  OOOOOO
-    *   cccc
-    */
+   *    ss
+   *  OOOOOO
+   *  OOOOOOc
+   * sOOooOOc
+   * sOOooOOc
+   *  OOOOOOc
+   *  OOOOOO
+   *   cccc
+   */
 
   const unsigned int imageHeight = 18;
   const unsigned int imageWidth  = 28;
@@ -265,8 +274,9 @@ int UtcDaliNPatchUtilityParseBorders(void)
     NPatchUtility::StretchRanges stretchPixelsX;
     NPatchUtility::StretchRanges stretchPixelsY;
 
-    NPatchUtility::ParseBorders(pixelBuffer, stretchPixelsX, stretchPixelsY);
+    bool ret = NPatchUtility::ParseBorders(pixelBuffer, stretchPixelsX, stretchPixelsY);
 
+    DALI_TEST_CHECK(ret);
     DALI_TEST_CHECK(stretchPixelsX.Size() == 1);
     DALI_TEST_CHECK(stretchPixelsY.Size() == 1);
 
@@ -287,6 +297,37 @@ int UtcDaliNPatchUtilityParseBorders(void)
   END_TEST;
 }
 
+int UtcDaliNPatchUtilityParseBordersN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliNPatchUtilityParseBordersN");
+
+  for(const std::pair<uint32_t, uint32_t>& imageSizePair : std::initializer_list<std::pair<uint32_t, uint32_t>>({{1u, 1u}, {2u, 2u}, {0xFFFF, 0xFFFF}, {2u, 129u}}))
+  {
+    tet_printf("Parse for image size : %u x %u\n", imageSizePair.first, imageSizePair.second);
+    Dali::Devel::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(imageSizePair.first, imageSizePair.second, Pixel::RGBA8888);
+    DALI_TEST_CHECK(pixelBuffer);
+
+    if(pixelBuffer)
+    {
+      NPatchUtility::StretchRanges stretchPixelsX;
+      NPatchUtility::StretchRanges stretchPixelsY;
+
+      bool ret = NPatchUtility::ParseBorders(pixelBuffer, stretchPixelsX, stretchPixelsY);
+
+      DALI_TEST_CHECK(!ret);
+      DALI_TEST_CHECK(stretchPixelsX.Size() == 0);
+      DALI_TEST_CHECK(stretchPixelsY.Size() == 0);
+    }
+    else
+    {
+      test_return_value = TET_FAIL;
+    }
+  }
+
+  END_TEST;
+}
+
 int UtcDaliNPatchUtilityIsNinePatchUrl(void)
 {
   tet_infoline("UtcDaliNPatchUtilityIsNinePatchUrl");
@@ -296,6 +337,48 @@ int UtcDaliNPatchUtilityIsNinePatchUrl(void)
   DALI_TEST_CHECK(!NPatchUtility::IsNinePatchUrl("test.9"));
   DALI_TEST_CHECK(!NPatchUtility::IsNinePatchUrl("test.#"));
   DALI_TEST_CHECK(!NPatchUtility::IsNinePatchUrl("test"));
+
+  END_TEST;
+}
+
+int UtcDaliNPatchUtilityGetValidStrechPointFromBorder(void)
+{
+  tet_infoline("UtcDaliNPatchUtilityGetValidStrechPointFromBorder");
+
+  Uint16Pair value;
+  value = NPatchUtility::GetValidStrechPointFromBorder(200u, 50u, 30u);
+  DALI_TEST_EQUALS(value.GetX(), 50u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 170u, TEST_LOCATION);
+
+  value = NPatchUtility::GetValidStrechPointFromBorder(80u, 50u, 30u);
+  DALI_TEST_EQUALS(value.GetX(), 50u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 50u, TEST_LOCATION);
+
+  tet_printf("Check the ratio of input keep ratio or not\n");
+  value = NPatchUtility::GetValidStrechPointFromBorder(8u, 50u, 30u);
+  DALI_TEST_EQUALS(value.GetX(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 5u, TEST_LOCATION);
+
+  value = NPatchUtility::GetValidStrechPointFromBorder(8u, 50u, 50u);
+  DALI_TEST_EQUALS(value.GetX(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 4u, TEST_LOCATION);
+
+  tet_printf("Check the ratio is not fit with given value\n");
+  value = NPatchUtility::GetValidStrechPointFromBorder(9u, 50u, 50u);
+  DALI_TEST_EQUALS(value.GetX(), value.GetY(), TEST_LOCATION);
+
+  tet_printf("Check the input size overflowed uint16_t\n");
+  value = NPatchUtility::GetValidStrechPointFromBorder(0xFFFFFFu, 0xFFFFFFu, 0xFFFFFFu);
+  DALI_TEST_EQUALS(value.GetX(), 0xFFFFu / 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 0xFFFFu / 2, TEST_LOCATION);
+
+  value = NPatchUtility::GetValidStrechPointFromBorder(0xFFFFFFu, 4u, 8u);
+  DALI_TEST_EQUALS(value.GetX(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 0xFFFFu - 8u, TEST_LOCATION);
+
+  value = NPatchUtility::GetValidStrechPointFromBorder(8u, 0xFFFFFFu, 0xFFFFFFu);
+  DALI_TEST_EQUALS(value.GetX(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.GetY(), 4u, TEST_LOCATION);
 
   END_TEST;
 }

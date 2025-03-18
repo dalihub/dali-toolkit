@@ -201,6 +201,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mLastRequiredSize(size),
   mTextureId(TextureManager::INVALID_TEXTURE_ID),
   mTextures(),
+  mNativeTexture(),
   mImageVisualShaderFactory(shaderFactory),
   mFittingMode(fittingMode),
   mSamplingMode(samplingMode),
@@ -213,7 +214,13 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mLoadState(TextureManager::LoadState::NOT_STARTED),
   mAttemptAtlasing(false),
   mOrientationCorrection(true),
-  mEnableBrokenImage(true)
+  mNeedYuvToRgb(false),
+  mNeedUnifiedYuvAndRgb(false),
+  mEnableBrokenImage(true),
+  mUseFastTrackUploading(false),
+  mRendererAdded(false),
+  mUseBrokenImageRenderer(false),
+  mUseSynchronousSizing(false)
 {
   EnablePreMultipliedAlpha(mFactoryCache.GetPreMultiplyOnLoad());
 }
@@ -379,7 +386,11 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::ImageVisual::Property::ATLASING:
     {
-      value.Get(mAttemptAtlasing);
+      bool attemptAtlasing = false;
+      if(value.Get(attemptAtlasing))
+      {
+        mAttemptAtlasing = attemptAtlasing;
+      }
       break;
     }
 
@@ -463,7 +474,11 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE:
     {
-      value.Get(mEnableBrokenImage);
+      bool enableBrokenImage = true;
+      if(value.Get(enableBrokenImage))
+      {
+        mEnableBrokenImage = enableBrokenImage;
+      }
       break;
     }
 
@@ -484,19 +499,31 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
     }
     case Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION:
     {
-      value.Get(mOrientationCorrection);
+      bool orientationCorrection = true;
+      if(value.Get(orientationCorrection))
+      {
+        mOrientationCorrection = orientationCorrection;
+      }
       break;
     }
 
     case Toolkit::DevelImageVisual::Property::FAST_TRACK_UPLOADING:
     {
-      value.Get(mUseFastTrackUploading);
+      bool useFastTrackUploading = false;
+      if(value.Get(useFastTrackUploading))
+      {
+        mUseFastTrackUploading = useFastTrackUploading;
+      }
       break;
     }
 
     case Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING:
     {
-      value.Get(mUseSynchronousSizing);
+      bool useSynchronousSizing = false;
+      if(value.Get(useSynchronousSizing))
+      {
+        mUseSynchronousSizing = useSynchronousSizing;
+      }
       break;
     }
   }
@@ -855,8 +882,9 @@ void ImageVisual::InitializeRenderer()
     mImpl->mRenderer.SetTextures(mTextures);
     ComputeTextureSize();
     CheckMaskTexture();
+    UpdateNativeTextureInfomation(mTextures);
 
-    bool needToUpdateShader = DevelTexture::IsNative(mTextures.GetTexture(0)) || mUseBrokenImageRenderer;
+    bool needToUpdateShader = (!!mNativeTexture) || mUseBrokenImageRenderer;
 
     if(mTextures.GetTextureCount() == 3)
     {
@@ -1056,6 +1084,7 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
 
       // Need to reset textureset after change load state.
       mTextures.Reset();
+      UpdateNativeTextureInfomation(Dali::TextureSet());
 
       Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
       LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::FORCED);
@@ -1090,6 +1119,7 @@ void ImageVisual::OnSetTransform()
 
       // Need to reset textureset after change load state.
       mTextures.Reset();
+      UpdateNativeTextureInfomation(Dali::TextureSet());
 
       bool attemptAtlasing = AttemptAtlasing();
       LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
@@ -1211,6 +1241,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       mImpl->mRenderer.SetTextures(textureInformation.textureSet);
       ComputeTextureSize();
       CheckMaskTexture();
+      UpdateNativeTextureInfomation(textureInformation.textureSet);
 
       bool needToUpdateShader = mUseBrokenImageRenderer;
 
@@ -1255,6 +1286,8 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
   if(!mImpl->mRenderer)
   {
     mTextures = textureInformation.textureSet;
+
+    UpdateNativeTextureInfomation(mTextures);
   }
 
   // Image loaded, set status regardless of staged status.
@@ -1360,7 +1393,7 @@ Shader ImageVisual::GenerateShader() const
   Shader shader;
 
   const bool useStandardShader = !mImpl->mCustomShader;
-  const bool useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
+  const bool useNativeImage    = (!!mNativeTexture);
 
   if(useStandardShader)
   {
@@ -1373,7 +1406,7 @@ Shader ImageVisual::GenerateShader() const
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
+        .SetTextureForFragmentShaderCheck(useNativeImage ? mNativeTexture : Dali::Texture())
         .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
         .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb));
   }
@@ -1407,10 +1440,9 @@ Shader ImageVisual::GenerateShader() const
     if(useNativeImage)
     {
       bool        modifiedFragmentShader = false;
-      Texture     nativeTexture          = mTextures.GetTexture(0);
       std::string fragmentShaderString   = std::string(fragmentShaderView);
 
-      modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShaderString);
+      modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShaderString);
       if(modifiedFragmentShader)
       {
         fragmentShaderView = fragmentShaderString;
@@ -1496,6 +1528,7 @@ void ImageVisual::ResetRenderer()
 
   // Need to reset textureset after change load state.
   mTextures.Reset();
+  UpdateNativeTextureInfomation(Dali::TextureSet());
 }
 
 void ImageVisual::ShowBrokenImage()
@@ -1602,6 +1635,22 @@ Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool
   }
 
   return geometry;
+}
+
+void ImageVisual::UpdateNativeTextureInfomation(TextureSet textureSet)
+{
+  // Reset previous flags and infomations.
+  mNativeTexture.Reset();
+
+  if(textureSet && textureSet.GetTextureCount() > 0u)
+  {
+    Texture texture = textureSet.GetTexture(0u);
+    if(DevelTexture::IsNative(texture))
+    {
+      // Keep native texture handle.
+      mNativeTexture = texture;
+    }
+  }
 }
 
 } // namespace Internal

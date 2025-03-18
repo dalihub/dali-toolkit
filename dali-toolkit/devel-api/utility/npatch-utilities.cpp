@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2022 Samsung Electronics Co., Ltd.
+* Copyright (c) 2025 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int32_t& byteOffset, i
   }
 }
 
-void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY)
+bool ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY)
 {
   stretchPixelsX.Clear();
   stretchPixelsY.Clear();
@@ -210,8 +210,14 @@ void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX
   uint32_t bytesPerPixel = Pixel::GetBytesPerPixel(pixelFormat);
   uint32_t width         = pixelBuffer.GetWidth();
   uint32_t height        = pixelBuffer.GetHeight();
+  uint32_t srcStride     = pixelBuffer.GetStrideBytes() ? pixelBuffer.GetStrideBytes() : width * bytesPerPixel;
   uint8_t* srcPixels     = pixelBuffer.GetBuffer();
-  uint32_t srcStride     = width * bytesPerPixel;
+
+  if(width <= 2 || width >= 0xFFFF || height <= 2 || height >= 0xFFFF)
+  {
+    DALI_LOG_ERROR("PixelBuffer size not allowed! [%u x %u] border parsing failed\n", width, height);
+    return false;
+  }
 
   // TOP
   uint8_t* top   = srcPixels + bytesPerPixel;
@@ -247,6 +253,8 @@ void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX
   {
     stretchPixelsY.PushBack(Uint16Pair(0, height - 2));
   }
+
+  return true;
 }
 
 bool IsNinePatchUrl(const std::string& url)
@@ -313,6 +321,31 @@ bool IsNinePatchUrl(const std::string& url)
     ++iter;
   }
   return match;
+}
+
+Dali::Uint16Pair GetValidStrechPointFromBorder(uint32_t maxRangeSize, uint32_t rangeFromZero, uint32_t rangeFromMax)
+{
+  maxRangeSize  = std::min(maxRangeSize, 0xFFFFu);
+  rangeFromZero = std::min(rangeFromZero, 0xFFFFu);
+  rangeFromMax  = std::min(rangeFromMax, 0xFFFFu);
+  if(DALI_UNLIKELY(rangeFromZero + rangeFromMax > maxRangeSize))
+  {
+    // Keep ratio and make ensure that sume of value didn't overflow the max range.
+    // Note that we can assume that rangeSum is bigger than zero!
+    uint32_t rangeSum = rangeFromZero + rangeFromMax;
+
+    rangeFromZero = (rangeFromZero * maxRangeSize) / rangeSum;
+    rangeFromMax  = (rangeFromMax * maxRangeSize) / rangeSum;
+
+    // Ensure to make rangeFromZero + rangeFromMax is equal to maxRangeSize.
+    uint32_t remainedRange = maxRangeSize - (rangeFromZero + rangeFromMax);
+    rangeFromZero += (remainedRange / 2);
+    rangeFromMax += remainedRange - (remainedRange / 2);
+  }
+
+  DALI_ASSERT_DEBUG(rangeFromZero + rangeFromMax <= maxRangeSize && "Rearrange strech point failed!");
+
+  return Uint16Pair(rangeFromZero, maxRangeSize - rangeFromMax);
 }
 
 } // namespace NPatchUtility
