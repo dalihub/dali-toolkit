@@ -174,10 +174,10 @@ bool Controller::HasAnchors() const
   return (mImpl->mMarkupProcessorEnabled && mImpl->mModel->mLogicalModel->mAnchors.Count() && mImpl->IsShowingRealText());
 }
 
-void Controller::SetAutoScrollEnabled(bool enable)
+void Controller::SetAutoScrollEnabled(bool enable, bool requestRelayout)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable) ? "true" : "false", (mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX) ? "true" : "false", this);
-  mImpl->SetAutoScrollEnabled(enable);
+  mImpl->SetAutoScrollEnabled(enable, requestRelayout);
 }
 
 void Controller::SetAutoScrollMaxTextureExceeded(bool exceed)
@@ -1549,6 +1549,16 @@ void Controller::SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type 
 {
   mImpl->mModel->mEllipsisPosition = ellipsisPosition;
   mImpl->mModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
+}
+
+Toolkit::DevelText::Ellipsize::Mode Controller::GetEllipsisMode() const
+{
+  return mImpl->mEllipsisMode;
+}
+
+void Controller::SetEllipsisMode(Toolkit::DevelText::Ellipsize::Mode ellipsisMode)
+{
+  mImpl->mEllipsisMode = ellipsisMode;
 }
 
 void Controller::SetCharacterSpacing(float characterSpacing)

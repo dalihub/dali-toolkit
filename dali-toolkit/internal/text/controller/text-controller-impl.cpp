@@ -1918,7 +1918,7 @@ void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()
   mModel->mLogicalModel->mCharacterSpacingRunsUpdated = false;
 }
 
-void Controller::Impl::SetAutoScrollEnabled(bool enable)
+void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout)
 {
   if(mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
   {
@@ -1939,7 +1939,10 @@ void Controller::Impl::SetAutoScrollEnabled(bool enable)
     }
 
     mIsAutoScrollEnabled = enable;
-    RequestRelayout();
+    if(requestRelayout)
+    {
+      RequestRelayout();
+    }
   }
   else
   {
