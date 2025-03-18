@@ -125,6 +125,11 @@ void RequestAsyncHeightForWidth(TextLabel textLabel, float width)
   GetImpl(textLabel).RequestAsyncHeightForWidth(width);
 }
 
+int GetLineCount(TextLabel textLabel, float width)
+{
+  return GetImpl(textLabel).GetLineCount(width);
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

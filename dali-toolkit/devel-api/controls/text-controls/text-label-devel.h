@@ -461,6 +461,14 @@ DALI_TOOLKIT_API void RequestAsyncNaturalSize(TextLabel textLabel);
 DALI_TOOLKIT_API void RequestAsyncHeightForWidth(TextLabel textLabel, float width);
 
 /**
+ * @brief Retrieves the text's number of lines for a given width.
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] width The width of the text's area.
+ * @return The number of lines.
+ */
+DALI_TOOLKIT_API int GetLineCount(TextLabel textLabel, float width);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal
