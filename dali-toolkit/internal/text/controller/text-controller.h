@@ -261,8 +261,9 @@ public: // Configure the text controller.
    * By default is disabled.
    *
    * @param[in] enable Whether to enable the auto scrolling
+   * @param[in] requestRelayout Whether to request the relayout
    */
-  void SetAutoScrollEnabled(bool enable);
+  void SetAutoScrollEnabled(bool enable, bool requestRelayout = true);
 
   /**
    * @brief Whether the auto scrolling texture exceed max texture.
@@ -1864,6 +1865,18 @@ public: // Queries & retrieves.
    * @param[in] ellipsisPosition The ellipsis position for the text
    */
   void SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type ellipsisPosition);
+
+  /**
+   * @brief Retrieves ellipsis mode
+   * @return The ellipsis mode
+   */
+  Toolkit::DevelText::Ellipsize::Mode GetEllipsisMode() const;
+
+  /**
+   * @brief Sets ellipsis mode
+   * @param[in] ellipsisMode The ellipsis mode for the text
+   */
+  void SetEllipsisMode(Toolkit::DevelText::Ellipsize::Mode ellipsisMode);
 
   /**
    * @brief Retrieves ignoreSpaceAfterText value from model

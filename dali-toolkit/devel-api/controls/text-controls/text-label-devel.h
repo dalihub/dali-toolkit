@@ -275,6 +275,19 @@ enum Type
    * @note This property is read-only.
    */
   ASYNC_LINE_COUNT,
+
+  /**
+   * @brief Ellipsis mode.
+   * @details Name "ellipsisMode", type Property::INTERGER.
+   */
+  ELLIPSIS_MODE,
+
+  /**
+   * @brief Whether the auto scroll animation is playing or not.
+   * @details Name "isScrolling", type Property::BOOLEAN.
+   * @note This property is read-only.
+   */
+  IS_SCROLLING,
 };
 
 } // namespace Property
@@ -446,6 +459,14 @@ DALI_TOOLKIT_API void RequestAsyncNaturalSize(TextLabel textLabel);
  * @param[in] width The width of text to compute.
  */
 DALI_TOOLKIT_API void RequestAsyncHeightForWidth(TextLabel textLabel, float width);
+
+/**
+ * @brief Retrieves the text's number of lines for a given width.
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] width The width of the text's area.
+ * @return The number of lines.
+ */
+DALI_TOOLKIT_API int GetLineCount(TextLabel textLabel, float width);
 
 /**
  * @brief Anchor clicked signal type.

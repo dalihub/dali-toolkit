@@ -287,6 +287,13 @@ public:
   void RequestAsyncNaturalSize();
 
   /**
+   * @brief Retrieves the text's number of lines for a given width.
+   * @param[in] width The width of the text's area.
+   * @return The number of lines.
+   */
+  int GetLineCount(float width);
+
+  /**
    * @brief Requests asynchronous computation of the height of the text based on the given width.
    * @param[in] width The width of text to compute.
    */
