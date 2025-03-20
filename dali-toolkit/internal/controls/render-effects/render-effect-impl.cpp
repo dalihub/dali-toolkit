@@ -192,26 +192,23 @@ void RenderEffectImpl::Activate()
     mPlacementSceneHolder = sceneHolder;
 
     Vector2 size = GetTargetSize();
-    if(size != Vector2::ZERO)
+    mCamera.SetPerspectiveProjection(size);
+    ownerControl.Add(mCamera);
+
+    // Activate logic for subclass.
+    OnActivate();
+
+    // Set round corner. Default is to sync to owner control's BACKGROUND.
+    Vector4 cornerRadius = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
+    if(cornerRadius != Vector4::ZERO)
     {
-      mCamera.SetPerspectiveProjection(size);
-      ownerControl.Add(mCamera);
+      int32_t cornerRadiusPolicy = ownerControl.GetProperty<int32_t>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
 
-      // Activate logic for subclass.
-      OnActivate();
+      Property::Map map;
+      map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
+      map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
 
-      // Set round corner. Default is to sync to owner control's BACKGROUND.
-      Vector4 cornerRadius = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
-      if(cornerRadius != Vector4::ZERO)
-      {
-        int32_t cornerRadiusPolicy = ownerControl.GetProperty<int32_t>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
-
-        Property::Map map;
-        map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
-        map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
-
-        SetCornerConstants(map);
-      }
+      SetCornerConstants(map);
     }
   }
 }
@@ -239,33 +236,38 @@ bool RenderEffectImpl::IsActivateValid() const
   // - All actors of owner control are visible
   // - The SceneHolder is exist, and it is visible
   // TODO : Currently we don't check SceneHolder's visibility.
+
   bool ret = false;
 
-  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
-  if(ownerControl && ownerControl.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  Vector2 size = GetTargetSize();
+  if(size.x > Math::MACHINE_EPSILON_1000 && size.y > Math::MACHINE_EPSILON_1000)
   {
-    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
-    if(sceneHolder)
+    Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+    if(ownerControl && ownerControl.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
     {
-      ret = true;
-
-      // Check visibility of owner control's parents.
-      // TODO : We'd better check the control visibility at core side.
-      // TODO : Window visibility will be consider at dali-core actor side in future.
-      Dali::Actor self = ownerControl;
-      while(self)
+      Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
+      if(sceneHolder)
       {
-        if(!self.GetProperty<bool>(Dali::Actor::Property::VISIBLE))
+        ret = true;
+
+        // Check visibility of owner control's parents.
+        // TODO : We'd better check the control visibility at core side.
+        // TODO : Window visibility will be consider at dali-core actor side in future.
+        Dali::Actor self = ownerControl;
+        while(self)
         {
-          ret = false;
-          break;
+          if(!self.GetProperty<bool>(Dali::Actor::Property::VISIBLE))
+          {
+            ret = false;
+            break;
+          }
+          self = self.GetParent();
         }
-        self = self.GetParent();
       }
     }
-  }
 
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][ret:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, ret);
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][ret:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, ret);
+  }
 
   return ret;
 }
@@ -298,12 +300,26 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
   if(ownerControl)
   {
-    const auto targetSize = ownerControl.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
-    if(mTargetSize != targetSize && IsActivated())
+    const Vector2 targetSize = mTargetSize;
+    UpdateTargetSize();
+    if(mTargetSize != targetSize)
     {
-      UpdateTargetSize();
-      mCamera.SetPerspectiveProjection(GetTargetSize());
-      OnRefresh();
+      if(IsActivateValid())
+      {
+        if(!IsActivated())
+        {
+          Activate();
+        }
+        else
+        {
+          mCamera.SetPerspectiveProjection(GetTargetSize());
+          OnRefresh();
+        }
+      }
+      else
+      {
+        Deactivate();
+      }
     }
   }
 }
