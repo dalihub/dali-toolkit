@@ -2737,6 +2737,31 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
   // Test whether the property callback is called
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[1], true, TEST_LOCATION);
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[2], true, TEST_LOCATION);
+
+  int tryCount    = 0;
+  int tryCountMax = 25;
+  // Third callback might not be applied to vector animation tasks. Retry again until it successed.
+  while(tryCount++ < tryCountMax)
+  {
+    const bool tryAgain = !gDynamicPropertyCallbackFiredMap[3];
+    if(tryAgain)
+    {
+      tet_printf("Retry to get value again! [%d]\n", tryCount);
+      application.SendNotification();
+      application.Render();
+
+      // Dummy sleep 1 second.
+      Test::WaitForEventThreadTrigger(1, 1);
+
+      application.SendNotification();
+      application.Render();
+      continue;
+    }
+    else
+    {
+      break;
+    }
+  }
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[3], true, TEST_LOCATION);
 
   END_TEST;
