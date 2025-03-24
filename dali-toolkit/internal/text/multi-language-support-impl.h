@@ -175,7 +175,8 @@ public:
                      float                                   fontSizeScale,
                      CharacterIndex                          startIndex,
                      Length                                  numberOfCharacters,
-                     Vector<FontRun>&                        fonts);
+                     Vector<FontRun>&                        fonts,
+                     Property::Map*                          variationsMapPtr);
 
   /**
    * @brief Callback function for when the locale is changed.

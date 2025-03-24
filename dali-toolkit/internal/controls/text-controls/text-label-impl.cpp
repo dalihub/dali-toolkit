@@ -155,6 +155,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "manualRendered",
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "asyncLineCount",               INTEGER, ASYNC_LINE_COUNT               )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisMode",                 INTEGER, ELLIPSIS_MODE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "isScrolling",                  BOOLEAN, IS_SCROLLING                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontVariations",               MAP,     FONT_VARIATIONS                )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -705,6 +706,15 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::FONT_VARIATIONS:
+      {
+        const Property::Map variationsMap = value.Get<Property::Map>();
+        impl.mController->SetVariationsMap(variationsMap);
+
+        impl.RequestTextRelayout();
+        impl.mIsAsyncRenderNeeded = true;
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -1020,6 +1030,14 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         value = impl.mTextScroller && impl.mTextScroller->IsScrolling() ? true : false;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::FONT_VARIATIONS:
+      {
+        Property::Map variationsMap;
+        impl.mController->GetVariationsMap(variationsMap);
+
+        value = variationsMap;
+        break;
+      }
     }
   }
 
@@ -1323,7 +1341,21 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
     }
     default:
     {
-      Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      if(Self().DoesCustomPropertyExist(index) && mVariationIndexMap.find(index) != mVariationIndexMap.end())
+      {
+        std::string tag = mVariationIndexMap[index];
+        float value = propertyValue.Get<float>();
+
+        Property::Map map;
+        mController->GetVariationsMap(map);
+        map[tag.data()] = value;
+
+        mController->SetVariationsMap(map);
+      }
+      else
+      {
+        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      }
       break;
     }
   }
@@ -2074,6 +2106,59 @@ void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float he
   mIsManualRender      = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
   mTextUpdateNeeded    = false;
   mIsAsyncRenderNeeded = false;
+}
+
+Dali::Property::Index TextLabel::RegisterFontVariationProperty(std::string tag)
+{
+  if(tag.length() != 4) // Variable tag must be 4-length string.
+  {
+    DALI_LOG_ERROR("Font Variation Register Failed. The length of tag is not 4.\n");
+    return Property::INVALID_INDEX;
+  }
+
+  Actor self = Self();
+
+  Property::Map variationsMap;
+  mController->GetVariationsMap(variationsMap);
+
+  float variationValue = 0.f;
+  auto tagPtr = variationsMap.Find(tag);
+
+  if(tagPtr)
+  {
+    variationValue = tagPtr->Get<float>();
+  }
+
+  Dali::Property::Index index = self.RegisterProperty(tag.data(), variationValue);
+  if(mVariationIndexMap.find(index) == mVariationIndexMap.end())
+  {
+    PropertyNotification customFontVariationNotification = self.AddPropertyNotification(index, StepCondition(1.0f));
+    // TODO: Make step value customizable by user.
+    customFontVariationNotification.NotifySignal().Connect(this, &TextLabel::OnVariationPropertyNotify);
+
+    mVariationIndexMap[index] = tag;
+    // TODO: Make UnregisterProperty() to remove tag from mVariationIndexMap.
+  }
+
+  return index;
+}
+
+void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
+{
+  Property::Map map;
+  mController->GetVariationsMap(map);
+
+  for(auto &[index, tag] : mVariationIndexMap)
+  {
+    if(Self().DoesCustomPropertyExist(index))
+    {
+      float value = Self().GetCurrentProperty(index).Get<float>();
+      map[tag.data()] = std::round(value);
+    }
+  }
+
+  // Full Variation Update.
+  mController->SetVariationsMap(map);
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const

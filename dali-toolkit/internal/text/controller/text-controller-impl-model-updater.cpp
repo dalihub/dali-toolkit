@@ -282,6 +282,12 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
         }
       }
 
+      Property::Map *variationsMapPtr = nullptr;
+      if(!impl.mModel->mLogicalModel->mVariationsMap.Empty())
+      {
+        variationsMapPtr = &impl.mModel->mLogicalModel->mVariationsMap;
+      }
+
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
       multilanguageSupport.ValidateFonts(impl.mFontClient,
@@ -293,7 +299,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
                                          impl.GetFontSizeScale(),
                                          startIndex,
                                          requestedNumberOfCharacters,
-                                         validFonts);
+                                         validFonts,
+                                         variationsMapPtr);
     }
     updated = true;
   }
@@ -377,6 +384,12 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
     TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
 
+    Property::Map *variationsMapPtr = nullptr;
+    if(!impl.mModel->mLogicalModel->mVariationsMap.Empty())
+    {
+      variationsMapPtr = &impl.mModel->mLogicalModel->mVariationsMap;
+    }
+
     // Shapes the text.
     ShapeText(shaping,
               impl.mFontClient,
@@ -390,7 +403,8 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
               glyphs,
               glyphsToCharactersMap,
               charactersPerGlyph,
-              newParagraphGlyphs);
+              newParagraphGlyphs,
+              variationsMapPtr);
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
     impl.mModel->mVisualModel->CreateGlyphsPerCharacterTable(startIndex, impl.mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);

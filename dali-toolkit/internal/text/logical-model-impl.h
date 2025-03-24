@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
@@ -272,6 +273,8 @@ public:
   Vector<StrikethroughCharacterRun>     mStrikethroughCharacterRuns;    ///< The strikethrough character run from markup-processor
   Vector<BoundedParagraphRun>           mBoundedParagraphRuns;          ///< The bounded paragraph is used to handle a paragraph mark-up tag and it's attributes. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
   Vector<CharacterSpacingCharacterRun>  mCharacterSpacingCharacterRuns; ///< The character-spacing character run from markup-processor.
+
+  Property::Map                         mVariationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
   bool                      mSpannedTextPlaced : 1;  ///< Whether the spanned-text is placed.

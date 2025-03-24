@@ -721,6 +721,14 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       impl.mController->SetRemoveBackInset(remove);
       break;
     }
+    case Toolkit::DevelTextField::Property::FONT_VARIATIONS:
+    {
+      const Property::Map variationsMap = value.Get<Property::Map>();
+      impl.mController->SetVariationsMap(variationsMap);
+
+      impl.RequestTextRelayout();
+      break;
+    }
   }
 }
 
@@ -1116,6 +1124,14 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::REMOVE_BACK_INSET:
     {
       value = impl.mController->IsRemoveBackInset();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::FONT_VARIATIONS:
+    {
+      Property::Map variationsMap;
+      impl.mController->GetVariationsMap(variationsMap);
+
+      value = variationsMap;
       break;
     }
 

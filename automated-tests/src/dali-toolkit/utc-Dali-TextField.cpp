@@ -117,6 +117,7 @@ const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
 const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -648,6 +649,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_SELECTION_POPUP_STYLE) == DevelTextField::Property::SELECTION_POPUP_STYLE);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextField::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextField::Property::REMOVE_BACK_INSET);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextField::Property::FONT_VARIATIONS);
 
   END_TEST;
 }
@@ -1286,6 +1288,30 @@ int UtcDaliTextFieldSetPropertyP(void)
   application.SendNotification();
   application.Render();
 
+  // Check font variations property
+  Property::Map fontVariationsMapSet;
+  Property::Map fontVariationsMapGet;
+
+  fontVariationsMapSet.Insert("wght", 400.f);
+  fontVariationsMapSet.Insert("wdth", 100.f);
+  fontVariationsMapSet.Insert("slnt", 0.f);
+  field.SetProperty(DevelTextField::Property::FONT_VARIATIONS, fontVariationsMapSet);
+
+  fontVariationsMapGet = field.GetProperty<Property::Map>(DevelTextField::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(fontVariationsMapSet.Count(), fontVariationsMapGet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(fontVariationsMapSet, fontVariationsMapGet), true, TEST_LOCATION);
+
+  // Check font variations ignore invalid values
+  Property::Map invalidFontVariationsMapSet;
+  Property::Map invalidFontVariationsMapGet;
+
+  invalidFontVariationsMapSet.Insert("abcde", 0.f);    // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abc", 0.f);     // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abcd", "str");  // invalid because value is not float.
+  field.SetProperty(DevelTextField::Property::FONT_VARIATIONS, invalidFontVariationsMapSet);
+
+  invalidFontVariationsMapGet = field.GetProperty<Property::Map>(DevelTextField::Property::FONT_VARIATIONS);
+  DALI_TEST_EQUALS(invalidFontVariationsMapGet.Count(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -6239,6 +6265,73 @@ int utcDaliTextFieldRemoveBackInset(void)
   DALI_TEST_CHECK(!DevelTextField::IsRemoveBackInset(field)); // default value is false.
   DevelTextField::SetRemoveBackInset(field, true);
   DALI_TEST_CHECK(DevelTextField::IsRemoveBackInset(field));
+
+  END_TEST;
+}
+
+int utcDaliTextFieldFontVariationsRegister(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldFontVariationsRegister");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  // Invalid key check
+  std::string INVALID_KEY = "invalid";
+  auto invalidFontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, INVALID_KEY.data());
+  DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
+
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  std::string WGHT_KEY = "wght";
+  const float WGHT_VALUE = 100.f;
+  const float WGHT_VALUE_END = 900.f;
+
+  // Check with no previous variations.
+  auto fontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, WGHT_KEY.data());
+  field.SetProperty(fontVariationsIndex, WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(field.GetProperty(fontVariationsIndex).Get<float>() == WGHT_VALUE);
+
+  Property::Map fontVariationsGet;
+  fontVariationsGet = field.GetProperty<Property::Map>(DevelTextField::Property::FONT_VARIATIONS);
+
+  DALI_TEST_CHECK(fontVariationsGet.Count() == 1u);
+
+  const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
+
+  std::string key = "";
+  if(keyvalue.first.type == Property::Key::STRING)
+  {
+    key = keyvalue.first.stringKey;
+  }
+
+  float value = keyvalue.second.Get<float>();
+
+  DALI_TEST_CHECK(key == WGHT_KEY);
+  DALI_TEST_CHECK(value = WGHT_VALUE);
+
+  application.SendNotification();
+  application.Render();
+
+  // Animation test
+
+  Animation anim = Animation::New(1);
+  anim.AnimateTo(Property(field, fontVariationsIndex), WGHT_VALUE_END);
+  anim.Play();
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

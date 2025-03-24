@@ -173,7 +173,7 @@ public:
   {
     return 0;
   }
-  FontId GetFontId(const FontDescription& fontDescription, PointSize26Dot6 pointSize, FaceIndex faceIndex)
+  FontId GetFontId(const FontDescription& fontDescription, PointSize26Dot6 pointSize, FaceIndex faceIndex, Property::Map* variationsMapPtr)
   {
     return 0;
   }
@@ -277,7 +277,7 @@ public:
     }
   }
 
-  Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
+  Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script, Property::Map* variationsMapPtr)
   {
     mText     = new unsigned char[numChars];
     mNumChars = numChars;
@@ -477,11 +477,13 @@ FontId FontClient::GetFontId(const FontPath& path, PointSize26Dot6 pointSize, Fa
 
 FontId FontClient::GetFontId(const FontDescription& fontDescription,
                              PointSize26Dot6        pointSize,
-                             FaceIndex              faceIndex)
+                             FaceIndex              faceIndex,
+                             Property::Map*         variationsMapPtr)
 {
   return GetImplementation(*this).GetFontId(fontDescription,
                                             pointSize,
-                                            faceIndex);
+                                            faceIndex,
+                                            variationsMapPtr);
 }
 
 bool FontClient::IsScalable(const FontPath& path)
@@ -640,9 +642,9 @@ void Shaping::GetGlyphs(GlyphInfo* glyphStore, unsigned int* mappingTable)
   GetImplementation(*this).GetGlyphs(glyphStore, mappingTable);
 }
 
-Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
+Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script, Property::Map* variationsMapPtr)
 {
-  return GetImplementation(*this).Shape(fontClient, text, numChars, fontId, script);
+  return GetImplementation(*this).Shape(fontClient, text, numChars, fontId, script, variationsMapPtr);
 }
 
 } // namespace TextAbstraction

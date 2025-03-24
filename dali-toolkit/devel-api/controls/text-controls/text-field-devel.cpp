@@ -125,6 +125,11 @@ bool IsRemoveBackInset(TextField textField)
   return GetImpl(textField).IsRemoveBackInset();
 }
 
+Dali::Property::Index RegisterFontVariationProperty(TextField textField, std::string tag)
+{
+  return GetImpl(textField).RegisterFontVariationProperty(tag);
+}
+
 } // namespace DevelTextField
 
 } // namespace Toolkit

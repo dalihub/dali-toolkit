@@ -492,6 +492,12 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
   const Vector<Character>& textToShape = mIsTextMirrored ? mirroredUtf32Characters : utf32Characters;
 
+  Property::Map *variationsMapPtr = nullptr;
+  if(!mTextModel->mLogicalModel->mVariationsMap.Empty())
+  {
+    variationsMapPtr = &mTextModel->mLogicalModel->mVariationsMap;
+  }
+
   // Shapes the text.
   ShapeText(mModule.GetShaping(),
             mModule.GetFontClient(),
@@ -505,7 +511,8 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
             glyphs,
             glyphsToCharactersMap,
             charactersPerGlyph,
-            newParagraphGlyphs);
+            newParagraphGlyphs,
+            variationsMapPtr);
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
   mTextModel->mVisualModel->CreateGlyphsPerCharacterTable(0u, 0u, numberOfCharacters);
