@@ -763,6 +763,14 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.mController->SetRemoveBackInset(remove);
       break;
     }
+    case Toolkit::DevelTextEditor::Property::FONT_VARIATIONS:
+    {
+      const Property::Map variationsMap = value.Get<Property::Map>();
+      impl.mController->SetVariationsMap(variationsMap);
+
+      impl.RequestTextRelayout();
+      break;
+    }
   }
 }
 
@@ -1200,6 +1208,14 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::REMOVE_BACK_INSET:
     {
       value = impl.mController->IsRemoveBackInset();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::FONT_VARIATIONS:
+    {
+      Property::Map variationsMap;
+      impl.mController->GetVariationsMap(variationsMap);
+
+      value = variationsMap;
       break;
     }
   } //switch

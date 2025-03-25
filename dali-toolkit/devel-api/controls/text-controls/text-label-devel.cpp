@@ -130,6 +130,11 @@ int GetLineCount(TextLabel textLabel, float width)
   return GetImpl(textLabel).GetLineCount(width);
 }
 
+Dali::Property::Index RegisterFontVariationProperty(TextLabel textLabel, std::string tag)
+{
+  return GetImpl(textLabel).RegisterFontVariationProperty(tag);
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

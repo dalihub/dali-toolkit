@@ -149,6 +149,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "characterSpacing
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectionPopupStyle",              MAP,       SELECTION_POPUP_STYLE               )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeFrontInset",                 BOOLEAN,   REMOVE_FRONT_INSET                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeBackInset",                  BOOLEAN,   REMOVE_BACK_INSET                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontVariations",                   MAP,       FONT_VARIATIONS                )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
@@ -630,7 +631,21 @@ void TextField::OnPropertySet(Property::Index index, const Property::Value& prop
     }
     default:
     {
-      Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      if(Self().DoesCustomPropertyExist(index) && mVariationIndexMap.find(index) != mVariationIndexMap.end())
+      {
+        std::string tag = mVariationIndexMap[index];
+        float value = propertyValue.Get<float>();
+
+        Property::Map map;
+        mController->GetVariationsMap(map);
+        map[tag.data()] = value;
+
+        mController->SetVariationsMap(map);
+      }
+      else
+      {
+        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+      }
       break;
     }
   }
@@ -1240,6 +1255,59 @@ void TextField::SetRemoveBackInset(bool remove)
 bool TextField::IsRemoveBackInset() const
 {
   return mController->IsRemoveBackInset();
+}
+
+Dali::Property::Index TextField::RegisterFontVariationProperty(std::string tag)
+{
+  if(tag.length() != 4) // Variable tag must be 4-length string.
+  {
+    DALI_LOG_ERROR("Font Variation Register Failed. The length of tag is not 4.\n");
+    return Property::INVALID_INDEX;
+  }
+
+  Actor self = Self();
+
+  Property::Map variationsMap;
+  mController->GetVariationsMap(variationsMap);
+
+  float variationValue = 0.f;
+  auto tagPtr = variationsMap.Find(tag);
+
+  if(tagPtr)
+  {
+    variationValue = tagPtr->Get<float>();
+  }
+
+  Dali::Property::Index index = self.RegisterProperty(tag.data(), variationValue);
+  if(mVariationIndexMap.find(index) == mVariationIndexMap.end())
+  {
+    PropertyNotification customFontVariationNotification = self.AddPropertyNotification(index, StepCondition(1.0f));
+    // TODO: Make step value customizable by user.
+    customFontVariationNotification.NotifySignal().Connect(this, &TextField::OnVariationPropertyNotify);
+
+    mVariationIndexMap[index] = tag;
+    // TODO: Make UnregisterProperty() to remove tag from mVariationIndexMap.
+  }
+
+  return index;
+}
+
+void TextField::OnVariationPropertyNotify(PropertyNotification& source)
+{
+  Property::Map map;
+  mController->GetVariationsMap(map);
+
+  for(auto &[index, tag] : mVariationIndexMap)
+  {
+    if(Self().DoesCustomPropertyExist(index))
+    {
+      float value = Self().GetCurrentProperty(index).Get<float>();
+      map[tag.data()] = std::round(value);
+    }
+  }
+
+  // Full Variation Update.
+  mController->SetVariationsMap(map);
 }
 
 std::string TextField::TextFieldAccessible::GetName() const

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
@@ -288,6 +289,13 @@ enum Type
    * @note This property is read-only.
    */
   IS_SCROLLING,
+
+  /**
+   * @brief Enables customization of fonts with variations such as weight and slant.
+   * @details Name "fontVariations", type Property::MAP.
+   * @note This property can be used only when using variable fonts.
+   */
+  FONT_VARIATIONS,
 };
 
 } // namespace Property
@@ -467,6 +475,15 @@ DALI_TOOLKIT_API void RequestAsyncHeightForWidth(TextLabel textLabel, float widt
  * @return The number of lines.
  */
 DALI_TOOLKIT_API int GetLineCount(TextLabel textLabel, float width);
+
+/**
+ * @brief Registers a new font variation property based on the provided tag.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] tag A 4-character string representing the variation property tag.
+ * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
+ */
+DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextLabel textLabel, std::string tag);
 
 /**
  * @brief Anchor clicked signal type.

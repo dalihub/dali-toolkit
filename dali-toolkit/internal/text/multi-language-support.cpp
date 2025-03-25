@@ -72,7 +72,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
                                          float                                   fontSizeScale,
                                          CharacterIndex                          startIndex,
                                          Length                                  numberOfCharacters,
-                                         Vector<FontRun>&                        fonts)
+                                         Vector<FontRun>&                        fonts,
+                                         Property::Map*                          variationsMapPtr)
 {
   GetImplementation(*this).ValidateFonts(fontClient,
                                          text,
@@ -83,7 +84,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
                                          fontSizeScale,
                                          startIndex,
                                          numberOfCharacters,
-                                         fonts);
+                                         fonts,
+                                         variationsMapPtr);
 }
 
 const std::string& MultilanguageSupport::GetLocale()

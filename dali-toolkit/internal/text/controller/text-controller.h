@@ -1927,6 +1927,18 @@ public: // Queries & retrieves.
   void SetTextCutout(bool cutout);
 
   /**
+   * @brief Retrieves variation value to model
+   * @param[out] map The value of cutout for the text
+   */
+  void GetVariationsMap(Property::Map& map);
+
+  /**
+   * @brief Sets variation value to model
+   * @param[in] map The value of cutout for the text
+   */
+  void SetVariationsMap(const Property::Map& map);
+
+  /**
    * @brief Sets SetMatchLayoutDirection value to model
    * @param[in] match The value of matchLayoutDirection for the text
    */

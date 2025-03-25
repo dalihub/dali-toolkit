@@ -468,6 +468,14 @@ public:
    */
   bool IsRemoveBackInset() const;
 
+  /**
+   * @brief Registers a new font variation property based on the provided tag.
+   *
+   * @param[in] tag A 4-character string representing the variation property tag.
+   * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
+   */
+  Dali::Property::Index RegisterFontVariationProperty(std::string tag);
+
 private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
@@ -599,6 +607,11 @@ private: // Implementation
   // Needed to synchronize TextAnchor actors with Anchor objects in text's logical model
   void OnAccessibilityStatusChanged();
 
+  /**
+   * @brief Notifies when the font variation property changes to specific value.
+   */
+  void OnVariationPropertyNotify(PropertyNotification& source);
+
 private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType                mTextChangedSignal;
@@ -611,6 +624,9 @@ private: // Data
   Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextEditor::SelectionClearedSignalType      mSelectionClearedSignal;
   Toolkit::DevelTextEditor::SelectionStartedSignalType      mSelectionStartedSignal;
+
+  // for Font Variations
+  std::map<Dali::Property::Index, std::string> mVariationIndexMap;  // Stores [CustomPropertyIndex, tag].
 
   InputMethodContext               mInputMethodContext;
   Text::ControllerPtr              mController;

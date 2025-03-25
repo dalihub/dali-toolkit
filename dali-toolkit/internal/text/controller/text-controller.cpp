@@ -340,6 +340,38 @@ void Controller::SetTextCutout(bool cutout)
   }
 }
 
+void Controller::GetVariationsMap(Property::Map& map)
+{
+  map = mImpl->mModel->mLogicalModel->mVariationsMap;
+}
+
+void Controller::SetVariationsMap(const Property::Map& map)
+{
+  auto& variationsMap = mImpl->mModel->mLogicalModel->mVariationsMap;
+  variationsMap.Clear();
+
+  std::size_t numberOfItems = map.Count();
+
+  for(std::size_t index = 0; index < numberOfItems; index++)
+  {
+    const KeyValuePair& keyvalue = map.GetKeyValue(index);
+
+    if(keyvalue.first.type == Property::Key::STRING)
+    {
+      float value = 0.f;
+      if(keyvalue.first.stringKey.length() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.
+      {
+        variationsMap[keyvalue.first.stringKey.data()] = value;
+      }
+    }
+  }
+
+  // Clear the font-specific data
+  mImpl->ClearFontData();
+
+  mImpl->RequestRelayout();
+}
+
 void Controller::ChangedLayoutDirection()
 {
   mImpl->mIsLayoutDirectionChanged = true;

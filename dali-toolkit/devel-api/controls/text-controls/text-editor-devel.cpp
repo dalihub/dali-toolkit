@@ -135,6 +135,11 @@ bool IsRemoveBackInset(TextEditor textEditor)
   return GetImpl(textEditor).IsRemoveBackInset();
 }
 
+Dali::Property::Index RegisterFontVariationProperty(TextEditor textEditor, std::string tag)
+{
+  return GetImpl(textEditor).RegisterFontVariationProperty(tag);
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit
