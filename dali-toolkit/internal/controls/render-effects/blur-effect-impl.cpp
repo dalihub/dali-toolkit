@@ -78,11 +78,12 @@ BlurEffectImpl::BlurEffectImpl(bool isBackground)
   mDownscaledPixelRadius(static_cast<uint32_t>(BLUR_EFFECT_PIXEL_RADIUS * BLUR_EFFECT_DOWNSCALE_FACTOR)),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
   mSkipBlur(false),
+  mBlurOnce(false),
   mIsBackground(isBackground)
 {
 }
 
-BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool isBackground)
+BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
   mDownscaleFactor(downscaleFactor),
@@ -90,6 +91,7 @@ BlurEffectImpl::BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool 
   mDownscaledPixelRadius(BLUR_EFFECT_PIXEL_RADIUS),
   mBellCurveWidth(Math::MACHINE_EPSILON_1),
   mSkipBlur(false),
+  mBlurOnce(blurOnce),
   mIsBackground(isBackground)
 {
   if(DALI_UNLIKELY(mDownscaleFactor < MINIMUM_DOWNSCALE_FACTOR || mDownscaleFactor > MAXIMUM_DOWNSCALE_FACTOR))
@@ -135,16 +137,16 @@ BlurEffectImplPtr BlurEffectImpl::New(bool isBackground)
   return handle;
 }
 
-BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius, bool isBackground)
+BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground)
 {
-  BlurEffectImplPtr handle = new BlurEffectImpl(downscaleFactor, blurRadius, isBackground);
+  BlurEffectImplPtr handle = new BlurEffectImpl(downscaleFactor, blurRadius, blurOnce, isBackground);
   handle->Initialize();
   return handle;
 }
 
 RenderEffectImplPtr BlurEffectImpl::Clone() const
 {
-  BlurEffectImplPtr blurEffectImpl = new BlurEffectImpl(mDownscaleFactor, mPixelRadius, mIsBackground);
+  BlurEffectImplPtr blurEffectImpl = new BlurEffectImpl(mDownscaleFactor, mPixelRadius, mBlurOnce, mIsBackground);
   blurEffectImpl->Initialize();
   return RenderEffectImplPtr(blurEffectImpl);
 }
@@ -413,6 +415,20 @@ void BlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, con
   // Clear sourceTexture as Transparent.
   mVerticalBlurTask.SetClearEnabled(true);
   mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
+
+  // Adjust refresh rate
+  if(mBlurOnce)
+  {
+    mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+    mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+    mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  }
+  else
+  {
+    mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+    mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+    mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  }
 }
 
 void BlurEffectImpl::DestroyRenderTasks()

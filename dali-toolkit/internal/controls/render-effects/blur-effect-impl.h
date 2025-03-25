@@ -63,10 +63,11 @@ public:
    *
    * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
+   * @param[in] blurOnce Whether to blur once or always. Default is false(always).
    * @param[in] isBackground True when blurring background, False otherwise
    * @return A handle to a newly allocated Dali resource
    */
-  static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool isBackground);
+  static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground);
 
   /**
    * @copydoc Toolkit::Intenral::RenderEffectImpl::Clone
@@ -94,9 +95,10 @@ protected:
    * @brief Creates an uninitialized blur effect implementation
    * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
+   * @param[in] blurOnce Whether to blur once or always. Default is false(always).
    * @param[in] isBackground True when blurring background, False otherwise
    */
-  BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool isBackground);
+  BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground);
 
   /**
    * @brief Destructor
@@ -206,6 +208,7 @@ private:
   float    mBellCurveWidth;
 
   bool mSkipBlur : 1;
+  bool mBlurOnce : 1;
   bool mIsBackground : 1;
 };
 } // namespace Internal
