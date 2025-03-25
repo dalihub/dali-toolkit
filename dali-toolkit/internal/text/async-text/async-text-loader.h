@@ -128,7 +128,8 @@ struct AsyncTextParameters
     isAutoScrollMaxTextureExceeded{false},
     cutout{false},
     backgroundWithCutoutEnabled{false},
-    backgroundColorWithCutout{Color::TRANSPARENT}
+    backgroundColorWithCutout{Color::TRANSPARENT},
+    variationsMap{}
   {
   }
 
@@ -210,9 +211,11 @@ struct AsyncTextParameters
   int                                    autoScrollGap;
   bool                                   isAutoScrollMaxTextureExceeded : 1;
 
-  bool cutout                      : 1; ///< Cutout enabled flag
-  bool backgroundWithCutoutEnabled : 1; ///< Background with cutout enabled flag.
-  Vector4 backgroundColorWithCutout;    ///< Background color with cutout.
+  bool          cutout                      : 1; ///< Cutout enabled flag
+  bool          backgroundWithCutoutEnabled : 1; ///< Background with cutout enabled flag.
+  Vector4       backgroundColorWithCutout;    ///< Background color with cutout.
+
+  Property::Map variationsMap;          ///< The map for variable fonts. it might be replaced by variable map run.
 };
 
 struct AsyncTextRenderInfo
