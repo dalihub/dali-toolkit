@@ -2885,3 +2885,107 @@ int UtcDaliToolkitTextLabelAsyncFontVariations(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelAsyncRenderScale(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncRenderScale");
+
+  // Include glyphs with advance of 0 for testing.
+  std::string text = "Hello World Render SCA̧LE Test!";
+
+  TextLabel label = TextLabel::New(text);
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  application.GetScene().Add(label);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  float expectedWidth  = 110.0f;
+  float expectedHeight = 50.0f;
+
+  // Case where both original and scaled textures have sufficient control size.
+  label.SetProperty(DevelTextLabel::Property::RENDER_SCALE, 1.045f);
+  label.SetProperty(TextLabel::Property::PIXEL_SNAP_FACTOR, 1.0f);
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 20);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  expectedWidth  = 60.0f;
+  expectedHeight = 50.0f;
+
+  asyncTextRendered = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Case where the scaled texture exceeds the control size.
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 12);
+  label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  expectedWidth  = 500.0f;
+  expectedHeight = 50.0f;
+
+  asyncTextRendered = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Text fit early return case.
+  Property::Map textFitMapSet;
+  textFitMapSet["enable"]       = true;
+  textFitMapSet["minSize"]      = 10.f;
+  textFitMapSet["maxSize"]      = 30.f;
+  textFitMapSet["stepSize"]     = 5.f;
+  textFitMapSet["fontSizeType"] = "pixelSize";
+  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
+  label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}

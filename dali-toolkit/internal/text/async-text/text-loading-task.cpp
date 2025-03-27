@@ -93,11 +93,29 @@ void TextLoadingTask::Load()
     case Text::Async::RENDER_FIXED_WIDTH:
     case Text::Async::RENDER_CONSTRAINT:
     {
+      // To avoid duplicate calculation, we can skip Initialize and Update.
+      Size naturalSize       = Size::ZERO;
+      bool cachedNaturalSize = false;
+
+      if(mParameters.renderScale > 1.0f)
+      {
+#ifdef TRACE_ENABLED
+        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+        {
+          DALI_LOG_RELEASE_INFO("SetupRenderScale : %f\n", mParameters.renderScale);
+        }
+#endif
+        naturalSize = mLoader.SetupRenderScale(mParameters, cachedNaturalSize);
+      }
+
       if(mParameters.ellipsis && !mParameters.isMultiLine && mParameters.ellipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
       {
-        Text::AsyncTextRenderInfo naturalSizeInfo;
-        naturalSizeInfo = mLoader.GetNaturalSize(mParameters);
-        if(mParameters.textWidth < naturalSizeInfo.renderedSize.width)
+        if(!cachedNaturalSize)
+        {
+          naturalSize       = mLoader.ComputeNaturalSize(mParameters);
+          cachedNaturalSize = true;
+        }
+        if(mParameters.textWidth < naturalSize.width)
         {
 #ifdef TRACE_ENABLED
           if(gTraceFilter && gTraceFilter->IsTraceEnabled())
@@ -106,7 +124,7 @@ void TextLoadingTask::Load()
           }
 #endif
           mParameters.isAutoScrollEnabled = true;
-          mRenderInfo = mLoader.RenderAutoScroll(mParameters);
+          mRenderInfo = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
         }
         else
         {
@@ -116,7 +134,7 @@ void TextLoadingTask::Load()
             DALI_LOG_RELEASE_INFO("RenderText, Ellipsize::AUTO_SCROLL\n");
           }
 #endif
-          mRenderInfo = mLoader.RenderText(mParameters);
+          mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
         }
       }
       else if(mParameters.isAutoScrollEnabled && !mParameters.isMultiLine)
@@ -127,7 +145,7 @@ void TextLoadingTask::Load()
           DALI_LOG_RELEASE_INFO("RenderAutoScroll\n");
         }
 #endif
-        mRenderInfo = mLoader.RenderAutoScroll(mParameters);
+        mRenderInfo = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
       }
       else if(mParameters.isTextFitEnabled || mParameters.isTextFitArrayEnabled)
       {
@@ -137,7 +155,7 @@ void TextLoadingTask::Load()
           DALI_LOG_RELEASE_INFO("RenderTextFit\n");
         }
 #endif
-        mRenderInfo = mLoader.RenderTextFit(mParameters);
+        mRenderInfo = mLoader.RenderTextFit(mParameters, cachedNaturalSize, naturalSize);
       }
       else
       {
@@ -147,7 +165,7 @@ void TextLoadingTask::Load()
           DALI_LOG_RELEASE_INFO("RenderText\n");
         }
 #endif
-        mRenderInfo = mLoader.RenderText(mParameters);
+        mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
       }
       break;
     }

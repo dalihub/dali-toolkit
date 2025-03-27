@@ -66,21 +66,20 @@ namespace Async
 struct AsyncTextParameters
 {
   AsyncTextParameters()
-  : requestType{Async::RENDER_FIXED_SIZE},
-    manualRender{false},
-    maxTextureSize{0},
-    text{},
-    fontSize{0.f},
-    textColor{Color::BLACK},
+  : text{},
     fontFamily{},
-    fontWeight{FontWeight::NONE},
-    fontWidth{FontWidth::NONE},
-    fontSlant{FontSlant::NONE},
-    isMultiLine{false},
-    ellipsis{true},
-    enableMarkup{false},
-    removeFrontInset{true},
-    removeBackInset{true},
+    textColor{Color::BLACK},
+    underlineColor{Color::BLACK},
+    strikethroughColor{Color::BLACK},
+    shadowColor{Color::BLACK},
+    outlineColor{Color::WHITE},
+    backgroundColorWithCutout{Color::TRANSPARENT},
+    shadowOffset{},
+    outlineOffset{},
+    padding{0u, 0u, 0u, 0u},
+    variationsMap{},
+    textFitArray{},
+    fontSize{0.f},
     minLineSize{0.f},
     lineSpacing{0.f},
     relativeLineSize{1.f},
@@ -88,48 +87,52 @@ struct AsyncTextParameters
     fontSizeScale{1.f},
     textWidth{0.f},
     textHeight{0.f},
-    padding{0u, 0u, 0u, 0u},
-    horizontalAlignment{Text::HorizontalAlignment::BEGIN},
-    verticalAlignment{Text::VerticalAlignment::TOP},
-    verticalLineAlignment{DevelText::VerticalLineAlignment::TOP},
-    lineWrapMode{Text::LineWrap::WORD},
-    layoutDirection{Dali::LayoutDirection::LEFT_TO_RIGHT},
-    layoutDirectionPolicy{DevelText::MatchLayoutDirection::INHERIT},
-    ellipsisPosition{DevelText::EllipsisPosition::END},
-    ellipsisMode{DevelText::Ellipsize::TRUNCATE},
-    isUnderlineEnabled{false},
-    underlineType{Text::Underline::SOLID},
-    underlineColor{Color::BLACK},
     underlineHeight{0.f},
     dashedUnderlineWidth{2.f},
     dashedUnderlineGap{1.f},
-    isStrikethroughEnabled{false},
-    strikethroughColor{Color::BLACK},
     strikethroughHeight{0.f},
     shadowBlurRadius{0.f},
-    shadowColor{Color::BLACK},
-    shadowOffset{},
-    outlineWidth{0u},
-    outlineColor{Color::WHITE},
     outlineBlurRadius{0.f},
-    outlineOffset{},
-    isTextFitEnabled{false},
     textFitMinSize{10.f},
     textFitMaxSize{100.f},
     textFitStepSize{1.f},
-    isTextFitArrayEnabled{false},
-    textFitArray{},
-    isAutoScrollEnabled{false},
-    autoScrollStopMode{TextLabel::AutoScrollStopMode::FINISH_LOOP},
+    autoScrollLoopDelay{0.0f},
+    renderScale{1.0f},
+    renderScaleWidth{0.f},
+    renderScaleHeight{0.f},
+    maxTextureSize{0},
     autoScrollSpeed{1},
     autoScrollLoopCount{1},
-    autoScrollLoopDelay{0.0f},
     autoScrollGap{0},
+    outlineWidth{0u},
+    requestType{Async::RENDER_FIXED_SIZE},
+    horizontalAlignment{Text::HorizontalAlignment::BEGIN},
+    verticalAlignment{Text::VerticalAlignment::TOP},
+    lineWrapMode{Text::LineWrap::WORD},
+    underlineType{Text::Underline::SOLID},
+    layoutDirection{Dali::LayoutDirection::LEFT_TO_RIGHT},
+    verticalLineAlignment{DevelText::VerticalLineAlignment::TOP},
+    layoutDirectionPolicy{DevelText::MatchLayoutDirection::INHERIT},
+    ellipsisPosition{DevelText::EllipsisPosition::END},
+    ellipsisMode{DevelText::Ellipsize::TRUNCATE},
+    autoScrollStopMode{TextLabel::AutoScrollStopMode::FINISH_LOOP},
+    fontWeight{FontWeight::NONE},
+    fontWidth{FontWidth::NONE},
+    fontSlant{FontSlant::NONE},
+    manualRender{false},
+    isMultiLine{false},
+    ellipsis{true},
+    enableMarkup{false},
+    removeFrontInset{true},
+    removeBackInset{true},
+    isUnderlineEnabled{false},
+    isStrikethroughEnabled{false},
+    isTextFitEnabled{false},
+    isTextFitArrayEnabled{false},
+    isAutoScrollEnabled{false},
     isAutoScrollMaxTextureExceeded{false},
     cutout{false},
-    backgroundWithCutoutEnabled{false},
-    backgroundColorWithCutout{Color::TRANSPARENT},
-    variationsMap{}
+    backgroundWithCutoutEnabled{false}
   {
   }
 
@@ -137,85 +140,82 @@ struct AsyncTextParameters
   {
   }
 
+  std::string text;       ///< The text to be rendered encoded in utf8.
+  std::string fontFamily; ///< The font's family.
+
+  Vector4 textColor;                 ///< The default text's color. Default is white.
+  Vector4 underlineColor;
+  Vector4 strikethroughColor;
+  Vector4 shadowColor;
+  Vector4 outlineColor;
+  Vector4 backgroundColorWithCutout; ///< Background color with cutout.
+
+  Vector2 shadowOffset;
+  Vector2 outlineOffset;
+
+  Extents padding;       ///< The padding of the boundaries where the text is going to be laid-out.
+
+  Property::Map variationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
+  std::vector<DevelTextLabel::FitOption> textFitArray;
+
+  float fontSize;             ///< The font's size (in points).
+  float minLineSize;          ///< The line's minimum size (in pixels).
+  float lineSpacing;          ///< The default extra space between lines in points. (in pixels).
+  float relativeLineSize;     ///< The relative height of the line (a factor that will be multiplied by text height).
+  float characterSpacing;     ///< The space between characters.
+  float fontSizeScale;        ///< The font's size scale.
+  float textWidth;            ///< The width in pixels of the boundaries where the text is going to be laid-out.
+  float textHeight;           ///< The height in pixels of the boundaries where the text is going to be laid-out.
+  float underlineHeight;
+  float dashedUnderlineWidth;
+  float dashedUnderlineGap;
+  float strikethroughHeight;
+  float shadowBlurRadius;
+  float outlineBlurRadius;
+  float textFitMinSize;
+  float textFitMaxSize;
+  float textFitStepSize;
+  float autoScrollLoopDelay;
+  float renderScale;          ///< The render scale.
+  float renderScaleWidth;     ///< The requested original textWidth when using render scale.
+  float renderScaleHeight;    ///< The requested original textHeight when using render scale.
+
+  int maxTextureSize;      ///< The maximum size of texture.
+  int autoScrollSpeed;     ///< auto scroll properties.
+  int autoScrollLoopCount;
+  int autoScrollGap;
+
+  uint16_t outlineWidth; ///< The width of the outline, if it is greater than 1, it is enabled.
+
   Async::RequestType requestType;
-  bool               manualRender : 1;
-
-  int         maxTextureSize; ///< The maximum size of texture.
-  std::string text;           ///< The text to be rendered encoded in utf8.
-  float       fontSize;       ///< The font's size (in points).
-  Vector4     textColor;      ///< The default text's color. Default is white.
-
-  std::string fontFamily;     ///< The font's family.
-  FontWeight  fontWeight;     ///< The font's weight.
-  FontWidth   fontWidth;      ///< The font's width.
-  FontSlant   fontSlant;      ///< The font's slant.
-
-  bool isMultiLine      : 1; ///< Whether the multi-line layout is enabled.
-  bool ellipsis         : 1; ///< Whether the ellipsis layout option is enabled.
-  bool enableMarkup     : 1; ///< Whether the mark-up processor is enabled.
-  bool removeFrontInset : 1; ///< Whether to ignore xBearing of the first glyph. Default is true.
-  bool removeBackInset  : 1; ///< Whether to ignore advance of the last glyph. Default is true.
-
-  float minLineSize;      ///< The line's minimum size (in pixels).
-  float lineSpacing;      ///< The default extra space between lines in points. (in pixels).
-  float relativeLineSize; ///< The relative height of the line (a factor that will be multiplied by text height).
-  float characterSpacing; ///< The space between characters.
-  float fontSizeScale;    ///< The font's size scale.
-
-  float textWidth;        ///< The width in pixels of the boundaries where the text is going to be laid-out.
-  float textHeight;       ///< The height in pixels of the boundaries where the text is going to be laid-out.
-  Extents  padding;       ///< The padding of the boundaries where the text is going to be laid-out.
-
   Text::HorizontalAlignment::Type        horizontalAlignment;   ///< The horizontal alignment: one of {BEGIN, CENTER, END}.
   Text::VerticalAlignment::Type          verticalAlignment;     ///< The vertical alignment: one of {TOP, CENTER, BOTTOM}.
-  DevelText::VerticalLineAlignment::Type verticalLineAlignment; ///< The vertical line alignment: one of {TOP, MIDDLE, BOTTOM}.
   Text::LineWrap::Mode                   lineWrapMode;          ///< The line wrap mode: one of {WORD, CHARACTER, HYPHENATION, MIXED}.
+  Text::Underline::Type                  underlineType;         ///< The type of underline: one of {SOLID, DASHED, DOUBLE}.
   Dali::LayoutDirection::Type            layoutDirection;       ///< The layout direction: one of {LEFT_TO_RIGHT, RIGHT_TO_LEFT}.
+  DevelText::VerticalLineAlignment::Type verticalLineAlignment; ///< The vertical line alignment: one of {TOP, MIDDLE, BOTTOM}.
   DevelText::MatchLayoutDirection        layoutDirectionPolicy; ///< The policy used to set the text layout direction : one of {INHERIT, LOCALE, CONTENTS}.
   DevelText::EllipsisPosition::Type      ellipsisPosition;      ///< The position of the ellipsis glyph: one of {END, START, MIDDLE}.
   DevelText::Ellipsize::Mode             ellipsisMode;          ///< The mode of the ellipsis: one of {TRUNCATE, AUTO_SCROLL}.
+  TextLabel::AutoScrollStopMode::Type    autoScrollStopMode;    ///< The auto scroll stop mode: one of {FINISH_LOOP, IMMEDIATE}.
+  FontWeight                             fontWeight;            ///< The font's weight.
+  FontWidth                              fontWidth;             ///< The font's width.
+  FontSlant                              fontSlant;             ///< The font's slant.
 
-  bool                  isUnderlineEnabled : 1;     ///< Underline properties
-  Text::Underline::Type underlineType;
-  Vector4               underlineColor;
-  float                 underlineHeight;
-  float                 dashedUnderlineWidth;
-  float                 dashedUnderlineGap;
-
-  bool                  isStrikethroughEnabled : 1; ///< Strikethrough properties
-  Vector4               strikethroughColor;
-  float                 strikethroughHeight;
-
-  float                 shadowBlurRadius;           ///< Shadow properties
-  Vector4               shadowColor;
-  Vector2               shadowOffset;
-
-  uint16_t              outlineWidth;               ///< Outline properties
-  Vector4               outlineColor;
-  float                 outlineBlurRadius;
-  Vector2               outlineOffset;
-
-  bool                  isTextFitEnabled : 1;       ///< TextFit
-  float                 textFitMinSize;
-  float                 textFitMaxSize;
-  float                 textFitStepSize;
-
-  bool                                   isTextFitArrayEnabled : 1; ///< TextFitArray
-  std::vector<DevelTextLabel::FitOption> textFitArray;
-
-  bool                                   isAutoScrollEnabled : 1;   ///< Auto scroll
-  TextLabel::AutoScrollStopMode::Type    autoScrollStopMode;
-  int                                    autoScrollSpeed;
-  int                                    autoScrollLoopCount;
-  float                                  autoScrollLoopDelay;
-  int                                    autoScrollGap;
-  bool                                   isAutoScrollMaxTextureExceeded : 1;
-
-  bool          cutout                      : 1; ///< Cutout enabled flag
-  bool          backgroundWithCutoutEnabled : 1; ///< Background with cutout enabled flag.
-  Vector4       backgroundColorWithCutout;    ///< Background color with cutout.
-
-  Property::Map variationsMap;          ///< The map for variable fonts. it might be replaced by variable map run.
+  bool manualRender                   : 1; ///< Whether the manual rendered or not.
+  bool isMultiLine                    : 1; ///< Whether the multi-line layout is enabled.
+  bool ellipsis                       : 1; ///< Whether the ellipsis layout option is enabled.
+  bool enableMarkup                   : 1; ///< Whether the mark-up processor is enabled.
+  bool removeFrontInset               : 1; ///< Whether to ignore xBearing of the first glyph. Default is true.
+  bool removeBackInset                : 1; ///< Whether to ignore advance of the last glyph. Default is true.
+  bool isUnderlineEnabled             : 1; ///< Underline enabeld flag.
+  bool isStrikethroughEnabled         : 1; ///< Strikethrough enabeld flag.
+  bool isTextFitEnabled               : 1; ///< TextFit enabeld flag.
+  bool isTextFitArrayEnabled          : 1; ///< TextFitArray enabeld flag.
+  bool isAutoScrollEnabled            : 1; ///< Auto scroll enabeld flag.
+  bool isAutoScrollMaxTextureExceeded : 1; ///< Whether the auto scroll texture size exceeds the maximum texture width.
+  bool cutout                         : 1; ///< Cutout enabled flag.
+  bool backgroundWithCutoutEnabled    : 1; ///< Background with cutout enabled flag.
 };
 
 struct AsyncTextRenderInfo
@@ -227,8 +227,7 @@ struct AsyncTextRenderInfo
     overlayStylePixelData(),
     maskPixelData(),
     autoScrollPixelData(),
-    width(0u),
-    height(0u),
+    size(),
     controlSize(),
     renderedSize(),
     lineCount(0),
@@ -252,8 +251,7 @@ struct AsyncTextRenderInfo
   PixelData          overlayStylePixelData;
   PixelData          maskPixelData;
   PixelData          autoScrollPixelData;
-  uint32_t           width;
-  uint32_t           height;
+  Size               size;
   Size               controlSize;
   Size               renderedSize;
   int                lineCount;
@@ -353,31 +351,64 @@ public:
   bool IsModuleClearNeeded();
 
   /**
-   * @brief Renders text into a pixel buffer.
+   * @brief Setup render scale.
+   * Sets the control size to be rendered to fit the given scale.
+   * The scaled rendering result cannot be exactly the same as the original.
+   * However, we guarantee the ellipsis result.
+   * If the original is ellipsised, the scaled result will always be ellipsised.
+   * If the original is not ellipsised, the scaled result will not be ellipsised.
+   * Occasionally, the scaled result exceeds the size of the control.
+   * Since we need to ensure the size of the control, we slightly reduce the glyph's advance to adjust the total width to fit the control size.
+   * While this may cause rendering quality issues at smaller point sizes, there is almost no noticeable difference at moderate sizes of 20pt or larger.
    *
-   * @param[in] parameters All options required to render text.
+   * @param[in] parameters All options required to compute size of text.
+   * @param[out] cachedNaturalSize Whether the natural size has been calculated.
    *
-   * @return An AsyncTextRenderInfo.
+   * @return The natural size of text.
    */
-  AsyncTextRenderInfo RenderText(AsyncTextParameters& parameters);
+  Size SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize);
+
+  /**
+   * @brief Compute natural size of text.
+   *
+   * @param[in] parameters All options required to compute size of text.
+   *
+   * @return The natural size of text.
+   */
+  Size ComputeNaturalSize(AsyncTextParameters& parameters);
 
   /**
    * @brief Renders text into a pixel buffer.
    *
    * @param[in] parameters All options required to render text.
+   * @param[in] useCachedNaturalSize Indicates whether to use the provided natural size or calculate it internally.
+   * @param[in] naturalSize The natural size of the text to be used if useCachedNaturalSize is true.
    *
    * @return An AsyncTextRenderInfo.
    */
-  AsyncTextRenderInfo RenderTextFit(AsyncTextParameters& parameters);
+  AsyncTextRenderInfo RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
 
   /**
    * @brief Renders text into a pixel buffer.
    *
    * @param[in] parameters All options required to render text.
+   * @param[in] useCachedNaturalSize Indicates whether to use the provided natural size or calculate it internally.
+   * @param[in] naturalSize The natural size of the text to be used if useCachedNaturalSize is true.
    *
    * @return An AsyncTextRenderInfo.
    */
-  AsyncTextRenderInfo RenderAutoScroll(AsyncTextParameters& parameters);
+  AsyncTextRenderInfo RenderTextFit(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
+
+  /**
+   * @brief Renders text into a pixel buffer.
+   *
+   * @param[in] parameters All options required to render text.
+   * @param[in] useCachedNaturalSize Indicates whether to use the provided natural size or calculate it internally.
+   * @param[in] naturalSize The natural size of the text to be used if useCachedNaturalSize is true.
+   *
+   * @return An AsyncTextRenderInfo.
+   */
+  AsyncTextRenderInfo RenderAutoScroll(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
 
   /**
    * @brief Gets the natural size of text.

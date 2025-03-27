@@ -296,6 +296,17 @@ enum Type
    * @note This property can be used only when using variable fonts.
    */
   FONT_VARIATIONS,
+
+  /**
+   * @brief Renders a texture at a given scale.
+   * @details Name "renderScale", type Property::FLOAT.
+   * @note This property is only available in ASYNC_AUTO, ASYNC_MANUAL.
+   * RenderScale is only valid when it is 1.0f or greater.
+   * Renders by scaling up the point size and texture size to the given scale.
+   * However, the size of the text control does not change.
+   * When using Actor::SetScale(), setting RenderScale to the same scale can ensure the rendering quality of the text.
+   */
+  RENDER_SCALE,
 };
 
 } // namespace Property

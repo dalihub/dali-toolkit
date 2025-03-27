@@ -1879,6 +1879,18 @@ public: // Queries & retrieves.
   void SetEllipsisMode(Toolkit::DevelText::Ellipsize::Mode ellipsisMode);
 
   /**
+   * @brief Sets the render scale
+   * @param[in] renderScale The render scale
+   */
+  void SetRenderScale(const float renderScale);
+
+  /**
+   * @brief Retrieves the render scale
+   * @return The value of the render scale
+   */
+  float GetRenderScale() const;
+
+  /**
    * @brief Retrieves ignoreSpaceAfterText value from model
    * @return The value of ignoreSpaceAfterText
    */

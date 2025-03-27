@@ -156,12 +156,14 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "asyncLineCount",
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisMode",                 INTEGER, ELLIPSIS_MODE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "isScrolling",                  BOOLEAN, IS_SCROLLING                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontVariations",               MAP,     FONT_VARIATIONS                )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderScale",                  FLOAT,   RENDER_SCALE                   )
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorBlue",  TEXT_COLOR_BLUE,  TEXT_COLOR, 2)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR, 3)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",       Color::BLACK,     TEXT_COLOR       )
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",    TEXT_COLOR_RED,   TEXT_COLOR,     0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorGreen",  TEXT_COLOR_GREEN, TEXT_COLOR,     1)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorBlue",   TEXT_COLOR_BLUE,  TEXT_COLOR,     2)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorAlpha",  TEXT_COLOR_ALPHA, TEXT_COLOR,     3)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit,              TextLabel, "pixelSnapFactor", FLOAT,            PIXEL_SNAP_FACTOR)
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextLabel, "anchorClicked",               SIGNAL_ANCHOR_CLICKED                 )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextLabel, "textFitChanged",              SIGNAL_TEXT_FIT_CHANGED               )
@@ -715,6 +717,23 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.mIsAsyncRenderNeeded = true;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::RENDER_SCALE:
+      {
+        float renderScale = value.Get<float>();
+        if(renderScale < 1.0f)
+        {
+          DALI_LOG_DEBUG_INFO("RenderScale must be greater than or equal to 1.0f. It will change as follows:%f -> 1.0\n", renderScale);
+          renderScale = 1.0f;
+        }
+
+        if(fabsf(renderScale - impl.mController->GetRenderScale()) > Math::MACHINE_EPSILON_1)
+        {
+          impl.mController->SetRenderScale(renderScale);
+          impl.mIsAsyncRenderNeeded = true;
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -1038,6 +1057,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         value = variationsMap;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::RENDER_SCALE:
+      {
+        value = impl.mController->GetRenderScale();
+        break;
+      }
     }
   }
 
@@ -1137,6 +1161,7 @@ void TextLabel::OnInitialize()
 
   TextVisual::SetAsyncTextInterface(mVisual, this);
   TextVisual::SetAnimatableTextColorProperty(mVisual, Toolkit::TextLabel::Property::TEXT_COLOR);
+  self.SetProperty(Toolkit::TextLabel::Property::PIXEL_SNAP_FACTOR, 0.0f);
 
   mController = TextVisual::GetController(mVisual);
   DALI_ASSERT_DEBUG(mController && "Invalid Text Controller")
@@ -1641,10 +1666,10 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.cutout                      = mController->IsTextCutout();
   parameters.backgroundWithCutoutEnabled = mController->IsBackgroundWithCutoutEnabled();
   parameters.backgroundColorWithCutout   = mController->GetBackgroundColorWithCutout();
-
   Property::Map variationsMap;
   mController->GetVariationsMap(variationsMap);
   parameters.variationsMap = variationsMap;
+  parameters.renderScale   = mController->GetRenderScale();
 
   return parameters;
 }
@@ -1715,16 +1740,11 @@ void TextLabel::SetUpAutoScrolling()
 void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
 {
   // Pure Virtual from AsyncTextInterface
-  Size verifiedSize(static_cast<float>(renderInfo.width), static_cast<float>(renderInfo.height));
-
-  Size  controlSize = renderInfo.controlSize;
-  float wrapGap     = renderInfo.autoScrollWrapGap;
-
-  PixelData data    = renderInfo.autoScrollPixelData;
-  Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                                 data.GetPixelFormat(),
-                                 data.GetWidth(),
-                                 data.GetHeight());
+  Size      verifiedSize = renderInfo.size;
+  Size      controlSize  = renderInfo.controlSize;
+  float     wrapGap      = renderInfo.autoScrollWrapGap;
+  PixelData data         = renderInfo.autoScrollPixelData;
+  Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
   texture.Upload(data);
 
   TextureSet textureSet = TextureSet::New();
