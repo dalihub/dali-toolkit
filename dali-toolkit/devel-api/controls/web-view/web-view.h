@@ -678,6 +678,13 @@ public:
   void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
 
   /**
+   * @brief Callback to be called when over scrolled.
+   *
+   * @param[in] callback
+   */
+  void RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback);
+
+  /**
    * @brief Callback to be called when url is changed.
    *
    * @param[in] callback

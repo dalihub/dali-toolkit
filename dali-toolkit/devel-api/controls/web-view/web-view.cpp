@@ -359,6 +359,11 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
   Dali::Toolkit::GetImpl(*this).RegisterScrollEdgeReachedCallback(callback);
 }
 
+void WebView::RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterOverScrolledCallback(callback);
+}
+
 void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterUrlChangedCallback(callback);
