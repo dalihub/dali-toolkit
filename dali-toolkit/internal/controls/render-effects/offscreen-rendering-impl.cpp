@@ -90,6 +90,7 @@ void OffScreenRenderingImpl::OnActivate()
   Toolkit::Control control = GetOwnerControl();
   control.GetImplementation().SetCacheRenderer(renderer);
   control.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  mRenderTask.SetScreenToFrameBufferMappingActor(control);
 }
 
 void OffScreenRenderingImpl::OnDeactivate()
@@ -137,7 +138,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
   mRenderTask.SetSourceActor(control);
   mRenderTask.SetCameraActor(GetCameraActor());
   mRenderTask.SetExclusive(true);
-  mRenderTask.SetInputEnabled(false);
+  mRenderTask.SetInputEnabled(true);
   mRenderTask.SetFrameBuffer(mFrameBuffer);
   mRenderTask.SetClearEnabled(true);
   mRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
