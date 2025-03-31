@@ -54,12 +54,6 @@ void OffScreenRenderingImpl::SetType(DevelControl::OffScreenRenderingType type)
   }
 }
 
-RenderEffectImplPtr OffScreenRenderingImpl::Clone() const
-{
-  DALI_LOG_ERROR("Cloning offscreen rendering is not allowed.\n");
-  return RenderEffectImplPtr();
-}
-
 OffScreenRenderable::Type OffScreenRenderingImpl::GetOffScreenRenderableType()
 {
   return OffScreenRenderable::Type::FORWARD;

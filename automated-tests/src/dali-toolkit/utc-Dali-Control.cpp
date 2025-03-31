@@ -1634,7 +1634,7 @@ int UtcDaliControlCornerRadius(void)
 
   application.GetScene().Add(control);
 
-  RenderEffect effect = RenderEffect::CreateBackgroundBlurEffect(0.25f, 50.0f);
+  RenderEffect effect = BackgroundBlurEffect::New(0.25f, 50.0f);
   control.SetRenderEffect(effect);
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
 

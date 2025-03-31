@@ -63,12 +63,6 @@ public:
   void SetCornerConstants(Property::Map map);
 
   /**
-   * @brief Clones current instance.
-   * @return Clone implementation
-   */
-  virtual RenderEffectImplPtr Clone() const = 0;
-
-  /**
    * @brief Retrieves OffScreenRenderableType of this RenderEffect.
    *
    * @return OffScreenRenderableType for this RenderEffect.

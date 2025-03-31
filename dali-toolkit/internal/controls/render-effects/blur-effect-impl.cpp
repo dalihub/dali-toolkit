@@ -144,13 +144,6 @@ BlurEffectImplPtr BlurEffectImpl::New(float downscaleFactor, uint32_t blurRadius
   return handle;
 }
 
-RenderEffectImplPtr BlurEffectImpl::Clone() const
-{
-  BlurEffectImplPtr blurEffectImpl = new BlurEffectImpl(mDownscaleFactor, mPixelRadius, mBlurOnce, mIsBackground);
-  blurEffectImpl->Initialize();
-  return RenderEffectImplPtr(blurEffectImpl);
-}
-
 OffScreenRenderable::Type BlurEffectImpl::GetOffScreenRenderableType()
 {
   return mSkipBlur ? OffScreenRenderable::NONE : OffScreenRenderable::BACKWARD;
@@ -184,16 +177,6 @@ void BlurEffectImpl::OnInitialize()
   if(DALI_UNLIKELY(mSkipBlur))
   {
     return;
-  }
-
-  // Create CameraActors
-  {
-    mRenderDownsampledCamera = CameraActor::New();
-    mRenderDownsampledCamera.SetInvertYAxis(true);
-    mRenderDownsampledCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mRenderDownsampledCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-    mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK);
-    mInternalRoot.Add(mRenderDownsampledCamera);
   }
 
   // Calculate bell curve width
@@ -267,6 +250,15 @@ void BlurEffectImpl::OnActivate()
   uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mDownscaleFactor), 1u);
 
   // Set size
+  if(!mRenderDownsampledCamera)
+  {
+    mRenderDownsampledCamera = CameraActor::New();
+    mRenderDownsampledCamera.SetInvertYAxis(true);
+    mRenderDownsampledCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mRenderDownsampledCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK);
+    mInternalRoot.Add(mRenderDownsampledCamera);
+  }
   mRenderDownsampledCamera.SetPerspectiveProjection(Size(downsampledWidth, downsampledHeight));
 
   mHorizontalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));

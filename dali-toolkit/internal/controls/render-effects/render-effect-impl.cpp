@@ -125,15 +125,6 @@ bool RenderEffectImpl::IsActivated() const
 
 void RenderEffectImpl::Initialize()
 {
-  if(!mCamera)
-  {
-    mCamera = CameraActor::New();
-    mCamera.SetInvertYAxis(true);
-    mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-    mCamera.SetType(Dali::Camera::FREE_LOOK);
-  }
-
   if(!mRenderer)
   {
     mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
@@ -191,8 +182,15 @@ void RenderEffectImpl::Activate()
     }
     mPlacementSceneHolder = sceneHolder;
 
-    Vector2 size = GetTargetSize();
-    mCamera.SetPerspectiveProjection(size);
+    if(!mCamera)
+    {
+      mCamera = CameraActor::New();
+      mCamera.SetInvertYAxis(true);
+      mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+      mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      mCamera.SetType(Dali::Camera::FREE_LOOK);
+    }
+    mCamera.SetPerspectiveProjection(GetTargetSize());
     ownerControl.Add(mCamera);
 
     // Activate logic for subclass.
@@ -225,7 +223,10 @@ void RenderEffectImpl::Deactivate()
     // Deactivate logic for subclass.
     OnDeactivate();
 
-    mCamera.Unparent();
+    if(mCamera)
+    {
+      mCamera.Unparent();
+    }
   }
 }
 
