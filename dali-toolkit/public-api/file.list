@@ -59,6 +59,7 @@ SET( public_api_header_files
   ${public_api_src_dir}/dali-toolkit-common.h
   ${public_api_src_dir}/enums.h
   ${public_api_src_dir}/align-enumerations.h
+  ${public_api_src_dir}/toolkit-constraint-tag-ranges.h
   ${public_api_src_dir}/toolkit-property-index-ranges.h
 )
 

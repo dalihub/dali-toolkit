@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -28,6 +29,7 @@
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
+#include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
 
 namespace Dali
 {
@@ -48,6 +50,8 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelNode, Dali::CustomActor, Create);
 DALI_TYPE_REGISTRATION_END()
+
+static constexpr uint32_t BONE_MATRIX_CONSTRAINT_TAG = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 110;
 } // unnamed namespace
 
 Dali::Scene3D::ModelNode ModelNode::New()
@@ -444,6 +448,7 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
 
     Actor joint = Self();
     boneData.constraint.AddSource(Source{joint, Actor::Property::WORLD_MATRIX});
+    Dali::Integration::ConstraintSetInternalTag(boneData.constraint, BONE_MATRIX_CONSTRAINT_TAG);
     boneData.constraint.ApplyPost();
     break;
   }
