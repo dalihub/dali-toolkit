@@ -80,9 +80,10 @@ public:
    * @brief Creates background blur effect.
    * @param[in] downscaleFactor Input texture downscaler for better performance.
    * @param[in] blurRadius Gaussian kernel size.
+   * @param[in] blurOnce Whether to perform blur once or always. Default is false(always).
    * @SINCE_2_4.1
    */
-  static RenderEffect CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius);
+  static RenderEffect CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius, bool blurOnce = false);
 
 public: // Not intended for Application developers
   ///@cond internal

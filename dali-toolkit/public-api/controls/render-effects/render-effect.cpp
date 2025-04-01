@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ RenderEffect RenderEffect::CreateBackgroundBlurEffect()
   return RenderEffect(internal.Get());
 }
 
-RenderEffect RenderEffect::CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius)
+RenderEffect RenderEffect::CreateBackgroundBlurEffect(float downscaleFactor, uint32_t blurRadius, bool blurOnce)
 {
-  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, true);
+  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, blurOnce, true);
   return RenderEffect(internal.Get());
 }
 } // namespace Toolkit

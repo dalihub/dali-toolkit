@@ -167,6 +167,7 @@ void AsyncTextLoader::ClearTextModelData()
   mTextModel->mLogicalModel->ClearUnderlineRuns();
   mTextModel->mLogicalModel->ClearEmbeddedImages();
   mTextModel->mLogicalModel->ClearAnchors();
+  mTextModel->mLogicalModel->mVariationsMap.Clear();
 
   // Free the allocated memory used to store the conversion table in the bidirectional line info run.
   for(Vector<BidirectionalLineInfoRun>::Iterator it    = mTextModel->mLogicalModel->mBidirectionalLineInfo.Begin(),
@@ -232,6 +233,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   mTextModel->mVerticalAlignment     = parameters.verticalAlignment;
   mTextModel->mVerticalLineAlignment = parameters.verticalLineAlignment;
 
+  mTextModel->mLogicalModel->mVariationsMap = parameters.variationsMap;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Update visual model.
@@ -411,6 +413,12 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
   defaultPointSize = parameters.fontSize * scale * numberOfPointsPerOneUnitOfPointSize;
 
+  Property::Map *variationsMapPtr = nullptr;
+  if(!mTextModel->mLogicalModel->mVariationsMap.Empty())
+  {
+    variationsMapPtr = &mTextModel->mLogicalModel->mVariationsMap;
+  }
+
   // Validates the fonts. If there is a character with no assigned font it sets a default one.
   // After this call, fonts are validated.
   mModule.GetMultilanguageSupport().ValidateFonts(mModule.GetFontClient(),
@@ -422,7 +430,8 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
                                                   scale,
                                                   0u,
                                                   numberOfCharacters,
-                                                  validFonts);
+                                                  validFonts,
+                                                  variationsMapPtr);
 
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -491,12 +500,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   const Length currentNumberOfGlyphs = glyphs.Count();
 
   const Vector<Character>& textToShape = mIsTextMirrored ? mirroredUtf32Characters : utf32Characters;
-
-  Property::Map *variationsMapPtr = nullptr;
-  if(!mTextModel->mLogicalModel->mVariationsMap.Empty())
-  {
-    variationsMapPtr = &mTextModel->mLogicalModel->mVariationsMap;
-  }
 
   // Shapes the text.
   ShapeText(mModule.GetShaping(),

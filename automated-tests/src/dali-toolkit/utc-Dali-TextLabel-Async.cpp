@@ -2826,3 +2826,62 @@ int UtcDaliToolkitTextLabelAsyncTextEllipsisMode(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelAsyncFontVariations(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncFontVariations");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float expectedWidth  = 300.0f;
+  float expectedHeight = 300.0f;
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
+  label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add(label);
+
+  std::string WGHT_KEY = "wght";
+  const float WGHT_VALUE = 100.f;
+
+  auto fontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, WGHT_KEY.data());
+  label.SetProperty(fontVariationsIndex, WGHT_VALUE);
+
+  DALI_TEST_CHECK(label.GetProperty(fontVariationsIndex).Get<float>() == WGHT_VALUE);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

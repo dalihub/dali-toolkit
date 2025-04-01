@@ -1642,6 +1642,10 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.backgroundWithCutoutEnabled = mController->IsBackgroundWithCutoutEnabled();
   parameters.backgroundColorWithCutout   = mController->GetBackgroundColorWithCutout();
 
+  Property::Map variationsMap;
+  mController->GetVariationsMap(variationsMap);
+  parameters.variationsMap = variationsMap;
+
   return parameters;
 }
 
@@ -2159,6 +2163,7 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
 
   // Full Variation Update.
   mController->SetVariationsMap(map);
+  mIsAsyncRenderNeeded = true;
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const

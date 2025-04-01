@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,7 +175,7 @@ void StyleManager::ApplyThemeStyle(Toolkit::Control control)
     ApplyDefaultTheme();
   }
 
-  if(mThemeBuilder)
+  if(DALI_LIKELY(mThemeBuilder))
   {
     ApplyStyle(mThemeBuilder, control);
   }
@@ -295,12 +295,20 @@ const Property::Map& StyleManager::GetConfigurations()
     mThemeBuilder = CreateBuilder(mThemeBuilderConstants);
 
     // Load default theme because this is first try to load stylesheet.
-#if defined(DEBUG_ENABLED)
-    bool themeLoaded = LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
+    const bool themeLoaded = LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
     DALI_LOG_STREAM(gLogFilter, Debug::Concise, "  themeLoaded" << (themeLoaded ? "success" : "failure"));
-#else
-    LoadJSON(mThemeBuilder, mDefaultThemeFilePath);
-#endif
+
+    if(DALI_UNLIKELY(!themeLoaded))
+    {
+      DALI_LOG_STREAM(gLogFilter, Debug::Concise, "GetConfigurations() Failed\n");
+
+      // We tried to load a theme, but it failed. Ensure the builder is reset
+      mThemeBuilder.Reset();
+
+      static const Property::Map emptyMap;
+
+      return emptyMap;
+    }
 
     mThemeFile = mDefaultThemeFilePath;
   }

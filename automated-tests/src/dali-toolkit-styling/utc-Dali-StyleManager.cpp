@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1434,7 +1434,7 @@ int UtcDaliStyleManagerSetSubState02(void)
   END_TEST;
 }
 
-int UtcDaliStyleManagerConfigSectionTest(void)
+int UtcDaliStyleManagerConfigSectionTestP(void)
 {
   tet_infoline("Test that the properties in config section are works");
 
@@ -1479,6 +1479,51 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   application.ProcessEvent(Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerConfigSectionTestN(void)
+{
+  tet_infoline("Test that the properties in config section are works as default if theme is broken");
+
+  const char* brokenTheme = "INVALID";
+
+  Test::StyleMonitor::SetThemeFileOutput(DALI_STYLE_DIR "dali-toolkit-default-theme.json", brokenTheme);
+  try
+  {
+    ToolkitTestApplication application;
+
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+    DALI_TEST_CHECK(config.Empty());
+
+    // For coverage
+    Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+    editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+    application.GetScene().Add(editor);
+
+    Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
+
+    application.ProcessEvent(Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
+    application.SendNotification();
+    application.Render();
+
+    Toolkit::TextLabel label = Toolkit::TextLabel::New();
+    label.SetProperty(Toolkit::TextLabel::Property::TEXT, "Hello, World!");
+    application.GetScene().Add(label);
+
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); ///< Should not get here
+  }
+
+  // Restore default theme data.
+  Test::StyleMonitor::SetThemeFileOutput(DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme);
 
   END_TEST;
 }

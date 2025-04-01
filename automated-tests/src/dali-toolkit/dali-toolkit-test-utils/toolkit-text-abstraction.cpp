@@ -134,18 +134,33 @@ public:
     return fontClientHandle;
   }
 
+  void ClearCache()
+  {
+  }
+  void ClearCacheOnLocaleChanged()
+  {
+  }
   void SetDpi(unsigned int horizontalDpi, unsigned int verticalDpi)
+  {
+  }
+  void SetDpiFromWindowSystem()
   {
   }
   void GetDpi(unsigned int& horizontalDpi, unsigned int& verticalDpi)
   {
     horizontalDpi = verticalDpi = 96;
   }
-
+  int GetDefaultFontSize()
+  {
+    return 10.0f;
+  }
   void ResetSystemDefaults()
   {
   }
   void GetDefaultFonts(FontList& defaultFonts)
+  {
+  }
+  void InitDefaultFontDescription()
   {
   }
   void GetDefaultPlatformFontDescription(FontDescription& fontDescription)
@@ -156,6 +171,10 @@ public:
   }
   void GetDescription(FontId id, FontDescription& fontDescription)
   {
+  }
+  bool IsCharacterSupportedByFont(FontId fontId, Character character)
+  {
+    return true;
   }
   PointSize26Dot6 GetPointSize(FontId id)
   {
@@ -191,10 +210,18 @@ public:
   void GetFixedSizes(const FontDescription& fontDescription, Dali::Vector<PointSize26Dot6>& sizes)
   {
   }
+  bool HasItalicStyle(FontId fontId) const
+  {
+    return false;
+  }
   void GetFontMetrics(FontId fontId, FontMetrics& metrics)
   {
   }
   GlyphIndex GetGlyphIndex(FontId fontId, Character charcode)
+  {
+    return 0;
+  }
+  GlyphIndex GetGlyphIndex(FontId fontId, Character charcode, Character variantSelector)
   {
     return 0;
   }
@@ -316,6 +343,13 @@ inline static TextAbstraction::Internal::FontClient& GetImplementation(TextAbstr
   return static_cast<TextAbstraction::Internal::FontClient&>(handle);
 }
 
+inline static const TextAbstraction::Internal::FontClient& GetImplementation(const TextAbstraction::FontClient& fontClient)
+{
+  DALI_ASSERT_ALWAYS(fontClient && "fontClient handle is empty");
+  const BaseObject& handle = fontClient.GetBaseObject();
+  return static_cast<const TextAbstraction::Internal::FontClient&>(handle);
+}
+
 inline static TextAbstraction::Internal::Shaping& GetImplementation(TextAbstraction::Shaping& shaping)
 {
   DALI_ASSERT_ALWAYS(shaping && "shaping handle is empty");
@@ -420,14 +454,34 @@ FontClient& FontClient::operator=(const FontClient& handle)
   return *this;
 }
 
+void FontClient::ClearCache()
+{
+  GetImplementation(*this).ClearCache();
+}
+
+void FontClient::ClearCacheOnLocaleChanged()
+{
+  GetImplementation(*this).ClearCacheOnLocaleChanged();
+}
+
 void FontClient::SetDpi(unsigned int horizontalDpi, unsigned int verticalDpi)
 {
   GetImplementation(*this).SetDpi(horizontalDpi, verticalDpi);
 }
 
+void FontClient::SetDpiFromWindowSystem()
+{
+  GetImplementation(*this).SetDpiFromWindowSystem();
+}
+
 void FontClient::GetDpi(unsigned int& horizontalDpi, unsigned int& verticalDpi)
 {
   GetImplementation(*this).GetDpi(horizontalDpi, verticalDpi);
+}
+
+int FontClient::GetDefaultFontSize()
+{
+  return GetImplementation(*this).GetDefaultFontSize();
 }
 
 void FontClient::ResetSystemDefaults()
@@ -438,6 +492,11 @@ void FontClient::ResetSystemDefaults()
 void FontClient::GetDefaultFonts(FontList& defaultFonts)
 {
   GetImplementation(*this).GetDefaultFonts(defaultFonts);
+}
+
+void FontClient::InitDefaultFontDescription()
+{
+  GetImplementation(*this).InitDefaultFontDescription();
 }
 
 void FontClient::GetDefaultPlatformFontDescription(FontDescription& fontDescription)
@@ -458,6 +517,11 @@ void FontClient::GetDescription(FontId id, FontDescription& fontDescription)
 PointSize26Dot6 FontClient::GetPointSize(FontId id)
 {
   return GetImplementation(*this).GetPointSize(id);
+}
+
+bool FontClient::IsCharacterSupportedByFont(FontId fontId, Character character)
+{
+  return GetImplementation(*this).IsCharacterSupportedByFont(fontId, character);
 }
 
 FontId FontClient::FindDefaultFont(Character charcode, PointSize26Dot6 pointSize, bool preferColor)
@@ -507,6 +571,11 @@ void FontClient::GetFixedSizes(const FontDescription&         fontDescription,
   GetImplementation(*this).GetFixedSizes(fontDescription, sizes);
 }
 
+bool FontClient::HasItalicStyle(FontId fontId) const
+{
+  return GetImplementation(*this).HasItalicStyle(fontId);
+}
+
 void FontClient::GetFontMetrics(FontId fontId, FontMetrics& metrics)
 {
   GetImplementation(*this).GetFontMetrics(fontId, metrics);
@@ -515,6 +584,11 @@ void FontClient::GetFontMetrics(FontId fontId, FontMetrics& metrics)
 GlyphIndex FontClient::GetGlyphIndex(FontId fontId, Character charcode)
 {
   return GetImplementation(*this).GetGlyphIndex(fontId, charcode);
+}
+
+GlyphIndex FontClient::GetGlyphIndex(FontId fontId, Character charcode, Character variantSelector)
+{
+  return GetImplementation(*this).GetGlyphIndex(fontId, charcode, variantSelector);
 }
 
 bool FontClient::GetGlyphMetrics(GlyphInfo* array, uint32_t size, GlyphType type, bool horizontal)
