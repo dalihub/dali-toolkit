@@ -259,7 +259,7 @@ int UtcDaliRenderEffectSynchronizeControlCornerRadius(void)
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4(30.0f, 30.0f, 30.0f, 30.0f));
   control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::Type::ABSOLUTE);
-  // TODO set squarness
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_SQUARENESS, Vector4(0.7f, 0.7f, 0.7f, 0.7f));
   scene.Add(control);
 
   control.SetProperty(Toolkit::Control::Property::BACKGROUND, blackDimmerMap);
@@ -271,8 +271,8 @@ int UtcDaliRenderEffectSynchronizeControlCornerRadius(void)
   Vector4  radius   = Vector4::ZERO;
   renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadius"))).Get(radius);
 
-  //Vector4 squreness = Vector4::ZERO;
-  //renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerSquareness"))).Get(squreness);
+  Vector4 squreness = Vector4::ZERO;
+  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerSquareness"))).Get(squreness);
 
   Toolkit::Visual::Transform::Policy::Type policy;
   renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadiusPolicy"))).Get(policy);
@@ -283,10 +283,10 @@ int UtcDaliRenderEffectSynchronizeControlCornerRadius(void)
   DALI_TEST_CHECK(radius.z == 30.0f);
   DALI_TEST_CHECK(radius.w == 30.0f);
 
-  //DALI_TEST_CHECK(squreness.x == 0.3f);
-  //DALI_TEST_CHECK(squreness.y == 0.3f);
-  //DALI_TEST_CHECK(squreness.z == 0.3f);
-  //DALI_TEST_CHECK(squreness.w == 0.3f);
+  DALI_TEST_CHECK(squreness.x == 0.7f);
+  DALI_TEST_CHECK(squreness.y == 0.7f);
+  DALI_TEST_CHECK(squreness.z == 0.7f);
+  DALI_TEST_CHECK(squreness.w == 0.7f);
 
   END_TEST;
 }
