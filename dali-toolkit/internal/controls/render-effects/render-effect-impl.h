@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDE
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
-#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -47,6 +46,7 @@ class RenderEffectImpl : public BaseObject, public ConnectionTracker
 public:
   /**
    * @brief Sets owner Control. Applies effect on the owner.
+   * @note Activates render effect on default.
    * @param[in] control The owner control to apply RenderEffect.
    */
   void SetOwnerControl(Toolkit::Control control);
@@ -85,6 +85,16 @@ public:
    */
   virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Activate
+   */
+  void Activate();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Deactivate
+   */
+  void Deactivate();
+
 protected:
   /**
    * @copydoc Dali::Toolkit::RenderEffect::RenderEffect
@@ -118,12 +128,6 @@ protected:
    * @return mTargetSize
    */
   Vector2 GetTargetSize() const;
-
-  /**
-   * @brief Get camera that captures full size texture of mOwnerControl
-   * @return mCamera
-   */
-  CameraActor GetCameraActor() const;
 
   /**
    * @brief Get Owner control. It could be return empty handle if owner control is not set, or destroyed.
@@ -160,29 +164,19 @@ protected:
    */
   virtual void OnRefresh() = 0;
 
+  /**
+   * @brief Get whether this effect activated or not.
+   * @return True if effect is activated. False otherwise.
+   */
+  bool IsActivated() const;
+
 private:
-  /**
-   * @brief Activates effect on ownerControl
-   */
-  void Activate();
-
-  /**
-   * @brief Deactivates effect
-   */
-  void Deactivate();
-
   /**
    * @brief Check whether it is possible to activate effect or not.
    *        It will check various status, e.g. the control's visibility.
    * @note This API don't consider mIsActivated
    */
   bool IsActivateValid() const;
-
-  /**
-   * @brief Get whether this effect activated or not.
-   * @return True if effect is activated. False otherwise.
-   */
-  bool IsActivated() const;
 
 private:
   /**
@@ -205,7 +199,6 @@ private:
 
 private:
   Dali::Renderer mRenderer; // An additional renderer for mOwnerControl
-  CameraActor    mCamera;   // A camera that captures full size texture of mOwnerControl
 
   Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl;         ///< Weakhandle of owner control.
   WeakHandle<Integration::SceneHolder>     mPlacementSceneHolder; ///< Weakhandle of scene
