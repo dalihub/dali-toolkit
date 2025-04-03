@@ -201,10 +201,12 @@ void RenderEffectImpl::Activate()
     if(cornerRadius != Vector4::ZERO)
     {
       int32_t cornerRadiusPolicy = ownerControl.GetProperty<int32_t>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
+      Vector4 cornerSquareness   = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
 
       Property::Map map;
       map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
       map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
+      map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
 
       SetCornerConstants(map);
     }

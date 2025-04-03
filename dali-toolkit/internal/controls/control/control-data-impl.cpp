@@ -375,8 +375,9 @@ const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "cornerRadius",             Toolkit::DevelControl::Property::CORNER_RADIUS,              Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "cornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "cornerRadius",                   Toolkit::DevelControl::Property::CORNER_RADIUS,                    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "cornerRadiusPolicy",             Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_34(typeRegistration, "cornerSquareness",               Toolkit::DevelControl::Property::CORNER_SQUARENESS,                Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -396,6 +397,7 @@ Control::Impl::Impl(Control& controlImpl)
   mBackgroundColor(Color::TRANSPARENT),
   mCornerRadius(Vector4::ZERO),
   mCornerRadiusPolicy(Toolkit::Visual::Transform::Policy::Type::ABSOLUTE),
+  mCornerSquareness(Vector4::ZERO),
   mRenderEffect(nullptr),
   mStartingPinchScale(nullptr),
   mMargin(0, 0, 0, 0),
@@ -609,6 +611,7 @@ void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visu
     Property::Map map;
     map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = mCornerRadius;
     map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = mCornerRadiusPolicy;
+    map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = mCornerSquareness;
 
     mVisualData->EnableCornerPropertiesOverridden(visual, enable, map);
   }
@@ -1090,10 +1093,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
       {
-        Vector4 vector;
-        if(value.Get(vector))
+        Vector4 radius;
+        if(value.Get(radius))
         {
-          controlImpl.mImpl->SetCornerRadius(vector, controlImpl.mImpl->mCornerRadiusPolicy);
+          controlImpl.mImpl->SetCornerRadius(radius, controlImpl.mImpl->mCornerRadiusPolicy, controlImpl.mImpl->mCornerSquareness);
         }
         break;
       }
@@ -1104,7 +1107,18 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         if(value.Get(policy))
         {
           controlImpl.mImpl->SetCornerRadius(controlImpl.mImpl->mCornerRadius,
-                                             static_cast<Toolkit::Visual::Transform::Policy::Type>(policy));
+                                             static_cast<Toolkit::Visual::Transform::Policy::Type>(policy),
+                                             controlImpl.mImpl->mCornerSquareness);
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
+      {
+        Vector4 squareness;
+        if(value.Get(squareness))
+        {
+          controlImpl.mImpl->SetCornerRadius(controlImpl.mImpl->mCornerRadius, controlImpl.mImpl->mCornerRadiusPolicy, squareness);
         }
         break;
       }
@@ -1330,6 +1344,12 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY:
       {
         value = static_cast<int32_t>(controlImpl.mImpl->mCornerRadiusPolicy);
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
+      {
+        value = controlImpl.mImpl->mCornerSquareness;
         break;
       }
     }
@@ -1730,19 +1750,21 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   mOffScreenRenderingType = newType;
 }
 
-void Control::Impl::SetCornerRadius(Vector4 vector, Toolkit::Visual::Transform::Policy::Type policy)
+void Control::Impl::SetCornerRadius(Vector4 radius, Toolkit::Visual::Transform::Policy::Type policy, Vector4 squareness)
 {
-  if(vector == mCornerRadius && policy == mCornerRadiusPolicy)
+  if(radius == mCornerRadius && policy == mCornerRadiusPolicy && squareness == mCornerSquareness)
   {
     return;
   }
 
-  mCornerRadius       = vector;
+  mCornerRadius       = radius;
   mCornerRadiusPolicy = policy;
+  mCornerSquareness   = squareness;
 
   Property::Map map;
-  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = vector;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = radius;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = policy;
+  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = squareness;
 
   RegisteredVisualContainer& visuals = mVisualData->mVisuals;
   for(auto it = visuals.begin(); it != visuals.end(); it++)
