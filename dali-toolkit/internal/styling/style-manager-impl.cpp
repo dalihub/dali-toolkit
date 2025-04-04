@@ -383,14 +383,14 @@ bool StyleManager::LoadJSON(Toolkit::Builder builder, const std::string& jsonFil
     }
     catch(...)
     {
-      DALI_LOG_WARNING("Error during parse JSON file '%s'\n", jsonFilePath.c_str());
+      DALI_LOG_ERROR("Error during parse JSON file '%s'\n", jsonFilePath.c_str());
       return false;
     }
     return true;
   }
   else
   {
-    DALI_LOG_WARNING("Error loading file '%s'\n", jsonFilePath.c_str());
+    DALI_LOG_ERROR("Error loading file '%s'\n", jsonFilePath.c_str());
     return false;
   }
 }

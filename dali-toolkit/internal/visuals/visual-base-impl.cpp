@@ -1248,7 +1248,7 @@ void Visual::Base::SetupTransition(
         else if(animator.animationType == TransitionData::AnimationType::BY)
         {
           // To Do
-          DALI_LOG_WARNING("AnimationType::By is not supported yet. \n");
+          DALI_LOG_ERROR("AnimationType::By is not supported yet. \n");
         }
         else
         {

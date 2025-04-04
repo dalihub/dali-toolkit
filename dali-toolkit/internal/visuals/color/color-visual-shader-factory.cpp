@@ -337,7 +337,7 @@ void ColorVisualShaderFactory::CreatePrecompileShader(ColorVisualShaderFeature::
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        DALI_LOG_ERROR("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
         break;
       }
     }
@@ -350,7 +350,7 @@ bool ColorVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(ShaderTypePredefines[i] == shader)
     {
-      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -359,7 +359,7 @@ bool ColorVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
-      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }

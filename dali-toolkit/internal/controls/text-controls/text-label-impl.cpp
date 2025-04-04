@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -395,7 +395,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       {
         if(impl.mController->IsTextElideEnabled() && impl.mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
         {
-          DALI_LOG_WARNING("Tried to autoscroll while in ellipsize auto scroll mode, request ignored.\n");
+          DALI_LOG_DEBUG_INFO("Tried to autoscroll while in ellipsize auto scroll mode, request ignored.\n");
         }
         else
         {
@@ -1343,8 +1343,8 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
     {
       if(Self().DoesCustomPropertyExist(index) && mVariationIndexMap.find(index) != mVariationIndexMap.end())
       {
-        std::string tag = mVariationIndexMap[index];
-        float value = propertyValue.Get<float>();
+        std::string tag   = mVariationIndexMap[index];
+        float       value = propertyValue.Get<float>();
 
         Property::Map map;
         mController->GetVariationsMap(map);
@@ -1480,7 +1480,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   {
     if(mController->IsMultiLineEnabled())
     {
-      DALI_LOG_WARNING("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+      DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
     }
     else
     {
@@ -1526,7 +1526,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     const int maxTextureSize = Dali::GetMaxTextureSize();
     if(layoutSize.width > maxTextureSize)
     {
-      DALI_LOG_WARNING("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", layoutSize.width, maxTextureSize);
+      DALI_LOG_DEBUG_INFO("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", layoutSize.width, maxTextureSize);
       layoutSize.width = maxTextureSize;
     }
 
@@ -2022,7 +2022,7 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
-    DALI_LOG_WARNING("Render mode is sync, return\n");
+    DALI_LOG_DEBUG_INFO("Render mode is sync, return\n");
     return;
   }
 
@@ -2054,7 +2054,7 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
-    DALI_LOG_WARNING("Render mode is sync, return\n");
+    DALI_LOG_DEBUG_INFO("Render mode is sync, return\n");
     return;
   }
 
@@ -2086,7 +2086,7 @@ void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float he
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
-    DALI_LOG_WARNING("Render mode is sync, return\n");
+    DALI_LOG_DEBUG_INFO("Render mode is sync, return\n");
     return;
   }
 
@@ -2126,7 +2126,7 @@ Dali::Property::Index TextLabel::RegisterFontVariationProperty(std::string tag)
   mController->GetVariationsMap(variationsMap);
 
   float variationValue = 0.f;
-  auto tagPtr = variationsMap.Find(tag);
+  auto  tagPtr         = variationsMap.Find(tag);
 
   if(tagPtr)
   {
@@ -2152,11 +2152,11 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
   Property::Map map;
   mController->GetVariationsMap(map);
 
-  for(auto &[index, tag] : mVariationIndexMap)
+  for(auto& [index, tag] : mVariationIndexMap)
   {
     if(Self().DoesCustomPropertyExist(index))
     {
-      float value = Self().GetCurrentProperty(index).Get<float>();
+      float value     = Self().GetCurrentProperty(index).Get<float>();
       map[tag.data()] = std::round(value);
     }
   }

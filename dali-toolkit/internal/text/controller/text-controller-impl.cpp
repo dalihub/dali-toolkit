@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1946,7 +1946,7 @@ void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout)
   }
   else
   {
-    DALI_LOG_WARNING("Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n");
+    DALI_LOG_DEBUG_INFO("Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n");
     mIsAutoScrollEnabled = false;
   }
 }

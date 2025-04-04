@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,10 +168,10 @@ void Builder::LoadFromString(std::string const& data, Dali::Toolkit::Builder::UI
 
   if(!parser.Parse(data))
   {
-    DALI_LOG_WARNING("JSON Parse Error:%d:%d:'%s'\n",
-                     parser.GetErrorLineNumber(),
-                     parser.GetErrorColumn(),
-                     parser.GetErrorDescription().c_str());
+    DALI_LOG_ERROR("JSON Parse Error:%d:%d:'%s'\n",
+                   parser.GetErrorLineNumber(),
+                   parser.GetErrorColumn(),
+                   parser.GetErrorDescription().c_str());
 
     DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
   }
@@ -207,10 +207,10 @@ void Builder::LoadFromString(std::string const& data, Dali::Toolkit::Builder::UI
     }
     else
     {
-      DALI_LOG_WARNING("JSON Parse Error:%d:%d:'%s'\n",
-                       mParser.GetErrorLineNumber(),
-                       mParser.GetErrorColumn(),
-                       mParser.GetErrorDescription().c_str());
+      DALI_LOG_ERROR("JSON Parse Error:%d:%d:'%s'\n",
+                     mParser.GetErrorLineNumber(),
+                     mParser.GetErrorColumn(),
+                     mParser.GetErrorDescription().c_str());
 
       DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ void PrecompileShaderOption::ConvertShaderMap(const Property::Map& shaderOption)
         }
         else
         {
-          DALI_LOG_WARNING("Can't find this flag[%s]\n", optionKey.c_str());
+          DALI_LOG_ERROR("Can't find this flag[%s]\n", optionKey.c_str());
           continue;
         }
       }

@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/async-text/async-text-loader-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cmath>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
+#include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -42,7 +42,7 @@ namespace
 constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
-{
+  {
     0.0f, // VerticalAlignment::TOP
     0.5f, // VerticalAlignment::CENTER
     1.0f  // VerticalAlignment::BOTTOM
@@ -111,7 +111,7 @@ void AsyncTextLoader::ClearModule()
 
 void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories)
 {
-  for(auto &path: customFontDirectories)
+  for(auto& path : customFontDirectories)
   {
     mModule.GetFontClient().AddCustomFontDirectory(path);
   }
@@ -137,7 +137,7 @@ void AsyncTextLoader::Initialize()
 
   mNumberOfCharacters = 0u;
   mIsTextDirectionRTL = false;
-  mIsTextMirrored = false;
+  mIsTextMirrored     = false;
 
   // Set the text properties to default
   mTextModel->mVisualModel->SetUnderlineEnabled(false);
@@ -221,13 +221,12 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo   = mTextModel->mLogicalModel->mBidirectionalParagraphInfo; // The bidirectional info per paragraph.
   Vector<ColorRun>&                      colorRuns           = mTextModel->mLogicalModel->mColorRuns;                  // colors of the text.
 
-
   // Set the default font's description with the given text parameters.
   TextAbstraction::FontDescription defaultFontDescription;
   defaultFontDescription.family = parameters.fontFamily;
   defaultFontDescription.weight = parameters.fontWeight;
-  defaultFontDescription.width = parameters.fontWidth;
-  defaultFontDescription.slant = parameters.fontSlant;
+  defaultFontDescription.width  = parameters.fontWidth;
+  defaultFontDescription.slant  = parameters.fontSlant;
 
   mTextModel->mHorizontalAlignment   = parameters.horizontalAlignment;
   mTextModel->mVerticalAlignment     = parameters.verticalAlignment;
@@ -289,7 +288,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   mTextModel->mRemoveFrontInset = parameters.removeFrontInset;
   mTextModel->mRemoveBackInset  = parameters.removeBackInset;
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Process the markup string if the mark-up processor is enabled.
   ////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +323,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
     utf8 = reinterpret_cast<const uint8_t*>(parameters.text.c_str());
   }
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Convert from utf8 to utf32
   ////////////////////////////////////////////////////////////////////////////////
@@ -336,7 +333,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   // It returns the actual number of characters.
   numberOfCharacters = Utf8ToUtf32(utf8, textSize, utf32Characters.Begin());
   utf32Characters.Resize(numberOfCharacters);
-
 
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the Line and Word Break Info.
@@ -391,18 +387,15 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   // Create the paragraph info.
   mTextModel->mLogicalModel->CreateParagraphInfo(0u, numberOfCharacters);
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the script runs.
   ////////////////////////////////////////////////////////////////////////////////
 
   mModule.GetMultilanguageSupport().SetScripts(utf32Characters, 0u, numberOfCharacters, scripts);
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Validate Fonts.
   ////////////////////////////////////////////////////////////////////////////////
-
 
   float scale = parameters.fontSizeScale;
 
@@ -413,7 +406,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
   defaultPointSize = parameters.fontSize * scale * numberOfPointsPerOneUnitOfPointSize;
 
-  Property::Map *variationsMapPtr = nullptr;
+  Property::Map* variationsMapPtr = nullptr;
   if(!mTextModel->mLogicalModel->mVariationsMap.Empty())
   {
     variationsMapPtr = &mTextModel->mLogicalModel->mVariationsMap;
@@ -433,7 +426,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
                                                   validFonts,
                                                   variationsMapPtr);
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the Bidirectional info.
   ////////////////////////////////////////////////////////////////////////////////
@@ -441,7 +433,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   // Update the layout direction policy to text model.
   mTextModel->mMatchLayoutDirection = parameters.layoutDirectionPolicy;
 
-  mIsTextMirrored = false;
+  mIsTextMirrored                 = false;
   const Length numberOfParagraphs = mTextModel->mLogicalModel->mParagraphInfo.Count();
 
   bidirectionalInfo.Reserve(numberOfParagraphs);
@@ -486,7 +478,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
     mTextModel->mLogicalModel->mCharacterDirections.Clear();
   }
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the glyphs. Text shaping
   ////////////////////////////////////////////////////////////////////////////////
@@ -520,7 +511,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
   mTextModel->mVisualModel->CreateGlyphsPerCharacterTable(0u, 0u, numberOfCharacters);
   mTextModel->mVisualModel->CreateCharacterToGlyphTable(0u, 0u, numberOfCharacters);
-
 
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the glyph's metrics.
@@ -567,7 +557,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
                            mTextModel->mVisualModel->mBackgroundColors,
                            mTextModel->mVisualModel->mBackgroundColorIndices);
 
-
   ////////////////////////////////////////////////////////////////////////////////
   // Update visual model for markup style.
   ////////////////////////////////////////////////////////////////////////////////
@@ -579,7 +568,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
     const Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns = mTextModel->mLogicalModel->mCharacterSpacingCharacterRuns;
     const Vector<GlyphIndex>&                   charactersToGlyph             = mTextModel->mVisualModel->mCharactersToGlyph;
     const Vector<Length>&                       glyphsPerCharacter            = mTextModel->mVisualModel->mGlyphsPerCharacter;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     // Markup underline
@@ -601,7 +589,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
       // Create one run for all glyphs of all run's characters that has same properties
       // This enhance performance and reduce the needed memory to store glyphs-runs
       UnderlinedGlyphRun underlineGlyphRun;
-      underlineGlyphRun.properties = it->properties;
+      underlineGlyphRun.properties              = it->properties;
       underlineGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
       underlineGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
 
@@ -615,7 +603,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
     // Reset flag. The updates have been applied from logical to visual.
     mTextModel->mLogicalModel->mUnderlineRunsUpdated = false;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     // Markup strikethrough
@@ -649,7 +636,6 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
 
     // Reset flag. The updates have been applied from logical to visual.
     mTextModel->mLogicalModel->mStrikethroughRunsUpdated = false;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     // Markup character spacing
@@ -762,7 +748,7 @@ Size AsyncTextLoader::Layout(AsyncTextParameters& parameters, bool& updated)
   layoutParameters.interGlyphExtraAdvance = 0.f;
 
   // Whether the last character is a new paragraph character.
-  const Character* const textBuffer = mTextModel->mLogicalModel->mText.Begin();
+  const Character* const textBuffer   = mTextModel->mLogicalModel->mText.Begin();
   layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph(*(textBuffer + (mTextModel->mLogicalModel->mText.Count() - 1u)));
 
   // Update the ellipsis
@@ -770,7 +756,7 @@ Size AsyncTextLoader::Layout(AsyncTextParameters& parameters, bool& updated)
   mTextModel->mElideEnabled = ellipsisEnabled;
   mTextModel->mVisualModel->SetTextElideEnabled(ellipsisEnabled);
 
-  auto ellipsisPosition = parameters.ellipsisPosition;
+  auto ellipsisPosition         = parameters.ellipsisPosition;
   mTextModel->mEllipsisPosition = ellipsisPosition;
   mTextModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 
@@ -797,7 +783,6 @@ Size AsyncTextLoader::Layout(AsyncTextParameters& parameters, bool& updated)
 
   // Store the actual size of the text after it has been laid-out.
   mTextModel->mVisualModel->SetLayoutSize(newLayoutSize);
-
 
   ////////////////////////////////////////////////////////////////////////////////
   // Align the text.
@@ -958,7 +943,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
     // Make transparent buffer.
     // If the cutout is enabled, a separate texture is not used for the text.
     Devel::PixelBuffer buffer = mTypesetter->CreateFullBackgroundBuffer(1, 1, Color::TRANSPARENT);
-    renderInfo.textPixelData = Devel::PixelBuffer::Convert(buffer);
+    renderInfo.textPixelData  = Devel::PixelBuffer::Convert(buffer);
 
     // Set the flag of cutout.
     renderInfo.isCutout = cutoutEnabled && (cutoutData != nullptr);
@@ -973,7 +958,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   {
     if(renderInfo.isCutout)
     {
-      float cutoutAlpha = mTextModel->GetDefaultColor().a;
+      float cutoutAlpha         = mTextModel->GetDefaultColor().a;
       renderInfo.stylePixelData = mTypesetter->RenderWithCutout(layoutSize, textDirection, cutoutData, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888, cutoutAlpha);
     }
     else
@@ -1036,8 +1021,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters)
     // In case of CONSTRAINT, the natural size has already been calculated.
     // So we can skip Initialize and Update at this stage.
     // Only the layout is newly calculated to obtain the height.
-    bool layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
-    float height = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
+    bool  layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
+    float height     = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // textHeight is heightConstraint.
     if(parameters.textHeight < height)
@@ -1086,11 +1071,11 @@ float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, fl
   }
 
   bool layoutUpdated = false;
-  Size layoutSize = Layout(parameters, layoutUpdated);
+  Size layoutSize    = Layout(parameters, layoutUpdated);
 
   // Restore actual size.
-  parameters.textWidth  = actualWidth;
-  parameters.textHeight = actualHeight;
+  parameters.textWidth                   = actualWidth;
+  parameters.textHeight                  = actualHeight;
   mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
 
   return layoutSize.height;
@@ -1119,8 +1104,8 @@ Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
   Size naturalSize = Layout(parameters, layoutUpdated);
 
   // Restore actual size.
-  parameters.textWidth  = actualWidth;
-  parameters.textHeight = actualHeight;
+  parameters.textWidth                   = actualWidth;
+  parameters.textHeight                  = actualHeight;
   mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
 
   return naturalSize;
@@ -1128,7 +1113,7 @@ Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
 
 AsyncTextRenderInfo AsyncTextLoader::GetHeightForWidth(AsyncTextParameters& parameters)
 {
-  float height = ComputeHeightForWidth(parameters, parameters.textWidth, false);
+  float               height = ComputeHeightForWidth(parameters, parameters.textWidth, false);
   AsyncTextRenderInfo renderInfo;
   renderInfo.renderedSize.width  = parameters.textWidth;
   renderInfo.renderedSize.height = height;
@@ -1140,7 +1125,7 @@ AsyncTextRenderInfo AsyncTextLoader::GetHeightForWidth(AsyncTextParameters& para
 
 AsyncTextRenderInfo AsyncTextLoader::GetNaturalSize(AsyncTextParameters& parameters)
 {
-  Size textNaturalSize = ComputeNaturalSize(parameters);
+  Size                textNaturalSize = ComputeNaturalSize(parameters);
   AsyncTextRenderInfo renderInfo;
   renderInfo.renderedSize = textNaturalSize;
   renderInfo.requestType  = Async::COMPUTE_NATURAL_SIZE;
@@ -1163,8 +1148,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
   if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
   {
     // The real height calculated during layout should be set.
-    parameters.textHeight = textNaturalSize.height - (parameters.padding.top + parameters.padding.bottom);
-    controlSize.height = parameters.textHeight;
+    parameters.textHeight                  = textNaturalSize.height - (parameters.padding.top + parameters.padding.bottom);
+    controlSize.height                     = parameters.textHeight;
     mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
   }
 
@@ -1193,8 +1178,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
       float actualWidth  = parameters.textWidth;
       float actualHeight = parameters.textHeight;
 
-      parameters.textWidth  = verifiedSize.width;
-      parameters.textHeight = textNaturalSize.height;
+      parameters.textWidth                      = verifiedSize.width;
+      parameters.textHeight                     = textNaturalSize.height;
       parameters.isAutoScrollMaxTextureExceeded = true;
 
       bool layoutUpdated = false;
@@ -1231,7 +1216,7 @@ bool AsyncTextLoader::CheckForTextFit(AsyncTextParameters& parameters, float poi
   Initialize();
   Update(parameters);
   bool layoutUpdated = false;
-  Size layoutSize = Layout(parameters, layoutUpdated);
+  Size layoutSize    = Layout(parameters, layoutUpdated);
 
   if(!layoutUpdated || layoutSize.width > allowedSize.width || layoutSize.height > allowedSize.height)
   {
@@ -1257,15 +1242,15 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
     // In case of CONSTRAINT, the natural size has already been calculated.
     // So we can skip Initialize and Update at this stage.
     // Only the layout is newly calculated to obtain the height.
-    bool layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
-    float height = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
+    bool  layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
+    float height     = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // textHeight is heightConstraint
     if(parameters.textHeight > height)
     {
       parameters.textHeight = height;
     }
-    DALI_LOG_WARNING("TextFit requires a fixed size. Render with natural size : %f, %f\n", parameters.textWidth, parameters.textHeight);
+    DALI_LOG_DEBUG_INFO("TextFit requires a fixed size. Render with natural size : %f, %f\n", parameters.textWidth, parameters.textHeight);
   }
 
   if(parameters.isTextFitArrayEnabled)
@@ -1277,8 +1262,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
     }
 #endif
 
-    std::vector<DevelTextLabel::FitOption> fitOptions = parameters.textFitArray;
-    int numberOfFitOptions = static_cast<int>(fitOptions.size());
+    std::vector<DevelTextLabel::FitOption> fitOptions         = parameters.textFitArray;
+    int                                    numberOfFitOptions = static_cast<int>(fitOptions.size());
     if(numberOfFitOptions == 0)
     {
       DALI_LOG_ERROR("fitOptions is empty, render with default value, point size:%f, min line size:%f\n", parameters.fontSize, parameters.minLineSize);
@@ -1312,35 +1297,35 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
 
     // Set the first FitOption(Minimum PointSize) to the best value.
     // If the search does not find an optimal value, the minimum PointSize will be used to text fit.
-    DevelTextLabel::FitOption firstOption = fitOptions.front();
-    bool  bestSizeUpdatedLatest = false;
-    float bestPointSize         = firstOption.GetPointSize();
-    float bestMinLineSize       = firstOption.GetMinLineSize();
+    DevelTextLabel::FitOption firstOption           = fitOptions.front();
+    bool                      bestSizeUpdatedLatest = false;
+    float                     bestPointSize         = firstOption.GetPointSize();
+    float                     bestMinLineSize       = firstOption.GetMinLineSize();
 
     if(binarySearch)
     {
-      int left = 0u;
+      int left  = 0u;
       int right = numberOfFitOptions - 1;
 
-      while (left <= right)
+      while(left <= right)
       {
-        int mid = left + (right - left) / 2;
-        DevelTextLabel::FitOption option = fitOptions[mid];
-        float testPointSize   = option.GetPointSize();
-        float testMinLineSize = option.GetMinLineSize();
-        parameters.minLineSize = testMinLineSize;
+        int                       mid             = left + (right - left) / 2;
+        DevelTextLabel::FitOption option          = fitOptions[mid];
+        float                     testPointSize   = option.GetPointSize();
+        float                     testMinLineSize = option.GetMinLineSize();
+        parameters.minLineSize                    = testMinLineSize;
 
         if(CheckForTextFit(parameters, testPointSize, allowedSize))
         {
           bestSizeUpdatedLatest = true;
-          bestPointSize   = testPointSize;
-          bestMinLineSize = testMinLineSize;
-          left = mid + 1;
+          bestPointSize         = testPointSize;
+          bestMinLineSize       = testMinLineSize;
+          left                  = mid + 1;
         }
         else
         {
           bestSizeUpdatedLatest = false;
-          right = mid - 1;
+          right                 = mid - 1;
         }
       }
     }
@@ -1349,16 +1334,16 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
       // If binary search is not possible, search sequentially starting from the largest PointSize.
       for(auto it = fitOptions.rbegin(); it != fitOptions.rend(); ++it)
       {
-        DevelTextLabel::FitOption option = *it;
-        float testPointSize   = option.GetPointSize();
-        float testMinLineSize = option.GetMinLineSize();
-        parameters.minLineSize = testMinLineSize;
+        DevelTextLabel::FitOption option          = *it;
+        float                     testPointSize   = option.GetPointSize();
+        float                     testMinLineSize = option.GetMinLineSize();
+        parameters.minLineSize                    = testMinLineSize;
 
         if(CheckForTextFit(parameters, testPointSize, allowedSize))
         {
           bestSizeUpdatedLatest = true;
-          bestPointSize   = testPointSize;
-          bestMinLineSize = testMinLineSize;
+          bestPointSize         = testPointSize;
+          bestMinLineSize       = testMinLineSize;
           break;
         }
         else
@@ -1387,9 +1372,9 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
     }
 #endif
 
-    float minPointSize           = parameters.textFitMinSize;
-    float maxPointSize           = parameters.textFitMaxSize;
-    float pointInterval          = parameters.textFitStepSize;
+    float minPointSize  = parameters.textFitMinSize;
+    float maxPointSize  = parameters.textFitMaxSize;
+    float pointInterval = parameters.textFitStepSize;
 
     mFitActualEllipsis  = parameters.ellipsis;
     parameters.ellipsis = false;

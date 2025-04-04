@@ -163,12 +163,12 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       if(mSlices > MAX_PARTITIONS)
       {
         mSlices = MAX_PARTITIONS;
-        DALI_LOG_WARNING("Value for slices clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for slices clamped.\n");
       }
       else if(mSlices < MIN_SLICES)
       {
         mSlices = MIN_SLICES;
-        DALI_LOG_WARNING("Value for slices clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for slices clamped.\n");
       }
     }
     else
@@ -186,12 +186,12 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       if(mStacks > MAX_PARTITIONS)
       {
         mStacks = MAX_PARTITIONS;
-        DALI_LOG_WARNING("Value for stacks clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for stacks clamped.\n");
       }
       else if(mStacks < MIN_STACKS)
       {
         mStacks = MIN_STACKS;
-        DALI_LOG_WARNING("Value for stacks clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for stacks clamped.\n");
       }
     }
     else
@@ -233,17 +233,17 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       if(mScaleDimensions.x <= 0.0)
       {
         mScaleDimensions.x = 1.0;
-        DALI_LOG_WARNING("Value for scale dimensions clamped. Must be greater than zero.\n");
+        DALI_LOG_DEBUG_INFO("Value for scale dimensions clamped. Must be greater than zero.\n");
       }
       if(mScaleDimensions.y <= 0.0)
       {
         mScaleDimensions.y = 1.0;
-        DALI_LOG_WARNING("Value for scale dimensions clamped. Must be greater than zero.\n");
+        DALI_LOG_DEBUG_INFO("Value for scale dimensions clamped. Must be greater than zero.\n");
       }
       if(mScaleDimensions.z <= 0.0)
       {
         mScaleDimensions.z = 1.0;
-        DALI_LOG_WARNING("Value for scale dimensions clamped. Must be greater than zero.\n");
+        DALI_LOG_DEBUG_INFO("Value for scale dimensions clamped. Must be greater than zero.\n");
       }
     }
     else
@@ -261,12 +261,12 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       if(mBevelPercentage < MIN_BEVEL_PERCENTAGE)
       {
         mBevelPercentage = MIN_BEVEL_PERCENTAGE;
-        DALI_LOG_WARNING("Value for bevel percentage clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for bevel percentage clamped.\n");
       }
       else if(mBevelPercentage > MAX_BEVEL_PERCENTAGE)
       {
         mBevelPercentage = MAX_BEVEL_PERCENTAGE;
-        DALI_LOG_WARNING("Value for bevel percentage clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for bevel percentage clamped.\n");
       }
     }
     else
@@ -284,12 +284,12 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       if(mBevelSmoothness < MIN_SMOOTHNESS)
       {
         mBevelSmoothness = MIN_SMOOTHNESS;
-        DALI_LOG_WARNING("Value for bevel smoothness clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for bevel smoothness clamped.\n");
       }
       else if(mBevelSmoothness > MAX_SMOOTHNESS)
       {
         mBevelSmoothness = MAX_SMOOTHNESS;
-        DALI_LOG_WARNING("Value for bevel smoothness clamped.\n");
+        DALI_LOG_DEBUG_INFO("Value for bevel smoothness clamped.\n");
       }
     }
     else

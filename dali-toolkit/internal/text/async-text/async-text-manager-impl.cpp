@@ -46,7 +46,6 @@ namespace Text
 {
 namespace Internal
 {
-
 AsyncTextManager::AsyncTextManager()
 : mLocale(),
   mTaskId(0u),
@@ -297,7 +296,7 @@ void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
   }
   else
   {
-    DALI_LOG_WARNING("LoadComplete -> Running task already removed! : %u\n", taskId);
+    DALI_LOG_DEBUG_INFO("LoadComplete -> Running task already removed! : %u\n", taskId);
   }
 
   for(auto iter = mRunningLoaders.begin(); iter != mRunningLoaders.end(); ++iter)

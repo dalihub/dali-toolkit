@@ -1126,7 +1126,7 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
 
   if(parameters.textWidth > maxTextureSize)
   {
-    DALI_LOG_WARNING("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", parameters.textWidth, maxTextureSize);
+    DALI_LOG_DEBUG_INFO("layoutSize(%f) > maxTextureSize(%d): To guarantee the behavior of Texture::New, layoutSize must not be bigger than maxTextureSize\n", parameters.textWidth, maxTextureSize);
     parameters.textWidth = maxTextureSize;
   }
 

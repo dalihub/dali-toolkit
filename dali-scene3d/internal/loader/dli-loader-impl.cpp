@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -709,7 +709,7 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
         }
         else if(value.GetType() == TreeNode::BOOLEAN)
         {
-          DALI_LOG_WARNING("\"bool\" uniforms are handled as floats in shader");
+          DALI_LOG_DEBUG_INFO("\"bool\" uniforms are handled as floats in shader");
           bool value = false;
           if(ReadBool(&keyValue.second, value))
           {
