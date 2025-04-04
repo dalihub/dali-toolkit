@@ -189,6 +189,16 @@ bool WebView::StopInspectorServer()
   return Dali::Toolkit::GetImpl(*this).StopInspectorServer();
 }
 
+bool WebView::SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
+{
+  return Dali::Toolkit::GetImpl(*this).SetImePositionAndAlignment(position, alignment);
+}
+
+void WebView::SetCursorThemeName(const std::string themeName)
+{
+  Dali::Toolkit::GetImpl(*this).SetCursorThemeName(themeName);
+}
+
 void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   Dali::Toolkit::GetImpl(*this).ScrollBy(deltaX, deltaY);
@@ -474,6 +484,25 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   Dali::Toolkit::GetImpl(*this).RegisterUserMediaPermissionRequestCallback(callback);
 }
 
+void WebView::RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterDeviceConnectionChangedCallback(callback);
+}
+
+void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterDeviceListGetCallback(callback);
+}
+
+void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
+{
+  Dali::Toolkit::GetImpl(*this).FeedMouseWheel(yDirection, step, x, y);
+}
+
+void WebView::SetVideoHole(bool enabled, bool isWaylandWindow)
+{
+  Dali::Toolkit::GetImpl(*this).SetVideoHole(enabled, isWaylandWindow);
+}
 
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)

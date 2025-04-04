@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,6 +267,21 @@ void WebSettings::SetExtraFeature(const std::string& feature, bool enable)
 bool WebSettings::IsExtraFeatureEnabled(const std::string& feature) const
 {
   return mWebEngineSettings.IsExtraFeatureEnabled(feature);
+}
+
+void WebSettings::SetImeStyle(int style)
+{
+  mWebEngineSettings.SetImeStyle(style);
+}
+
+int WebSettings::GetImeStyle() const
+{
+  return mWebEngineSettings.GetImeStyle();
+}
+
+void WebSettings::SetDefaultAudioInputDevice(const std::string& deviceId) const
+{
+  mWebEngineSettings.SetDefaultAudioInputDevice(deviceId);
 }
 
 

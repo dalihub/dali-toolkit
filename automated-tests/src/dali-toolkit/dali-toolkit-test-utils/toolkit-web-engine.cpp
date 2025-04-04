@@ -44,6 +44,7 @@
 #include <toolkit-application.h>
 #include <memory>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-plugin.h>
 
 namespace Dali
 {
@@ -905,7 +906,8 @@ public:
     mockClipboardEnabled(true),
     mockImePanelEnabled(true),
     mockImageLoadedAutomatically(true),
-    mockDefaultTextEncodingName()
+    mockDefaultTextEncodingName(),
+    mockImeStyle(9)
   {
   }
 
@@ -1135,6 +1137,20 @@ public:
     return true;
   }
 
+  void SetImeStyle(int style) override
+  {
+    mockImeStyle = style;
+  }
+
+  int GetImeStyle() const override
+  {
+    return mockImeStyle;
+  }
+
+  void SetDefaultAudioInputDevice(const std::string& deviceId) const override
+  {
+  }
+
 private:
   int         mockDefaultFontSize;
   bool        mockJavaScriptEnabled;
@@ -1152,6 +1168,7 @@ private:
   bool        mockImePanelEnabled;
   bool        mockImageLoadedAutomatically;
   std::string mockDefaultTextEncodingName;
+  int         mockImeStyle;
 };
 
 class MockWebEnginePlugin : public Dali::WebEnginePlugin
@@ -1519,6 +1536,31 @@ public:
   {
   }
   void RegisterUserMediaPermissionRequestCallback(WebEngineUserMediaPermissionRequestCallback callback) override
+  {
+  }
+
+  bool SetImePositionAndAlignment(Dali::Vector2 position, int alignment) override
+  {
+    return true;
+  }
+
+  void SetCursorThemeName(const std::string themeName) override
+  {
+  }
+
+  void RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback) override
+  {
+  }
+
+  void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback) override
+  {
+  }
+
+  void FeedMouseWheel(bool yDirection, int step, int x, int y) override
+  {
+  }
+
+  void SetVideoHole(bool enabled, bool isWaylandWindow) override
   {
   }
 
@@ -2030,6 +2072,31 @@ public:
     mUserMediaPermissionRequestCallback = callback;
   }
 
+  bool SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
+  {
+    return true;
+  }
+
+  void SetCursorThemeName(const std::string themeName)
+  {
+  }
+
+  void RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+  {
+  }
+
+  void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+  {
+  }
+
+  void FeedMouseWheel(bool yDirection, int step, int x, int y)
+  {
+  }
+
+  void SetVideoHole(bool enabled, bool isWaylandWindow)
+  {
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -2239,7 +2306,7 @@ bool OnLoadUrl()
     if(gInstance->mUserMediaPermissionRequestCallback)
     {
       std::unique_ptr<Dali::WebEngineUserMediaPermissionRequest> request(new MockUserMediaPermissionRequest());
-      gInstance->mUserMediaPermissionRequestCallback(std::move(request), "message");
+      gInstance->mUserMediaPermissionRequestCallback(request.get(), "message");
     }
   }
   return false;
@@ -3043,5 +3110,34 @@ void WebEngine::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin
   Internal::Adaptor::GetImplementation(*this).RegisterUserMediaPermissionRequestCallback(callback);
 }
 
+bool WebEngine::SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
+{
+  return Internal::Adaptor::GetImplementation(*this).SetImePositionAndAlignment(position, alignment);
+}
+
+void WebEngine::SetCursorThemeName(const std::string themeName)
+{
+  Internal::Adaptor::GetImplementation(*this).SetCursorThemeName(themeName);
+}
+
+void WebEngine::RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterDeviceConnectionChangedCallback(callback);
+}
+
+void WebEngine::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterDeviceListGetCallback(callback);
+}
+
+void WebEngine::FeedMouseWheel(bool yDirection, int step, int x, int y)
+{
+  Internal::Adaptor::GetImplementation(*this).FeedMouseWheel(yDirection, step, x, y);
+}
+
+void WebEngine::SetVideoHole(bool enabled, bool isWaylandWindow)
+{
+  Internal::Adaptor::GetImplementation(*this).SetVideoHole(enabled, isWaylandWindow);
+}
 
 } // namespace Dali
