@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_URL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ public:
    * Get the hash value of full URL
    * @return The hash value of url
    */
-  std::uint64_t GetUrlHash() const;
+  std::size_t GetUrlHash() const;
 
   /**
    * Get the visual type of the URL
@@ -225,7 +225,7 @@ private:
   Type         mType;
   ProtocolType mLocation;
 
-  mutable std::uint64_t mUrlHash;
+  mutable std::size_t mUrlHash;
 };
 
 } // namespace Internal
