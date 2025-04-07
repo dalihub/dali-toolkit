@@ -900,22 +900,3 @@ int UtcDaliVideoViewSynchronizationForWindowRotation(void)
 
   END_TEST;
 }
-
-// For coverage
-int UtcDaliVideoViewDisplayModeForCoverage(void)
-{
-  ToolkitTestApplication application;
-
-  VideoView videoView = VideoView::New();
-  DALI_TEST_CHECK(videoView);
-
-  Toolkit::DevelVideoView::SetAutoRotationEnabled(videoView, true);
-  // A false return is correct because there is no plugin.
-  DALI_TEST_EQUALS(false, Toolkit::DevelVideoView::IsAutoRotationEnabled(videoView), TEST_LOCATION);
-
-  Toolkit::DevelVideoView::SetLetterBoxEnabled(videoView, true);
-  // A false return is correct because there is no plugin.
-  DALI_TEST_EQUALS(false, Toolkit::DevelVideoView::IsLetterBoxEnabled(videoView), TEST_LOCATION);
-
-  END_TEST;
-}

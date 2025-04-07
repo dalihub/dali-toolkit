@@ -41,26 +41,6 @@ void PlayAnimation(VideoView videoView, Animation animation)
   Dali::Toolkit::GetImpl(videoView).PlayAnimation(animation);
 }
 
-void SetAutoRotationEnabled(VideoView videoView, bool enable)
-{
-  Dali::Toolkit::GetImpl(videoView).SetAutoRotationEnabled(enable);
-}
-
-bool IsAutoRotationEnabled(VideoView videoView)
-{
-return Dali::Toolkit::GetImpl(videoView).IsAutoRotationEnabled();
-}
-
-void SetLetterBoxEnabled(VideoView videoView, bool enable)
-{
-  Dali::Toolkit::GetImpl(videoView).SetLetterBoxEnabled(enable);
-}
-
-bool IsLetterBoxEnabled(VideoView videoView)
-{
-  return Dali::Toolkit::GetImpl(videoView).IsLetterBoxEnabled();
-}
-
 } // namespace DevelVideoView
 
 } // namespace Toolkit

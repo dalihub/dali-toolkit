@@ -60,38 +60,6 @@ DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
  */
 DALI_TOOLKIT_API void PlayAnimation(VideoView videoView, Animation animation);
 
-/**
- * @brief Sets auto rotation feature. If enabled, video will rotate automatically according to the video orientation.
- *
- * @param[in] videoView The current VideoView
- * @param[in] enable true if auto rotation should be enabled, false otherwise. Default value is false.
- */
-DALI_TOOLKIT_API void SetAutoRotationEnabled(VideoView videoView, bool enable);
-
-/**
- * @brief Checks whether auto rotation feature is enabled.
- *
- * @param[in] videoView The current VideoView
- * @return true if auto rotation is enabled, false otherwise. Default value is false.
- */
-DALI_TOOLKIT_API bool IsAutoRotationEnabled(VideoView videoView);
-
-/**
- * @brief Sets letter box feature. If enabled, the video will play in the video player's aspect ratio.
- *
- * @param[in] videoView The current VideoView
- * @param[in] enable true if letter box should be enabled, false otherwise. Default value is false.
- */
-DALI_TOOLKIT_API void SetLetterBoxEnabled(VideoView videoView, bool enable);
-
-/**
- * @brief Checks whether letter box feature is enabled.
- *
- * @param[in] videoView The current VideoView
- * @return true if letter box is enabled, false otherwise. Default value is false.
- */
-DALI_TOOLKIT_API bool IsLetterBoxEnabled(VideoView videoView);
-
 } // namespace DevelVideoView
 
 } // namespace Toolkit
