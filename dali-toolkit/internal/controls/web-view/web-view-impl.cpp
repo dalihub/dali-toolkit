@@ -508,6 +508,19 @@ bool WebView::StopInspectorServer()
   return mWebEngine ? mWebEngine.StopInspectorServer() : false;
 }
 
+bool WebView::SetImePositionAndAlignment(Dali::Vector2 position, int alignment)
+{
+  return mWebEngine ? mWebEngine.SetImePositionAndAlignment(position, alignment) : false;
+}
+
+void WebView::SetCursorThemeName(const std::string themeName)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetCursorThemeName(themeName);
+  }
+}
+
 void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   if(mWebEngine)
@@ -979,6 +992,43 @@ void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::
   if(mWebEngine)
   {
     mWebEngine.RegisterUserMediaPermissionRequestCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterDeviceConnectionChangedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterDeviceListGetCallback(std::move(callback));
+  }
+}
+
+void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.FeedMouseWheel(yDirection, step, x, y);
+  }
+}
+
+void WebView::SetVideoHole(bool enabled, bool isWaylandWindow)
+{
+  mVideoHoleEnabled = enabled;
+
+  EnableBlendMode(!mVideoHoleEnabled);
+
+  if(mWebEngine)
+  {
+    DALI_LOG_DEBUG_INFO("WebView[%p] SetVideoHole(%d) isWaylandWindow(%d)\n", this, mVideoHoleEnabled, isWaylandWindow);
+    mWebEngine.SetVideoHole(mVideoHoleEnabled, isWaylandWindow);
   }
 }
 

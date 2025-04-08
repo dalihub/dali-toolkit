@@ -363,10 +363,21 @@ static void OnWebAuthResponse()
   gWebAuthDisplayResponseCalled++;
 }
 
-static void OnUserMediaPermissionRequest(std::unique_ptr<Dali::WebEngineUserMediaPermissionRequest> request, const std::string& msg)
+static void OnUserMediaPermissionRequest(Dali::WebEngineUserMediaPermissionRequest*, const std::string&)
 {
   gUserMediaPermissionRequestCalled++;
 }
+
+//using WebEngineDeviceConnectionChangedCallback = std::function<void(int32_t)>;
+static void OnDeviceConnectionChanged(int32_t)
+{
+}
+
+//using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
+static void OnDeviceListGetCallback(Dali::WebEngineDeviceListGet*, int32_t)
+{
+}
+
 
 } // namespace
 
@@ -2406,6 +2417,43 @@ int UtcDaliWebSettingsSetExtraFeature(void)
   END_TEST;
 }
 
+int UtcDaliWebSettingsSetImeStyle(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK(settings != 0)
+
+  // Check the value is true or not
+  int value = settings->GetImeStyle();
+  DALI_TEST_CHECK(value);
+
+  settings->SetImeStyle(99);
+
+  value = settings->GetImeStyle();
+  DALI_TEST_EQUALS(value, 99, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsSetDefaultAudioInputDevice(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK(settings != 0)
+
+  settings->SetDefaultAudioInputDevice("test");
+
+  END_TEST;
+}
+
 int UtcDaliWebViewGetPlainText(void)
 {
   ToolkitTestApplication application;
@@ -2609,6 +2657,79 @@ int UtcDaliWebViewRegisterUserMediaPermissionRequestCallback(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gUserMediaPermissionRequestCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewSetImePositionAndAlignment(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  bool ret = view.SetImePositionAndAlignment(Vector2(0, 0), 9);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewSetCursorThemeName(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.SetCursorThemeName("test");
+
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterDeviceConnectionChangedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterDeviceConnectionChangedCallback(&OnDeviceConnectionChanged);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterDeviceListGetCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterDeviceListGetCallback(&OnDeviceListGetCallback);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewFeedMouseWheel(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.FeedMouseWheel(false, 1, 1, 1);
+
+  END_TEST;
+}
+
+int UtcDaliWebViewSetVideoHole(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.SetVideoHole(true, false);
+
   END_TEST;
 }
 
