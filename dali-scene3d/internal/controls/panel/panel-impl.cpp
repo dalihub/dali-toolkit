@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -36,6 +37,7 @@
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
+#include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
 #include <dali-scene3d/public-api/controls/panel/panel.h>
 #include <dali-scene3d/public-api/loader/light-parameters.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
@@ -68,7 +70,9 @@ DALI_TYPE_REGISTRATION_END()
 
 static constexpr Vector3 Y_DIRECTION(1.0f, -1.0f, 1.0f);
 
-constexpr int32_t PANEL_ORDER_INDEX = 90; // It should be lower value than SceneView's first RenderTask's value.
+static constexpr int32_t PANEL_ORDER_INDEX = 90; // It should be lower value than SceneView's first RenderTask's value.
+
+static constexpr uint32_t PANEL_CONSTRAINT_TAG = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 300;
 
 Dali::Geometry CreatePlaneGeometry(bool flip = false)
 {
@@ -395,6 +399,7 @@ void Panel::OnInitialize()
     output = output * Y_DIRECTION; });
   scaleConstraint.AddSource(Source{self, Dali::Actor::Property::SIZE});
   scaleConstraint.AddSource(Source{mPanelNode, mResolutionPropertyIndex});
+  Dali::Integration::ConstraintSetInternalTag(scaleConstraint, PANEL_CONSTRAINT_TAG);
   scaleConstraint.Apply();
 
   UpdateProperties();

@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
@@ -41,6 +42,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 
 using std::string;
 using namespace Dali;
@@ -65,7 +67,8 @@ const float   OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
 const float   DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION = 0.2f;
 
-const unsigned int OVERSHOOT_SIZE_CONSTRAINT_TAG(42);
+static constexpr uint32_t ITEM_VIEW_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 41);
+static constexpr uint32_t OVERSHOOT_SIZE_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 42);
 
 /**
  * Local helper to convert pan distance (in actor coordinates) to the layout-specific scrolling direction
@@ -298,7 +301,7 @@ void ApplyOvershootSizeConstraint(Actor overshootOverlay, float height)
   constraint.AddSource(ParentSource(Dali::Toolkit::ItemView::Property::SCROLL_DIRECTION));
   constraint.AddSource(ParentSource(Dali::Toolkit::ItemView::Property::LAYOUT_ORIENTATION));
   constraint.AddSource(ParentSource(Dali::Actor::Property::SIZE));
-  constraint.SetTag(OVERSHOOT_SIZE_CONSTRAINT_TAG);
+  Dali::Integration::ConstraintSetInternalTag(constraint, OVERSHOOT_SIZE_CONSTRAINT_TAG);
   constraint.Apply();
 }
 
@@ -1555,7 +1558,8 @@ void ItemView::SetOvershootSize(const Vector2& size)
   if(mOvershootOverlay)
   {
     // Remove old & add new size constraint
-    mOvershootOverlay.RemoveConstraints(OVERSHOOT_SIZE_CONSTRAINT_TAG);
+    Dali::Integration::HandleRemoveConstraints(mOvershootOverlay, OVERSHOOT_SIZE_CONSTRAINT_TAG);
+
     ApplyOvershootSizeConstraint(mOvershootOverlay, mOvershootSize.height);
   }
 }
@@ -1590,6 +1594,7 @@ void ItemView::EnableScrollOvershoot(bool enable)
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::SCROLL_DIRECTION));
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_ORIENTATION));
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::OVERSHOOT));
+      Dali::Integration::ConstraintSetInternalTag(constraint, ITEM_VIEW_CONSTRAINT_TAG);
       constraint.Apply();
 
       constraint = Constraint::New<Vector3>(mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint);
@@ -1597,14 +1602,17 @@ void ItemView::EnableScrollOvershoot(bool enable)
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::SCROLL_DIRECTION));
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_ORIENTATION));
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::OVERSHOOT));
+      Dali::Integration::ConstraintSetInternalTag(constraint, ITEM_VIEW_CONSTRAINT_TAG);
       constraint.Apply();
 
       constraint = Constraint::New<bool>(mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint);
       constraint.AddSource(ParentSource(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL));
+      Dali::Integration::ConstraintSetInternalTag(constraint, ITEM_VIEW_CONSTRAINT_TAG);
       constraint.Apply();
 
       constraint = Constraint::New<float>(mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint());
       constraint.AddSource(ParentSource(Toolkit::ItemView::Property::OVERSHOOT));
+      Dali::Integration::ConstraintSetInternalTag(constraint, ITEM_VIEW_CONSTRAINT_TAG);
       constraint.Apply();
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -43,6 +44,7 @@
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/light/light-impl.h>
+#include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
 
 using namespace Dali;
 
@@ -80,6 +82,8 @@ static constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
 static constexpr int32_t SCENE_ORDER_INDEX  = 100;
 static constexpr int32_t SHADOW_ORDER_INDEX = 99;
+
+static constexpr uint32_t SCENE_VIEW_CONSTRAINT_TAG = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 200;
 
 static constexpr std::string_view SKYBOX_INTENSITY_STRING = "uIntensity";
 static constexpr std::string_view Y_FLIP_MASK_TEXTURE     = "uYFlipMaskTexture";
@@ -300,6 +304,7 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::FAR_PLANE_DISTANCE});
   projectionMatrixConstraint.AddSource(Source{selectedCamera, Dali::CameraActor::Property::ASPECT_RATIO});
   projectionMatrixConstraint.AddSource(Source{shadowLightCamera, Dali::Actor::Property::WORLD_MATRIX});
+  Dali::Integration::ConstraintSetInternalTag(projectionMatrixConstraint, SCENE_VIEW_CONSTRAINT_TAG);
   projectionMatrixConstraint.ApplyPost();
 }
 

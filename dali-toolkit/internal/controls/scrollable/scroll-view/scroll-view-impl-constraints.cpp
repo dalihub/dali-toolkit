@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-constraints.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/constraint-integ.h>
+
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 
 namespace Dali
 {
@@ -30,6 +34,7 @@ namespace Internal
 {
 namespace
 {
+static constexpr uint32_t SCROLL_VIEW_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 40);
 
 float FinalDefaultAlphaFunction(float offset)
 {
@@ -433,6 +438,7 @@ void ScrollViewConstraints::UpdateMainInternalConstraint(ScrollView& scrollView)
     mScrollMainInternalPrePositionConstraint.AddSource(Source(detector, PanGestureDetector::Property::LOCAL_POSITION));
     mScrollMainInternalPrePositionConstraint.AddSource(Source(detector, PanGestureDetector::Property::PANNING));
     mScrollMainInternalPrePositionConstraint.AddSource(Source(scrollViewActor, Actor::Property::SIZE));
+    Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalPrePositionConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
     mScrollMainInternalPrePositionConstraint.Apply();
   }
 
@@ -446,17 +452,20 @@ void ScrollViewConstraints::UpdateMainInternalConstraint(ScrollView& scrollView)
   mScrollMainInternalPositionConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN));
   mScrollMainInternalPositionConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
   mScrollMainInternalPositionConstraint.AddSource(Source(scrollViewActor, Actor::Property::SIZE));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalPositionConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalPositionConstraint.Apply();
 
   mScrollMainInternalDeltaConstraint = Constraint::New<Vector2>(scrollViewActor, Toolkit::ScrollView::Property::SCROLL_POSITION_DELTA, InternalPositionDeltaConstraint);
   mScrollMainInternalDeltaConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_POSITION));
   mScrollMainInternalDeltaConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalDeltaConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalDeltaConstraint.Apply();
 
   mScrollMainInternalFinalConstraint = Constraint::New<Vector2>(scrollViewActor, Toolkit::ScrollView::Property::SCROLL_FINAL, InternalFinalConstraint(FinalDefaultAlphaFunction, FinalDefaultAlphaFunction));
   mScrollMainInternalFinalConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_POSITION));
   mScrollMainInternalFinalConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::OVERSHOOT_X));
   mScrollMainInternalFinalConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::OVERSHOOT_Y));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalFinalConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalFinalConstraint.Apply();
 
   mScrollMainInternalRelativeConstraint = Constraint::New<Vector2>(scrollViewActor, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION, InternalRelativePositionConstraint);
@@ -464,17 +473,20 @@ void ScrollViewConstraints::UpdateMainInternalConstraint(ScrollView& scrollView)
   mScrollMainInternalRelativeConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN));
   mScrollMainInternalRelativeConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
   mScrollMainInternalRelativeConstraint.AddSource(LocalSource(Actor::Property::SIZE));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalRelativeConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalRelativeConstraint.Apply();
 
   mScrollMainInternalDomainConstraint = Constraint::New<Vector2>(scrollViewActor, Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE, InternalScrollDomainConstraint);
   mScrollMainInternalDomainConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN));
   mScrollMainInternalDomainConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
   mScrollMainInternalDomainConstraint.AddSource(LocalSource(Actor::Property::SIZE));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalDomainConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalDomainConstraint.Apply();
 
   mScrollMainInternalPrePositionMaxConstraint = Constraint::New<Vector2>(scrollViewActor, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX, InternalPrePositionMaxConstraint);
   mScrollMainInternalPrePositionMaxConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
   mScrollMainInternalPrePositionMaxConstraint.AddSource(LocalSource(Actor::Property::SIZE));
+  Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalPrePositionMaxConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
   mScrollMainInternalPrePositionMaxConstraint.Apply();
 
   // When panning we want to make sure overshoot values are affected by pre position and post position
@@ -498,12 +510,14 @@ void ScrollViewConstraints::SetOvershootConstraintsEnabled(ScrollView& scrollVie
     mScrollMainInternalOvershootXConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION));
     mScrollMainInternalOvershootXConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_POSITION));
     mScrollMainInternalOvershootXConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL));
+    Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalOvershootXConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
     mScrollMainInternalOvershootXConstraint.Apply();
 
     mScrollMainInternalOvershootYConstraint = Constraint::New<float>(scrollViewActor, Toolkit::ScrollView::Property::OVERSHOOT_Y, OvershootYConstraint(scrollView.mMaxOvershoot.y));
     mScrollMainInternalOvershootYConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION));
     mScrollMainInternalOvershootYConstraint.AddSource(LocalSource(Toolkit::ScrollView::Property::SCROLL_POSITION));
     mScrollMainInternalOvershootYConstraint.AddSource(LocalSource(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL));
+    Dali::Integration::ConstraintSetInternalTag(mScrollMainInternalOvershootYConstraint, SCROLL_VIEW_CONSTRAINT_TAG);
     mScrollMainInternalOvershootYConstraint.Apply();
   }
   else
@@ -530,6 +544,7 @@ void ScrollViewConstraints::SetInternalConstraints(ScrollView& scrollView)
   constraint = Constraint::New<Vector3>(scrollViewActor, Actor::Property::POSITION, MoveActorConstraint);
   constraint.AddSource(Source(scrollViewActor, Toolkit::ScrollView::Property::SCROLL_POSITION));
   constraint.SetRemoveAction(Constraint::DISCARD);
+  Dali::Integration::ConstraintSetInternalTag(constraint, SCROLL_VIEW_CONSTRAINT_TAG);
   scrollView.ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
@@ -541,9 +556,9 @@ void ScrollViewConstraints::SetInternalConstraints(ScrollView& scrollView)
   constraint.AddSource(Source(scrollViewActor, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
   constraint.AddSource(Source(scrollViewActor, Toolkit::ScrollView::Property::WRAP));
   constraint.SetRemoveAction(Constraint::DISCARD);
+  Dali::Integration::ConstraintSetInternalTag(constraint, SCROLL_VIEW_CONSTRAINT_TAG);
   scrollView.ApplyConstraintToBoundActors(constraint);
 }
-
 
 } // namespace Internal
 
