@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
 
-  shader = factoryCache.GetShader(shaderType);
+  shader = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
   if(shader)
   {
     return shader;
@@ -135,7 +135,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       if(mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE)
       {
         shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) - NATIVE_SHADER_TYPE_OFFSET);
-        shader     = factoryCache.GetShader(shaderType);
+        shader     = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
       }
     }
   }
@@ -145,7 +145,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     return shader;
   }
 
-  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, featureBuilder.IsDefaultTransformUsed());
 
   shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
                                  ((featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0)));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,6 +305,7 @@ void TextVisual::OnInitialize()
   Shader   shader         = GetTextShader(mFactoryCache, featureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
+  mImpl->mRenderer.RegisterVisualTransformUniform();
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mTextRequireRenderPropertyIndex = mImpl->mRenderer.RegisterUniqueProperty("requireRender", mTextRequireRender);
   mHasMultipleTextColorsIndex     = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", static_cast<float>(false));
@@ -711,7 +712,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sa
   renderer.SetTextures(textureSet);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(renderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(renderer, Direction::LEFT_TO_RIGHT);
 
   // Enable the pre-multiplied alpha to improve the text quality
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
@@ -882,7 +883,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
       mImpl->mRenderer.SetTextures(textureSet);
       // Register transform properties
-      mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+      mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
       mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(mTextShaderFeatureCache.IsEnabledMultiColor()));
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
@@ -938,6 +939,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       while(verifiedHeight > 0)
       {
         VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
+        tilingRenderer.RegisterVisualTransformUniform();
         tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
         // New offset position of buffer for tiling.
         info.offsetHeight += static_cast<uint32_t>(maxTextureSize);
@@ -1166,7 +1168,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
     mImpl->mRenderer.SetTextures(textureSet);
     // Register transform properties
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
     mImpl->mRenderer.SetProperty(mHasMultipleTextColorsIndex, static_cast<float>(hasMultipleTextColors));
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
@@ -1235,6 +1237,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     while(verifiedHeight > 0)
     {
       VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
+      tilingRenderer.RegisterVisualTransformUniform();
       tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
       // New offset position of buffer for tiling.
       info.offsetHeight += maxTextureSize;

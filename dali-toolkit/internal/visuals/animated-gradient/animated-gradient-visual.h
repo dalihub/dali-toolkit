@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_GRADIENT_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,11 +200,6 @@ protected: //from Visual
   void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
-   * @copydoc Visual::Base::OnSetTransform
-   */
-  void OnSetTransform() override;
-
-  /**
    * @copydoc Visual::Base::DoSetOnScene
    */
   void DoSetOnScene(Actor& actor) override;
@@ -213,6 +208,16 @@ protected: //from Visual
    * @copydoc Visual::Base::DoSetOffScene
    */
   void DoSetOffScene(Actor& actor) override;
+
+  /**
+   * @copydoc Visual::Base::OnSetTransform
+   */
+  void OnSetTransform() override;
+
+  /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
 
 private:
   /**

@@ -463,7 +463,19 @@ void AnimatedGradientVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
+  }
+}
+
+void AnimatedGradientVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GetOrCreateShader();
+    mImpl->mRenderer.SetShader(shader);
   }
 }
 
@@ -597,61 +609,65 @@ Shader AnimatedGradientVisual::GetOrCreateShader()
 
   VisualFactoryCache::ShaderType shaderType = GetShaderType(mGradientType, mUnitType, mSpreadType);
 
-  std::string tagUnit;
-  std::string tagGrad;
-  std::string tagSpread;
-  switch(mUnitType)
+  shader = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
+  if(!shader)
   {
-    case Toolkit::DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX:
+    std::string tagUnit;
+    std::string tagGrad;
+    std::string tagSpread;
+    switch(mUnitType)
     {
-      tagUnit = "UNIT_TYPE_BOUNDING_BOX";
-      break;
+      case Toolkit::DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX:
+      {
+        tagUnit = "UNIT_TYPE_BOUNDING_BOX";
+        break;
+      }
+      case Toolkit::DevelAnimatedGradientVisual::UnitType::USER_SPACE:
+      {
+        tagUnit = "UNIT_TYPE_USER";
+        break;
+      }
     }
-    case Toolkit::DevelAnimatedGradientVisual::UnitType::USER_SPACE:
+    switch(mGradientType)
     {
-      tagUnit = "UNIT_TYPE_USER";
-      break;
+      case Toolkit::DevelAnimatedGradientVisual::GradientType::LINEAR:
+      {
+        tagGrad = "GRADIENT_TYPE_LINEAR";
+        break;
+      }
+      case Toolkit::DevelAnimatedGradientVisual::GradientType::RADIAL:
+      {
+        tagGrad = "GRADIENT_TYPE_RADIAL";
+        break;
+      }
     }
-  }
-  switch(mGradientType)
-  {
-    case Toolkit::DevelAnimatedGradientVisual::GradientType::LINEAR:
+    switch(mSpreadType)
     {
-      tagGrad = "GRADIENT_TYPE_LINEAR";
-      break;
+      case Toolkit::DevelAnimatedGradientVisual::SpreadType::REFLECT:
+      {
+        tagSpread = "SPREAD_TYPE_REFLECT";
+        break;
+      }
+      case Toolkit::DevelAnimatedGradientVisual::SpreadType::REPEAT:
+      {
+        tagSpread = "SPREAD_TYPE_REPEAT";
+        break;
+      }
+      case Toolkit::DevelAnimatedGradientVisual::SpreadType::CLAMP:
+      {
+        tagSpread = "SPREAD_TYPE_CLAMP";
+        break;
+      }
     }
-    case Toolkit::DevelAnimatedGradientVisual::GradientType::RADIAL:
-    {
-      tagGrad = "GRADIENT_TYPE_RADIAL";
-      break;
-    }
-  }
-  switch(mSpreadType)
-  {
-    case Toolkit::DevelAnimatedGradientVisual::SpreadType::REFLECT:
-    {
-      tagSpread = "SPREAD_TYPE_REFLECT";
-      break;
-    }
-    case Toolkit::DevelAnimatedGradientVisual::SpreadType::REPEAT:
-    {
-      tagSpread = "SPREAD_TYPE_REPEAT";
-      break;
-    }
-    case Toolkit::DevelAnimatedGradientVisual::SpreadType::CLAMP:
-    {
-      tagSpread = "SPREAD_TYPE_CLAMP";
-      break;
-    }
-  }
 
-  std::string vert;
-  std::string frag;
+    std::string vert;
+    std::string frag;
 
-  vert = "#define " + tagUnit + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_VERT.data();
-  frag = "#define " + tagGrad + "\n" + "#define " + tagSpread + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_FRAG.data();
+    vert = "#define " + tagUnit + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_VERT.data();
+    frag = "#define " + tagGrad + "\n" + "#define " + tagSpread + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_FRAG.data();
 
-  shader = mFactoryCache.GenerateAndSaveShader(shaderType, vert, frag);
+    shader = mFactoryCache.GenerateAndSaveShader(shaderType, vert, frag, mImpl->mTransformMapUsingDefault);
+  }
   return shader;
 }
 
@@ -672,7 +688,7 @@ void AnimatedGradientVisual::OnInitialize()
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_OFFSET_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::OFFSET, OFFSET_NAME));
 
   //Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 } //namespace Internal
