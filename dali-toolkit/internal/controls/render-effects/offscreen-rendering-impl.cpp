@@ -54,12 +54,6 @@ void OffScreenRenderingImpl::SetType(DevelControl::OffScreenRenderingType type)
   }
 }
 
-RenderEffectImplPtr OffScreenRenderingImpl::Clone() const
-{
-  DALI_LOG_ERROR("Cloning offscreen rendering is not allowed.\n");
-  return RenderEffectImplPtr();
-}
-
 OffScreenRenderable::Type OffScreenRenderingImpl::GetOffScreenRenderableType()
 {
   return OffScreenRenderable::Type::FORWARD;
@@ -90,6 +84,7 @@ void OffScreenRenderingImpl::OnActivate()
   Toolkit::Control control = GetOwnerControl();
   control.GetImplementation().SetCacheRenderer(renderer);
   control.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  mRenderTask.SetScreenToFrameBufferMappingActor(control);
 }
 
 void OffScreenRenderingImpl::OnDeactivate()
@@ -137,7 +132,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
   mRenderTask.SetSourceActor(control);
   mRenderTask.SetCameraActor(GetCameraActor());
   mRenderTask.SetExclusive(true);
-  mRenderTask.SetInputEnabled(false);
+  mRenderTask.SetInputEnabled(true);
   mRenderTask.SetFrameBuffer(mFrameBuffer);
   mRenderTask.SetClearEnabled(true);
   mRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());

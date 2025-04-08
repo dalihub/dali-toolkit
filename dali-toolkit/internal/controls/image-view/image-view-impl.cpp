@@ -149,7 +149,6 @@ void ImageView::SetImage(const Property::Map& map)
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -198,6 +197,9 @@ void ImageView::SetImage(const Property::Map& map)
     }
 
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
+
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
   }
   else
   {
@@ -231,7 +233,6 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     // This previous visual will be deleted when transition effect is done.
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -271,6 +272,9 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     }
 
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
+
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
   }
   else
   {
@@ -512,6 +516,10 @@ void ImageView::ShowPlaceholderImage()
   if(mPlaceholderVisual)
   {
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
+
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
+
     Actor self = Self();
     Toolkit::GetImplementation(mPlaceholderVisual).SetOnScene(self);
   }

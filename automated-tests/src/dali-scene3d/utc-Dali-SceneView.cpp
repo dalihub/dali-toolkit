@@ -1671,7 +1671,7 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  control1.SetRenderEffect(RenderEffect::CreateBackgroundBlurEffect());
+  control1.SetRenderEffect(BackgroundBlurEffect::New());
 
   sceneView.Add(control1);
 

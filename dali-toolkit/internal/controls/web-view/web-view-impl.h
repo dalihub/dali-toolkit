@@ -188,6 +188,21 @@ public:
   bool StopInspectorServer();
 
   /**
+   * @brief Set the style of IME.
+   * @param[in] position Position of IME.
+   * @param[in] alignment Alignment of IME.
+   *
+   * @return true if succeeded, false otherwise
+   */
+  bool SetImePositionAndAlignment(Dali::Vector2 position, int alignment);
+
+  /**
+   * @brief Set the theme name of cursor.
+   * @param[in] themeName The name of theme of cursor.
+   */
+  void SetCursorThemeName(const std::string themeName);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::ScrollBy()
    */
   void ScrollBy(int32_t deltaX, int32_t deltaY);
@@ -466,6 +481,26 @@ public:
    * @copydoc Dali::Toolkit::WebView::RegisterUserMediaPermissionRequestCallback()
    */
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterDeviceConnectionChangedCallback()
+   */
+  void RegisterDeviceConnectionChangedCallback(Dali::WebEnginePlugin::WebEngineDeviceConnectionChangedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterDeviceListGetCallback()
+   */
+  void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FeedMouseWheel()
+   */
+  void FeedMouseWheel(bool yDirection, int step, int x, int y);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::SetVideoHole()
+   */
+  void SetVideoHole(bool enabled, bool isWaylandWindow);
 
 public: // Properties
   /**

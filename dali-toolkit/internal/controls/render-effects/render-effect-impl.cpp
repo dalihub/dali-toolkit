@@ -125,15 +125,6 @@ bool RenderEffectImpl::IsActivated() const
 
 void RenderEffectImpl::Initialize()
 {
-  if(!mCamera)
-  {
-    mCamera = CameraActor::New();
-    mCamera.SetInvertYAxis(true);
-    mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-    mCamera.SetType(Dali::Camera::FREE_LOOK);
-  }
-
   if(!mRenderer)
   {
     mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
@@ -191,8 +182,15 @@ void RenderEffectImpl::Activate()
     }
     mPlacementSceneHolder = sceneHolder;
 
-    Vector2 size = GetTargetSize();
-    mCamera.SetPerspectiveProjection(size);
+    if(!mCamera)
+    {
+      mCamera = CameraActor::New();
+      mCamera.SetInvertYAxis(true);
+      mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+      mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      mCamera.SetType(Dali::Camera::FREE_LOOK);
+    }
+    mCamera.SetPerspectiveProjection(GetTargetSize());
     ownerControl.Add(mCamera);
 
     // Activate logic for subclass.
@@ -203,10 +201,12 @@ void RenderEffectImpl::Activate()
     if(cornerRadius != Vector4::ZERO)
     {
       int32_t cornerRadiusPolicy = ownerControl.GetProperty<int32_t>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
+      Vector4 cornerSquareness   = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
 
       Property::Map map;
       map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
       map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
+      map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
 
       SetCornerConstants(map);
     }
@@ -225,7 +225,10 @@ void RenderEffectImpl::Deactivate()
     // Deactivate logic for subclass.
     OnDeactivate();
 
-    mCamera.Unparent();
+    if(mCamera)
+    {
+      mCamera.Unparent();
+    }
   }
 }
 

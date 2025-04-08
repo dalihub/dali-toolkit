@@ -171,21 +171,19 @@ void Control::ClearBackground()
 
 void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 {
+  ClearRenderEffect();
+
   if(effect)
   {
     Internal::RenderEffectImpl* object = dynamic_cast<Internal::RenderEffectImpl*>(effect.GetObjectPtr());
-    DALI_ASSERT_ALWAYS(object && "Not a valid RenderEffect set.");
+    DALI_ASSERT_ALWAYS(object && "Given render effect is not valid.");
 
-    ClearRenderEffect();
-
-    RenderEffectImplPtr clone = object->Clone();
-
-    SetOffScreenRenderableType(clone->GetOffScreenRenderableType());
+    SetOffScreenRenderableType(object->GetOffScreenRenderableType());
 
     Dali::Toolkit::Control ownerControl(GetOwner());
-    clone->SetOwnerControl(ownerControl);
+    object->SetOwnerControl(ownerControl);
 
-    mImpl->mRenderEffect = clone;
+    mImpl->mRenderEffect = object;
   }
   else
   {

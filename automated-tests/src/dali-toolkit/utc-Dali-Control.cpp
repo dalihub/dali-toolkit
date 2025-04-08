@@ -1634,13 +1634,15 @@ int UtcDaliControlCornerRadius(void)
 
   application.GetScene().Add(control);
 
-  RenderEffect effect = RenderEffect::CreateBackgroundBlurEffect(0.25f, 50.0f);
+  RenderEffect effect = BackgroundBlurEffect::New(0.25f, 50.0f);
   control.SetRenderEffect(effect);
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
 
-  Vector4 vector = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
-  control.SetProperty(DevelControl::Property::CORNER_RADIUS, vector); // default: relative policy
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius); // default: relative policy
   control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::Type::RELATIVE);
+  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness);
   tet_infoline("Sync with render effects.");
 
   application.SendNotification();
@@ -1648,7 +1650,9 @@ int UtcDaliControlCornerRadius(void)
 
   Vector4 retrievedVector;
   control.GetProperty(DevelControl::Property::CORNER_RADIUS).Get(retrievedVector);
-  DALI_TEST_CHECK(retrievedVector == vector);
+  DALI_TEST_CHECK(retrievedVector == radius);
+  control.GetProperty(DevelControl::Property::CORNER_SQUARENESS).Get(retrievedVector);
+  DALI_TEST_CHECK(retrievedVector == squreness);
 
   control.ClearRenderEffect();
   control.ClearBackground();

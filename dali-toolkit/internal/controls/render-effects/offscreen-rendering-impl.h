@@ -59,8 +59,6 @@ public:
    */
   void SetType(DevelControl::OffScreenRenderingType type);
 
-  // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::Clone
-  RenderEffectImplPtr Clone() const override;
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
   OffScreenRenderable::Type GetOffScreenRenderableType() override;
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks

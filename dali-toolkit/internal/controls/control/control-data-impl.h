@@ -491,10 +491,11 @@ private:
 
   /**
    * Set corner radius to this control.
-   * @param[in] vector Corner radius property value
+   * @param[in] radius Corner radius property value
    * @param[in] policy Corner radius policy. Default value is ABSOLUTE.
+   * @param[in] squareness Corner squareness property value
    */
-  void SetCornerRadius(Vector4 vector, Toolkit::Visual::Transform::Policy::Type policy);
+  void SetCornerRadius(Vector4 radius, Toolkit::Visual::Transform::Policy::Type policy, Vector4 squareness);
 
 public:
   Control&            mControlImpl;
@@ -515,6 +516,7 @@ public:
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
   Vector4                                   mCornerRadius;       ///< The corner radius of this control
   Toolkit::Visual::Transform::Policy::Type  mCornerRadiusPolicy; ///< The corner radius policy of this control
+  Vector4                                   mCornerSquareness;   ///< The corner squareness of this control
   RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
@@ -583,6 +585,7 @@ public:
   static const PropertyRegistration PROPERTY_31;
   static const PropertyRegistration PROPERTY_32;
   static const PropertyRegistration PROPERTY_33;
+  static const PropertyRegistration PROPERTY_34;
 };
 
 } // namespace Internal
