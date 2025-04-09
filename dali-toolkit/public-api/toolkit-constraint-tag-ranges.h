@@ -1,5 +1,5 @@
-#ifndef DALI_DEVEL_TOOLKIT_PROPERTY_INDEX_RANGES_H
-#define DALI_DEVEL_TOOLKIT_PROPERTY_INDEX_RANGES_H
+#ifndef DALI_TOOLKIT_CONSTRAINT_TAG_RANGES_H
+#define DALI_TOOLKIT_CONSTRAINT_TAG_RANGES_H
 
 /*
  * Copyright (c) 2025 Samsung Electronics Co., Ltd.
@@ -35,4 +35,4 @@ enum ConstraintTagRanges
 
 } // namespace Dali::Toolkit
 
-#endif // DALI_DEVEL_TOOLKIT_PROPERTY_INDEX_RANGES_H
+#endif // DALI_TOOLKIT_CONSTRAINT_TAG_RANGES_H
