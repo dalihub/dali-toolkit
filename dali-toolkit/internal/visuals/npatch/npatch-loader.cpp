@@ -22,7 +22,6 @@
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 // EXTERNAL HEADERS
-#include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -202,7 +201,7 @@ void NPatchLoader::Process(bool postProcessor)
 
 NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad)
 {
-  std::size_t                              hash  = CalculateHash(url.GetUrl());
+  std::size_t                              hash  = url.GetUrlHash();
   std::vector<NPatchInfo>::size_type       index = UNINITIALIZED_ID;
   const std::vector<NPatchInfo>::size_type count = mCache.size();
 

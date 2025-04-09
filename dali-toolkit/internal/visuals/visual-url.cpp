@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,9 +311,9 @@ std::string VisualUrl::GetEllipsedUrl() const
   return mUrl;
 }
 
-std::uint64_t VisualUrl::GetUrlHash() const
+std::size_t VisualUrl::GetUrlHash() const
 {
-  return DALI_UNLIKELY(mUrlHash == 0) ? (mUrlHash = Dali::CalculateHash(mUrl)) : mUrlHash;
+  return DALI_UNLIKELY(mUrlHash == 0) ? (mUrlHash = Dali::CalculateHash(std::string_view(mUrl.data(), mUrl.size()))) : mUrlHash;
 }
 
 VisualUrl::Type VisualUrl::GetType() const
