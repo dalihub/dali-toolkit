@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1305,14 +1305,14 @@ void UsdLoaderImpl::Impl::ConvertCamera(LoadResult& output, const UsdPrim& prim)
 
   Radian yFOV = Radian(gfCamera.GetFieldOfView(GfCamera::FOVVertical));
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "yFOV: %f, ", yFOV.radian);
-  cameraParameters[0].yFovDegree = Degree(gfCamera.GetFieldOfView(GfCamera::FOVVertical));
+  cameraParameters[0].yFovDegree = Degree(yFOV);
 
   float aspectRatio = gfCamera.GetAspectRatio();
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "aspectRatio: %.7f, ", aspectRatio);
   cameraParameters[0].aspectRatio = aspectRatio;
 
-  float apertureX = gfCamera.GetHorizontalAperture() / 10.0f;
-  float apertureY = gfCamera.GetVerticalAperture() / 10.0f;
+  [[maybe_unused]] float apertureX = gfCamera.GetHorizontalAperture() / 10.0f;
+  [[maybe_unused]] float apertureY = gfCamera.GetVerticalAperture() / 10.0f;
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "apertureX: %.7f, apertureY: %.7f\n", apertureX, apertureY);
 
   // Apply the camera's transform matrix to the camera parameters
