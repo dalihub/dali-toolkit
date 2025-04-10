@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1277,6 +1277,212 @@ int UtcDaliBuilderPathConstraintsP(void)
     "          [\n"
     "            {\n"
     "              \"source\": \"Image1\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"Image1\",\n"
+    "              \"targetProperty\": \"colorBlue\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
+    "        }\n"
+    "      ]\n"
+    "    }\n"
+    "  ],\n"
+    "  \"paths\":\n"
+    "  {\n"
+    "    \"path0\":\n"
+    "    {\n"
+    "      \"points\":[ [-150, -50, 0], [0.0,70.0,0.0], [190.0,-150.0,0.0] ],\n"
+    "      \"curvature\":0.35\n"
+    "    }\n"
+    "  },\n"
+    "  \"constrainers\":\n"
+    "  {\n"
+    "    \"constrainer0\":\n"
+    "    {\n"
+    "      \"type\": \"PathConstrainer\",\n"
+    "      \"points\": [ [0, 0, 0], [0,0,0], [0,0,0] ],\n"
+    "      \"controlPoints\": [ [0, 0, 0], [0,0,0], [0,0,0] ]\n"
+    "    },\n"
+    "    \"constrainer1\":\n"
+    "    {\n"
+    "      \"type\": \"LinearConstrainer\",\n"
+    "      \"value\": [ 0, 0, 0 ]\n"
+    "    }\n"
+    "  },\n"
+    "  \"animations\": {\n"
+    "    \"pathAnimation\": {\n"
+    "      \"duration\": 3.0,\n"
+    "      \"properties\":\n"
+    "      [{\n"
+    "        \"actor\": \"Image1\",\n"
+    "        \"path\":\"path0\",\n"
+    "        \"forward\":[1,0,0],\n"
+    "        \"alphaFunction\": \"EASE_IN_OUT\",\n"
+    "        \"timePeriod\": {\n"
+    "          \"delay\": 0,\n"
+    "          \"duration\": 3\n"
+    "        }\n"
+    "      },\n"
+    "       {\n"
+    "         \"actor\": \"Image1\",\n"
+    "         \"property\": \"uTime\",\n"
+    "         \"value\": 10.0,\n"
+    "         \"alphaFunction\": \"LINEAR\",\n"
+    "         \"timePeriod\": {\n"
+    "           \"delay\": 0,\n"
+    "           \"duration\": 10.0\n"
+    "         },\n"
+    "         \"gui-builder-timeline-color\": \"#8dc0da\"\n"
+    "       }]\n"
+    "    },\n"
+    "    \"Animation_1\": {\n"
+    "      \"loop\":true,\n"
+    "      \"properties\": [\n"
+    "        {\n"
+    "          \"actor\": \"Image1\",\n"
+    "          \"property\": \"uTime\",\n"
+    "          \"value\": 10.0,\n"
+    "          \"alphaFunction\": \"LINEAR\",\n"
+    "          \"timePeriod\": {\n"
+    "            \"delay\": 0,\n"
+    "            \"duration\": 10.0\n"
+    "          },\n"
+    "          \"gui-builder-timeline-color\": \"#8dc0da\"\n"
+    "        }\n"
+    "      ]\n"
+    "    }\n"
+    "  }\n"
+    "}\n");
+
+  Builder builder = Builder::New();
+
+  // frame buffer coverage
+  builder.LoadFromString(json);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Dali::Path path = builder.GetPath("path0");
+  DALI_TEST_CHECK(path);
+
+  Dali::Path path2 = builder.GetPath("path0");
+  DALI_TEST_CHECK(path2);
+  DALI_TEST_CHECK(path == path2);
+
+  Dali::PathConstrainer constrainer0 = builder.GetPathConstrainer("constrainer0");
+  DALI_TEST_CHECK(constrainer0);
+
+  Dali::PathConstrainer constrainer0_2 = builder.GetPathConstrainer("constrainer0");
+  DALI_TEST_CHECK(constrainer0_2);
+  DALI_TEST_CHECK(constrainer0 == constrainer0_2);
+
+  Dali::LinearConstrainer constrainer1 = builder.GetLinearConstrainer("constrainer1");
+  DALI_TEST_CHECK(constrainer1);
+
+  Dali::LinearConstrainer constrainer1_2 = builder.GetLinearConstrainer("constrainer1");
+  DALI_TEST_CHECK(constrainer1 == constrainer1_2);
+
+  // For coverage
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  builder.AddActors(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  actor.GetChildAt(0).Unparent();
+
+  END_TEST;
+}
+
+int UtcDaliBuilderPathConstraintsN(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Signals and constraints with invalid names, For line coverage\n");
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+    "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"FB_WIDTH\": 200.0,\n"
+    "    \"FB_HEIGHT\": 200.0,\n"
+    "    \"FB_SIZE\": [200,200],\n"
+    "    \"FB_ASPECT_RATIO\": 1\n"
+    "  },\n"
+    "  \"stage\": [\n"
+    "    {\n"
+    "      \"type\": \"ImageView\",\n"
+    "      \"name\": \"Image1\",\n"
+    "      \"size\": [200, 200, 0],\n"
+    "      \"parentOrigin\": [0.5, 0.5, 0.5],\n"
+    "      \"effect\": \"Ripple2D\",\n"
+    "      \"image\": {\n"
+    "        \"url\": \"{DALI_IMAGE_DIR}gallery-medium-25.jpg\"\n"
+    "      },\n"
+    "      \"signals\": [\n"
+    "        {\n"
+    "          \"name\": \"onScene\",\n"
+    "          \"action\": \"play\",\n"
+    "          \"animation\": \"INVALID\"\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"onScene\",\n"
+    "          \"action\": \"applyConstraint\",\n"
+    "          \"constrainer\": \"constrainer0\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"Image1\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"INVALID\",\n"
+    "              \"targetProperty\": \"colorRed\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"onScene\",\n"
+    "          \"action\": \"applyConstraint\",\n"
+    "          \"constrainer\": \"constrainer1\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"INVALID\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"Image1\",\n"
+    "              \"targetProperty\": \"colorBlue\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"offScene\",\n"
+    "          \"action\": \"removeConstraints\",\n"
+    "          \"constrainer\": \"constrainer0\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"Image1\",\n"
+    "              \"sourceProperty\": \"positionX\",\n"
+    "              \"target\": \"INVALID\",\n"
+    "              \"targetProperty\": \"colorRed\",\n"
+    "              \"range\": [-300,300]\n"
+    "            }\n"
+    "          ]\n"
+    "        },\n"
+    "        {\n"
+    "          \"name\": \"offScene\",\n"
+    "          \"action\": \"removeConstraints\",\n"
+    "          \"constrainer\": \"constrainer1\",\n"
+    "          \"properties\":\n"
+    "          [\n"
+    "            {\n"
+    "              \"source\": \"INVALID\",\n"
     "              \"sourceProperty\": \"positionX\",\n"
     "              \"target\": \"Image1\",\n"
     "              \"targetProperty\": \"colorBlue\",\n"
