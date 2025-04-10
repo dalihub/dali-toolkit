@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,13 @@ void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali
   Internal::Control&       controlInternal = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlInternal);
   controlDataImpl.DoActionExtension(visualIndex, actionId, attributes);
+}
+
+void EnableCornerPropertiesOverridden(Control& control, Visual::Base& visual, bool enable)
+{
+  Internal::Control&       controlInternal = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlInternal);
+  controlDataImpl.EnableCornerPropertiesOverridden(visual, enable);
 }
 
 void SetInputMethodContext(Internal::Control& control, InputMethodContext& inputMethodContext)
