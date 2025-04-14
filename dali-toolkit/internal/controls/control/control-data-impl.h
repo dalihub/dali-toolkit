@@ -583,9 +583,10 @@ public:
   static const PropertyRegistration PROPERTY_29;
   static const PropertyRegistration PROPERTY_30;
   static const PropertyRegistration PROPERTY_31;
-  static const PropertyRegistration PROPERTY_32;
-  static const PropertyRegistration PROPERTY_33;
-  static const PropertyRegistration PROPERTY_34;
+
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_1;
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_2;
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_3;
 };
 
 } // namespace Internal

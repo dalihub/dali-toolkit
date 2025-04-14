@@ -272,7 +272,7 @@ enum
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
    */
-  CORNER_RADIUS,
+  CORNER_RADIUS = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000,
 
   /**
    * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
