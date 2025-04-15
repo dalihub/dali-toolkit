@@ -267,7 +267,7 @@ enum
 
   /**
    * @brief The radius for the rounded corners of the control.
-   * @details Name "cornerRadius", type Property::VECTOR4
+   * @details Name "viewCornerRadius", type Property::VECTOR4
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
@@ -276,7 +276,7 @@ enum
 
   /**
    * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
-   * @details Name "cornerRadiusPolicy", type Property::INTEGER.
+   * @details Name "viewCornerRadiusPolicy", type Property::INTEGER.
    * @see Policy::Type
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS_POLICY
    */
@@ -284,7 +284,7 @@ enum
 
   /**
    * @brief The squareness for the rounded corners of the control.
-   * @details Name "cornerSquareness", type Property::VECTOR4
+   * @details Name "viewCornerSquareness", type Property::VECTOR4
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_SQUARENESS
