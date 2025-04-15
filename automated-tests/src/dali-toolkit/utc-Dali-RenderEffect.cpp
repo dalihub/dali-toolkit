@@ -19,6 +19,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
+#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
 using namespace Dali;
@@ -34,6 +35,20 @@ int UtcDaliRenderEffectNewP(void)
 
   RenderEffect blurEffect2 = BackgroundBlurEffect::New(0.5f, 10);
   DALI_TEST_CHECK(blurEffect2);
+
+  Control control = Control::New();
+
+  RenderEffect maskEffect1 = MaskEffect::New(control);
+  DALI_TEST_CHECK(maskEffect1);
+
+  RenderEffect maskEffect2 = MaskEffect::New(control, MaskEffect::MaskMode::LUMINANCE, Vector2(0.f, 0.f), Vector2(1.f, 1.f));
+  DALI_TEST_CHECK(maskEffect2);
+
+  MaskEffect maskEffect3 = MaskEffect::New(control);
+  DALI_TEST_CHECK(maskEffect3);
+
+  MaskEffect maskEffect4 = maskEffect3;
+  DALI_TEST_CHECK(maskEffect4);
 
   END_TEST;
 }
@@ -83,6 +98,12 @@ int UtcDaliRenderEffectActivateP01(void)
   taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
 
+  Control newControl = Control::New();
+  childControl.SetRenderEffect(MaskEffect::New(newControl));
+
+  taskList = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -116,6 +137,37 @@ int UtcDaliRenderEffectActivateP02(void)
   END_TEST;
 }
 
+int UtcDaliRenderEffectActivateP03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectActivateP03");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  scene.Add(control);
+
+  Control newControl = Control::New();
+  RenderEffect maskEffect = MaskEffect::New(newControl);
+  control.SetRenderEffect(maskEffect);
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  Control control2 = Control::New();
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  scene.Add(control2);
+
+  control2.SetRenderEffect(maskEffect);
+  taskList = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderEffectDeactivateP(void)
 {
   ToolkitTestApplication application;
@@ -139,6 +191,17 @@ int UtcDaliRenderEffectDeactivateP(void)
   taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+  Control newControl = Control::New();
+  count = control.GetRendererCount();
+  control.SetRenderEffect(MaskEffect::New(newControl));
+
+  taskList = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  control.ClearRenderEffect();
+  taskList = scene.GetRenderTaskList();
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -842,6 +905,77 @@ int UtcDaliRenderEffectBlurOnce(void)
   DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
   tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
   DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMaskEffect(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliMaskEffect");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  scene.Add(control);
+
+  Control maskControl = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  // Add render effect during scene on.
+  control.SetRenderEffect(MaskEffect::New(maskControl));
+
+  // send notification.
+  application.SendNotification();
+  application.Render();
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(3.0f, 3.0f));
+
+  // send notification twice to refresh.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMaskEffectScaleN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliMaskEffect");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  scene.Add(control);
+
+  Control maskControl = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  // adjust to epsilon.
+  control.SetRenderEffect(MaskEffect::New(maskControl, MaskEffect::MaskMode::ALPHA, Vector2(0.f, 0.f), Vector2(0.f, 0.f)));
+
+  // send notification.
+  application.SendNotification();
+  application.Render();
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
 
   END_TEST;
 }
