@@ -324,6 +324,7 @@ const char* const STOP_OFFSET_NAME("stopOffset");     // Property::Array FLOAT
 const char* const STOP_COLOR_NAME("stopColor");       // Property::Array VECTOR4
 const char* const UNITS_NAME("units");                // Property::String  "userSpaceOnUse | objectBoundingBox"
 const char* const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
+const char* const START_OFFSET_NAME("startOffset");   // Property::FLOAT
 
 //mesh visual
 const char* const OBJECT_URL_NAME("objectUrl");

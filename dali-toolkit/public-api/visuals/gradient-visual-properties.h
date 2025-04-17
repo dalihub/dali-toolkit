@@ -120,7 +120,15 @@ enum
    * @note Optional. If not supplied, default is SpreadMethod::PAD.
    * @see SpreadMethod::Type
    */
-  SPREAD_METHOD
+  SPREAD_METHOD,
+
+  /**
+   * @brief The offset value that shifts the starting position of the gradient.
+   * @details Name "startOffset", type Property::FLOAT.
+   * @SINCE_2_4.17
+   * @note Optional. If not supplied, default is 0.
+   */
+  START_OFFSET
 };
 
 } // namespace Property

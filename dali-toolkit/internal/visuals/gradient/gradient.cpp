@@ -23,7 +23,7 @@
 namespace
 {
 // The maximum width of the lookup texture ( it is a 1-dimension texture with the height as 1 )
-const unsigned int MAXIMUM_TEXTURE_RESOLUTION(128u);
+const uint32_t MAXIMUM_TEXTURE_RESOLUTION(512u);
 } // namespace
 
 namespace Dali
@@ -34,7 +34,8 @@ namespace Internal
 {
 Gradient::Gradient()
 : mGradientUnits(Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX),
-  mSpreadMethod(Toolkit::GradientVisual::SpreadMethod::PAD)
+  mSpreadMethod(Toolkit::GradientVisual::SpreadMethod::PAD),
+  mStartOffset(0.f)
 {
 }
 
@@ -180,23 +181,17 @@ Dali::Texture Gradient::GenerateLookupTexture()
 
 unsigned int Gradient::EstimateTextureResolution()
 {
-  float          minInterval = 1.0;
-  const uint32_t numStops    = mGradientStops.Count();
-  DALI_ASSERT_ALWAYS(numStops > 0u && "The number of gradient stop should not be zero!");
-  for(uint32_t i = 0; i < numStops - 1u; i++)
-  {
-    float interval = mGradientStops[i + 1].mOffset - mGradientStops[i].mOffset;
-    minInterval    = interval > minInterval ? minInterval : interval;
-  }
-  // Use at least three pixels for each segment between two stops
-  unsigned int resolution = static_cast<int>(3.f / (minInterval + Math::MACHINE_EPSILON_100) + 0.5f);
-  // Clamp the resolution to handle the overlapping stops
-  if(resolution > MAXIMUM_TEXTURE_RESOLUTION)
-  {
-    return MAXIMUM_TEXTURE_RESOLUTION;
-  }
+  return MAXIMUM_TEXTURE_RESOLUTION;
+}
 
-  return resolution;
+void Gradient::SetStartOffset(float startOffset)
+{
+  mStartOffset = startOffset;
+}
+
+float Gradient::GetStartOffset() const
+{
+  return mStartOffset;
 }
 
 } // namespace Internal

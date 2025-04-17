@@ -176,6 +176,7 @@ private:
   Matrix3                mGradientTransform;
   IntrusivePtr<Gradient> mGradient;
   Type                   mGradientType;
+  Dali::Property::Index  mStartOffsetIndex;
   bool                   mIsOpaque; ///< Set to false if any of the stop colors are not opaque
 };
 

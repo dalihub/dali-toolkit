@@ -63,6 +63,7 @@ DALI_ENUM_TO_STRING_TABLE_END(SPREAD_METHOD)
 // uniform names
 static constexpr std::string_view UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
 static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("uTextureCoordinateScaleFactor");
+static constexpr std::string_view UNIFORM_START_OFFSET_NAME("uGradientOffset");
 
 // default offset value
 static constexpr float DEFAULT_OFFSET_MINIMUM = 0.0f;
@@ -294,6 +295,9 @@ void GradientVisual::OnInitialize()
   float textureSize = static_cast<float>(lookupTexture.GetWidth());
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f) / textureSize);
 
+  float startOffset = mGradient->GetStartOffset();
+  mStartOffsetIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::GradientVisual::Property::START_OFFSET, UNIFORM_START_OFFSET_NAME, startOffset);
+
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
@@ -373,6 +377,13 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     {
       mGradient->SetSpreadMethod(spreadMethod);
     }
+  }
+
+  Property::Value* startOffset = propertyMap.Find(Toolkit::GradientVisual::Property::START_OFFSET, START_OFFSET_NAME);
+  float startOffsetValue;
+  if(startOffset && startOffset->Get(startOffsetValue))
+  {
+    mGradient->SetStartOffset(startOffsetValue);
   }
 
   return true;
