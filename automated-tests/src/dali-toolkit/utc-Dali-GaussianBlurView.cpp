@@ -214,21 +214,21 @@ int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 8, TEST_LOCATION);
 
   view.Deactivate();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 8, TEST_LOCATION);
 
   view.Activate();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 12, TEST_LOCATION);
   END_TEST;
 }
 
@@ -317,14 +317,14 @@ int UtcDaliGaussianBlurActivateOnce2(void)
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 4);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 8, TEST_LOCATION);
 
   view.ActivateOnce();
 
   application.SendNotification();
   application.Render(20);
 
-  DALI_TEST_CHECK(gl.GetLastGenTextureId() == 8);
+  DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 12, TEST_LOCATION);
 
   END_TEST;
 }
