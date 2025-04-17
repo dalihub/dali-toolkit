@@ -181,7 +181,10 @@ void GradientVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 }
 
@@ -292,7 +295,7 @@ void GradientVisual::OnInitialize()
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f) / textureSize);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)
@@ -409,7 +412,7 @@ Shader GradientVisual::GenerateShader() const
   DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid gradient shader type generated!");
 
   VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
-  Shader                         shader     = mFactoryCache.GetShader(shaderType);
+  Shader                         shader     = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
   if(!shader)
   {
     std::string vertexShaderPrefixList;
@@ -440,7 +443,8 @@ Shader GradientVisual::GenerateShader() const
 
     shader = mFactoryCache.GenerateAndSaveShader(shaderType,
                                                  Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
-                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
+                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data(),
+                                                 mImpl->mTransformMapUsingDefault);
   }
 
   return shader;

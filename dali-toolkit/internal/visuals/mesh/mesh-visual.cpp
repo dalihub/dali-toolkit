@@ -24,6 +24,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
@@ -237,7 +238,26 @@ void MeshVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
+  }
+}
+
+void MeshVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    if(!mImpl->mTransformMapUsingDefault)
+    {
+      // Unregister default uniform blocks if transform changed.
+      if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mShader)
+      {
+        mFactoryCache.GetDefaultUniformBlock().DisconnectFromShader(mShader);
+      }
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
   }
 }
 
@@ -303,12 +323,16 @@ void MeshVisual::OnInitialize()
   }
 
   mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mImpl->mTransformMapUsingDefault)
+  {
+    mFactoryCache.GetDefaultUniformBlock().ConnectToShader(mShader);
+  }
   mImpl->mRenderer.SetTextures(mTextureSet);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
 
   //Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 void MeshVisual::SupplyEmptyGeometry()

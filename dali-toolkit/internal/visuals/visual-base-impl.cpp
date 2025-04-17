@@ -247,6 +247,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             // Unusual case. SetProperty called after OnInitialize().
             // Assume that DoAction call UPDATE_PROPERTY.
             mImpl->mTransformMapChanged |= !map.Empty();
+            if(mImpl->mTransformMapChanged)
+            {
+              mImpl->mTransformMapUsingDefault = false;
+              mImpl->mRenderer.RegisterVisualTransformUniform();
+            }
             mImpl->mTransform.UpdatePropertyMap(map);
 
             // Set Renderer uniforms, and change logics for subclasses.
@@ -257,6 +262,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           }
           else
           {
+            mImpl->mTransformMapUsingDefault &= map.Empty();
             mImpl->mTransform.SetPropertyMap(map);
           }
         }
@@ -531,6 +537,11 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
 {
   mImpl->mControlSize = controlSize;
   mImpl->mTransformMapChanged |= !transform.Empty();
+  if(mImpl->mTransformMapChanged)
+  {
+    mImpl->mTransformMapUsingDefault = false;
+    mImpl->mRenderer.RegisterVisualTransformUniform();
+  }
   mImpl->mTransform.UpdatePropertyMap(transform);
 
 #if defined(DEBUG_ENABLED)
@@ -1237,7 +1248,7 @@ void Visual::Base::SetupTransition(
         else if(animator.animationType == TransitionData::AnimationType::BY)
         {
           // To Do
-          DALI_LOG_WARNING("AnimationType::By is not supported yet. \n");
+          DALI_LOG_ERROR("AnimationType::By is not supported yet. \n");
         }
         else
         {
@@ -1394,10 +1405,24 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     }
     case Toolkit::Visual::Transform::Property::OFFSET:
     {
+      // Need to change visual transform is not default anymore.
+      mImpl->mTransformMapUsingDefault = false;
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+
+      // Change shader
+      UpdateShader();
+
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_OFFSET);
     }
     case Toolkit::Visual::Transform::Property::SIZE:
     {
+      // Need to change visual transform is not default anymore.
+      mImpl->mTransformMapUsingDefault = false;
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+
+      // Change shader
+      UpdateShader();
+
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_SIZE);
     }
 

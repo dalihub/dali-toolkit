@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
 
-  shader = factoryCache.GetShader(shaderType);
+  shader = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
   if(shader)
   {
     return shader;
@@ -135,7 +135,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       if(mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE)
       {
         shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) - NATIVE_SHADER_TYPE_OFFSET);
-        shader     = factoryCache.GetShader(shaderType);
+        shader     = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
       }
     }
   }
@@ -145,7 +145,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     return shader;
   }
 
-  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, featureBuilder.IsDefaultTransformUsed());
 
   shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
                                  ((featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0)));
@@ -291,7 +291,7 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        DALI_LOG_ERROR("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
         break;
       }
     }
@@ -304,7 +304,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(ShaderTypePredefines[i] == shader)
     {
-      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -313,7 +313,7 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
-      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }

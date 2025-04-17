@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3003,6 +3003,7 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(colorShader2);
   factory.AddPrecompileShader(colorShader3);
   factory.AddPrecompileShader(npatchShader);
+  factory.AddPrecompileShader(npatchShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(npatchShader2);
   factory.AddPrecompileShader(customShader);
 

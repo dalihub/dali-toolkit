@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 
@@ -208,7 +209,10 @@ void ColorVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 }
 
@@ -246,7 +250,7 @@ void ColorVisual::OnInitialize()
   }
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Shader ColorVisual::GenerateShader() const
@@ -257,7 +261,8 @@ Shader ColorVisual::GenerateShader() const
       .EnableBlur(IsBlurRequired())
       .EnableBorderLine(IsBorderlineRequired())
       .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
-      .EnableCutout(IsCutoutRequired()));
+      .EnableCutout(IsCutoutRequired())
+      .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
 
   return shader;
 }

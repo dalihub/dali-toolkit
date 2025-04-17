@@ -133,6 +133,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mIgnoreFittingMode(false),
   mPixelAreaSetByFittingMode(false),
   mTransformMapSetForFittingMode(false),
+  mTransformMapUsingDefault(true),
   mTransformMapChanged(false)
 {
 }

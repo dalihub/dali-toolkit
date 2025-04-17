@@ -375,9 +375,10 @@ const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "cornerRadius",                   Toolkit::DevelControl::Property::CORNER_RADIUS,                    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "cornerRadiusPolicy",             Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_34(typeRegistration, "cornerSquareness",               Toolkit::DevelControl::Property::CORNER_SQUARENESS,                Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty); ///< Make animatable, for constarint-input
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 

@@ -16,6 +16,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/controls/progress-bar/progress-bar.cpp
   ${public_api_src_dir}/controls/render-effects/render-effect.cpp
   ${public_api_src_dir}/controls/render-effects/background-blur-effect.cpp
+  ${public_api_src_dir}/controls/render-effects/mask-effect.cpp
   ${public_api_src_dir}/controls/scrollable/item-view/default-item-layout.cpp
   ${public_api_src_dir}/controls/scrollable/item-view/item-layout.cpp
   ${public_api_src_dir}/controls/scrollable/item-view/item-view.cpp
@@ -59,6 +60,7 @@ SET( public_api_header_files
   ${public_api_src_dir}/dali-toolkit-common.h
   ${public_api_src_dir}/enums.h
   ${public_api_src_dir}/align-enumerations.h
+  ${public_api_src_dir}/toolkit-constraint-tag-ranges.h
   ${public_api_src_dir}/toolkit-property-index-ranges.h
 )
 
@@ -109,6 +111,7 @@ SET( public_api_progress_bar_header_files
 SET( public_api_render_effects_header_files
   ${public_api_src_dir}/controls/render-effects/render-effect.h
   ${public_api_src_dir}/controls/render-effects/background-blur-effect.h
+  ${public_api_src_dir}/controls/render-effects/mask-effect.h
 )
 
 SET( public_api_scrollable_header_files

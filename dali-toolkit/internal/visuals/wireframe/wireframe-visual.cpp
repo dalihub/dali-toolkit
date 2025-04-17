@@ -157,7 +157,7 @@ void WireframeVisual::OnInitialize()
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
 
   //Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Geometry WireframeVisual::CreateQuadWireframeGeometry()
@@ -197,7 +197,7 @@ void WireframeVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     //Register transform properties
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 

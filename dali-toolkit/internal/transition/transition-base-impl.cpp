@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ void TransitionBase::SetTimePeriod(const Dali::TimePeriod& timePeriod)
 {
   if(timePeriod.durationSeconds < 0.0f)
   {
-    DALI_LOG_WARNING("Duration should be greater than 0.0f.\n");
+    DALI_LOG_DEBUG_INFO("Duration should be greater than 0.0f.\n");
   }
   else
   {
@@ -95,7 +95,7 @@ void TransitionBase::SetTimePeriod(const Dali::TimePeriod& timePeriod)
 
   if(timePeriod.delaySeconds < 0.0f)
   {
-    DALI_LOG_WARNING("Delay should be greater than 0.0f.\n");
+    DALI_LOG_DEBUG_INFO("Delay should be greater than 0.0f.\n");
     return;
   }
   else

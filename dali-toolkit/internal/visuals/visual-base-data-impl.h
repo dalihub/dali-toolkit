@@ -134,6 +134,19 @@ struct Base::Impl
     int     mCornerRadiusPolicy;
   };
 
+  /**
+   * @brief Set the uniform properties onto the renderer.
+   * And Register visual transform uniforms if neccessary.
+   */
+  void SetTransformUniforms(VisualRenderer renderer, Toolkit::Direction::Type direction)
+  {
+    if(!mTransformMapUsingDefault || direction != Toolkit::Direction::LEFT_TO_RIGHT)
+    {
+      renderer.RegisterVisualTransformUniform();
+      mTransform.SetUniforms(renderer, direction);
+    }
+  }
+
   DecorationData* EnsureDecorationData()
   {
     if(mDecorationData == nullptr)
@@ -282,7 +295,9 @@ struct Base::Impl
   bool                            mIgnoreFittingMode : 1;             ///< Whether we need to ignore fitting mode.
   bool                            mPixelAreaSetByFittingMode : 1;     ///< Whether the pixel area is set for fitting mode.
   bool                            mTransformMapSetForFittingMode : 1; ///< Whether the transformMap is set for fitting mode.
-  bool                            mTransformMapChanged : 1;           ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
+  bool                            mTransformMapUsingDefault : 1;      ///< Whether we are using the default transformMap not. We'll be false after SetTransform called, or animated.
+                                                                      ///< Note : If it change to false, never be true again.
+  bool mTransformMapChanged : 1;                                      ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
 };
 
 } // namespace Visual

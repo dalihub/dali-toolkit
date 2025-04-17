@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ RendererPtr Backend::NewRenderer(unsigned int renderingType)
 
     default:
     {
-      DALI_LOG_WARNING("Unknown renderer type: %d\n", renderingType);
+      DALI_LOG_ERROR("Unknown renderer type: %d\n", renderingType);
       break;
     }
   }

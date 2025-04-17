@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -775,7 +775,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
         }
         else
         {
-          DALI_LOG_WARNING("There is no focusable in popup\n");
+          DALI_LOG_DEBUG_INFO("There is no focusable in popup\n");
         }
 
         if(focusActor)
@@ -1964,7 +1964,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
 
       if(!nextFocusableActor)
       {
-        DALI_LOG_WARNING("Can not decide next focusable actor\n");
+        DALI_LOG_DEBUG_INFO("Can not decide next focusable actor\n");
       }
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
-  shader                                    = factoryCache.GetShader(shaderType);
+  shader                                    = factoryCache.GetShader(shaderType, false);
 
   if(!shader)
   {
@@ -179,7 +179,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
-    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, false);
   }
   return shader;
 }
@@ -264,7 +264,7 @@ void TextVisualShaderFactory::CreatePrecompileShader(TextVisualShaderFeature::Fe
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        DALI_LOG_ERROR("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
         break;
       }
     }
@@ -277,7 +277,7 @@ bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTyp
   {
     if(ShaderTypePredefines[i] == shader)
     {
-      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -286,7 +286,7 @@ bool TextVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTyp
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
-      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }

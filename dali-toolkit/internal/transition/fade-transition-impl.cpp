@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,20 +31,19 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 FadeTransitionPtr FadeTransition::New(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
 {
   float delaySeconds = timePeriod.delaySeconds;
   if(delaySeconds < 0.0f)
   {
-    DALI_LOG_WARNING("delay should be greater than 0.0f.\n");
+    DALI_LOG_DEBUG_INFO("delay should be greater than 0.0f.\n");
     delaySeconds = 0.0f;
   }
 
   float durationSeconds = timePeriod.durationSeconds;
   if(durationSeconds < 0.0f)
   {
-    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+    DALI_LOG_DEBUG_INFO("duration should be greater than 0.0f.\n");
     durationSeconds = 0.0f;
   }
 

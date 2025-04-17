@@ -482,7 +482,11 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   mImpl->mRenderer.SetTextures(textureSet);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  if(mImpl->mCustomShader)
+  {
+    mImpl->mRenderer.RegisterVisualTransformUniform();
+  }
 
   mVectorAnimationTask->SetRenderer(mImpl->mRenderer);
 }
@@ -558,7 +562,10 @@ void AnimatedVectorImageVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 
   if(IsOnScene())
@@ -929,6 +936,11 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
     // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
     // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
     shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
+
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
   }
   else
   {
@@ -937,7 +949,8 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
       ImageVisualShaderFeature::FeatureBuilder()
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture()));
+        .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture())
+        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
   }
   return shader;
 }

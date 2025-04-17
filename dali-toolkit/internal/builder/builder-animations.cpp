@@ -271,9 +271,9 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
           }
           catch(...)
           {
-            DALI_LOG_WARNING("Property:'%s' type does not match value type '%s'\n",
-                             (*property).c_str(),
-                             PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
+            DALI_SCRIPT_WARNING("Property:'%s' type does not match value type '%s'\n",
+                                (*property).c_str(),
+                                PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
 
             throw;
           }
@@ -340,7 +340,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
         }
         catch(...)
         {
-          DALI_LOG_WARNING("Property:'%s' type does not match value type '%s'\n", (*property).c_str(), PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
+          DALI_SCRIPT_WARNING("Property:'%s' type does not match value type '%s'\n", (*property).c_str(), PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
 
           throw;
         }

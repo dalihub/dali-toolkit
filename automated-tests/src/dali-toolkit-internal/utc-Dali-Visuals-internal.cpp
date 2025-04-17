@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -384,10 +384,11 @@ int UtcDaliVisualUpdateBrokenImageRenderer(void)
   // Set default broken image
   factoryCache->SetBrokenImageUrl(defaultBrokenImageUrl, std::vector<std::string>());
 
-  //Created dummy renderer
+  //Created dummy visual renderer
   Geometry geometry = factoryCache->GetGeometry(Toolkit::Internal::VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = Shader::New("foo", "bar");
-  Renderer renderer = Renderer::New(geometry, shader);
+
+  VisualRenderer renderer = VisualRenderer::New(geometry, shader);
 
   DALI_TEST_CHECK(renderer);
 

@@ -94,7 +94,8 @@ FeatureBuilder::FeatureBuilder()
 : mColorRoundCorner(RoundedCorner::DISABLED),
   mColorBorderline(Borderline::DISABLED),
   mColorBlur(Blur::DISABLED),
-  mColorCutout(Cutout::DISABLED)
+  mColorCutout(Cutout::DISABLED),
+  mUseDefaultTransform(true)
 {
 }
 
@@ -119,6 +120,12 @@ FeatureBuilder& FeatureBuilder::EnableBlur(bool enableBlur)
 FeatureBuilder& FeatureBuilder::EnableCutout(bool enableCutout)
 {
   mColorCutout = (enableCutout ? Cutout::ENABLED : Cutout::DISABLED);
+  return *this;
+}
+
+FeatureBuilder& FeatureBuilder::UseDefaultTransform(bool useDefaultTransform)
+{
+  mUseDefaultTransform = useDefaultTransform;
   return *this;
 }
 
@@ -207,6 +214,11 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   }
 }
 
+bool FeatureBuilder::IsDefaultTransformUsed() const
+{
+  return mUseDefaultTransform;
+}
+
 } // namespace ColorVisualShaderFeature
 
 ColorVisualShaderFactory::ColorVisualShaderFactory()
@@ -221,7 +233,7 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
-  shader                                    = factoryCache.GetShader(shaderType);
+  shader                                    = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
 
   if(!shader)
   {
@@ -233,7 +245,7 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
 
-    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, featureBuilder.IsDefaultTransformUsed());
   }
   return shader;
 }
@@ -325,7 +337,7 @@ void ColorVisualShaderFactory::CreatePrecompileShader(ColorVisualShaderFeature::
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
+        DALI_LOG_ERROR("Unknown option[%d]. maybe this type can't use this flag\n", static_cast<int>(option[i]));
         break;
       }
     }
@@ -338,7 +350,7 @@ bool ColorVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(ShaderTypePredefines[i] == shader)
     {
-      DALI_LOG_WARNING("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already added list(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }
@@ -347,7 +359,7 @@ bool ColorVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
   {
     if(mRequestedPrecompileShader[i].type == shader)
     {
-      DALI_LOG_WARNING("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
+      DALI_LOG_DEBUG_INFO("This shader already requsted(%s).\n", Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(mRequestedPrecompileShader[i].type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT));
       return false;
     }
   }

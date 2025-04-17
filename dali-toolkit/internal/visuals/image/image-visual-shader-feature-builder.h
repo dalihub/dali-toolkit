@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FEATURE_BUILDER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,8 @@ public:
 
   FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
 
+  FeatureBuilder& UseDefaultTransform(bool useDefaultTransform);
+
   VisualFactoryCache::ShaderType GetShaderType() const;
 
   ChangeFragmentShader::Type NeedToChangeFragmentShader() const;
@@ -154,6 +156,7 @@ public:
   Dali::Texture GetTexture() const;
 
   bool IsEnabledAlphaMaskingOnRendering() const;
+  bool IsDefaultTransformUsed() const;
 
 private:
   TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
@@ -162,7 +165,8 @@ private:
   Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED
   AlphaMaskingOnRendering::Type mAlphaMaskingOnRendering : 2; ///< Whether use runtime alpha masking, or not. default as AlphaMaskingOnRendering::DISABLED
   ColorConversion::Type         mColorConversion : 2;         ///< Whether the color format conversion is needed or not
-  Dali::Texture                 mTexture;                     ///< Texture to check whether we need to change fragment shader or not
+  bool                          mUseDefaultTransform : 1;
+  Dali::Texture                 mTexture; ///< Texture to check whether we need to change fragment shader or not
 };
 
 } // namespace ImageVisualShaderFeature

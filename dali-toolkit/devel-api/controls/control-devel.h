@@ -267,16 +267,16 @@ enum
 
   /**
    * @brief The radius for the rounded corners of the control.
-   * @details Name "cornerRadius", type Property::VECTOR4
+   * @details Name "viewCornerRadius", type Property::VECTOR4
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
    */
-  CORNER_RADIUS,
+  CORNER_RADIUS = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000,
 
   /**
    * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
-   * @details Name "cornerRadiusPolicy", type Property::INTEGER.
+   * @details Name "viewCornerRadiusPolicy", type Property::INTEGER.
    * @see Policy::Type
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS_POLICY
    */
@@ -284,7 +284,7 @@ enum
 
   /**
    * @brief The squareness for the rounded corners of the control.
-   * @details Name "cornerSquareness", type Property::VECTOR4
+   * @details Name "viewCornerSquareness", type Property::VECTOR4
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_SQUARENESS
@@ -447,6 +447,16 @@ DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualInd
  * @param[in] attributes Optional attributes for the action.
  */
 DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
+
+/**
+ * @brief Takes corner properties of control and overrides them to registered visual.
+ * @note This function is to support derived control classes that cannot use Control::Impl::EnableCornerPropertiesOverridden directly.
+ *
+ * @param[in] control The control.
+ * @param[in] visual A registered visual.
+ * @param[in] enable Whether to override corner properties of control to visual.
+ */
+DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Control& control, Visual::Base& visual, bool enable);
 
 /**
  * @brief Set input method context.

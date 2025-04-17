@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,10 +243,10 @@ void FeedbackStyle::LoadFromString(const std::string& data)
 
   if(!parser.Parse(data))
   {
-    DALI_LOG_WARNING("JSON Parse Error:'%s'\n", parser.GetErrorDescription().c_str());
-    DALI_LOG_WARNING("JSON Parse Line :'%d (%d)'\n",
-                     parser.GetErrorLineNumber(),
-                     parser.GetErrorColumn());
+    DALI_LOG_ERROR("JSON Parse Error:'%s'\n", parser.GetErrorDescription().c_str());
+    DALI_LOG_ERROR("JSON Parse Line :'%d (%d)'\n",
+                   parser.GetErrorLineNumber(),
+                   parser.GetErrorColumn());
   }
   else
   {

@@ -90,16 +90,20 @@ public:
   FeatureBuilder& EnableBorderLine(bool enableBorderLine);
   FeatureBuilder& EnableBlur(bool enableBlur);
   FeatureBuilder& EnableCutout(bool enableCutout);
+  FeatureBuilder& UseDefaultTransform(bool useDefaultTransform);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
   void                           GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
   void                           GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
+
+  bool IsDefaultTransformUsed() const;
 
 private:
   RoundedCorner::Type mColorRoundCorner : 3; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
   Borderline::Type    mColorBorderline : 2;  ///< Whether use border line, or not. default as Borderline::DISABLED
   Blur::Type          mColorBlur : 2;        ///< Whether use blur, or not. default as Blur::DISABLED
   Cutout::Type        mColorCutout : 2;      ///< Whether use cutout, or not. default as Cutout::DISABLED
+  bool                mUseDefaultTransform : 1;
 };
 } // namespace ColorVisualShaderFeature
 

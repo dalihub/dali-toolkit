@@ -629,7 +629,7 @@ void Control::Impl::VisualData::EnableVisual(Property::Index index, bool enable)
   }
   else
   {
-    DALI_LOG_WARNING("Control::EnableVisual(%d, %s) FAILED - NO SUCH VISUAL\n", index, enable ? "T" : "F");
+    DALI_LOG_ERROR("Control::EnableVisual(%d, %s) FAILED - NO SUCH VISUAL\n", index, enable ? "T" : "F");
   }
 }
 

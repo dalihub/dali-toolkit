@@ -682,7 +682,11 @@ void ImageVisual::OnInitialize()
   }
 
   //Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  if(mImpl->mCustomShader)
+  {
+    mImpl->mRenderer.RegisterVisualTransformUniform();
+  }
 
   EnablePreMultipliedAlpha(IsPreMultipliedAlphaEnabled());
 
@@ -1097,7 +1101,10 @@ void ImageVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 
   if(mUseSynchronousSizing)
@@ -1408,7 +1415,8 @@ Shader ImageVisual::GenerateShader() const
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(useNativeImage ? mNativeTexture : Dali::Texture())
         .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb));
+        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb)
+        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
   }
   else
   {
@@ -1464,6 +1472,11 @@ Shader ImageVisual::GenerateShader() const
     // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
     // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
     shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
+
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
   }
 
   return shader;

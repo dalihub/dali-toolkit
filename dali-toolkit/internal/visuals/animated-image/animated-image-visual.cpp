@@ -1033,7 +1033,10 @@ void AnimatedImageVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
-    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+
+    // TODO : We many need to less call it.
+    UpdateShader();
   }
 }
 
@@ -1060,6 +1063,11 @@ Shader AnimatedImageVisual::GenerateShader() const
     // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
     // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
     shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
+
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
   }
   else
   {
@@ -1072,7 +1080,8 @@ Shader AnimatedImageVisual::GenerateShader() const
         .ApplyDefaultTextureWrapMode(defaultWrapMode)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
+        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
   }
   return shader;
 }
@@ -1109,7 +1118,11 @@ void AnimatedImageVisual::OnInitialize()
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
-  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  if(mImpl->mCustomShader)
+  {
+    mImpl->mRenderer.RegisterVisualTransformUniform();
+  }
 
   if(!defaultWrapMode) // custom wrap mode
   {
