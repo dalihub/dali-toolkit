@@ -18,13 +18,17 @@
  */
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/time-period.h>
+
 namespace Dali
 {
 namespace Toolkit
 {
 namespace Internal DALI_INTERNAL
 {
-class BlurEffectImpl;
+class BackgroundBlurEffectImpl;
 } // namespace DALI_INTERNAL
 /**
  * @brief BackgroundBlurEffect is a visual effect that blurs owner control's background.
@@ -46,39 +50,105 @@ class DALI_TOOLKIT_API BackgroundBlurEffect : public RenderEffect
 {
 public:
   /**
-   * @brief Creates an initialized BackgroundBlurEffect, using default settings. The default settings are:
+   * @brief Typedef for finished signals sent by this class.
    *
-   * downscaleFactor = 0.4f
-   * pixelRadius = 5u
-   *
+   * @SINCE_2_4.15
+   */
+  typedef Signal<void()> FinishedSignalType;
+
+  /**
+   * @brief Creates an initialized BackgroundBlurEffect, using default settings. As default, blur radius is set to 10u.
    * @SINCE_2_3.28
    * @return A handle to a newly allocated Dali resource
    */
   static BackgroundBlurEffect New();
+
   /**
    * @brief Creates an initialized BackgroundBlurEffect.
-   * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] blurOnce Whether to blur once or always. Default is false(always).
    * @SINCE_2_3.28
    * @return A handle to a newly allocated Dali resource
    */
-  static BackgroundBlurEffect New(float downscaleFactor, uint32_t blurRadius, bool blurOnce = false);
+  static BackgroundBlurEffect New(uint32_t blurRadius);
+
   /**
    * @brief Creates an uninitialized blur effect.
    * @SINCE_2_3.28
    */
   BackgroundBlurEffect();
+
   /**
    * @brief Copy constructor.
    * @SINCE_2_3.28
    */
   BackgroundBlurEffect(const BackgroundBlurEffect& handle);
+
   /**
-  * @brief Destructor
-  * @SINCE_2_3.28
-  */
+   * @brief Destructor
+   * @SINCE_2_3.28
+   */
   ~BackgroundBlurEffect();
+
+  /**
+   * @brief Set whether to refresh effect once or every frame.
+   * @param[in] blurOnce If true, renders effect once, else updates effect rendering every frame.
+   * @SINCE_2_4.15
+   */
+  void SetBlurOnce(bool blurOnce);
+
+  /**
+   * @brief Retrives whether effect rendering is done once(true) or every frame(false)
+   * @SINCE_2_4.15
+   */
+  bool GetBlurOnce() const;
+
+  /**
+   * @brief Set blur radius value.
+   * @param[in] blurRadius The radius of Gaussian kernel.
+   * @SINCE_2_4.15
+   */
+  void SetBlurRadius(uint32_t blurRadius);
+
+  /**
+   * @brief Retrieves blur radius value.
+   * @SINCE_2_4.15
+   */
+  uint32_t GetBlurRadius() const;
+
+  /**
+   * @brief Adds blur strength animation. Blurifies clear texture within given animation parameters.
+   * @param[in] animation Animation instance to which we add blur strength animation.
+   * @param[in] alphaFunction AlphaFunction of blur strength animation.
+   * @param[in] timePeriod TimePeriod of blur strength animation. Default value is animation's duration.
+   * @param[in] fromValue Starting value of blur strength. Must be in range of [0.0f, 1.0f]
+   * @param[in] toValue End value of blur strength. Must be in range of [0.0f, 1.0f]
+   * @note If toValue is smaller than fromValue, animation would show reversed(blurred->clarified) animation.
+   * @note When choosing alpha function, note that gaussian curve itself is innately non-linear.
+   * @SINCE_2_4.15
+   */
+  void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
+
+  /**
+   * @brief Adds blur opacity animation. Blurifies clear texture within given animation parameters.
+   * @param[in] animation Animation instance to which we add blur opacity animation.
+   * @param[in] alphaFunction AlphaFunction of blur opacity animation.
+   * @param[in] timePeriod TimePeriod of blur opacity animation. Default value is animation's duration.
+   * @param[in] fromValue Starting value of blur opacity. Must be in range of [0.0f, 1.0f]
+   * @param[in] toValue End value of blur opacity. Must be in range of [0.0f, 1.0f]
+   * @note If toValue is smaller than fromValue, animation would show reversed(blurred->clarified) animation.
+   * @note When choosing alpha function, note that gaussian curve itself is innately non-linear.
+   * @SINCE_2_4.15
+   */
+  void AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
+
+public: // Signals
+  /**
+   * @brief If blurOnce is true and effect is activated, then connect to this signal to be notified when the
+   * target actor has been rendered.
+   * @SINCE_2_4.15
+   * @return The finished signal
+   */
+  FinishedSignalType& FinishedSignal();
 
 public: // Not intended for use by Application developers
   ///@cond internal
@@ -87,7 +157,7 @@ public: // Not intended for use by Application developers
    * @SINCE_2_3.28
    * @param[in]  blurEffectImpl The UI Control implementation.
    */
-  explicit DALI_INTERNAL BackgroundBlurEffect(Internal::BlurEffectImpl* blurEffectImpl);
+  explicit DALI_INTERNAL BackgroundBlurEffect(Internal::BackgroundBlurEffectImpl* backgroundBlurEffectImpl);
   ///@endcond
 };
 } // namespace Toolkit

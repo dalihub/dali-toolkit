@@ -74,6 +74,17 @@ void OffScreenRenderingImpl::OnActivate()
     return;
   }
 
+  if(!mCamera)
+  {
+    mCamera = CameraActor::New();
+    mCamera.SetInvertYAxis(true);
+    mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mCamera.SetType(Dali::Camera::FREE_LOOK);
+  }
+  mCamera.SetPerspectiveProjection(GetTargetSize());
+  GetOwnerControl().Add(mCamera);
+
   CreateFrameBuffer();
   CreateRenderTask();
   SetType(mType);
@@ -94,6 +105,8 @@ void OffScreenRenderingImpl::OnDeactivate()
   {
     control.GetImplementation().RemoveCacheRenderer();
     control.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::NONE);
+
+    mCamera.Unparent();
   }
 
   DestroyFrameBuffer();
@@ -103,6 +116,8 @@ void OffScreenRenderingImpl::OnDeactivate()
 void OffScreenRenderingImpl::OnRefresh()
 {
   DestroyFrameBuffer();
+
+  mCamera.SetPerspectiveProjection(GetTargetSize());
 
   CreateFrameBuffer();
   mRenderTask.SetFrameBuffer(mFrameBuffer);
@@ -130,7 +145,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
 
   mRenderTask = taskList.CreateTask();
   mRenderTask.SetSourceActor(control);
-  mRenderTask.SetCameraActor(GetCameraActor());
+  mRenderTask.SetCameraActor(mCamera);
   mRenderTask.SetExclusive(true);
   mRenderTask.SetInputEnabled(true);
   mRenderTask.SetFrameBuffer(mFrameBuffer);

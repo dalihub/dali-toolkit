@@ -35,5 +35,14 @@ RenderEffect::RenderEffect(Internal::RenderEffectImpl* renderEffectImpl)
 {
 }
 
+void RenderEffect::Activate()
+{
+  GetImplementation(*this).Activate();
+}
+
+void RenderEffect::Deactivate()
+{
+  GetImplementation(*this).Deactivate();
+}
 } // namespace Toolkit
 } // namespace Dali

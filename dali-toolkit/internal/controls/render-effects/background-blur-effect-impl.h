@@ -38,37 +38,26 @@ namespace Toolkit
 {
 namespace Internal
 {
-class BlurEffectImpl;
-using BlurEffectImplPtr = IntrusivePtr<BlurEffectImpl>;
+class BackgroundBlurEffectImpl;
+using BackgroundBlurEffectImplPtr = IntrusivePtr<BackgroundBlurEffectImpl>;
 
-class BlurEffectImpl : public RenderEffectImpl
+class BackgroundBlurEffectImpl : public RenderEffectImpl
 {
 public:
   /**
-   * @brief Creates an initialized BlurEffect implementation, using default settings. The default settings are:
-   *
-   * downscaleFactor = 0.4f
-   * pixelRadius = 5u
-   *
-   * This blur algorithm is used for both foreground and background blurs.
-   *
-   * @param[in] isBackground True when blurring background, False otherwise
+   * @brief Creates an initialized BlurEffect implementation, using default settings. As default, blur radius is set to 10u.
    * @return A handle to a newly allocated Dali resource
    */
 
-  static BlurEffectImplPtr New(bool isBackground);
+  static BackgroundBlurEffectImplPtr New();
 
   /**
    * @brief Creates an initialized BlurEffect implementation.
-   * This blur algorithm is used for both foreground and background blurs.
    *
-   * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] blurOnce Whether to blur once or always. Default is false(always).
-   * @param[in] isBackground True when blurring background, False otherwise
    * @return A handle to a newly allocated Dali resource
    */
-  static BlurEffectImplPtr New(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground);
+  static BackgroundBlurEffectImplPtr New(uint32_t blurRadius);
 
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
@@ -80,26 +69,57 @@ public:
    */
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurOnce
+   */
+  void SetBlurOnce(bool blurOnce);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurOnce
+   */
+  bool GetBlurOnce() const;
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurRadius
+   */
+  void SetBlurRadius(uint32_t blurRadius);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurRadius
+   */
+  uint32_t GetBlurRadius() const;
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::AddBlurStrengthAnimation
+   */
+  void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::AddBlurOpacityAnimation
+   */
+  void AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::FinishedSignal
+   */
+  Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType& FinishedSignal();
+
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation
-   * @param[in] isBackground True when blurring background, False otherwise
    */
-  BlurEffectImpl(bool isBackground);
+  BackgroundBlurEffectImpl();
 
   /**
    * @brief Creates an uninitialized blur effect implementation
-   * @param[in] downscaleFactor This value should reside in the range [0.0, 1.0].
    * @param[in] blurRadius The radius of Gaussian kernel.
-   * @param[in] blurOnce Whether to blur once or always. Default is false(always).
-   * @param[in] isBackground True when blurring background, False otherwise
    */
-  BlurEffectImpl(float downscaleFactor, uint32_t blurRadius, bool blurOnce, bool isBackground);
+  BackgroundBlurEffectImpl(uint32_t blurRadius);
 
   /**
    * @brief Destructor
    */
-  virtual ~BlurEffectImpl();
+  virtual ~BackgroundBlurEffectImpl();
 
   /**
    * @brief Initializes blur effect
@@ -175,13 +195,24 @@ private:
    */
   std::string GetSampleWeightsPropertyName(unsigned int index) const;
 
-  BlurEffectImpl(const BlurEffectImpl&) = delete;
-  BlurEffectImpl(BlurEffectImpl&&)      = delete;
-  BlurEffectImpl& operator=(BlurEffectImpl&&) = delete;      // no move()
-  BlurEffectImpl& operator=(const BlurEffectImpl&) = delete; // no copy()
+  /**
+   * @brief Emits render finished signal of the effect,
+   * when mBlurOnce is true and finished signal of the last render task(mVerticalBlurTask) is emitted.
+   * @param[in] renderTask that emits source signal.
+   */
+  void OnRenderFinished(Dali::RenderTask& renderTask);
+
+  BackgroundBlurEffectImpl(const BackgroundBlurEffectImpl&) = delete;
+  BackgroundBlurEffectImpl(BackgroundBlurEffectImpl&&)      = delete;
+  BackgroundBlurEffectImpl& operator=(BackgroundBlurEffectImpl&&) = delete;      // no move()
+  BackgroundBlurEffectImpl& operator=(const BackgroundBlurEffectImpl&) = delete; // no copy()
+
+public:
+  Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType mFinishedSignal; // Emits when blur once is enabled
 
 private:
   // Camera actors
+  CameraActor mCamera;
   CameraActor mRenderDownsampledCamera;
 
   // Resource
@@ -199,26 +230,25 @@ private:
 
   // Variables
   float    mDownscaleFactor;
-  uint32_t mPixelRadius;
-  uint32_t mDownscaledPixelRadius;
+  uint32_t mBlurRadius;
+  uint32_t mDownscaledBlurRadius;
   float    mBellCurveWidth;
 
   bool mSkipBlur : 1;
   bool mBlurOnce : 1;
-  bool mIsBackground : 1;
 };
 } // namespace Internal
 
-inline Toolkit::Internal::BlurEffectImpl& GetImplementation(Toolkit::BackgroundBlurEffect& obj)
+inline Toolkit::Internal::BackgroundBlurEffectImpl& GetImplementation(Toolkit::BackgroundBlurEffect& obj)
 {
   BaseObject& handle = obj.GetBaseObject();
-  return static_cast<Toolkit::Internal::BlurEffectImpl&>(handle);
+  return static_cast<Toolkit::Internal::BackgroundBlurEffectImpl&>(handle);
 }
 
-inline const Toolkit::Internal::BlurEffectImpl& GetImplementation(const Toolkit::BackgroundBlurEffect& obj)
+inline const Toolkit::Internal::BackgroundBlurEffectImpl& GetImplementation(const Toolkit::BackgroundBlurEffect& obj)
 {
   const BaseObject& handle = obj.GetBaseObject();
-  return static_cast<const Toolkit::Internal::BlurEffectImpl&>(handle);
+  return static_cast<const Toolkit::Internal::BackgroundBlurEffectImpl&>(handle);
 }
 
 } // namespace Toolkit
