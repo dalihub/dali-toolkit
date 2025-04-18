@@ -21,6 +21,6 @@ void main()
   {
     col += (TEXTURE(sTexture, vTexCoord + uSampleOffsets[i] * uAnimationRatio) + TEXTURE(sTexture, vTexCoord - uSampleOffsets[i] * uAnimationRatio)) * uSampleWeights[i];
   }
-  col.w *= uOpacity;
+  col *= uOpacity;
   gl_FragColor = col;
 }

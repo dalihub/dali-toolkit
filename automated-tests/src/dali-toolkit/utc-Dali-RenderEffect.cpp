@@ -1054,7 +1054,13 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
   effect.SetBlurOnce(true);
   effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
   // animation will not be added but cannot check
+  animation.Clear();
   DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+  effect.SetBlurRadius(2u);
+  effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+  // animation will not be added but cannot check
+  animation.Clear();
 
   END_TEST;
 }
@@ -1118,7 +1124,13 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
   effect.SetBlurOnce(true);
   effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
   // animation will not be added but cannot check
+  animation.Clear();
   DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+  effect.SetBlurRadius(2u);
+  effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+  // animation will not be added but cannot check
+  animation.Clear();
 
   END_TEST;
 }

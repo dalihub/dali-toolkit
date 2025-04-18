@@ -182,7 +182,7 @@ void BackgroundBlurEffectImpl::SetBlurOnce(bool blurOnce)
 {
   mBlurOnce = blurOnce;
 
-  if(IsActivated()) // if false, no render task exists yet(nothing to do)
+  if(!mSkipBlur && IsActivated()) // if false, no render task exists yet(nothing to do)
   {
     if(mBlurOnce)
     {
@@ -210,7 +210,7 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
 {
   if(mBlurRadius != blurRadius)
   {
-    if(IsActivated())
+    if(!mSkipBlur && IsActivated())
     {
       OnDeactivate();
     }
@@ -228,7 +228,7 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
 
     OnInitialize();
 
-    if(IsActivated())
+    if(!mSkipBlur && IsActivated())
     {
       OnActivate();
     }
@@ -242,6 +242,11 @@ uint32_t BackgroundBlurEffectImpl::GetBlurRadius() const
 
 void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.");
+    return;
+  }
   if(mBlurOnce)
   {
     DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.");
@@ -263,6 +268,11 @@ void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Al
 
 void BackgroundBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
+  if(DALI_UNLIKELY(mSkipBlur))
+  {
+    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.");
+    return;
+  }
   if(mBlurOnce)
   {
     DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.");
