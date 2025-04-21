@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali.h>
 
@@ -715,6 +716,42 @@ int UtcDaliControlShadowProperties(void)
   Property::Map emptyMap;
   control.SetProperty(DevelControl::Property::SHADOW, emptyMap);
   DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::SHADOW).Get<Property::Map>().Empty());
+
+  END_TEST;
+}
+
+int UtcDaliControlInnerShadowProperties(void)
+{
+  ToolkitTestApplication application;
+  Control                control = Control::New();
+
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::INNER_SHADOW).Get<Property::Map>().Empty());
+
+  Property::Map imageMap;
+  imageMap[Toolkit::Visual::Property::TYPE] = Visual::IMAGE;
+  imageMap[ImageVisual::Property::URL]      = "TestImage";
+  control.SetProperty(DevelControl::Property::INNER_SHADOW, imageMap);
+  Property::Value propValue = control.GetProperty(DevelControl::Property::INNER_SHADOW);
+  Property::Map*  resultMap = propValue.GetMap();
+  DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
+  DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION);
+  DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
+  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
+
+  Property::Map colorMap;
+  colorMap[Visual::Property::TYPE]           = Visual::COLOR;
+  colorMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
+  control.SetProperty(DevelControl::Property::INNER_SHADOW, colorMap);
+  propValue = control.GetProperty(DevelControl::Property::INNER_SHADOW);
+  resultMap = propValue.GetMap();
+  DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
+  DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::COLOR, TEST_LOCATION);
+  DALI_TEST_CHECK(resultMap->Find(ColorVisual::Property::MIX_COLOR));
+  DALI_TEST_EQUALS(resultMap->Find(ColorVisual::Property::MIX_COLOR)->Get<Vector4>(), Color::CYAN, TEST_LOCATION);
+
+  Property::Map emptyMap;
+  control.SetProperty(DevelControl::Property::INNER_SHADOW, emptyMap);
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::INNER_SHADOW).Get<Property::Map>().Empty());
 
   END_TEST;
 }
@@ -1609,6 +1646,8 @@ int UtcDaliControlNewWithDisableVisuals(void)
   // Check Background or Shadow with property map skipped
   control.SetProperty(Control::Property::BACKGROUND, propertyMap);
   control.SetProperty(DevelControl::Property::SHADOW, propertyMap);
+  control.SetProperty(DevelControl::Property::INNER_SHADOW, propertyMap);
+  control.SetProperty(DevelControl::Property::BORDERLINE, propertyMap);
 
   application.SendNotification();
   application.Render();
@@ -1669,6 +1708,189 @@ int UtcDaliControlCornerRadius(void)
   control.SetRenderEffect(effect);
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
   tet_infoline("Late sync with render effects.");
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderline(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  float   borderlineWidth  = 10.0f;
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 0.2f;
+
+  control.SetProperty(DevelControl::Property::BORDERLINE_WIDTH, borderlineWidth);
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, borderlineColor);
+  control.SetProperty(DevelControl::Property::BORDERLINE_OFFSET, borderlineOffset);
+
+  application.SendNotification();
+  application.Render();
+
+  float   retrievedFloat;
+  Vector4 retrievedVector;
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE_WIDTH).Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineWidth, TEST_LOCATION);
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE_COLOR).Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, borderlineColor, TEST_LOCATION);
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE_OFFSET).Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  Property::Map retrievedMap;
+
+  tet_printf("Check BORDERLINE visual has not corner radius value yet.\n");
+
+  Property::Value value = control.GetProperty(DevelControl::Property::BORDERLINE);
+  DALI_TEST_CHECK(value.GetMap());
+  retrievedMap = *(value.GetMap());
+
+  Property::Value* valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS);
+  if(valuePtr)
+  {
+    DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+    DALI_TEST_EQUALS(retrievedVector, Vector4::ZERO, TEST_LOCATION);
+  }
+
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_WIDTH);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineWidth, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_COLOR);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, borderlineColor, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_OFFSET);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  tet_printf("Set corner radius. Check BORDERLINE visual has corner radius value now.\n");
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::Type::RELATIVE);
+  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness);
+
+  value = control.GetProperty(DevelControl::Property::BORDERLINE);
+  DALI_TEST_CHECK(value.GetMap());
+  retrievedMap = *(value.GetMap());
+
+  int retrievedInteger;
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, radius, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedInteger));
+  DALI_TEST_EQUALS(retrievedInteger, (int)Toolkit::Visual::Transform::Policy::Type::RELATIVE, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_SQUARENESS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, squreness, TEST_LOCATION);
+
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_WIDTH);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineWidth, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_COLOR);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, borderlineColor, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_OFFSET);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  tet_printf("Change borderline value. Check BORDERLINE visual.\n");
+  borderlineWidth  = 20.0f;
+  borderlineColor  = Color::RED;
+  borderlineOffset = -1.0f;
+
+  control.SetProperty(DevelControl::Property::BORDERLINE_WIDTH, borderlineWidth);
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, borderlineColor);
+  control.SetProperty(DevelControl::Property::BORDERLINE_OFFSET, borderlineOffset);
+
+  value = control.GetProperty(DevelControl::Property::BORDERLINE);
+  DALI_TEST_CHECK(value.GetMap());
+  retrievedMap = *(value.GetMap());
+
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, radius, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedInteger));
+  DALI_TEST_EQUALS(retrievedInteger, (int)Toolkit::Visual::Transform::Policy::Type::RELATIVE, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_SQUARENESS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, squreness, TEST_LOCATION);
+
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_WIDTH);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineWidth, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_COLOR);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, borderlineColor, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_OFFSET);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  tet_printf("Set borderline property forcibly!\n");
+  borderlineWidth  = 30.0f;
+  borderlineColor  = Color::GREEN;
+  borderlineOffset = -0.3f;
+  // Just re-use retrieved map, to reduce duplicated property settings.
+  retrievedMap[DevelVisual::Property::CORNER_RADIUS]        = Vector4(10.f, 20.f, 30.f, 40.f);
+  retrievedMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = (int)Toolkit::Visual::Transform::Policy::Type::ABSOLUTE;
+  retrievedMap[DevelVisual::Property::CORNER_SQUARENESS]    = Vector4(0.7f, 0.6f, 0.5f, 0.4f);
+  retrievedMap[DevelVisual::Property::BORDERLINE_WIDTH]     = borderlineWidth;
+  retrievedMap[DevelVisual::Property::BORDERLINE_COLOR]     = borderlineColor;
+  retrievedMap[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+
+  control.SetProperty(DevelControl::Property::BORDERLINE, retrievedMap);
+
+  value = control.GetProperty(DevelControl::Property::BORDERLINE);
+  DALI_TEST_CHECK(value.GetMap());
+  retrievedMap = *(value.GetMap());
+
+  // Check we are using Control's corner radius feature instead it's own.
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, radius, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedInteger));
+  DALI_TEST_EQUALS(retrievedInteger, (int)Toolkit::Visual::Transform::Policy::Type::RELATIVE, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_SQUARENESS);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, squreness, TEST_LOCATION);
+
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_WIDTH);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineWidth, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_COLOR);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
+  DALI_TEST_EQUALS(retrievedVector, borderlineColor, TEST_LOCATION);
+  valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_OFFSET);
+  DALI_TEST_CHECK(valuePtr);
+  DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
+  DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
 
   END_TEST;
 }

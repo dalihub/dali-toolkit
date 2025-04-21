@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/controls/control/control-decoration-data.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
@@ -114,26 +115,6 @@ struct Base::Impl
     Toolkit::Align::Type mAnchorPoint;
   };
 
-  struct DecorationData
-  {
-    // Default constructor
-    DecorationData()
-    : mBorderlineColor(Color::BLACK),
-      mCornerRadius(Vector4::ZERO),
-      mCornerSquareness(Vector4::ZERO),
-      mBorderlineWidth(0.0f),
-      mBorderlineOffset(0.0f),
-      mCornerRadiusPolicy(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE))
-    {
-    }
-    Vector4 mBorderlineColor;
-    Vector4 mCornerRadius;
-    Vector4 mCornerSquareness;
-    float   mBorderlineWidth;
-    float   mBorderlineOffset;
-    int     mCornerRadiusPolicy;
-  };
-
   /**
    * @brief Set the uniform properties onto the renderer.
    * And Register visual transform uniforms if neccessary.
@@ -147,23 +128,14 @@ struct Base::Impl
     }
   }
 
-  DecorationData* EnsureDecorationData()
-  {
-    if(mDecorationData == nullptr)
-    {
-      mDecorationData = new DecorationData();
-    }
-    return mDecorationData;
-  }
-
   /**
    * @brief Get decoration data value : borderline width
    *
    * Keep these API as inline function due to the performance.
    */
-  float GetBorderlineWidth()
+  float GetBorderlineWidth() const
   {
-    return mDecorationData ? mDecorationData->mBorderlineWidth : 0.0f;
+    return DecorationData::GetBorderlineWidth(mDecorationData);
   }
 
   /**
@@ -173,7 +145,7 @@ struct Base::Impl
    */
   void SetBorderlineWidth(float value)
   {
-    EnsureDecorationData()->mBorderlineWidth = value;
+    DecorationData::SetBorderlineWidth(mDecorationData, value);
   }
 
   /**
@@ -181,9 +153,9 @@ struct Base::Impl
    *
    * Keep these API as inline function due to the performance.
    */
-  Vector4 GetBorderlineColor()
+  Vector4 GetBorderlineColor() const
   {
-    return mDecorationData ? mDecorationData->mBorderlineColor : Color::BLACK;
+    return DecorationData::GetBorderlineColor(mDecorationData);
   }
 
   /**
@@ -193,7 +165,7 @@ struct Base::Impl
    */
   void SetBorderlineColor(Vector4 value)
   {
-    EnsureDecorationData()->mBorderlineColor = value;
+    DecorationData::SetBorderlineColor(mDecorationData, value);
   }
 
   /**
@@ -201,9 +173,9 @@ struct Base::Impl
    *
    * Keep these API as inline function due to the performance.
    */
-  float GetBorderlineOffset()
+  float GetBorderlineOffset() const
   {
-    return mDecorationData ? mDecorationData->mBorderlineOffset : 0.0f;
+    return DecorationData::GetBorderlineOffset(mDecorationData);
   }
 
   /**
@@ -213,7 +185,7 @@ struct Base::Impl
    */
   void SetBorderlineOffset(float value)
   {
-    EnsureDecorationData()->mBorderlineOffset = value;
+    DecorationData::SetBorderlineOffset(mDecorationData, value);
   }
 
   /**
@@ -221,9 +193,9 @@ struct Base::Impl
    *
    * Keep these API as inline function due to the performance.
    */
-  Vector4 GetCornerRadius()
+  Vector4 GetCornerRadius() const
   {
-    return mDecorationData ? mDecorationData->mCornerRadius : Vector4::ZERO;
+    return DecorationData::GetCornerRadius(mDecorationData);
   }
 
   /**
@@ -233,7 +205,7 @@ struct Base::Impl
    */
   void SetCornerRadius(Vector4 value)
   {
-    EnsureDecorationData()->mCornerRadius = value;
+    DecorationData::SetCornerRadius(mDecorationData, value);
   }
 
   /**
@@ -241,9 +213,9 @@ struct Base::Impl
    *
    * Keep these API as inline function due to the performance.
    */
-  int GetCornerRadiusPolicy()
+  int GetCornerRadiusPolicy() const
   {
-    return mDecorationData ? mDecorationData->mCornerRadiusPolicy : static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE);
+    return DecorationData::GetCornerRadiusPolicy(mDecorationData);
   }
 
   /**
@@ -253,7 +225,7 @@ struct Base::Impl
    */
   void SetCornerRadiusPolicy(int value)
   {
-    EnsureDecorationData()->mCornerRadiusPolicy = value;
+    DecorationData::SetCornerRadiusPolicy(mDecorationData, value);
   }
 
   /**
@@ -261,9 +233,9 @@ struct Base::Impl
    *
    * Keep these API as inline function due to the performance.
    */
-  Vector4 GetCornerSquareness()
+  Vector4 GetCornerSquareness() const
   {
-    return mDecorationData ? mDecorationData->mCornerSquareness : Vector4::ZERO;
+    return DecorationData::GetCornerSquareness(mDecorationData);
   }
 
   /**
@@ -273,7 +245,7 @@ struct Base::Impl
    */
   void SetCornerSquareness(Vector4 value)
   {
-    EnsureDecorationData()->mCornerSquareness = value;
+    DecorationData::SetCornerSquareness(mDecorationData, value);
   }
 
   VisualRenderer                  mRenderer;

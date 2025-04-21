@@ -49,6 +49,8 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 
@@ -93,6 +95,9 @@ constexpr const char* ACTION_ACCESSIBILITY_READING_PAUSED    = "ReadingPaused";
 constexpr const char* ACTION_ACCESSIBILITY_READING_RESUMED   = "ReadingResumed";
 constexpr const char* ACTION_ACCESSIBILITY_READING_SKIPPED   = "ReadingSkipped";
 constexpr const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
+
+constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 2;
+constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::DECORATION - 1;
 
 bool PerformAccessibilityAction(Toolkit::Control control, const std::string& actionName, const Property::Map& attributes)
 {
@@ -375,10 +380,15 @@ const PropertyRegistration Control::Impl::PROPERTY_28(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "innerShadow",                    Toolkit::DevelControl::Property::INNER_SHADOW,                     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "borderline",                     Toolkit::DevelControl::Property::BORDERLINE,                       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty); ///< Make animatable, for constarint-input
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_6(typeRegistration, "viewBorderlineOffset",   Toolkit::DevelControl::Property::BORDERLINE_OFFSET,    Property::FLOAT,   &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -396,9 +406,6 @@ Control::Impl::Impl(Control& controlImpl)
   mCounterClockwiseFocusableActorId(-1),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
-  mCornerRadius(Vector4::ZERO),
-  mCornerRadiusPolicy(Toolkit::Visual::Transform::Policy::Type::ABSOLUTE),
-  mCornerSquareness(Vector4::ZERO),
   mRenderEffect(nullptr),
   mStartingPinchScale(nullptr),
   mMargin(0, 0, 0, 0),
@@ -412,6 +419,7 @@ Control::Impl::Impl(Control& controlImpl)
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
+  mDecorationData{nullptr},
   mOffScreenRenderingImpl(nullptr),
   mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
@@ -610,9 +618,9 @@ void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visu
   if(DALI_LIKELY(mVisualData))
   {
     Property::Map map;
-    map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = mCornerRadius;
-    map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = mCornerRadiusPolicy;
-    map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = mCornerSquareness;
+    map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = DecorationData::GetCornerRadius(mDecorationData);
+    map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(mDecorationData);
+    map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(mDecorationData);
 
     mVisualData->EnableCornerPropertiesOverridden(visual, enable, map);
   }
@@ -1092,12 +1100,46 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         break;
       }
 
+      case Toolkit::DevelControl::Property::INNER_SHADOW:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map && !map->Empty())
+        {
+          controlImpl.mImpl->SetInnerShadow(*map);
+        }
+        else
+        {
+          // The shadow is an empty property map, so we should clear the inner shadow
+          controlImpl.mImpl->ClearInnerShadow();
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map && !map->Empty())
+        {
+          controlImpl.mImpl->SetBorderline(*map, true);
+        }
+        else
+        {
+          // The shadow is an empty property map, so we should clear the inner shadow
+          controlImpl.mImpl->ClearBorderline();
+        }
+        break;
+      }
+
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
       {
         Vector4 radius;
         if(value.Get(radius))
         {
-          controlImpl.mImpl->SetCornerRadius(radius, controlImpl.mImpl->mCornerRadiusPolicy, controlImpl.mImpl->mCornerSquareness);
+          if(DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData) != radius)
+          {
+            DecorationData::SetCornerRadius(controlImpl.mImpl->mDecorationData, radius);
+            controlImpl.mImpl->UpdateCornerRadius();
+          }
         }
         break;
       }
@@ -1107,9 +1149,11 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int policy;
         if(value.Get(policy))
         {
-          controlImpl.mImpl->SetCornerRadius(controlImpl.mImpl->mCornerRadius,
-                                             static_cast<Toolkit::Visual::Transform::Policy::Type>(policy),
-                                             controlImpl.mImpl->mCornerSquareness);
+          if(DecorationData::GetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData) != policy)
+          {
+            DecorationData::SetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData, policy);
+            controlImpl.mImpl->UpdateCornerRadius();
+          }
         }
         break;
       }
@@ -1119,7 +1163,53 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         Vector4 squareness;
         if(value.Get(squareness))
         {
-          controlImpl.mImpl->SetCornerRadius(controlImpl.mImpl->mCornerRadius, controlImpl.mImpl->mCornerRadiusPolicy, squareness);
+          if(DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData) != squareness)
+          {
+            DecorationData::SetCornerSquareness(controlImpl.mImpl->mDecorationData, squareness);
+            controlImpl.mImpl->UpdateCornerRadius();
+          }
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_WIDTH:
+      {
+        float width;
+        if(value.Get(width))
+        {
+          if(DecorationData::GetBorderlineWidth(controlImpl.mImpl->mDecorationData) != width)
+          {
+            DecorationData::SetBorderlineWidth(controlImpl.mImpl->mDecorationData, width);
+            controlImpl.mImpl->UpdateBorderline();
+          }
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_COLOR:
+      {
+        Vector4 color;
+        if(value.Get(color))
+        {
+          if(DecorationData::GetBorderlineColor(controlImpl.mImpl->mDecorationData) != color)
+          {
+            DecorationData::SetBorderlineColor(controlImpl.mImpl->mDecorationData, color);
+            controlImpl.mImpl->UpdateBorderline();
+          }
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_OFFSET:
+      {
+        float offset;
+        if(value.Get(offset))
+        {
+          if(DecorationData::GetBorderlineOffset(controlImpl.mImpl->mDecorationData) != offset)
+          {
+            DecorationData::SetBorderlineOffset(controlImpl.mImpl->mDecorationData, offset);
+            controlImpl.mImpl->UpdateBorderline();
+          }
         }
         break;
       }
@@ -1336,21 +1426,73 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
         break;
       }
 
+      case Toolkit::DevelControl::Property::INNER_SHADOW:
+      {
+        Property::Map map;
+
+        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        {
+          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::INNER_SHADOW);
+          if(visual)
+          {
+            visual.CreatePropertyMap(map);
+          }
+        }
+
+        value = map;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE:
+      {
+        Property::Map map;
+
+        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        {
+          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::BORDERLINE);
+          if(visual)
+          {
+            visual.CreatePropertyMap(map);
+          }
+        }
+
+        value = map;
+        break;
+      }
+
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
       {
-        value = controlImpl.mImpl->mCornerRadius;
+        value = DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData);
         break;
       }
 
       case Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY:
       {
-        value = static_cast<int32_t>(controlImpl.mImpl->mCornerRadiusPolicy);
+        value = DecorationData::GetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData);
         break;
       }
 
       case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
       {
-        value = controlImpl.mImpl->mCornerSquareness;
+        value = DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData);
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_WIDTH:
+      {
+        value = DecorationData::GetBorderlineWidth(controlImpl.mImpl->mDecorationData);
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_COLOR:
+      {
+        value = DecorationData::GetBorderlineColor(controlImpl.mImpl->mDecorationData);
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::BORDERLINE_OFFSET:
+      {
+        value = DecorationData::GetBorderlineOffset(controlImpl.mImpl->mDecorationData);
         break;
       }
     }
@@ -1591,6 +1733,71 @@ void Control::Impl::ClearShadow()
   }
 }
 
+void Control::Impl::SetInnerShadow(const Property::Map& map)
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(map);
+    visual.SetName("innerShadow");
+
+    if(visual)
+    {
+      mVisualData->RegisterVisual(Toolkit::DevelControl::Property::INNER_SHADOW, visual, INNER_SHADOW_DEPTH_INDEX);
+      EnableCornerPropertiesOverridden(visual, true);
+
+      mControlImpl.RelayoutRequest();
+    }
+  }
+}
+
+void Control::Impl::ClearInnerShadow()
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::INNER_SHADOW);
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    mControlImpl.RelayoutRequest();
+  }
+}
+
+void Control::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    if(!forciblyCreate)
+    {
+      Toolkit::Internal::Visual::Base* previousVisualImplPtr = mVisualData->GetVisualImplPtr(Toolkit::DevelControl::Property::BORDERLINE);
+      if(previousVisualImplPtr)
+      {
+        previousVisualImplPtr->DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+        return;
+      }
+    }
+    Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(map);
+    visual.SetName("borderline");
+
+    if(visual)
+    {
+      mVisualData->RegisterVisual(Toolkit::DevelControl::Property::BORDERLINE, visual, BORDERLINE_DEPTH_INDEX);
+      EnableCornerPropertiesOverridden(visual, true);
+
+      mControlImpl.RelayoutRequest();
+    }
+  }
+}
+
+void Control::Impl::ClearBorderline()
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::BORDERLINE);
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    mControlImpl.RelayoutRequest();
+  }
+}
+
 Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
 {
   if(DALI_LIKELY(mVisualData))
@@ -1751,21 +1958,12 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   mOffScreenRenderingType = newType;
 }
 
-void Control::Impl::SetCornerRadius(Vector4 radius, Toolkit::Visual::Transform::Policy::Type policy, Vector4 squareness)
+void Control::Impl::UpdateCornerRadius()
 {
-  if(radius == mCornerRadius && policy == mCornerRadiusPolicy && squareness == mCornerSquareness)
-  {
-    return;
-  }
-
-  mCornerRadius       = radius;
-  mCornerRadiusPolicy = policy;
-  mCornerSquareness   = squareness;
-
   Property::Map map;
-  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = radius;
-  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = policy;
-  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = squareness;
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = DecorationData::GetCornerRadius(mDecorationData);
+  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(mDecorationData);
+  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(mDecorationData);
 
   RegisteredVisualContainer& visuals = mVisualData->mVisuals;
   for(auto it = visuals.begin(); it != visuals.end(); it++)
@@ -1785,6 +1983,18 @@ void Control::Impl::SetCornerRadius(Vector4 radius, Toolkit::Visual::Transform::
   {
     mOffScreenRenderingImpl->SetCornerConstants(map);
   }
+}
+
+void Control::Impl::UpdateBorderline()
+{
+  Property::Map map;
+  map[Toolkit::Visual::Property::TYPE]                   = Toolkit::Visual::Type::COLOR;
+  map[Toolkit::ColorVisual::Property::MIX_COLOR]         = Color::TRANSPARENT;
+  map[Toolkit::DevelVisual::Property::BORDERLINE_WIDTH]  = DecorationData::GetBorderlineWidth(mDecorationData);
+  map[Toolkit::DevelVisual::Property::BORDERLINE_COLOR]  = DecorationData::GetBorderlineColor(mDecorationData);
+  map[Toolkit::DevelVisual::Property::BORDERLINE_OFFSET] = DecorationData::GetBorderlineOffset(mDecorationData);
+
+  SetBorderline(map, false);
 }
 
 void Control::Impl::Process(bool postProcessor)
