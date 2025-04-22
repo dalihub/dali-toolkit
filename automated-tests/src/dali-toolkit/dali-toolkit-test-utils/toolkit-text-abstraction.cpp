@@ -304,7 +304,7 @@ public:
     }
   }
 
-  Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script, Property::Map* variationsMapPtr)
+  Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
   {
     mText     = new unsigned char[numChars];
     mNumChars = numChars;
@@ -716,9 +716,9 @@ void Shaping::GetGlyphs(GlyphInfo* glyphStore, unsigned int* mappingTable)
   GetImplementation(*this).GetGlyphs(glyphStore, mappingTable);
 }
 
-Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script, Property::Map* variationsMapPtr)
+Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
 {
-  return GetImplementation(*this).Shape(fontClient, text, numChars, fontId, script, variationsMapPtr);
+  return GetImplementation(*this).Shape(fontClient, text, numChars, fontId, script);
 }
 
 } // namespace TextAbstraction

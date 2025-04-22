@@ -505,8 +505,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
             glyphs,
             glyphsToCharactersMap,
             charactersPerGlyph,
-            newParagraphGlyphs,
-            variationsMapPtr);
+            newParagraphGlyphs);
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
   mTextModel->mVisualModel->CreateGlyphsPerCharacterTable(0u, 0u, numberOfCharacters);
