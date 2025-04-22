@@ -271,14 +271,16 @@ enum
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
-  CORNER_RADIUS = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000,
+  CORNER_RADIUS = ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX,
 
   /**
    * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
    * @details Name "viewCornerRadiusPolicy", type Property::INTEGER.
    * @see Policy::Type
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS_POLICY
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
   CORNER_RADIUS_POLICY,
 
@@ -288,6 +290,7 @@ enum
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_SQUARENESS
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
   CORNER_SQUARENESS,
 };
