@@ -1569,6 +1569,13 @@ int UtcDaliControlOffScreenRenderingSizeSet(void)
   DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2::ZERO, TEST_LOCATION);
   tet_infoline("Size update: a valid size to zero");
 
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::NONE);
+  control.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
+  tet_infoline("Size update when type NONE");
+
   END_TEST;
 }
 
@@ -1634,7 +1641,7 @@ int UtcDaliControlCornerRadius(void)
 
   application.GetScene().Add(control);
 
-  RenderEffect effect = BackgroundBlurEffect::New(0.25f, 50.0f);
+  RenderEffect effect = BackgroundBlurEffect::New(50.0f);
   control.SetRenderEffect(effect);
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
 

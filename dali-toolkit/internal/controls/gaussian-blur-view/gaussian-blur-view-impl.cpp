@@ -112,7 +112,7 @@ inline float CalculateGaussianWeight(float localOffset, float sigma)
 } // namespace
 
 GaussianBlurView::GaussianBlurView()
-: Control(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES),
   mBellCurveWidth(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH),
   mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT),
@@ -122,7 +122,7 @@ GaussianBlurView::GaussianBlurView()
   mDownsampledHeight(0.0f),
   mBlurUserImage(false),
   mRenderOnce(false),
-  mBackgroundColor(Color::BLACK),
+  mBackgroundColor(Color::TRANSPARENT),
   mTargetSize(Vector2::ZERO),
   mLastSize(Vector2::ZERO),
   mChildrenRoot(Actor::New()),
@@ -138,7 +138,7 @@ GaussianBlurView::GaussianBlurView(const unsigned int  numSamples,
                                    const float         downsampleWidthScale,
                                    const float         downsampleHeightScale,
                                    bool                blurUserImage)
-: Control(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(numSamples),
   mBellCurveWidth(blurBellCurveWidth),
   mPixelFormat(renderTargetPixelFormat),
@@ -148,7 +148,7 @@ GaussianBlurView::GaussianBlurView(const unsigned int  numSamples,
   mDownsampledHeight(0.0f),
   mBlurUserImage(blurUserImage),
   mRenderOnce(false),
-  mBackgroundColor(Color::BLACK),
+  mBackgroundColor(Color::TRANSPARENT),
   mTargetSize(Vector2::ZERO),
   mLastSize(Vector2::ZERO),
   mChildrenRoot(Actor::New()),
@@ -260,12 +260,14 @@ void GaussianBlurView::OnInitialize()
   mHorizontalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   Renderer renderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  renderer.SetProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
   mHorizontalBlurActor.AddRenderer(renderer);
 
   // Create an actor for performing a vertical blur on the texture
   mVerticalBlurActor = Actor::New();
   mVerticalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   renderer = CreateRenderer(BASIC_VERTEX_SOURCE, fragmentSource.c_str());
+  renderer.SetProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
   mVerticalBlurActor.AddRenderer(renderer);
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
@@ -279,6 +281,7 @@ void GaussianBlurView::OnInitialize()
     mCompositingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     mCompositingActor.SetProperty(Actor::Property::OPACITY, GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
     renderer = CreateRenderer(BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE);
+    renderer.SetProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
     mCompositingActor.AddRenderer(renderer);
 
     Constraint blurStrengthConstraint = Constraint::New<float>(mCompositingActor, Actor::Property::COLOR_ALPHA, EqualToConstraint());
@@ -289,6 +292,7 @@ void GaussianBlurView::OnInitialize()
     mTargetActor = Actor::New();
     mTargetActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     renderer = CreateRenderer(BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE);
+    renderer.SetProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
     mTargetActor.AddRenderer(renderer);
 
     //////////////////////////////////////////////////////
@@ -503,7 +507,8 @@ void GaussianBlurView::CreateRenderTasks()
     mCompositeTask.SetSourceActor(mCompositingActor);
     mCompositeTask.SetExclusive(true);
     mCompositeTask.SetInputEnabled(false);
-
+    mCompositeTask.SetClearEnabled(true);
+    mCompositeTask.SetClearColor(mBackgroundColor);
     mCompositeTask.SetCameraActor(mRenderFullSizeCamera);
     mCompositeTask.SetFrameBuffer(mBlurResultFrameBuffer);
 

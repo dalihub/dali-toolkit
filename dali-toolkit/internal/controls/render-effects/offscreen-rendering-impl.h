@@ -95,6 +95,7 @@ private:
 
 private:
   RenderTask                           mRenderTask;
+  CameraActor                          mCamera;
   FrameBuffer                          mFrameBuffer;
   DevelControl::OffScreenRenderingType mType;
 };

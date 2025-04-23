@@ -70,6 +70,18 @@ public:
    */
   RenderEffect(const RenderEffect& handle);
 
+  /**
+   * @brief Activates effect on ownerControl
+   * @SINCE_2_4.15
+   */
+  void Activate();
+
+  /**
+   * @brief Deactivates effect
+   * @SINCE_2_4.15
+   */
+  void Deactivate();
+
 public: // Not intended for Application developers
   ///@cond internal
   /**

@@ -47,7 +47,6 @@ Debug::Filter* gRenderEffectLogFilter = Debug::Filter::New(Debug::NoLogging, fal
 
 RenderEffectImpl::RenderEffectImpl()
 : mRenderer(),
-  mCamera(),
   mOwnerControl(),
   mSizeNotification(),
   mTargetSize(Vector2::ZERO),
@@ -159,11 +158,6 @@ Vector2 RenderEffectImpl::GetTargetSize() const
   return mTargetSize;
 }
 
-CameraActor RenderEffectImpl::GetCameraActor() const
-{
-  return mCamera;
-}
-
 void RenderEffectImpl::Activate()
 {
   if(!IsActivated() && IsActivateValid())
@@ -181,17 +175,6 @@ void RenderEffectImpl::Activate()
       return;
     }
     mPlacementSceneHolder = sceneHolder;
-
-    if(!mCamera)
-    {
-      mCamera = CameraActor::New();
-      mCamera.SetInvertYAxis(true);
-      mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-      mCamera.SetType(Dali::Camera::FREE_LOOK);
-    }
-    mCamera.SetPerspectiveProjection(GetTargetSize());
-    ownerControl.Add(mCamera);
 
     // Activate logic for subclass.
     OnActivate();
@@ -224,11 +207,6 @@ void RenderEffectImpl::Deactivate()
 
     // Deactivate logic for subclass.
     OnDeactivate();
-
-    if(mCamera)
-    {
-      mCamera.Unparent();
-    }
   }
 }
 
@@ -315,7 +293,6 @@ void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
         }
         else
         {
-          mCamera.SetPerspectiveProjection(GetTargetSize());
           OnRefresh();
         }
       }

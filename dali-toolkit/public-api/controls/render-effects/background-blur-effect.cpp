@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/render-effects/blur-effect-impl.h>
+#include <dali-toolkit/internal/controls/render-effects/background-blur-effect-impl.h>
 namespace Dali
 {
 namespace Toolkit
@@ -28,20 +28,60 @@ BackgroundBlurEffect::BackgroundBlurEffect(const BackgroundBlurEffect& handle)
 : RenderEffect(handle)
 {
 }
-BackgroundBlurEffect::BackgroundBlurEffect(Internal::BlurEffectImpl* blurEffectImpl)
-: RenderEffect(blurEffectImpl)
+
+BackgroundBlurEffect::BackgroundBlurEffect(Internal::BackgroundBlurEffectImpl* backgroundBlurEffectImpl)
+: RenderEffect(backgroundBlurEffectImpl)
 {
 }
+
 BackgroundBlurEffect::~BackgroundBlurEffect() = default;
+
 BackgroundBlurEffect BackgroundBlurEffect::New()
 {
-  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(true);
+  Internal::BackgroundBlurEffectImplPtr internal = Internal::BackgroundBlurEffectImpl::New();
   return BackgroundBlurEffect(internal.Get());
 }
-BackgroundBlurEffect BackgroundBlurEffect::New(float downscaleFactor, uint32_t blurRadius, bool blurOnce)
+
+BackgroundBlurEffect BackgroundBlurEffect::New(uint32_t blurRadius)
 {
-  Internal::BlurEffectImplPtr internal = Internal::BlurEffectImpl::New(downscaleFactor, blurRadius, blurOnce, true);
+  Internal::BackgroundBlurEffectImplPtr internal = Internal::BackgroundBlurEffectImpl::New(blurRadius);
   return BackgroundBlurEffect(internal.Get());
 }
+
+void BackgroundBlurEffect::SetBlurOnce(bool blurOnce)
+{
+  GetImplementation(*this).SetBlurOnce(blurOnce);
+}
+
+bool BackgroundBlurEffect::GetBlurOnce() const
+{
+  return GetImplementation(*this).GetBlurOnce();
+}
+
+void BackgroundBlurEffect::SetBlurRadius(uint32_t blurRadius)
+{
+  GetImplementation(*this).SetBlurRadius(blurRadius);
+}
+
+uint32_t BackgroundBlurEffect::GetBlurRadius() const
+{
+  return GetImplementation(*this).GetBlurRadius();
+}
+
+void BackgroundBlurEffect::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
+{
+  GetImplementation(*this).AddBlurStrengthAnimation(animation, alphaFunction, timePeriod, fromValue, toValue);
+}
+
+void BackgroundBlurEffect::AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
+{
+  GetImplementation(*this).AddBlurOpacityAnimation(animation, alphaFunction, timePeriod, fromValue, toValue);
+}
+
+BackgroundBlurEffect::FinishedSignalType& BackgroundBlurEffect::FinishedSignal()
+{
+  return GetImplementation(*this).FinishedSignal();
+}
+
 } // namespace Toolkit
 } // namespace Dali
