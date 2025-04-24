@@ -72,7 +72,9 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/alignment/alignment-impl.cpp
    ${toolkit_src_dir}/controls/render-effects/render-effect-impl.cpp
    ${toolkit_src_dir}/controls/render-effects/mask-effect-impl.cpp
+   ${toolkit_src_dir}/controls/render-effects/gaussian-blur-algorithm.cpp
    ${toolkit_src_dir}/controls/render-effects/background-blur-effect-impl.cpp
+   ${toolkit_src_dir}/controls/render-effects/gaussian-blur-effect-impl.cpp
    ${toolkit_src_dir}/controls/render-effects/offscreen-rendering-impl.cpp
    ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
