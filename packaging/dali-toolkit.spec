@@ -110,7 +110,7 @@ Application development package for Dali 3D engine toolkit - headers and package
 %package -n %{dali2_scene3d}
 Summary:    DLI scene loading library
 Group:      System/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and BSD-3-Clause and MIT
 Requires:   dali2-toolkit
 
 %description -n %{dali2_scene3d}
@@ -131,7 +131,7 @@ Development components for dali-scene3d.
 %package -n %{dali2_physics2d}
 Summary:    Physics library 2D
 Group:      System/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and BSD-3-Clause and MIT
 
 %description -n %{dali2_physics2d}
 Provides functionality for 2D physics simulation. See README.md for more details.
@@ -151,7 +151,7 @@ Development components for dali2-physics-2d.
 %package -n %{dali2_physics3d}
 Summary:    Physics library 3D
 Group:      System/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and BSD-3-Clause and MIT
 
 %description -n %{dali2_physics3d}
 Provides functionality for 3D physics simulation. See README.md for more details.
@@ -172,7 +172,7 @@ Development components for dali2-physics-3d.
 %package -n %{dali2_usdloader}
 Summary:    USD model loading library
 Group:      System/Libraries
-License:    Apache-2.0
+License:    Apache-2.0 and BSD-3-Clause and MIT
 Requires:   %{dali2_scene3d}
 Requires:   openusd
 
