@@ -830,6 +830,14 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
   }
 }
 
+void WebView::RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterOverScrolledCallback(callback);
+  }
+}
+
 void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
   if(mWebEngine)
