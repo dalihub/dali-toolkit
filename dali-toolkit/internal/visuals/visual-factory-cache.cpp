@@ -57,6 +57,24 @@ bool NeedToLoadYuvPlanes()
   return loadYuvPlanes;
 }
 
+// Happy trick for Tizen platform! since 2025-04-22. eunkiki.hong@samsung.com
+// Since uniform buffer reduce fps near 10% than before, let we ignore uniform block feature
+// except several default SharedUniformBlocks, like "VisualVertBlock".
+// If we resolve performance issue, please remove below code!
+#define IGNORE_UNIFORM_BLOCKS_FOR_NORMAL_CASES 1
+
+#if IGNORE_UNIFORM_BLOCKS_FOR_NORMAL_CASES
+inline bool ApplyNonDefaultUniformBlockVertexShaderCode(std::string& vertexShader)
+{
+  auto it = vertexShader.find("VisualVertBlock");
+  if(it != std::string::npos)
+  {
+    vertexShader.replace(it, 15, "NisualVertBlock");
+    return true;
+  }
+  return false;
+}
+#endif
 } // namespace
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
@@ -101,11 +119,11 @@ Shader VisualFactoryCache::GetShader(ShaderType type, bool useDefaultUniforms)
 
 Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader, bool useDefaultUniforms)
 {
-  Shader shader;
+  Shader      shader;
   std::string shaderName = Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT);
 
   // If the shader name is empty, it means that the shader is not generated internally. So, there is need to support file caching. Otherwise, it is defined externally. So, it needs not to support file caching.
-  Shader::Hint::Value shaderHints = shaderName.empty()? Shader::Hint::NONE : Shader::Hint::FILE_CACHE_SUPPORT;
+  Shader::Hint::Value shaderHints = shaderName.empty() ? Shader::Hint::NONE : Shader::Hint::FILE_CACHE_SUPPORT;
 
   if(useDefaultUniforms)
   {
@@ -114,7 +132,15 @@ Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_vi
   }
   else
   {
-    shader = Shader::New(vertexShader, fragmentShader, shaderHints, shaderName);
+#if IGNORE_UNIFORM_BLOCKS_FOR_NORMAL_CASES
+    std::string convertedVertexShader = std::string(vertexShader);
+    if(ApplyNonDefaultUniformBlockVertexShaderCode(convertedVertexShader))
+    {
+      vertexShader = convertedVertexShader;
+      shaderName += "_N";
+    }
+#endif
+    shader        = Shader::New(vertexShader, fragmentShader, shaderHints, shaderName);
     mShader[type] = shader;
   }
 
