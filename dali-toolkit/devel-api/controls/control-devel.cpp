@@ -121,11 +121,9 @@ void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali
   controlDataImpl.DoActionExtension(visualIndex, actionId, attributes);
 }
 
-void EnableCornerPropertiesOverridden(Control& control, Visual::Base& visual, bool enable)
+void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable)
 {
-  Internal::Control&       controlInternal = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlInternal);
-  controlDataImpl.EnableCornerPropertiesOverridden(visual, enable);
+  Internal::Control::Impl::Get(control).EnableCornerPropertiesOverridden(visual, enable);
 }
 
 void SetInputMethodContext(Internal::Control& control, InputMethodContext& inputMethodContext)

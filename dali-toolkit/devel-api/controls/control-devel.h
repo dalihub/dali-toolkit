@@ -495,7 +495,7 @@ DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index 
  * @param[in] visual A registered visual.
  * @param[in] enable Whether to override corner properties of control to visual.
  */
-DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Control& control, Visual::Base& visual, bool enable);
+DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable);
 
 /**
  * @brief Set input method context.

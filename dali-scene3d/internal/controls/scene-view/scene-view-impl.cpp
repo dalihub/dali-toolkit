@@ -66,12 +66,6 @@ DALI_TYPE_REGISTRATION_BEGIN(Scene3D::SceneView, Toolkit::Control, Create);
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "AlphaMaskUrl", STRING, ALPHA_MASK_URL)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "MaskContentScale", FLOAT, MASK_CONTENT_SCALE)
 DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CropToMask", BOOLEAN, CROP_TO_MASK)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerRadius", VECTOR4, CORNER_RADIUS)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerRadiusPolicy", FLOAT, CORNER_RADIUS_POLICY)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineWidth", FLOAT, BORDERLINE_WIDTH)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineColor", VECTOR4, BORDERLINE_COLOR)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "BorderlineOffset", FLOAT, BORDERLINE_OFFSET)
-DALI_PROPERTY_REGISTRATION(Scene3D, SceneView, "CornerSquareness", VECTOR4, CORNER_SQUARENESS)
 DALI_TYPE_REGISTRATION_END()
 
 Property::Index           RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
@@ -343,7 +337,6 @@ SceneView::SceneView()
   mSkyboxIntensity(1.0f),
   mFailedCaptureCallbacks(nullptr),
   mLightObservers(),
-  mCornerRadiusPolicy(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)),
   mShaderManager(new Scene3D::Loader::ShaderManager())
 {
 }
@@ -1111,114 +1104,6 @@ bool SceneView::IsEnabledCropToMask()
   return mCropToMask;
 }
 
-void SceneView::SetCornerRadius(Vector4 cornerRadius)
-{
-  if(mCornerRadius != cornerRadius)
-  {
-    mCornerRadius = cornerRadius;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-Vector4 SceneView::GetCornerRadius() const
-{
-  return mCornerRadius;
-}
-
-void SceneView::SetCornerSquareness(Vector4 cornerSquareness)
-{
-  if(mCornerSquareness != cornerSquareness)
-  {
-    mCornerSquareness = cornerSquareness;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-Vector4 SceneView::GetCornerSquareness() const
-{
-  return mCornerSquareness;
-}
-
-void SceneView::SetCornerRadiusPolicy(int cornerRadiusPolicy)
-{
-  if(mCornerRadiusPolicy != cornerRadiusPolicy)
-  {
-    mCornerRadiusPolicy = cornerRadiusPolicy;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-int SceneView::GetCornerRadiusPolicy() const
-{
-  return mCornerRadiusPolicy;
-}
-
-void SceneView::SetBorderlineWidth(float borderlineWidth)
-{
-  if(!Dali::Equals(mBorderlineWidth, borderlineWidth))
-  {
-    mBorderlineWidth = borderlineWidth;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-float SceneView::GetBorderlineWidth() const
-{
-  return mBorderlineWidth;
-}
-
-void SceneView::SetBorderlineColor(Vector4 borderlineColor)
-{
-  if(mBorderlineColor != borderlineColor)
-  {
-    mBorderlineColor = borderlineColor;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-Vector4 SceneView::GetBorderlineColor() const
-{
-  return mBorderlineColor;
-}
-
-void SceneView::SetBorderlineOffset(float borderlineOffset)
-{
-  if(!Dali::Equals(mBorderlineOffset, borderlineOffset))
-  {
-    mBorderlineOffset = borderlineOffset;
-    if(mUseFrameBuffer)
-    {
-      mDecoratedVisualPropertyChanged = true;
-      UpdateRenderTask();
-    }
-  }
-}
-
-float SceneView::GetBorderlineOffset() const
-{
-  return mBorderlineOffset;
-}
-
 Dali::RenderTask SceneView::GetRenderTask()
 {
   return mRenderTask;
@@ -1250,36 +1135,6 @@ void SceneView::SetProperty(BaseObject* object, Property::Index index, const Pro
         sceneViewImpl.EnableCropToMask(value.Get<bool>());
         break;
       }
-      case Scene3D::SceneView::Property::CORNER_RADIUS:
-      {
-        sceneViewImpl.SetCornerRadius(value.Get<Vector4>());
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_RADIUS_POLICY:
-      {
-        sceneViewImpl.SetCornerRadiusPolicy(value.Get<int>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_WIDTH:
-      {
-        sceneViewImpl.SetBorderlineWidth(value.Get<float>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_COLOR:
-      {
-        sceneViewImpl.SetBorderlineColor(value.Get<Vector4>());
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_OFFSET:
-      {
-        sceneViewImpl.SetBorderlineOffset(value.Get<float>());
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_SQUARENESS:
-      {
-        sceneViewImpl.SetCornerSquareness(value.Get<Vector4>());
-        break;
-      }
     }
   }
 }
@@ -1309,36 +1164,6 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
       case Scene3D::SceneView::Property::CROP_TO_MASK:
       {
         value = sceneViewImpl.IsEnabledCropToMask();
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_RADIUS:
-      {
-        value = sceneViewImpl.GetCornerRadius();
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_RADIUS_POLICY:
-      {
-        value = sceneViewImpl.GetCornerRadiusPolicy();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_WIDTH:
-      {
-        value = sceneViewImpl.GetBorderlineWidth();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_COLOR:
-      {
-        value = sceneViewImpl.GetBorderlineColor();
-        break;
-      }
-      case Scene3D::SceneView::Property::BORDERLINE_OFFSET:
-      {
-        value = sceneViewImpl.GetBorderlineOffset();
-        break;
-      }
-      case Scene3D::SceneView::Property::CORNER_SQUARENESS:
-      {
-        value = sceneViewImpl.GetCornerSquareness();
         break;
       }
     }
@@ -1598,7 +1423,6 @@ void SceneView::UpdateRenderTask()
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetWidth(), width) ||
          !Dali::Equals(currentFrameBuffer.GetColorTexture().GetHeight(), height) ||
          mMaskingPropertyChanged ||
-         mDecoratedVisualPropertyChanged ||
          mWindowSizeChanged)
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
@@ -1626,32 +1450,17 @@ void SceneView::UpdateRenderTask()
           imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
           Self().RegisterProperty(Y_FLIP_MASK_TEXTURE, FLIP_MASK_TEXTURE);
         }
-        if(mCornerRadius != Vector4::ZERO)
-        {
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mCornerRadius);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, mCornerRadiusPolicy);
-          if(mCornerSquareness != Vector4::ZERO)
-          {
-            imagePropertyMap.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, mCornerSquareness);
-          }
-        }
-        if(!Dali::EqualsZero(mBorderlineWidth))
-        {
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, mBorderlineWidth);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, mBorderlineColor);
-          imagePropertyMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, mBorderlineOffset);
-        }
 
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
         Toolkit::DevelControl::RegisterVisual(*this, RENDERING_BUFFER, mVisual);
+        Toolkit::DevelControl::EnableCornerPropertiesOverridden(*this, mVisual, true);
 
         mRenderTask.SetFrameBuffer(mFrameBuffer);
         mRenderTask.SetClearEnabled(true);
         mRenderTask.SetClearColor(Color::TRANSPARENT);
 
-        mMaskingPropertyChanged         = false;
-        mDecoratedVisualPropertyChanged = false;
-        mWindowSizeChanged              = false;
+        mMaskingPropertyChanged = false;
+        mWindowSizeChanged      = false;
       }
     }
     else
