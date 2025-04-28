@@ -115,6 +115,21 @@ public:
    */
   Dali::Texture GenerateLookupTexture();
 
+  /**
+   * Sets the gradient's start position offset.
+   * @param[in] startOffset The start offset.
+   * @note 0.0 is start position of gradient, 1.0 is end position of gradient.
+   * It is possible to set the startOffset outside the [0, 1] range.
+   * For example, you can animate it from 0.5 to 1.5.
+   */
+  void SetStartOffset(float startOffset);
+
+  /**
+   * Retrieves the gradient's start position offset.
+   * @return The start offset
+   */
+  float GetStartOffset() const;
+
 private:
   /**
    * Estimate the resolution of the lookup texture.
@@ -145,6 +160,7 @@ protected:
   Matrix3                                     mAlignmentTransform;
   Toolkit::GradientVisual::Units::Type        mGradientUnits;
   Toolkit::GradientVisual::SpreadMethod::Type mSpreadMethod;
+  float                                       mStartOffset;
 };
 
 } // namespace Internal
