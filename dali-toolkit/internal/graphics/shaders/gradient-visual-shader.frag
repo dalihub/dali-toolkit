@@ -32,6 +32,10 @@ UNIFORM_BLOCK FragBlock
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
   UNIFORM highp vec4 cornerSquareness;
 #endif
+
+#ifdef CONIC
+  UNIFORM highp float uStartAngle;
+#endif
 };
 
 #ifdef IS_REQUIRED_BORDERLINE
@@ -257,6 +261,12 @@ void main()
 #ifdef RADIAL
   mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
   lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord + uGradientOffset, 0.5)) * uColor;
+#elif defined(CONIC)
+  highp float angle = atan(vTexCoord.y, vTexCoord.x);
+  angle -= uStartAngle;
+  // fract(angle / (2 * PI))
+  highp float normalizedAngle = fract(angle * 0.15915494309189533576888376337251);
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(normalizedAngle + uGradientOffset, 0.5)) * uColor;
 #else
   lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y + uGradientOffset, 0.5)) * uColor;
 #endif

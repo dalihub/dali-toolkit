@@ -185,6 +185,9 @@ extern const char* const ANTI_ALIASING;
 extern const char* const CENTER_NAME; // Property::VECTOR2
 extern const char* const RADIUS_NAME; // Property::FLOAT
 
+// properties: conic gradient
+extern const char* const CONIC_START_ANGLE_NAME; // Property::FLOAT
+
 // properties: linear&radial gradient
 extern const char* const STOP_OFFSET_NAME;   // Property::Array FLOAT
 extern const char* const STOP_COLOR_NAME;    // Property::Array VECTOR4
