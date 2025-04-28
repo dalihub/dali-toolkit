@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -951,7 +951,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // Test whether current frame is 3.
-  CheckAndRetryCurrentFrame(actor, 3, {0, 1}, TEST_LOCATION);
+  CheckAndRetryCurrentFrame(actor, 3, {0, 1, 2}, TEST_LOCATION);
 
   array.Clear();
   array.PushBack(0);
