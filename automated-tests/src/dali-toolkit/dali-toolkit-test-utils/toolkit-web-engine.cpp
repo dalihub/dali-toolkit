@@ -1478,6 +1478,9 @@ public:
   void RegisterScrollEdgeReachedCallback(WebEngineScrollEdgeReachedCallback callback) override
   {
   }
+  void RegisterOverScrolledCallback(WebEngineOverScrolledCallback callback) override
+  {
+  }
   void RegisterUrlChangedCallback(WebEngineUrlChangedCallback callback) override
   {
   }
@@ -1968,6 +1971,11 @@ public:
     mScrollEdgeReachedCallback = callback;
   }
 
+  void RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback)
+  {
+    mOverScrolledCallback = callback;
+  }
+
   void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
   {
     mUrlChangedCallback = callback;
@@ -2122,6 +2130,7 @@ public:
   Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadFinishedCallback;
   Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback           mPageLoadErrorCallback;
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineOverScrolledCallback            mOverScrolledCallback;
   Dali::WebEnginePlugin::WebEngineUrlChangedCallback              mUrlChangedCallback;
   Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback       mFormRepostDecidedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback           mFrameRenderedCallback;
@@ -3008,6 +3017,11 @@ void WebEngine::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePa
 void WebEngine::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterScrollEdgeReachedCallback(callback);
+}
+
+void WebEngine::RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterOverScrolledCallback(callback);
 }
 
 void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)

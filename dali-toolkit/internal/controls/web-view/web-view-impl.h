@@ -378,6 +378,11 @@ public:
   void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterOverScrolledCallback()
+   */
+  void RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterUrlChangedCallback()
    */
   void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback);
