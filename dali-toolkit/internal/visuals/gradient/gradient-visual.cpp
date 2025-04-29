@@ -141,7 +141,10 @@ GradientVisualPtr GradientVisual::New(VisualFactoryCache& factoryCache, const Pr
 
 GradientVisual::GradientVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::GRADIENT),
+  mGradientTransform(),
+  mGradient(nullptr),
   mGradientType(LINEAR),
+  mStartOffsetIndex(Property::INVALID_INDEX),
   mIsOpaque(true)
 {
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -380,7 +383,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   }
 
   Property::Value* startOffset = propertyMap.Find(Toolkit::GradientVisual::Property::START_OFFSET, START_OFFSET_NAME);
-  float startOffsetValue;
+  float            startOffsetValue;
   if(startOffset && startOffset->Get(startOffsetValue))
   {
     mGradient->SetStartOffset(startOffsetValue);
