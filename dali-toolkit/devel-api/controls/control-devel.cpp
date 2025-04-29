@@ -147,88 +147,100 @@ Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, D
 
 Toolkit::DevelControl::AccessibilityActivateSignalType& AccessibilityActivateSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityActivateSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityActivateSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingSkippedSignalType& AccessibilityReadingSkippedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingSkippedSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityReadingSkippedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingPausedSignalType& AccessibilityReadingPausedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingPausedSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityReadingPausedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingResumedSignalType& AccessibilityReadingResumedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingResumedSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityReadingResumedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingCancelledSignalType& AccessibilityReadingCancelledSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingCancelledSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityReadingCancelledSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingStoppedSignalType& AccessibilityReadingStoppedSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityReadingStoppedSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityReadingStoppedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetNameSignalType& AccessibilityGetNameSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityGetNameSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityGetNameSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetDescriptionSignalType& AccessibilityGetDescriptionSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityGetDescriptionSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityGetDescriptionSignal;
 }
 
 Toolkit::DevelControl::AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityDoGestureSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityDoGestureSignal;
 }
 
 Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control)
 {
-  return GetControlImplementation(control).mAccessibilityData->mAccessibilityActionSignal;
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityActionSignal;
 }
 
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
   {
-    GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations[relation].insert(destinationAccessible);
+    GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityProps.relations[relation].insert(destinationAccessible);
   }
 }
 
 void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
-  if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
+  auto& controlImpl = GetControlImplementation(control);
+
+  auto* accessibilityData = controlImpl.GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
   {
-    auto& relations = GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations;
-
-    relations[relation].erase(destinationAccessible);
-
-    if(relations[relation].empty())
+    if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
     {
-      relations.erase(relation);
+      auto& relations = accessibilityData->mAccessibilityProps.relations;
+
+      relations[relation].erase(destinationAccessible);
+
+      if(relations[relation].empty())
+      {
+        relations.erase(relation);
+      }
     }
   }
 }
 
 std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  const auto&                          relations = GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations;
   std::vector<Accessibility::Relation> result;
 
-  for(auto& relation : relations)
-  {
-    auto& targets = relation.second;
+  auto& controlImpl = GetControlImplementation(control);
 
-    result.emplace_back(Accessibility::Relation{relation.first, {}});
-    std::copy(targets.begin(), targets.end(), std::back_inserter(result.back().mTargets));
+  const auto* accessibilityData = controlImpl.GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
+  {
+    const auto& relations = accessibilityData->mAccessibilityProps.relations;
+    for(const auto& relation : relations)
+    {
+      const auto& targets = relation.second;
+
+      result.emplace_back(Accessibility::Relation{relation.first, {}});
+      std::copy(targets.begin(), targets.end(), std::back_inserter(result.back().mTargets));
+    }
   }
 
   return result;
@@ -236,7 +248,13 @@ std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control 
 
 void ClearAccessibilityRelations(Toolkit::Control control)
 {
-  GetControlImplementation(control).mAccessibilityData->mAccessibilityProps.relations.clear();
+  auto& controlImpl = GetControlImplementation(control);
+
+  auto* accessibilityData = controlImpl.GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
+  {
+    accessibilityData->mAccessibilityProps.relations.clear();
+  }
 }
 
 void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value)

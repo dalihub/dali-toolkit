@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MAGNIFIER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,16 +113,16 @@ protected:
   Magnifier();
 
   /**
-   * 2nd-phase initialization.
-   */
-  void Initialize();
-
-  /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~Magnifier();
 
 private:
+  /**
+   * @copydoc Toolkit::Control::OnInitialize()
+   */
+  void OnInitialize() override;
+
   /**
    * Initializes the render task required to render contents.
    */
