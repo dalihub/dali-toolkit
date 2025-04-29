@@ -13,7 +13,7 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp vec3 uSize;
 };
 
-UNIFORM_BLOCK VisualVertBlock
+UNIFORM_BLOCK NisualVertBlock
 {
   //Visual size and offset
   UNIFORM highp vec2 offset;
