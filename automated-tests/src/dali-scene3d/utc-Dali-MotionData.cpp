@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,6 +388,15 @@ int UtcDaliMotionDataLoadAsyncMultiple(void)
   application.SendNotification();
   application.Render();
 
+  while(!gLoadCompleted)
+  {
+    // Sometimes, BVH file loader load completed before it is cancelled.
+    // In this case, let we try to wait one more time until latest load completed.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
+  }
+
   DALI_TEST_EQUALS(gLoadCompleted, true, TEST_LOCATION);
 
   // Check MotionData load successfully.
@@ -396,7 +405,7 @@ int UtcDaliMotionDataLoadAsyncMultiple(void)
   gLoadCompleted = false;
 
   // Check if completed request comes only 1 time.
-  Test::WaitForEventThreadTrigger(1, 1);
+  Test::WaitForEventThreadTrigger(1, 0);
   application.SendNotification();
   application.Render();
 
@@ -412,12 +421,12 @@ int UtcDaliMotionDataLoadBvhUseRootTranslationOnly(void)
   MotionData motionDataAllTranslation = MotionData::New();
   motionDataAllTranslation.LoadBvh(TEST_BVH_FILE_NAME, false, Vector3::ONE, true);
 
-  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);  
+  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);
 
   MotionData motionDataOnlyRootTranslation = MotionData::New();
   motionDataOnlyRootTranslation.LoadBvh(TEST_BVH_FILE_NAME, true, Vector3::ONE, true);
 
-  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);  
+  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);
 
   END_TEST;
 }
@@ -431,12 +440,12 @@ int UtcDaliMotionDataLoadBvhFromBufferUseRootTranslationOnly(void)
   MotionData motionDataAllTranslation = MotionData::New();
   motionDataAllTranslation.LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), false, Vector3::ONE, true);
 
-  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);  
+  DALI_TEST_EQUALS(motionDataAllTranslation.GetMotionCount(), 4, TEST_LOCATION);
 
   MotionData motionDataOnlyRootTranslation = MotionData::New();
   motionDataOnlyRootTranslation.LoadBvhFromBuffer(reinterpret_cast<uint8_t*>(rawString.data()), static_cast<int>(rawString.length()), true, Vector3::ONE, true);
 
-  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);  
+  DALI_TEST_EQUALS(motionDataOnlyRootTranslation.GetMotionCount(), 3, TEST_LOCATION);
 
   END_TEST;
 }
