@@ -7083,3 +7083,48 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
 
   END_TEST;
 }
+
+int UtcDaliGradientAnimateTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGradientAnimateTest");
+
+  Control control = Control::New();
+  control[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+
+  // Linear Gradient
+  Dali::Property::Map map;
+  map.Insert(Toolkit::Visual::Property::TYPE, Visual::GRADIENT);
+  Property::Array stopOffsets;
+  stopOffsets.PushBack(0.0f);
+  stopOffsets.PushBack(0.5f);
+  stopOffsets.PushBack(1.0f);
+  map.Insert(GradientVisual::Property::STOP_OFFSET, stopOffsets);
+  Property::Array stopColors;
+  stopColors.PushBack(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+  stopColors.PushBack(Vector4(0.8f, 1.0f, 0.0f, 1.0f));
+  stopColors.PushBack(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+  map.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
+  map.Insert(GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT);
+  map.Insert(GradientVisual::Property::START_POSITION, Vector2(-100.f, -100.f));
+  map.Insert(GradientVisual::Property::END_POSITION, Vector2(100.f, 100.f));
+  map.Insert(GradientVisual::Property::START_OFFSET, 0.5f);
+
+  control[Dali::Toolkit::Control::Property::BACKGROUND] = map;
+
+  Dali::Property property1 = DevelControl::GetVisualProperty(control, Control::Property::BACKGROUND, GradientVisual::Property::START_OFFSET);
+  DALI_TEST_EQUALS(property1.object.GetProperty(property1.propertyIndex).Get<float>(), 0.5f, TEST_LOCATION);
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(control, Control::Property::BACKGROUND, GradientVisual::Property::START_OFFSET), 1.0f);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);     // Ensure animation starts
+  application.Render(1001u); // A Cycle
+
+  Dali::Property property2 = DevelControl::GetVisualProperty(control, Control::Property::BACKGROUND, GradientVisual::Property::START_OFFSET);
+  DALI_TEST_EQUALS(property2.object.GetProperty(property2.propertyIndex).Get<float>(), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}

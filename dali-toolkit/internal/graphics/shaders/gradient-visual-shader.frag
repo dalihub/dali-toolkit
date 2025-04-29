@@ -21,6 +21,7 @@ UNIFORM_BLOCK FragBlock
 {
   // scale factor to fit start and end position of gradient.
   UNIFORM highp float uTextureCoordinateScaleFactor;
+  UNIFORM highp float uGradientOffset;
   UNIFORM lowp vec4 uColor;
 
 #ifdef IS_REQUIRED_BORDERLINE
@@ -255,9 +256,9 @@ void main()
 {
 #ifdef RADIAL
   mediump float radialTexCoord = ((length(vTexCoord) - 0.5) * uTextureCoordinateScaleFactor) + 0.5;
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord, 0.5)) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(radialTexCoord + uGradientOffset, 0.5)) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * uColor;
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y + uGradientOffset, 0.5)) * uColor;
 #endif
 
 #if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)

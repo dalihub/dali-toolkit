@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/control/control-decoration-data.h>
 #include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-impl.h>
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
@@ -358,6 +359,29 @@ public:
   void ClearShadow();
 
   /**
+   * @brief Sets the inner shadow with a property map.
+   * @param[in] map The inner shadow property map
+   */
+  void SetInnerShadow(const Property::Map& map);
+
+  /**
+   * @brief Clear the inner shadow.
+   */
+  void ClearInnerShadow();
+
+  /**
+   * @brief Sets the borderline with a property map.
+   * @param[in] map The borderline property map
+   * @param[in] forciblyCreate Create new visual forcibly, False if we only need to update properties.
+   */
+  void SetBorderline(const Property::Map& map, bool forciblyCreate);
+
+  /**
+   * @brief Clear the borderline.
+   */
+  void ClearBorderline();
+
+  /**
    * @copydoc DevelControl::GetVisualProperty()
    */
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
@@ -490,12 +514,14 @@ private:
   void SetOffScreenRendering(int32_t offScreenRenderingType);
 
   /**
-   * Set corner radius to this control.
-   * @param[in] radius Corner radius property value
-   * @param[in] policy Corner radius policy. Default value is ABSOLUTE.
-   * @param[in] squareness Corner squareness property value
+   * Notify to this control's corner radius changed.
    */
-  void SetCornerRadius(Vector4 radius, Toolkit::Visual::Transform::Policy::Type policy, Vector4 squareness);
+  void UpdateCornerRadius();
+
+  /**
+   * Notify to this control's borderline changed.
+   */
+  void UpdateBorderline();
 
 public:
   Control&            mControlImpl;
@@ -514,9 +540,6 @@ public:
 
   std::string                               mStyleName;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
-  Vector4                                   mCornerRadius;       ///< The corner radius of this control
-  Toolkit::Visual::Transform::Policy::Type  mCornerRadiusPolicy; ///< The corner radius policy of this control
-  Vector4                                   mCornerSquareness;   ///< The corner squareness of this control
   RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
@@ -532,6 +555,9 @@ public:
   PanGestureDetector       mPanGestureDetector;
   TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
+
+  // Decoration data (CornerRadius, Borderline)
+  DecorationData* mDecorationData;
 
   // Off screen rendering context
   std::unique_ptr<OffScreenRenderingImpl> mOffScreenRenderingImpl;
@@ -583,10 +609,15 @@ public:
   static const PropertyRegistration PROPERTY_29;
   static const PropertyRegistration PROPERTY_30;
   static const PropertyRegistration PROPERTY_31;
+  static const PropertyRegistration PROPERTY_32;
+  static const PropertyRegistration PROPERTY_33;
 
   static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_1;
   static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_2;
   static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_3;
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_4;
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_5;
+  static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_6;
 };
 
 } // namespace Internal

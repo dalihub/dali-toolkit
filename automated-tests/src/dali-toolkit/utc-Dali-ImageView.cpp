@@ -703,8 +703,6 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
 
   application.GetScene().Add(imageView);
 
-  imageView.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
-
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
@@ -907,17 +905,17 @@ int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
   imageMap[ImageVisual::Property::ATLASING]       = true;
 
   // No atlasing with big image
-  ImageView imageView_bigdesired = ImageView::New();
-  imageView_bigdesired.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageView_bigdesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
+  ImageView imageViewBigdesired = ImageView::New();
+  imageViewBigdesired.SetProperty(ImageView::Property::IMAGE, imageMap);
+  imageViewBigdesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
 
   imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 0;
   imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 0;
 
   // No atlasing with zero desired size
-  ImageView imageView_nodesired = ImageView::New();
-  imageView_nodesired.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageView_nodesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
+  ImageView imageViewNodesired = ImageView::New();
+  imageViewNodesired.SetProperty(ImageView::Property::IMAGE, imageMap);
+  imageViewNodesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
 
   imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 34;
   imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 34;
@@ -929,22 +927,20 @@ int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
   // By default, Aysnc loading is used
   // loading is not started if the actor is offScene
   application.GetScene().Add(imageView);
-  application.GetScene().Add(imageView_bigdesired);
-  application.GetScene().Add(imageView_nodesired);
+  application.GetScene().Add(imageViewBigdesired);
+  application.GetScene().Add(imageViewNodesired);
   application.SendNotification();
   application.Render(16);
 
   // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
-  application.Render(16);
   application.SendNotification();
+  application.Render(16);
 
   // Change url to url2
   imageMap[ImageVisual::Property::URL] = url2.GetUrl();
   imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
-
-  imageView.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
 
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,6 +376,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::RegisterScrollEdgeReachedCallback()
    */
   void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterOverScrolledCallback()
+   */
+  void RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterUrlChangedCallback()
@@ -836,8 +841,6 @@ private:
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
-
-  Dali::Property::Map mVisualPropertyMap; ///< ImageVisual property map
 
   static std::unordered_map<Dali::WebEnginePlugin*, Dali::WeakHandle<Toolkit::WebView>> mPluginWebViewMap;
 };

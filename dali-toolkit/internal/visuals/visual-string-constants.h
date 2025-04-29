@@ -190,6 +190,7 @@ extern const char* const STOP_OFFSET_NAME;   // Property::Array FLOAT
 extern const char* const STOP_COLOR_NAME;    // Property::Array VECTOR4
 extern const char* const UNITS_NAME;         // Property::String  "userSpaceOnUse | objectBoundingBox"
 extern const char* const SPREAD_METHOD_NAME; // Property::String  "pad | reflect | repeat"
+extern const char* const START_OFFSET_NAME;  // Property::FLOAT
 
 //mesh visual
 extern const char* const OBJECT_URL_NAME;

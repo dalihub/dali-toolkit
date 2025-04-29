@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,10 +121,10 @@ Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
 {
   bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
   Vector3 actorSize               = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
-                                                                                             : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 screenPosition          = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
-                                                                                             : Dali::DevelActor::CalculateScreenPosition(self);
+                                                                               : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 anchorPointOffSet = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2 screenPosition    = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
+                                                                                    : Dali::DevelActor::CalculateScreenPosition(self);
 
   Dali::Rect<int32_t> displayArea;
   displayArea.x      = screenPosition.x - anchorPointOffSet.x;
@@ -148,9 +148,6 @@ const Property::Map DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES{
   {Dali::Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
   {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
   {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE},
-  {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, Vector4::ZERO},
-  {Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS, Vector4::ZERO},
-  {Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Dali::Toolkit::Visual::Transform::Policy::ABSOLUTE},
   {Dali::Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE}}},
 };
 
@@ -185,8 +182,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr},
-  mVisualPropertyMap{EMPTY_VISUAL_PROPERTIES}
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -210,8 +206,7 @@ WebView::WebView(uint32_t argc, char** argv, int32_t type)
   mKeyEventsEnabled(true),
   mVisualChangeRequired(false),
   mScreenshotCapturedCallback{nullptr},
-  mFrameRenderedCallback{nullptr},
-  mVisualPropertyMap{EMPTY_VISUAL_PROPERTIES}
+  mFrameRenderedCallback{nullptr}
 {
   mWebEngine = Dali::WebEngine::New(type);
 
@@ -316,10 +311,11 @@ void WebView::OnInitialize()
   mScaleUpdateNotification.NotifySignal().Connect(this, &WebView::OnDisplayAreaUpdated);
 
   // Create WebVisual for WebView
-  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(mVisualPropertyMap);
+  Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(EMPTY_VISUAL_PROPERTIES);
   if(webVisual)
   {
     Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
+    Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(*this, webVisual, true);
   }
   else
   {
@@ -830,6 +826,14 @@ void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngine
   }
 }
 
+void WebView::RegisterOverScrolledCallback(Dali::WebEnginePlugin::WebEngineOverScrolledCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterOverScrolledCallback(callback);
+  }
+}
+
 void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
   if(mWebEngine)
@@ -1045,28 +1049,7 @@ void WebView::OnFrameRendered()
     return;
   }
 
-  // Get webVisual for checking corner radius
-  Toolkit::Visual::Base webVisual = Dali::Toolkit::DevelControl::GetVisual(*this, Toolkit::WebView::Property::URL);
-  Property::Map         webMap;
-  webVisual.CreatePropertyMap(webMap);
-
   Property::Map newWebMap = DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES;
-
-  Property::Value* cornerRadiusValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
-  if(cornerRadiusValue)
-  {
-    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS] = cornerRadiusValue->Get<Vector4>();
-  }
-  Property::Value* cornerSquarenessValue = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS);
-  if(cornerSquarenessValue)
-  {
-    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS] = cornerSquarenessValue->Get<Vector4>();
-  }
-  Property::Value* cornerRadiusValuePolicy = webMap.Find(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY);
-  if(cornerRadiusValuePolicy)
-  {
-    newWebMap[Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = cornerRadiusValuePolicy->Get<int>();
-  }
 
   // Reset flag
   mVisualChangeRequired = false;
@@ -1080,14 +1063,12 @@ void WebView::OnFrameRendered()
 
   newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
 
-  // Store new visual property map now.
-  mVisualPropertyMap = std::move(newWebMap);
-
-  mVisual = Toolkit::VisualFactory::Get().CreateVisual(mVisualPropertyMap);
+  mVisual = Toolkit::VisualFactory::Get().CreateVisual(newWebMap);
 
   if(mVisual)
   {
     DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual, DepthIndex::CONTENT);
+    DevelControl::EnableCornerPropertiesOverridden(*this, mVisual, true);
     EnableBlendMode(!mVideoHoleEnabled);
   }
 }
@@ -1140,9 +1121,6 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
 
       const Vector4 pixelArea(0.0f, 0.0f, std::min(1.0f, textureRatio.x), std::min(1.0f, textureRatio.y));
       const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.y));
-
-      mVisualPropertyMap[Toolkit::ImageVisual::Property::PIXEL_AREA] = pixelArea;
-      mVisualPropertyMap[Toolkit::Visual::Property::TRANSFORM]       = {{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}};
 
       Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}, {Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}}}});
     }

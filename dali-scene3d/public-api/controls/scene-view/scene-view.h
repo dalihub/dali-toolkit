@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,71 +149,6 @@ public:
        * @note If this is false, then the mask is scaled to fit the rendered result before being applied.
        */
       CROP_TO_MASK,
-
-      /**
-       * @brief The radius for the rounded corners of the scene view.
-       * @details Name "cornerRadius", type Property::VECTOR4.
-       * @note By default, it is Vector::ZERO.
-       * @note Corner radius is only available when framebuffer is used.
-       * @note Each radius will clamp internally to the half of smaller of the SceneView width and height.
-       * @note Radius value are used in clockwise order from top-left-corner to bottom-left-corner.
-       *       When radius is Vector4(x, y, z, w)
-       *       x    y
-       *        +--+
-       *        |  |
-       *        +--+
-       *       w    z
-       */
-      CORNER_RADIUS,
-
-      /**
-       * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the SceneView size) or absolute (in world units).
-       * @details Name "cornerRadiusPolicy", type Property::INTEGER.
-       * @see Dali::Visual::Transform::Policy::Type
-       * @note By default, it is ABSOLUTE to the SceneView's size.
-       *       If it it RELATIVE, the corner radius value is relative to the smaller of the SceneView width and height.
-       */
-      CORNER_RADIUS_POLICY,
-
-      /**
-       * @brief The width for the borderline of the scene view.
-       * @details Name "borderlineWidth", type Property::FLOAT.
-       * @note Optional. Default value is 0.0f.
-       * @note Borderline is only available when framebuffer is used.
-       */
-      BORDERLINE_WIDTH,
-
-      /**
-       * @brief The color for the borderline of the scene view.
-       * @details Name "borderlineColor", type Property::VECTOR4.
-       * @note Default value is Color::BLACK.
-       */
-      BORDERLINE_COLOR,
-
-      /**
-       * @brief The offset from the scene view borderline (recommend [-1.0f to 1.0f]).
-       * @details Name "borderlineOffset", type Property::FLOAT
-       * @note Default value is 0.0f.
-       * @note This value will clamp internally to [-1.0f to 1.0f].
-       */
-      BORDERLINE_OFFSET,
-
-      /**
-       * @brief The squareness for the rounded corners of the scene view.
-       * @details Name "cornerSquareness", type Property::VECTOR4.
-       * @note By default, it is Vector::ZERO.
-       * @note Corner radius is only available when framebuffer is used.
-       * @note Each squareness will clamp internally as [0.0 1.0].
-       * @note If squareness is not zero, the width of borderline might not equal with it's real value.
-       * @note Squareness value are used in clockwise order from top-left-corner to bottom-left-corner.
-       *       When squareness is Vector4(x, y, z, w)
-       *       x    y
-       *        +--+
-       *        |  |
-       *        +--+
-       *       w    z
-       */
-      CORNER_SQUARENESS,
     };
   };
 

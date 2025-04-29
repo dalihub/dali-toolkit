@@ -266,6 +266,18 @@ enum
   OFFSCREEN_RENDERING,
 
   /**
+   * @brief The inner shadow of the control. The visual will use DepthIndex::Ranges::DECORATION - 2
+   * @details Name "innerShadow", type Property::MAP.
+   */
+  INNER_SHADOW,
+
+  /**
+   * @brief The inset borderline of the control. The visual will use DepthIndex::Ranges::DECORATION - 1
+   * @details Name "borderline", type Property::MAP.
+   */
+  BORDERLINE,
+
+  /**
    * @brief The radius for the rounded corners of the control.
    * @details Name "viewCornerRadius", type Property::VECTOR4
    * @note By default, it is Vector::ZERO.
@@ -293,6 +305,30 @@ enum
    * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
   CORNER_SQUARENESS,
+
+  /**
+   * @brief The width for the borderline of the control. It will update borderline visual
+   * @details Name "viewBorderlineWidth", type Property::FLOAT.
+   * @see Dali::Toolkit::DevelVisual::Property::Type::BORDERLINE_WIDTH
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
+   */
+  BORDERLINE_WIDTH,
+
+  /**
+   * @brief The color for the borderline of the control. It will update borderline visual
+   * @details Name "viewBorderlineColor", type Property::VECTOR4
+   * @see Dali::Toolkit::DevelVisual::Property::Type::BORDERLINE_COLOR
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
+   */
+  BORDERLINE_COLOR,
+
+  /**
+   * @brief The offset for the borderline of the control. It will update borderline visual
+   * @details Name "viewBorderlineOffset", type Property::FLOAT.
+   * @see Dali::Toolkit::DevelVisual::Property::Type::BORDERLINE_OFFSET
+   * @note It will not create UniformMap internally. So this property don't be used at Render phase.
+   */
+  BORDERLINE_OFFSET,
 };
 
 } // namespace Property
@@ -459,7 +495,7 @@ DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index 
  * @param[in] visual A registered visual.
  * @param[in] enable Whether to override corner properties of control to visual.
  */
-DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Control& control, Visual::Base& visual, bool enable);
+DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable);
 
 /**
  * @brief Set input method context.

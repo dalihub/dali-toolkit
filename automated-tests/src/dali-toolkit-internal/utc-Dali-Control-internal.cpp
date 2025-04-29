@@ -123,7 +123,7 @@ int UtcDaliControlOverrideCornerProperties(void)
   dummyImpl.RegisterVisual(Toolkit::DummyControl::Property::TEST_VISUAL, visual);
   tet_infoline("Register image visual into derived dummy control");
 
-  DevelControl::EnableCornerPropertiesOverridden(dummy, visual, true);
+  DevelControl::EnableCornerPropertiesOverridden(dummyImpl, visual, true);
 
   Property::Map map;
   visual.CreatePropertyMap(map);

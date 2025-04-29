@@ -62,6 +62,7 @@ static int                                                                gPageL
 static int                                                                gPageLoadErrorCallbackCalled           = 0;
 static std::unique_ptr<Dali::WebEngineLoadError>                          gPageLoadErrorInstance                 = nullptr;
 static int                                                                gScrollEdgeReachedCallbackCalled       = 0;
+static int                                                                gOverScrolledCallbackCalled            = 0;
 static int                                                                gUrlChangedCallbackCalled              = 0;
 static int                                                                gEvaluateJavaScriptCallbackCalled      = 0;
 static int                                                                gJavaScriptAlertCallbackCalled         = 0;
@@ -162,6 +163,11 @@ static void OnNewWindowCreated(Dali::WebEnginePlugin*& outPlugin)
   gNewWindowCreatedCallbackCalled++;
   WebView newView = WebView::New();
   outPlugin       = newView.GetPlugin();
+}
+
+static void OnOverScrolled(Dali::WebEnginePlugin::OverScrolled over)
+{
+  gOverScrolledCallbackCalled++;
 }
 
 static void OnUrlChanged(const std::string& url)
@@ -1199,6 +1205,9 @@ int UtcDaliWebViewScrollBy(void)
   view.GetProperty(WebView::Property::SCROLL_POSITION).Get(output);
   DALI_TEST_CHECK(output.x == 200 && output.y == 200);
   DALI_TEST_EQUALS(gScrollEdgeReachedCallbackCalled, 2, TEST_LOCATION);
+
+  view.RegisterOverScrolledCallback(&OnOverScrolled);
+  DALI_TEST_EQUALS(gOverScrolledCallbackCalled, 0, TEST_LOCATION);
 
   END_TEST;
 }
