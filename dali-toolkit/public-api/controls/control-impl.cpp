@@ -178,7 +178,7 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
     Internal::RenderEffectImpl* object = dynamic_cast<Internal::RenderEffectImpl*>(effect.GetObjectPtr());
     DALI_ASSERT_ALWAYS(object && "Given render effect is not valid.");
 
-    SetOffScreenRenderableType(object->GetOffScreenRenderableType());
+    RegisterOffScreenRenderableType(object->GetOffScreenRenderableType());
 
     Dali::Toolkit::Control ownerControl(GetOwner());
     object->SetOwnerControl(ownerControl);
@@ -200,10 +200,14 @@ void Control::ClearRenderEffect()
 {
   if(mImpl->mRenderEffect)
   {
-    mImpl->mRenderEffect.Get()->ClearOwnerControl();
+    RenderEffectImplPtr effectImpl = std::move(mImpl->mRenderEffect);
+
+    // Reset handle first to avoid circular reference
     mImpl->mRenderEffect.Reset();
+
+    UnregisterOffScreenRenderableType(effectImpl->GetOffScreenRenderableType());
+    effectImpl->ClearOwnerControl();
   }
-  SetOffScreenRenderableType(OffScreenRenderable::NONE);
 }
 
 void Control::SetResourceReady()

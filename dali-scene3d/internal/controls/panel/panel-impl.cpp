@@ -403,7 +403,7 @@ void Panel::OnInitialize()
   scaleConstraint.Apply();
 
   UpdateProperties();
-  SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
 }
 
 void Panel::OnSceneConnection(int depth)
