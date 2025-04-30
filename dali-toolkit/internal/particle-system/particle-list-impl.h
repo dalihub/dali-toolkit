@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_LIST_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_LIST_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/common/list-wrapper.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/base-object.h>
 #include <algorithm>
+#include <cstring>
 #include <memory>
-
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -44,40 +44,27 @@ struct StreamDataTypeWrapper
 struct ParticleDataStream
 {
   ~ParticleDataStream() = default;
-  template<class T>
-  ParticleDataStream(uint32_t capacity, const T& defaultValue, ParticleStream::StreamDataType dataType)
-  : ParticleDataStream(capacity, sizeof(T), &defaultValue, dataType)
-  {
-  }
 
   /**
    * Creates new stream of requested capacity and (optionally) fills with default data
    */
-  ParticleDataStream(uint32_t capacity, uint32_t dataSize, const void* defaultValue, ParticleStream::StreamDataType dataType)
+  ParticleDataStream(uint32_t capacity, uint32_t dataSize, const void* defaultValue, ParticleStream::StreamDataType dataType, const char* name, bool localStream)
+  : type(dataType),
+    data(capacity * dataSize),
+    streamName(name ? name : ""),
+    dataSize(dataSize),
+    localStream(localStream)
   {
-    this->capacity = capacity;
-    data.resize(capacity * dataSize);
     if(defaultValue)
     {
+      auto*       dstPtr          = data.data();
+      const auto* defaultValuePtr = reinterpret_cast<const uint8_t*>(defaultValue);
       for(auto i = 0u; i < capacity; ++i)
       {
-        auto dstPtr = data.data() + (i * dataSize);
-        std::copy(reinterpret_cast<const uint8_t*>(defaultValue), reinterpret_cast<const uint8_t*>(defaultValue) + dataSize, dstPtr);
+        memcpy(dstPtr, defaultValuePtr, dataSize);
+        dstPtr += dataSize;
       }
     }
-    type           = dataType;
-    alive          = 0u;
-    this->dataSize = dataSize;
-  }
-
-  void SetStreamName(const char* name)
-  {
-    streamName = name;
-  }
-
-  void SetStreamLocal(bool local)
-  {
-    localStream = local;
   }
 
   /**
@@ -92,8 +79,6 @@ struct ParticleDataStream
   ParticleStream::StreamDataType type;
   std::vector<uint8_t>           data;
   std::string                    streamName;
-  uint32_t                       alive{0u};
-  uint32_t                       capacity;
   uint32_t                       dataSize;
   bool                           localStream{true};
 };
@@ -109,7 +94,6 @@ struct ParticleDataStream
 class ParticleList : public Dali::BaseObject
 {
 public:
-
   ParticleList(uint32_t capacity, ParticleSystem::ParticleList::ParticleStreamTypeFlags streamFlags);
 
   ~ParticleList();
@@ -168,7 +152,7 @@ public:
 
   std::list<ParticleSystem::Particle>& GetParticles();
 
-  void ReleaseParticle(uint32_t particleIndex);
+  void ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndices);
 
   uint32_t GetStreamElementSize(bool includeLocalStream);
 

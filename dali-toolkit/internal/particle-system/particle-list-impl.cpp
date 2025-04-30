@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,45 +55,37 @@ ParticleList::ParticleList(uint32_t capacity, ParticleSystem::ParticleList::Part
   // initialize built-in streams and build map (to optimize later)
   if(streamFlags & ParticleStream::POSITION_STREAM_BIT)
   {
-    AddStream(Vector3::ZERO, "aStreamPosition", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::POSITION_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::POSITION_STREAM_BIT)] = AddStream(Vector3::ZERO, "aStreamPosition", false);
   }
   if(streamFlags & ParticleStream::ROTATION_STREAM_BIT)
   {
-    AddStream(Vector4::ZERO, "aStreamRotation", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::ROTATION_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::ROTATION_STREAM_BIT)] = AddStream(Vector4::ZERO, "aStreamRotation", false);
   }
   if(streamFlags & ParticleStream::SCALE_STREAM_BIT)
   {
-    AddStream(Vector3::ONE, "aStreamScale", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::SCALE_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::SCALE_STREAM_BIT)] = AddStream(Vector3::ONE, "aStreamScale", false);
   }
   if(streamFlags & ParticleStream::VELOCITY_STREAM_BIT)
   {
-    AddStream(Vector3::ZERO, "aStreamVelocity", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::VELOCITY_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::VELOCITY_STREAM_BIT)] = AddStream(Vector3::ZERO, "aStreamVelocity", false);
   }
   if(streamFlags & ParticleStream::COLOR_STREAM_BIT)
   {
-    AddStream(Color::YELLOW, "aStreamColor", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::COLOR_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::COLOR_STREAM_BIT)] = AddStream(Color::YELLOW, "aStreamColor", false);
   }
   if(streamFlags & ParticleStream::OPACITY_STREAM_BIT)
   {
-    AddStream(0.0f, "aStreamOpacity", false);
-    mBuiltInStreamMap[uint32_t(ParticleStream::OPACITY_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::OPACITY_STREAM_BIT)] = AddStream(0.0f, "aStreamOpacity", false);
   }
   if(streamFlags & ParticleStream::LIFETIME_STREAM_BIT)
   {
-    AddStream(0.0f, "aStreamLifetime", true);
-    mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_STREAM_BIT)] = mDataStreams.size() - 1;
-    AddStream(0.0f, "aStreamLifetimeBase", true);
-    mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_BASE_STREAM_BIT)] = mDataStreams.size() - 1;
+    mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_STREAM_BIT)]      = AddStream(0.0f, "aStreamLifetime", true);
+    mBuiltInStreamMap[uint32_t(ParticleStream::LIFETIME_BASE_STREAM_BIT)] = AddStream(0.0f, "aStreamLifetimeBase", true);
   }
 
   // create free chain
   mFreeChain.resize(capacity);
-  for(auto i = 0u; i < mFreeChain.size(); ++i)
+  for(auto i = 0u; i + 1 < mFreeChain.size(); ++i)
   {
     mFreeChain[i] = i + 1;
   }
@@ -105,25 +97,14 @@ ParticleList::~ParticleList() = default;
 
 uint32_t ParticleList::AddStream(uint32_t sizeOfDataType, const void* defaultValue, ParticleStream::StreamDataType dataType, const char* streamName, bool localStream)
 {
-  mDataStreams.emplace_back(new ParticleDataStream(mMaxParticleCount, sizeOfDataType, defaultValue, dataType));
-  if(streamName)
-  {
-    mDataStreams.back()->SetStreamName(streamName);
-  }
-
-  mDataStreams.back()->SetStreamLocal(localStream);
+  mDataStreams.emplace_back(new ParticleDataStream(mMaxParticleCount, sizeOfDataType, defaultValue, dataType, streamName, localStream));
 
   // Update element size
-  mParticleStreamElementSize          = 0;
-  mParticleStreamElementSizeWithLocal = 0;
-  for(auto& ds : mDataStreams)
+  if(!localStream)
   {
-    if(!ds->localStream)
-    {
-      mParticleStreamElementSize += ds->dataSize;
-    }
-    mParticleStreamElementSizeWithLocal += ds->dataSize;
+    mParticleStreamElementSize += sizeOfDataType;
   }
+  mParticleStreamElementSizeWithLocal += sizeOfDataType;
 
   return mDataStreams.size() - 1;
 }
@@ -174,13 +155,14 @@ uint32_t ParticleList::GetStreamDataTypeSize(uint32_t streamIndex) const
 
 ParticleSystem::Particle ParticleList::NewParticle(float lifetime)
 {
-  if(mParticles.size() < mMaxParticleCount)
+  if(mAliveParticleCount < mMaxParticleCount)
   {
     auto newIndex = int32_t(mFreeIndex);
     mFreeIndex    = int32_t(mFreeChain[mFreeIndex]);
     mAliveParticleCount++;
 
     // Add particle
+    // TODO : Could we use a pool allocator here?
     mParticles.emplace_back(new Internal::Particle(*this, newIndex));
 
     // Set particle lifetime
@@ -208,22 +190,32 @@ uint32_t ParticleList::GetStreamElementSize(bool includeLocalStream)
   }
 }
 
-void ParticleList::ReleaseParticle(uint32_t particleIndex)
+void ParticleList::ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndices)
 {
   auto it = mParticles.begin();
-  std::advance(it, particleIndex);
 
-  // Point at this slot of memory as next free slot
-  auto& p = *it;
-  if(mFreeIndex > -1)
+  mAliveParticleCount -= sortedEraseIndices.size();
+
+  uint32_t particleIndex = 0;
+  for(auto& index : sortedEraseIndices)
   {
-    mFreeChain[p.GetIndex()] = mFreeIndex;
-  }
-  mFreeIndex = p.GetIndex();
+    // Find particle in the list
+    // TODO : Let we remove advancement in future.
+    while(particleIndex < index)
+    {
+      ++it;
+      ++particleIndex;
+    }
 
-  // Remove particle from the list
-  mParticles.erase(it);
-  mAliveParticleCount--;
+    // Point at this slot of memory as next free slot
+    auto& p                  = *it;
+    mFreeChain[p.GetIndex()] = mFreeIndex;
+    mFreeIndex               = p.GetIndex();
+
+    // Remove particle from the list
+    it = mParticles.erase(it);
+    ++particleIndex;
+  }
 }
 
 void* ParticleList::GetDefaultStream(ParticleStreamTypeFlagBit streamBit)

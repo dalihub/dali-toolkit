@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,14 @@
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
+namespace
+{
+/**
+ * @brief The number of vertex elements per each particle is 6.
+ */
+static constexpr uint32_t NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE = 6u;
+} // namespace
+
 ParticleRenderer::ParticleRenderer()
 {
   mStreamBufferUpdateCallback = Dali::VertexBufferUpdateCallback::New(this, &ParticleRenderer::OnStreamBufferUpdate);
@@ -112,7 +120,7 @@ void ParticleRenderer::CreateShader()
       streamAtttributes.Add(key, ATTR_TYPES[dataTypeIndex]);
 
       // Add shader attribute line
-      ss << "INPUT mediump " << ATTR_GLSL_TYPES[dataTypeIndex] << " " << key << ";\n";
+      ss << "INPUT highp " << ATTR_GLSL_TYPES[dataTypeIndex] << " " << key << ";\n";
     }
   }
 
@@ -128,31 +136,33 @@ void ParticleRenderer::CreateShader()
    */
   std::string vertexShaderCode = streamAttributesStr + std::string(
                                                          "//@version 100\n\
-      INPUT mediump vec2 aPosition;\n\
-      INPUT mediump vec2 aTexCoords;\n\
+      precision highp float;\n\
+      INPUT highp vec2 aPosition;\n\
+      INPUT highp vec2 aTexCoords;\n\
       \n\
       UNIFORM_BLOCK VertBlock \n\
       {\n\
-      UNIFORM mediump mat4   uMvpMatrix;\n\
-      UNIFORM mediump vec3   uSize;\n\
-      UNIFORM lowp vec4      uColor;\n\
+      UNIFORM highp mat4 uMvpMatrix;\n\
+      UNIFORM highp vec3 uSize;\n\
+      UNIFORM lowp  vec4 uColor;\n\
       };\n\
-      OUTPUT mediump vec2 vTexCoord;\n\
+      OUTPUT highp   vec2 vTexCoord;\n\
       OUTPUT mediump vec4 vColor;\n\
       \n\
       void main()\n\
       {\n\
-        vec4 pos = vec4(aPosition, 0.0, 1.0) * vec4(aStreamScale, 1.0);\n\
+        vec4 pos      = vec4(aPosition, 0.0, 1.0) * vec4(aStreamScale, 1.0);\n\
         vec4 position =  pos + vec4(aStreamPosition, 0.0);\n\
         vTexCoord     = aTexCoords;\n\
-        vColor = uColor * aStreamColor;\n\
+        vColor        = uColor * aStreamColor;\n\
         gl_Position   = uMvpMatrix * position ;\n\
       }\n");
 
   std::string fragmentShaderCode =
     {"//@version 100\n\
-      INPUT mediump vec2       vTexCoord;\n\
-      INPUT mediump vec4       vColor;\n\
+      precision highp float;\n\
+      INPUT highp   vec2 vTexCoord;\n\
+      INPUT mediump vec4 vColor;\n\
       UNIFORM sampler2D sTexture;\n\
       \n\
       void main()\n\
@@ -186,10 +196,12 @@ void ParticleRenderer::CreateShader()
     Vertex2D a5{Vector2(0.0f, 1.0f) - C, Vector2(0.0f, 1.0f)};
   } QUAD;
 
+  static_assert(sizeof(Quad2D) == sizeof(Vertex2D) * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE, "Quad2D must be 6x Vertex2D");
+
   std::vector<Quad2D> quads;
   quads.resize(mEmitter->GetParticleList().GetCapacity());
   std::fill(quads.begin(), quads.end(), QUAD);
-  vertexBuffer0.SetData(quads.data(), 6u * quads.size());
+  vertexBuffer0.SetData(quads.data(), quads.size() * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE);
 
   // Second vertex buffer with stream data
   VertexBuffer vertexBuffer1 = VertexBuffer::New(streamAtttributes);
@@ -213,12 +225,12 @@ void ParticleRenderer::CreateShader()
   mStreamBuffer = vertexBuffer1;
 
   // Set some initial data for streambuffer to force initialization
-  std::vector<uint8_t> data;
+  Dali::Vector<uint8_t> data;
+
   // Resize using only-non local streams
-  auto elementSize = mEmitter->GetParticleList().GetParticleDataSize(false);
-  data.resize(elementSize *
-              mEmitter->GetParticleList().GetCapacity() * 6u);
-  mStreamBuffer.SetData(data.data(), mEmitter->GetParticleList().GetCapacity() * 6u); // needed to initialize
+  const auto elementSize = mEmitter->GetParticleList().GetParticleDataSize(false);
+  data.ResizeUninitialized(elementSize * mEmitter->GetParticleList().GetCapacity() * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE);
+  mStreamBuffer.SetData(data.Begin(), mEmitter->GetParticleList().GetCapacity() * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE); // needed to initialize
 
   // Sets up callback
   mStreamBuffer.SetVertexBufferUpdateCallback(std::move(mStreamBufferUpdateCallback));
@@ -258,33 +270,25 @@ void ParticleRenderer::CreateShader()
   }
 }
 
-uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
+uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t maxBytes)
 {
   auto& list = GetImplementation(mEmitter->GetParticleList());
 
-  auto particleCount    = list.GetActiveParticleCount(); // active particle count
-  auto particleMaxCount = list.GetParticleCount();
+  const auto particleCount = list.GetActiveParticleCount(); // active particle count
   if(!particleCount)
   {
     return 0;
   }
 
-  auto streamCount = list.GetStreamCount();
+  const auto particleMaxCount = list.GetParticleCount();
 
-  auto elementSize = 0u; // elements size should be cached (it's also stride of buffer) (in bytes)
-  for(auto i = 0u; i < streamCount; ++i)
-  {
-    if(!list.IsStreamLocal(i))
-    {
-      elementSize += list.GetStreamDataTypeSize(i);
-    }
-  }
+  const auto elementByte = list.GetStreamElementSize(false);
 
   // Prepare source buffer (MUST BE OPTIMIZED TO AVOID ALLOCATING AND COPYING!!)
-  auto totalSize = particleMaxCount * elementSize * 6u;
+  auto totalSize = particleMaxCount * elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE;
 
   // buffer sizes must match
-  if(totalSize != size)
+  if(DALI_UNLIKELY(totalSize != maxBytes))
   {
     // ASSERT here ?
     return 0;
@@ -292,10 +296,8 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
 
   auto* dst = reinterpret_cast<uint8_t*>(streamData);
 
-  auto& particles = list.GetParticles();
-
   // prepare worker threads
-  auto workerCount = GetThreadPool().GetWorkerCount();
+  static const auto workerCount = GetThreadPool().GetWorkerCount();
 
   // divide particles if over the threshold
 
@@ -307,7 +309,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
   else
   {
     // Partial to handle
-    auto partialSize = (particleCount / workerCount);
+    const auto partial = particleCount / workerCount;
 
     struct UpdateTask
     {
@@ -328,72 +330,43 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t size)
 
       Internal::ParticleRenderer& owner;
       Internal::ParticleList&     particleList;
-      uint32_t                    startIndex;
-      uint32_t                    count;
+      const uint32_t              startIndex;
+      const uint32_t              count;
       uint8_t*                    ptr;
     };
 
-    std::vector<UpdateTask> tasks;
+    static std::vector<UpdateTask> tasks;
     tasks.reserve(workerCount);
-    std::vector<Task> taskQueue;
-    auto              count = partialSize;
+
+    static std::vector<Task> taskQueue;
+    taskQueue.reserve(workerCount);
 
     for(auto i = 0u; i < workerCount; ++i)
     {
-      auto index = i * partialSize;
-      count      = partialSize;
+      const auto index = i * partial;
+      const auto count = i == workerCount - 1 ? particleCount - index : partial;
 
-      // make sure there's no leftover particles!
-      if(i == workerCount - 1 && index + count < particleCount)
-      {
-        count = particleCount - index;
-      }
-
-      tasks.emplace_back(*this, list, index, count, streamData);
-      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId) { t.Update(); });
+      tasks.emplace_back(*this, list, index, count, dst + (elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE) * index);
+      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId)
+                             { t.Update(); });
     }
 
     // Execute worker tasks
     auto future = GetThreadPool().SubmitTasks(taskQueue, 0);
     // wait to finish
     future->Wait();
+
+    // clear tasks
+    tasks.clear();
+    taskQueue.clear();
   }
 
   // less particles so run on a single thread
   if(!runParallel)
   {
-    for(auto& p : particles)
-    {
-      // without instancing we need to duplicate data 4 times per each quad
-      auto* particleDst = dst;
-      for(auto s = 0u; s < streamCount; ++s)
-      {
-        if(!list.IsStreamLocal(s))
-        {
-          // Pointer to stream value
-          auto* valuePtr = &p.GetByIndex<uint8_t*>(s);
-
-          // Size of data
-          auto dataSize = list.GetStreamDataTypeSize(s);
-
-          memcpy(dst, valuePtr, dataSize);
-          dst += dataSize;
-        }
-      }
-      // Replicate data 5 more times for each vertex (GLES2)
-      memcpy(dst, particleDst, elementSize);
-      dst += elementSize;
-      memcpy(dst, particleDst, elementSize);
-      dst += elementSize;
-      memcpy(dst, particleDst, elementSize);
-      dst += elementSize;
-      memcpy(dst, particleDst, elementSize);
-      dst += elementSize;
-      memcpy(dst, particleDst, elementSize);
-      dst += elementSize;
-    }
+    UpdateParticlesTask(list, 0, particleCount, dst);
   }
-  return particleCount * 6u; // return number of elements to render
+  return particleCount * elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE; // return byte of elements to render
 }
 
 Renderer ParticleRenderer::GetRenderer() const
@@ -404,15 +377,14 @@ Renderer ParticleRenderer::GetRenderer() const
 void ParticleRenderer::UpdateParticlesTask(Internal::ParticleList& list,
                                            uint32_t                particleStartIndex,
                                            uint32_t                particleCount,
-                                           uint8_t*                basePtr)
+                                           uint8_t*                dst)
 {
-  auto& particles   = list.GetParticles();
-  auto  streamCount = list.GetStreamCount();
-  auto  elementSize = list.GetStreamElementSize(false);
+  const auto streamCount = list.GetStreamCount();
+  const auto elementByte = list.GetStreamElementSize(false);
 
-  // calculate begin of buffer
-  uint8_t* dst = (basePtr + (elementSize * 6u) * particleStartIndex);
+  auto& particles = list.GetParticles();
 
+  // TODO : Let we remove advancement in future.
   auto it = particles.begin();
   std::advance(it, particleStartIndex);
 
@@ -436,16 +408,11 @@ void ParticleRenderer::UpdateParticlesTask(Internal::ParticleList& list,
       }
     }
     // Replicate data 5 more times for each vertex (GLES2)
-    memcpy(dst, particleDst, elementSize);
-    dst += elementSize;
-    memcpy(dst, particleDst, elementSize);
-    dst += elementSize;
-    memcpy(dst, particleDst, elementSize);
-    dst += elementSize;
-    memcpy(dst, particleDst, elementSize);
-    dst += elementSize;
-    memcpy(dst, particleDst, elementSize);
-    dst += elementSize;
+    for(auto vertexCopyCount = 0u; vertexCopyCount < NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE - 1; ++vertexCopyCount)
+    {
+      memcpy(dst, particleDst, elementByte);
+      dst += elementByte;
+    }
   }
 }
 
