@@ -18,7 +18,7 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp mat4 uMvpMatrix;
 };
 
-UNIFORM_BLOCK NisualVertBlock
+UNIFORM_BLOCK VisualVertBlock
 {
   //Visual size and offset
   UNIFORM highp vec2 offset;
