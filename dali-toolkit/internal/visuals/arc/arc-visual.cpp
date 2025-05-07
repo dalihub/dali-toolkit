@@ -201,18 +201,18 @@ void ArcVisual::OnInitialize()
   Shader shader;
   if(mCapType == DevelArcVisual::Cap::BUTT)
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, mImpl->mTransformMapUsingDefault);
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data(), mImpl->mTransformMapUsingDefault);
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
     }
   }
   else
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, mImpl->mTransformMapUsingDefault);
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data(), mImpl->mTransformMapUsingDefault);
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
     }
   }
 

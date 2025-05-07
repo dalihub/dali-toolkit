@@ -497,9 +497,6 @@ void SvgVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 
   if(IsOnScene() && !mLoadFailed)
@@ -547,8 +544,7 @@ Shader SvgVisual::GenerateShader() const
       ImageVisualShaderFeature::FeatureBuilder()
         .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
-        .EnableBorderline(IsBorderlineRequired())
-        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
+        .EnableBorderline(IsBorderlineRequired()));
   }
   else
   {

@@ -1034,9 +1034,6 @@ void AnimatedImageVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 }
 
@@ -1080,8 +1077,7 @@ Shader AnimatedImageVisual::GenerateShader() const
         .ApplyDefaultTextureWrapMode(defaultWrapMode)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
   }
   return shader;
 }

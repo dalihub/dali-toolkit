@@ -275,9 +275,6 @@ void NPatchVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 }
 
@@ -467,10 +464,10 @@ Shader NPatchVisual::CreateShader()
     if(DALI_LIKELY((xStretchCount == 1 && yStretchCount == 1) ||
                    (xStretchCount == 0 && yStretchCount == 0)))
     {
-      shader = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
+      shader = mFactoryCache.GetShader(shaderType);
       if(DALI_UNLIKELY(!shader))
       {
-        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader, mImpl->mTransformMapUsingDefault);
+        shader = mFactoryCache.GenerateAndSaveShader(shaderType, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, fragmentShader);
       }
     }
     else if(xStretchCount > 0 || yStretchCount > 0)

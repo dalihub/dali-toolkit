@@ -365,25 +365,6 @@ void PrimitiveVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
-  }
-}
-
-void PrimitiveVisual::UpdateShader()
-{
-  if(mImpl->mRenderer)
-  {
-    if(!mImpl->mTransformMapUsingDefault)
-    {
-      // Unregister default uniform blocks if transform changed.
-      if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mShader)
-      {
-        mFactoryCache.GetDefaultUniformBlock().DisconnectFromShader(mShader);
-      }
-      mImpl->mRenderer.RegisterVisualTransformUniform();
-    }
   }
 }
 
@@ -400,10 +381,7 @@ void PrimitiveVisual::OnInitialize()
   }
 
   mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
-  if(mImpl->mTransformMapUsingDefault)
-  {
-    mFactoryCache.GetDefaultUniformBlock().ConnectToShader(mShader);
-  }
+  mImpl->mRenderer.RegisterVisualTransformUniform();
   mImpl->mRenderer.SetProperty(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK);
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }

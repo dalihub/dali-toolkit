@@ -563,9 +563,6 @@ void AnimatedVectorImageVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 
   if(IsOnScene())
@@ -949,8 +946,7 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
       ImageVisualShaderFeature::FeatureBuilder()
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture())
-        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
+        .SetTextureForFragmentShaderCheck(mUseNativeImage ? mImpl->mRenderer.GetTextures().GetTexture(0) : Dali::Texture()));
   }
   return shader;
 }

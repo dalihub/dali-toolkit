@@ -186,9 +186,6 @@ void GradientVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 }
 
@@ -426,7 +423,7 @@ Shader GradientVisual::GenerateShader() const
   DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid gradient shader type generated!");
 
   VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
-  Shader                         shader     = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
+  Shader                         shader     = mFactoryCache.GetShader(shaderType);
   if(!shader)
   {
     std::string vertexShaderPrefixList;
@@ -457,8 +454,7 @@ Shader GradientVisual::GenerateShader() const
 
     shader = mFactoryCache.GenerateAndSaveShader(shaderType,
                                                  Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
-                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data(),
-                                                 mImpl->mTransformMapUsingDefault);
+                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
   }
 
   return shader;

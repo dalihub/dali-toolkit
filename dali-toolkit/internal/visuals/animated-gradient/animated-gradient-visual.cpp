@@ -464,9 +464,6 @@ void AnimatedGradientVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 }
 
@@ -609,7 +606,7 @@ Shader AnimatedGradientVisual::GetOrCreateShader()
 
   VisualFactoryCache::ShaderType shaderType = GetShaderType(mGradientType, mUnitType, mSpreadType);
 
-  shader = mFactoryCache.GetShader(shaderType, mImpl->mTransformMapUsingDefault);
+  shader = mFactoryCache.GetShader(shaderType);
   if(!shader)
   {
     std::string tagUnit;
@@ -666,7 +663,7 @@ Shader AnimatedGradientVisual::GetOrCreateShader()
     vert = "#define " + tagUnit + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_VERT.data();
     frag = "#define " + tagGrad + "\n" + "#define " + tagSpread + "\n" + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_FRAG.data();
 
-    shader = mFactoryCache.GenerateAndSaveShader(shaderType, vert, frag, mImpl->mTransformMapUsingDefault);
+    shader = mFactoryCache.GenerateAndSaveShader(shaderType, vert, frag);
   }
   return shader;
 }

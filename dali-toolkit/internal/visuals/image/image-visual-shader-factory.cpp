@@ -96,7 +96,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
 
-  shader = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
+  shader = factoryCache.GetShader(shaderType);
   if(shader)
   {
     return shader;
@@ -135,7 +135,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       if(mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE)
       {
         shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) - NATIVE_SHADER_TYPE_OFFSET);
-        shader     = factoryCache.GetShader(shaderType, featureBuilder.IsDefaultTransformUsed());
+        shader     = factoryCache.GetShader(shaderType);
       }
     }
   }
@@ -145,7 +145,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     return shader;
   }
 
-  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, featureBuilder.IsDefaultTransformUsed());
+  shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 
   shader.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT +
                                  ((featureBuilder.IsEnabledAlphaMaskingOnRendering() ? 1 : 0)));

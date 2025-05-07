@@ -223,17 +223,16 @@ public:
    * Request shader of the given type.
    * @return The shader of the required type if it exist in the cache. Otherwise, an empty handle is returned.
    */
-  Shader GetShader(ShaderType type, bool useDefaultUniforms = false);
+  Shader GetShader(ShaderType type);
 
   /**
    * Generate and cache the shader of the give type. The name of shader will be installed to shader.
    * @param[in] type The shder type.
    * @param[in] vertexShader The vertex shader code.
    * @param[in] fragmentShader The fragment shader code.
-   * @param[in] useDefaultUniforms Whether to use default uniforms or not.
    * @return The shader created by given vertex and fragment shader code.
    */
-  Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader, bool useDefaultUniforms = false);
+  Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader);
 
   /*
    * Greate the quad geometry.
@@ -411,7 +410,6 @@ private:
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX];
   Shader   mShader[SHADER_TYPE_MAX];
-  Shader   mDefaultShader[SHADER_TYPE_MAX];
 
   bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 

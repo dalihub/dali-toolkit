@@ -90,35 +90,21 @@ void VisualFactoryCache::SaveGeometry(GeometryType type, Geometry geometry)
   mGeometry[type] = geometry;
 }
 
-Shader VisualFactoryCache::GetShader(ShaderType type, bool useDefaultUniforms)
+Shader VisualFactoryCache::GetShader(ShaderType type)
 {
-  if(useDefaultUniforms)
-  {
-    return mDefaultShader[type];
-  }
   return mShader[type];
 }
 
-Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader, bool useDefaultUniforms)
+Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader)
 {
-  Shader shader;
   std::string shaderName = Scripting::GetLinearEnumerationName<ShaderType>(type, VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT);
 
   // If the shader name is empty, it means that the shader is not generated internally. So, there is need to support file caching. Otherwise, it is defined externally. So, it needs not to support file caching.
-  Shader::Hint::Value shaderHints = shaderName.empty()? Shader::Hint::NONE : Shader::Hint::FILE_CACHE_SUPPORT;
+  Shader::Hint::Value shaderHints = shaderName.empty() ? Shader::Hint::NONE : Shader::Hint::FILE_CACHE_SUPPORT;
 
-  if(useDefaultUniforms)
-  {
-    shader               = Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
-    mDefaultShader[type] = shader;
-  }
-  else
-  {
-    shader = Shader::New(vertexShader, fragmentShader, shaderHints, shaderName);
-    mShader[type] = shader;
-  }
+  mShader[type] = Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
 
-  return shader;
+  return mShader[type];
 }
 
 Geometry VisualFactoryCache::CreateQuadGeometry()
@@ -380,11 +366,11 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
 
   if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0) || (xStretchCount == 1 && yStretchCount == 1)))
   {
-    shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER, false);
+    shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER);
     if(DALI_UNLIKELY(!shader))
     {
       // Only cache vanilla 9 patch shaders
-      shader = GenerateAndSaveShader(VisualFactoryCache::NINE_PATCH_SHADER, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG, false);
+      shader = GenerateAndSaveShader(VisualFactoryCache::NINE_PATCH_SHADER, SHADER_NPATCH_VISUAL_3X3_SHADER_VERT, SHADER_NPATCH_VISUAL_SHADER_FRAG);
     }
   }
   else if(xStretchCount > 0 || yStretchCount > 0)
@@ -491,10 +477,10 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, con
     if(!rendererIsImage)
     {
       Geometry geometry = GetGeometry(QUAD_GEOMETRY);
-      Shader   shader   = GetShader(IMAGE_SHADER, false);
+      Shader   shader   = GetShader(IMAGE_SHADER);
       if(!shader)
       {
-        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data(), false);
+        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
         shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
       }

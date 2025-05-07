@@ -247,7 +247,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             // Unusual case. SetProperty called after OnInitialize().
             // Assume that DoAction call UPDATE_PROPERTY.
             mImpl->mTransformMapChanged |= !map.Empty();
-            if(mImpl->mTransformMapChanged)
+            if(mImpl->mTransformMapChanged && mImpl->mTransformMapUsingDefault)
             {
               mImpl->mTransformMapUsingDefault = false;
               mImpl->mRenderer.RegisterVisualTransformUniform();
@@ -537,7 +537,7 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
 {
   mImpl->mControlSize = controlSize;
   mImpl->mTransformMapChanged |= !transform.Empty();
-  if(mImpl->mTransformMapChanged)
+  if(mImpl->mTransformMapChanged && mImpl->mTransformMapUsingDefault)
   {
     mImpl->mTransformMapUsingDefault = false;
     mImpl->mRenderer.RegisterVisualTransformUniform();
@@ -1406,22 +1406,22 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     case Toolkit::Visual::Transform::Property::OFFSET:
     {
       // Need to change visual transform is not default anymore.
-      mImpl->mTransformMapUsingDefault = false;
-      mImpl->mRenderer.RegisterVisualTransformUniform();
-
-      // Change shader
-      UpdateShader();
+      if(mImpl->mTransformMapUsingDefault)
+      {
+        mImpl->mTransformMapUsingDefault = false;
+        mImpl->mRenderer.RegisterVisualTransformUniform();
+      }
 
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_OFFSET);
     }
     case Toolkit::Visual::Transform::Property::SIZE:
     {
       // Need to change visual transform is not default anymore.
-      mImpl->mTransformMapUsingDefault = false;
-      mImpl->mRenderer.RegisterVisualTransformUniform();
-
-      // Change shader
-      UpdateShader();
+      if(mImpl->mTransformMapUsingDefault)
+      {
+        mImpl->mTransformMapUsingDefault = false;
+        mImpl->mRenderer.RegisterVisualTransformUniform();
+      }
 
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_SIZE);
     }
