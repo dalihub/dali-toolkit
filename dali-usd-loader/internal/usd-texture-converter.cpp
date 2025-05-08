@@ -1,6 +1,6 @@
 
 /*
-* Copyright (c) 2025 Samsung Electronics Co., Ltd.
+* Copyright (c) 2024 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -64,15 +64,13 @@ bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, co
   for(const auto& d : deps)
   {
     TfToken tokenId;
-    if(d.GetShaderId(&tokenId))
-    {
-      std::string depsId = tokenId.GetString();
+    d.GetShaderId(&tokenId);
+    std::string depsId = tokenId.GetString();
 
-      // Use the shader ID to find the appropriate processor and call it
-      if(shaderProcessors.find(depsId) != shaderProcessors.end())
-      {
-        shaderProcessors[depsId](d);
-      }
+    // Use the shader ID to find the appropriate processor and call it
+    if(shaderProcessors.find(depsId) != shaderProcessors.end())
+    {
+      shaderProcessors[depsId](d);
     }
   }
 
@@ -239,20 +237,18 @@ bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinit
 
   if(imageBuffer.size() > 0)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Buffer Processed: semantic: %u", semantic);
-
     // If the image buffer is valid, push it to the material definition as a texture stage
     materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imageBuffer), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Buffer Processed: semantic: %u", semantic);
     return true;
   }
   else if(!imagePath.empty())
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Path Processed: semantic: %u, imagePath: %s", semantic, imagePath.c_str());
-
     // If we have a valid image path, push it to the material definition
     materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imagePath), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Path Processed: semantic: %u, imagePath: %s", semantic, imagePath.c_str());
     return true;
   }
 
