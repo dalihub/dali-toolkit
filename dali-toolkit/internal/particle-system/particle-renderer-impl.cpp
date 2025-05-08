@@ -15,17 +15,23 @@
  *
  */
 
-#include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
-#include <dali-toolkit/internal/particle-system/particle-list-impl.h>
+// CLASS HEADER
 #include <dali-toolkit/internal/particle-system/particle-renderer-impl.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 
+// EXTERNAL HEADERS
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/graphics-api/graphics-buffer.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-program.h>
 #include <dali/graphics-api/graphics-shader.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
+#include <dali-toolkit/internal/particle-system/particle-list-impl.h>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -233,7 +239,11 @@ void ParticleRenderer::CreateShader()
   mStreamBuffer.SetData(data.Begin(), mEmitter->GetParticleList().GetCapacity() * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE); // needed to initialize
 
   // Sets up callback
-  mStreamBuffer.SetVertexBufferUpdateCallback(std::move(mStreamBufferUpdateCallback));
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    // Note : MUST NOT call this API during app terminating
+    mStreamBuffer.SetVertexBufferUpdateCallback(std::move(mStreamBufferUpdateCallback));
+  }
 
   mRenderer = Renderer::New(mGeometry, mShader);
 
@@ -347,8 +357,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t maxByte
       const auto count = i == workerCount - 1 ? particleCount - index : partial;
 
       tasks.emplace_back(*this, list, index, count, dst + (elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE) * index);
-      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId)
-                             { t.Update(); });
+      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId) { t.Update(); });
     }
 
     // Execute worker tasks
@@ -430,8 +439,9 @@ bool ParticleRenderer::Initialize()
 
 void ParticleRenderer::PrepareToDie()
 {
-  if(mStreamBuffer)
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mStreamBuffer)
   {
+    // Note : MUST NOT call this API during app terminating
     mStreamBuffer.ClearVertexBufferUpdateCallback();
   }
 }
