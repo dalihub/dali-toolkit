@@ -1102,9 +1102,6 @@ void ImageVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 
   if(mUseSynchronousSizing)
@@ -1415,8 +1412,7 @@ Shader ImageVisual::GenerateShader() const
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(useNativeImage ? mNativeTexture : Dali::Texture())
         .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb)
-        .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
+        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb));
   }
   else
   {

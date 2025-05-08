@@ -162,8 +162,6 @@ void RenderEffectImpl::Activate()
 {
   if(!IsActivated() && IsActivateValid())
   {
-    mIsActivated = true;
-
     Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
     DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
@@ -174,6 +172,8 @@ void RenderEffectImpl::Activate()
       DALI_LOG_ERROR("RenderEffect Could not be activated due to ownerControl's SceneHolder is not exist\n");
       return;
     }
+    mIsActivated = true;
+
     mPlacementSceneHolder = sceneHolder;
 
     // Activate logic for subclass.
@@ -198,7 +198,7 @@ void RenderEffectImpl::Activate()
 
 void RenderEffectImpl::Deactivate()
 {
-  if(IsActivated() || !IsActivateValid())
+  if(IsActivated())
   {
     mIsActivated = false;
 

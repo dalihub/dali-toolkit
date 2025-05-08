@@ -798,8 +798,9 @@ void SceneView::UseFramebuffer(bool useFramebuffer)
 {
   if(mUseFrameBuffer != useFramebuffer)
   {
+    UnregisterOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
     mUseFrameBuffer = useFramebuffer;
-    SetOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
+    RegisterOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
     UpdateRenderTask();
     RequestRenderTaskReorder();
   }
@@ -1326,10 +1327,7 @@ void SceneView::OnInitialize()
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
 
-  if(mUseFrameBuffer)
-  {
-    SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
-  }
+  RegisterOffScreenRenderableType((mUseFrameBuffer) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE);
 }
 
 void SceneView::OnChildAdd(Actor& child)

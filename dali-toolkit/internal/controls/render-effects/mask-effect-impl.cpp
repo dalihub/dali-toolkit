@@ -142,7 +142,7 @@ void MaskEffectImpl::OnActivate()
   ownerControl.Add(mCamera);
   Renderer maskRenderer = GetTargetRenderer();
   ownerControl.GetImplementation().SetCacheRenderer(maskRenderer);
-  ownerControl.GetImplementation().SetOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
 
   Vector2 size = GetTargetSize();
   mCamera.SetPerspectiveProjection(size);
@@ -166,6 +166,13 @@ void MaskEffectImpl::OnActivate()
 
 void MaskEffectImpl::OnDeactivate()
 {
+  Toolkit::Control control = GetOwnerControl();
+  if(DALI_LIKELY(control))
+  {
+    control.GetImplementation().RemoveCacheRenderer();
+    control.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  }
+
   mCamera.Unparent();
   mMaskTargetFrameBuffer.Reset();
   mMaskSourceFrameBuffer.Reset();

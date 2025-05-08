@@ -108,11 +108,6 @@ protected:
    */
   void OnSetTransform() override;
 
-  /**
-   * @copydoc Visual::Base::UpdateShader
-   */
-  void UpdateShader() override;
-
 private:
   /**
    * @brief Provide an empty geometry for the visual to use.

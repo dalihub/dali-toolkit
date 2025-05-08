@@ -52,7 +52,6 @@ class VisualModel;
  * @param[out] glyphToCharacterMap Vector containing the first character in the logical model that each glyph relates to.
  * @param[out] charactersPerGlyph Vector containing the number of characters per glyph.
  * @param[out] newParagraphGlyphs Vector containing the indices to the new paragraph glyphs.
- * @param[in] variationsMapPtr The variations used in variable fonts.
  */
 void ShapeText(TextAbstraction::Shaping&    shaping,
                TextAbstraction::FontClient& fontClient,
@@ -66,8 +65,7 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                Vector<GlyphInfo>&           glyphs,
                Vector<CharacterIndex>&      glyphToCharacterMap,
                Vector<Length>&              charactersPerGlyph,
-               Vector<GlyphIndex>&          newParagraphGlyphs,
-               Property::Map*               variationsMapPtr = nullptr);
+               Vector<GlyphIndex>&          newParagraphGlyphs);
 
 } // namespace Text
 

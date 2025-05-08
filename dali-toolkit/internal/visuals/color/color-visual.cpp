@@ -210,9 +210,6 @@ void ColorVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-    // TODO : We many need to less call it.
-    UpdateShader();
   }
 }
 
@@ -261,8 +258,7 @@ Shader ColorVisual::GenerateShader() const
       .EnableBlur(IsBlurRequired())
       .EnableBorderLine(IsBorderlineRequired())
       .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
-      .EnableCutout(IsCutoutRequired())
-      .UseDefaultTransform(mImpl->mTransformMapUsingDefault));
+      .EnableCutout(IsCutoutRequired()));
 
   return shader;
 }

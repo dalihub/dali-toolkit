@@ -62,8 +62,7 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                Vector<GlyphInfo>&           glyphs,
                Vector<CharacterIndex>&      glyphToCharacterMap,
                Vector<Length>&              charactersPerGlyph,
-               Vector<GlyphIndex>&          newParagraphGlyphs,
-               Property::Map*               variationsMapPtr)
+               Vector<GlyphIndex>&          newParagraphGlyphs)
 {
   if(0u == numberOfCharacters)
   {
@@ -213,8 +212,7 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                                                 textBuffer + previousIndex,
                                                 (currentIndex - previousIndex), // The number of characters to shape.
                                                 currentFontId,
-                                                currentScript,
-                                                variationsMapPtr);
+                                                currentScript);
 
 #if defined(TRACE_ENABLED)
     if(logEnabled)

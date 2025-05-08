@@ -167,7 +167,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
 {
   Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = featureBuilder.GetShaderType();
-  shader                                    = factoryCache.GetShader(shaderType, false);
+  shader                                    = factoryCache.GetShader(shaderType);
 
   if(!shader)
   {
@@ -179,7 +179,7 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
-    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader, false);
+    shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
   }
   return shader;
 }

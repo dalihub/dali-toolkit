@@ -77,7 +77,6 @@ FeatureBuilder::FeatureBuilder()
   mBorderline(Borderline::DISABLED),
   mAlphaMaskingOnRendering(AlphaMaskingOnRendering::DISABLED),
   mColorConversion(ColorConversion::DONT_NEED),
-  mUseDefaultTransform(true),
   mTexture()
 {
 }
@@ -121,12 +120,6 @@ FeatureBuilder& FeatureBuilder::EnableAlphaMaskingOnRendering(bool enableAlphaMa
 FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb)
 {
   mColorConversion = (enableUnifiedYuvAndRgb ? ColorConversion::UNIFIED_YUV_AND_RGB : (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED));
-  return *this;
-}
-
-FeatureBuilder& FeatureBuilder::UseDefaultTransform(bool useDefaultTransform)
-{
-  mUseDefaultTransform = useDefaultTransform;
   return *this;
 }
 
@@ -259,11 +252,6 @@ Dali::Texture FeatureBuilder::GetTexture() const
 bool FeatureBuilder::IsEnabledAlphaMaskingOnRendering() const
 {
   return mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED;
-}
-
-bool FeatureBuilder::IsDefaultTransformUsed() const
-{
-  return mUseDefaultTransform;
 }
 
 } // namespace ImageVisualShaderFeature

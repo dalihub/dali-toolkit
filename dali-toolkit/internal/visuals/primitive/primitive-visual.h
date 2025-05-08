@@ -155,11 +155,6 @@ protected:
    */
   void OnSetTransform() override;
 
-  /**
-   * @copydoc Visual::Base::UpdateShader
-   */
-  void UpdateShader() override;
-
 private:
   //Simple struct to store the position and normal of a single vertex.
   struct Vertex

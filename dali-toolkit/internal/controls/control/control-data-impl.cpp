@@ -1940,8 +1940,8 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   {
     if(mOffScreenRenderingImpl)
     {
-      mOffScreenRenderingImpl->ClearOwnerControl();
-      mOffScreenRenderingImpl.reset();
+      auto tempOffscreenRenderingImpl = std::move(mOffScreenRenderingImpl);
+      tempOffscreenRenderingImpl->ClearOwnerControl();
     }
   }
   else if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)

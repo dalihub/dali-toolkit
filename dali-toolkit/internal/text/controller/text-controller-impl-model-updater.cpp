@@ -384,12 +384,6 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
     TextAbstraction::Shaping shaping = TextAbstraction::Shaping::Get();
 
-    Property::Map *variationsMapPtr = nullptr;
-    if(!impl.mModel->mLogicalModel->mVariationsMap.Empty())
-    {
-      variationsMapPtr = &impl.mModel->mLogicalModel->mVariationsMap;
-    }
-
     // Shapes the text.
     ShapeText(shaping,
               impl.mFontClient,
@@ -403,8 +397,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
               glyphs,
               glyphsToCharactersMap,
               charactersPerGlyph,
-              newParagraphGlyphs,
-              variationsMapPtr);
+              newParagraphGlyphs);
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
     impl.mModel->mVisualModel->CreateGlyphsPerCharacterTable(startIndex, impl.mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
