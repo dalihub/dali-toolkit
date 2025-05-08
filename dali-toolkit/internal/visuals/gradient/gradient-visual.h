@@ -57,7 +57,15 @@ typedef IntrusivePtr<GradientVisual> GradientVisualPtr;
  * | radius                  | FLOAT            |
  * | stopColor               | ARRAY of VECTOR4 |
  *
- * The following properties are optional for both LINEAR and RADIAL GradientRender.
+ * The following properties are essential for create a CONIC GradientRender
+ *
+ * | %Property Name          | Type             |
+ * |-------------------------|------------------|
+ * | center                  | VECTOR2          |
+ * | startAngle              | Dali::Radian     |
+ * | stopColor               | ARRAY of VECTOR4 |
+ *
+ * The following properties are optional for all kind of GradientRender.
  *
  * | %Property Name          | Type             |
  * |-------------------------|------------------|
@@ -78,7 +86,8 @@ public:
   enum Type
   {
     LINEAR,
-    RADIAL
+    RADIAL,
+    CONIC
   };
 
   /**

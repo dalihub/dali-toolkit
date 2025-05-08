@@ -1888,6 +1888,176 @@ int UtcDaliVisualGetPropertyMap13(void)
   END_TEST;
 }
 
+int UtcDaliVisualGetPropertyMap14(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetPropertyMap14: conic GradientVisual");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::GRADIENT);
+
+  Vector2 center(100.f, 100.f);
+  float   startAngle = -Math::PI;
+  propertyMap.Insert(GradientVisual::Property::UNITS, GradientVisual::Units::USER_SPACE);
+  propertyMap.Insert(GradientVisual::Property::CENTER, center);
+  propertyMap.Insert(GradientVisual::Property::START_ANGLE, startAngle);
+  propertyMap.Insert(GradientVisual::Property::STOP_OFFSET, Vector3(0.1f, 0.3f, 1.1f));
+
+  Property::Array stopColors;
+  stopColors.PushBack(Color::RED);
+  stopColors.PushBack(Color::BLACK);
+  stopColors.PushBack(Color::GREEN);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
+
+  float   borderlineWidth = 8.0f;
+  Vector4 cornerRadius(1.0f, 2.0f, 4.0f, 8.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(gradientVisual);
+
+  Property::Map resultMap;
+  gradientVisual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from visual
+  Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == Visual::GRADIENT);
+
+  value = resultMap.Find(GradientVisual::Property::UNITS, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == GradientVisual::Units::USER_SPACE);
+
+  value = resultMap.Find(GradientVisual::Property::SPREAD_METHOD, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == GradientVisual::SpreadMethod::PAD);
+
+  value = resultMap.Find(GradientVisual::Property::CENTER, Property::VECTOR2);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector2>(), center, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::START_ANGLE, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  // start angle will be wraped to [0.0, 2*PI];
+  DALI_TEST_EQUALS(value->Get<float>(), Math::PI, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<float>(), borderlineWidth, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), cornerRadius, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::STOP_OFFSET, Property::ARRAY);
+  DALI_TEST_CHECK(value);
+  Property::Array* offsetArray = value->GetArray();
+  DALI_TEST_CHECK(offsetArray->Count() == 3);
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(0).Get<float>(), 0.1f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(1).Get<float>(), 0.3f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  // any stop value will be clamped to [0.0, 1.0];
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(2).Get<float>(), 1.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::STOP_COLOR, Property::ARRAY);
+  DALI_TEST_CHECK(value);
+  Property::Array* colorArray = value->GetArray();
+  DALI_TEST_CHECK(colorArray->Count() == 3);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(0).Get<Vector4>(), Color::RED, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(1).Get<Vector4>(), Color::BLACK, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(2).Get<Vector4>(), Color::GREEN, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetPropertyMap15(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetPropertyMap15: conic GradientVisual");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::GRADIENT);
+
+  Vector2 center(0.f, 0.f);
+  float   startAngle = 3 * Math::PI;
+  propertyMap.Insert(GradientVisual::Property::UNITS, GradientVisual::Units::USER_SPACE);
+  propertyMap.Insert(GradientVisual::Property::CENTER, center);
+  propertyMap.Insert(GradientVisual::Property::START_ANGLE, startAngle);
+  propertyMap.Insert(GradientVisual::Property::STOP_OFFSET, Vector3(0.1f, 0.3f, 1.1f));
+
+  Property::Array stopColors;
+  stopColors.PushBack(Color::RED);
+  stopColors.PushBack(Color::BLACK);
+  stopColors.PushBack(Color::GREEN);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
+
+  float   borderlineWidth = 8.0f;
+  Vector4 cornerRadius(1.0f, 2.0f, 4.0f, 8.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(gradientVisual);
+
+  Property::Map resultMap;
+  gradientVisual.CreatePropertyMap(resultMap);
+
+  // check the property values from the returned map from visual
+  Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == Visual::GRADIENT);
+
+  value = resultMap.Find(GradientVisual::Property::UNITS, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == GradientVisual::Units::USER_SPACE);
+
+  value = resultMap.Find(GradientVisual::Property::SPREAD_METHOD, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == GradientVisual::SpreadMethod::PAD);
+
+  value = resultMap.Find(GradientVisual::Property::CENTER, Property::VECTOR2);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector2>(), center, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::START_ANGLE, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  // start angle will be wraped to [0.0, 2*PI];
+  DALI_TEST_EQUALS(value->Get<float>(), Math::PI, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<float>(), borderlineWidth, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<Vector4>(), cornerRadius, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::STOP_OFFSET, Property::ARRAY);
+  DALI_TEST_CHECK(value);
+  Property::Array* offsetArray = value->GetArray();
+  DALI_TEST_CHECK(offsetArray->Count() == 3);
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(0).Get<float>(), 0.1f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(1).Get<float>(), 0.3f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  // any stop value will be clamped to [0.0, 1.0];
+  DALI_TEST_EQUALS(offsetArray->GetElementAt(2).Get<float>(), 1.0f, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  value = resultMap.Find(GradientVisual::Property::STOP_COLOR, Property::ARRAY);
+  DALI_TEST_CHECK(value);
+  Property::Array* colorArray = value->GetArray();
+  DALI_TEST_CHECK(colorArray->Count() == 3);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(0).Get<Vector4>(), Color::RED, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(1).Get<Vector4>(), Color::BLACK, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorArray->GetElementAt(2).Get<Vector4>(), Color::GREEN, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVisualAnimateArcVisual(void)
 {
   ToolkitTestApplication application;

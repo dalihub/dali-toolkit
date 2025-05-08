@@ -30,6 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/gradient/conic-gradient.h>
 #include <dali-toolkit/internal/visuals/gradient/linear-gradient.h>
 #include <dali-toolkit/internal/visuals/gradient/radial-gradient.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -63,6 +64,7 @@ DALI_ENUM_TO_STRING_TABLE_END(SPREAD_METHOD)
 // uniform names
 static constexpr std::string_view UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
 static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("uTextureCoordinateScaleFactor");
+static constexpr std::string_view UNIFORM_START_ANGLE_NAME("uStartAngle");
 static constexpr std::string_view UNIFORM_START_OFFSET_NAME("uGradientOffset");
 
 // default offset value
@@ -94,6 +96,18 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
   VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
   VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_BOUNDING_BOX_SQUIRCLE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_SQUIRCLE_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_SQUIRCLE_BORDERLINE,
 };
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
 
@@ -107,6 +121,7 @@ enum GradientVisualRequireFlag
   BORDERLINE = (1 << 0) * 3,
   USER_SPACE = (1 << 1) * 3,
   RADIAL     = (1 << 2) * 3,
+  CONIC      = (2 << 2) * 3
 };
 
 Dali::WrapMode::Type GetWrapMode(Toolkit::GradientVisual::SpreadMethod::Type spread)
@@ -168,6 +183,10 @@ void GradientVisual::DoSetProperties(const Property::Map& propertyMap)
   if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
   {
     mGradientType = Type::RADIAL;
+  }
+  else if(propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME))
+  {
+    mGradientType = Type::CONIC;
   }
 
   if(NewGradient(mGradientType, propertyMap))
@@ -241,11 +260,17 @@ void GradientVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
     map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
   }
-  else // if( &typeid( *mGradient ) == &typeid(RadialGradient) )
+  else if(&typeid(*mGradient) == &typeid(RadialGradient))
   {
     RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
     map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
     map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
+  }
+  else // if( &typeid( *mGradient ) == &typeid(ConicGradient) )
+  {
+    ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+    map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+    map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
   }
 }
 
@@ -291,6 +316,11 @@ void GradientVisual::OnInitialize()
   }
 
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
+  if(mGradientType == Type::CONIC)
+  {
+    ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+    mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_START_ANGLE_NAME, gradient->GetStartAngle().radian);
+  }
 
   float textureSize = static_cast<float>(lookupTexture.GetWidth());
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME, (textureSize - 1.0f) / textureSize);
@@ -320,7 +350,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
       return false;
     }
   }
-  else // type==Type::RADIAL
+  else if(gradientType == Type::RADIAL)
   {
     Property::Value* centerValue = propertyMap.Find(Toolkit::GradientVisual::Property::CENTER, CENTER_NAME);
     Property::Value* radiusValue = propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME);
@@ -329,6 +359,21 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     if(centerValue && centerValue->Get(center) && radiusValue && radiusValue->Get(radius))
     {
       mGradient = new RadialGradient(center, radius);
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else // if(gradientType == Type::CONIC)
+  {
+    Property::Value* centerValue = propertyMap.Find(Toolkit::GradientVisual::Property::CENTER, CENTER_NAME);
+    Property::Value* startAngleValue = propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME);
+    Vector2          center;
+    float            startAngle;
+    if(centerValue && centerValue->Get(center) && startAngleValue && startAngleValue->Get(startAngle))
+    {
+      mGradient = new ConicGradient(center, Dali::Radian(startAngle));
     }
     else
     {
@@ -396,6 +441,7 @@ Shader GradientVisual::GenerateShader() const
   bool squircleCorner = IsSquircleCornerRequired();
   bool borderline     = IsBorderlineRequired();
   bool radialGradient = (mGradientType == Type::RADIAL);
+  bool conicGradient  = (mGradientType == Type::CONIC);
 
   uint32_t shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
   if(squircleCorner)
@@ -415,9 +461,14 @@ Shader GradientVisual::GenerateShader() const
   {
     shaderTypeFlag += GradientVisualRequireFlag::USER_SPACE;
   }
+
   if(radialGradient)
   {
     shaderTypeFlag += GradientVisualRequireFlag::RADIAL;
+  }
+  else if(conicGradient)
+  {
+    shaderTypeFlag += GradientVisualRequireFlag::CONIC;
   }
 
   DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid gradient shader type generated!");
@@ -443,10 +494,16 @@ Shader GradientVisual::GenerateShader() const
       vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
     }
+
     if(radialGradient)
     {
       fragmentShaderPrefixList += "#define RADIAL\n";
     }
+    else if(conicGradient)
+    {
+      fragmentShaderPrefixList += "#define CONIC\n";
+    }
+
     if(userspaceUnit)
     {
       vertexShaderPrefixList += "#define USER_SPACE\n";

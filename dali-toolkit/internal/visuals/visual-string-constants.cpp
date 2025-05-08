@@ -97,6 +97,18 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_RADIAL_USER_SPACE_SQUIRCLE_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX_SQUIRCLE_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_BOUNDING_BOX_SQUIRCLE_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE_ROUNDED_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE_SQUIRCLE_CORNER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE_ROUNDED_BORDERLINE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, GRADIENT_SHADER_CONIC_USER_SPACE_SQUIRCLE_BORDERLINE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_CORNER)
@@ -318,6 +330,9 @@ const char* const ANTI_ALIASING("antiAliasing");
 // properties: radial gradient
 const char* const CENTER_NAME("center"); // Property::VECTOR2
 const char* const RADIUS_NAME("radius"); // Property::FLOAT
+
+// properties: conic gradient
+const char* const CONIC_START_ANGLE_NAME("conicStartAngle"); // Property::FLOAT
 
 // properties: linear&radial gradient
 const char* const STOP_OFFSET_NAME("stopOffset");     // Property::Array FLOAT
