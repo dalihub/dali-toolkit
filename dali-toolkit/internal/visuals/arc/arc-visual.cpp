@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -180,7 +180,7 @@ void ArcVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 
 void ArcVisual::OnSetTransform()
 {
-  Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+  Vector2 visualSize = mImpl->GetTransformVisualSize(mImpl->mControlSize);
   mRadius            = (std::min(visualSize.width, visualSize.height) - mThickness) / 2.0f;
 
   if(mImpl->mRenderer)

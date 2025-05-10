@@ -567,7 +567,7 @@ void AnimatedVectorImageVisual::OnSetTransform()
 
   if(IsOnScene())
   {
-    Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+    Vector2 visualSize = mImpl->GetTransformVisualSize(mImpl->mControlSize);
 
     if(visualSize != mVisualSize)
     {

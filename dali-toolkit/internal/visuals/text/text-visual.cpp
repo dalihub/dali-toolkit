@@ -543,15 +543,17 @@ void TextVisual::UpdateRenderer()
   // Calculates the size to be used to relayout.
   Vector2 relayoutSize;
 
-  const bool isWidthRelative  = fabsf(mImpl->mTransform.mOffsetSizeMode.z) < Math::MACHINE_EPSILON_1000;
-  const bool isHeightRelative = fabsf(mImpl->mTransform.mOffsetSizeMode.w) < Math::MACHINE_EPSILON_1000;
+  auto& visualTransform = mImpl->GetOrCreateTransform();
+
+  const bool isWidthRelative  = fabsf(visualTransform.mOffsetSizeMode.z) < Math::MACHINE_EPSILON_1000;
+  const bool isHeightRelative = fabsf(visualTransform.mOffsetSizeMode.w) < Math::MACHINE_EPSILON_1000;
 
   const float controlWidth  = mImpl->mControlSize.width;
   const float controlHeight = mImpl->mControlSize.height;
 
   // Round the size and offset to avoid pixel alignement issues.
-  relayoutSize.width  = floorf(0.5f + (isWidthRelative ? controlWidth * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width));
-  relayoutSize.height = floorf(0.5f + (isHeightRelative ? controlHeight * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height));
+  relayoutSize.width  = floorf(0.5f + (isWidthRelative ? controlWidth * visualTransform.mSize.x : visualTransform.mSize.width));
+  relayoutSize.height = floorf(0.5f + (isHeightRelative ? controlHeight * visualTransform.mSize.y : visualTransform.mSize.height));
 
   auto textLengthUtf32 = mController->GetNumberOfCharacters();
 
@@ -634,16 +636,16 @@ void TextVisual::UpdateRenderer()
         // When Cutout Enabled, the current visual must draw the entire control.
         // so set the size to controlSize and offset to 0.
 
-        relayoutSize                   = Vector2(controlWidth, controlHeight);
-        mImpl->mTransform.mSize.width  = controlWidth;
-        mImpl->mTransform.mSize.height = controlHeight;
+        relayoutSize                 = Vector2(controlWidth, controlHeight);
+        visualTransform.mSize.width  = controlWidth;
+        visualTransform.mSize.height = controlHeight;
 
         // Relayout to the original size has been completed, so save only the offset information and use it in typesetter.
 
-        Vector2 originOffset = Vector2(mImpl->mTransform.mOffset.x, mImpl->mTransform.mOffset.y);
+        Vector2 originOffset = Vector2(visualTransform.mOffset.x, visualTransform.mOffset.y);
         mController->SetOffsetWithCutout(originOffset);
-        mImpl->mTransform.mOffset.x = 0;
-        mImpl->mTransform.mOffset.y = 0;
+        visualTransform.mOffset.x = 0;
+        visualTransform.mOffset.y = 0;
       }
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
@@ -930,11 +932,14 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
       // Get the current offset for recalculate the offset when tiling.
       Property::Map retMap;
-      mImpl->mTransform.GetPropertyMap(retMap);
-      Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
-      if(offsetValue)
+      if(mImpl->mTransform)
       {
-        offsetValue->Get(info.transformOffset);
+        mImpl->mTransform->GetPropertyMap(retMap);
+        Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
+        if(offsetValue)
+        {
+          offsetValue->Get(info.transformOffset);
+        }
       }
 
       // Create a textureset in the default renderer.
@@ -1228,11 +1233,14 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
     // Get the current offset for recalculate the offset when tiling.
     Property::Map retMap;
-    mImpl->mTransform.GetPropertyMap(retMap);
-    Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
-    if(offsetValue)
+    if(mImpl->mTransform)
     {
-      offsetValue->Get(info.transformOffset);
+      mImpl->mTransform->GetPropertyMap(retMap);
+      Property::Value* offsetValue = retMap.Find(Dali::Toolkit::Visual::Transform::Property::OFFSET);
+      if(offsetValue)
+      {
+        offsetValue->Get(info.transformOffset);
+      }
     }
 
     // Create a textureset in the default renderer.

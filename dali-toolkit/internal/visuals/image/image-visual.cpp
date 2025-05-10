@@ -681,7 +681,7 @@ void ImageVisual::OnInitialize()
     mPixelAreaIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
 
-  //Register transform properties
+  // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   if(mImpl->mCustomShader)
   {
@@ -738,7 +738,8 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
    * @brief Check whether FastTrackUploading is avaliable or not.
    * @return True if we can use fast track uploading feature. False otherwise.
    */
-  auto IsFastTrackUploadingAvailable = [&]() {
+  auto IsFastTrackUploadingAvailable = [&]()
+  {
     if(mUseFastTrackUploading &&
        mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::ATTACHED &&
        mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED &&
@@ -1107,7 +1108,7 @@ void ImageVisual::OnSetTransform()
   if(mUseSynchronousSizing)
   {
     // Get current visual size
-    Vector2  size                    = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+    Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
     uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
     uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
     sizeWidth                        = std::min(sizeWidth, maximumNumber);

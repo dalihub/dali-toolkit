@@ -118,7 +118,7 @@ bool GetPolicyFromValue(const Property::Value& value, Vector2& policy)
 Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Type type)
 : mCustomShader(nullptr),
   mEventObserver(nullptr),
-  mTransform(),
+  mTransform(nullptr),
   mMixColor(Color::WHITE),
   mControlSize(Vector2::ZERO),
   mDecorationData(nullptr),
@@ -358,6 +358,21 @@ Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize(const Vector2& co
   return Vector2(Lerp(mOffsetSizeMode.z, mSize.x * controlSize.x, mSize.x),
                  Lerp(mOffsetSizeMode.w, mSize.y * controlSize.y, mSize.y)) +
          mExtraSize;
+}
+
+const Property::Map& Internal::Visual::Base::Impl::Transform::GetDefaultTransformMap()
+{
+  static const Property::Map sDefaultTransformMap{
+    {Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO},
+    {Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE},
+    {Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN},
+    {Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN},
+    {Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2::ZERO},
+    {Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2::ZERO},
+    {Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, Vector2::ZERO},
+  };
+
+  return sDefaultTransformMap;
 }
 
 } // namespace Internal

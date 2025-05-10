@@ -27,7 +27,7 @@
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/rendering/visual-renderer.h>
 
-//INTERNAL HEARDER
+// INTERNAL HEARDER
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
@@ -242,28 +242,38 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         Property::Map map;
         if(value.Get(map))
         {
-          if(DALI_UNLIKELY(mImpl->mRenderer))
+          if(!map.Empty() &&
+             (!mImpl->mTransformMapUsingDefault ||
+              map.GetHash() != Impl::Transform::GetDefaultTransformMap().GetHash() ||
+              DALI_UNLIKELY(map != Impl::Transform::GetDefaultTransformMap())))
           {
-            // Unusual case. SetProperty called after OnInitialize().
-            // Assume that DoAction call UPDATE_PROPERTY.
-            mImpl->mTransformMapChanged |= !map.Empty();
-            if(mImpl->mTransformMapChanged && mImpl->mTransformMapUsingDefault)
+            if(DALI_UNLIKELY(mImpl->mRenderer))
+            {
+              // Unusual case. SetProperty called after OnInitialize().
+              // Assume that DoAction call UPDATE_PROPERTY.
+              mImpl->mTransformMapChanged = true;
+              if(mImpl->mTransformMapUsingDefault)
+              {
+                mImpl->mTransformMapUsingDefault = false;
+                mImpl->mRenderer.RegisterVisualTransformUniform();
+              }
+
+              if(!mImpl->mTransformMapUsingDefault)
+              {
+                mImpl->GetOrCreateTransform().UpdatePropertyMap(map);
+
+                // Set Renderer uniforms, and change logics for subclasses.
+                OnSetTransform();
+              }
+
+              // Reset flag here.
+              mImpl->mTransformMapChanged = false;
+            }
+            else
             {
               mImpl->mTransformMapUsingDefault = false;
-              mImpl->mRenderer.RegisterVisualTransformUniform();
+              mImpl->GetOrCreateTransform().SetPropertyMap(map);
             }
-            mImpl->mTransform.UpdatePropertyMap(map);
-
-            // Set Renderer uniforms, and change logics for subclasses.
-            OnSetTransform();
-
-            // Reset flag here.
-            mImpl->mTransformMapChanged = false;
-          }
-          else
-          {
-            mImpl->mTransformMapUsingDefault &= map.Empty();
-            mImpl->mTransform.SetPropertyMap(map);
           }
         }
         break;
@@ -542,7 +552,10 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
     mImpl->mTransformMapUsingDefault = false;
     mImpl->mRenderer.RegisterVisualTransformUniform();
   }
-  mImpl->mTransform.UpdatePropertyMap(transform);
+  if(!mImpl->mTransformMapUsingDefault)
+  {
+    mImpl->GetOrCreateTransform().UpdatePropertyMap(transform);
+  }
 
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
@@ -680,8 +693,14 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     // Update values from Renderer
     mImpl->mMixColor = mImpl->mRenderer.GetProperty<Vector4>(Renderer::Property::MIX_COLOR);
 
-    mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
-    mImpl->mTransform.mSize   = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
+    const auto& rendererOffset = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
+    const auto& rendererSize   = mImpl->mRenderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
+
+    if(rendererSize != Vector2::ZERO || rendererSize != Vector2::ONE)
+    {
+      mImpl->GetOrCreateTransform().mOffset = rendererOffset;
+      mImpl->GetOrCreateTransform().mSize   = rendererSize;
+    }
 
     if(IsRoundedCornerRequired())
     {
@@ -707,7 +726,14 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   }
 
   Property::Map transform;
-  mImpl->mTransform.GetPropertyMap(transform);
+  if(mImpl->mTransform)
+  {
+    mImpl->mTransform->GetPropertyMap(transform);
+  }
+  else
+  {
+    transform = Impl::Transform::GetDefaultTransformMap();
+  }
   map.Insert(Toolkit::Visual::Property::TRANSFORM, transform);
 
   bool premultipliedAlpha(IsPreMultipliedAlphaEnabled());
@@ -1334,7 +1360,7 @@ void Visual::Base::AnimateRendererProperty(
 
       // Set flag to ignore fitting mode when we set the transform property map
       mImpl->mIgnoreFittingMode = true;
-      mImpl->mTransform.UpdatePropertyMap(map);
+      mImpl->GetOrCreateTransform().UpdatePropertyMap(map);
     }
     SetupTransition(transition, animator, index, animator.initialValue, animator.targetValue);
   }
