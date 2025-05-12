@@ -102,6 +102,7 @@ vec4 ComputeVertexPosition()
 #endif
 
 #ifdef USER_SPACE
+  vertexPosition.xyz += vec3(0.5);
   vertexPosition.xyz *= uSize;
 #endif
 
