@@ -228,6 +228,10 @@ public:
    */
   int GetDefaultStreamIndex(ParticleStreamTypeFlagBit defaultStreamBit);
 
+  /**
+   * @brief Returns raw data container of the particle list
+   * @return list of particles
+   */
   std::list<Particle>& GetActiveParticles();
 
 private:
@@ -241,8 +245,7 @@ private:
    * @param[in] localStream Flag indicating whether stream is local (not used in shaders) or not
    * @return Index of new stream
    */
-  uint32_t
-  AddStream(void* defaults, size_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream);
+  uint32_t AddStream(void* defaults, size_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream);
   /// @endcond
 
   /// @cond internal

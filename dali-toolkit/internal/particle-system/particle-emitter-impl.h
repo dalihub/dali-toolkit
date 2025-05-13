@@ -61,6 +61,8 @@ public:
     return (mParticleStatusBits & STATUS_COMPLETE_BITS) == STATUS_COMPLETE_BITS;
   }
 
+  // TODO : Split below API per thread accessness.
+
   [[nodiscard]] ParticleSystem::ParticleSource GetSource() const;
 
   void SetSource(const ParticleSystem::ParticleSource& source);
@@ -119,6 +121,7 @@ public:
 
   [[nodiscard]] ParticleSystem::ParticleEmitter::Status GetStatus() const;
 
+  // DevNote : Need to be define for create fake time getter at UTC
   [[nodiscard]] std::chrono::milliseconds GetCurrentTimeMillis() const;
 
   // All these bits must be set in order to consider emitter COMPLETE
@@ -151,7 +154,7 @@ public:
   uint32_t                  mEmissionRatePerSecond{1u};
   std::atomic<uint32_t>     mEmissionCountOnStart{0u};
   std::atomic<uint32_t>     mActiveParticlesLimit{0u}; ///< 0 - unlimited
-  std::atomic<bool>         mSystemStarted{false};
+  std::atomic<uint8_t >     mSystemStarted{0u};        ///< 0 - not started, 1 - started
   std::chrono::milliseconds mCurrentMilliseconds{0};
   std::chrono::milliseconds mLastUpdateMs{0};
 
