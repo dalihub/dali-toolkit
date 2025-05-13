@@ -306,6 +306,18 @@ public:
   bool FilterKeyEvent(const KeyEvent& event);
 
   /**
+   * @brief Get private AccessibilityData context for this impl. If not created yet, it will create new data.
+   * @return The l-value of AccessibilityData context.
+   */
+  [[nodiscard]] AccessibilityData& GetOrCreateAccessibilityData();
+
+  /**
+   * @brief Get private AccessibilityData context for this impl.
+   * @return The pointer of AccessibilityData context.
+   */
+  [[nodiscard]] AccessibilityData* GetAccessibilityData() const;
+
+  /**
    * @brief Adds accessibility attribute
    * @param[in] key Attribute name to set
    * @param[in] value Attribute value to set
@@ -474,40 +486,6 @@ private:
   bool OnIdleCallback();
 
   /**
-   * @brief Checks highlighted object geometry if it is showing or not
-   */
-  void CheckHighlightedObjectGeometry();
-
-  /**
-   * @brief Register property notification to check highlighted object position
-   */
-  void RegisterAccessibilityPositionPropertyNotification();
-
-  /**
-   * @brief Remove property notification added by RegisterAccessibilityPositionPropertyNotification
-   */
-  void UnregisterAccessibilityPositionPropertyNotification();
-
-  /**
-   * @brief Register PropertySet signal to check highlighted object name and description
-   */
-  void RegisterAccessibilityPropertySetSignal();
-
-  /**
-   * @brief Remove PropertySet signal added by RegisterAccessibilityPropertySetSignal
-   */
-  void UnregisterAccessibilityPropertySetSignal();
-
-  /**
-   * @brief Signal callback of PropertySet when this object is become highlighted, so RegisterAccessibilityPropertySetSignal called.
-   *
-   * @param[in] handle Handle of the control.
-   * @param[in] index The index of property.
-   * @param[in] value The value of property.
-   */
-  void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
-
-  /**
    * Set off-screen rendering.
    * @param[in] offScreenRenderingType enum OffScreenRenderingType
    */
@@ -570,12 +548,18 @@ public:
   CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
 
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
-  bool             mIsKeyboardNavigationSupported : 1;    ///< Stores whether keyboard navigation is supported by the control.
-  bool             mIsKeyboardFocusGroup : 1;             ///< Stores whether the control is a focus group.
-  bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
-  bool             mIdleCallbackRegistered : 1;           ///< True if need to emit the resource ready signal again.
-  bool             mDispatchKeyEvents : 1;                ///< Whether the actor emits key event signals
-  bool             mProcessorRegistered : 1;              ///< Whether the processor is registered.
+
+  // Frequencly touched accessibility relative values.
+  // Keep it on Impl to avoid AccessibilityData creation.
+  int32_t mAccessibilityRole : Dali::Log<static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT)>::value + 2;
+
+  bool mIsKeyboardNavigationSupported : 1; ///< Stores whether keyboard navigation is supported by the control.
+  bool mIsKeyboardFocusGroup : 1;          ///< Stores whether the control is a focus group.
+  bool mIsEmittingResourceReadySignal : 1; ///< True during ResourceReady().
+  bool mIdleCallbackRegistered : 1;        ///< True if need to emit the resource ready signal again.
+  bool mDispatchKeyEvents : 1;             ///< Whether the actor emits key event signals
+  bool mAccessibleCreatable : 1;           ///< Whether we can create new accessible or not.
+  bool mProcessorRegistered : 1;           ///< Whether the processor is registered.
 
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;

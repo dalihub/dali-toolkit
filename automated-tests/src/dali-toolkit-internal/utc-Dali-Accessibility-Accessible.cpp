@@ -174,7 +174,7 @@ int utcDaliAccessibilityHidden(void)
   END_TEST;
 }
 
-int utcDaliAutomationId(void)
+int utcDaliAccessibilityAutomationId(void)
 {
   ToolkitTestApplication application;
   Dali::Property::Index  automationIdIndex = Toolkit::DevelControl::Property::AUTOMATION_ID;
@@ -185,9 +185,9 @@ int utcDaliAutomationId(void)
   auto* controlAccessible = Accessibility::Accessible::Get(control);
 
   // Check that there is no automationId initially
-  DALI_TEST_CHECK(control.GetProperty<std::string>(automationIdIndex).empty());
+  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex).empty(), true, TEST_LOCATION);
   auto attributes = controlAccessible->GetAttributes();
-  DALI_TEST_CHECK(attributes.find(automationIdKey) == attributes.end());
+  DALI_TEST_EQUALS(attributes.find(automationIdKey) == attributes.end(), true, TEST_LOCATION);
 
   // Set automationId
   control.SetProperty(automationIdIndex, automationIdValue);
@@ -195,21 +195,21 @@ int utcDaliAutomationId(void)
   // Check that automationId is set
   DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex), automationIdValue, TEST_LOCATION);
   attributes = controlAccessible->GetAttributes();
-  DALI_TEST_CHECK(attributes.find(automationIdKey) != attributes.end());
+  DALI_TEST_EQUALS(attributes.find(automationIdKey) != attributes.end(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(attributes[automationIdKey], automationIdValue, TEST_LOCATION);
 
   // Unset automationId
   control.SetProperty(automationIdIndex, "");
 
   // Check that there is no automationId
-  DALI_TEST_CHECK(control.GetProperty<std::string>(automationIdIndex).empty());
+  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex).empty(), true, TEST_LOCATION);
   attributes = controlAccessible->GetAttributes();
-  DALI_TEST_CHECK(attributes.find(automationIdKey) == attributes.end());
+  DALI_TEST_EQUALS(attributes.find(automationIdKey) == attributes.end(), true, TEST_LOCATION);
 
   END_TEST;
 }
 
-int utcDaliImgSrc(void)
+int utcDaliAccessibilityImgSrc(void)
 {
   ToolkitTestApplication application;
   const std::string      imageSrcKey = "imgSrc";
