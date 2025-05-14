@@ -791,11 +791,12 @@ public:
   bool       mUnderlineColorSet : 1;            ///< Has the underline color been explicitly set?
   bool       mBackgroundEnabled : 1;            ///< Background enabled flag
   bool       mMarkupProcessorEnabled : 1;       ///< Markup-processor enabled flag
-  HyphenInfo mHyphen;                           ///< Contains hyphen glyph info & the character index to draw hyphen after.
   bool       mStrikethroughEnabled : 1;         ///< Strikethrough enabled flag
+  bool       mStrikethroughColorSet : 1;        ///< Has the strikethrough color been explicitly set?
   float      mCharacterSpacing;                 ///< Contains the value of the character spacing.
   bool       mCutoutEnabled : 1;                ///< Cutout enabled flag
   bool       mBackgroundWithCutoutEnabled : 1;  ///< Background with cutout enabled flag.
+  HyphenInfo mHyphen;                           ///< Contains hyphen glyph info & the character index to draw hyphen after.
 };
 
 } // namespace Text

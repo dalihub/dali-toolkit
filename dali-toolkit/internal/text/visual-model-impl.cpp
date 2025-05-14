@@ -358,6 +358,10 @@ void VisualModel::SetTextColor(const Vector4& textColor)
   {
     mUnderlineColor = textColor;
   }
+  if(!mStrikethroughColorSet)
+  {
+    mStrikethroughColor = textColor;
+  }
 }
 
 void VisualModel::SetShadowOffset(const Vector2& shadowOffset)
@@ -473,7 +477,8 @@ void VisualModel::SetSecondMiddleIndexOfElidedGlyphs(GlyphIndex secondMiddleInde
 
 void VisualModel::SetStrikethroughColor(const Vector4& color)
 {
-  mStrikethroughColor = color;
+  mStrikethroughColor    = color;
+  mStrikethroughColorSet = true;
 }
 
 void VisualModel::SetStrikethroughEnabled(bool enabled)
@@ -749,6 +754,7 @@ VisualModel::VisualModel()
   mBackgroundEnabled(false),
   mMarkupProcessorEnabled(false),
   mStrikethroughEnabled(false),
+  mStrikethroughColorSet(false),
   mCharacterSpacing(0.0f),
   mCutoutEnabled(false),
   mBackgroundWithCutoutEnabled(false)
