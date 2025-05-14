@@ -1593,6 +1593,16 @@ void Controller::SetEllipsisMode(Toolkit::DevelText::Ellipsize::Mode ellipsisMod
   mImpl->mEllipsisMode = ellipsisMode;
 }
 
+void Controller::SetRenderScale(const float renderScale)
+{
+  mImpl->mRenderScale = renderScale;
+}
+
+float Controller::GetRenderScale() const
+{
+  return mImpl->mRenderScale;
+}
+
 void Controller::SetCharacterSpacing(float characterSpacing)
 {
   mImpl->mModel->mVisualModel->SetCharacterSpacing(characterSpacing);

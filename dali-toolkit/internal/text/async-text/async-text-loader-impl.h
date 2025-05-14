@@ -95,19 +95,29 @@ public:
 
   // Worker thread
   /**
+   * @copydoc Dali::AsyncTextLoader::SetupRenderScale()
+   */
+  Size SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize);
+
+  /**
+   * @copydoc Dali::AsyncTextLoader::ComputeNaturalSize()
+   */
+  Size ComputeNaturalSize(AsyncTextParameters& parameters);
+
+  /**
    * @copydoc Dali::AsyncTextLoader::RenderText()
    */
-  AsyncTextRenderInfo RenderText(AsyncTextParameters& parameters);
+  AsyncTextRenderInfo RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
 
   /**
    * @copydoc Dali::AsyncTextLoader::RenderTextFit()
    */
-  AsyncTextRenderInfo RenderTextFit(AsyncTextParameters& parameters);
+  AsyncTextRenderInfo RenderTextFit(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
 
   /**
    * @copydoc Dali::AsyncTextLoader::RenderAutoScroll()
    */
-  AsyncTextRenderInfo RenderAutoScroll(AsyncTextParameters& parameters);
+  AsyncTextRenderInfo RenderAutoScroll(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize);
 
   /**
    * @copydoc Dali::AsyncTextLoader::GetNaturalSize()
@@ -156,15 +166,6 @@ private:
    * @param[in] parameters All options required to render text.
    */
   AsyncTextRenderInfo Render(AsyncTextParameters& parameters);
-
-  /**
-   * @brief Compute natural size of text.
-   *
-   * @param[in] parameters All options required to compute size of text.
-   *
-   * @return The natural size of text.
-   */
-  Size ComputeNaturalSize(AsyncTextParameters& parameters);
 
   /**
    * @brief Compute height for width of text.
