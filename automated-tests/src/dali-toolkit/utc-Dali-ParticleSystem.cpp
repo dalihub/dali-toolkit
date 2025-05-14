@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
  */
 
-#include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/public-api/particle-system/particle-domain.h>
 #include <dali-toolkit/public-api/particle-system/particle-emitter.h>
 #include <dali-toolkit/public-api/particle-system/particle-list.h>
@@ -66,6 +66,8 @@ std::chrono::milliseconds ParticleEmitter::GetCurrentTimeMillis() const
 
 using ParticleEmitterWrapper = Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter;
 
+namespace
+{
 Texture CreateTexture()
 {
   Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, 100, 100);
@@ -147,7 +149,7 @@ public:
       [[maybe_unused]] auto& col  = particle.Get<Vector4>(ParticleStream::COLOR_STREAM_BIT);
       [[maybe_unused]] auto& vel  = particle.Get<Vector3>(ParticleStream::VELOCITY_STREAM_BIT);
       [[maybe_unused]] auto& sca  = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
-      //auto& basePos = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
+      // auto& basePos = particle.Get<Vector3>(ParticleStream::SCALE_STREAM_BIT);
     }
 
     return count;
@@ -278,9 +280,12 @@ ParticleEmitter CreateEmitter(EmitterGroup* output = nullptr)
 
   return emitter;
 }
+} // namespace
 
 int UtcDaliParticleSystemEmitterNew(void)
 {
+  ToolkitTestApplication application;
+
   // create particle emitter
   auto emitter = ParticleEmitter::New();
 
@@ -322,6 +327,8 @@ int UtcDaliParticleSystemEmitterNew(void)
 
 int UtcDaliParticleSystemEmitterNew2(void)
 {
+  ToolkitTestApplication application;
+
   // create particle emitter
   auto emitter = ParticleEmitter::New();
 
@@ -374,6 +381,8 @@ int UtcDaliParticleSystemEmitterNew2(void)
 
 int UtcDaliParticleSystemEmitterDefaultStreams(void)
 {
+  ToolkitTestApplication application;
+
   // create particle emitter
   auto emitter = ParticleEmitter::New();
 
@@ -425,6 +434,8 @@ int UtcDaliParticleSystemEmitterDefaultStreams(void)
 
 int UtcDaliParticleSystemEmitterModifierStack(void)
 {
+  ToolkitTestApplication application;
+
   // create particle emitter
   auto emitter = ParticleEmitter::New();
 
@@ -478,7 +489,7 @@ int UtcDaliParticleSystemEmitterModifierStack(void)
 
 int UtcDaliParticleSystemTest(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -549,7 +560,7 @@ int UtcDaliParticleSystemTest(void)
 
 int UtcDaliParticleSystemTestWithTextureScreen(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -627,7 +638,7 @@ int UtcDaliParticleSystemTestWithTextureScreen(void)
 
 int UtcDaliParticleSystemTestWithTextureAdd(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -705,7 +716,7 @@ int UtcDaliParticleSystemTestWithTextureAdd(void)
 
 int UtcDaliParticleSystemTestInitialSetup(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -795,7 +806,7 @@ int UtcDaliParticleSystemTestInitialSetup(void)
 
 int UtcDaliParticleSystemTestMT(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -880,7 +891,7 @@ int UtcDaliParticleSystemTestMT(void)
 
 int UtcDaliParticleSystemTestParticleSource(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();
@@ -979,7 +990,7 @@ int UtcDaliParticleSystemTestParticleSource(void)
 
 int UtcDaliParticleSystemReplaceEmitter(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Create actor to be used with emitter
   Actor actor = Actor::New();

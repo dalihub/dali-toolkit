@@ -16,6 +16,8 @@ UNIFORM_BLOCK VertBlock
   UNIFORM highp float uHorizontalAlign;
   UNIFORM highp float uVerticalAlign;
   UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec3 uScale;
+  UNIFORM highp float pixelSnapFactor;
 };
 
 UNIFORM_BLOCK VisualVertBlock
@@ -38,6 +40,15 @@ void main()
   vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + aPosition.y * visualSize.y ) / ( uTextureSize.y ) + 0.5;
 
   highp vec4 vertexPosition = vec4( ( aPosition + anchorPoint ) * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0 );
+
+  vec2 snappedPosition = vertexPosition.xy;
+  snappedPosition.x = floor(snappedPosition.x * uScale.x + 0.5) / uScale.x;
+  snappedPosition.y = floor(snappedPosition.y * uScale.y + 0.5) / uScale.y;
+
+  snappedPosition.x = snappedPosition.x + (1.0 - abs(mod(uSize.x, 2.0) - 1.0)) * 0.5;
+  snappedPosition.y = snappedPosition.y + (1.0 - abs(mod(uSize.y, 2.0) - 1.0)) * 0.5;
+
+  vertexPosition.xy = mix(vertexPosition.xy, snappedPosition, pixelSnapFactor);
 
   gl_Position = uMvpMatrix * vertexPosition;
 }

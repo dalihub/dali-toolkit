@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBILITY_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,32 +63,36 @@ public:
   Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::CheckHighlightedObjectGeometry()
+   * @brief Checks highlighted object geometry if it is showing or not
    */
   void CheckHighlightedObjectGeometry();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterAccessibilityPositionPropertyNotification()
+   * @brief Register property notification to check highlighted object position
    */
   void RegisterAccessibilityPositionPropertyNotification();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::UnregisterAccessibilityPositionPropertyNotification()
+   * @brief Remove property notification added by RegisterAccessibilityPositionPropertyNotification
    */
   void UnregisterAccessibilityPositionPropertyNotification();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterAccessibilityPropertySetSignal()
+   * @brief Register PropertySet signal to check highlighted object name and description
    */
   void RegisterAccessibilityPropertySetSignal();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::UnregisterAccessibilityPropertySetSignal()
+   * @brief Remove PropertySet signal added by RegisterAccessibilityPropertySetSignal
    */
   void UnregisterAccessibilityPropertySetSignal();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::OnAccessibilityPropertySet()
+   * @brief Signal callback of PropertySet when this object is become highlighted, so RegisterAccessibilityPropertySetSignal called.
+   *
+   * @param[in] handle Handle of the control.
+   * @param[in] index The index of property.
+   * @param[in] value The value of property.
    */
   void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
@@ -97,20 +101,16 @@ public:
    */
   std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
+public:
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::IsAccessibleCreated()
+   * @brief Helper function to get default reading info type attributes
    */
-  bool IsAccessibleCreated() const;
+  static Dali::Accessibility::ReadingInfoTypes GetDefaultReadingInfoTypes();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableCreateAccessible()
+   * @brief Helper function to get control's default state attributes
    */
-  void EnableCreateAccessible(bool enable);
-
-  /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::IsCreateAccessibleEnabled()
-   */
-  bool IsCreateAccessibleEnabled() const;
+  static Toolkit::DevelControl::AccessibilityStates GetDefaultControlAccessibilityStates();
 
 public:
   Toolkit::DevelControl::AccessibilityActivateSignalType         mAccessibilityActivateSignal;
@@ -128,18 +128,30 @@ public:
 
   struct AccessibilityProps
   {
-    std::string                                                                       name{};
-    std::string                                                                       description{};
-    std::string                                                                       value{};
-    std::string                                                                       automationId{};
-    int32_t                                                                           role{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)};
+    AccessibilityProps()
+    : isHighlightable(TriStateProperty::AUTO),
+      isHidden(false),
+      isScrollable(false),
+      isModal(false)
+    {
+    }
+
+    AccessibilityProps(const AccessibilityProps&) = default;
+    AccessibilityProps(AccessibilityProps&&)      = default;
+
+    std::string name{};
+    std::string description{};
+    std::string value{};
+    std::string automationId{};
+
     DevelControl::AccessibilityStates                                                 states{};
-    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
+    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations{};
     Property::Map                                                                     extraAttributes{};
-    TriStateProperty                                                                  isHighlightable{TriStateProperty::AUTO};
-    bool                                                                              isHidden{false};
-    bool                                                                              isScrollable{false};
-    bool                                                                              isModal{false};
+
+    TriStateProperty isHighlightable : 3;
+    bool             isHidden : 1;
+    bool             isScrollable : 1;
+    bool             isModal : 1;
   } mAccessibilityProps;
 
 private:
@@ -151,7 +163,6 @@ private:
 
   bool mIsAccessibilityPositionPropertyNotificationSet : 1;
   bool mIsAccessibilityPropertySetSignalRegistered : 1;
-  bool mAccessibleCreatable : 1;
 };
 } // namespace Internal
 } // namespace Toolkit

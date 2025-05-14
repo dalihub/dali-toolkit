@@ -1,3 +1,20 @@
+/**
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -12,8 +29,11 @@
 #include <dali/devel-api/atspi-interfaces/hyperlink.h>
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
+#include <tuple>
 
 using namespace Dali::Toolkit;
 
@@ -79,7 +99,11 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
 {
   ToolkitTestApplication application;
 
-  auto control = Control::New();
+  Dali::Accessibility::ReadingInfoTypes infoTypes{};
+  Dali::Accessibility::RelationType     relationType{Accessibility::RelationType::NULL_OF};
+
+  auto control  = Control::New();
+  auto control2 = Control::New();
 
   // Default is true.
   DALI_TEST_EQUALS(DevelControl::IsCreateAccessibleEnabled(control), true, TEST_LOCATION);
@@ -93,10 +117,33 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     // Should not throw exception even if accessible is not created.
     DALI_TEST_EQUALS(DevelControl::ClearAccessibilityHighlight(control), false, TEST_LOCATION);
     DALI_TEST_EQUALS(DevelControl::GrabAccessibilityHighlight(control), false, TEST_LOCATION);
-
     DevelControl::GetAccessibilityStates(control);
     DevelControl::NotifyAccessibilityStateChange(control, Dali::Accessibility::States{}, false);
     DevelControl::NotifyAccessibilityStateChange(control, Dali::Accessibility::States{}, true);
+    DevelControl::EmitAccessibilityStateChanged(control, Accessibility::State::SHOWING, 0);
+    DevelControl::EmitAccessibilityStateChanged(control, Accessibility::State::SHOWING, 1);
+    DevelControl::AppendAccessibilityRelation(control, control2, relationType);
+    DevelControl::RemoveAccessibilityRelation(control, control2, relationType);
+    DevelControl::GetAccessibilityRelations(control);
+    DevelControl::ClearAccessibilityRelations(control);
+    DevelControl::AppendAccessibilityAttribute(control, "dummy", "i_am_dummy");
+    DevelControl::RemoveAccessibilityAttribute(control, "dummy");
+    DevelControl::ClearAccessibilityAttributes(control);
+    DevelControl::SetAccessibilityReadingInfoType(control, infoTypes);
+    DevelControl::GetAccessibilityReadingInfoType(control);
+
+    // Signal relative API.
+    DevelControl::AccessibilityActivateSignal(control);
+    DevelControl::AccessibilityReadingSkippedSignal(control);
+    DevelControl::AccessibilityReadingPausedSignal(control);
+    DevelControl::AccessibilityReadingResumedSignal(control);
+    DevelControl::AccessibilityReadingCancelledSignal(control);
+    DevelControl::AccessibilityReadingStoppedSignal(control);
+    DevelControl::AccessibilityGetNameSignal(control);
+    DevelControl::AccessibilityGetDescriptionSignal(control);
+    DevelControl::AccessibilityDoGestureSignal(control);
+    DevelControl::AccessibilityActionSignal(control);
+
     DALI_TEST_CHECK(true);
   }
   catch(...)
@@ -120,6 +167,29 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     DevelControl::GetAccessibilityStates(control);
     DevelControl::NotifyAccessibilityStateChange(control, Dali::Accessibility::States{}, false);
     DevelControl::NotifyAccessibilityStateChange(control, Dali::Accessibility::States{}, true);
+    DevelControl::EmitAccessibilityStateChanged(control, Accessibility::State::SHOWING, 0);
+    DevelControl::EmitAccessibilityStateChanged(control, Accessibility::State::SHOWING, 1);
+    DevelControl::AppendAccessibilityRelation(control, control2, relationType);
+    DevelControl::RemoveAccessibilityRelation(control, control2, relationType);
+    DevelControl::GetAccessibilityRelations(control);
+    DevelControl::ClearAccessibilityRelations(control);
+    DevelControl::AppendAccessibilityAttribute(control, "dummy", "i_am_dummy");
+    DevelControl::RemoveAccessibilityAttribute(control, "dummy");
+    DevelControl::ClearAccessibilityAttributes(control);
+    DevelControl::SetAccessibilityReadingInfoType(control, infoTypes);
+    DevelControl::GetAccessibilityReadingInfoType(control);
+
+    // Signal relative API.
+    DevelControl::AccessibilityActivateSignal(control);
+    DevelControl::AccessibilityReadingSkippedSignal(control);
+    DevelControl::AccessibilityReadingPausedSignal(control);
+    DevelControl::AccessibilityReadingResumedSignal(control);
+    DevelControl::AccessibilityReadingCancelledSignal(control);
+    DevelControl::AccessibilityReadingStoppedSignal(control);
+    DevelControl::AccessibilityGetNameSignal(control);
+    DevelControl::AccessibilityGetDescriptionSignal(control);
+    DevelControl::AccessibilityDoGestureSignal(control);
+    DevelControl::AccessibilityActionSignal(control);
     DALI_TEST_CHECK(true);
   }
   catch(...)

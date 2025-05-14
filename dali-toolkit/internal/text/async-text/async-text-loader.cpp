@@ -82,19 +82,29 @@ AsyncTextLoader AsyncTextLoader::New()
   return AsyncTextLoader(asyncTextLoaderImpl);
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters)
+Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize)
 {
-  return GetImplementation(*this).RenderText(parameters);
+  return GetImplementation(*this).SetupRenderScale(parameters, cachedNaturalSize);
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& parameters)
+Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
 {
-  return GetImplementation(*this).RenderTextFit(parameters);
+  return GetImplementation(*this).ComputeNaturalSize(parameters);
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& parameters)
+AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
 {
-  return GetImplementation(*this).RenderAutoScroll(parameters);
+  return GetImplementation(*this).RenderText(parameters, useCachedNaturalSize, naturalSize);
+}
+
+AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
+{
+  return GetImplementation(*this).RenderTextFit(parameters, useCachedNaturalSize, naturalSize);
+}
+
+AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
+{
+  return GetImplementation(*this).RenderAutoScroll(parameters, useCachedNaturalSize, naturalSize);
 }
 
 AsyncTextRenderInfo AsyncTextLoader::GetNaturalSize(AsyncTextParameters& parameters)

@@ -152,7 +152,11 @@ void Magnifier::SetSourceActor(Actor actor)
   mTask.SetSourceActor(actor);
 }
 
-void Magnifier::Initialize()
+Magnifier::~Magnifier()
+{
+}
+
+void Magnifier::OnInitialize()
 {
   Actor   self = Self();
   Vector2 stageSize(Stage::GetCurrent().GetSize());
@@ -219,10 +223,6 @@ void Magnifier::Initialize()
   constraint.Apply();
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
-}
-
-Magnifier::~Magnifier()
-{
 }
 
 void Magnifier::InitializeRenderTask()

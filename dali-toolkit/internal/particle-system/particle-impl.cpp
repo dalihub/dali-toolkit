@@ -29,15 +29,15 @@ Particle::Particle(Internal::ParticleList& ownerList, uint32_t index)
 
 void* Particle::Get(ParticleStreamTypeFlagBit streamBit)
 {
-  auto streamIndex = mOwnerList.GetDefaultStreamIndex(streamBit);
-  auto dataSize    = mOwnerList.GetStreamDataTypeSize(streamIndex);
+  const auto streamIndex = mOwnerList.GetDefaultStreamIndex(streamBit);
+  const auto dataSize    = mOwnerList.GetStreamDataTypeSize(streamIndex);
   return reinterpret_cast<uint8_t*>(mOwnerList.GetDefaultStream(streamBit)) + (mIndex * dataSize);
 }
 
 void* Particle::GetByIndex(uint32_t streamIndex)
 {
-  auto  dataSize = mOwnerList.GetStreamDataTypeSize(streamIndex);
-  auto* ptr      = reinterpret_cast<uint8_t*>(mOwnerList.GetRawStream(streamIndex));
+  const auto dataSize = mOwnerList.GetStreamDataTypeSize(streamIndex);
+  auto*      ptr      = reinterpret_cast<uint8_t*>(mOwnerList.GetRawStream(streamIndex));
   return reinterpret_cast<uint8_t*>(ptr + (mIndex * dataSize));
 }
 

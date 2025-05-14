@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,18 @@ static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
 {
   return rect.width > 0 && rect.height > 0;
 }
+
+static constexpr uint32_t DEFAULT_READING_INFO_TYPES_RAW_DATA = (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::NAME)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::ROLE)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::DESCRIPTION)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::STATE));
+
+static constexpr uint32_t DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA = (1u << static_cast<uint32_t>(DevelControl::AccessibilityState::ENABLED)) |
+                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::SELECTED)) |
+                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::CHECKED)) |
+                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::BUSY)) |
+                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::EXPANDED));
+
 } // unnamed namespace
 
 Control::Impl::AccessibilityData::AccessibilityData(Control& controlImpl)
@@ -77,25 +89,9 @@ Control::Impl::AccessibilityData::AccessibilityData(Control& controlImpl)
   mAccessibilityDoGestureSignal(),
   mControlImpl(controlImpl),
   mIsAccessibilityPositionPropertyNotificationSet(false),
-  mIsAccessibilityPropertySetSignalRegistered(false),
-  mAccessibleCreatable(true)
+  mIsAccessibilityPropertySetSignalRegistered(false)
 {
-  Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
-    auto control = Toolkit::Control::DownCast(actor);
-    if(!control)
-    {
-      return {nullptr, true};
-    }
-
-    auto& controlImpl = Toolkit::Internal::GetImplementation(control);
-    if(controlImpl.mImpl->IsCreateAccessibleEnabled())
-    {
-      return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
-    }
-
-    return {nullptr, false};
-  });
-  mAccessibilityProps.states[DevelControl::AccessibilityState::ENABLED] = true;
+  mAccessibilityProps.states = GetDefaultControlAccessibilityStates();
 }
 
 void Control::Impl::AccessibilityData::AppendAccessibilityAttribute(const std::string& key, const std::string value)
@@ -259,12 +255,7 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetAcces
   }
   else
   {
-    Dali::Accessibility::ReadingInfoTypes types;
-    types[Dali::Accessibility::ReadingInfoType::NAME]        = true;
-    types[Dali::Accessibility::ReadingInfoType::ROLE]        = true;
-    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
-    types[Dali::Accessibility::ReadingInfoType::STATE]       = true;
-    return types;
+    return GetDefaultReadingInfoTypes();
   }
 
   if(value.empty())
@@ -347,19 +338,14 @@ std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::Accessi
   return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
 }
 
-bool Control::Impl::AccessibilityData::IsAccessibleCreated() const
+Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetDefaultReadingInfoTypes()
 {
-  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(mControlImpl.Self());
+  return Dali::Accessibility::ReadingInfoTypes{DEFAULT_READING_INFO_TYPES_RAW_DATA};
 }
 
-void Control::Impl::AccessibilityData::EnableCreateAccessible(bool enable)
+Toolkit::DevelControl::AccessibilityStates Control::Impl::AccessibilityData::GetDefaultControlAccessibilityStates()
 {
-  mAccessibleCreatable = enable;
-}
-
-bool Control::Impl::AccessibilityData::IsCreateAccessibleEnabled() const
-{
-  return mAccessibleCreatable;
+  return Toolkit::DevelControl::AccessibilityStates{DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA};
 }
 
 } // namespace Internal

@@ -89,6 +89,7 @@ const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
 const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
 const char* const PROPERTY_NAME_ELLIPSIS_MODE         = "ellipsisMode";
 const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
+const char* const PROPERTY_NAME_RENDER_SCALE          = "renderScale";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -378,6 +379,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ASYNC_LINE_COUNT) == DevelTextLabel::Property::ASYNC_LINE_COUNT);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_MODE) == DevelTextLabel::Property::ELLIPSIS_MODE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextLabel::Property::FONT_VARIATIONS);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_RENDER_SCALE) == DevelTextLabel::Property::RENDER_SCALE);
 
   END_TEST;
 }
@@ -1082,6 +1084,23 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
   DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::ELLIPSIS_MODE), static_cast<int>(Toolkit::DevelText::Ellipsize::AUTO_SCROLL), TEST_LOCATION);
+
+  // Render Scale
+  label.SetProperty(TextLabel::Property::PIXEL_SNAP_FACTOR, 1.0f);
+  DALI_TEST_EQUALS(label.GetProperty<float>(TextLabel::Property::PIXEL_SNAP_FACTOR), 1.0f, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_SCALE, 1.045f);
+  DALI_TEST_EQUALS(label.GetProperty<float>(DevelTextLabel::Property::RENDER_SCALE), 1.045f, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_SCALE, 1.0f);
+  DALI_TEST_EQUALS(label.GetProperty<float>(DevelTextLabel::Property::RENDER_SCALE), 1.0f, TEST_LOCATION);
+
+  // Invalid value
+  label.SetProperty(DevelTextLabel::Property::RENDER_SCALE, 0.5f);
+  DALI_TEST_EQUALS(label.GetProperty<float>(DevelTextLabel::Property::RENDER_SCALE), 1.0f, TEST_LOCATION);
+
+  label.SetProperty(TextLabel::Property::PIXEL_SNAP_FACTOR, 0.0f);
+  DALI_TEST_EQUALS(label.GetProperty<float>(TextLabel::Property::PIXEL_SNAP_FACTOR), 0.0f, TEST_LOCATION);
 
   // Check font variations property
   Property::Map fontVariationsMapSet;

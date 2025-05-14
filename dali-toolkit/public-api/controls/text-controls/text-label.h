@@ -342,6 +342,22 @@ public:
        * @see TEXT_COLOR
        */
       TEXT_COLOR_ALPHA,
+
+      /**
+       * @brief A pixel snap factor.
+       * @details Name "pixelSnapFactor", type Property::FLOAT.
+       * @note A factor of pixel snap, it should be 0.0 ~ 1.0.
+       * Controls the degree of pixel snapping applied to the visual position.
+       * A value of 0.0 means no snapping is applied (original position is preserved), while 1.0 applies full pixel alignment.
+       * Intermediate values blend smoothly between the original and snapped positions using linear interpolation (mix) in the vertex shader.
+       * Typical usage:
+       * To ensure both smooth animations and sharp visual alignment,
+       * transition the pixelSnapFactor value gradually from 0.0 to 1.0 during or after animations.
+       * This allows the snapping to engage seamlessly without visible jitter or popping, maintaining both visual quality and motion fluidity.
+       * Use 0.0 during animation to avoid snapping artifacts.
+       * Gradually increase to 1.0 as the animation settles, for crisp pixel alignment.
+       */
+      PIXEL_SNAP_FACTOR,
     };
   };
 

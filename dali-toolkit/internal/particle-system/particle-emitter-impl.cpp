@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,7 +134,10 @@ ParticleSystem::ParticleModifier ParticleEmitter::GetModifierAt(uint32_t index)
 
 void ParticleEmitter::RemoveModifierAt(uint32_t index)
 {
-  mModifiers.erase(mModifiers.begin() + index);
+  if(DALI_LIKELY(index < mModifiers.size()))
+  {
+    mModifiers.erase(mModifiers.begin() + index);
+  }
 }
 
 void ParticleEmitter::Start()
@@ -148,7 +151,7 @@ void ParticleEmitter::Start()
 
     GetImplementation(mParticleRenderer).Initialize();
 
-    mSystemStarted = true;
+    mSystemStarted.store(1u, std::memory_order_relaxed);
     mParticleStatusBits &= ~(SIMULATION_STOPPED_STATUS_BIT | SIMULATION_PAUSED_STATUS_BIT);
     mParticleStatusBits |= SIMULATION_STARTED_STATUS_BIT;
     mFrameCallback = std::make_unique<FrameCallback>(this);
@@ -164,7 +167,7 @@ void ParticleEmitter::Stop()
 {
   if(mActor && IsComplete() && (mParticleStatusBits & SIMULATION_STARTED_STATUS_BIT))
   {
-    mSystemStarted = false;
+    mSystemStarted.store(0u, std::memory_order_relaxed);
     mParticleStatusBits &= ~(SIMULATION_STARTED_STATUS_BIT | SIMULATION_PAUSED_STATUS_BIT);
     mParticleStatusBits |= SIMULATION_STOPPED_STATUS_BIT;
     auto renderer = GetImplementation(mParticleRenderer).GetRenderer();
@@ -182,70 +185,67 @@ std::chrono::milliseconds ParticleEmitter::GetCurrentTimeMillis() const
 
 void ParticleEmitter::Update()
 {
-  // Do not update if emitter setup isn't complete
-  if(!IsComplete())
-  {
-    return;
-  }
-
-  auto ms = GetCurrentTimeMillis();
+  auto currentUpdateMs = GetCurrentTimeMillis();
 
   if(mCurrentMilliseconds.count() == 0)
   {
-    mCurrentMilliseconds = ms;
+    mCurrentMilliseconds = currentUpdateMs;
   }
 
   if(mLastUpdateMs.count() == 0)
   {
-    mLastUpdateMs = ms;
+    mLastUpdateMs = currentUpdateMs;
   }
+
+  // TODO : Make below codes as thread safe! See mSystemStarted implementation
 
   float emissionDelta = 1.0f / float(mEmissionRatePerSecond); // time per one particle emission (TODO: add some randomness to it)
 
-  auto diffTime = double((ms - mCurrentMilliseconds).count()) / 1000.0;
+  auto diffTime = double((currentUpdateMs - mCurrentMilliseconds).count()) / 1000.0;
 
   uint32_t emissionCount = 0u;
   if(diffTime >= emissionDelta)
   {
     emissionCount        = round(diffTime / emissionDelta);
-    mCurrentMilliseconds = ms;
+    mCurrentMilliseconds = mCurrentMilliseconds + std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(emissionCount * emissionDelta));
   }
 
   // Update lifetimes and discard dead particles
-  auto& particles = mParticleList.GetActiveParticles();
-  auto  dt        = ms - mLastUpdateMs;
-  if(dt.count())
+  const auto deltaMs = currentUpdateMs - mLastUpdateMs;
+
+  mLastUpdateMs = currentUpdateMs;
+
+  const float deltaSeconds = float(deltaMs.count()) / 1000.0f;
+  if(deltaMs.count())
   {
-    std::vector<int> toErase;
-    int              n = 0;
+    auto& particles = mParticleList.GetActiveParticles();
+
+    static std::vector<uint32_t> toEraseIndices;
+
+    uint32_t n = 0;
     for(auto& p : particles)
     {
       auto& lifetime = p.Get<float>(ParticleStream::LIFETIME_STREAM_BIT);
-      lifetime -= (float(dt.count()) / 1000.0f);
+      lifetime -= deltaSeconds;
       if(lifetime <= 0.0f)
       {
-        toErase.emplace_back(n);
+        toEraseIndices.emplace_back(n);
       }
       ++n;
     }
 
-    if(!toErase.empty())
+    if(!toEraseIndices.empty())
     {
-      int indexShift = 0;
-      for(auto& v : toErase)
-      {
-        GetImplementation(mParticleList).ReleaseParticle(v - indexShift);
-        ++indexShift;
-      }
+      GetImplementation(mParticleList).ReleaseParticles(toEraseIndices);
+      toEraseIndices.clear();
     }
   }
-  mLastUpdateMs = ms;
 
   // apply initial emission count
-  if(mSystemStarted)
+  const bool isFirstFrameAfterStart = mSystemStarted.fetch_and(0u, std::memory_order_relaxed);
+  if(isFirstFrameAfterStart)
   {
-    emissionCount  = mEmissionCountOnStart;
-    mSystemStarted = false;
+    emissionCount = mEmissionCountOnStart;
   }
 
   // Update source if there are any particles to be emitted
@@ -298,9 +298,11 @@ void ParticleEmitter::UpdateSource(uint32_t count)
 
 void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleModifier& modifier)
 {
-  auto& threadPool    = GetThreadPool();
-  auto  workerThreads = threadPool.GetWorkerCount();
-  auto  activeCount   = mParticleList.GetActiveParticleCount();
+  auto& threadPool = GetThreadPool();
+
+  static const auto workerThreads = threadPool.GetWorkerCount();
+
+  const auto activeCount = mParticleList.GetActiveParticleCount();
 
   // at least 10 particles per worker thread (should be parametrized)
   // If less, continue ST
@@ -310,7 +312,7 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
     return;
   }
 
-  auto partial = mParticleList.GetActiveParticleCount() / workerThreads;
+  const auto partial = activeCount / workerThreads;
 
   // make tasks
   struct UpdateTask
@@ -325,8 +327,8 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
 
     Internal::ParticleModifier&   mModifier;
     ParticleSystem::ParticleList& mList;
-    uint32_t                      mFirst;
-    uint32_t                      mCount;
+    const uint32_t                mFirst;
+    const uint32_t                mCount;
 
     void Update()
     {
@@ -334,25 +336,28 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
     }
   };
 
-  std::vector<UpdateTask> updateTasks;
+  static std::vector<UpdateTask> updateTasks;
   updateTasks.reserve(workerThreads);
-  std::vector<Task> tasks;
+
+  static std::vector<Task> tasks;
+  tasks.reserve(workerThreads);
 
   for(auto i = 0u; i < workerThreads; ++i)
   {
-    auto index = i * partial;
-    auto count = partial;
-    if(i == workerThreads - 1 && index + count < activeCount)
-    {
-      count = activeCount - index;
-    }
+    const auto index = i * partial;
+    const auto count = (i == workerThreads - 1) ? activeCount - index : partial;
 
     updateTasks.emplace_back(GetImplementation(modifier), mParticleList, index, count);
-    tasks.emplace_back([&task = updateTasks.back()](uint32_t n) { task.Update(); });
+    tasks.emplace_back([&task = updateTasks.back()](uint32_t n)
+                       { task.Update(); });
   }
 
   auto future = threadPool.SubmitTasks(tasks, 0);
   future->Wait();
+
+  // clear tasks
+  updateTasks.clear();
+  tasks.clear();
 }
 
 void ParticleEmitter::UpdateDomain()
@@ -449,7 +454,8 @@ Dali::ThreadPool& GetThreadPool()
   // NOTE: this function shouldn't be called from multiple thread anyway
   if(!gThreadPool)
   {
-    std::call_once(onceFlag, [&threadPool = gThreadPool] { threadPool = std::make_unique<Dali::ThreadPool>();
+    std::call_once(onceFlag, [&threadPool = gThreadPool]
+                   { threadPool = std::make_unique<Dali::ThreadPool>();
                      threadPool->Initialize(4u); });
   }
 

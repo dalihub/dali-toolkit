@@ -85,6 +85,33 @@ void CreateClippingRenderer(Control& controlImpl)
   }
 }
 
+/**
+ * @brief Register external accessible getter function only 1 times per each programs.
+ * @note We could call this API only for main thread. So use static bool flag is enough than std::once_flag
+ */
+void RegisterControlAccessibleGetter()
+{
+  static bool onceFlag = false;
+  if(DALI_UNLIKELY(!onceFlag))
+  {
+    onceFlag = true;
+    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
+      auto control = Toolkit::Control::DownCast(actor);
+      if(!control)
+      {
+        return {nullptr, true};
+      }
+
+      if(Toolkit::DevelControl::IsCreateAccessibleEnabled(control))
+      {
+        auto& controlImpl = Toolkit::Internal::GetImplementation(control);
+        return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
+      }
+
+      return {nullptr, false};
+    });
+  }
+}
 } // unnamed namespace
 
 Toolkit::Control Control::New()
@@ -469,10 +496,12 @@ Control::~Control()
 
 void Control::Initialize()
 {
-  if(DALI_LIKELY(!(mImpl->mFlags & DISABLE_VISUALS)))
+  if(!(mImpl->mFlags & DISABLE_VISUALS))
   {
     mImpl->InitializeVisualData();
   }
+
+  RegisterControlAccessibleGetter();
 
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();

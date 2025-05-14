@@ -48,6 +48,12 @@ const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
     1.0f  // VerticalAlignment::BOTTOM
 };
 
+float ConvertToEven(float value)
+{
+  int intValue(static_cast<int>(value));
+  return static_cast<float>(intValue + (intValue & 1));
+}
+
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
@@ -397,8 +403,7 @@ void AsyncTextLoader::Update(AsyncTextParameters& parameters)
   // Validate Fonts.
   ////////////////////////////////////////////////////////////////////////////////
 
-  float scale = parameters.fontSizeScale;
-
+  float                            scale            = parameters.fontSizeScale * parameters.renderScale;
   TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * scale;
 
   //Get the number of points per one unit of point-size
@@ -928,8 +933,18 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
 
   // Set information for creating pixel datas.
   AsyncTextRenderInfo renderInfo;
-  renderInfo.width  = static_cast<uint32_t>(layoutSize.x);
-  renderInfo.height = static_cast<uint32_t>(layoutSize.y);
+
+  bool isRenderScale = parameters.renderScale > 1.0f ? true : false;
+  if(isRenderScale)
+  {
+    float width     = (layoutSize.width / parameters.renderScale) * (layoutSize.width / ((layoutSize.width / parameters.renderScale) * parameters.renderScale));
+    float height    = (layoutSize.height / parameters.renderScale) * (layoutSize.height / ((layoutSize.height / parameters.renderScale) * parameters.renderScale));
+    renderInfo.size = Size(width, height);
+  }
+  else
+  {
+    renderInfo.size = layoutSize;
+  }
 
   // Set the direction of text.
   renderInfo.isTextDirectionRTL = mIsTextDirectionRTL;
@@ -991,23 +1006,32 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
 
   if(cutoutEnabled)
   {
-    renderInfo.renderedSize = Size(static_cast<float>(renderInfo.width), static_cast<float>(renderInfo.height));
+    renderInfo.renderedSize = renderInfo.size;
   }
   else
   {
-    renderInfo.renderedSize = Size(parameters.textWidth, parameters.textHeight);
+    float renderedWidth     = isRenderScale ? parameters.renderScaleWidth : parameters.textWidth;
+    float renderedHeight    = isRenderScale ? parameters.renderScaleHeight : parameters.textHeight;
+    renderInfo.renderedSize = Size(renderedWidth, renderedHeight);
   }
 
   return renderInfo;
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters)
+AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_RENDER_TEXT");
 
+  Size textNaturalSize   = naturalSize;
+  bool cachedNaturalSize = useCachedNaturalSize;
+
   if(parameters.requestType == Async::RENDER_CONSTRAINT)
   {
-    Size textNaturalSize = ComputeNaturalSize(parameters);
+    if(!cachedNaturalSize)
+    {
+      textNaturalSize   = ComputeNaturalSize(parameters);
+      cachedNaturalSize = true;
+    }
     // textWidth is widthConstraint
     if(parameters.textWidth > textNaturalSize.width)
     {
@@ -1020,7 +1044,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters)
     // In case of CONSTRAINT, the natural size has already been calculated.
     // So we can skip Initialize and Update at this stage.
     // Only the layout is newly calculated to obtain the height.
-    bool  layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
+    bool  layoutOnly = cachedNaturalSize;
     float height     = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // textHeight is heightConstraint.
@@ -1039,8 +1063,11 @@ AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters)
   }
   else
   {
-    Initialize();
-    Update(parameters);
+    if(!cachedNaturalSize)
+    {
+      Initialize();
+      Update(parameters);
+    }
     bool layoutUpdated = false;
     Layout(parameters, layoutUpdated);
   }
@@ -1080,6 +1107,98 @@ float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, fl
   return layoutSize.height;
 }
 
+Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize)
+{
+  if(parameters.isTextFitEnabled || parameters.isTextFitArrayEnabled)
+  {
+    // If text fit, only update the scaled size.
+    parameters.renderScaleWidth  = parameters.textWidth;
+    parameters.renderScaleHeight = parameters.textHeight;
+    parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
+    parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
+    parameters.minLineSize       = ConvertToEven(ceil(parameters.minLineSize * parameters.renderScale));
+    cachedNaturalSize            = false;
+    return Size::ZERO;
+  }
+
+  float renderScale = parameters.renderScale;
+  // Set render scale to 1.0 to compute the original scale natural size.
+  parameters.renderScale   = 1.0f;
+  Size originalNaturalSize = ComputeNaturalSize(parameters);
+
+  // Restore render scale.
+  parameters.renderScale = renderScale;
+
+  // Check if the original text is ellipsized or not.
+  bool widthEllipsized  = parameters.textWidth < originalNaturalSize.width ? true : false;
+  bool heightEllipsized = parameters.textHeight < originalNaturalSize.height ? true : false;
+
+  // Store the computed natural size to avoid redundant calculations.
+  Size naturalSize  = ComputeNaturalSize(parameters);
+  cachedNaturalSize = true;
+
+  // Update the scaled size.
+  parameters.renderScaleWidth  = parameters.textWidth;
+  parameters.renderScaleHeight = parameters.textHeight;
+  parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
+  parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
+  parameters.minLineSize       = ConvertToEven(ceil(parameters.minLineSize * parameters.renderScale));
+
+  // The texture in RenderScale needs to be resized because it exceeds the control size.
+  if(!widthEllipsized && naturalSize.width > parameters.textWidth)
+  {
+    float renderScaleGap = ceil(naturalSize.width - parameters.textWidth);
+    if(renderScaleGap > 0.0f)
+    {
+      Vector<GlyphInfo>& glyphs         = mTextModel->mVisualModel->mGlyphs;
+      const Length       numberOfGlyphs = static_cast<Length>(glyphs.Count());
+      if(numberOfGlyphs > 1u)
+      {
+        naturalSize.width -= (renderScaleGap - 1.0f);
+        parameters.textWidth = naturalSize.width;
+
+        uint32_t numberOfAdvance = 0u;
+        float    sumOfGap        = 0.0f;
+        float    gap             = renderScaleGap / static_cast<float>(numberOfGlyphs - 1u);
+
+        // Reduce the advance of all glyphs slightly to fit the width to the control size.
+        // Reducing the advance of the last glyph is pointless.
+        for(Length index = 0u; index < numberOfGlyphs - 1u; index++)
+        {
+          if(glyphs[index].advance > 0.0f)
+          {
+            glyphs[index].advance -= gap;
+            numberOfAdvance++;
+            sumOfGap += gap;
+          }
+        }
+
+        // Remove all remaining gaps.
+        if(numberOfAdvance > 0u && fabsf(renderScaleGap - sumOfGap) > Math::MACHINE_EPSILON_1000)
+        {
+          float remainedGap = (renderScaleGap - sumOfGap) / static_cast<float>(numberOfAdvance);
+          for(Length index = 0u; index < numberOfGlyphs - 1u; index++)
+          {
+            if(glyphs[index].advance > 0.0f)
+            {
+              glyphs[index].advance -= remainedGap;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Adjust the size to ensure same ellipsis behavior as the original text.
+  parameters.textWidth  = widthEllipsized ? std::min(parameters.textWidth, naturalSize.width - 1) : std::max(parameters.textWidth, naturalSize.width);
+  parameters.textHeight = heightEllipsized ? std::min(parameters.textHeight, naturalSize.height - 1) : std::max(parameters.textHeight, naturalSize.height);
+
+  // Update the control size because textWidth and textHeight have been adjusted. (Skip Initialize and Update)
+  mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
+
+  return naturalSize;
+}
+
 Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
 {
 #ifdef TRACE_ENABLED
@@ -1112,7 +1231,8 @@ Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
 
 AsyncTextRenderInfo AsyncTextLoader::GetHeightForWidth(AsyncTextParameters& parameters)
 {
-  float               height = ComputeHeightForWidth(parameters, parameters.textWidth, false);
+  float height = ComputeHeightForWidth(parameters, parameters.textWidth, false);
+
   AsyncTextRenderInfo renderInfo;
   renderInfo.renderedSize.width  = parameters.textWidth;
   renderInfo.renderedSize.height = height;
@@ -1124,7 +1244,10 @@ AsyncTextRenderInfo AsyncTextLoader::GetHeightForWidth(AsyncTextParameters& para
 
 AsyncTextRenderInfo AsyncTextLoader::GetNaturalSize(AsyncTextParameters& parameters)
 {
-  Size                textNaturalSize = ComputeNaturalSize(parameters);
+  Size textNaturalSize   = ComputeNaturalSize(parameters);
+  textNaturalSize.width  = ConvertToEven(textNaturalSize.width);
+  textNaturalSize.height = ConvertToEven(textNaturalSize.height);
+
   AsyncTextRenderInfo renderInfo;
   renderInfo.renderedSize = textNaturalSize;
   renderInfo.requestType  = Async::COMPUTE_NATURAL_SIZE;
@@ -1133,16 +1256,24 @@ AsyncTextRenderInfo AsyncTextLoader::GetNaturalSize(AsyncTextParameters& paramet
   return renderInfo;
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& parameters)
+AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_RENDER_AUTO_SCROLL");
 
   Size controlSize(parameters.textWidth, parameters.textHeight);
 
   // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
-  Size textNaturalSize = ComputeNaturalSize(parameters);
-  textNaturalSize.width += (parameters.padding.start + parameters.padding.end);
-  textNaturalSize.height += (parameters.padding.top + parameters.padding.bottom);
+  Size textNaturalSize;
+  if(useCachedNaturalSize)
+  {
+    textNaturalSize = naturalSize;
+  }
+  else
+  {
+    textNaturalSize = ComputeNaturalSize(parameters);
+    textNaturalSize.width += (parameters.padding.start + parameters.padding.end);
+    textNaturalSize.height += (parameters.padding.top + parameters.padding.bottom);
+  }
 
   if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
   {
@@ -1201,10 +1332,12 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
   parameters.textWidth = actualWidth;
 
   // Store the control size and calculated wrap gap in render info.
-  renderInfo.controlSize       = controlSize;
+  bool  isRenderScale          = parameters.renderScale > 1.0f ? true : false;
+  float renderedWidth          = isRenderScale ? parameters.renderScaleWidth : controlSize.width;
+  float renderedHeight         = isRenderScale ? parameters.renderScaleHeight : controlSize.height;
+  renderInfo.controlSize       = Size(renderedWidth, renderedHeight);
+  renderInfo.renderedSize      = Size(renderedWidth, renderedHeight);
   renderInfo.autoScrollWrapGap = wrapGap;
-  renderInfo.renderedSize      = controlSize;
-
   return renderInfo;
 }
 
@@ -1224,11 +1357,18 @@ bool AsyncTextLoader::CheckForTextFit(AsyncTextParameters& parameters, float poi
   return true;
 }
 
-AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& parameters)
+AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
 {
+  Size textNaturalSize   = naturalSize;
+  bool cachedNaturalSize = useCachedNaturalSize;
+
   if(parameters.requestType == Async::RENDER_CONSTRAINT)
   {
-    Size textNaturalSize = ComputeNaturalSize(parameters);
+    if(!cachedNaturalSize)
+    {
+      textNaturalSize   = ComputeNaturalSize(parameters);
+      cachedNaturalSize = true;
+    }
     // textWidth is widthConstraint
     if(parameters.textWidth > textNaturalSize.width)
     {
@@ -1241,7 +1381,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
     // In case of CONSTRAINT, the natural size has already been calculated.
     // So we can skip Initialize and Update at this stage.
     // Only the layout is newly calculated to obtain the height.
-    bool  layoutOnly = (parameters.requestType == Async::RENDER_CONSTRAINT);
+    bool  layoutOnly = cachedNaturalSize;
     float height     = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // textHeight is heightConstraint

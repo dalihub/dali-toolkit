@@ -791,7 +791,15 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
     // Calculate the size of the visual that can fit the text.
     // The size of the text after it has been laid-out, size of pixel data buffer.
-    Size layoutSize(static_cast<float>(renderInfo.width), static_cast<float>(renderInfo.height));
+    Size layoutSize = renderInfo.size;
+
+    // Set textWidth, textHeight to the original size requested for rendering.
+    bool isRenderScale = parameters.renderScale > 1.0f ? true : false;
+    if(isRenderScale)
+    {
+      parameters.textWidth  = parameters.renderScaleWidth;
+      parameters.textHeight = parameters.renderScaleHeight;
+    }
 
     // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
     Vector2 alignmentOffset;
@@ -824,7 +832,8 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       // This affects font rendering quality.
       // It need to be integerized.
       visualTransformOffset.x = roundf(parameters.padding.start + alignmentOffset.x);
-      visualTransformOffset.y = roundf(parameters.padding.top + alignmentOffset.y);
+      visualTransformOffset.y = isRenderScale ? roundf((layoutSize.y + parameters.padding.top + alignmentOffset.y) * 2.0f) * 0.5f - layoutSize.y :
+                                                roundf(parameters.padding.top + alignmentOffset.y);
     }
 
     SetRequireRender(renderInfo.isCutout);
@@ -850,7 +859,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
     const int maxTextureSize = Dali::GetMaxTextureSize();
 
     // No tiling required. Use the default renderer.
-    if(renderInfo.height < static_cast<uint32_t>(maxTextureSize))
+    if(renderInfo.size.height < static_cast<float>(maxTextureSize))
     {
       // Filter mode needs to be set to linear to produce better quality while scaling.
       Sampler sampler = Sampler::New();
@@ -895,8 +904,8 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       Sampler sampler = Sampler::New();
       sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
 
-      int verifiedWidth  = static_cast<int>(renderInfo.width);
-      int verifiedHeight = static_cast<int>(renderInfo.height);
+      int verifiedWidth  = static_cast<int>(renderInfo.size.width);
+      int verifiedHeight = static_cast<int>(renderInfo.size.height);
 
       // Set information for creating textures.
       TilingInfo info(verifiedWidth, maxTextureSize);

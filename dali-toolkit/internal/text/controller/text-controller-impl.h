@@ -378,6 +378,7 @@ public:
     mTextFitLineSize(0.f),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
     mDisabledColorOpacity(DEFAULT_DISABLED_COLOR_OPACITY),
+    mRenderScale(1.0f),
     mFontSizeScaleEnabled(true),
     mTextFitEnabled(false),
     mTextFitChanged(false),
@@ -1120,6 +1121,7 @@ public:
   float mTextFitLineSize;              ///< This is the LineSize that is the standard when performing TextFit.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
   float mDisabledColorOpacity;         ///< Color opacity when disabled.
+  float mRenderScale;                  ///< The render scale. Default 1.0
   bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.
   bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
   bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.

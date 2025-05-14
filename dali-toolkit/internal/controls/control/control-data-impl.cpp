@@ -44,6 +44,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -51,8 +52,6 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 
 namespace Dali
 {
@@ -426,14 +425,15 @@ Control::Impl::Impl(Control& controlImpl)
   mInputMethodContext(),
   mIdleCallback(nullptr),
   mFlags(Control::ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+  mAccessibilityRole{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)},
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
   mIdleCallbackRegistered(false),
   mDispatchKeyEvents(true),
+  mAccessibleCreatable(true),
   mProcessorRegistered(false)
 {
-  mAccessibilityData = std::make_unique<AccessibilityData>(mControlImpl);
 }
 
 Control::Impl::~Impl()
@@ -947,7 +947,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         std::string name;
         if(value.Get(name))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.name = std::move(name);
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !name.empty())
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.name = std::move(name);
+          }
         }
         break;
       }
@@ -957,7 +960,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         std::string text;
         if(value.Get(text))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.description = std::move(text);
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !text.empty())
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.description = std::move(text);
+          }
         }
         break;
       }
@@ -967,7 +973,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int32_t role;
         if(value.Get(role))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.role = role;
+          controlImpl.mImpl->mAccessibilityRole = role;
         }
         break;
       }
@@ -977,7 +983,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         bool highlightable;
         if(value.Get(highlightable))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isHighlightable = highlightable ? TriStateProperty::TRUE : TriStateProperty::FALSE;
+          controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isHighlightable = highlightable ? TriStateProperty::TRUE : TriStateProperty::FALSE;
         }
         break;
       }
@@ -985,9 +991,12 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
         const Property::Map* map = value.GetMap();
-        if(map && !map->Empty())
+        if(map)
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.extraAttributes = *map;
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !map->Empty())
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.extraAttributes = *map;
+          }
         }
         break;
       }
@@ -1007,15 +1016,20 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         bool hidden;
         if(value.Get(hidden))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isHidden = hidden;
-
-          auto accessible = controlImpl.GetAccessibleObject();
-          if(DALI_LIKELY(accessible))
+          const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+          const bool  originalHidden    = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isHidden : false;
+          if(originalHidden != hidden)
           {
-            auto* parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
-            if(parent)
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isHidden = hidden;
+
+            auto accessible = controlImpl.GetAccessibleObject();
+            if(DALI_LIKELY(accessible))
             {
-              parent->OnChildrenChanged();
+              auto* parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
+              if(parent)
+              {
+                parent->OnChildrenChanged();
+              }
             }
           }
         }
@@ -1045,7 +1059,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         std::string automationId;
         if(value.Get(automationId))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.automationId = std::move(automationId);
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !automationId.empty())
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.automationId = std::move(automationId);
+          }
         }
         break;
       }
@@ -1055,7 +1072,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         std::string accessibilityValue;
         if(value.Get(accessibilityValue))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.value = std::move(accessibilityValue);
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !accessibilityValue.empty())
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.value = std::move(accessibilityValue);
+          }
         }
         break;
       }
@@ -1065,7 +1085,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         bool isScrollable;
         if(value.Get(isScrollable))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isScrollable = isScrollable;
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || isScrollable)
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isScrollable = isScrollable;
+          }
         }
         break;
       }
@@ -1075,7 +1098,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int32_t states;
         if(value.Get(states))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || states != static_cast<int32_t>(AccessibilityData::GetDefaultControlAccessibilityStates().GetRawData32()))
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
+          }
         }
         break;
       }
@@ -1085,7 +1111,10 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         bool isModal;
         if(value.Get(isModal))
         {
-          controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isModal = isModal;
+          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || isModal)
+          {
+            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isModal = isModal;
+          }
         }
         break;
       }
@@ -1338,31 +1367,35 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.name;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.name : "";
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.description;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.description : "";
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.role;
+        value = controlImpl.mImpl->mAccessibilityRole;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isHighlightable == TriStateProperty::TRUE ? true : false;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = (DALI_LIKELY(accessibilityData) && accessibilityData->mAccessibilityProps.isHighlightable == TriStateProperty::TRUE) ? true : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.extraAttributes;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.extraAttributes : Property::Map();
         break;
       }
 
@@ -1374,7 +1407,8 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isHidden;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isHidden : false;
         break;
       }
 
@@ -1392,31 +1426,36 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::AUTOMATION_ID:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.automationId;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.automationId : "";
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.value;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.value : "";
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isScrollable;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isScrollable : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
       {
-        value = static_cast<int32_t>(controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.states.GetRawData32());
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = static_cast<int32_t>((DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.states : AccessibilityData::GetDefaultControlAccessibilityStates()).GetRawData32());
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
       {
-        value = controlImpl.mImpl->mAccessibilityData->mAccessibilityProps.isModal;
+        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isModal : false;
         break;
       }
 
@@ -1627,74 +1666,77 @@ bool Control::Impl::FilterKeyEvent(const KeyEvent& event)
   return consumed;
 }
 
+Control::Impl::AccessibilityData& Control::Impl::GetOrCreateAccessibilityData()
+{
+  if(DALI_UNLIKELY(!mAccessibilityData))
+  {
+    // Create only 1 times.
+    mAccessibilityData = std::make_unique<AccessibilityData>(mControlImpl);
+  }
+  DALI_ASSERT_DEBUG(mAccessibilityData && "AccessibilityData not created!");
+  return *mAccessibilityData;
+}
+
+Control::Impl::AccessibilityData* Control::Impl::GetAccessibilityData() const
+{
+  return mAccessibilityData.get();
+}
+
 void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
-  mAccessibilityData->AppendAccessibilityAttribute(key, value);
+  GetOrCreateAccessibilityData().AppendAccessibilityAttribute(key, value);
 }
 
 void Control::Impl::RemoveAccessibilityAttribute(const std::string& key)
 {
-  mAccessibilityData->RemoveAccessibilityAttribute(key);
+  auto* accessibilityData = GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
+  {
+    accessibilityData->RemoveAccessibilityAttribute(key);
+  }
 }
 
 void Control::Impl::ClearAccessibilityAttributes()
 {
-  mAccessibilityData->ClearAccessibilityAttributes();
+  auto* accessibilityData = GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
+  {
+    accessibilityData->ClearAccessibilityAttributes();
+  }
 }
 
 void Control::Impl::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
 {
-  mAccessibilityData->SetAccessibilityReadingInfoType(types);
+  GetOrCreateAccessibilityData().SetAccessibilityReadingInfoType(types);
 }
 
 Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfoType() const
 {
-  return mAccessibilityData->GetAccessibilityReadingInfoType();
-}
-
-void Control::Impl::CheckHighlightedObjectGeometry()
-{
-  mAccessibilityData->CheckHighlightedObjectGeometry();
-}
-
-void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
-{
-  mAccessibilityData->RegisterAccessibilityPositionPropertyNotification();
-}
-
-void Control::Impl::UnregisterAccessibilityPositionPropertyNotification()
-{
-  mAccessibilityData->UnregisterAccessibilityPositionPropertyNotification();
-}
-
-void Control::Impl::RegisterAccessibilityPropertySetSignal()
-{
-  mAccessibilityData->RegisterAccessibilityPropertySetSignal();
-}
-
-void Control::Impl::UnregisterAccessibilityPropertySetSignal()
-{
-  mAccessibilityData->UnregisterAccessibilityPropertySetSignal();
-}
-
-void Control::Impl::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
-{
-  mAccessibilityData->OnAccessibilityPropertySet(handle, index, value);
+  const auto* accessibilityData = GetAccessibilityData();
+  if(DALI_LIKELY(accessibilityData))
+  {
+    return accessibilityData->GetAccessibilityReadingInfoType();
+  }
+  else
+  {
+    // Return default ReadingInfoTypes
+    return AccessibilityData::GetDefaultReadingInfoTypes();
+  }
 }
 
 bool Control::Impl::IsAccessibleCreated() const
 {
-  return mAccessibilityData->IsAccessibleCreated();
+  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(mControlImpl.Self());
 }
 
 void Control::Impl::EnableCreateAccessible(bool enable)
 {
-  mAccessibilityData->EnableCreateAccessible(enable);
+  mAccessibleCreatable = enable;
 }
 
 bool Control::Impl::IsCreateAccessibleEnabled() const
 {
-  return mAccessibilityData->IsCreateAccessibleEnabled();
+  return mAccessibleCreatable;
 }
 
 void Control::Impl::ApplyFittingMode(const Vector2& size)
@@ -1908,7 +1950,7 @@ bool Control::Impl::OnIdleCallback()
 
 std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::GetAccessibleObject()
 {
-  return mAccessibilityData->GetAccessibleObject();
+  return GetOrCreateAccessibilityData().GetAccessibleObject();
 }
 
 void Control::Impl::RegisterProcessorOnce()

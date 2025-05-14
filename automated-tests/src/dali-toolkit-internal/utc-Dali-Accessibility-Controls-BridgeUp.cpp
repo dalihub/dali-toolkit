@@ -1,3 +1,20 @@
+/**
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
@@ -16,6 +33,7 @@
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/atspi-interfaces/component.h>
 #include <dali/devel-api/common/stage.h>
+
 #include <cstdlib>
 
 using namespace Dali::Toolkit;
@@ -31,7 +49,17 @@ const auto flushCoalescableMessage = [](Dali::ToolkitTestApplication& applicatio
     timer.MockEmitSignal();
   }
 };
+
+static void TestVoidCallback()
+{
 }
+
+static void Wait(ToolkitTestApplication& application)
+{
+  application.SendNotification();
+  application.Render(16);
+}
+} // namespace
 
 void utc_dali_toolkit_accessibility_control_bridgeup_startup(void)
 {
@@ -1491,10 +1519,6 @@ int UtcDaliAccessibilityActivateFallbackToLegacy(void)
   END_TEST;
 }
 
-void TestVoidCallback()
-{
-}
-
 int UtcDaliAccessibilitySignals(void)
 {
   ToolkitTestApplication application;
@@ -1514,12 +1538,6 @@ int UtcDaliAccessibilitySignals(void)
   DALI_TEST_CHECK(!DevelControl::AccessibilityDoGestureSignal(control).Empty());
 
   END_TEST;
-}
-
-static void Wait(ToolkitTestApplication& application)
-{
-  application.SendNotification();
-  application.Render(16);
 }
 
 int UtcDaliAccessibilityScrollToChildScrollView(void)
@@ -2112,7 +2130,7 @@ int UtcDaliAccessibleRemovalOnActorDestoyed(void)
   END_TEST;
 }
 
-int UtcDaliIncludeHidden(void)
+int UtcDaliAccessibleIncludeHidden(void)
 {
   ToolkitTestApplication application;
 
@@ -2151,6 +2169,8 @@ int UtcDaliIncludeHidden(void)
   END_TEST;
 }
 
+namespace
+{
 enum class MatchType : int32_t
 {
   INVALID,
@@ -2309,8 +2329,9 @@ static Accessibility::Collection::MatchRule GetMatchRule(std::vector<Accessibili
     static_cast<int32_t>(MatchType::INVALID),
     false};
 }
+} // namespace
 
-int UtcDaliGetMatches(void)
+int UtcDaliAccessibleGetMatches(void)
 {
   const int              N = 48;
   ToolkitTestApplication application;
@@ -2336,7 +2357,7 @@ int UtcDaliGetMatches(void)
   END_TEST;
 }
 
-int UtcDaliGetMatchesInMatches(void)
+int UtcDaliAccessibleGetMatchesInMatches(void)
 {
   const int              N = 48;
   ToolkitTestApplication application;
@@ -2364,7 +2385,7 @@ int UtcDaliGetMatchesInMatches(void)
   END_TEST;
 }
 
-int UtcDaliDumpTree(void)
+int UtcDaliAccessibleDumpTree(void)
 {
   ToolkitTestApplication application;
 
@@ -2434,4 +2455,3 @@ int UtcDaliWebViewCheckResumeOnAccessibilityMode(void)
 
   END_TEST;
 }
-

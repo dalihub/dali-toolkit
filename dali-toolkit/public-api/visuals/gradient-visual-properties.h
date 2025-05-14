@@ -76,7 +76,7 @@ enum
    * @brief The center point of a radial gradient.
    * @details Name "center", type Property::VECTOR2.
    * @SINCE_1_1.45
-   * @note Mandatory for Radial.
+   * @note Mandatory for Radial and Conic.
    */
   CENTER,
 
@@ -128,7 +128,15 @@ enum
    * @SINCE_2_4.17
    * @note Optional. If not supplied, default is 0.
    */
-  START_OFFSET
+  START_OFFSET,
+
+  /**
+   * @brief The initial angle from which the conic gradient begins.
+   * @details Name "startAngle", type Property::FLOAT.
+   * @SINCE_2_4.17
+   * @note Mandatory for Conic.
+   */
+  START_ANGLE
 };
 
 } // namespace Property
