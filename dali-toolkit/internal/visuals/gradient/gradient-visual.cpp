@@ -171,32 +171,35 @@ GradientVisual::~GradientVisual()
 
 void GradientVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
+  if(!mGradient)
+  {
+    Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
 
-  Property::Value* unitsValue = propertyMap.Find(Toolkit::GradientVisual::Property::UNITS, UNITS_NAME);
-  if(unitsValue)
-  {
-    Scripting::GetEnumerationProperty(*unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits);
-  }
+    Property::Value* unitsValue = propertyMap.Find(Toolkit::GradientVisual::Property::UNITS, UNITS_NAME);
+    if(unitsValue)
+    {
+      Scripting::GetEnumerationProperty(*unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits);
+    }
 
-  mGradientType = Type::LINEAR;
-  if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
-  {
-    mGradientType = Type::RADIAL;
-  }
-  else if(propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME))
-  {
-    mGradientType = Type::CONIC;
-  }
+    mGradientType = Type::LINEAR;
+    if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
+    {
+      mGradientType = Type::RADIAL;
+    }
+    else if(propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME))
+    {
+      mGradientType = Type::CONIC;
+    }
 
-  if(NewGradient(mGradientType, propertyMap))
-  {
-    mGradient->SetGradientUnits(gradientUnits);
-    mGradientTransform = mGradient->GetAlignmentTransform();
-  }
-  else
-  {
-    DALI_LOG_ERROR("Fail to provide valid properties to create a GradientVisual object\n");
+    if(NewGradient(mGradientType, propertyMap))
+    {
+      mGradient->SetGradientUnits(gradientUnits);
+      mGradientTransform = mGradient->GetAlignmentTransform();
+    }
+    else
+    {
+      DALI_LOG_ERROR("Fail to provide valid properties to create a GradientVisual object\n");
+    }
   }
 }
 
@@ -367,7 +370,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   }
   else // if(gradientType == Type::CONIC)
   {
-    Property::Value* centerValue = propertyMap.Find(Toolkit::GradientVisual::Property::CENTER, CENTER_NAME);
+    Property::Value* centerValue     = propertyMap.Find(Toolkit::GradientVisual::Property::CENTER, CENTER_NAME);
     Property::Value* startAngleValue = propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME);
     Vector2          center;
     float            startAngle;
