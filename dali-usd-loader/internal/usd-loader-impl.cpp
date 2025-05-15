@@ -422,7 +422,8 @@ void UsdLoaderImpl::Impl::GetXformableTransformation(const UsdPrim& prim, Vector
 NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, const std::string nodeName, const Index parentIndex, const Vector3& position, const Quaternion& rotation, const Vector3& scale, bool setTransformation)
 {
   // Add the node to the scene graph
-  auto weakNode = scene.AddNode([&]() {
+  auto weakNode = scene.AddNode([&]()
+                                {
         std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
         nodeDefinition->mParentIdx = parentIndex;
@@ -1339,6 +1340,13 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
   // USD’s default FPS is 24 frames per second, and time code from GetTimeSamples() is the frame number.
   // e.g. if there are totally 192 frames, the duration of the animation is 8 seconds.
 
+  // FPS should not be zero!
+  if(DALI_UNLIKELY(FPS < Dali::Math::MACHINE_EPSILON_10))
+  {
+    DALI_LOG_ERROR("USD Stage has 0 fps! use 24 FPS instead\n");
+    FPS = 24.0f;
+  }
+
   if(timeSamples.size() > 0)
   {
     AnimationDefinition animationDefinition;
@@ -1356,7 +1364,8 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
       maxTime = std::max(maxTime, gltfTime);
     }
 
-    float duration = maxTime - minTime;
+    // duration should not be zero!
+    float duration = std::max(maxTime - minTime, AnimationDefinition::MIN_DURATION_SECONDS);
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "minTime: %f, maxTime: %f, animation duration: %f, ", minTime, maxTime, duration);
 
     animationDefinition.ReserveSize(3);
@@ -1407,7 +1416,7 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
     animationDefinition.SetProperty(1, std::move(orientationProperty));
     animationDefinition.SetProperty(2, std::move(scaleProperty));
 
-    animationDefinition.SetDuration(std::max(duration, AnimationDefinition::MIN_DURATION_SECONDS));
+    animationDefinition.SetDuration(duration);
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "translations: %lu, rotations: %lu, scales: %lu, ", translations.size(), rotations.size(), scales.size());
 
