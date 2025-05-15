@@ -635,14 +635,14 @@ void Control::Impl::VisualData::EnableVisual(Property::Index index, bool enable)
 
 void Control::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableReadyTransitionOverriden(%p, %s)\n", visual, enable ? "T" : "F");
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableReadyTransitionOverriden(%p, %s)\n", &visual, enable ? "T" : "F");
 
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visual, mVisuals, iter))
   {
     if((*iter)->overideReadyTransition == enable)
     {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableReadyTransitionOverriden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), visual, enable ? "enabled" : "disabled");
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableReadyTransitionOverriden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), &visual, enable ? "enabled" : "disabled");
       return;
     }
 
@@ -652,14 +652,14 @@ void Control::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual:
 
 void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Property::Map cornerProperties)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", visual, enable ? "T" : "F");
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", &visual, enable ? "T" : "F");
 
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visual, mVisuals, iter))
   {
     if((*iter)->overrideCornerProperties == enable)
     {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableCornerPropertiesOverridden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), visual, enable ? "enabled" : "disabled");
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::EnableCornerPropertiesOverridden Visual %s(%p) already %s\n", (*iter)->visual.GetName().c_str(), &visual, enable ? "enabled" : "disabled");
       return;
     }
 
