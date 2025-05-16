@@ -1315,7 +1315,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       {
         mController->SetDefaultColor(textColor);
         mTextUpdateNeeded    = true;
-        mIsAsyncRenderNeeded = mController->IsUnderlineEnabled() || mController->IsStrikethroughEnabled();
+        mIsAsyncRenderNeeded = mIsAsyncRenderNeeded ? true : (mController->IsUnderlineEnabled() || mController->IsStrikethroughEnabled());
       }
       break;
     }
