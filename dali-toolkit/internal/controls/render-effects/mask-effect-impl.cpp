@@ -141,7 +141,7 @@ void MaskEffectImpl::OnActivate()
 
   ownerControl.Add(mCamera);
   Renderer maskRenderer = GetTargetRenderer();
-  ownerControl.GetImplementation().SetCacheRenderer(maskRenderer);
+  ownerControl.AddCacheRenderer(maskRenderer);
   ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
 
   Vector2 size = GetTargetSize();
@@ -169,7 +169,8 @@ void MaskEffectImpl::OnDeactivate()
   Toolkit::Control control = GetOwnerControl();
   if(DALI_LIKELY(control))
   {
-    control.GetImplementation().RemoveCacheRenderer();
+    Renderer maskRenderer = GetTargetRenderer();
+    control.RemoveCacheRenderer(maskRenderer);
     control.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   }
 

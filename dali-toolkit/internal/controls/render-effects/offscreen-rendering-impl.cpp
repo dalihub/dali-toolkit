@@ -93,7 +93,7 @@ void OffScreenRenderingImpl::OnActivate()
   SetRendererTexture(renderer, mFrameBuffer);
 
   Toolkit::Control control = GetOwnerControl();
-  control.GetImplementation().SetCacheRenderer(renderer);
+  control.AddCacheRenderer(renderer);
   control.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   mRenderTask.SetScreenToFrameBufferMappingActor(control);
 }
@@ -103,7 +103,8 @@ void OffScreenRenderingImpl::OnDeactivate()
   Toolkit::Control control = GetOwnerControl();
   if(DALI_LIKELY(control))
   {
-    control.GetImplementation().RemoveCacheRenderer();
+    Renderer renderer = GetTargetRenderer();
+    control.RemoveCacheRenderer(renderer);
     control.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
 
     mCamera.Unparent();

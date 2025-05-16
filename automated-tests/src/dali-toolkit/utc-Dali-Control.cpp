@@ -1538,6 +1538,10 @@ int UtcDaliControlOffScreenRendering(void)
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
+  control.SetProperty(DevelControl::Property::BORDERLINE_WIDTH, 10.0f);
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, Color::RED);
+  control.SetProperty(DevelControl::Property::BORDERLINE_OFFSET, 10.0f);
+
   application.GetScene().Add(control);
 
   control.SetBackgroundColor(Color::RED);
@@ -1548,6 +1552,15 @@ int UtcDaliControlOffScreenRendering(void)
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ALWAYS, TEST_LOCATION);
   tet_infoline("Set offscreen rendering : refresh always");
 
+  const Property::Value SHADOW{
+    {Visual::Property::TYPE, Visual::COLOR},
+    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)},
+    {Visual::Property::TRANSFORM,
+     Property::Map{{Visual::Transform::Property::SIZE, Vector2(1.05f, 1.05f)},
+                   {Visual::Transform::Property::ORIGIN, Align::CENTER},
+                   {Visual::Transform::Property::ANCHOR_POINT, Align::CENTER}}}};
+  control.SetProperty(DevelControl::Property::SHADOW, SHADOW);
+
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ONCE, TEST_LOCATION);
   tet_infoline("Set offscreen rendering : refresh once");
@@ -1557,6 +1570,12 @@ int UtcDaliControlOffScreenRendering(void)
 
   control.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
   tet_infoline("Size set");
+  application.SendNotification();
+  application.Render();
+
+  control.Unparent();
+  application.GetScene().Add(control);
+
   application.SendNotification();
   application.Render();
 
