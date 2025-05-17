@@ -30,6 +30,9 @@ namespace Internal
 {
 namespace
 {
+constexpr std::string_view PIXEL_SNAP_FACTOR_UNIFORM_NAME = "pixelSnapFactor";
+constexpr float            PIXEL_SNAP_DISABLED_VALUE(0.0f);
+
 // enum of required list when we select shader
 enum class TextVisualRequireFlag : uint32_t
 {
@@ -180,6 +183,9 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
     shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+
+    // Register property which only textlabel used.
+    shader.RegisterProperty(PIXEL_SNAP_FACTOR_UNIFORM_NAME.data(), PIXEL_SNAP_DISABLED_VALUE);
   }
   return shader;
 }
