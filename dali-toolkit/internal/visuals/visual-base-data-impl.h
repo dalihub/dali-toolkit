@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/rendering/visual-renderer.h>
+#include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -107,6 +108,11 @@ struct Base::Impl
      */
     Vector2 GetVisualSize(const Vector2& controlSize);
 
+    /**
+     * Get property maps for the default transform.
+     */
+    static const Property::Map& GetDefaultTransformMap();
+
     Vector2              mOffset;
     Vector2              mSize;
     Vector2              mExtraSize;
@@ -114,6 +120,18 @@ struct Base::Impl
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;
   };
+
+  /**
+   * @brief Ensure to create and get the transform data for the visual.
+   */
+  Transform& GetOrCreateTransform()
+  {
+    if(DALI_UNLIKELY(!mTransform))
+    {
+      mTransform.reset(new Transform());
+    }
+    return *(mTransform.get());
+  }
 
   /**
    * @brief Set the uniform properties onto the renderer.
@@ -124,8 +142,21 @@ struct Base::Impl
     if(!mTransformMapUsingDefault || direction != Toolkit::Direction::LEFT_TO_RIGHT)
     {
       renderer.RegisterVisualTransformUniform();
-      mTransform.SetUniforms(renderer, direction);
+      GetOrCreateTransform().SetUniforms(renderer, direction);
     }
+  }
+
+  /**
+   * Convert the control size and the transform attributes into the actual
+   * size of the visual.
+   */
+  Vector2 GetTransformVisualSize(const Vector2& controlSize)
+  {
+    if(!mTransformMapUsingDefault && mTransform)
+    {
+      return mTransform->GetVisualSize(controlSize);
+    }
+    return controlSize;
   }
 
   /**
@@ -252,7 +283,7 @@ struct Base::Impl
   CustomShader*                   mCustomShader;
   EventObserver*                  mEventObserver; ///< Allows controls to observe when the visual has events to notify
   std::string                     mName;
-  Transform                       mTransform;
+  std::unique_ptr<Transform>      mTransform;
   Vector4                         mMixColor;
   Size                            mControlSize;
   DecorationData*                 mDecorationData;
@@ -261,15 +292,16 @@ struct Base::Impl
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
-  bool                            mAlwaysUsingBorderline : 1;         ///< Whether we need the borderline in shader always.
-  bool                            mAlwaysUsingCornerRadius : 1;       ///< Whether we need the corner radius in shader always.
-  bool                            mAlwaysUsingCornerSquareness : 1;   ///< Whether we need the corner squareness in shader always.
-  bool                            mIgnoreFittingMode : 1;             ///< Whether we need to ignore fitting mode.
-  bool                            mPixelAreaSetByFittingMode : 1;     ///< Whether the pixel area is set for fitting mode.
-  bool                            mTransformMapSetForFittingMode : 1; ///< Whether the transformMap is set for fitting mode.
-  bool                            mTransformMapUsingDefault : 1;      ///< Whether we are using the default transformMap not. We'll be false after SetTransform called, or animated.
-                                                                      ///< Note : If it change to false, never be true again.
-  bool mTransformMapChanged : 1;                                      ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
+
+  bool mAlwaysUsingBorderline : 1;         ///< Whether we need the borderline in shader always.
+  bool mAlwaysUsingCornerRadius : 1;       ///< Whether we need the corner radius in shader always.
+  bool mAlwaysUsingCornerSquareness : 1;   ///< Whether we need the corner squareness in shader always.
+  bool mIgnoreFittingMode : 1;             ///< Whether we need to ignore fitting mode.
+  bool mPixelAreaSetByFittingMode : 1;     ///< Whether the pixel area is set for fitting mode.
+  bool mTransformMapSetForFittingMode : 1; ///< Whether the transformMap is set for fitting mode.
+  bool mTransformMapUsingDefault : 1;      ///< Whether we are using the default transformMap not. We'll be false after SetTransform called, or animated.
+                                           ///< Note : If it change to false, never be true again.
+  bool mTransformMapChanged : 1;           ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
 };
 
 } // namespace Visual

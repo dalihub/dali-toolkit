@@ -510,7 +510,7 @@ void SvgVisual::OnSetTransform()
     else
     {
       // Use visual size
-      size = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+      size = mImpl->GetTransformVisualSize(mImpl->mControlSize);
     }
 
     // roundf and change as integer scale.

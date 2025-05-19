@@ -205,7 +205,7 @@ Vector4 GetAlphaPreMultipliedColor(const Vector4& color)
   return Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a);
 }
 
-} //namespace
+} // namespace
 
 void dali_visual_startup(void)
 {
@@ -266,7 +266,7 @@ int UtcDaliVisualCopyAndAssignment(void)
   emptyVisualEquals = emptyVisual;
   DALI_TEST_CHECK(emptyVisual == emptyVisualEquals);
 
-  //self assignment
+  // self assignment
   visual = visual;
   DALI_TEST_CHECK(visual = visualCopy);
 
@@ -432,7 +432,7 @@ int UtcDaliVisualSize(void)
   // The height returned for a particular width should also be greater for the large text visual
   DALI_TEST_CHECK(smallTextVisual.GetHeightForWidth(40.f) < largeTextVisual.GetHeightForWidth(40.f));
 
-  //AnimatedImageVisual
+  // AnimatedImageVisual
   Visual::Base animatedImageVisual = factory.CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions());
   animatedImageVisual.SetTransformAndSize(DefaultTransform(), controlSize);
   animatedImageVisual.GetNaturalSize(naturalSize);
@@ -1123,13 +1123,13 @@ int UtcDaliVisualGetPropertyMap7(void)
   END_TEST;
 }
 
-//Mesh visual
+// Mesh visual
 int UtcDaliVisualGetPropertyMap8(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualGetPropertyMap8: MeshVisual");
 
-  //Request MeshVisual using a property map.
+  // Request MeshVisual using a property map.
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
@@ -1145,7 +1145,7 @@ int UtcDaliVisualGetPropertyMap8(void)
   meshVisual.CreatePropertyMap(resultMap);
   TestMixColor(meshVisual, Visual::Property::MIX_COLOR, Color::BLUE);
 
-  //Check values in the result map are identical to the initial map's values.
+  // Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), (int)Visual::MESH, TEST_LOCATION);
@@ -1173,7 +1173,7 @@ int UtcDaliVisualGetPropertyMap8(void)
   END_TEST;
 }
 
-//Primitive shape visual
+// Primitive shape visual
 int UtcDaliVisualGetPropertyMap9(void)
 {
   ToolkitTestApplication application;
@@ -1182,7 +1182,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   Vector4 color      = Vector4(1.0, 0.8, 0.6, 1.0);
   Vector3 dimensions = Vector3(1.0, 2.0, 3.0);
 
-  //Request PrimitiveVisual using a property map.
+  // Request PrimitiveVisual using a property map.
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
@@ -1203,7 +1203,7 @@ int UtcDaliVisualGetPropertyMap9(void)
   Property::Map resultMap;
   primitiveVisual.CreatePropertyMap(resultMap);
 
-  //Check values in the result map are identical to the initial map's values.
+  // Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), (int)Visual::PRIMITIVE, TEST_LOCATION);
@@ -1287,13 +1287,13 @@ int UtcDaliVisualGetPropertyMap9(void)
   END_TEST;
 }
 
-//Text shape visual
+// Text shape visual
 int UtcDaliVisualGetPropertyMap10(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualGetPropertyMap10: TextVisual");
 
-  //Request PrimitiveVisual using a property map.
+  // Request PrimitiveVisual using a property map.
   VisualFactory factory = VisualFactory::Get();
 
   Property::Map propertyMap;
@@ -1331,7 +1331,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map resultMap;
   textVisual.CreatePropertyMap(resultMap);
 
-  //Check values in the result map are identical to the initial map's values.
+  // Check values in the result map are identical to the initial map's values.
   Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), (int)Visual::TEXT, TEST_LOCATION);
@@ -1524,7 +1524,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::OUT;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -1590,7 +1591,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REPEAT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
+      {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1598,7 +1600,8 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
+        {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1650,7 +1653,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN_OUT;
 
-      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert("startValue", start);
         animationMap.Insert("targetValue", target);
@@ -1718,7 +1722,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REFLECT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
+      {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1726,7 +1731,8 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
+        {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1782,7 +1788,8 @@ int UtcDaliVisualGetPropertyMap13(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -2434,7 +2441,7 @@ int UtcDaliVisualAnimatedGradientVisual01(void)
       DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("gradient_offset", 0.5f * step_iter + 0.5f), true, TEST_LOCATION);
     }
 
-    //Not check here. cause gradient_offset value can be 2.0f or 0.0f
+    // Not check here. cause gradient_offset value can be 2.0f or 0.0f
     application.Render(750u); // go to end
     application.SendNotification();
 
@@ -2497,7 +2504,8 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       int unit_type     = DevelAnimatedGradientVisual::UnitType::USER_SPACE;
       int spread_type   = DevelAnimatedGradientVisual::SpreadType::REPEAT;
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2609,8 +2617,9 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
 
       application.SendNotification();
 
-      //Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
+      // Compare between CPU calculated value and Shader Visual calculated value
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2793,7 +2802,8 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       Property::Map animationMap;
       propertyMap.Insert(Visual::Property::TYPE, DevelVisual::ANIMATED_GRADIENT);
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2905,8 +2915,9 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
 
       application.SendNotification();
 
-      //Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
+      // Compare between CPU calculated value and Shader Visual calculated value
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -3087,7 +3098,7 @@ int UtcDaliVisualGetTransform(void)
   Dali::Property::Map* map   = value->GetMap();
   DALI_TEST_CHECK(map);
 
-  //Test default values
+  // Test default values
   {
     Property::Value* typeValue = map->Find(Toolkit::Visual::Transform::Property::OFFSET);
     DALI_TEST_CHECK(typeValue);
@@ -3127,6 +3138,8 @@ int UtcDaliVisualGetTransform(void)
   END_TEST;
 }
 
+namespace
+{
 static void TestTransform(ToolkitTestApplication& application, Visual::Base visual)
 {
   Property::Map transform;
@@ -3181,7 +3194,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
     DALI_TEST_EQUALS(typeValue->Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
   }
 
-  //Put the visual on the stage
+  // Put the visual on the stage
   DummyControl        actor     = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000.f, 2000.f));
@@ -3213,7 +3226,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   Vector2 extraSize = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   DALI_TEST_EQUALS(extraSize, Vector2(50.0f, 50.0f), TEST_LOCATION);
 
-  //Set a new transform
+  // Set a new transform
   transform.Clear();
   transform = DefaultTransform();
   transform.Insert(Visual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f));
@@ -3224,7 +3237,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   application.SendNotification();
   application.Render(0);
 
-  //Check that the values have changed in the renderer
+  // Check that the values have changed in the renderer
   offset = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
   DALI_TEST_EQUALS(offset, Vector2(20.0f, 20.0f), TEST_LOCATION);
 
@@ -3234,7 +3247,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   offsetSizeMode = renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   DALI_TEST_EQUALS(offsetSizeMode, Vector4(0.0f, 0.0f, 1.0f, 1.0f), TEST_LOCATION);
 
-  //Parent origin and anchor point should have the default values
+  // Parent origin and anchor point should have the default values
   parentOrigin = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN);
   DALI_TEST_EQUALS(parentOrigin, Vector2(-0.5f, -0.5f), TEST_LOCATION);
 
@@ -3244,6 +3257,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   extraSize = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   DALI_TEST_EQUALS(extraSize, Vector2(0.5f, 0.5f), TEST_LOCATION);
 }
+} // namespace
 
 int UtcDaliVisualSetTransform01(void)
 {
@@ -5267,7 +5281,8 @@ int UtcDaliVisualGetPropertyObject01(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5319,7 +5334,8 @@ int UtcDaliVisualGetPropertyObject02(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5369,7 +5385,8 @@ int UtcDaliVisualGetPropertyObject03(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::COLOR);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -6240,7 +6257,6 @@ int UtcDaliVisualUpdateProperty02(void)
   propertyMap[Visual::Property::TYPE]                      = Visual::Type::IMAGE;
   propertyMap[ImageVisual::Property::URL]                  = TEST_IMAGE_FILE_NAME;
   propertyMap[Visual::Property::MIX_COLOR]                 = Color::BLUE;
-  propertyMap[DevelVisual::Property::VISUAL_FITTING_MODE]  = DevelVisual::FIT_WIDTH;
   propertyMap[DevelVisual::Property::CORNER_RADIUS]        = 0.0f;
   propertyMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
   propertyMap[DevelVisual::Property::BORDERLINE_WIDTH]     = 0.0f;
@@ -6275,6 +6291,23 @@ int UtcDaliVisualUpdateProperty02(void)
   targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
   targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = targetBorderlineWidth;
 
+  Vector2              targetTransformOffset       = Vector2(10.0f, 12.0f);
+  Vector2              targetTransformSize         = Vector2(0.2f, 3.5f);
+  Vector2              targetTransformOffsetPolicy = Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::RELATIVE);
+  Vector2              targetTransformSizePolicy   = Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::ABSOLUTE);
+  Toolkit::Align::Type targetTransformOrigin       = Toolkit::Align::CENTER;
+  Toolkit::Align::Type targetTransformAnchorPoint  = Toolkit::Align::BOTTOM_END;
+  Vector2              targetTransformExtraSize    = Vector2(50.0f, 5.0f);
+  Property::Map        transform;
+  transform.Insert(Visual::Transform::Property::OFFSET, targetTransformOffset);
+  transform.Insert(Visual::Transform::Property::SIZE, targetTransformSize);
+  transform.Insert(Visual::Transform::Property::OFFSET_POLICY, targetTransformOffsetPolicy);
+  transform.Insert(Visual::Transform::Property::SIZE_POLICY, targetTransformSizePolicy);
+  transform.Insert(Visual::Transform::Property::ORIGIN, targetTransformOrigin);
+  transform.Insert(Visual::Transform::Property::ANCHOR_POINT, targetTransformAnchorPoint);
+  transform.Insert(DevelVisual::Transform::Property::EXTRA_SIZE, targetTransformExtraSize);
+  targetPropertyMap[Visual::Property::TRANSFORM] = transform;
+
   // Update Properties
   DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
 
@@ -6304,6 +6337,40 @@ int UtcDaliVisualUpdateProperty02(void)
   Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerSquarenessValue);
   DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), cornerSquareness, TEST_LOCATION);
+
+  // Transform comparision
+  Property::Value* transformValue = resultMap.Find(DevelVisual::Property::TRANSFORM, Property::MAP);
+  DALI_TEST_CHECK(transformValue);
+  Property::Map* transformMap = transformValue->GetMap();
+  DALI_TEST_CHECK(transformMap);
+
+  Property::Value* transformOffsetValue = transformMap->Find(Visual::Transform::Property::OFFSET, Property::VECTOR2);
+  DALI_TEST_CHECK(transformOffsetValue);
+  DALI_TEST_EQUALS(transformOffsetValue->Get<Vector2>(), targetTransformOffset, TEST_LOCATION);
+
+  Property::Value* transformSizeValue = transformMap->Find(Visual::Transform::Property::SIZE, Property::VECTOR2);
+  DALI_TEST_CHECK(transformSizeValue);
+  DALI_TEST_EQUALS(transformSizeValue->Get<Vector2>(), targetTransformSize, TEST_LOCATION);
+
+  Property::Value* transformOffsetPolicyValue = transformMap->Find(Visual::Transform::Property::OFFSET_POLICY, Property::VECTOR2);
+  DALI_TEST_CHECK(transformOffsetPolicyValue);
+  DALI_TEST_EQUALS(transformOffsetPolicyValue->Get<Vector2>(), targetTransformOffsetPolicy, TEST_LOCATION);
+
+  Property::Value* transformSizePolicyValue = transformMap->Find(Visual::Transform::Property::SIZE_POLICY, Property::VECTOR2);
+  DALI_TEST_CHECK(transformSizePolicyValue);
+  DALI_TEST_EQUALS(transformSizePolicyValue->Get<Vector2>(), targetTransformSizePolicy, TEST_LOCATION);
+
+  Property::Value* transformOriginValue = transformMap->Find(Visual::Transform::Property::ORIGIN, Property::INTEGER);
+  DALI_TEST_CHECK(transformOriginValue);
+  DALI_TEST_EQUALS(transformOriginValue->Get<int32_t>(), static_cast<int32_t>(targetTransformOrigin), TEST_LOCATION);
+
+  Property::Value* transformAnchorPointValue = transformMap->Find(Visual::Transform::Property::ANCHOR_POINT, Property::INTEGER);
+  DALI_TEST_CHECK(transformAnchorPointValue);
+  DALI_TEST_EQUALS(transformAnchorPointValue->Get<int32_t>(), static_cast<int32_t>(targetTransformAnchorPoint), TEST_LOCATION);
+
+  Property::Value* transformExtraSizeValue = transformMap->Find(DevelVisual::Transform::Property::EXTRA_SIZE, Property::VECTOR2);
+  DALI_TEST_CHECK(transformExtraSizeValue);
+  DALI_TEST_EQUALS(transformExtraSizeValue->Get<Vector2>(), targetTransformExtraSize, TEST_LOCATION);
 
   END_TEST;
 }
@@ -7259,7 +7326,7 @@ int UtcDaliGradientAnimateTest(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliGradientAnimateTest");
 
-  Control control = Control::New();
+  Control control                = Control::New();
   control[Actor::Property::SIZE] = Vector2(200.f, 200.f);
 
   // Linear Gradient
