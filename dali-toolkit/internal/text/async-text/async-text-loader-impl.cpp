@@ -937,8 +937,8 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   bool isRenderScale = parameters.renderScale > 1.0f ? true : false;
   if(isRenderScale)
   {
-    float width     = (layoutSize.width / parameters.renderScale) * (layoutSize.width / ((layoutSize.width / parameters.renderScale) * parameters.renderScale));
-    float height    = (layoutSize.height / parameters.renderScale) * (layoutSize.height / ((layoutSize.height / parameters.renderScale) * parameters.renderScale));
+    float width     = layoutSize.width / parameters.renderScale;
+    float height    = layoutSize.height / parameters.renderScale;
     renderInfo.size = Size(width, height);
   }
   else
@@ -1116,7 +1116,7 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
     parameters.renderScaleHeight = parameters.textHeight;
     parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
     parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
-    parameters.minLineSize       = ConvertToEven(ceil(parameters.minLineSize * parameters.renderScale));
+    parameters.minLineSize       = parameters.minLineSize * parameters.renderScale;
     cachedNaturalSize            = false;
     return Size::ZERO;
   }
@@ -1142,7 +1142,7 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
   parameters.renderScaleHeight = parameters.textHeight;
   parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
   parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
-  parameters.minLineSize       = ConvertToEven(ceil(parameters.minLineSize * parameters.renderScale));
+  parameters.minLineSize       = parameters.minLineSize * parameters.renderScale;
 
   // The texture in RenderScale needs to be resized because it exceeds the control size.
   if(!widthEllipsized && naturalSize.width > parameters.textWidth)
