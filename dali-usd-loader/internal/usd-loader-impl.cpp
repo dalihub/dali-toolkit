@@ -422,8 +422,7 @@ void UsdLoaderImpl::Impl::GetXformableTransformation(const UsdPrim& prim, Vector
 NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, const std::string nodeName, const Index parentIndex, const Vector3& position, const Quaternion& rotation, const Vector3& scale, bool setTransformation)
 {
   // Add the node to the scene graph
-  auto weakNode = scene.AddNode([&]()
-                                {
+  auto weakNode = scene.AddNode([&]() {
         std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
         nodeDefinition->mParentIdx = parentIndex;
@@ -692,10 +691,27 @@ void UsdLoaderImpl::Impl::ProcessMeshTexcoords(MeshDefinition& meshDefinition, s
         }
         else if(interpolation.GetString() == "vertex")
         {
+          bool indicesValid = true;
+
           // Handle vertex-based UVs
           for(auto x : subIndexArray)
           {
+            if(DALI_UNLIKELY(x < 0 || static_cast<size_t>(x) >= rawUVs.size()))
+            {
+              // This should never happen. The USD spec and the “indexed” primvar APIs guarantee that
+              // you will never have an index that lies outside the authored-values array.
+              indicesValid = false;
+              DALI_LOG_ERROR("Invalid UV index %d. Skipping this UV set.\n", x);
+              break;
+            }
+
             UVs.push_back(static_cast<GfVec2f>(rawUVs[x]));
+          }
+
+          if(!indicesValid)
+          {
+            // Skip the current UV set
+            continue;
           }
         }
         else
