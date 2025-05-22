@@ -16,10 +16,11 @@
  */
 
 #include <dali-toolkit-test-suite-utils.h>
+
+#include <dali-toolkit/dali-toolkit.h>
+
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
-#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
 using namespace Dali;
@@ -289,6 +290,7 @@ int UtcDaliRenderEffectResize(void)
   DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
 
   ////////////////////////////////////////////
+  tet_infoline("resize test on BackgroundBlurEffect");
   control.SetRenderEffect(BackgroundBlurEffect::New());
 
   application.SendNotification();
@@ -336,6 +338,40 @@ int UtcDaliRenderEffectResize(void)
   DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
   tet_infoline("Background blur effect deactivated.\n");
+  /////////////////////////////////////////////
+  tet_infoline("resize test on GaussianBlurEffect");
+  GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+  control.SetRenderEffect(effect);
+
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+  tet_infoline("size zero owner control's effect is not activated.");
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+  tet_infoline("Blur effect activated.\n");
+  DALI_TEST_EQUALS(effect.GetBlurRadius(), 20u, TEST_LOCATION);
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+  tet_infoline("Blur effect refreshed.\n");
 
   END_TEST;
 }
@@ -935,6 +971,12 @@ int UtcDaliRenderEffectReInitialize(void)
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(effect.GetBlurRadius(), 2u, TEST_LOCATION);
 
+  control.SetRenderEffect(GaussianBlurEffect::New(2u)); // invalid blur radius value(too small)
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(effect.GetBlurRadius(), 2u, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -959,30 +1001,58 @@ int UtcDaliRenderEffectBlurOnce(void)
 
   scene.Add(control);
 
-  // Add render effect during scene on.
-  BackgroundBlurEffect effect = BackgroundBlurEffect::New(20u);
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+  {
+    // Add render effect during scene on.
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New(20u);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
-  effect.SetBlurOnce(true);
-  effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
-  control.SetRenderEffect(effect);
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+    effect.SetBlurOnce(true);
+    effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
+    control.SetRenderEffect(effect);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-  application.SendNotification();
+    application.SendNotification();
 
-  RenderTaskList taskList = scene.GetRenderTaskList();
+    RenderTaskList taskList = scene.GetRenderTaskList();
 
-  // Render effect activated.
-  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-  tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-  DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+    // Render effect activated.
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+    DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
 
-  effect.SetBlurOnce(false);
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+    effect.SetBlurOnce(false);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-  tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-  DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+    DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+  }
+  {
+    // Add render effect during scene on.
+    GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    effect.SetBlurOnce(true);
+    effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
+    control.SetRenderEffect(effect);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+    application.SendNotification();
+
+    RenderTaskList taskList = scene.GetRenderTaskList();
+
+    // Render effect activated.
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+    DALI_TEST_EQUALS(0u, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+
+    effect.SetBlurOnce(false);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+    DALI_TEST_EQUALS(0u, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+  }
 
   END_TEST;
 }
@@ -1037,30 +1107,59 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
-  BackgroundBlurEffect effect = BackgroundBlurEffect::New();
-  control.SetRenderEffect(effect);
-  scene.Add(control);
+  {
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New();
+    control.SetRenderEffect(effect);
+    scene.Add(control);
 
-  float     durationSeconds = 0.05f;
-  Animation animation       = Animation::New(durationSeconds);
+    float     durationSeconds = 0.05f;
+    Animation animation       = Animation::New(durationSeconds);
 
-  effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  animation.Play();
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
-  animation.Clear();
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    animation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
-  effect.SetBlurOnce(true);
-  effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  // animation will not be added but cannot check
-  animation.Clear();
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+    effect.SetBlurOnce(true);
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-  effect.SetBlurRadius(2u);
-  effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  // animation will not be added but cannot check
-  animation.Clear();
+    effect.SetBlurRadius(2u);
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+  }
+
+  {
+    GaussianBlurEffect effect = GaussianBlurEffect::New();
+    control.SetRenderEffect(effect);
+    scene.Add(control);
+
+    float     durationSeconds = 0.05f;
+    Animation animation       = Animation::New(durationSeconds);
+
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    animation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    effect.SetBlurOnce(true);
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+    effect.SetBlurRadius(2u);
+    effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+  }
 
   END_TEST;
 }
@@ -1108,29 +1207,56 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
-  BackgroundBlurEffect effect = BackgroundBlurEffect::New();
-  control.SetRenderEffect(effect);
-  scene.Add(control);
+  {
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New();
+    control.SetRenderEffect(effect);
+    scene.Add(control);
 
-  float     durationSeconds = 0.05f;
-  Animation animation       = Animation::New(durationSeconds);
+    float     durationSeconds = 0.05f;
+    Animation animation       = Animation::New(durationSeconds);
 
-  effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  animation.Play();
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    animation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
-  effect.SetBlurOnce(true);
-  effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  // animation will not be added but cannot check
-  animation.Clear();
-  DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+    effect.SetBlurOnce(true);
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-  effect.SetBlurRadius(2u);
-  effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
-  // animation will not be added but cannot check
-  animation.Clear();
+    effect.SetBlurRadius(2u);
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+  }
+  {
+    Toolkit::GaussianBlurEffect effect = Toolkit::GaussianBlurEffect::New();
+    control.SetRenderEffect(effect);
+    scene.Add(control);
+
+    float     durationSeconds = 0.05f;
+    Animation animation       = Animation::New(durationSeconds);
+
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    animation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    effect.SetBlurOnce(true);
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+    effect.SetBlurRadius(2u);
+    effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    // animation will not be added but cannot check
+    animation.Clear();
+  }
 
   END_TEST;
 }

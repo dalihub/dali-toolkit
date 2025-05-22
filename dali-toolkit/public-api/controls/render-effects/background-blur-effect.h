@@ -30,19 +30,20 @@ namespace Internal DALI_INTERNAL
 {
 class BackgroundBlurEffectImpl;
 } // namespace DALI_INTERNAL
+
 /**
  * @brief BackgroundBlurEffect is a visual effect that blurs owner control's background.
- * This class is a concrete class from RenderEffect interface.
- * Add this effect to a control, clear manually to deactivate.
  *
- * Toolkit::Control control = Toolkit::Control::New();
- * parent.Add(control);
- * control.SetRenderEffect(BackgroundBlurEffect::New()); // Activate
- * ...
+ * @code
+ * BackgroundBlurEffect effect = BackgroundBlurEffect::New();
+ * control.SetRenderEffect(effect); // Activate
+ * effect.Deactivate();
+ * effect.Activate();
  * control.ClearRenderEffect(); // Deactivate
+ * @endcode
  *
- * Note that tree hierarchy matters for BackgroundBlurEffect. You should determine "what is the background".
- * Add() should preceed SetRenderEffect(), and the effect cannot have multiple owner controls.
+ * @note The owner control owns at most one render effect.
+ * @note Tree hierarchy matters for BackgroundBlurEffect. You should determine "what is the background".
  *
  * @SINCE_2_3.28
  */

@@ -691,10 +691,27 @@ void UsdLoaderImpl::Impl::ProcessMeshTexcoords(MeshDefinition& meshDefinition, s
         }
         else if(interpolation.GetString() == "vertex")
         {
+          bool indicesValid = true;
+
           // Handle vertex-based UVs
           for(auto x : subIndexArray)
           {
+            if(DALI_UNLIKELY(x < 0 || static_cast<size_t>(x) >= rawUVs.size()))
+            {
+              // This should never happen. The USD spec and the “indexed” primvar APIs guarantee that
+              // you will never have an index that lies outside the authored-values array.
+              indicesValid = false;
+              DALI_LOG_ERROR("Invalid UV index %d. Skipping this UV set.\n", x);
+              break;
+            }
+
             UVs.push_back(static_cast<GfVec2f>(rawUVs[x]));
+          }
+
+          if(!indicesValid)
+          {
+            // Skip the current UV set
+            continue;
           }
         }
         else
@@ -1339,6 +1356,13 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
   // USD’s default FPS is 24 frames per second, and time code from GetTimeSamples() is the frame number.
   // e.g. if there are totally 192 frames, the duration of the animation is 8 seconds.
 
+  // FPS should not be zero!
+  if(DALI_UNLIKELY(FPS < Dali::Math::MACHINE_EPSILON_10))
+  {
+    DALI_LOG_ERROR("USD Stage has 0 fps! use 24 FPS instead\n");
+    FPS = 24.0f;
+  }
+
   if(timeSamples.size() > 0)
   {
     AnimationDefinition animationDefinition;
@@ -1356,7 +1380,8 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
       maxTime = std::max(maxTime, gltfTime);
     }
 
-    float duration = maxTime - minTime;
+    // duration should not be zero!
+    float duration = std::max(maxTime - minTime, AnimationDefinition::MIN_DURATION_SECONDS);
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "minTime: %f, maxTime: %f, animation duration: %f, ", minTime, maxTime, duration);
 
     animationDefinition.ReserveSize(3);
@@ -1407,7 +1432,7 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
     animationDefinition.SetProperty(1, std::move(orientationProperty));
     animationDefinition.SetProperty(2, std::move(scaleProperty));
 
-    animationDefinition.SetDuration(std::max(duration, AnimationDefinition::MIN_DURATION_SECONDS));
+    animationDefinition.SetDuration(duration);
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "translations: %lu, rotations: %lu, scales: %lu, ", translations.size(), rotations.size(), scales.size());
 

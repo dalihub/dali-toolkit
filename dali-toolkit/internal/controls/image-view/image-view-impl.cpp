@@ -199,7 +199,7 @@ void ImageView::SetImage(const Property::Map& map)
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
+    controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
   {
@@ -274,7 +274,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
+    controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
   {
@@ -518,7 +518,7 @@ void ImageView::ShowPlaceholderImage()
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, true);
+    controlDataImpl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
 
     Actor self = Self();
     Toolkit::GetImplementation(mPlaceholderVisual).SetOnScene(self);
@@ -615,7 +615,6 @@ void ImageView::ClearTransitionAnimation()
     Actor                    self            = Self();
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, false);
-    controlDataImpl.EnableCornerPropertiesOverridden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
     DiscardImageViewVisual(mPreviousVisual);
   }
