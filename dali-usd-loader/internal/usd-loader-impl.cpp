@@ -696,7 +696,7 @@ void UsdLoaderImpl::Impl::ProcessMeshTexcoords(MeshDefinition& meshDefinition, s
           // Handle vertex-based UVs
           for(auto x : subIndexArray)
           {
-            if(DALI_UNLIKELY(x < 0 || static_cast<size_t>(x) >= rawUVs.size()))
+            if(DALI_UNLIKELY(static_cast<size_t>(x) >= rawUVs.size()))
             {
               // This should never happen. The USD spec and the “indexed” primvar APIs guarantee that
               // you will never have an index that lies outside the authored-values array.
