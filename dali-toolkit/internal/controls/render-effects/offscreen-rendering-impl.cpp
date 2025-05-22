@@ -120,6 +120,7 @@ void OffScreenRenderingImpl::OnRefresh()
   mCamera.SetPerspectiveProjection(GetTargetSize());
 
   CreateFrameBuffer();
+  SetRendererTexture(GetTargetRenderer(), mFrameBuffer);
   mRenderTask.SetFrameBuffer(mFrameBuffer);
 }
 
