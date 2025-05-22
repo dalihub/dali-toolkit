@@ -53,6 +53,7 @@ public:
    * @param[in] type Defines whether effect is enabled or not, and its refresh rate
    */
   OffScreenRenderingImpl(DevelControl::OffScreenRenderingType type);
+
   /**
    * @brief Set OffScreenRenderingType explicitly
    * @param[in] type Defines whether effect is enabled or not, and its refresh rate
@@ -61,26 +62,31 @@ public:
 
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
   OffScreenRenderable::Type GetOffScreenRenderableType() override;
+
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
 protected:
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnInitialize
   void OnInitialize() override;
+
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnActivate
   void OnActivate() override;
+
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnDeactivate
   void OnDeactivate() override;
+
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnRefresh
   void OnRefresh() override;
 
 private:
   /**
-   * @brief Initializes off screen buffer to draw subtree
+   * @brief Initializes offscreen buffer to draw subtree
    */
   void CreateFrameBuffer();
+
   /**
-   * @brief
+   * @brief Destroys offscreen buffer
    */
   void DestroyFrameBuffer();
 
@@ -88,8 +94,9 @@ private:
    * @brief Initializes render task for offscreen rendering
    */
   void CreateRenderTask();
+
   /**
-   * @brief
+   * @brief Destroys render task for offscreen rendering
    */
   void DestroyRenderTask();
 

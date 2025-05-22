@@ -407,6 +407,7 @@ void BackgroundBlurEffectImpl::OnRefresh()
   mVerticalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
 
   CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
+  SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
 
   // Reset shader constants
   mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f, 0.0f) / downsampledWidth);
