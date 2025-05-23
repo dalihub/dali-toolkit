@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ VectorAnimationThread::VectorAnimationThread()
   mSleepThread.Start();
 
   mEventTrigger = std::unique_ptr<EventThreadCallback>(new EventThreadCallback(MakeCallback(this, &VectorAnimationThread::OnEventCallbackTriggered)));
+  DALI_LOG_DEBUG_INFO("VectorAnimationThread Trigger Id(%d)\n", mEventTrigger->GetId());
 }
 
 /// Event thread called
@@ -189,7 +190,8 @@ void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
   Mutex::ScopedLock lock(mEventTriggerMutex);
   if(DALI_LIKELY(!mDestroyThread))
   {
-    auto iter = std::remove_if(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), [&callback](std::pair<CallbackBase*, uint32_t>& item) { return item.first == callback; });
+    auto iter = std::remove_if(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), [&callback](std::pair<CallbackBase*, uint32_t>& item)
+                               { return item.first == callback; });
     mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
   }
 }
@@ -247,16 +249,16 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
 
   if(DALI_LIKELY(!mDestroyThread))
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss) {
-      oss << "[" << mAnimationTasks.size() << "," << useCurrentTime << "]";
-    });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
+                                            { oss << "[" << mAnimationTasks.size() << "," << useCurrentTime << "]"; });
 
     // Find if the task is already in the list except loading task
-    auto iter = std::find_if(mAnimationTasks.begin(), mAnimationTasks.end(), [task, useCurrentTime](VectorAnimationTaskPtr& element) {
-      return (element == task) &&
-             (!useCurrentTime ||            // If we don't need to use current time (i.e. CompletedTasks)
-              !element->IsLoadRequested()); // Or we need to use current time And loading completed.
-    });
+    auto iter = std::find_if(mAnimationTasks.begin(), mAnimationTasks.end(), [task, useCurrentTime](VectorAnimationTaskPtr& element)
+                             {
+                               return (element == task) &&
+                                      (!useCurrentTime ||            // If we don't need to use current time (i.e. CompletedTasks)
+                                       !element->IsLoadRequested()); // Or we need to use current time And loading completed.
+                             });
 
     if(iter == mAnimationTasks.end())
     {
@@ -280,9 +282,8 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
         mAnimationTasks.push_back(task);
       }
 
-      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss) {
-        oss << "[" << mAnimationTasks.size() << "]";
-      });
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
+                                            { oss << "[" << mAnimationTasks.size() << "]"; });
 
       return true;
     }
@@ -296,9 +297,8 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
 {
   // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
   // Since we should make ensure that all working tasks are completed before destroying the thread.
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
-    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
+                                          { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]"; });
   bool needRasterize = false;
 
   for(auto&& taskPair : completedTasksQueue)
@@ -341,9 +341,8 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
     mNeedToSleep = false;
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss) {
-    oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]";
-  });
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
+                                        { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
 }
 
 /// VectorAnimationThread called
@@ -391,9 +390,8 @@ void VectorAnimationThread::Rasterize()
     {
       if(mAnimationTasks.size() > 0u)
       {
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss) {
-          oss << "[" << mAnimationTasks.size() << "]";
-        });
+        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
+                                                { oss << "[" << mAnimationTasks.size() << "]"; });
 
         // pop out the next task from the queue
         for(auto it = mAnimationTasks.begin(); it != mAnimationTasks.end();)
@@ -426,9 +424,8 @@ void VectorAnimationThread::Rasterize()
             break;
           }
         }
-        DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss) {
-          oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]";
-        });
+        DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
+                                              { oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]"; });
       }
     }
   }
@@ -565,7 +562,8 @@ void VectorAnimationThread::SleepThread::Run()
 
       if(DALI_LIKELY(!mDestroyThread))
       {
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD", [&](std::ostringstream& oss) {
+        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD", [&](std::ostringstream& oss)
+                                                {
           oss << "[";
           if(needToSleep)
           {
@@ -576,8 +574,7 @@ void VectorAnimationThread::SleepThread::Run()
           else
           {
             oss << "until notify]";
-          }
-        });
+          } });
 
         if(needToSleep)
         {
