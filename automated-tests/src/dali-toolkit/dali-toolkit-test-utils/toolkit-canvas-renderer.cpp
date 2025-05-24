@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,15 @@
 #include <sys/stat.h>
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
+
+#include <atomic>
 #include <cstring>
 #include <memory>
 
 namespace
 {
-bool gRasterizeCalled = false;
-bool gRasterizeResult = true; ///< Default rasterization result as success
+std::atomic_uint32_t gRasterizeCalledCount = 0u;
+std::atomic_uint32_t gRasterizeResult      = true; ///< Default rasterization result as success
 } // namespace
 namespace Dali
 {
@@ -68,7 +70,7 @@ public:
 
   bool Rasterize()
   {
-    gRasterizeCalled = true;
+    ++gRasterizeCalledCount;
     return gRasterizeResult;
   }
 
@@ -247,16 +249,21 @@ namespace Test::CanvasRenderer
 {
 void MarkRasterizationResult(bool result)
 {
-  gRasterizeResult = result;
+  gRasterizeResult.store(result ? 1u : 0u);
+}
+
+void ReduceRasterizationFlagCount()
+{
+  --gRasterizeCalledCount;
 }
 
 void ResetRasterizationFlag()
 {
-  gRasterizeCalled = false;
+  gRasterizeCalledCount.store(0u);
 }
 
 bool IsRasterizationCalled()
 {
-  return gRasterizeCalled;
+  return gRasterizeCalledCount.load();
 }
 } // namespace Test::CanvasRenderer

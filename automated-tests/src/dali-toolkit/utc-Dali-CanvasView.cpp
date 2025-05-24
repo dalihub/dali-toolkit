@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -718,7 +718,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), true, TEST_LOCATION);
-  Test::CanvasRenderer::ResetRasterizationFlag();
+  Test::CanvasRenderer::ReduceRasterizationFlagCount();
 
   application.SendNotification();
   application.Render();
@@ -746,7 +746,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), true, TEST_LOCATION);
-  Test::CanvasRenderer::ResetRasterizationFlag();
+  Test::CanvasRenderer::ReduceRasterizationFlagCount();
 
   application.SendNotification();
   application.Render();
@@ -755,7 +755,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), true, TEST_LOCATION);
-  Test::CanvasRenderer::ResetRasterizationFlag();
+  Test::CanvasRenderer::ReduceRasterizationFlagCount();
 
   application.SendNotification();
   application.Render();
@@ -764,7 +764,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), true, TEST_LOCATION);
-  Test::CanvasRenderer::ResetRasterizationFlag();
+  Test::CanvasRenderer::ReduceRasterizationFlagCount();
 
   // Make rasterization success.
   Test::CanvasRenderer::MarkRasterizationResult(true);
@@ -776,12 +776,18 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), true, TEST_LOCATION);
-  Test::CanvasRenderer::ResetRasterizationFlag();
+  Test::CanvasRenderer::ReduceRasterizationFlagCount();
 
   application.SendNotification();
   application.Render();
 
   // Check whether the canvasView is not rasterized again.
+  // Note that it could be trigger if latest rasterize callback finished before we mark result as true.
+  // So we have to consume result one time.
+  if(Test::WaitForEventThreadTrigger(1, 0))
+  {
+    Test::CanvasRenderer::ReduceRasterizationFlagCount();
+  }
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::CanvasRenderer::IsRasterizationCalled(), false, TEST_LOCATION);
