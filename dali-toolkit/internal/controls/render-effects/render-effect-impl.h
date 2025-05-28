@@ -95,6 +95,11 @@ public:
    */
   void Deactivate();
 
+  /**
+   * @brief Refreshes rendering
+   */
+  void Refresh();
+
 protected:
   /**
    * @copydoc Dali::Toolkit::RenderEffect::RenderEffect
@@ -186,11 +191,6 @@ private:
   void UpdateTargetSize();
 
   /**
-   * @brief Callback when the size changes.
-   */
-  void OnSizeSet(PropertyNotification& source);
-
-  /**
    * @brief Callback when the visibility of the actor is changed.
    * @param[in] actor The actor
    * @param[in] visible Whether this actor is visible or not.
@@ -203,8 +203,7 @@ private:
   Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl;         ///< Weakhandle of owner control.
   WeakHandle<Integration::SceneHolder>     mPlacementSceneHolder; ///< Weakhandle of scene
 
-  PropertyNotification mSizeNotification; // Resize/Relayout signal.
-  Vector2              mTargetSize;       // The final size of mOwnerControl
+  Vector2 mTargetSize; // The final size of mOwnerControl
 
   bool mIsActivated : 1;
 };

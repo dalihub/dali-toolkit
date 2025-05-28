@@ -684,6 +684,17 @@ void Control::OnSizeSet(const Vector3& targetSize)
   // Apply FittingMode here
   mImpl->mSize = Vector2(targetSize);
   mImpl->RegisterProcessorOnce();
+
+  // Refresh render effects
+  if(mImpl->mRenderEffect)
+  {
+    mImpl->mRenderEffect->Refresh();
+  }
+
+  if(mImpl->mOffScreenRenderingImpl)
+  {
+    mImpl->mOffScreenRenderingImpl->Refresh();
+  }
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
