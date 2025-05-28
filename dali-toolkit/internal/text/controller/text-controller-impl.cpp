@@ -1716,9 +1716,18 @@ Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
   actor.SetProperty(Actor::Property::POSITION, anchorPosition);
   const Vector2 anchorSize = GetAnchorSize(anchor);
   actor.SetProperty(Actor::Property::SIZE, anchorSize);
-  std::string anchorText(mModel->mLogicalModel->mText.Begin() + anchor.startIndex, mModel->mLogicalModel->mText.Begin() + anchor.endIndex);
+
+  std::string anchorText;
+  std::string anchorHref               = anchor.href ? anchor.href : "";
+  Length      numberOfAnchorCharacters = anchor.endIndex - anchor.startIndex;
+  if(numberOfAnchorCharacters > 0u && mModel->mLogicalModel->mText.Size() >= numberOfAnchorCharacters)
+  {
+    Utf32ToUtf8(mModel->mLogicalModel->mText.Begin() + anchor.startIndex, numberOfAnchorCharacters, anchorText);
+  }
+  DALI_LOG_INFO(gLogFilter, Debug::General, "CreateAnchorActor NAME:%s, URI:%s\n", anchorText.c_str(), anchorHref.c_str());
+
   actor.SetProperty(Actor::Property::NAME, anchorText);
-  actor.SetProperty(Toolkit::TextAnchor::Property::URI, std::string(anchor.href));
+  actor.SetProperty(Toolkit::TextAnchor::Property::URI, anchorHref);
   actor.SetProperty(Toolkit::TextAnchor::Property::START_CHARACTER_INDEX, static_cast<int>(anchor.startIndex));
   actor.SetProperty(Toolkit::TextAnchor::Property::END_CHARACTER_INDEX, static_cast<int>(anchor.endIndex));
   return actor;
