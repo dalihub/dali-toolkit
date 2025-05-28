@@ -43,6 +43,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_FONT_PERFORMANCE_MARKER, false);
 
 const Dali::Toolkit::Text::Character UTF32_A     = 0x0041;
 const Dali::Toolkit::Text::Character UTF32_COLON = 0x3A;
+const Dali::Toolkit::Text::Character UTF32_EMOJI = 0x1F600; // Grinning Face
 
 const char* DALI_TEXT_ENABLE_ICU("DALI_TEXT_ENABLE_ICU");
 const int   DEFAULT_ENABLE_ICU   = 0;
@@ -894,15 +895,23 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
           if(TextAbstraction::IsEmojiTextScript(script))
           {
             // Find a fallback-font.
-            requestedFontId = fontClient.FindFallbackFont(character,
-                                         currentFontDescription,
-                                         currentFontPointSize,
-                                         false);
-
+            requestedFontId = fontClient.FindFallbackFont(character, currentFontDescription, currentFontPointSize, false);
             if(fontClient.IsColorGlyph(requestedFontId, glyphIndexChar))
             {
               // Try to find text style glyph.
               requestedFontId = 0;
+            }
+          }
+          else if(TextAbstraction::IsEmojiColorScript(script) && TextAbstraction::IsEmojiPresentationSelector(character))
+          {
+            if(IsEmojiScript(previousScript) && fontClient.IsColorFont(previousFontId))
+            {
+              requestedFontId = previousFontId;
+            }
+            else
+            {
+              // There are Color emoji fonts that do not have Variation Selector glyphs. Search for fonts using the basic emoji unicode code point.
+              requestedFontId = fontClient.FindFallbackFont(UTF32_EMOJI, currentFontDescription, currentFontPointSize, true);
             }
           }
           if(0u == requestedFontId)
