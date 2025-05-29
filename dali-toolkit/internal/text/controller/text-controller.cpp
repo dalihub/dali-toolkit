@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/controller/text-controller-background-actor.h>
 #include <dali-toolkit/internal/text/controller/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
@@ -40,6 +41,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-geometry.h>
+
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -1693,41 +1695,7 @@ int Controller::GetCharacterIndexAtPosition(float visualX, float visualY)
 
 Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
 {
-  Vector<Vector2> sizeList;
-  Vector<Vector2> positionList;
-
-  GetTextGeometry(mImpl->mModel, startIndex, endIndex, sizeList, positionList);
-
-  if(sizeList.Empty() || sizeList.Size() != positionList.Size())
-  {
-    return {0, 0, 0, 0};
-  }
-
-  auto controlWidth = mImpl->mModel->mVisualModel->mControlSize.width;
-  auto minX         = positionList[0].x;
-  auto minY         = positionList[0].y;
-  auto maxRight     = positionList[0].x + sizeList[0].x;
-  auto maxBottom    = positionList[0].y + sizeList[0].y;
-
-  for(unsigned int i = 1; i < sizeList.Size(); i++)
-  {
-    minX      = std::min(minX, positionList[i].x);
-    minY      = std::min(minY, positionList[i].y);
-    maxRight  = std::max(maxRight, positionList[i].x + sizeList[i].x);
-    maxBottom = std::max(maxBottom, positionList[i].y + sizeList[i].y);
-  }
-
-  if(minX < 0.0f)
-  {
-    minX = 0.0f;
-  }
-
-  if(maxRight > controlWidth)
-  {
-    maxRight = controlWidth;
-  }
-
-  return {minX, minY, maxRight - minX, maxBottom - minY};
+  return Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mImpl->mModel, startIndex, endIndex);
 }
 
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()

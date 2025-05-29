@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,50 @@
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
+#include <dali-toolkit/internal/text/text-geometry.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali::Toolkit::Internal
 {
+Rect<> CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex)
+{
+  Vector<Vector2> sizeList;
+  Vector<Vector2> positionList;
+
+  GetTextGeometry(model, startIndex, endIndex, sizeList, positionList);
+
+  if(sizeList.Empty() || sizeList.Size() != positionList.Size())
+  {
+    return {0, 0, 0, 0};
+  }
+
+  auto controlWidth = model->mVisualModel->mControlSize.width;
+  auto minX         = positionList[0].x;
+  auto minY         = positionList[0].y;
+  auto maxRight     = positionList[0].x + sizeList[0].x;
+  auto maxBottom    = positionList[0].y + sizeList[0].y;
+
+  for(unsigned int i = 1; i < sizeList.Size(); i++)
+  {
+    minX      = std::min(minX, positionList[i].x);
+    minY      = std::min(minY, positionList[i].y);
+    maxRight  = std::max(maxRight, positionList[i].x + sizeList[i].x);
+    maxBottom = std::max(maxBottom, positionList[i].y + sizeList[i].y);
+  }
+
+  if(minX < 0.0f)
+  {
+    minX = 0.0f;
+  }
+
+  if(maxRight > controlWidth)
+  {
+    maxRight = controlWidth;
+  }
+
+  return {minX, minY, maxRight - minX, maxBottom - minY};
+}
+
 void CommonTextUtils::SynchronizeTextAnchorsInParent(
   Actor                             parent,
   Text::ControllerPtr               controller,

@@ -1319,12 +1319,6 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       break;
     }
-    case Toolkit::TextLabel::Property::TEXT:
-    case Toolkit::TextLabel::Property::ENABLE_MARKUP:
-    {
-      CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
-      break;
-    }
     case Toolkit::Control::Property::BACKGROUND:
     {
       if(mController->IsTextCutout())
@@ -1575,6 +1569,11 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(mController->IsAutoScrollEnabled())
     {
       SetUpAutoScrolling();
+    }
+
+    if(Dali::Accessibility::IsUp())
+    {
+      CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
     }
 
     mTextUpdateNeeded = false;
