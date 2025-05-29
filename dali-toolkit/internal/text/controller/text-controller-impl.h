@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
-#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
@@ -957,24 +957,6 @@ struct Controller::Impl
    * @return the 0-based index in anchor vector (-1 if an anchor not found)
    */
   int32_t GetAnchorIndex(size_t characterOffset) const;
-
-  /**
-   * @brief Return the geometrical position of an anchor relative to the parent origin point.
-   *
-   * @param[in] anchor An anchor.
-   *
-   * @return The x, y, z coordinates of an anchor.
-   */
-  Vector3 GetAnchorPosition(Anchor anchor) const;
-
-  /**
-   * @brief Return the size of an anchor expresed as a vector containing anchor's width and height.
-   *
-   * @param[in] anchor An anchor.
-   *
-   * @return The width and height of an anchor.
-   */
-  Vector2 GetAnchorSize(Anchor anchor) const;
 
   /**
    * @brief Return the actor representing an anchor.

@@ -948,6 +948,9 @@ int UtcDaliAccessibilityTextLabel(void)
   auto textlabel = TextLabel::New();
   DALI_TEST_CHECK(textlabel);
 
+  application.GetScene().Add(textlabel);
+  application.SendNotification();
+
   textlabel.SetProperty(Actor::Property::NAME, "test");
   DALI_TEST_EQUALS(textlabel.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION);
 
@@ -984,7 +987,7 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(hypertext->GetLink(-1) == nullptr, true, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLink(0) == nullptr, true, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLink(5) == nullptr, true, TEST_LOCATION);
-  // text with the anchors markup and ENABLE_MARKUP property set (by default) to false
+  // text with the anchors; No anchor created until layout
   textlabel.SetProperty(Toolkit::TextLabel::Property::TEXT, "12345<a href = 'https://www.tizen.org'>anchor1</a>12345<a href = 'https://www.tizen.org' >veryveryveryveryveryveryveryverylonganchor2</a>12345<a href = 'https://www.tizen.org'>anchor3</a>12345");
   DALI_TEST_EQUALS(hypertext->GetLinkCount(), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(-1), -1, TEST_LOCATION);
@@ -993,8 +996,11 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(hypertext->GetLink(-1) == nullptr, true, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLink(0) == nullptr, true, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLink(5) == nullptr, true, TEST_LOCATION);
-  // text with the anchors markup and ENABLE_MARKUP property set to true
   textlabel.SetProperty(Toolkit::TextLabel::Property::ENABLE_MARKUP, true);
+  // Triggers text layout
+  application.SendNotification();
+  application.Render(1);
+  // Anchors are created after layout
   DALI_TEST_EQUALS(hypertext->GetLinkCount(), 3, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(-1), -1, TEST_LOCATION);
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(0), -1, TEST_LOCATION);

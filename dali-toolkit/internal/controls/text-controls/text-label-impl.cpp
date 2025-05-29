@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT
  * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
  */
 const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
-{
+  {
     0.0f, // VerticalAlignment::TOP
     0.5f, // VerticalAlignment::CENTER
     1.0f  // VerticalAlignment::BOTTOM
@@ -88,7 +88,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 #endif
 
 const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
-{
+  {
     {"IMMEDIATE", Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE},
     {"FINISH_LOOP", Toolkit::TextLabel::AutoScrollStopMode::FINISH_LOOP},
 };
@@ -1030,12 +1030,6 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       break;
     }
-    case Toolkit::TextLabel::Property::TEXT:
-    case Toolkit::TextLabel::Property::ENABLE_MARKUP:
-    {
-      CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
-      break;
-    }
     default:
     {
       Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
@@ -1151,6 +1145,11 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(mController->IsAutoScrollEnabled())
     {
       SetUpAutoScrolling();
+    }
+
+    if(Dali::Accessibility::IsUp())
+    {
+      CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
     }
 
     mTextUpdateNeeded = false;
