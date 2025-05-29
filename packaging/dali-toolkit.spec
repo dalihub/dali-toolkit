@@ -247,6 +247,7 @@ cmake \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
       -DENABLE_I18N=ON \
+      -DCP_USE_DOUBLES=ON \
       .
 
 make %{?jobs:-j%jobs}
