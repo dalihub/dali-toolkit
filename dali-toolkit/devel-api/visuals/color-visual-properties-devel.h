@@ -69,10 +69,10 @@ namespace CutoutPolicy
 enum Type
 {
   NONE,                              ///< Fully render the visual area (Default)
-  CUTOUT_VIEW,                       ///< Cutout the area of the view. It will use size of view.
-  CUTOUT_VIEW_WITH_CORNER_RADIUS,    ///< Cutout the area of the view include visual's corner radius. It will use size of view.
-  CUTOUT_OUTSIDE,                    ///< Cutout the outside area of the view. It will use size of view.
-  CUTOUT_OUTSIDE_WITH_CORNER_RADIUS, ///< Cutout the outside area of the view include visual's corner radius. It will use size of view.
+  CUTOUT_VIEW,                       ///< Cutout the area of the view.
+  CUTOUT_VIEW_WITH_CORNER_RADIUS,    ///< Cutout the area of the view include view's corner radius.
+  CUTOUT_OUTSIDE,                    ///< Cutout the outside area of the view.
+  CUTOUT_OUTSIDE_WITH_CORNER_RADIUS, ///< Cutout the outside area of the view include view's corner radius.
 };
 } // namespace CutoutPolicy
 

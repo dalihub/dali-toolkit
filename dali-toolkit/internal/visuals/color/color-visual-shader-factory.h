@@ -95,6 +95,8 @@ public:
   void                           GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
   void                           GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const;
 
+  bool IsCutoutEnabled() const;
+
 private:
   RoundedCorner::Type mColorRoundCorner : 3; ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
   Borderline::Type    mColorBorderline : 2;  ///< Whether use border line, or not. default as Borderline::DISABLED
@@ -125,7 +127,7 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] featureBuilder Collection of current text shader's features
    * @return The standard text rendering shader with features.
-  */
+   */
   Shader GetShader(VisualFactoryCache& factoryCache, const ColorVisualShaderFeature::FeatureBuilder& featureBuilder);
 
 public: // Implementation of VisualShaderFactoryInterface

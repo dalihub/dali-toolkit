@@ -21,16 +21,20 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
@@ -54,6 +58,8 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, CUTOUT_OUTSIDE_WITH_CORNER_RADIUS)
 DALI_ENUM_TO_STRING_TABLE_END(CUTOUT_POLICY)
 
+static constexpr uint32_t CUTOUT_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 20);
+
 } // unnamed namespace
 
 ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory, const Property::Map& properties)
@@ -67,6 +73,7 @@ ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, ColorVisualSha
 ColorVisual::ColorVisual(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
+  mCuroutCornerRadiusIndex(Property::INVALID_INDEX),
   mCutoutPolicy(DevelColorVisual::CutoutPolicy::NONE),
   mAlwaysUsingBlurRadius(false),
   mColorVisualShaderFactory(shaderFactory)
@@ -163,12 +170,33 @@ void ColorVisual::DoSetOnScene(Actor& actor)
 {
   actor.AddRenderer(mImpl->mRenderer);
 
+  if(mCuroutCornerRadiusIndex != Property::INVALID_INDEX)
+  {
+    // If cutout policy is CUTOUT_VIEW_WITH_CORNER_RADIUS or CUTOUT_OUTSIDE_WITH_CORNER_RADIUS, we need to apply equal constraint to it with control's corner radius.
+    Toolkit::Control control = Toolkit::Control::DownCast(actor);
+    DALI_ASSERT_ALWAYS(control && "ColorVisual must be used with Control");
+
+    // Get the corner radius from control
+    mCutoutCornerRadiusConstraint = Constraint::New<Vector4>(mImpl->mRenderer, mCuroutCornerRadiusIndex, Dali::EqualToConstraint());
+    mCutoutCornerRadiusConstraint.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+    Dali::Integration::ConstraintSetInternalTag(mCutoutCornerRadiusConstraint, CUTOUT_CORNER_RADIUS_CONSTRAINT_TAG);
+
+    // Apply the constraint to renderer
+    mCutoutCornerRadiusConstraint.Apply();
+  }
+
   // Color Visual generated and ready to display
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
 }
 
 void ColorVisual::DoSetOffScene(Actor& actor)
 {
+  if(mCuroutCornerRadiusIndex != Property::INVALID_INDEX)
+  {
+    // Remove the constraint
+    mCutoutCornerRadiusConstraint.Remove();
+    mCutoutCornerRadiusConstraint.Reset();
+  }
   actor.RemoveRenderer(mImpl->mRenderer);
 }
 
@@ -242,8 +270,16 @@ void ColorVisual::OnInitialize()
   {
     int cutoutWithCornerRadius = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
     int cutoutOutside          = ((mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE) || (mCutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS));
+
+    mImpl->mRenderer.ReserveCustomProperties(2 + cutoutWithCornerRadius);
     mImpl->mRenderer.RegisterUniqueProperty("uCutoutWithCornerRadius", cutoutWithCornerRadius);
     mImpl->mRenderer.RegisterUniqueProperty("uCutoutOutside", cutoutOutside);
+
+    if(cutoutWithCornerRadius)
+    {
+      // Register cutout policy property
+      mCuroutCornerRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(CUTOUT_CORNER_RADIUS_UNIFORM_NAME, Vector4::ZERO);
+    }
   }
 
   // Register transform properties
