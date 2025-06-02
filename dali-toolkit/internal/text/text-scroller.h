@@ -184,12 +184,13 @@ private:
   Shader             mShader;            // Shader originally used by the renderer while not scrolling
   TextureSet         mTextureSet;        // Texture originally used by the renderer while not scrolling
 
-  int                                 mScrollSpeed; ///< Speed which text should automatically scroll at
-  int                                 mLoopCount;   ///< Number of time the text should scroll
-  float                               mLoopDelay;   ///< Time delay of loop start
-  float                               mWrapGap;     ///< Gap before text wraps around when scrolling
-  TextLabel::AutoScrollStopMode::Type mStopMode;    ///< Stop mode of scrolling text, when loop count is 0.
-  bool                                mIsStop : 1;  ///< Whether the stop scrolling has been triggered or not.
+  int                                 mScrollSpeed;           ///< Speed which text should automatically scroll at
+  int                                 mLoopCount;             ///< Number of time the text should scroll
+  float                               mLoopDelay;             ///< Time delay of loop start
+  float                               mWrapGap;               ///< Gap before text wraps around when scrolling
+  TextLabel::AutoScrollStopMode::Type mStopMode;              ///< Stop mode of scrolling text, when loop count is 0.
+  bool                                mIsStop : 1;            ///< Whether the stop scrolling has been triggered or not.
+  std::atomic<bool>                   mIsStoppedImmediately;  ///< Whether the stop is triggered by immediate stop.
 
 }; // TextScroller class
 
