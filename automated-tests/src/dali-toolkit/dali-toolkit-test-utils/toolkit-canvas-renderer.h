@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOLKIT_CANVAS_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,10 @@ namespace Test::CanvasRenderer
 // Set global rasterization result for CanvaseRender Rasterize() function.
 void MarkRasterizationResult(bool result);
 
-// Reset CanvaseRender Rasterize() function called signal.
+// Reduce the cound of CanvaseRender Rasterize() function called signal.
+void ReduceRasterizationFlagCount();
+
+// Reset CanvaseRender Rasterize() function called signal as zero.
 void ResetRasterizationFlag();
 
 // Get CanvaseRender Rasterize() function called or not.

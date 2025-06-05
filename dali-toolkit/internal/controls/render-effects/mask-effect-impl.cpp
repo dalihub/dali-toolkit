@@ -199,6 +199,16 @@ void MaskEffectImpl::OnRefresh()
 
   mMaskTargetRenderTask.SetFrameBuffer(mMaskTargetFrameBuffer);
   mMaskSourceRenderTask.SetFrameBuffer(mMaskSourceFrameBuffer);
+
+  TextureSet textureSet = TextureSet::New();
+
+  Texture maskSourceTexture = mMaskSourceFrameBuffer.GetColorTexture();
+  Texture maskTargetTexture = mMaskTargetFrameBuffer.GetColorTexture();
+
+  textureSet.SetTexture(maskSourceIndex, maskSourceTexture);
+  textureSet.SetTexture(maskTargetIndex, maskTargetTexture);
+
+  GetTargetRenderer().SetTextures(textureSet);
 }
 
 void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)

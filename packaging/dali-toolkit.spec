@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.4.19
+Version:    2.4.21
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -247,6 +247,7 @@ cmake \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
       -DENABLE_I18N=ON \
+      -DCP_USE_DOUBLES=ON \
       .
 
 make %{?jobs:-j%jobs}

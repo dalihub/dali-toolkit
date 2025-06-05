@@ -1262,10 +1262,11 @@ int UtcDaliToolkitTextLabelEmojisP(void)
 
   // EMOJI Sequences case for coverage.
   std::string emojiSequences =
-    "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   //case for coverage when glyph is not included in the font
-    "Text VS15 &#x262a;&#xfe0e;\n"                                                         //text presentation sequence and selector
-    "Color VS16 &#x262a;&#xfe0f;\n"                                                        //emoji presentation sequence and selector
-    "Default &#x262a; \n"                                                                  //default presentation
+    "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   // case for coverage when glyph is not included in the font
+    "Text VS15 &#x262a;&#xfe0e;\n"                                                         // text presentation sequence and selector
+    "Color VS16 &#x262a;&#xfe0f;\n"                                                        // emoji presentation sequence and selector
+    "Default &#x262a; \n"                                                                  // default presentation
+    "\U0001F465\ufe0f\U0001F468\u200d\U0001F469\u200D\U0001F467\u200D\U0001F466\n"         // negative emoji presentation sequence and selector
     "FamilyManWomanGirlBoy &#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;\n" // emoji multi zwj sequence
     "WomanScientist &#x1f469;&#x200d;&#x1f52c;\n"                                          // emoji zwj sequence
     "WomanScientistLightSkinTone&#x1F469;&#x1F3FB;&#x200D;&#x1F52C; \n"                    // emoji modifier sequence: skin tone & JWZ

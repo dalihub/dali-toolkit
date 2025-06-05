@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_CONTROLS_COMMON_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,13 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
 namespace Dali::Toolkit::Internal
 {
@@ -53,18 +55,18 @@ public:
    * @param[in] updateTextType How the text has been updated
    */
   static void RenderText(
-    Actor                            textActor,
-    Text::RendererPtr                renderer,
-    Text::ControllerPtr              controller,
-    Text::DecoratorPtr               decorator,
-    float&                           alignmentOffset,
-    Actor&                           renderableActor,
-    Actor&                           backgroundActor,
-    Actor&                           cursorLayerActor,
-    Toolkit::Control&                stencil,
-    std::vector<Actor>&              clippingDecorationActors,
+    Actor                             textActor,
+    Text::RendererPtr                 renderer,
+    Text::ControllerPtr               controller,
+    Text::DecoratorPtr                decorator,
+    float&                            alignmentOffset,
+    Actor&                            renderableActor,
+    Actor&                            backgroundActor,
+    Actor&                            cursorLayerActor,
+    Toolkit::Control&                 stencil,
+    std::vector<Actor>&               clippingDecorationActors,
     std::vector<Toolkit::TextAnchor>& anchorActors,
-    Text::Controller::UpdateTextType updateTextType);
+    Text::Controller::UpdateTextType  updateTextType);
 
   /**
    * Common method to synchronize TextAnchor actors with Anchor objects in text's logical model.
@@ -76,6 +78,16 @@ public:
     Actor                             parent,
     Text::ControllerPtr               controller,
     std::vector<Toolkit::TextAnchor>& anchorActors);
+
+  /**
+   * @brief Gets the bounding box of a specific text range.
+   *
+   * @param[in] model pointer to the text model.
+   * @param[in] startIndex start index of the text requested to get bounding box to.
+   * @param[in] endIndex end index(included) of the text requested to get bounding box to.
+   * @return bounding box of the requested text.
+   */
+  static Rect<> GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex);
 };
 
 class TextControlAccessible : public DevelControl::ControlAccessible,
