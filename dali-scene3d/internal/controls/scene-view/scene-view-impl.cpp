@@ -1186,12 +1186,7 @@ void SceneView::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_POSITION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
-  mRootLayer.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
-  mRootLayer.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   self.Add(mRootLayer);
-
-  Dali::Toolkit::DevelControl::AppendAccessibilityAttribute(Dali::Toolkit::Control::DownCast(self), "forceChildSearch", "1");
-  self.SetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
 
   mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
