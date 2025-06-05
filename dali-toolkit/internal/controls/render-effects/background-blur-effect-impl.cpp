@@ -164,8 +164,6 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
       OnDeactivate();
     }
 
-    // Reinitialize blur parameters
-    mDownscaledBlurRadius = BLUR_EFFECT_DOWNSCALE_FACTOR;
     mBlurRadius           = blurRadius;
     mDownscaledBlurRadius = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mDownscaleFactor, mBlurRadius);
 
@@ -174,9 +172,16 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
     {
       mSkipBlur = true;
       DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
+      return;
     }
 
-    OnInitialize();
+    Renderer horizontalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+    mHorizontalBlurActor.RemoveRenderer(0u);
+    mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
+
+    Renderer verticalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+    mVerticalBlurActor.RemoveRenderer(0u);
+    mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
 
     if(!mSkipBlur && IsActivated())
     {
@@ -190,21 +195,67 @@ uint32_t BackgroundBlurEffectImpl::GetBlurRadius() const
   return mBlurRadius;
 }
 
+void BackgroundBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
+{
+  if(mDownscaleFactor != downscaleFactor)
+  {
+    if(!mSkipBlur && IsActivated())
+    {
+      OnDeactivate();
+    }
+
+    mDownscaleFactor      = downscaleFactor;
+    mDownscaledBlurRadius = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mDownscaleFactor, mBlurRadius); // note: may overwrite mDownscaleFactor
+
+    mSkipBlur = false;
+    if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+    {
+      mSkipBlur = true;
+      DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
+      return;
+    }
+
+    Renderer horizontalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+    mHorizontalBlurActor.RemoveRenderer(0u);
+    mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
+
+    Renderer verticalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+    mVerticalBlurActor.RemoveRenderer(0u);
+    mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
+
+    if(!mSkipBlur && IsActivated())
+    {
+      OnActivate();
+    }
+  }
+}
+
+float BackgroundBlurEffectImpl::GetBlurDownscaleFactor() const
+{
+  return mDownscaleFactor;
+}
+
 void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
-    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.");
+    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.\n");
     return;
   }
+
   if(mBlurOnce)
   {
-    DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.");
+    DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.\n");
     return;
   }
 
   fromValue = std::clamp(fromValue, 0.0f, 1.0f);
   toValue   = std::clamp(toValue, 0.0f, 1.0f);
+
+  if(fromValue > toValue)
+  {
+    DALI_LOG_ERROR("Removing blur may require blur downscale factor updates for visual quality.\n");
+  }
 
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, fromValue, AlphaFunction::BuiltinFunction::LINEAR);
@@ -255,39 +306,25 @@ void BackgroundBlurEffectImpl::OnInitialize()
 
     // Create an actor for performing a vertical blur on the texture
     Renderer horizontalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
-    if(mHorizontalBlurActor)
-    {
-      mHorizontalBlurActor.RemoveRenderer(0u);
-      mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
-    }
-    else
-    {
-      mHorizontalBlurActor = Actor::New();
-      mHorizontalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
-      mInternalRoot.Add(mHorizontalBlurActor);
+    mHorizontalBlurActor            = Actor::New();
+    mHorizontalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
 
-      mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
-      mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
-    }
+    mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+    mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
+
+    mInternalRoot.Add(mHorizontalBlurActor);
 
     // Create an actor for performing a vertical blur on the texture
     Renderer verticalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
-    if(mVerticalBlurActor)
-    {
-      mVerticalBlurActor.RemoveRenderer(0u);
-      mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
-    }
-    else
-    {
-      mVerticalBlurActor = Actor::New();
-      mVerticalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
-      mInternalRoot.Add(mVerticalBlurActor);
+    mVerticalBlurActor            = Actor::New();
+    mVerticalBlurActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
 
-      mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
-      mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
-    }
+    mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+    mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
+
+    mInternalRoot.Add(mVerticalBlurActor);
   }
 }
 
@@ -300,6 +337,12 @@ void BackgroundBlurEffectImpl::OnActivate()
 
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
+
+  // Reset animation properties
+  mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+  mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
+  mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+  mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
 
   // Get size
   Vector2 size = GetTargetSize();
@@ -391,6 +434,12 @@ void BackgroundBlurEffectImpl::OnRefresh()
   {
     return;
   }
+
+  // Reset animation properties
+  mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+  mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
+  mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_OPACITY_NAME.data(), 1.0f);
+  mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_STRENGTH_NAME.data(), 1.0f);
 
   DestroyFrameBuffers();
 

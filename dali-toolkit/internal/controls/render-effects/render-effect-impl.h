@@ -96,7 +96,7 @@ public:
   void Deactivate();
 
   /**
-   * @brief Refreshes rendering
+   * @copydoc Dali::Toolkit::RenderEffect::Refresh
    */
   void Refresh();
 

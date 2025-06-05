@@ -988,10 +988,10 @@ void BlurRenderingFinishedCallback(void)
 }
 } // namespace
 
-int UtcDaliRenderEffectBlurOnce(void)
+int UtcDaliBlurEffectBlurOnce(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliRenderEffectBlurOnce");
+  tet_infoline("UtcDaliBlurEffectBlurOnce");
 
   Integration::Scene scene = application.GetScene();
 
@@ -1048,6 +1048,63 @@ int UtcDaliRenderEffectBlurOnce(void)
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
     DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliBlurEffectDownscaleFactor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliBlurEffectDownscaleFactor");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  scene.Add(control);
+
+  {
+    tet_printf("test BackgroundBlurEffect\n");
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New(200);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION); // Default
+
+    effect.Deactivate();
+    effect.SetBlurDownscaleFactor(0.16f); // update while deactivated
+    effect.Activate();
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.16f, TEST_LOCATION);
+
+    effect.SetBlurDownscaleFactor(0.5f); // update while activated
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
+
+    effect.Refresh();
+  }
+  {
+    tet_printf("test GaussianBlurEffect\n");
+    GaussianBlurEffect effect = GaussianBlurEffect::New(200);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION); // Default
+
+    effect.Deactivate();
+    effect.SetBlurDownscaleFactor(0.16f); // update while deactivated
+    effect.Activate();
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.16f, TEST_LOCATION);
+
+    effect.SetBlurDownscaleFactor(0.5f); // update while activated
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
+
+    effect.SetBlurRadius(30);
   }
 
   END_TEST;
