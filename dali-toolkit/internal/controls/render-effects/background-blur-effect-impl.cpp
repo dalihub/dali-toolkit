@@ -343,12 +343,12 @@ void BackgroundBlurEffectImpl::OnActivate()
   {
     Renderer renderer = mHorizontalBlurActor.GetRendererAt(0u);
     renderer.SetShader(blurShader);
-    renderer.RegisterUniqueProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
   }
   {
     Renderer renderer = mVerticalBlurActor.GetRendererAt(0u);
     renderer.SetShader(blurShader);
-    renderer.RegisterUniqueProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
+    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
   }
 
   // Inject blurred output to control
@@ -392,9 +392,7 @@ void BackgroundBlurEffectImpl::OnRefresh()
     return;
   }
 
-  mInputBackgroundFrameBuffer.Reset();
-  mTemporaryFrameBuffer.Reset();
-  mBlurredOutputFrameBuffer.Reset();
+  DestroyFrameBuffers();
 
   Vector2  size              = GetTargetSize();
   uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mDownscaleFactor), 1u);
@@ -406,16 +404,25 @@ void BackgroundBlurEffectImpl::OnRefresh()
   mHorizontalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
   mVerticalBlurActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
 
+  // Reset buffers and renderers
   CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
-  SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
-
-  // Reset shader constants
-  mHorizontalBlurActor.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f, 0.0f) / downsampledWidth);
-  mVerticalBlurActor.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f) / downsampledHeight);
 
   mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
   mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
+
+  {
+    Renderer renderer = mHorizontalBlurActor.GetRendererAt(0);
+    SetRendererTexture(renderer, mInputBackgroundFrameBuffer);
+    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+  }
+  {
+    Renderer renderer = mVerticalBlurActor.GetRendererAt(0);
+    SetRendererTexture(renderer, mTemporaryFrameBuffer);
+    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
+  }
+
+  SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
 }
 
 void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsampledSize)
