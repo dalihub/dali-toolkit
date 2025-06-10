@@ -29,11 +29,6 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
-namespace
-{
-static constexpr float SIZE_STEP_CONDITION = 3.0f;
-} // namespace
-
 namespace Dali
 {
 namespace Toolkit
@@ -48,7 +43,6 @@ Debug::Filter* gRenderEffectLogFilter = Debug::Filter::New(Debug::NoLogging, fal
 RenderEffectImpl::RenderEffectImpl()
 : mRenderer(),
   mOwnerControl(),
-  mSizeNotification(),
   mTargetSize(Vector2::ZERO),
   mIsActivated(false)
 {
@@ -62,8 +56,6 @@ RenderEffectImpl::~RenderEffectImpl()
   // Reset weak handle first. (Since it might not valid during destruction.)
   mOwnerControl.Reset();
   mPlacementSceneHolder.Reset();
-
-  mSizeNotification.Reset();
 
   // Don't call Deactivate here, since we cannot call virtual function during destruction.
   // Deactivate already be called at Control's destructor, and InheritVisibilityChanged signal.
@@ -87,9 +79,6 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 
       ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
 
-      mSizeNotification = ownerControl.AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
-      mSizeNotification.NotifySignal().Connect(this, &RenderEffectImpl::OnSizeSet);
-
       Activate(); // Dev note : Activate after set the owner control.
     }
   }
@@ -104,9 +93,6 @@ void RenderEffectImpl::ClearOwnerControl()
   if(ownerControl)
   {
     ownerControl.InheritedVisibilityChangedSignal().Disconnect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
-
-    ownerControl.RemovePropertyNotification(mSizeNotification);
-    mSizeNotification.Reset();
 
     auto previousOwnerControl = ownerControl;
     mOwnerControl.Reset();
@@ -210,6 +196,34 @@ void RenderEffectImpl::Deactivate()
   }
 }
 
+void RenderEffectImpl::Refresh()
+{
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  if(ownerControl)
+  {
+    const Vector2 targetSize = mTargetSize;
+    UpdateTargetSize();
+    if(mTargetSize != targetSize)
+    {
+      if(IsActivateValid())
+      {
+        if(!IsActivated())
+        {
+          Activate();
+        }
+        else
+        {
+          OnRefresh();
+        }
+      }
+      else
+      {
+        Deactivate();
+      }
+    }
+  }
+}
+
 bool RenderEffectImpl::IsActivateValid() const
 {
   // Activate is valid if
@@ -274,34 +288,6 @@ void RenderEffectImpl::UpdateTargetSize()
     size.y               = (size.y * maxTextureSize / denominator);
   }
   mTargetSize = size;
-}
-
-void RenderEffectImpl::OnSizeSet(PropertyNotification& source)
-{
-  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
-  if(ownerControl)
-  {
-    const Vector2 targetSize = mTargetSize;
-    UpdateTargetSize();
-    if(mTargetSize != targetSize)
-    {
-      if(IsActivateValid())
-      {
-        if(!IsActivated())
-        {
-          Activate();
-        }
-        else
-        {
-          OnRefresh();
-        }
-      }
-      else
-      {
-        Deactivate();
-      }
-    }
-  }
 }
 
 void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
