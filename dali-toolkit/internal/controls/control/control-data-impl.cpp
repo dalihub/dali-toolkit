@@ -1978,22 +1978,45 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   }
 
   DevelControl::OffScreenRenderingType newType = static_cast<DevelControl::OffScreenRenderingType>(offScreenRenderingType);
+
+  Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+
   if(newType == DevelControl::OffScreenRenderingType::NONE)
   {
     if(mOffScreenRenderingImpl)
     {
       auto tempOffscreenRenderingImpl = std::move(mOffScreenRenderingImpl);
       tempOffscreenRenderingImpl->ClearOwnerControl();
+
+      RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+      for(auto it = visuals.begin(); it != visuals.end(); it++)
+      {
+        if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+        {
+          Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
+          handle.RemoveCacheRenderer(renderer);
+          handle.AddRenderer(renderer);
+        }
+      }
     }
   }
   else if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)
   {
     mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(newType);
-
-    Dali::Toolkit::Control handle(mControlImpl.GetOwner());
     mOffScreenRenderingImpl->SetOwnerControl(handle);
+
+    RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+    for(auto it = visuals.begin(); it != visuals.end(); it++)
+    {
+      if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+      {
+        Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
+        handle.RemoveRenderer(renderer);
+        handle.AddCacheRenderer(renderer);
+      }
+    }
   }
-  else
+  else if(mOffScreenRenderingType != newType)
   {
     mOffScreenRenderingImpl->SetType(newType);
   }

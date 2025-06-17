@@ -1043,15 +1043,11 @@ int UtcDaliRenderEffectBlurOnce(void)
 
     // Render effect activated.
     DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-    DALI_TEST_EQUALS(0u, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
 
     effect.SetBlurOnce(false);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
     DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-    DALI_TEST_EQUALS(0u, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
   }
 
   END_TEST;

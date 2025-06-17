@@ -106,6 +106,22 @@ OffScreenRenderable::Type GaussianBlurEffectImpl::GetOffScreenRenderableType()
 
 void GaussianBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
 {
+  tasks.clear();
+  if(isForward)
+  {
+    if(mSourceRenderTask)
+    {
+      tasks.push_back(mSourceRenderTask);
+    }
+    if(mHorizontalBlurTask)
+    {
+      tasks.push_back(mHorizontalBlurTask);
+    }
+    if(mVerticalBlurTask)
+    {
+      tasks.push_back(mVerticalBlurTask);
+    }
+  }
 }
 
 void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
@@ -335,7 +351,7 @@ void GaussianBlurEffectImpl::OnActivate()
   // Inject blurred output to control
   Renderer renderer = GetTargetRenderer();
   renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::FOREGROUND_EFFECT);
-  ownerControl.GetImplementation().SetCacheRenderer(renderer);
+  ownerControl.AddCacheRenderer(renderer);
   ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   SetRendererTexture(renderer, mBlurredOutputFrameBuffer);
 
@@ -356,7 +372,8 @@ void GaussianBlurEffectImpl::OnDeactivate()
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    ownerControl.GetImplementation().RemoveCacheRenderer();
+    Renderer renderer = GetTargetRenderer();
+    ownerControl.RemoveCacheRenderer(renderer);
     ownerControl.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   }
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
