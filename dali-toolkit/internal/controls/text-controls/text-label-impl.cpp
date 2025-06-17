@@ -1789,11 +1789,8 @@ void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type
 
 void TextLabel::OnLocaleChanged(std::string locale)
 {
-  if(mLocale != locale)
-  {
-    mLocale = locale;
-    mController->ResetFontAndStyleData();
-  }
+  mLocale = locale;
+  mController->ResetFontAndStyleData();
 }
 
 std::string TextLabel::GetLocale()
