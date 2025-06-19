@@ -75,6 +75,26 @@ public:
    */
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
+    /**
+   * @copydoc Toolkit::MaskEffect::SetTargetMaskOnce
+   */
+  void SetTargetMaskOnce(bool targetMaskOnce);
+
+  /**
+   * @copydoc Toolkit::MaskEffect::GetTargetMaskOnce
+   */
+  bool GetTargetMaskOnce() const;
+
+  /**
+   * @copydoc Toolkit::MaskEffect::SetSourceMaskOnce
+   */
+  void SetSourceMaskOnce(bool sourceMaskOnce);
+
+  /**
+   * @copydoc Toolkit::MaskEffect::GetSourceMaskOnce
+   */
+  bool GetSourceMaskOnce() const;
+
 protected:
   /**
    * @brief Creates an uninitialized mask effect implementation
@@ -174,8 +194,23 @@ private:
   MaskEffect::MaskMode mMaskMode;
   Vector2              mMaskPosition;
   Vector2              mMaskScale;
+  bool                 mTargetMaskOnce : 1;
+  bool                 mSourceMaskOnce : 1;
 };
 } // namespace Internal
+
+inline Toolkit::Internal::MaskEffectImpl& GetImplementation(Toolkit::MaskEffect& obj)
+{
+  BaseObject& handle = obj.GetBaseObject();
+  return static_cast<Toolkit::Internal::MaskEffectImpl&>(handle);
+}
+
+inline const Toolkit::Internal::MaskEffectImpl& GetImplementation(const Toolkit::MaskEffect& obj)
+{
+  const BaseObject& handle = obj.GetBaseObject();
+  return static_cast<const Toolkit::Internal::MaskEffectImpl&>(handle);
+}
+
 } // namespace Toolkit
 } // namespace Dali
 

@@ -29,16 +29,40 @@ MaskEffect::MaskEffect(const MaskEffect& handle)
 : RenderEffect(handle)
 {
 }
+
 MaskEffect::MaskEffect(Internal::MaskEffectImpl* maskEffectImpl)
 : RenderEffect(maskEffectImpl)
 {
 }
+
 MaskEffect::~MaskEffect() = default;
+
 MaskEffect MaskEffect::New(Toolkit::Control maskControl)
 {
   Internal::MaskEffectImplPtr internal = Internal::MaskEffectImpl::New(maskControl);
   return MaskEffect(internal.Get());
 }
+
+void MaskEffect::SetTargetMaskOnce(bool targetMaskOnce)
+{
+  GetImplementation(*this).SetTargetMaskOnce(targetMaskOnce);
+}
+
+bool MaskEffect::GetTargetMaskOnce() const
+{
+  return GetImplementation(*this).GetTargetMaskOnce();
+}
+
+void MaskEffect::SetSourceMaskOnce(bool sourceMaskOnce)
+{
+  GetImplementation(*this).SetSourceMaskOnce(sourceMaskOnce);
+}
+
+bool MaskEffect::GetSourceMaskOnce() const
+{
+  return GetImplementation(*this).GetSourceMaskOnce();
+}
+
 MaskEffect MaskEffect::New(Toolkit::Control maskControl, MaskMode maskMode, Vector2 maskPosition, Vector2 maskScale)
 {
   Internal::MaskEffectImplPtr internal = Internal::MaskEffectImpl::New(maskControl, maskMode, maskPosition, maskScale);

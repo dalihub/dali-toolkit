@@ -1256,3 +1256,82 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
 
   END_TEST;
 }
+
+int UtcDaliMaskEffectMaskOnce(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliMaskEffectMaskOnce");
+
+  Integration::Scene scene = application.GetScene();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  scene.Add(control);
+
+  {
+    // Add mask effect before activated.
+    Control maskControl = Control::New();
+    maskControl.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    maskControl.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+    scene.Add(maskControl);
+
+    MaskEffect maskEffect = MaskEffect::New(maskControl);
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(true);
+
+    control.SetRenderEffect(maskEffect);
+
+    // send notification.
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), true, TEST_LOCATION);
+
+    control.ClearRenderEffect();
+    scene.Remove(maskControl);
+  }
+  {
+    // Add mask effect during activate.
+    Control maskControl = Control::New();
+    maskControl.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    maskControl.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+    scene.Add(maskControl);
+
+    MaskEffect maskEffect = MaskEffect::New(maskControl);
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(true);
+
+    control.SetRenderEffect(maskEffect);
+
+    application.SendNotification();
+    application.Render();
+
+    maskEffect.SetTargetMaskOnce(false);
+    maskEffect.SetSourceMaskOnce(false);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), false, TEST_LOCATION);
+
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(true);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), true, TEST_LOCATION);
+
+    control.ClearRenderEffect();
+    scene.Remove(maskControl);
+  }
+
+  END_TEST;
+}

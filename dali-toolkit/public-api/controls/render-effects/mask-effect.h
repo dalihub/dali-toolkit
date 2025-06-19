@@ -101,6 +101,32 @@ public:
    */
   ~MaskEffect();
 
+  /**
+   * @brief Set whether the target should be rendered once(true) or every frame(false).
+   * @param[in] targetMaskOnce If true, renders target once, else updates every frame.
+   * @SINCE_2_4.25
+   */
+  void SetTargetMaskOnce(bool targetMaskOnce);
+
+  /**
+   * @brief Retrives whether the target should be rendered once(true) or every frame(false).
+   * @SINCE_2_4.25
+   */
+  bool GetTargetMaskOnce() const;
+
+  /**
+   * @brief Set whether the source should be rendered once(true) or every frame(false).
+   * @param[in] sourceMaskOnce If true, renders source once, else updates every frame.
+   * @SINCE_2_4.25
+   */
+  void SetSourceMaskOnce(bool sourceMaskOnce);
+
+  /**
+   * @brief Retrives whether the source should be rendered once(true) or every frame(false).
+   * @SINCE_2_4.25
+   */
+  bool GetSourceMaskOnce() const;
+
 public: // Not intended for use by Application developers
   ///@cond internal
   /**
