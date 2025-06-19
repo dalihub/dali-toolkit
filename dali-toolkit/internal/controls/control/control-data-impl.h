@@ -421,6 +421,18 @@ public:
                          Dali::Toolkit::Control                                              destination);
 
   /**
+   * @brief Create constraints to animate animatable properties.
+   * @param[in] index The animatable property
+   */
+  void CreateAnimationConstraints(Property::Index index);
+
+  /**
+   * @brief Clear animatable constraints
+   * @param[in] index The animatable property
+   */
+  void ClearAnimationConstraints(Property::Index index);
+
+  /**
    * @brief Update visual properties.
    * @param[in] properties Property list to be used to update visual properties of this Control.
    *
@@ -537,7 +549,9 @@ public:
 
   // Decoration data (CornerRadius, Borderline)
   DecorationData* mDecorationData;
-  Constraint      mInnerShadowCornerRadiusConstraint; ///< InnerShadow's CornerRaidus constriant
+  Constraint      mInnerShadowCornerRadiusConstraint; ///< InnerShadow's CornerRadius constriant
+
+  std::unordered_set<Property::Index> mPropertyOnAnimation; ///< Properties that are currently on animation
 
   // Off screen rendering context
   std::unique_ptr<OffScreenRenderingImpl> mOffScreenRenderingImpl;

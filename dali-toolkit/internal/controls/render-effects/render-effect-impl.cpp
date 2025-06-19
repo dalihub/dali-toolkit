@@ -77,6 +77,28 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
     {
       UpdateTargetSize();
 
+      if(mAnimationConstraints.empty())
+      {
+        Renderer        renderer    = GetTargetRenderer();
+        Property::Index radiusIndex = renderer.GetPropertyIndex("uCornerRadius");
+        if(radiusIndex != Property::INVALID_INDEX)
+        {
+          Constraint cornerRadiusConstraint = Constraint::New<Vector4>(renderer, radiusIndex, EqualToConstraint());
+          cornerRadiusConstraint.AddSource(Source(ownerControl, DevelControl::Property::CORNER_RADIUS));
+          cornerRadiusConstraint.Apply();
+          mAnimationConstraints.push_back(cornerRadiusConstraint);
+        }
+
+        Property::Index squarenessIndex = renderer.GetPropertyIndex("uCornerSquareness");
+        if(squarenessIndex != Property::INVALID_INDEX)
+        {
+          Constraint cornerSquarenessConstraint = Constraint::New<Vector4>(renderer, squarenessIndex, EqualToConstraint());
+          cornerSquarenessConstraint.AddSource(Source(ownerControl, DevelControl::Property::CORNER_SQUARENESS));
+          cornerSquarenessConstraint.Apply();
+          mAnimationConstraints.push_back(cornerSquarenessConstraint);
+        }
+      }
+
       ownerControl.InheritedVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlInheritedVisibilityChanged);
 
       Activate(); // Dev note : Activate after set the owner control.
@@ -87,6 +109,12 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
 void RenderEffectImpl::ClearOwnerControl()
 {
   Deactivate(); // Dev note : Deactivate before clearing the owner control.
+
+  for(auto constraint : mAnimationConstraints)
+  {
+    constraint.Remove();
+  }
+  mAnimationConstraints.clear();
 
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] ClearOwnerControl [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
@@ -115,10 +143,9 @@ void RenderEffectImpl::Initialize()
     mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
     mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
 
-    Shader shader = mRenderer.GetShader();
-    shader.RegisterProperty("uCornerRadius", Vector4::ZERO);
-    shader.RegisterProperty("uCornerSquareness", Vector4::ZERO);
-    shader.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
+    mRenderer.RegisterProperty("uCornerRadius", Vector4::ZERO);
+    mRenderer.RegisterProperty("uCornerSquareness", Vector4::ZERO);
+    mRenderer.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
   }
 
   OnInitialize();

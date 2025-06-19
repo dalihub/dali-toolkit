@@ -386,6 +386,11 @@ protected: // From CustomActorImpl
   void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
 
   /**
+   * @copydoc CustomActorImpl::OnAnimateAnimatableProperty()
+   */
+  void OnAnimateAnimatableProperty(Property::Index index, Dali::Animation::State state) override;
+
+  /**
    * @copydoc CustomActorImpl::GetOffScreenRenderTasks()
    */
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;

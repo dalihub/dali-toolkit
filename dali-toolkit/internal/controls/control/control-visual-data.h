@@ -48,10 +48,13 @@ struct RegisteredVisual
 {
   Property::Index       index;
   Toolkit::Visual::Base visual;
-  bool                  enabled : 1;
-  bool                  pending : 1;
-  bool                  overideReadyTransition : 1;
-  bool                  overrideCornerProperties : 1;
+
+  std::unordered_map<Property::Index, Constraint> animationConstraint; // map to bind control's animatable property to this visual
+
+  bool enabled : 1;
+  bool pending : 1;
+  bool overideReadyTransition : 1;
+  bool overrideCornerProperties : 1;
 
   RegisteredVisual(Property::Index aIndex, Toolkit::Visual::Base& aVisual, bool aEnabled, bool aPendingReplacement)
   : index(aIndex),
@@ -110,7 +113,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableCornerPropertiesOverridden()
    */
-  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Property::Map cornerProperties);
+  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualResourceStatus()
@@ -275,6 +278,18 @@ public:
    * @copydoc Dali::Toolkit::Internal::Control::Impl::UpdateVisualProperties()
    */
   void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
+
+  /**
+   * @brief Insert constraint that binds control's animatable property to visual's.
+   * @param[in] index Animatable property index from Control
+   */
+  void BindAnimatablePropertyFromControlToVisual(Property::Index index);
+
+  /**
+   * @brief Remove constraint that binds control's animatable property to visual's.
+   * @param[in] index Animatable property index from Control
+   */
+  void UnbindAnimatablePropertyFromControlToVisual(Property::Index index);
 
 private:
   /**

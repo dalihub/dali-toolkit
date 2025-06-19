@@ -1937,3 +1937,122 @@ int UtcDaliControlBorderline(void)
 
   END_TEST;
 }
+
+int UtcDaliControlCornerRadiusAnimation1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlCornerRadiusAnimation1: Bind/unbind every visuals\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  tet_printf("Add first visual\n");
+  Property::Map background;
+  background.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  background.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::RED);
+  background.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
+
+  tet_printf("Add second visual\n");
+  Property::Value shadow{
+    {Visual::Property::TYPE, Visual::COLOR},
+    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  control.SetProperty(DevelControl::Property::SHADOW, shadow);
+
+  application.GetScene().Add(control);
+
+  tet_printf("Play animation\n");
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_RADIUS), radius);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_SQUARENESS), squreness);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+
+  application.SendNotification();
+  application.Render(250);
+
+  animation.Pause();
+
+  application.SendNotification();
+  application.Render(250 + 1);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), radius * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), squreness * 0.5f, TEST_LOCATION);
+
+  animation.Stop();
+  animation.Clear();
+
+  application.Render();
+  application.SendNotification();
+
+  END_TEST;
+}
+
+int UtcDaliControlCornerRadiusAnimation2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlCornerRadiusAnimation2: Add/Remove visual during Animation::Play()\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  tet_printf("Add first visual\n");
+  Property::Map background;
+  background.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  background.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::RED);
+  background.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
+
+  application.GetScene().Add(control);
+
+  tet_printf("Play two corner animations\n");
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_RADIUS), radius);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_SQUARENESS), squreness);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);
+
+  application.SendNotification();
+  application.Render(250);
+
+  tet_printf("Add second visual\n");
+  Property::Value shadow{
+    {Visual::Property::TYPE, Visual::COLOR},
+    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  control.SetProperty(DevelControl::Property::SHADOW, shadow);
+
+  application.SendNotification();
+  application.Render(250 + 1);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), radius, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), squreness, TEST_LOCATION);
+
+  tet_printf("Remove first visual\n");
+  control.ClearBackground();
+
+  application.SendNotification();
+  application.Render();
+
+  animation.Stop();
+  animation.Clear();
+
+  tet_printf("All constraints are gone.\n");
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelVisual::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+
+  END_TEST;
+}

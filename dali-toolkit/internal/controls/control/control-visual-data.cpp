@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/public-api/animation/constraint-source.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/animation/constraints.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
@@ -611,6 +614,12 @@ void Control::Impl::VisualData::UnregisterVisual(Property::Index index)
 
     SetVisualOffScene(Toolkit::GetImplementation((*iter)->visual), mOuter.mControlImpl);
 
+    for(auto animationConstraint : (*iter)->animationConstraint)
+    {
+      animationConstraint.second.Remove();
+    }
+    (*iter)->animationConstraint.clear();
+
     (*iter)->visual.Reset();
     mVisuals.Erase(iter);
   }
@@ -698,7 +707,7 @@ void Control::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual:
   }
 }
 
-void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Property::Map cornerProperties)
+void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", &visual, enable ? "T" : "F");
 
@@ -713,13 +722,22 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
 
     (*iter)->overrideCornerProperties = enable;
 
-    // Override corner radius if it exists
-    Vector4 cornerRadius;
-    cornerProperties[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(cornerRadius);
-
-    if(enable && cornerRadius != Vector4::ZERO)
+    if(enable)
     {
-      visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, cornerProperties);
+      DecorationData* decorationData = mOuter.mControlImpl.mImpl->mDecorationData;
+      Vector4         cornerRadius   = DecorationData::GetCornerRadius(decorationData);
+
+      Property::Map map;
+      map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
+      map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(decorationData);
+      map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(decorationData);
+
+      // TODO This condition is to cover utc failtures. Remove this after updating them.
+      // e.g Setting control's corner radius and then setting background visual: Changing visual's corner radius crashes utc.
+      if(cornerRadius != Vector4::ZERO)
+      {
+        visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+      }
     }
   }
 }
@@ -960,6 +978,52 @@ void Control::Impl::VisualData::UpdateVisualProperties(const std::vector<std::pa
     }
   }
   mOuter.mControlImpl.OnUpdateVisualProperties(properties);
+}
+
+void Control::Impl::VisualData::BindAnimatablePropertyFromControlToVisual(Property::Index index)
+{
+  Property::Index visualIndex;
+  switch(index)
+  {
+    case DevelControl::Property::CORNER_RADIUS:
+      visualIndex = Toolkit::DevelVisual::Property::CORNER_RADIUS;
+      break;
+    case DevelControl::Property::CORNER_SQUARENESS:
+      visualIndex = Toolkit::DevelVisual::Property::CORNER_SQUARENESS;
+      break;
+    default: // No animatable property to target
+      return;
+  }
+
+  Toolkit::Control handle = Toolkit::Control(mOuter.mControlImpl.GetOwner());
+
+  // Add constraint that constrains visual's index from control's index
+  for(auto registeredVisual : mVisuals)
+  {
+    if(registeredVisual->overrideCornerProperties && registeredVisual->animationConstraint.count(index) == 0)
+    {
+      Toolkit::Visual::Base& visualToAnimate = registeredVisual->visual;
+
+      Property   property   = visualToAnimate.GetPropertyObject(visualIndex);
+      Constraint constraint = Constraint::New<Vector4>(property.object, property.propertyIndex, EqualToConstraint());
+      constraint.AddSource(Source(handle, index));
+      constraint.Apply();
+
+      registeredVisual->animationConstraint[index] = constraint;
+    }
+  }
+}
+
+void Control::Impl::VisualData::UnbindAnimatablePropertyFromControlToVisual(Property::Index index)
+{
+  for(auto registeredVisual : mVisuals)
+  {
+    if(registeredVisual->overrideCornerProperties && registeredVisual->animationConstraint.count(index) > 0)
+    {
+      registeredVisual->animationConstraint[index].Remove();
+      registeredVisual->animationConstraint.erase(index);
+    }
+  }
 }
 
 void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
