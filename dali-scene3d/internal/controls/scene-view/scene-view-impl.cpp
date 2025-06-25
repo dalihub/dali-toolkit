@@ -1320,8 +1320,6 @@ void SceneView::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_POSITION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
-  mRootLayer.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
-  mRootLayer.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   self.Add(mRootLayer);
 
   Dali::Toolkit::DevelControl::AppendAccessibilityAttribute(Dali::Toolkit::Control::DownCast(self), "forceChildSearch", "1");
