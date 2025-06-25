@@ -318,11 +318,8 @@ MultilanguageSupport::~MultilanguageSupport()
 
 void MultilanguageSupport::OnLocaleChanged(std::string locale)
 {
-  if(mLocale != locale)
-  {
-    SetLocale(locale);
-    ClearCache();
-  }
+  SetLocale(locale);
+  ClearCache();
 }
 
 void MultilanguageSupport::ClearCache()
