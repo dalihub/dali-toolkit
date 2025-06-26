@@ -316,6 +316,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedSize01(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   application.GetScene().Add(label);
 
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
   // Connect to the async text rendered signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
@@ -344,6 +346,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedSize01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // RTL test.
   asyncTextRendered        = false;
@@ -470,6 +473,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   application.GetScene().Add(label);
 
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
   // Connect to the async text rendered signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
@@ -498,6 +503,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -510,6 +516,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
 
   label.SetProperty(TextLabel::Property::TEXT, "Update paragraphs with different directions. Update middle paragraphs. مرحبا بالعالم שלום עולם مرحبا بالعالم Hello world.");
   label.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT);
+
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedWidth(label, 300.0f, std::numeric_limits<float>::infinity());
@@ -527,6 +535,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -629,6 +638,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
   application.GetScene().Add(label);
 
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
   // Connect to the async text rendered signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
@@ -660,6 +671,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -672,6 +684,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
 
   label.SetProperty(TextLabel::Property::TEXT, "Update paragraphs with different directions. Update middle paragraphs. مرحبا بالعالم שלום עולם مرحبا بالعالم Hello world.");
   label.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT);
+
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithConstraint(label, std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
@@ -693,6 +707,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -706,6 +721,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   label.SetProperty(TextLabel::Property::TEXT, "Update paragraphs with different directions. Update middle paragraphs. مرحبا بالعالم שלום עולם مرحبا بالعالم Hello world.");
   label.SetProperty(TextLabel::Property::POINT_SIZE, 30);
   label.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT);
+
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   expectedWidth  = 50.0f;
   expectedHeight = label.GetNaturalSize().height;
@@ -724,6 +741,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

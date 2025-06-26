@@ -307,6 +307,13 @@ enum Type
    * When using Actor::SetScale(), setting RenderScale to the same scale can ensure the rendering quality of the text.
    */
   RENDER_SCALE,
+
+  /**
+   * @brief Whether a render request is required when render mode is ASYNC_MANUAL.
+   * @details Name "needRequestAsyncRender", type Property::BOOLEAN.
+   * @note This property is read-only.
+   */
+  NEED_REQUEST_ASYNC_RENDER,
 };
 
 } // namespace Property
