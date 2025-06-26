@@ -314,6 +314,16 @@ enum Type
    * @note This property is read-only.
    */
   NEED_REQUEST_ASYNC_RENDER,
+
+  /**
+   * @brief MatchLayoutDirection value from text model.
+   * @details Name "layoutDirectionPolicy", type Property::INTERGER.
+   * @note
+   * INHERIT  : The text layout direction is inherited. If you change the layout direction, it will be aligned with the changed layout direction.
+   * LOCALE   : The text layout direction is determined by the locale of the system language.
+   * CONTENTS : The text layout direction is determined by the text itself.
+   */
+  LAYOUT_DIRECTION_POLICY,
 };
 
 } // namespace Property
