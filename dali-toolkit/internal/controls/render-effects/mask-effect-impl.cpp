@@ -120,6 +120,48 @@ void MaskEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& task
   }
 }
 
+void MaskEffectImpl::SetTargetMaskOnce(bool targetMaskOnce)
+{
+  mTargetMaskOnce = targetMaskOnce;
+  if(IsActivated())
+  {
+    if(targetMaskOnce)
+    {
+      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+    }
+    else
+    {
+      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+    }
+  }
+}
+
+bool MaskEffectImpl::GetTargetMaskOnce() const
+{
+  return mTargetMaskOnce;
+}
+
+void MaskEffectImpl::SetSourceMaskOnce(bool sourceMaskOnce)
+{
+  mSourceMaskOnce = sourceMaskOnce;
+  if(IsActivated())
+  {
+    if(sourceMaskOnce)
+    {
+      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+    }
+    else
+    {
+      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+    }
+  }
+}
+
+bool MaskEffectImpl::GetSourceMaskOnce() const
+{
+  return mSourceMaskOnce;
+}
+
 void MaskEffectImpl::OnInitialize()
 {
   // Create CameraActors
