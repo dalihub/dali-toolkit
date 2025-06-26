@@ -19,13 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
-#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -128,10 +128,14 @@ private:
 
   /**
    * @brief Sets mask render tasks.
-   * @param[in] sceneHolder SceneHolder of owner control
    * @param[in] ownerControl Input owner control
    */
   void CreateRenderTasks(Toolkit::Control ownerControl);
+
+  /**
+   * @brief Reset Mask Data
+   */
+  void ResetMaskData();
 
   /**
    * @brief Sets shader constants, mask mode, position, and scale.
@@ -139,30 +143,37 @@ private:
    */
   void SetShaderConstants(Toolkit::Control ownerControl);
 
-private:
+  /**
+   * @brief Create mask data including RenderTask, Framebuffer, Texture.
+   * @param[in] ownerControl Input owner control
+   */
+  void CreateMaskData();
 
-  MaskEffectImpl(const MaskEffectImpl&) = delete;
-  MaskEffectImpl(MaskEffectImpl&&)      = delete;
-  MaskEffectImpl& operator=(MaskEffectImpl&&) = delete;      // no move()
+private:
+  MaskEffectImpl(const MaskEffectImpl&)            = delete;
+  MaskEffectImpl(MaskEffectImpl&&)                 = delete;
+  MaskEffectImpl& operator=(MaskEffectImpl&&)      = delete; // no move()
   MaskEffectImpl& operator=(const MaskEffectImpl&) = delete; // no copy()
 
 private:
   // Camera actors
   CameraActor mCamera;
 
+  WeakHandle<Toolkit::Control> mMaskControl;
+
   // Resource
   RenderTask  mMaskTargetRenderTask;
   FrameBuffer mMaskTargetFrameBuffer;
-
-  WeakHandle<Toolkit::Control> mMaskControl;
+  Texture     mMaskTargetTexture;
 
   RenderTask  mMaskSourceRenderTask;
   FrameBuffer mMaskSourceFrameBuffer;
+  Texture     mMaskSourceTexture;
 
   // Variables
   MaskEffect::MaskMode mMaskMode;
-  Vector2 mMaskPosition;
-  Vector2 mMaskScale;
+  Vector2              mMaskPosition;
+  Vector2              mMaskScale;
 };
 } // namespace Internal
 } // namespace Toolkit
