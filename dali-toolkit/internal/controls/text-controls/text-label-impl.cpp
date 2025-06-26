@@ -157,6 +157,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisMode",  
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "isScrolling",                  BOOLEAN, IS_SCROLLING                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontVariations",               MAP,     FONT_VARIATIONS                )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderScale",                  FLOAT,   RENDER_SCALE                   )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "needRequestAsyncRender",       BOOLEAN, NEED_REQUEST_ASYNC_RENDER      )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",       Color::BLACK,     TEXT_COLOR       )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",    TEXT_COLOR_RED,   TEXT_COLOR,     0)
@@ -1060,6 +1061,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::RENDER_SCALE:
       {
         value = impl.mController->GetRenderScale();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER:
+      {
+        value = impl.mIsAsyncRenderNeeded || impl.mTextUpdateNeeded;
         break;
       }
     }

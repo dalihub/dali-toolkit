@@ -84,12 +84,13 @@ const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
 const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
 
-const char* const PROPERTY_NAME_RENDER_MODE           = "renderMode";
-const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
-const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
-const char* const PROPERTY_NAME_ELLIPSIS_MODE         = "ellipsisMode";
-const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
-const char* const PROPERTY_NAME_RENDER_SCALE          = "renderScale";
+const char* const PROPERTY_NAME_RENDER_MODE               = "renderMode";
+const char* const PROPERTY_NAME_MANUAL_RENDERED           = "manualRendered";
+const char* const PROPERTY_NAME_ASYNC_LINE_COUNT          = "asyncLineCount";
+const char* const PROPERTY_NAME_ELLIPSIS_MODE             = "ellipsisMode";
+const char* const PROPERTY_NAME_FONT_VARIATIONS           = "fontVariations";
+const char* const PROPERTY_NAME_RENDER_SCALE              = "renderScale";
+const char* const PROPERTY_NAME_NEED_REQUEST_ASYNC_RENDER = "needRequestAsyncRender";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -380,6 +381,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_MODE) == DevelTextLabel::Property::ELLIPSIS_MODE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextLabel::Property::FONT_VARIATIONS);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_RENDER_SCALE) == DevelTextLabel::Property::RENDER_SCALE);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_NEED_REQUEST_ASYNC_RENDER) == DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER);
 
   END_TEST;
 }
