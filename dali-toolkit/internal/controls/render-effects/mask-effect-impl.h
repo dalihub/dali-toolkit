@@ -95,6 +95,12 @@ public:
    */
   bool GetSourceMaskOnce() const;
 
+  /**
+   * @brief Reverses target and source roles to alter masking direction
+   * @param[in] reverseMaskDirection True if masking direction reversed
+   */
+  void SetReverseMaskDirection(bool reverseMaskDirection);
+
 protected:
   /**
    * @brief Creates an uninitialized mask effect implementation
@@ -196,6 +202,7 @@ private:
   Vector2              mMaskScale;
   bool                 mTargetMaskOnce : 1;
   bool                 mSourceMaskOnce : 1;
+  bool                 mReverseMaskDirection : 1;
 };
 } // namespace Internal
 

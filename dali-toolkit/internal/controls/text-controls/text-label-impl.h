@@ -307,6 +307,13 @@ public:
    */
   Dali::Property::Index RegisterFontVariationProperty(std::string tag);
 
+  /**
+   * @brief Applies the visual of the given control as a mask to shape the label.
+   *
+   * @param[in] control The control to apply mask.
+   */
+  void SetMaskEffect(Toolkit::Control control);
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
