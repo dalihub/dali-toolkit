@@ -2463,6 +2463,21 @@ int UtcDaliWebSettingsSetDefaultAudioInputDevice(void)
   END_TEST;
 }
 
+int UtcDaliWebSettingsEnableDragAndDrop(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK(settings != 0)
+
+  settings->EnableDragAndDrop(true);
+
+  END_TEST;
+}
+
 int UtcDaliWebViewGetPlainText(void)
 {
   ToolkitTestApplication application;

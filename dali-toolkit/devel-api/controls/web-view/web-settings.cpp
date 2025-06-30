@@ -284,6 +284,10 @@ void WebSettings::SetDefaultAudioInputDevice(const std::string& deviceId) const
   mWebEngineSettings.SetDefaultAudioInputDevice(deviceId);
 }
 
+void WebSettings::EnableDragAndDrop(bool enable)
+{
+  mWebEngineSettings.EnableDragAndDrop(enable);
+}
 
 } // namespace Toolkit
 
