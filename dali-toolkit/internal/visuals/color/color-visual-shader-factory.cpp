@@ -75,12 +75,12 @@ constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
 static constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 2u;
 
 constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
-  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+  "",                                     // VisualFactoryCache::COLOR_SHADER
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
 };
 constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
-  "",                                     //VisualFactoryCache::COLOR_SHADER
-  "#define IS_REQUIRED_ROUNDED_CORNER\n", //VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+  "",                                     // VisualFactoryCache::COLOR_SHADER
+  "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
 };
 constexpr VisualFactoryCache::ShaderType ShaderTypePredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   VisualFactoryCache::ShaderType::COLOR_SHADER,
@@ -207,6 +207,11 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   }
 }
 
+bool FeatureBuilder::IsCutoutEnabled() const
+{
+  return (mColorCutout == Cutout::ENABLED);
+}
+
 } // namespace ColorVisualShaderFeature
 
 ColorVisualShaderFactory::ColorVisualShaderFactory()
@@ -234,6 +239,11 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
 
     shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
+
+    if(featureBuilder.IsCutoutEnabled())
+    {
+      shader.RegisterUniqueProperty(CUTOUT_CORNER_RADIUS_UNIFORM_NAME, Vector4::ZERO);
+    }
   }
   return shader;
 }

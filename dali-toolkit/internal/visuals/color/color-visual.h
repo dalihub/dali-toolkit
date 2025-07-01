@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -151,6 +152,9 @@ private:
 
 private:
   float mBlurRadius; ///< The blur radius
+
+  Constraint      mCutoutCornerRadiusConstraint{};
+  Property::Index mCuroutCornerRadiusIndex; ///< The index of cutout corner radius property
 
   DevelColorVisual::CutoutPolicy::Type mCutoutPolicy : 3;          ///< The policy of cutout
   bool                                 mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.

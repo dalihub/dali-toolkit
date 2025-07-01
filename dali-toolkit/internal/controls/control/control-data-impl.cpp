@@ -31,10 +31,12 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 #include <cstring>
 #include <limits>
 
@@ -50,6 +52,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
@@ -97,6 +100,67 @@ constexpr const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 
 constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 2;
 constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::DECORATION - 1;
+
+static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
+
+/**
+ * @brief Constraint function for InnerShadow's CornerRadius
+ * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : Offset, [4] : ExtraSize
+ * @param[out] current InnerShadow's corner radius value.
+ * @param[in] inputs Input properties.
+ */
+static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyInputContainer& inputs)
+{
+  // We just assume below state are applied.
+  // - Transform::ORIGIN is CENTER
+  // - Transform::ANCHOR_POINT is CENTER
+  // - Transform::OFFSET_POLICY are ABSOLUTE
+  // - Transform::SIZE_POLICY are RELATIVE
+  // - Transform::SIZE is Vector2::ONE
+  // - Visual::BORDERLINE_OFFSET is -1.0f
+
+  Vector4 viewCornerRadius = inputs[0]->GetVector4();
+
+  const int     viewCornerRadiusPolicy = inputs[1]->GetInteger();
+  const Vector3 visualSize             = inputs[2]->GetVector3(); // We use VisualSize as ViewSize.
+
+  Vector2 offset    = inputs[3]->GetVector2();
+  Vector2 extraSize = inputs[4]->GetVector2();
+
+  // InnerShadowRadius = ViewRadius + 0.5f * (dx + dy)
+  //
+  // +-------------
+  // |        | dy
+  // |--------*****
+  // | dx     *   | ViewRadius
+  // |        *   x << Centour of View's corner radius.
+  // |----------x << Centour of InnerShadow's corner radius.
+  // |  InnerShadowRadius
+  //
+  // Note that we cannot make ellipse rounded corner now,
+  // just use heuristic position.
+
+  if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
+  {
+    const float minViewSize = std::min(visualSize.x, visualSize.y);
+    viewCornerRadius *= minViewSize;
+  }
+
+  // Calculate on pixel scale.
+  current.x = viewCornerRadius.x + 0.5f * ((-offset.x + extraSize.x * 0.5f) + (-offset.y + extraSize.y * 0.5f));
+  current.y = viewCornerRadius.y + 0.5f * ((offset.x + extraSize.x * 0.5f) + (-offset.y + extraSize.y * 0.5f));
+  current.z = viewCornerRadius.z + 0.5f * ((offset.x + extraSize.x * 0.5f) + (offset.y + extraSize.y * 0.5f));
+  current.w = viewCornerRadius.w + 0.5f * ((-offset.x + extraSize.x * 0.5f) + (offset.y + extraSize.y * 0.5f));
+
+  if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
+  {
+    const float minInnerShadowSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
+    if(DALI_LIKELY(minInnerShadowSize > Math::MACHINE_EPSILON_100))
+    {
+      current /= minInnerShadowSize;
+    }
+  }
+}
 
 bool PerformAccessibilityAction(Toolkit::Control control, const std::string& actionName, const Property::Map& attributes)
 {
@@ -383,7 +447,7 @@ const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "innerSh
 const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "borderline",                     Toolkit::DevelControl::Property::BORDERLINE,                       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty); ///< Make animatable, for constarint-input
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::Value(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)), &Control::Impl::SetProperty, &Control::Impl::GetProperty); ///< Make animatable, for constarint-input
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
@@ -419,6 +483,7 @@ Control::Impl::Impl(Control& controlImpl)
   mTapGestureDetector(),
   mLongPressGestureDetector(),
   mDecorationData{nullptr},
+  mInnerShadowCornerRadiusConstraint{},
   mOffScreenRenderingImpl(nullptr),
   mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
@@ -1787,6 +1852,30 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
       mVisualData->RegisterVisual(Toolkit::DevelControl::Property::INNER_SHADOW, visual, INNER_SHADOW_DEPTH_INDEX);
       EnableCornerPropertiesOverridden(visual, true);
 
+      if(mInnerShadowCornerRadiusConstraint)
+      {
+        // Reset previously applied constraints.
+        mInnerShadowCornerRadiusConstraint.Remove();
+        mInnerShadowCornerRadiusConstraint.Reset();
+      }
+
+      auto visualCornerRadiusProperty = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
+
+      if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object))
+      {
+        Dali::CustomActor handle(mControlImpl.GetOwner());
+
+        mInnerShadowCornerRadiusConstraint = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, InnerShadowCornerRadiusConstraint);
+        mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS));
+        mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS_POLICY));
+        mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, Dali::Actor::Property::SIZE));
+        mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::TRANSFORM_OFFSET));
+        mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::EXTRA_SIZE));
+
+        Dali::Integration::ConstraintSetInternalTag(mInnerShadowCornerRadiusConstraint, INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG);
+        mInnerShadowCornerRadiusConstraint.Apply();
+      }
+
       mControlImpl.RelayoutRequest();
     }
   }
@@ -1797,6 +1886,13 @@ void Control::Impl::ClearInnerShadow()
   if(DALI_LIKELY(mVisualData))
   {
     mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::INNER_SHADOW);
+
+    if(mInnerShadowCornerRadiusConstraint)
+    {
+      // Reset previously applied constraints.
+      mInnerShadowCornerRadiusConstraint.Remove();
+      mInnerShadowCornerRadiusConstraint.Reset();
+    }
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     mControlImpl.RelayoutRequest();
