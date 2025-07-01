@@ -1603,6 +1603,13 @@ int UtcDaliControlOffScreenRendering(void)
   control.Unparent(); // Disconnect fron scene.
   application.GetScene().Add(control);
 
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ONCE, TEST_LOCATION);
+  tet_infoline("Set offscreen rendering : refresh once");
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 

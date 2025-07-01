@@ -569,7 +569,7 @@ void Control::Impl::ResourceReady()
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
-  if(mVisualData->IsResourceReady())
+  if(DALI_LIKELY(mVisualData) && mVisualData->IsResourceReady())
   {
     EmitResourceReadySignal();
   }
@@ -2084,14 +2084,17 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
       auto tempOffscreenRenderingImpl = std::move(mOffScreenRenderingImpl);
       tempOffscreenRenderingImpl->ClearOwnerControl();
 
-      RegisteredVisualContainer& visuals = mVisualData->mVisuals;
-      for(auto it = visuals.begin(); it != visuals.end(); it++)
+      if(DALI_LIKELY(mVisualData))
       {
-        if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+        RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+        for(auto it = visuals.begin(); it != visuals.end(); it++)
         {
-          Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
-          handle.RemoveCacheRenderer(renderer);
-          handle.AddRenderer(renderer);
+          if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+          {
+            Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
+            handle.RemoveCacheRenderer(renderer);
+            handle.AddRenderer(renderer);
+          }
         }
       }
     }
@@ -2101,14 +2104,17 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
     mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(newType);
     mOffScreenRenderingImpl->SetOwnerControl(handle);
 
-    RegisteredVisualContainer& visuals = mVisualData->mVisuals;
-    for(auto it = visuals.begin(); it != visuals.end(); it++)
+    if(DALI_LIKELY(mVisualData))
     {
-      if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+      RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+      for(auto it = visuals.begin(); it != visuals.end(); it++)
       {
-        Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
-        handle.RemoveRenderer(renderer);
-        handle.AddCacheRenderer(renderer);
+        if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+        {
+          Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
+          handle.RemoveRenderer(renderer);
+          handle.AddCacheRenderer(renderer);
+        }
       }
     }
   }
@@ -2126,12 +2132,15 @@ void Control::Impl::UpdateCornerRadius()
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(mDecorationData);
   map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(mDecorationData);
 
-  RegisteredVisualContainer& visuals = mVisualData->mVisuals;
-  for(auto it = visuals.begin(); it != visuals.end(); it++)
+  if(DALI_LIKELY(mVisualData))
   {
-    if((*it)->overrideCornerProperties)
+    RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+    for(auto it = visuals.begin(); it != visuals.end(); it++)
     {
-      (*it)->visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+      if((*it)->overrideCornerProperties)
+      {
+        (*it)->visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+      }
     }
   }
 
