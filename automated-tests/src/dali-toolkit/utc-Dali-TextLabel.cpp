@@ -84,12 +84,14 @@ const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
 const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
 const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
 
-const char* const PROPERTY_NAME_RENDER_MODE           = "renderMode";
-const char* const PROPERTY_NAME_MANUAL_RENDERED       = "manualRendered";
-const char* const PROPERTY_NAME_ASYNC_LINE_COUNT      = "asyncLineCount";
-const char* const PROPERTY_NAME_ELLIPSIS_MODE         = "ellipsisMode";
-const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
-const char* const PROPERTY_NAME_RENDER_SCALE          = "renderScale";
+const char* const PROPERTY_NAME_RENDER_MODE               = "renderMode";
+const char* const PROPERTY_NAME_MANUAL_RENDERED           = "manualRendered";
+const char* const PROPERTY_NAME_ASYNC_LINE_COUNT          = "asyncLineCount";
+const char* const PROPERTY_NAME_ELLIPSIS_MODE             = "ellipsisMode";
+const char* const PROPERTY_NAME_FONT_VARIATIONS           = "fontVariations";
+const char* const PROPERTY_NAME_RENDER_SCALE              = "renderScale";
+const char* const PROPERTY_NAME_NEED_REQUEST_ASYNC_RENDER = "needRequestAsyncRender";
+const char* const PROPERTY_NAME_LAYOUT_DIRECTION_POLICY   = "layoutDirectionPolicy";
 
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -380,6 +382,8 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ELLIPSIS_MODE) == DevelTextLabel::Property::ELLIPSIS_MODE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextLabel::Property::FONT_VARIATIONS);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_RENDER_SCALE) == DevelTextLabel::Property::RENDER_SCALE);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_NEED_REQUEST_ASYNC_RENDER) == DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_LAYOUT_DIRECTION_POLICY) == DevelTextLabel::Property::LAYOUT_DIRECTION_POLICY);
 
   END_TEST;
 }
@@ -1077,6 +1081,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Invalid index
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, 3);
   DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::RENDER_MODE), static_cast<int>(DevelTextLabel::Render::SYNC), TEST_LOCATION);
+
+  // Layout direction policy
+  label.SetProperty(DevelTextLabel::Property::LAYOUT_DIRECTION_POLICY, DevelText::MatchLayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(label.GetProperty<int>(DevelTextLabel::Property::LAYOUT_DIRECTION_POLICY), static_cast<int>(DevelText::MatchLayoutDirection::INHERIT), TEST_LOCATION);
 
   // Check ellipsis mode property
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::TRUNCATE);

@@ -1147,6 +1147,10 @@ public:
     return mockImeStyle;
   }
 
+  void EnableDragAndDrop(bool enable) override
+  {
+  }
+
   void SetDefaultAudioInputDevice(const std::string& deviceId) const override
   {
   }

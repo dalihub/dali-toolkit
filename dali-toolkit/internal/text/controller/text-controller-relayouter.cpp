@@ -599,6 +599,11 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
     // Not worth to relayout if width or height is equal to zero.
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n");
 
+    // When the Relayout size becomes 0, the size should be stored.
+    // Since we check whether it is a new size with mControlSize,
+    // if the size is 0 and then relayout to the same size as before, the text will not be updated.
+    visualModel->mControlSize = size;
+
     return updateTextType;
   }
 

@@ -82,6 +82,7 @@ MaskEffectImpl::MaskEffectImpl(Toolkit::Control maskControl, MaskEffect::MaskMod
 
 MaskEffectImpl::~MaskEffectImpl()
 {
+  ResetMaskData();
 }
 
 MaskEffectImplPtr MaskEffectImpl::New(Toolkit::Control maskControl)
@@ -119,6 +120,48 @@ void MaskEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& task
   }
 }
 
+void MaskEffectImpl::SetTargetMaskOnce(bool targetMaskOnce)
+{
+  mTargetMaskOnce = targetMaskOnce;
+  if(IsActivated())
+  {
+    if(targetMaskOnce)
+    {
+      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+    }
+    else
+    {
+      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+    }
+  }
+}
+
+bool MaskEffectImpl::GetTargetMaskOnce() const
+{
+  return mTargetMaskOnce;
+}
+
+void MaskEffectImpl::SetSourceMaskOnce(bool sourceMaskOnce)
+{
+  mSourceMaskOnce = sourceMaskOnce;
+  if(IsActivated())
+  {
+    if(sourceMaskOnce)
+    {
+      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+    }
+    else
+    {
+      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+    }
+  }
+}
+
+bool MaskEffectImpl::GetSourceMaskOnce() const
+{
+  return mSourceMaskOnce;
+}
+
 void MaskEffectImpl::OnInitialize()
 {
   // Create CameraActors
@@ -140,9 +183,40 @@ void MaskEffectImpl::OnActivate()
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
   ownerControl.Add(mCamera);
+
+  ResetMaskData();
+  CreateMaskData();
+}
+
+void MaskEffectImpl::OnDeactivate()
+{
+  Toolkit::Control control = GetOwnerControl();
+  if(DALI_LIKELY(control))
+  {
+    Renderer maskRenderer = GetTargetRenderer();
+    control.RemoveCacheRenderer(maskRenderer);
+    control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
+  }
+
+  mCamera.Unparent();
+
+  ResetMaskData();
+}
+
+void MaskEffectImpl::OnRefresh()
+{
+  ResetMaskData();
+  CreateMaskData();
+}
+
+void MaskEffectImpl::CreateMaskData()
+{
+  Toolkit::Control ownerControl = GetOwnerControl();
+  DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
+
   Renderer maskRenderer = GetTargetRenderer();
   ownerControl.AddCacheRenderer(maskRenderer);
-  ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(GetOffScreenRenderableType());
 
   Vector2 size = GetTargetSize();
   mCamera.SetPerspectiveProjection(size);
@@ -153,63 +227,15 @@ void MaskEffectImpl::OnActivate()
 
   mMaskTargetRenderTask.SetScreenToFrameBufferMappingActor(ownerControl);
 
-  TextureSet textureSet = TextureSet::New();
-
-  Texture maskSourceTexture = mMaskSourceFrameBuffer.GetColorTexture();
-  Texture maskTargetTexture = mMaskTargetFrameBuffer.GetColorTexture();
-
-  textureSet.SetTexture(maskSourceIndex, maskSourceTexture);
-  textureSet.SetTexture(maskTargetIndex, maskTargetTexture);
-
-  maskRenderer.SetTextures(textureSet);
-}
-
-void MaskEffectImpl::OnDeactivate()
-{
-  Toolkit::Control control = GetOwnerControl();
-  if(DALI_LIKELY(control))
+  TextureSet textureSet = GetTargetRenderer().GetTextures();
+  if(textureSet)
   {
-    Renderer maskRenderer = GetTargetRenderer();
-    control.RemoveCacheRenderer(maskRenderer);
-    control.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    textureSet = TextureSet::New();
+    GetTargetRenderer().SetTextures(textureSet);
   }
 
-  mCamera.Unparent();
-  mMaskTargetFrameBuffer.Reset();
-  mMaskSourceFrameBuffer.Reset();
-
-  auto sceneHolder = GetSceneHolder();
-  if(DALI_LIKELY(sceneHolder))
-  {
-    RenderTaskList taskList = sceneHolder.GetRenderTaskList();
-    taskList.RemoveTask(mMaskTargetRenderTask);
-    mMaskTargetRenderTask.Reset();
-    taskList.RemoveTask(mMaskSourceRenderTask);
-    mMaskSourceRenderTask.Reset();
-  }
-}
-
-void MaskEffectImpl::OnRefresh()
-{
-  mMaskTargetFrameBuffer.Reset();
-  mMaskSourceFrameBuffer.Reset();
-
-  Vector2 size = GetTargetSize();
-  mCamera.SetPerspectiveProjection(size);
-  CreateFrameBuffers(ImageDimensions(size.x, size.y));
-
-  mMaskTargetRenderTask.SetFrameBuffer(mMaskTargetFrameBuffer);
-  mMaskSourceRenderTask.SetFrameBuffer(mMaskSourceFrameBuffer);
-
-  TextureSet textureSet = TextureSet::New();
-
-  Texture maskSourceTexture = mMaskSourceFrameBuffer.GetColorTexture();
-  Texture maskTargetTexture = mMaskTargetFrameBuffer.GetColorTexture();
-
-  textureSet.SetTexture(maskSourceIndex, maskSourceTexture);
-  textureSet.SetTexture(maskTargetIndex, maskTargetTexture);
-
-  GetTargetRenderer().SetTextures(textureSet);
+  textureSet.SetTexture(maskSourceIndex, mMaskSourceTexture);
+  textureSet.SetTexture(maskTargetIndex, mMaskTargetTexture);
 }
 
 void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
@@ -217,12 +243,12 @@ void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
   uint32_t width  = size.GetWidth();
   uint32_t height = size.GetHeight();
 
-  mMaskTargetFrameBuffer     = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
-  Texture mMaskTargetTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
+  mMaskTargetFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mMaskTargetTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
   mMaskTargetFrameBuffer.AttachColorTexture(mMaskTargetTexture);
 
-  mMaskSourceFrameBuffer     = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
-  Texture mMaskSourceTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
+  mMaskSourceFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mMaskSourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
   mMaskSourceFrameBuffer.AttachColorTexture(mMaskSourceTexture);
 }
 
@@ -247,6 +273,23 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   mMaskSourceRenderTask.SetFrameBuffer(mMaskSourceFrameBuffer);
   mMaskSourceRenderTask.SetClearEnabled(true);
   mMaskSourceRenderTask.SetClearColor(Color::TRANSPARENT);
+}
+
+void MaskEffectImpl::ResetMaskData()
+{
+  auto sceneHolder = GetSceneHolder();
+  if(DALI_LIKELY(sceneHolder))
+  {
+    RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+    taskList.RemoveTask(mMaskSourceRenderTask);
+    taskList.RemoveTask(mMaskTargetRenderTask);
+  }
+  mMaskSourceRenderTask.Reset();
+  mMaskTargetRenderTask.Reset();
+  mMaskSourceTexture.Reset();
+  mMaskTargetTexture.Reset();
+  mMaskSourceFrameBuffer.Reset();
+  mMaskTargetFrameBuffer.Reset();
 }
 
 void MaskEffectImpl::SetShaderConstants(Toolkit::Control ownerControl)

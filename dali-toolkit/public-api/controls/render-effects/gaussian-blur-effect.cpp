@@ -70,6 +70,16 @@ uint32_t GaussianBlurEffect::GetBlurRadius() const
   return GetImplementation(*this).GetBlurRadius();
 }
 
+void GaussianBlurEffect::SetBlurDownscaleFactor(float downscaleFactor)
+{
+  GetImplementation(*this).SetBlurDownscaleFactor(downscaleFactor);
+}
+
+float GaussianBlurEffect::GetBlurDownscaleFactor() const
+{
+  return GetImplementation(*this).GetBlurDownscaleFactor();
+}
+
 void GaussianBlurEffect::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   GetImplementation(*this).AddBlurStrengthAnimation(animation, alphaFunction, timePeriod, fromValue, toValue);

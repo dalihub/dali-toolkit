@@ -44,5 +44,11 @@ void RenderEffect::Deactivate()
 {
   GetImplementation(*this).Deactivate();
 }
+
+void RenderEffect::Refresh()
+{
+  GetImplementation(*this).Refresh();
+}
+
 } // namespace Toolkit
 } // namespace Dali

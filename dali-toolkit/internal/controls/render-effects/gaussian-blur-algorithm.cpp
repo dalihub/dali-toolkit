@@ -26,7 +26,7 @@
 
 namespace
 {
-static constexpr float MINIMUM_DOWNSCALE_FACTOR = 0.1f;
+static constexpr float MINIMUM_DOWNSCALE_FACTOR = Dali::Math::MACHINE_EPSILON_1000;
 static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
 
 static constexpr uint32_t MAXIMUM_BLUR_RADIUS       = 500u; ///< Maximum pixel radius for blur effect. (GL_MAX_FRAGMENT_UNIFORM_COMPONENTS(Usually 1024) - 19 (vertex shader used)) / 3 float
@@ -208,6 +208,8 @@ Dali::Shader& GaussianBlurAlgorithm::GetGaussianBlurShader(const uint32_t blurRa
 
 uint32_t GaussianBlurAlgorithm::GetDownscaledBlurRadius(float& downscaleFactor, uint32_t& blurRadius)
 {
+  downscaleFactor = Dali::Clamp(downscaleFactor, MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
+
   if(DALI_UNLIKELY(blurRadius > MAXIMUM_BLUR_RADIUS))
   {
     const uint32_t fixedBlurRadius      = MAXIMUM_BLUR_RADIUS;

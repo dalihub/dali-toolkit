@@ -89,6 +89,16 @@ public:
   uint32_t GetBlurRadius() const;
 
   /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurDownscaleFactor
+   */
+  void SetBlurDownscaleFactor(float downscaleFactor);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurDownscaleFactor
+   */
+  float GetBlurDownscaleFactor() const;
+
+  /**
    * @copydoc Toolkit::BackgroundBlurEffect::AddBlurStrengthAnimation
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
@@ -136,7 +146,7 @@ protected:
   void OnDeactivate() override;
 
   /**
-   * @brief Redraw effect without deactivation
+   * @brief Redraws effect without deactivation
    */
   void OnRefresh() override;
 
