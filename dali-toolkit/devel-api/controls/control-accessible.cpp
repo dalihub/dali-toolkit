@@ -581,7 +581,11 @@ bool ControlAccessible::GrabHighlight()
   EmitHighlighted(true);
   RegisterPositionPropertyNotification();
   RegisterPropertySetSignal();
-
+  auto control = Dali::Toolkit::Control::DownCast(self);
+  if(!DevelControl::AccessibilityHighlightedSignal(control).Empty())
+  {
+    DevelControl::AccessibilityHighlightedSignal(control).Emit(true);
+  }
   return true;
 }
 
@@ -594,12 +598,18 @@ bool ControlAccessible::ClearHighlight()
 
   if(IsHighlighted())
   {
+    Dali::Actor self = Self();
     UnregisterPropertySetSignal();
     UnregisterPositionPropertyNotification();
-    Self().Remove(mCurrentHighlightActor.GetHandle());
+    self.Remove(mCurrentHighlightActor.GetHandle());
     mCurrentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
     EmitHighlighted(false);
+    auto control = Dali::Toolkit::Control::DownCast(self);
+    if(!DevelControl::AccessibilityHighlightedSignal(control).Empty())
+    {
+      DevelControl::AccessibilityHighlightedSignal(control).Emit(false);
+    }
     return true;
   }
   return false;

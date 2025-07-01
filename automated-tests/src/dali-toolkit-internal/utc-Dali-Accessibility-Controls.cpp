@@ -143,6 +143,7 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     DevelControl::AccessibilityGetDescriptionSignal(control);
     DevelControl::AccessibilityDoGestureSignal(control);
     DevelControl::AccessibilityActionSignal(control);
+    DevelControl::AccessibilityHighlightedSignal(control);
 
     DALI_TEST_CHECK(true);
   }
@@ -190,6 +191,7 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     DevelControl::AccessibilityGetDescriptionSignal(control);
     DevelControl::AccessibilityDoGestureSignal(control);
     DevelControl::AccessibilityActionSignal(control);
+    DevelControl::AccessibilityHighlightedSignal(control);
     DALI_TEST_CHECK(true);
   }
   catch(...)

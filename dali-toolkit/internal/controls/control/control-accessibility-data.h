@@ -124,7 +124,8 @@ public:
   Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
   Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
-  Toolkit::DevelControl::AccessibilityActionSignalType mAccessibilityActionSignal;
+  Toolkit::DevelControl::AccessibilityActionSignalType      mAccessibilityActionSignal;
+  Toolkit::DevelControl::AccessibilityHighlightedSignalType mAccessibilityHighlightedSignal;
 
   struct AccessibilityProps
   {
