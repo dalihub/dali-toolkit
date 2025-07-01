@@ -67,6 +67,16 @@ uint32_t BackgroundBlurEffect::GetBlurRadius() const
   return GetImplementation(*this).GetBlurRadius();
 }
 
+void BackgroundBlurEffect::SetBlurDownscaleFactor(float downscaleFactor)
+{
+  GetImplementation(*this).SetBlurDownscaleFactor(downscaleFactor);
+}
+
+float BackgroundBlurEffect::GetBlurDownscaleFactor() const
+{
+  return GetImplementation(*this).GetBlurDownscaleFactor();
+}
+
 void BackgroundBlurEffect::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   GetImplementation(*this).AddBlurStrengthAnimation(animation, alphaFunction, timePeriod, fromValue, toValue);

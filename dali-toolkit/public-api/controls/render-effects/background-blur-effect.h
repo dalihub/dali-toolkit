@@ -100,6 +100,7 @@ public:
   /**
    * @brief Retrives whether effect rendering is done once(true) or every frame(false)
    * @SINCE_2_4.15
+   * @return Whether blur is rendered once or every frame.
    */
   bool GetBlurOnce() const;
 
@@ -113,8 +114,22 @@ public:
   /**
    * @brief Retrieves blur radius value.
    * @SINCE_2_4.15
+   * @return The blur radius.
    */
   uint32_t GetBlurRadius() const;
+
+  /**
+   * @brief Set blur downscale factor. The value resides between 0.0f to 1.0f.
+   * @SINCE_2_4.23
+   */
+  void SetBlurDownscaleFactor(float downscaleFactor);
+
+  /**
+   * @brief Retrives blur downscale factor.
+   * @SINCE_2_4.23
+   * @return The blur downscale factor.
+   */
+  float GetBlurDownscaleFactor() const;
 
   /**
    * @brief Adds blur strength animation. Blurifies clear texture within given animation parameters.

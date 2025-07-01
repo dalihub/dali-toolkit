@@ -90,6 +90,16 @@ public:
   uint32_t GetBlurRadius() const;
 
   /**
+   * @copydoc Toolkit::GaussianBlurEffect::SetBlurDownscaleFactor
+   */
+  void SetBlurDownscaleFactor(float downscaleFactor);
+
+  /**
+   * @copydoc Toolkit::GaussianBlurEffect::GetBlurDownscaleFactor
+   */
+  float GetBlurDownscaleFactor() const;
+
+  /**
    * @copydoc Toolkit::GaussianBlurEffect::AddBlurStrengthAnimation
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
@@ -195,7 +205,7 @@ private:
   CameraActor mRenderDownsampledCamera;
 
   // Resource
-  FrameBuffer mInputFrameBuffer; // Input. Background. What to blur.
+  FrameBuffer mInputFrameBuffer; // Input. What to blur.
 
   Actor       mInternalRoot;
   Actor       mHorizontalBlurActor;

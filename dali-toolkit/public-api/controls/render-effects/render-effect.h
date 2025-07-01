@@ -82,6 +82,12 @@ public:
    */
   void Deactivate();
 
+  /**
+   * @brief Refreshes effect rendering
+   * @SINCE_2_4.23
+   */
+  void Refresh();
+
 public: // Not intended for Application developers
   ///@cond internal
   /**
