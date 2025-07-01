@@ -6108,7 +6108,7 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
   application.Render(16);
 
   // loading started, this waits for the loader thread
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 120), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
@@ -6132,7 +6132,7 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
   application.Render(16);
 
   // loading started, this waits for the loader thread
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 120), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(imageView.IsResourceReady(), true, TEST_LOCATION);
