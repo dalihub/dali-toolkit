@@ -149,7 +149,7 @@ void calculatePotential()
 #endif
 }
 
-void setupMinMaxPotential(highp float currentBorderlineWidth)
+void setupMinMaxPotential(highp float currentBorderlineWidth, float heuristicFactor)
 {
   gPotentialRange = vAliasMargin;
 
@@ -162,18 +162,18 @@ void setupMinMaxPotential(highp float currentBorderlineWidth)
 #endif
 
   // reduce defect near edge of rounded corner.
-  highp float heuristicEdgeCasePotential = clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, gPotentialRange);
+  highp float heuristicEdgeCasePotential = clamp(-min(gDiff.x, gDiff.y) / max(1.0, gRadius), 0.0, gPotentialRange * heuristicFactor);
   gMaxOutlinePotential += heuristicEdgeCasePotential;
   gMinOutlinePotential += heuristicEdgeCasePotential;
 }
 
-void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth)
+void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth, float heuristicFactor)
 {
   calculateCornerRadius(cornerRadius, position);
   calculateFragmentPosition(position, halfSizeOfRect);
   calculatePosition(currentBorderlineWidth);
   calculatePotential();
-  setupMinMaxPotential(currentBorderlineWidth);
+  setupMinMaxPotential(currentBorderlineWidth, heuristicFactor);
 }
 #endif
 
@@ -402,17 +402,27 @@ void main()
 #ifdef IS_REQUIRED_CUTOUT
   mediump float discardOpacity = 1.0;
 
-  if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 && abs(vPositionFromCenter.y) <= uSize.y * 0.5)
+  mediump float cutoutVertexMargin = 0.0;
+#if defined(IS_REQUIRED_ROUNDED_CORNER)
+  if(uCutoutWithCornerRadius == 1)
+  {
+    cutoutVertexMargin += vAliasMargin * float(uCutoutOutside) * 1.5;
+  }
+#endif
+
+  if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 + cutoutVertexMargin && abs(vPositionFromCenter.y) <= uSize.y * 0.5 + cutoutVertexMargin)
   {
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
     if(uCutoutWithCornerRadius == 1)
     {
       // Ignore borderline width
-      PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0);
+      PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0, 0.0);
 
       // Decrease potential range, to avoid alias make some hole.
-      gMinOutlinePotential += gPotentialRange * (float(uCutoutOutside) - 0.5);
-      gMaxOutlinePotential += gPotentialRange * (float(uCutoutOutside) - 0.5);
+      // For cutout case, move hole insde 1 pixels
+      // For cutout outside case, move hole outside 0.5 pixels
+      gMinOutlinePotential += cutoutVertexMargin - vAliasMargin;
+      gMaxOutlinePotential += cutoutVertexMargin - vAliasMargin;
 
       discardOpacity = smoothstep(gMinOutlinePotential, gMaxOutlinePotential, gPotential);
     }
@@ -466,7 +476,7 @@ void main()
 #ifdef IS_REQUIRED_BORDERLINE
     gl_FragColor = convertBorderlineColorWithBlur(targetColor, tempBorderlineWidth, blurRadius);
 #else
-    setupMinMaxPotential(tempBorderlineWidth);
+    setupMinMaxPotential(tempBorderlineWidth, 1.0);
 
     gl_FragColor = targetColor;
 
@@ -490,7 +500,7 @@ void main()
 #endif
       calculatePosition(tempBorderlineWidth);
       calculatePotential();
-      setupMinMaxPotential(tempBorderlineWidth);
+      setupMinMaxPotential(tempBorderlineWidth, 1.0);
 
 #ifdef IS_REQUIRED_BORDERLINE
       targetColor = convertBorderlineColor(targetColor);
