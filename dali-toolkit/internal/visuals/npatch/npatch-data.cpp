@@ -231,7 +231,11 @@ void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMu
   PixelData pixels = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
 
   Texture texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(pixels, mUrl.GetUrl());
+#else
   texture.Upload(pixels);
+#endif
 
   mTextureSet = TextureSet::New();
   mTextureSet.SetTexture(0u, texture);

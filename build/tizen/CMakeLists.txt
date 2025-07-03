@@ -37,6 +37,7 @@ OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. O
 OPTION(BUILD_SCENE3D             "Whether to build dali-scene3d." ON)
 OPTION(BUILD_PHYSICS             "Whether to build dali-physics." ON)
 OPTION(BUILD_USD_LOADER          "Whether to build dali-usd-loader." OFF)
+OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling" OFF)
 
 # Search for OpenUSD headers and libraries
 find_path(OpenUSD_INCLUDE_DIR pxr/usd/usd/stage.h
@@ -190,6 +191,11 @@ ENDIF()
 
 # Remove below when thorvg is ready
 ADD_DEFINITIONS( "-DNO_THORVG" )
+
+
+IF( ENABLE_GPU_MEMORY_PROFILE )
+  ADD_DEFINITIONS("-DENABLE_GPU_MEMORY_PROFILE")
+ENDIF()
 
 # Set paths
 SET( toolkit_images_dir  ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common )
@@ -732,6 +738,7 @@ MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "Build Dali Scene3D:            " ${BUILD_SCENE3D} )
 MESSAGE( STATUS "Build Dali Physics:            " ${BUILD_PHYSICS} )
 MESSAGE( STATUS "Build Dali USD Loader:         " ${BUILD_USD_LOADER} )
+MESSAGE( STATUS "GPU memory profiling:          " ${ENABLE_GPU_MEMORY_PROFILE} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
 

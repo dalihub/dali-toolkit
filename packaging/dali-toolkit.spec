@@ -242,6 +242,9 @@ cmake \
 %if 0%{?enable_debug}
       -DCMAKE_BUILD_TYPE=Debug \
 %endif
+%if 0%{?enable_gpu_memory_profile}
+      -DENABLE_GPU_MEMORY_PROFILE=ON \
+%endif
       -DENABLE_TRACE=ON \
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \

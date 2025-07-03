@@ -1740,7 +1740,12 @@ void TextLabel::SetUpAutoScrolling()
                                  data.GetPixelFormat(),
                                  data.GetWidth(),
                                  data.GetHeight());
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(data,"TextLabel");
+#else
   texture.Upload(data);
+#endif
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);
@@ -1766,7 +1771,11 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   float     wrapGap      = renderInfo.autoScrollWrapGap;
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(data,"TextLabel");
+#else
   texture.Upload(data);
+#endif
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);

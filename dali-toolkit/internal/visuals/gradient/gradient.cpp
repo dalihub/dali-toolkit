@@ -164,7 +164,11 @@ Dali::Texture Gradient::GenerateLookupTexture()
   }
 
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, resolution, 1u);
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  texture.Upload(pixelData,"gradient");
+#else
   texture.Upload(pixelData);
+#endif
 
   // remove the stops added temporarily for generating the pixels, as the spread method might get changed later
   if(tempLastStop)

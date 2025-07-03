@@ -662,7 +662,11 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
                                  data.GetPixelFormat(),
                                  data.GetWidth(),
                                  data.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(data,"TextVisual");
+#else
   texture.Upload(data);
+#endif
 
   textureSet.SetTexture(textureSetIndex, texture);
   textureSet.SetSampler(textureSetIndex, sampler);
