@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -50,6 +52,8 @@ DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "viewBox", VECTOR2, VIEW_BOX)
 DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "synchronousLoading", BOOLEAN, SYNCHRONOUS_LOADING)
 DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "rasterizationRequestManually", BOOLEAN, RASTERIZATION_REQUEST_MANUALLY)
 DALI_TYPE_REGISTRATION_END()
+
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_VECTOR_ANIMATION_PERFORMANCE_MARKER, false);
 } // anonymous namespace
 
 using namespace Dali;
@@ -65,12 +69,18 @@ CanvasView::CanvasView(const Vector2& viewBox)
   mProcessorRegistered(false),
   mLastCommitRasterized(false)
 {
+  DALI_LOG_DEBUG_INFO("[%p] Created\n", this);
+  if(DALI_UNLIKELY(!mCanvasRenderer))
+  {
+    DALI_LOG_ERROR("CanvasView is not supported!\n");
+  }
 }
 
 CanvasView::~CanvasView()
 {
   if(Adaptor::IsAvailable() && mProcessorRegistered)
   {
+    DALI_LOG_DEBUG_INFO("[%p] Destroyed\n", this);
     if(mRasterizingTask)
     {
       Dali::AsyncTaskManager::Get().RemoveTask(mRasterizingTask);
@@ -108,8 +118,8 @@ void CanvasView::OnInitialize()
 
 void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  if(!mCanvasRenderer ||
-     !mCanvasRenderer.SetSize(size))
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_CANVAS_VIEW_RELAYOUT");
+  if(!(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.SetSize(size)))
   {
     return;
   }
@@ -118,10 +128,10 @@ void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 void CanvasView::OnSizeSet(const Vector3& targetSize)
 {
+  DALI_TRACE_SCOPE(gTraceFilter, "DALI_CANVAS_VIEW_RESIZE");
   Control::OnSizeSet(targetSize);
 
-  if(!mCanvasRenderer ||
-     !mCanvasRenderer.SetSize(Vector2(targetSize)))
+  if(!(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.SetSize(Vector2(targetSize))))
   {
     return;
   }
@@ -203,11 +213,15 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
 
 void CanvasView::Process(bool postProcessor)
 {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_PROCESS", [&](std::ostringstream& oss)
+                                          { oss << "[s:" << mIsSynchronous << ", l:" << mLastCommitRasterized << ", "
+                                                << "m:" << mManualRasterization << ", s:" << mSize.width << "x" << mSize.height << "]"; });
+
   bool rasterizeRequired = false;
 
   mProcessorRegistered = false;
 
-  if(mCanvasRenderer && mSize.width > 0 && mSize.height > 0)
+  if(DALI_LIKELY(mCanvasRenderer) && mSize.width > 0 && mSize.height > 0)
   {
     const bool forcibleRasterization = (mIsSynchronous && !mLastCommitRasterized);
     rasterizeRequired                = (forcibleRasterization) || (mCanvasRenderer.IsCanvasChanged());
@@ -222,7 +236,7 @@ void CanvasView::Process(bool postProcessor)
 
   // If we are not doing manual rasterization, register processor once again.
   // TODO : Could we reqest it only if IsCanvasChagned() is true?
-  if(!mManualRasterization || isSynchronousRasterizationFailed)
+  if(DALI_LIKELY(mCanvasRenderer) && (!mManualRasterization || isSynchronousRasterizationFailed))
   {
     RequestRasterization();
 
@@ -232,11 +246,14 @@ void CanvasView::Process(bool postProcessor)
       Adaptor::Get().RequestProcessEventsOnIdle();
     }
   }
+  DALI_TRACE_END(gTraceFilter, "DALI_CANVAS_VIEW_PROCESS");
 }
 
 void CanvasView::AddRasterizationTask(bool forceProcess)
 {
-  if(mCanvasRenderer && (mCanvasRenderer.Commit() || forceProcess))
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_ADD_RASTERIZE", [&](std::ostringstream& oss)
+                                          { oss << "[f:" << forceProcess << "]"; });
+  if(DALI_LIKELY(mCanvasRenderer) && (mCanvasRenderer.Commit() || forceProcess))
   {
     mLastCommitRasterized = false;
     if(mIsSynchronous)
@@ -259,11 +276,13 @@ void CanvasView::AddRasterizationTask(bool forceProcess)
       AsyncTaskManager::Get().AddTask(mRasterizingTask);
     }
   }
+  DALI_TRACE_END(gTraceFilter, "DALI_CANVAS_VIEW_ADD_RASTERIZE");
 }
 
 void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
 {
   mLastCommitRasterized = task->IsRasterized();
+  DALI_LOG_DEBUG_INFO("[%p] Rasterized. Success?[%d]\n", this, mLastCommitRasterized);
 
   if(mLastCommitRasterized)
   {
@@ -293,8 +312,8 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
     mRasterizingTask.Reset(); // We don't need it anymore
   }
 
-  //If there are accumulated changes to CanvasRenderer during Rasterize, or previous rasterization failed, Rasterize once again.
-  if(!mIsSynchronous && mCanvasRenderer && (!mLastCommitRasterized || (!mManualRasterization && mCanvasRenderer.IsCanvasChanged())))
+  // If there are accumulated changes to CanvasRenderer during Rasterize, or previous rasterization failed, Rasterize once again.
+  if(!mIsSynchronous && DALI_LIKELY(mCanvasRenderer) && (!mLastCommitRasterized || (!mManualRasterization && mCanvasRenderer.IsCanvasChanged())))
   {
     AddRasterizationTask(!mLastCommitRasterized);
   }
@@ -302,7 +321,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
 
 bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
-  if(mCanvasRenderer && mCanvasRenderer.AddDrawable(drawable))
+  if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.AddDrawable(drawable))
   {
     return true;
   }
@@ -311,7 +330,7 @@ bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 
 bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
-  if(mCanvasRenderer && mCanvasRenderer.RemoveDrawable(drawable))
+  if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.RemoveDrawable(drawable))
   {
     return true;
   }
@@ -320,7 +339,7 @@ bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
 
 bool CanvasView::RemoveAllDrawables()
 {
-  if(mCanvasRenderer && mCanvasRenderer.RemoveAllDrawables())
+  if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.RemoveAllDrawables())
   {
     return true;
   }
@@ -329,7 +348,8 @@ bool CanvasView::RemoveAllDrawables()
 
 void CanvasView::RequestRasterization()
 {
-  if(!mProcessorRegistered && Adaptor::IsAvailable())
+  DALI_LOG_DEBUG_INFO("[%p] Rasterize request\n", this);
+  if(DALI_LIKELY(mCanvasRenderer) && !mProcessorRegistered && Adaptor::IsAvailable())
   {
     mProcessorRegistered = true;
     Adaptor::Get().RegisterProcessorOnce(*this, true);
@@ -338,7 +358,7 @@ void CanvasView::RequestRasterization()
 
 bool CanvasView::SetViewBox(const Vector2& viewBox)
 {
-  if(mCanvasRenderer && mCanvasRenderer.SetViewBox(viewBox))
+  if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.SetViewBox(viewBox))
   {
     return true;
   }
@@ -347,7 +367,7 @@ bool CanvasView::SetViewBox(const Vector2& viewBox)
 
 const Vector2& CanvasView::GetViewBox()
 {
-  if(mCanvasRenderer)
+  if(DALI_LIKELY(mCanvasRenderer))
   {
     return mCanvasRenderer.GetViewBox();
   }
