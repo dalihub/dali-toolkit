@@ -100,6 +100,12 @@ public:
    */
   void Refresh();
 
+  /**
+   * @brief Get whether this effect activated or not.
+   * @return True if effect is activated. False otherwise.
+   */
+  bool IsActivated() const;
+
 protected:
   /**
    * @copydoc Dali::Toolkit::RenderEffect::RenderEffect
@@ -165,15 +171,9 @@ protected:
 
   /**
    * @brief Redraws effect without deactivation
-   * @note Assumes activation
+   * @note This activates effect if not activated yet.
    */
   virtual void OnRefresh() = 0;
-
-  /**
-   * @brief Get whether this effect activated or not.
-   * @return True if effect is activated. False otherwise.
-   */
-  bool IsActivated() const;
 
 private:
   /**

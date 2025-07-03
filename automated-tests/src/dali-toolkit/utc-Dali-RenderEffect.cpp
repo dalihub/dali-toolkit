@@ -123,6 +123,7 @@ int UtcDaliRenderEffectActivateP02(void)
 
   RenderTaskList taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, blurEffect.IsActivated(), TEST_LOCATION);
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -179,17 +180,20 @@ int UtcDaliRenderEffectDeactivateP(void)
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   scene.Add(control);
 
-  uint32_t count = control.GetRendererCount();
-  control.SetRenderEffect(BackgroundBlurEffect::New());
+  uint32_t             count      = control.GetRendererCount();
+  BackgroundBlurEffect blurEffect = BackgroundBlurEffect::New();
+  control.SetRenderEffect(blurEffect);
 
   RenderTaskList taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, blurEffect.IsActivated(), TEST_LOCATION);
 
   control.ClearRenderEffect();
   taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, blurEffect.IsActivated(), TEST_LOCATION);
 
   Control newControl = Control::New();
   count              = control.GetRendererCount();
@@ -1080,11 +1084,17 @@ int UtcDaliBlurEffectDownscaleFactor(void)
     effect.SetBlurDownscaleFactor(0.16f); // update while deactivated
     effect.Activate();
     DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.16f, TEST_LOCATION);
+    DALI_TEST_EQUALS(effect.IsActivated(), true, TEST_LOCATION);
 
     effect.SetBlurDownscaleFactor(0.5f); // update while activated
     DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
 
     effect.Refresh();
+    DALI_TEST_EQUALS(effect.IsActivated(), true, TEST_LOCATION);
+
+    effect.Deactivate();
+    effect.Refresh();
+    DALI_TEST_EQUALS(effect.IsActivated(), true, TEST_LOCATION);
   }
   {
     tet_printf("test GaussianBlurEffect\n");

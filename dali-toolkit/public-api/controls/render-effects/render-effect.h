@@ -88,6 +88,13 @@ public:
    */
   void Refresh();
 
+  /**
+   * @brief Get whether this effect activated or not.
+   * @return True if effect is activated. False otherwise.
+   * @SINCE_2_4.26
+   */
+  bool IsActivated();
+
 public: // Not intended for Application developers
   ///@cond internal
   /**
