@@ -63,8 +63,8 @@ MaskEffectImpl::MaskEffectImpl(Toolkit::Control maskControl, MaskEffect::MaskMod
   mMaskPosition(maskPosition),
   mMaskScale(maskScale),
   mTargetMaskOnce(false),
-  mSourceMaskOnce(false)
-
+  mSourceMaskOnce(false),
+  mReverseMaskDirection(false)
 {
   if(mMaskScale.x < Math::MACHINE_EPSILON_100)
   {
@@ -161,6 +161,11 @@ bool MaskEffectImpl::GetSourceMaskOnce() const
   return mSourceMaskOnce;
 }
 
+void MaskEffectImpl::SetReverseMaskDirection(bool reverseMaskDirection)
+{
+  mReverseMaskDirection = reverseMaskDirection;
+}
+
 void MaskEffectImpl::OnInitialize()
 {
   // Create CameraActors
@@ -233,8 +238,16 @@ void MaskEffectImpl::CreateMaskData()
     GetTargetRenderer().SetTextures(textureSet);
   }
 
-  textureSet.SetTexture(maskSourceIndex, mMaskSourceTexture);
-  textureSet.SetTexture(maskTargetIndex, mMaskTargetTexture);
+  if(mReverseMaskDirection)
+  {
+    textureSet.SetTexture(maskSourceIndex, mMaskTargetTexture);
+    textureSet.SetTexture(maskTargetIndex, mMaskSourceTexture);
+  }
+  else
+  {
+    textureSet.SetTexture(maskSourceIndex, mMaskSourceTexture);
+    textureSet.SetTexture(maskTargetIndex, mMaskTargetTexture);
+  }
 }
 
 void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)

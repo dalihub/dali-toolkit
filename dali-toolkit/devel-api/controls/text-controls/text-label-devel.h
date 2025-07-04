@@ -514,6 +514,14 @@ DALI_TOOLKIT_API int GetLineCount(TextLabel textLabel, float width);
 DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextLabel textLabel, std::string tag);
 
 /**
+ * @brief Applies the visual of the given control as a mask to shape the label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] control The control to apply mask.
+ */
+DALI_TOOLKIT_API void SetMaskEffect(TextLabel textLabel, Toolkit::Control control);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal

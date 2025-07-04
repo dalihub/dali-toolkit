@@ -135,6 +135,11 @@ Dali::Property::Index RegisterFontVariationProperty(TextLabel textLabel, std::st
   return GetImpl(textLabel).RegisterFontVariationProperty(tag);
 }
 
+void SetMaskEffect(TextLabel textLabel, Toolkit::Control control)
+{
+  GetImpl(textLabel).SetMaskEffect(control);
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit
