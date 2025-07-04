@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,9 +114,11 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }),
+  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current)
+                                  { return callback == current; }),
                    mCallbacks.End());
-  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current) { return callback == current; }),
+  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current)
+                                        { return callback == current; }),
                          mReturnCallbacks.End());
 }
 
@@ -321,6 +323,10 @@ void Adaptor::Resume()
 void Adaptor::Stop()
 {
   mImpl->Stop();
+}
+
+void Adaptor::RenderOnce()
+{
 }
 
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)

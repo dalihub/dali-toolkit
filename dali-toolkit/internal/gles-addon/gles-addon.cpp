@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,11 @@ void GlViewBindTextureResources(GlViewImpl&& glViewImpl, std::vector<Dali::Textu
 {
   glViewImpl.BindTextureResources(std::move(textures));
 }
+
+void GlViewTerminate(GlViewImpl&& glViewImpl)
+{
+  glViewImpl.Terminate();
+}
 } // unnamed namespace
 
 class ToolkitGlesAddOn : public Dali::AddOns::AddOnBase
@@ -133,6 +138,7 @@ public:
       dispatchTable["GlViewGetBackendMode"]       = GlViewGetBackendMode;
       dispatchTable["GlViewRenderOnce"]           = GlViewRenderOnce;
       dispatchTable["GlViewBindTextureResources"] = GlViewBindTextureResources;
+      dispatchTable["GlViewTerminate"]            = GlViewTerminate;
     }
     return &dispatchTable;
   }
