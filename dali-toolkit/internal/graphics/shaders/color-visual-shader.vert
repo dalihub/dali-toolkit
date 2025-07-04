@@ -128,8 +128,11 @@ vec4 ComputeVertexPosition()
 #if defined(IS_REQUIRED_CUTOUT)
   vPositionFromCenter = vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy;
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
-  vCutoutCornerRadius = mix(cutoutCornerRadius * min(uSize.x, uSize.y), cutoutCornerRadius, cornerRadiusPolicy);
-  vCutoutCornerRadius = min(vCutoutCornerRadius, min(uSize.x, uSize.y) * 0.5);
+  // Reuse each parameters for cutout cases
+  minSize = min(uSize.x, uSize.y);
+
+  vCutoutCornerRadius = mix(cutoutCornerRadius * minSize, cutoutCornerRadius, cornerRadiusPolicy);
+  vCutoutCornerRadius = min(vCutoutCornerRadius, minSize * 0.5);
 #endif
   return vec4(vPositionFromCenter, 0.0, 1.0);
 #else
