@@ -190,9 +190,15 @@ private:
    */
   void OnRenderFinished(Dali::RenderTask& renderTask);
 
-  BackgroundBlurEffectImpl(const BackgroundBlurEffectImpl&) = delete;
-  BackgroundBlurEffectImpl(BackgroundBlurEffectImpl&&)      = delete;
-  BackgroundBlurEffectImpl& operator=(BackgroundBlurEffectImpl&&) = delete;      // no move()
+  /**
+   * @brief Calculate valid downscale factor and blur radius by given mBlurRadius and mDownscaleFactor.
+   * It will change internal values, downscaled blur radius, and skip blur
+   */
+  void UpdateDownscaledBlurRadius();
+
+  BackgroundBlurEffectImpl(const BackgroundBlurEffectImpl&)            = delete;
+  BackgroundBlurEffectImpl(BackgroundBlurEffectImpl&&)                 = delete;
+  BackgroundBlurEffectImpl& operator=(BackgroundBlurEffectImpl&&)      = delete; // no move()
   BackgroundBlurEffectImpl& operator=(const BackgroundBlurEffectImpl&) = delete; // no copy()
 
 public:
@@ -219,6 +225,10 @@ private:
   // Variables
   float    mDownscaleFactor;
   uint32_t mBlurRadius;
+
+  float    mInternalDownscaleFactor;
+  uint32_t mInternalBlurRadius;
+
   uint32_t mDownscaledBlurRadius;
 
   bool mSkipBlur : 1;
