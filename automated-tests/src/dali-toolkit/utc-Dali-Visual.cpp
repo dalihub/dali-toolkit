@@ -7242,6 +7242,7 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     {
       UniformData("uCutoutWithCornerRadius", Property::Type::INTEGER),
       UniformData("uCutoutOutside", Property::Type::INTEGER),
+      UniformData("cutoutCornerRadius", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -7291,6 +7292,9 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, colorVisual);
     dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+
+    Vector4 dummyCornerRadius(20.0f, 40.0f, 60.0f, 80.0f);
+    dummyControl[DevelControl::Property::CORNER_RADIUS] = dummyCornerRadius;
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -7311,6 +7315,11 @@ int UtcDaliVisualCutoutPolicyChangeShader01(void)
       auto& gl = application.GetGlAbstraction();
       DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutWithCornerRadius", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
       DALI_TEST_EQUALS(gl.CheckUniformValue<int>("uCutoutOutside", (cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS) ? 1 : 0), true, TEST_LOCATION);
+
+      if(cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_VIEW_WITH_CORNER_RADIUS || cutoutPolicy == DevelColorVisual::CutoutPolicy::CUTOUT_OUTSIDE_WITH_CORNER_RADIUS)
+      {
+        DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("cutoutCornerRadius", dummyCornerRadius), true, TEST_LOCATION);
+      }
     }
     dummyControl.Unparent();
 

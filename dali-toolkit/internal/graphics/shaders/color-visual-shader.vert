@@ -31,8 +31,12 @@ UNIFORM_BLOCK VertBlock
 #endif
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
-  UNIFORM highp vec4 cornerRadius;
   UNIFORM mediump float cornerRadiusPolicy;
+  UNIFORM highp vec4 cornerRadius;
+
+#ifdef IS_REQUIRED_CUTOUT
+  UNIFORM highp vec4 cutoutCornerRadius;
+#endif
 #endif
 };
 
@@ -124,8 +128,11 @@ vec4 ComputeVertexPosition()
 #if defined(IS_REQUIRED_CUTOUT)
   vPositionFromCenter = vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy;
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
-  vCutoutCornerRadius = mix(cornerRadius * min(uSize.x, uSize.y), cornerRadius, cornerRadiusPolicy);
-  vCutoutCornerRadius = min(vCutoutCornerRadius, min(uSize.x, uSize.y) * 0.5);
+  // Reuse each parameters for cutout cases
+  minSize = min(uSize.x, uSize.y);
+
+  vCutoutCornerRadius = mix(cutoutCornerRadius * minSize, cutoutCornerRadius, cornerRadiusPolicy);
+  vCutoutCornerRadius = min(vCutoutCornerRadius, minSize * 0.5);
 #endif
   return vec4(vPositionFromCenter, 0.0, 1.0);
 #else

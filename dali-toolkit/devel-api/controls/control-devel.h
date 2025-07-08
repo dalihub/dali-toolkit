@@ -71,6 +71,10 @@ typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> Accessi
 /// @brief AccessibilityAction signal type.
 typedef Signal<bool(const Dali::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
 
+/// @brief AccessibilityHighlighted signal type.
+/// @param bool highlighted true if control is highlighted, false if highlight is removed.
+typedef Signal<void(bool)> AccessibilityHighlightedSignalType;
+
 enum OffScreenRenderingType
 {
   NONE,
@@ -612,6 +616,12 @@ DALI_TOOLKIT_API AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(
  * @return The signal to connect to
  */
 DALI_TOOLKIT_API AccessibilityActionSignalType& AccessibilityActionSignal(Toolkit::Control control);
+
+/**
+ * @brief The signal is emitted when accessibility highlight is added or removed from control.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityHighlightedSignalType& AccessibilityHighlightedSignal(Toolkit::Control control);
 
 /**
  * @brief The method allows connection with other actor with usage of concrete accessibility relation type.

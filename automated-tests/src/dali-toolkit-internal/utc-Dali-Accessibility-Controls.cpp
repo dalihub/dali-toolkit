@@ -143,6 +143,7 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     DevelControl::AccessibilityGetDescriptionSignal(control);
     DevelControl::AccessibilityDoGestureSignal(control);
     DevelControl::AccessibilityActionSignal(control);
+    DevelControl::AccessibilityHighlightedSignal(control);
 
     DALI_TEST_CHECK(true);
   }
@@ -190,6 +191,7 @@ int UtcDaliControlAccessibileBlockAccessibleCreation(void)
     DevelControl::AccessibilityGetDescriptionSignal(control);
     DevelControl::AccessibilityDoGestureSignal(control);
     DevelControl::AccessibilityActionSignal(control);
+    DevelControl::AccessibilityHighlightedSignal(control);
     DALI_TEST_CHECK(true);
   }
   catch(...)
@@ -477,78 +479,6 @@ int UtcDaliAccessibilityTextSelectionConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(textselectiontoolbar);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::TOOL_BAR, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/internal/accessibility-manager/accessibility-manager-impl.h>
-int UtcDaliAccessibilityManager(void)
-{
-  using attr = Toolkit::AccessibilityManager::AccessibilityAttribute;
-
-  ToolkitTestApplication application;
-
-  Dali::Accessibility::TestEnableSC(true);
-
-  auto accessmanager = new Dali::Toolkit::Internal::AccessibilityManager;
-  auto actor         = Control::New();
-
-  const std::string name  = "Name";
-  const std::string descr = "Description";
-
-  accessmanager->SetAccessibilityAttribute(actor, attr::ACCESSIBILITY_LABEL, name);
-  DALI_TEST_EQUALS(accessmanager->GetAccessibilityAttribute(actor, attr::ACCESSIBILITY_LABEL), name, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<std::string>(DevelControl::Property::ACCESSIBILITY_NAME), name, TEST_LOCATION);
-
-  accessmanager->SetAccessibilityAttribute(actor, attr::ACCESSIBILITY_TRAIT, "Whatever");
-  DALI_TEST_EQUALS(accessmanager->GetAccessibilityAttribute(actor, attr::ACCESSIBILITY_TRAIT), "", TEST_LOCATION);
-
-  accessmanager->SetAccessibilityAttribute(actor, attr::ACCESSIBILITY_VALUE, "Whatever");
-  DALI_TEST_EQUALS(accessmanager->GetAccessibilityAttribute(actor, attr::ACCESSIBILITY_VALUE), "", TEST_LOCATION);
-
-  accessmanager->SetAccessibilityAttribute(actor, attr::ACCESSIBILITY_HINT, descr);
-  DALI_TEST_EQUALS(accessmanager->GetAccessibilityAttribute(actor, attr::ACCESSIBILITY_HINT), descr, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<std::string>(DevelControl::Property::ACCESSIBILITY_DESCRIPTION), descr, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(accessmanager->GetFocusOrder(actor), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessmanager->GenerateNewFocusOrder(), 1, TEST_LOCATION);
-
-  accessmanager->SetFocusOrder({}, 0);
-  accessmanager->SetFocusOrder(Control::New(), 1);
-  accessmanager->SetFocusOrder(actor, 2);
-  accessmanager->SetFocusOrder(Control::New(), 3);
-
-  DALI_TEST_EQUALS(accessmanager->GetFocusOrder(actor), 2, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessmanager->GetActorByFocusOrder(2), actor, TEST_LOCATION);
-
-  accessmanager->SetCurrentFocusActor(actor);
-  DALI_TEST_EQUALS(accessmanager->GetCurrentFocusActor(), actor, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessmanager->GetCurrentFocusOrder(), 2, TEST_LOCATION);
-
-  accessmanager->MoveFocusForward();
-  accessmanager->MoveFocusBackward();
-  DALI_TEST_EQUALS(accessmanager->GetCurrentFocusActor(), actor, TEST_LOCATION);
-  accessmanager->SetCurrentFocusActor({});
-
-  accessmanager->Reset();
-  accessmanager->MoveFocusBackward();
-  accessmanager->MoveFocusForward();
-
-  accessmanager->GetCurrentFocusGroup();
-  DALI_TEST_EQUALS(accessmanager->IsFocusGroup(actor), false, TEST_LOCATION);
-  accessmanager->GetFocusGroup(actor);
-
-  DALI_TEST_EQUALS(accessmanager->GetGroupMode(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessmanager->GetWrapMode(), true, TEST_LOCATION);
-
-  auto vector = accessmanager->GetReadPosition();
-  DALI_TEST_EQUALS(vector.x, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.y, 0.0f, TEST_LOCATION);
-
-  accessmanager->SetFocusIndicatorActor(Dali::Actor{});
-  accessmanager->GetFocusIndicatorActor();
-
-  Dali::Accessibility::TestEnableSC(false);
 
   END_TEST;
 }

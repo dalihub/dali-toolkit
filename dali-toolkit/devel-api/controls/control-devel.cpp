@@ -195,6 +195,11 @@ Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(
   return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityActionSignal;
 }
 
+Toolkit::DevelControl::AccessibilityHighlightedSignalType& AccessibilityHighlightedSignal(Toolkit::Control control)
+{
+  return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityHighlightedSignal;
+}
+
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
   if(auto destinationAccessible = Accessibility::Accessible::Get(destination))

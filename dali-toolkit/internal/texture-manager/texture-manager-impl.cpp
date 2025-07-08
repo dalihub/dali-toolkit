@@ -203,7 +203,11 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
               {
                 PixelData maskPixelData = Devel::PixelBuffer::Convert(maskPixelBuffer); // takes ownership of buffer
                 maskTexture             = Texture::New(Dali::TextureType::TEXTURE_2D, maskPixelData.GetPixelFormat(), maskPixelData.GetWidth(), maskPixelData.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+                maskTexture.Upload(maskPixelData,maskTextureInfo.url.GetUrl(), maskTextureInfo.textureId);
+#else
                 maskTexture.Upload(maskPixelData);
+#endif
               }
               else
               {
@@ -225,7 +229,11 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
 
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
       Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      texture.Upload(pixelData, url.GetUrl(), textureId);
+#else
       texture.Upload(pixelData);
+#endif
       textureSet = TextureSet::New();
       textureSet.SetTexture(TEXTURE_INDEX, texture);
       if(maskTexture)
@@ -1274,7 +1282,11 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
     {
       Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      texture.Upload(pixelData, textureInfo.url.GetUrl(), textureInfo.textureId);
+#else
       texture.Upload(pixelData);
+#endif
       textureInfo.textures.push_back(texture);
     }
   }

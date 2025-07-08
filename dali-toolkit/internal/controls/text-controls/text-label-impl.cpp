@@ -31,6 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/controls/render-effects/mask-effect-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
@@ -46,6 +47,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -1740,7 +1742,12 @@ void TextLabel::SetUpAutoScrolling()
                                  data.GetPixelFormat(),
                                  data.GetWidth(),
                                  data.GetHeight());
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(data,"TextLabel");
+#else
   texture.Upload(data);
+#endif
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);
@@ -1766,7 +1773,11 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   float     wrapGap      = renderInfo.autoScrollWrapGap;
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(data,"TextLabel");
+#else
   texture.Upload(data);
+#endif
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);
@@ -2203,6 +2214,19 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
   // Full Variation Update.
   mController->SetVariationsMap(map);
   mIsAsyncRenderNeeded = true;
+}
+
+void TextLabel::SetMaskEffect(Toolkit::Control control)
+{
+  Actor self = Self();
+  Toolkit::Control selfControl = Toolkit::Control::DownCast(self);
+
+  // Add control to this component
+  self.Add(control);
+
+  MaskEffect maskEffect = MaskEffect::New(control);
+  GetImplementation(maskEffect).SetReverseMaskDirection(true);
+  selfControl.SetRenderEffect(maskEffect);
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const

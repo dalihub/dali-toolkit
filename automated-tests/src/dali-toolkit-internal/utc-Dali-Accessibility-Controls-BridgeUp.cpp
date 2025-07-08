@@ -1810,11 +1810,25 @@ int UtcDaliAccessibilityCheckHighlight(void)
   parentButton.Add(buttonB);
   Wait(application);
 
+  thread_local bool buttonAHighlighted = false;
+  thread_local bool buttonBHighlighted = false;
+
+  DevelControl::AccessibilityHighlightedSignal(buttonA).Connect([](bool highlighted) {
+    buttonAHighlighted = highlighted;
+  });
+
+  DevelControl::AccessibilityHighlightedSignal(buttonB).Connect([](bool highlighted) {
+    buttonBHighlighted = highlighted;
+  });
+
   // Set highlight to first child (A) to enable movement tracking
   auto* accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(buttonA));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
+
+  DALI_TEST_CHECK(buttonAHighlighted);
+  DALI_TEST_CHECK(!buttonBHighlighted);
 
   // Move first child (A) out of parent area through the parent's area top edge - single move outed event expected for A object and OUTGOING_TOP_LEFT direction
   buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, -200.0f));
@@ -1841,6 +1855,9 @@ int UtcDaliAccessibilityCheckHighlight(void)
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
+
+  DALI_TEST_CHECK(!buttonAHighlighted);
+  DALI_TEST_CHECK(buttonBHighlighted);
 
   // Move second child (B) inside of parent area (both start and end position are inside of parent area) - no move outed event expected for B object
   // B: (0,100) --> (0, 50)
@@ -1879,6 +1896,9 @@ int UtcDaliAccessibilityCheckHighlight(void)
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
+
+  DALI_TEST_CHECK(buttonAHighlighted);
+  DALI_TEST_CHECK(!buttonBHighlighted);
 
   // Move B (untracked) out of parent area through the parent's area right edge - no move outed event expected for B object
   // B: (0,100) --> (300, 100)

@@ -702,6 +702,9 @@ int UtcDaliControlShadowProperties(void)
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
   DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
 
+  application.SendNotification();
+  application.Render();
+
   Property::Map colorMap;
   colorMap[Visual::Property::TYPE]           = Visual::COLOR;
   colorMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
@@ -712,6 +715,9 @@ int UtcDaliControlShadowProperties(void)
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::COLOR, TEST_LOCATION);
   DALI_TEST_CHECK(resultMap->Find(ColorVisual::Property::MIX_COLOR));
   DALI_TEST_EQUALS(resultMap->Find(ColorVisual::Property::MIX_COLOR)->Get<Vector4>(), Color::CYAN, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   Property::Map emptyMap;
   control.SetProperty(DevelControl::Property::SHADOW, emptyMap);
@@ -738,6 +744,9 @@ int UtcDaliControlInnerShadowProperties(void)
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
   DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
 
+  application.SendNotification();
+  application.Render();
+
   Property::Map colorMap;
   colorMap[Visual::Property::TYPE]           = Visual::COLOR;
   colorMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
@@ -748,6 +757,14 @@ int UtcDaliControlInnerShadowProperties(void)
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::COLOR, TEST_LOCATION);
   DALI_TEST_CHECK(resultMap->Find(ColorVisual::Property::MIX_COLOR));
   DALI_TEST_EQUALS(resultMap->Find(ColorVisual::Property::MIX_COLOR)->Get<Vector4>(), Color::CYAN, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, (int)Toolkit::Visual::Transform::Policy::RELATIVE);
+
+  application.SendNotification();
+  application.Render();
 
   Property::Map emptyMap;
   control.SetProperty(DevelControl::Property::INNER_SHADOW, emptyMap);
@@ -1200,7 +1217,7 @@ int UtcDaliControlDoAction(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  //Created AnimatedImageVisual
+  // Created AnimatedImageVisual
   VisualFactory factory     = VisualFactory::Get();
   Visual::Base  imageVisual = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
 
@@ -1242,7 +1259,7 @@ int UtcDaliControlDoActionWhenNotStage(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  //Created AnimatedImageVisual
+  // Created AnimatedImageVisual
   VisualFactory factory     = VisualFactory::Get();
   Visual::Base  imageVisual = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
 
@@ -1293,7 +1310,7 @@ int UtcDaliControlDoActionMultipleWhenNotStage01(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  //Created AnimatedImageVisual
+  // Created AnimatedImageVisual
   VisualFactory factory     = VisualFactory::Get();
   Visual::Base  imageVisual = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
 
@@ -1358,7 +1375,7 @@ int UtcDaliControlDoActionMultipleWhenNotStage02(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  //Created AnimatedImageVisual
+  // Created AnimatedImageVisual
   VisualFactory factory      = VisualFactory::Get();
   Visual::Base  imageVisual  = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
   Visual::Base  imageVisual2 = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
@@ -1437,7 +1454,7 @@ int UtcDaliControlDoActionMultipleWhenNotStage03(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  //Created AnimatedImageVisual
+  // Created AnimatedImageVisual
   VisualFactory factory      = VisualFactory::Get();
   Visual::Base  imageVisual  = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
   Visual::Base  imageVisual2 = factory.CreateVisual(TEST_IMAGE_FILE_NAME, ImageDimensions());
@@ -1585,6 +1602,13 @@ int UtcDaliControlOffScreenRendering(void)
 
   control.Unparent(); // Disconnect fron scene.
   application.GetScene().Add(control);
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ONCE, TEST_LOCATION);
+  tet_infoline("Set offscreen rendering : refresh once");
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

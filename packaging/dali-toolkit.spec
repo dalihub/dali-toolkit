@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.4.25
+Version:    2.4.26
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -241,6 +241,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 cmake \
 %if 0%{?enable_debug}
       -DCMAKE_BUILD_TYPE=Debug \
+%endif
+%if 0%{?enable_gpu_memory_profile}
+      -DENABLE_GPU_MEMORY_PROFILE=ON \
 %endif
       -DENABLE_TRACE=ON \
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ extern const char* const CORNER_SQUARENESS;
 // Color visual
 extern const char* const BLUR_RADIUS_NAME;
 extern const char* const CUTOUT_POLICY_NAME;
+extern const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME;
 
 // Image visual
 extern const char* const IMAGE_URL_NAME;
@@ -136,7 +137,7 @@ extern const char* const OUTLINE_PROPERTY;
 extern const char* const BACKGROUND_PROPERTY;
 extern const char* const STRIKETHROUGH_PROPERTY;
 
-//NPatch visual
+// NPatch visual
 extern const char* const BORDER_ONLY;
 extern const char* const BORDER;
 extern const char* const AUXILIARY_IMAGE_NAME;
@@ -195,7 +196,7 @@ extern const char* const UNITS_NAME;         // Property::String  "userSpaceOnUs
 extern const char* const SPREAD_METHOD_NAME; // Property::String  "pad | reflect | repeat"
 extern const char* const START_OFFSET_NAME;  // Property::FLOAT
 
-//mesh visual
+// mesh visual
 extern const char* const OBJECT_URL_NAME;
 extern const char* const MATERIAL_URL_NAME;
 extern const char* const TEXTURES_PATH_NAME;
@@ -204,7 +205,7 @@ extern const char* const USE_MIPMAPPING_NAME;
 extern const char* const USE_SOFT_NORMALS_NAME;
 extern const char* const LIGHT_POSITION_NAME;
 
-//Primitive properties
+// Primitive properties
 extern const char* const PRIMITIVE_SHAPE;
 extern const char* const SLICES;
 extern const char* const STACKS;

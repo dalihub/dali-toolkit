@@ -3650,3 +3650,23 @@ int utcDaliTextLabelFontVariationsRegister(void)
 
   END_TEST;
 }
+
+int utcDaliTextLabelSetMaskEffect(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelSetMaskEffect");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  // Set Mask Effect
+  Control maskControl = Toolkit::Control::New();
+  DevelTextLabel::SetMaskEffect(label, maskControl);
+  DALI_TEST_CHECK(maskControl.GetParent() == label);
+
+  END_TEST;
+}

@@ -29,29 +29,29 @@ namespace
 static constexpr float MINIMUM_DOWNSCALE_FACTOR = Dali::Math::MACHINE_EPSILON_1000;
 static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
 
-static constexpr uint32_t MAXIMUM_BLUR_RADIUS       = 500u; ///< Maximum pixel radius for blur effect. (GL_MAX_FRAGMENT_UNIFORM_COMPONENTS(Usually 1024) - 19 (vertex shader used)) / 3 float
+static constexpr uint32_t MAXIMUM_BLUR_RADIUS       = 200u; ///< TODO : This is just experience defined value. We need to change it after more tests.
 static constexpr uint32_t MAXIMUM_NUMBER_OF_SAMPLES = (MAXIMUM_BLUR_RADIUS >> 1);
 
-static constexpr float   MAXIMUM_BELL_CURVE_WIDTH            = 171.352f; ///< bell curve width for MAXIMUM_BLUR_RADIUS case
-static constexpr int32_t MAXIMUM_BELL_CURVE_LOOP_TRIAL_COUNT = 50;
+static constexpr float   MAXIMUM_BELL_CURVE_WIDTH            = 64.062302f; ///< bell curve width for MAXIMUM_BLUR_RADIUS case
+static constexpr int32_t MAXIMUM_BELL_CURVE_LOOP_TRIAL_COUNT = 20;
 
 /**
-* @brief Calculates gaussian weight
-* @param[in] localOffset Input variable of gaussian distribution
-* @param[in] sigma Standard deviation of gaussian distribution, the width of the "bell"
-* @note Expected value of this gaussian distribution is 0.
-*/
+ * @brief Calculates gaussian weight
+ * @param[in] localOffset Input variable of gaussian distribution
+ * @param[in] sigma Standard deviation of gaussian distribution, the width of the "bell"
+ * @note Expected value of this gaussian distribution is 0.
+ */
 inline static float CalculateGaussianWeight(float localOffset, float sigma)
 {
   return (1.0f / (sigma * sqrt(2.0f * Dali::Math::PI))) * exp(-0.5f * (localOffset / sigma * localOffset / sigma));
 }
 
 /**
-* @brief Calculates gaussian bell curve width from given radius.
-* Appropriate bell curve width lets gaussian bell curve reside in a valid range(with non-tail, distinguishable values).
-* @param[in] blurRadius Given radius value of gaussian bell curve.
-* @return Bell curve width of gaussian bell curve.
-*/
+ * @brief Calculates gaussian bell curve width from given radius.
+ * Appropriate bell curve width lets gaussian bell curve reside in a valid range(with non-tail, distinguishable values).
+ * @param[in] blurRadius Given radius value of gaussian bell curve.
+ * @return Bell curve width of gaussian bell curve.
+ */
 float CalculateBellCurveWidth(uint32_t blurRadius)
 {
   const float epsilon     = 1e-2f / (blurRadius * 2);
@@ -75,15 +75,16 @@ float CalculateBellCurveWidth(uint32_t blurRadius)
       upperBoundBellCurveWidth = bellCurveWidth;
     }
   }
+
   return bellCurveWidth;
 }
 
 /**
-* @brief Fills in gaussian kernel vectors of a specific size. Uses 4*numSamples+1 sized gaussian bell curve for sampling.
-* @param[in] numSamples Number of samples. Note that we sample half size of given blur radius, and the curve is symmetric.
-* @param[out] weights Samples from a gaussian bell curve.
-* @param[out] offsets Adjacent pixel offsets to apply gaussian weights.
-*/
+ * @brief Fills in gaussian kernel vectors of a specific size. Uses 4*numSamples+1 sized gaussian bell curve for sampling.
+ * @param[in] numSamples Number of samples. Note that we sample half size of given blur radius, and the curve is symmetric.
+ * @param[out] weights Samples from a gaussian bell curve.
+ * @param[out] offsets Adjacent pixel offsets to apply gaussian weights.
+ */
 void CalculateGaussianConstants(uint32_t numSamples, std::vector<float>& weights, std::vector<float>& offsets)
 {
   const float bellCurveWidth = CalculateBellCurveWidth(numSamples);
@@ -145,6 +146,43 @@ inline static Dali::Shader& GetCachedShader(const uint32_t numSamples)
   return gPredefinedShader[numSamples];
 }
 
+/**
+ * @brief Get cached geometry what gaussian blur using.
+ * @return Gaussian blur geometry
+ */
+inline static Dali::Geometry& GetCachedGeometry()
+{
+  static Dali::Geometry gPredefinedGeometry;
+  if(!gPredefinedGeometry)
+  {
+    // TODO : Can't we share the geometry what VisualFactoryCache using, for performance?
+    gPredefinedGeometry = Dali::Geometry::New();
+
+    struct VertexPosition
+    {
+      Dali::Vector2 position;
+    };
+
+    VertexPosition positionArray[] =
+      {
+        {Dali::Vector2(-0.5f, -0.5f)},
+        {Dali::Vector2(0.5f, -0.5f)},
+        {Dali::Vector2(-0.5f, 0.5f)},
+        {Dali::Vector2(0.5f, 0.5f)}};
+    uint32_t numberOfVertices = sizeof(positionArray) / sizeof(VertexPosition);
+
+    Dali::Property::Map positionVertexFormat;
+    positionVertexFormat["aPosition"]   = Dali::Property::VECTOR2;
+    Dali::VertexBuffer positionVertices = Dali::VertexBuffer::New(positionVertexFormat);
+    positionVertices.SetData(positionArray, numberOfVertices);
+    gPredefinedGeometry.AddVertexBuffer(positionVertices);
+
+    const uint16_t indices[] = {0, 3, 1, 0, 2, 3};
+    gPredefinedGeometry.SetIndexBuffer(&indices[0], sizeof(indices) / sizeof(indices[0]));
+  }
+  return gPredefinedGeometry;
+}
+
 } // namespace
 
 namespace Dali
@@ -155,7 +193,10 @@ namespace Internal
 {
 Dali::Renderer GaussianBlurAlgorithm::CreateRenderer(const uint32_t blurRadius)
 {
-  Dali::Renderer renderer = Dali::Toolkit::Internal::CreateRenderer("", "");
+  Dali::Renderer   renderer   = Dali::Renderer::New();
+  Dali::TextureSet textureSet = Dali::TextureSet::New();
+  renderer.SetTextures(textureSet);
+  renderer.SetGeometry(GetCachedGeometry());
   renderer.SetShader(GetGaussianBlurShader(blurRadius));
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use premultiplied alpha
   return renderer;
@@ -210,13 +251,24 @@ uint32_t GaussianBlurAlgorithm::GetDownscaledBlurRadius(float& downscaleFactor, 
 {
   downscaleFactor = Dali::Clamp(downscaleFactor, MINIMUM_DOWNSCALE_FACTOR, MAXIMUM_DOWNSCALE_FACTOR);
 
-  if(DALI_UNLIKELY(blurRadius > MAXIMUM_BLUR_RADIUS))
+  uint32_t downscaledBlurRadius = static_cast<uint32_t>(blurRadius * downscaleFactor);
+
+  if(DALI_UNLIKELY(downscaledBlurRadius > MAXIMUM_BLUR_RADIUS))
   {
-    const uint32_t fixedBlurRadius      = MAXIMUM_BLUR_RADIUS;
-    const float    fixedDownScaleFactor = Dali::Clamp(
-      downscaleFactor * static_cast<float>(fixedBlurRadius) / static_cast<float>(blurRadius),
+    uint32_t    fixedBlurRadius      = blurRadius;
+    const float fixedDownScaleFactor = Dali::Clamp(
+      downscaleFactor * static_cast<float>(MAXIMUM_BLUR_RADIUS) / static_cast<float>(downscaledBlurRadius),
       MINIMUM_DOWNSCALE_FACTOR,
       MAXIMUM_DOWNSCALE_FACTOR);
+
+    downscaledBlurRadius = static_cast<uint32_t>(fixedBlurRadius * fixedDownScaleFactor);
+
+    // downscaledBlurRadius still could be bigger than maximum radius. Let we change blur radius for this case.
+    while(DALI_UNLIKELY(downscaledBlurRadius > MAXIMUM_BLUR_RADIUS))
+    {
+      --fixedBlurRadius;
+      downscaledBlurRadius = static_cast<uint32_t>(fixedBlurRadius * fixedDownScaleFactor);
+    }
 
     DALI_LOG_ERROR("Blur radius is out of bound: %u. Use %u and make downscale factor %f to %f.\n",
                    blurRadius,
@@ -227,7 +279,7 @@ uint32_t GaussianBlurAlgorithm::GetDownscaledBlurRadius(float& downscaleFactor, 
     downscaleFactor = fixedDownScaleFactor;
     blurRadius      = fixedBlurRadius;
   }
-  return static_cast<uint32_t>(blurRadius * downscaleFactor);
+  return downscaledBlurRadius;
 }
 
 } // namespace Internal

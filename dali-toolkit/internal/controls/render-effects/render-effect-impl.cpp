@@ -201,25 +201,22 @@ void RenderEffectImpl::Refresh()
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
   if(ownerControl)
   {
-    const Vector2 targetSize = mTargetSize;
     UpdateTargetSize();
-    if(mTargetSize != targetSize)
+
+    if(IsActivateValid())
     {
-      if(IsActivateValid())
+      if(!IsActivated())
       {
-        if(!IsActivated())
-        {
-          Activate();
-        }
-        else
-        {
-          OnRefresh();
-        }
+        Activate();
       }
       else
       {
-        Deactivate();
+        OnRefresh();
       }
+    }
+    else
+    {
+      Deactivate();
     }
   }
 }

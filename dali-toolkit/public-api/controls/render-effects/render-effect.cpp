@@ -50,5 +50,10 @@ void RenderEffect::Refresh()
   GetImplementation(*this).Refresh();
 }
 
+bool RenderEffect::IsActivated()
+{
+  return GetImplementation(*this).IsActivated();
+}
+
 } // namespace Toolkit
 } // namespace Dali

@@ -34,7 +34,7 @@ namespace
 {
 // Default values
 static constexpr float    BLUR_EFFECT_DOWNSCALE_FACTOR = 0.25f;
-static constexpr uint32_t BLUR_EFFECT_BLUR_RADIUS      = 10u;
+static constexpr uint32_t BLUR_EFFECT_BLUR_RADIUS      = 40u;
 
 static constexpr uint32_t MINIMUM_GPU_ARRAY_SIZE = 2u; // GPU cannot handle array size smaller than 2.
 
@@ -54,13 +54,7 @@ extern Debug::Filter* gRenderEffectLogFilter; ///< Define at render-effect-impl.
 #endif
 
 BackgroundBlurEffectImpl::BackgroundBlurEffectImpl()
-: RenderEffectImpl(),
-  mInternalRoot(Actor::New()),
-  mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
-  mBlurRadius(BLUR_EFFECT_BLUR_RADIUS),
-  mDownscaledBlurRadius(static_cast<uint32_t>(BLUR_EFFECT_BLUR_RADIUS * BLUR_EFFECT_DOWNSCALE_FACTOR)),
-  mSkipBlur(false),
-  mBlurOnce(false)
+: BackgroundBlurEffectImpl(BLUR_EFFECT_BLUR_RADIUS)
 {
 }
 
@@ -69,16 +63,12 @@ BackgroundBlurEffectImpl::BackgroundBlurEffectImpl(uint32_t blurRadius)
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mBlurRadius(blurRadius),
-  mDownscaledBlurRadius(BLUR_EFFECT_BLUR_RADIUS),
+  mInternalDownscaleFactor(mDownscaleFactor),
+  mInternalBlurRadius(mBlurRadius),
   mSkipBlur(false),
   mBlurOnce(false)
 {
-  mDownscaledBlurRadius = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mDownscaleFactor, mBlurRadius);
-  if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
-  {
-    mSkipBlur = true;
-    DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
-  }
+  UpdateDownscaledBlurRadius();
 }
 
 BackgroundBlurEffectImpl::~BackgroundBlurEffectImpl()
@@ -87,9 +77,7 @@ BackgroundBlurEffectImpl::~BackgroundBlurEffectImpl()
 
 BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New()
 {
-  BackgroundBlurEffectImplPtr handle = new BackgroundBlurEffectImpl();
-  handle->Initialize();
-  return handle;
+  return BackgroundBlurEffectImpl::New(BLUR_EFFECT_BLUR_RADIUS);
 }
 
 BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New(uint32_t blurRadius)
@@ -164,14 +152,10 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
       OnDeactivate();
     }
 
-    mBlurRadius           = blurRadius;
-    mDownscaledBlurRadius = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mDownscaleFactor, mBlurRadius);
-
-    mSkipBlur = false;
-    if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+    mBlurRadius = blurRadius;
+    UpdateDownscaledBlurRadius();
+    if(DALI_UNLIKELY(mSkipBlur))
     {
-      mSkipBlur = true;
-      DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
       return;
     }
 
@@ -197,21 +181,17 @@ uint32_t BackgroundBlurEffectImpl::GetBlurRadius() const
 
 void BackgroundBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
 {
-  if(mDownscaleFactor != downscaleFactor)
+  if(!Dali::Equals(mDownscaleFactor, downscaleFactor))
   {
     if(!mSkipBlur && IsActivated())
     {
       OnDeactivate();
     }
 
-    mDownscaleFactor      = downscaleFactor;
-    mDownscaledBlurRadius = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mDownscaleFactor, mBlurRadius); // note: may overwrite mDownscaleFactor
-
-    mSkipBlur = false;
-    if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+    mDownscaleFactor = downscaleFactor;
+    UpdateDownscaledBlurRadius();
+    if(DALI_UNLIKELY(mSkipBlur))
     {
-      mSkipBlur = true;
-      DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
       return;
     }
 
@@ -346,10 +326,10 @@ void BackgroundBlurEffectImpl::OnActivate()
 
   // Get size
   Vector2 size = GetTargetSize();
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BlurEffect:%p] OnActivated! [ID:%d][size:%fx%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BackgroundBlurEffect:%p] OnActivated! [ID:%d][size:%fx%f] [radius:%u, scale:%f, downscaledRadius:%u=%u*%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y, mBlurRadius, mDownscaleFactor, mDownscaledBlurRadius, mInternalBlurRadius, mInternalDownscaleFactor);
 
-  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mDownscaleFactor), 1u);
-  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mDownscaleFactor), 1u);
+  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
 
   // Set size
   if(!mCamera)
@@ -420,7 +400,7 @@ void BackgroundBlurEffectImpl::OnDeactivate()
     Renderer renderer = GetTargetRenderer();
     ownerControl.RemoveRenderer(renderer);
   }
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BackgroundBlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
   mInternalRoot.Unparent();
 
@@ -444,8 +424,8 @@ void BackgroundBlurEffectImpl::OnRefresh()
   DestroyFrameBuffers();
 
   Vector2  size              = GetTargetSize();
-  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mDownscaleFactor), 1u);
-  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mDownscaleFactor), 1u);
+  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
 
   // Set size
   mCamera.SetPerspectiveProjection(size);
@@ -564,6 +544,20 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
 void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 {
   mFinishedSignal.Emit();
+}
+
+void BackgroundBlurEffectImpl::UpdateDownscaledBlurRadius()
+{
+  mInternalDownscaleFactor = mDownscaleFactor;
+  mInternalBlurRadius      = mBlurRadius;
+  mDownscaledBlurRadius    = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mInternalDownscaleFactor, mInternalBlurRadius);
+
+  mSkipBlur = false;
+  if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+  {
+    mSkipBlur = true;
+    DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
+  }
 }
 
 void BackgroundBlurEffectImpl::DestroyRenderTasks()

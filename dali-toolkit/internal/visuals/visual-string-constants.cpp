@@ -224,6 +224,7 @@ const char* const CORNER_SQUARENESS("cornerSquareness");
 // Color visual
 const char* const BLUR_RADIUS_NAME("blurRadius");
 const char* const CUTOUT_POLICY_NAME("cutoutPolicy");
+const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME("cutoutCornerRadius");
 
 // Image visual
 const char* const IMAGE_URL_NAME("url");
@@ -284,7 +285,7 @@ const char* const OUTLINE_PROPERTY("outline");
 const char* const BACKGROUND_PROPERTY("textBackground");
 const char* const STRIKETHROUGH_PROPERTY("strikethrough");
 
-//NPatch visual
+// NPatch visual
 const char* const BORDER_ONLY("borderOnly");
 const char* const BORDER("border");
 
@@ -341,7 +342,7 @@ const char* const UNITS_NAME("units");                // Property::String  "user
 const char* const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 const char* const START_OFFSET_NAME("startOffset");   // Property::FLOAT
 
-//mesh visual
+// mesh visual
 const char* const OBJECT_URL_NAME("objectUrl");
 const char* const MATERIAL_URL_NAME("materialUrl");
 const char* const TEXTURES_PATH_NAME("texturesPath");
@@ -350,7 +351,7 @@ const char* const USE_MIPMAPPING_NAME("useMipmapping");
 const char* const USE_SOFT_NORMALS_NAME("useSoftNormals");
 const char* const LIGHT_POSITION_NAME("lightPosition");
 
-//Primitive properties
+// Primitive properties
 const char* const PRIMITIVE_SHAPE("shape");
 const char* const SLICES("slices");
 const char* const STACKS("stacks");
