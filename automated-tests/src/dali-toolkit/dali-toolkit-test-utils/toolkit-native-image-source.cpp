@@ -32,10 +32,10 @@ const char* NativeImageSourceTest::GetCustomFragmentPrefix()
   return "#extension GL_OES_EGL_image_external:require\n";
 }
 
-NativeImageSourcePtr NativeImageSource::New( unsigned int width, unsigned int height, ColorDepth depth )
+NativeImageSourcePtr NativeImageSource::New(unsigned int width, unsigned int height, ColorDepth depth)
 {
-  Any empty;
-  NativeImageSourcePtr image = new NativeImageSource( width, height, depth, empty );
+  Any                  empty;
+  NativeImageSourcePtr image = new NativeImageSource(width, height, depth, empty);
   return image;
 }
 
@@ -45,13 +45,13 @@ Any NativeImageSource::GetNativeImageSource()
   return source;
 }
 
-NativeImageSourcePtr NativeImageSource::New( Any nativeImageSource )
+NativeImageSourcePtr NativeImageSource::New(Any nativeImageSource)
 {
   NativeImageSourcePtr image = new NativeImageSource(0, 0, COLOR_DEPTH_DEFAULT, nativeImageSource);
   return image;
 }
 
-bool NativeImageSource::GetPixels( std::vector<unsigned char> &pixbuf, unsigned int &width, unsigned int &height, Pixel::Format& pixelFormat ) const
+bool NativeImageSource::GetPixels(std::vector<unsigned char>& pixbuf, unsigned int& width, unsigned int& height, Pixel::Format& pixelFormat) const
 {
   return false;
 }
@@ -61,11 +61,11 @@ bool NativeImageSource::EncodeToFile(const std::string& filename) const
   return false;
 }
 
-void NativeImageSource::SetSource( Any source )
+void NativeImageSource::SetSource(Any source)
 {
 }
 
-bool NativeImageSource::IsColorDepthSupported( ColorDepth colorDepth )
+bool NativeImageSource::IsColorDepthSupported(ColorDepth colorDepth)
 {
   return false;
 }
@@ -84,8 +84,9 @@ unsigned int NativeImageSource::TargetTexture()
   return 0;
 }
 
-void NativeImageSource::PrepareTexture()
+Dali::NativeImageInterface::PrepareTextureResult NativeImageSource::PrepareTexture()
 {
+  return Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR;
 }
 
 unsigned int NativeImageSource::GetWidth() const
@@ -134,7 +135,7 @@ NativeImageInterface::Extension* NativeImageSource::GetExtension()
   return NULL;
 }
 
-NativeImageSource::NativeImageSource( unsigned int width, unsigned int height, ColorDepth depth, Any nativeImageSource )
+NativeImageSource::NativeImageSource(unsigned int width, unsigned int height, ColorDepth depth, Any nativeImageSource)
 {
 }
 
