@@ -188,7 +188,7 @@ Dali::Shader CameraView::CreateShader(Dali::NativeImageSourcePtr nativeImageSour
 
   nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader);
 
-  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, "CAMERA_VIEW");
+  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
   // Initialize shader properties
   shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
   shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));

@@ -178,7 +178,7 @@ void ParticleRenderer::CreateShader()
         gl_FragColor = col;\n\
       }\n"};
 
-  mShader   = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderCode, Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderCode);
+  mShader   = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderCode, Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderCode, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PARTICLE_RENDERER");
   mGeometry = Geometry::New();
 
   // Configure geometry attributes

@@ -852,7 +852,7 @@ struct AtlasRenderer::Impl
       // The glyph is an emoji and is not a shadow.
       if(!mShaderRgba)
       {
-        mShaderRgba = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG, Shader::Hint::NONE, "TEXT_ATLAS_RGBA");
+        mShaderRgba = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_RGBA");
       }
       shader = mShaderRgba;
     }
@@ -861,7 +861,7 @@ struct AtlasRenderer::Impl
       // The glyph is text or a shadow.
       if(!mShaderL8)
       {
-        mShaderL8 = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG, Shader::Hint::NONE, "TEXT_ATLAS_L8");
+        mShaderL8 = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_L8");
       }
       shader = mShaderL8;
     }

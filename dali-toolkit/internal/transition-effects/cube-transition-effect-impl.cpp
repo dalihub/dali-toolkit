@@ -212,7 +212,7 @@ void CubeTransitionEffect::Initialize()
 void CubeTransitionEffect::OnSceneConnection(int depth)
 {
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader   shader   = Shader::New(SHADER_CUBE_TRANSITION_EFFECT_VERT, SHADER_CUBE_TRANSITION_EFFECT_FRAG, Shader::Hint::NONE, "CUBE_TRANSITION_EFFECT");
+  Shader   shader   = Shader::New(SHADER_CUBE_TRANSITION_EFFECT_VERT, SHADER_CUBE_TRANSITION_EFFECT_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CUBE_TRANSITION_EFFECT");
 
   TextureSet textureSet = TextureSet::New();
 

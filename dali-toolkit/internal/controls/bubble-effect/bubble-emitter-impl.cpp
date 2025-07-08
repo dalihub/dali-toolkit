@@ -213,7 +213,7 @@ void BubbleEmitter::SetBackground(Texture bgTexture, const Vector3& hsvDelta)
 
   //Create renderer
   Dali::Geometry geometry   = CreateTexturedQuad();
-  Shader         shader     = Shader::New(SHADER_BUBBLE_EMITTER_VERT, SHADER_BUBBLE_EMITTER_FRAG, Shader::Hint::NONE, "BUBBLE_EMITTER");
+  Shader         shader     = Shader::New(SHADER_BUBBLE_EMITTER_VERT, SHADER_BUBBLE_EMITTER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "BUBBLE_EMITTER");
   Renderer       renderer   = Renderer::New(geometry, shader);
   TextureSet     textureSet = TextureSet::New();
   textureSet.SetTexture(0u, bgTexture);
