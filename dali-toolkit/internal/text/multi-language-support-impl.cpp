@@ -324,6 +324,22 @@ void MultilanguageSupport::OnLocaleChanged(std::string locale)
 
 void MultilanguageSupport::ClearCache()
 {
+  for(Vector<DefaultFonts*>::Iterator it    = mDefaultFontPerScriptCache.Begin(),
+                                      endIt = mDefaultFontPerScriptCache.End();
+      it != endIt;
+      ++it)
+  {
+    delete *it;
+  }
+
+  for(Vector<ValidateFontsPerScript*>::Iterator it    = mValidFontsPerScriptCache.Begin(),
+                                                endIt = mValidFontsPerScriptCache.End();
+      it != endIt;
+      ++it)
+  {
+    delete *it;
+  }
+
   mDefaultFontPerScriptCache.Clear();
   mValidFontsPerScriptCache.Clear();
 
