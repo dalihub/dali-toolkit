@@ -616,6 +616,171 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth02(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight01");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(0u, 0u);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
+  label.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add(label);
+
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Request render.
+  DevelTextLabel::RequestAsyncRenderWithFixedHeight(label, std::numeric_limits<float>::infinity(), 300.0f);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  float expectedWidth  = label.GetNaturalSize().width;
+  float expectedHeight = 300.0f;
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // RTL test.
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  label.SetProperty(TextLabel::Property::TEXT, "Update paragraphs with different directions. Update middle paragraphs. مرحبا بالعالم שלום עולם مرحبا بالعالم Hello world.");
+  label.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT);
+
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
+  // Request render.
+  DevelTextLabel::RequestAsyncRenderWithFixedHeight(label, std::numeric_limits<float>::infinity(), 300.0f);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  expectedWidth = label.GetNaturalSize().width;
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight02");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(0u, 0u);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float labelWidth  = 300.0f;
+  float labelHeight = 300.0f;
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::SYNC);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
+  label.SetProperty(Actor::Property::SIZE, Vector2(labelWidth, labelHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add(label);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  gAsyncTextRenderedCalled = false;
+
+  // Connect to the async natural size computed signal.
+  ConnectionTracker* testSizeTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
+
+  bool asyncSizeComputed = false;
+  label.ConnectSignal(testSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+
+  gAsyncSizeComputedCalled = false;
+  gAsyncSizeComputedWidth  = 0.0f;
+  gAsyncSizeComputedHeight = 0.0f;
+
+  // Request render, but the request will cancelled due to being in sync mode.
+  DevelTextLabel::RequestAsyncRenderWithFixedHeight(label, labelWidth, std::numeric_limits<float>::infinity());
+
+  // Async size computation also works in sync mode.
+  DevelTextLabel::RequestAsyncNaturalSize(label);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(!asyncTextRendered);
+
+  DALI_TEST_CHECK(gAsyncSizeComputedCalled);
+  DALI_TEST_CHECK(asyncSizeComputed);
+
+  float expectedWidth  = label.GetNaturalSize().width;
+  float expectedHeight = label.GetNaturalSize().height;
+
+  gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
+  gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncSizeComputedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncSizeComputedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
 {
   ToolkitTestApplication application;
@@ -2648,6 +2813,27 @@ int UtcDaliToolkitTextLabelAsyncSetText(void)
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedWidth(label, expectedWidth, std::numeric_limits<float>::infinity());
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  expectedWidth  = 0.0f;
+  expectedHeight = 300.0f;
+
+  // Request render.
+  DevelTextLabel::RequestAsyncRenderWithFixedHeight(label, std::numeric_limits<float>::infinity(), expectedHeight);
 
   application.SendNotification();
   application.Render();

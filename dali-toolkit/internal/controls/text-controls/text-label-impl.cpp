@@ -2130,6 +2130,38 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
   mIsAsyncRenderNeeded = false;
 }
 
+void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float height)
+{
+  DALI_LOG_RELEASE_INFO("Request width constraint : %f, height : %f\n", widthConstraint, height);
+
+  if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
+  {
+    DALI_LOG_DEBUG_INFO("Render mode is sync, return\n");
+    return;
+  }
+
+  Actor   self = Self();
+  Extents padding;
+  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+
+  float contentWidthConstraint = std::max(widthConstraint - (padding.start + padding.end), 0.0f);
+  float contentHeight          = std::max(height - (padding.top + padding.bottom), 0.0f);
+  Size  contentSize(contentWidthConstraint, contentHeight);
+
+  Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
+  if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+  {
+    std::swap(padding.start, padding.end);
+  }
+
+  AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_HEIGHT, contentSize, padding, layoutDirection);
+  parameters.manualRender        = true;
+
+  mIsManualRender      = TextVisual::UpdateAsyncRenderer(mVisual, parameters);
+  mTextUpdateNeeded    = false;
+  mIsAsyncRenderNeeded = false;
+}
+
 void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float heightConstraint)
 {
   DALI_LOG_RELEASE_INFO("Request constraint : %f, %f\n", widthConstraint, heightConstraint);

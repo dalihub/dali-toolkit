@@ -467,6 +467,17 @@ DALI_TOOLKIT_API void RequestAsyncRenderWithFixedSize(TextLabel textLabel, float
 DALI_TOOLKIT_API void RequestAsyncRenderWithFixedWidth(TextLabel textLabel, float width, float heightConstraint);
 
 /**
+ * @brief Requests asynchronous text rendering with a fixed height.
+ * The width is determined by the content of the text.
+ * The maximum width will be the widthConstraint.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ * @param[in] widthConstraint The maximum available width of text to render.
+ * @param[in] height The height of text to render.
+ */
+DALI_TOOLKIT_API void RequestAsyncRenderWithFixedHeight(TextLabel textLabel, float widthConstraint, float height);
+
+/**
  * @brief Requests asynchronous rendering with the maximum available width using the given widthConstraint.
  *
  * If the width of the text content is smaller than the widthConstraint, the width will be determined by the width of the text.

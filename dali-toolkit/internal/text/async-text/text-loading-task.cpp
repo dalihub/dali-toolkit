@@ -91,6 +91,7 @@ void TextLoadingTask::Load()
   {
     case Text::Async::RENDER_FIXED_SIZE:
     case Text::Async::RENDER_FIXED_WIDTH:
+    case Text::Async::RENDER_FIXED_HEIGHT:
     case Text::Async::RENDER_CONSTRAINT:
     {
       // To avoid duplicate calculation, we can skip Initialize and Update.
