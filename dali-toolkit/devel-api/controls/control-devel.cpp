@@ -204,19 +204,19 @@ Toolkit::DevelControl::AccessibilityActionSignalType& AccessibilityActionSignal(
 
 void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
-  if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
+  if(destination)
   {
-    GetControlImplementation(control).mAccessibilityProps.relations[relation].insert(destinationAccessible);
+    GetControlImplementation(control).mAccessibilityProps.relations[relation].insert(Dali::WeakHandle<Dali::Actor>(destination));
   }
 }
 
 void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
 {
-  if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
+  if(destination)
   {
     auto& relations = GetControlImplementation(control).mAccessibilityProps.relations;
 
-    relations[relation].erase(destinationAccessible);
+    relations[relation].erase(Dali::WeakHandle<Dali::Actor>(destination));
 
     if(relations[relation].empty())
     {
@@ -227,15 +227,36 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
 
 std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  const auto&                          relations = GetControlImplementation(control).mAccessibilityProps.relations;
+  auto& relationMap = GetControlImplementation(control).mAccessibilityProps.relations;
   std::vector<Accessibility::Relation> result;
 
-  for(auto& relation : relations)
+  for (auto& relationPair : relationMap)
   {
-    auto& targets = relation.second;
+    auto& relationType = relationPair.first;
+    auto& targets = relationPair.second;
 
-    result.emplace_back(Accessibility::Relation{relation.first, {}});
-    std::copy(targets.begin(), targets.end(), std::back_inserter(result.back().mTargets));
+    Accessibility::Relation newRelation(relationType, {});
+
+    for (auto it = targets.begin(); it != targets.end(); )
+    {
+      auto actor = it->GetHandle();
+      auto accessible = actor ? Accessibility::Accessible::Get(actor) : nullptr;
+
+      if (!accessible)
+      {
+        it = targets.erase(it);
+      }
+      else
+      {
+        newRelation.mTargets.push_back(accessible);
+        ++it;
+      }
+    }
+
+    if (!newRelation.mTargets.empty())
+    {
+      result.emplace_back(std::move(newRelation));
+    }
   }
 
   return result;

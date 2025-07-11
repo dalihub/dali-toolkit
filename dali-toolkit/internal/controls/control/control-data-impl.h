@@ -550,6 +550,14 @@ public:
 
   Toolkit::DevelControl::AccessibilityActionSignalType mAccessibilityActionSignal;
 
+  struct WeakHandleCompare
+  {
+    bool operator()(const Dali::WeakHandle<Dali::Actor>& lhs, const Dali::WeakHandle<Dali::Actor>& rhs) const
+    {
+      return lhs.GetBaseHandle() < rhs.GetBaseHandle();
+    }
+  };
+
   struct AccessibilityProps
   {
     std::string                                                                       name{};
@@ -558,7 +566,7 @@ public:
     std::string                                                                       automationId{};
     int32_t                                                                           role{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)};
     DevelControl::AccessibilityStates                                                 states{};
-    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations;
+    std::map<Dali::Accessibility::RelationType, std::set<Dali::WeakHandle<Dali::Actor>, WeakHandleCompare>> relations;
     Property::Map                                                                     extraAttributes{};
     TriStateProperty                                                                  isHighlightable{TriStateProperty::AUTO};
     bool                                                                              isHidden{false};
