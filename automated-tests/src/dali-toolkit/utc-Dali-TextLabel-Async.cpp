@@ -214,6 +214,14 @@ int UtcDaliToolkitTextLabelAsyncRender02(void)
   shadow.Insert("offset", Vector2(1.0f, 1.0f));
   label.SetProperty(TextLabel::Property::SHADOW, shadow);
 
+  Property::Map emboss;
+  emboss["enable"] = true;
+  emboss["direction"] = Vector2(-1.0f, -1.0f);
+  emboss["strength"] = 5.f;
+  emboss["lightColor"] = Color::WHITE;
+  emboss["shadowColor"] = Color::BLACK;
+  label.SetProperty(TextLabel::Property::EMBOSS, emboss);
+
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
@@ -2235,6 +2243,14 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   shadow.Insert("color", Color::BLACK);
   shadow.Insert("offset", Vector2(1.0f, 1.0f));
   label.SetProperty(TextLabel::Property::SHADOW, shadow);
+
+  Property::Map emboss;
+  emboss["enable"] = true;
+  emboss["direction"] = Vector2(-1.0f, -1.0f);
+  emboss["strength"] = 5.f;
+  emboss["lightColor"] = Color::WHITE;
+  emboss["shadowColor"] = Color::BLACK;
+  label.SetProperty(TextLabel::Property::EMBOSS, emboss);
 
   expectedWidth = 100.0f;
 

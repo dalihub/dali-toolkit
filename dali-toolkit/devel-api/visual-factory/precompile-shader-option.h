@@ -131,6 +131,7 @@ public:
     NATIVE,
     STRETCH_X,
     STRETCH_Y,
+    EMBOSS,
   };
 
   PrecompileShaderOption(const Property::Map& shaderOption);

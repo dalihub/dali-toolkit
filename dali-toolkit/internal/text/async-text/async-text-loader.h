@@ -81,6 +81,10 @@ struct AsyncTextParameters
     padding{0u, 0u, 0u, 0u},
     variationsMap{},
     textFitArray{},
+    embossDirection{},
+    embossStrength{0.f},
+    embossLightColor{Color::TRANSPARENT},
+    embossShadowColor{Color::TRANSPARENT},
     fontSize{0.f},
     minLineSize{0.f},
     lineSpacing{0.f},
@@ -134,7 +138,8 @@ struct AsyncTextParameters
     isAutoScrollEnabled{false},
     isAutoScrollMaxTextureExceeded{false},
     cutout{false},
-    backgroundWithCutoutEnabled{false}
+    backgroundWithCutoutEnabled{false},
+    embossEnabled{false}
   {
   }
 
@@ -159,6 +164,11 @@ struct AsyncTextParameters
 
   Property::Map variationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
   std::vector<DevelTextLabel::FitOption> textFitArray;
+
+  Vector2 embossDirection;
+  float embossStrength;
+  Vector4 embossLightColor;
+  Vector4 embossShadowColor;
 
   float fontSize;             ///< The font's size (in points).
   float minLineSize;          ///< The line's minimum size (in pixels).
@@ -218,6 +228,7 @@ struct AsyncTextParameters
   bool isAutoScrollMaxTextureExceeded : 1; ///< Whether the auto scroll texture size exceeds the maximum texture width.
   bool cutout                         : 1; ///< Cutout enabled flag.
   bool backgroundWithCutoutEnabled    : 1; ///< Background with cutout enabled flag.
+  bool embossEnabled                  : 1; ///< Emboss enabled flag.
 };
 
 struct AsyncTextRenderInfo
@@ -240,7 +251,8 @@ struct AsyncTextRenderInfo
     isOverlayStyle(false),
     isTextDirectionRTL(false),
     isCutout(false),
-    manualRendered(false)
+    manualRendered(false),
+    embossEnabled(false)
   {
   }
 
@@ -265,6 +277,7 @@ struct AsyncTextRenderInfo
   bool               isTextDirectionRTL    : 1;
   bool               isCutout              : 1;
   bool               manualRendered        : 1;
+  bool               embossEnabled         : 1;
 };
 
 /**

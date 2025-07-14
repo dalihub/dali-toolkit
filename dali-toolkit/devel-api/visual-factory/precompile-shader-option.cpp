@@ -49,6 +49,7 @@ const char* TOKEN_OPTION_MULTI_COLOR("MULTI_COLOR");
 const char* TOKEN_OPTION_STYLES("STYLES");
 const char* TOKEN_OPTION_OVERLAY("OVERLAY");
 const char* TOKEN_OPTION_EMOJI("EMOJI");
+const char* TOKEN_OPTION_EMBOSS("EMBOSS");
 const char* TOKEN_OPTION_STRETCH_X("xStretchCount");
 const char* TOKEN_OPTION_STRETCH_Y("yStretchCount");
 
@@ -83,6 +84,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SHADER_OPTION_FLAG)
   {TOKEN_OPTION_STYLES,          static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::STYLES)},
   {TOKEN_OPTION_OVERLAY,         static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::OVERLAY)},
   {TOKEN_OPTION_EMOJI,           static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::EMOJI)},
+  {TOKEN_OPTION_EMBOSS,          static_cast<int32_t>(Dali::Toolkit::PrecompileShaderOption::Flag::EMBOSS)},
 DALI_ENUM_TO_STRING_TABLE_END(SHADER_OPTION_FLAG);
 // clang-format on
 } // namespace

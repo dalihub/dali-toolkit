@@ -993,6 +993,56 @@ void Controller::SetShadowBlurRadius(const float& shadowBlurRadius)
   }
 }
 
+bool Controller::IsEmbossEnabled() const
+{
+  return mImpl->mModel->mVisualModel->IsEmbossEnabled();
+}
+
+void Controller::SetEmbossEnabled(const bool enable)
+{
+  mImpl->mModel->mVisualModel->SetEmbossEnabled(enable);
+}
+
+const Vector2& Controller::GetEmbossDirection() const
+{
+  return mImpl->mModel->mVisualModel->GetEmbossDirection();
+}
+
+void Controller::SetEmbossDirection(const Vector2& direction)
+{
+  mImpl->mModel->mVisualModel->SetEmbossDirection(direction);
+}
+
+float Controller::GetEmbossStrength() const
+{
+  return mImpl->mModel->mVisualModel->GetEmbossStrength();
+}
+
+void Controller::SetEmbossStrength(const float strength)
+{
+  mImpl->mModel->mVisualModel->SetEmbossStrength(strength);
+}
+
+const Vector4& Controller::GetEmbossLightColor() const
+{
+  return mImpl->mModel->mVisualModel->GetEmbossLightColor();
+}
+
+void Controller::SetEmbossLightColor(const Vector4& lightColor)
+{
+  mImpl->mModel->mVisualModel->SetEmbossLightColor(lightColor);
+}
+
+const Vector4& Controller::GetEmbossShadowColor() const
+{
+  return mImpl->mModel->mVisualModel->GetEmbossShadowColor();
+}
+
+void Controller::SetEmbossShadowColor(const Vector4& shadowColor)
+{
+  mImpl->mModel->mVisualModel->SetEmbossShadowColor(shadowColor);
+}
+
 const float& Controller::GetShadowBlurRadius() const
 {
   return mImpl->mModel->mVisualModel->GetShadowBlurRadius();

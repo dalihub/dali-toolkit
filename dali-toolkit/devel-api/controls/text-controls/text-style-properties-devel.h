@@ -119,6 +119,50 @@ enum
 
 } // namespace Underline
 
+namespace Emboss
+{
+namespace Property
+{
+enum
+{
+  /**
+   * @brief Whether the emboss is enabled.
+   * @details Name "enable", type Property::STRING or Property::BOOLEAN. i.e. "true", "false", true or false
+   * @note Optional. By default is disabled.
+   */
+  ENABLE,
+
+  /**
+   * @brief The emboss direction in texture space.
+   * @details Name "direction", type Property::STRING or Property::Vector2
+   * @note Optional. By default is (0.f, 0.f).
+   */
+  DIRECTION,
+
+  /**
+   * @brief The strength of emboss in pixels.
+   * @details Name "strength", type Property::STRING or Property::FLOAT. e.g. "1.0" or 1.f
+   * @note Optional. By default is 0.f.
+   */
+  STRENGTH,
+
+  /**
+   * @brief The highlight color for raised areas.
+   * @details Name "lightColor", type Property::STRING or Property::VECTOR4
+   * @note Optional. By default is transparent.
+   */
+  LIGHT_COLOR,
+
+  /**
+   * @brief The shadow color for recessed areas.
+   * @details Name "shadowColor", type Property::STRING or Property::VECTOR4
+   * @note Optional. By default is transparent.
+   */
+  SHADOW_COLOR
+};
+}
+}
+
 namespace Outline
 {
 namespace Property

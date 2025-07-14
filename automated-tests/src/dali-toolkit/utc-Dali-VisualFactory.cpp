@@ -2954,6 +2954,11 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   textShader2["shaderOption"] = Property::Map()
                                   .Add("EMOJI", true);
 
+  Property::Map textShader3;
+  textShader3["shaderType"]   = "text";
+  textShader3["shaderOption"] = Property::Map()
+                                  .Add("EMBOSS", true);
+
   Property::Map colorShader;
   colorShader["shaderType"]   = "color";
   colorShader["shaderOption"] = Property::Map()
@@ -2998,6 +3003,7 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(textShader);
   factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(textShader2);
+  factory.AddPrecompileShader(textShader3);
   factory.AddPrecompileShader(colorShader);
   factory.AddPrecompileShader(colorShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(colorShader2);

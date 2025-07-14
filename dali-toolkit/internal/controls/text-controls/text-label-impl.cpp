@@ -1691,8 +1691,13 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.backgroundColorWithCutout   = mController->GetBackgroundColorWithCutout();
   Property::Map variationsMap;
   mController->GetVariationsMap(variationsMap);
-  parameters.variationsMap = variationsMap;
-  parameters.renderScale   = mController->GetRenderScale();
+  parameters.variationsMap     = variationsMap;
+  parameters.renderScale       = mController->GetRenderScale();
+  parameters.embossEnabled     = mController->IsEmbossEnabled();
+  parameters.embossDirection   = mController->GetEmbossDirection();
+  parameters.embossStrength    = mController->GetEmbossStrength();
+  parameters.embossLightColor  = mController->GetEmbossLightColor();
+  parameters.embossShadowColor = mController->GetEmbossShadowColor();
 
   return parameters;
 }

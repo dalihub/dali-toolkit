@@ -39,8 +39,9 @@ enum class TextVisualRequireFlag : uint32_t
   DEFAULT     = 0,
   STYLES      = 1 << 0,
   OVERLAY     = 1 << 1,
-  EMOJI       = 1 << 2,
-  MULTI_COLOR = 1 << 3,
+  EMBOSS      = 1 << 2,
+  EMOJI       = 1 << 3,
+  MULTI_COLOR = 1 << 4,
 };
 
 const VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] =
@@ -49,14 +50,26 @@ const VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] =
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMBOSS,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY_AND_EMOJI,
     VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMOJI,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_OVERLAY_AND_EMOJI_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMOJI_AND_EMBOSS,
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT,
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_OVERLAY,
     VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY,
+    VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_OVERLAY_AND_EMBOSS,
+    VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMBOSS,
 };
 
 static constexpr auto      PREDEFINED_SHADER_TYPE_COUNT = 1u;
@@ -78,7 +91,8 @@ FeatureBuilder::FeatureBuilder()
 : mTextMultiColor(TextMultiColor::SINGLE_COLOR_TEXT),
   mTextEmoji(TextEmoji::NO_EMOJI),
   mTextStyle(TextStyle::NO_STYLES),
-  mTextOverlay(TextOverlay::NO_OVERLAY)
+  mTextOverlay(TextOverlay::NO_OVERLAY),
+  mTextEmboss(TextEmboss::NO_EMBOSS)
 {
 }
 
@@ -100,6 +114,11 @@ FeatureBuilder& FeatureBuilder::EnableStyle(bool enableStyle)
 FeatureBuilder& FeatureBuilder::EnableOverlay(bool enableOverlay)
 {
   mTextOverlay = enableOverlay ? TextOverlay::HAS_OVERLAY : TextOverlay::NO_OVERLAY;
+  return *this;
+}
+FeatureBuilder& FeatureBuilder::EnableEmboss(bool enableEmboss)
+{
+  mTextEmboss = enableEmboss ? TextEmboss::HAS_EMBOSS : TextEmboss::NO_EMBOSS;
   return *this;
 }
 
@@ -124,6 +143,10 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
   if(mTextMultiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
   {
     shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::MULTI_COLOR);
+  }
+  if(mTextEmboss == TextVisualShaderFeature::TextEmboss::HAS_EMBOSS)
+  {
+    shaderTypeFlag |= static_cast<uint32_t>(TextVisualRequireFlag::EMBOSS);
   }
 
   shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
@@ -153,6 +176,10 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   if(mTextMultiColor == TextVisualShaderFeature::TextMultiColor::MULTI_COLOR_TEXT)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_MULTI_COLOR\n";
+  }
+  if(mTextEmboss == TextVisualShaderFeature::TextEmboss::HAS_EMBOSS)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_EMBOSS\n";
   }
 }
 
@@ -266,6 +293,11 @@ void TextVisualShaderFactory::CreatePrecompileShader(TextVisualShaderFeature::Fe
       case PrecompileShaderOption::Flag::MULTI_COLOR:
       {
         builder.EnableMultiColor(true);
+        break;
+      }
+      case PrecompileShaderOption::Flag::EMBOSS:
+      {
+        builder.EnableEmboss(true);
         break;
       }
       default:

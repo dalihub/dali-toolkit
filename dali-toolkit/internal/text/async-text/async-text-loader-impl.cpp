@@ -891,6 +891,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   const bool backgroundWithCutoutEnabled = mTextModel->IsBackgroundWithCutoutEnabled();
   const bool styleEnabled                = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText || backgroundMarkupSet || cutoutEnabled || backgroundWithCutoutEnabled);
   const bool isOverlayStyle              = underlineEnabled || strikethroughEnabled;
+  const bool embossEnabled               = parameters.embossEnabled;
 
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
   Pixel::Format textPixelFormat = (containsColorGlyph || hasMultipleTextColors || cutoutEnabled) ? Pixel::RGBA8888 : Pixel::L8;
@@ -1003,6 +1004,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   renderInfo.isOverlayStyle        = isOverlayStyle;
   renderInfo.manualRendered        = parameters.manualRender;
   renderInfo.lineCount             = mTextModel->GetNumberOfLines();
+  renderInfo.embossEnabled         = embossEnabled;
 
   if(cutoutEnabled)
   {
