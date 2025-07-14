@@ -159,6 +159,19 @@ enum Mode
 
 } //namespace Ellipsize
 
+namespace AutoScroll
+{
+/**
+ * @brief Enumerations specifying autoscroll direction.
+ */
+enum Direction
+{
+  HORIZONTAL = 0, ///< Horizontal scrolling of text, only valid when single-line.
+  VERTICAL        ///< Vertical scrolling of text, only valid when multi-line.
+};
+
+} // namespace AutoScroll
+
 } // namespace DevelText
 
 } // namespace Toolkit

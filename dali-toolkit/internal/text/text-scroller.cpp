@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -142,6 +143,21 @@ void TextScroller::SetStopMode(TextLabel::AutoScrollStopMode::Type stopMode)
   mStopMode = stopMode;
 }
 
+TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
+{
+  return mStopMode;
+}
+
+DevelText::AutoScroll::Direction TextScroller::GetDirection() const
+{
+  return mDirection;
+}
+
+void TextScroller::SetDirection(DevelText::AutoScroll::Direction direction)
+{
+  mDirection = direction;
+}
+
 void TextScroller::StopScrolling()
 {
   if(IsScrolling())
@@ -184,11 +200,6 @@ bool TextScroller::IsScrolling()
   return (mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING);
 }
 
-TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
-{
-  return mStopMode;
-}
-
 TextScroller::TextScroller(ScrollerInterface& scrollerInterface)
 : mScrollerInterface(scrollerInterface),
   mScrollDeltaIndex(Property::INVALID_INDEX),
@@ -197,6 +208,7 @@ TextScroller::TextScroller(ScrollerInterface& scrollerInterface)
   mLoopDelay(0.0f),
   mWrapGap(0.0f),
   mStopMode(TextLabel::AutoScrollStopMode::FINISH_LOOP),
+  mDirection(DevelText::AutoScroll::HORIZONTAL),
   mIsStop(false),
   mIsStoppedImmediately(false)
 {
@@ -207,18 +219,19 @@ TextScroller::~TextScroller()
 {
 }
 
-void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment)
+void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment, bool animationReStart)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] textureSize[%f,%f] direction[%d]\n", controlSize.x, controlSize.y, textureSize.x, textureSize.y, direction);
   mRenderer = renderer;
 
+  bool  isHorizontal      = mDirection == DevelText::AutoScroll::HORIZONTAL;
   float animationProgress = 0.0f;
   int   remainedLoop      = mLoopCount;
   if(mScrollAnimation)
   {
     if(mScrollAnimation.GetState() == Animation::PLAYING)
     {
-      animationProgress = mScrollAnimation.GetCurrentProgress();
+      animationProgress = animationReStart ? 0.0f : mScrollAnimation.GetCurrentProgress();
 
       if(mLoopCount > 0) // If not a ininity loop, then calculate remained loop
       {
@@ -240,25 +253,29 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER");
+  Shader shader = isHorizontal ? Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER")
+                               : Shader::New(SHADER_TEXT_SCROLLER_VERTICAL_SHADER_VERT, SHADER_TEXT_SCROLLER_VERTICAL_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER_VERTICAL");
+
   mRenderer.SetShader(shader);
   mRenderer.SetTextures(textureSet);
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::SetParameters wrapGap[%f]\n", wrapGap);
 
-  float horizontalAlign;
-
-  if(textureSize.x > controlSize.x)
+  float horizontalAlign = 0.0f;
+  if(isHorizontal)
   {
-    // if Text is elided, scroll should start at the begin of text.
-    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[HorizontalAlignment::BEGIN][direction];
-  }
-  else
-  {
-    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[horizontalAlignment][direction];
+    if(textureSize.x > controlSize.x)
+    {
+      // if Text is elided, scroll should start at the begin of text.
+      horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[HorizontalAlignment::BEGIN][direction];
+    }
+    else
+    {
+      horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[horizontalAlignment][direction];
+    }
   }
 
-  const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[verticalAlignment];
+  const float verticalAlign = isHorizontal ? VERTICAL_ALIGNMENT_TABLE[verticalAlignment] : VERTICAL_ALIGNMENT_TABLE[VerticalAlignment::TOP];
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign);
 
@@ -268,10 +285,10 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   shader.RegisterProperty("uGap", wrapGap);
   mScrollDeltaIndex = shader.RegisterProperty("uDelta", 0.0f);
 
-  float scrollAmount   = std::max(textureSize.width, controlSize.width);
+  float scrollAmount   = isHorizontal ? std::max(textureSize.width, controlSize.width) : std::max(textureSize.height, controlSize.height);
   float scrollDuration = scrollAmount / mScrollSpeed;
 
-  if(direction)
+  if(isHorizontal && direction)
   {
     scrollAmount = -scrollAmount; // reverse direction of scrolling
   }

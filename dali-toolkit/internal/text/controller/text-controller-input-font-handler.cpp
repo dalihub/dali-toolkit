@@ -120,6 +120,8 @@ void Controller::InputFontHandler::SetInputFontFamily(Controller& controller, co
                                                                               REORDER |
                                                                               ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
+      controller.mImpl->mRecalculateLayoutSize  = true;
+
       controller.mImpl->RequestRelayout();
 
       // As the font changes, recalculate the handle positions is needed.
@@ -186,6 +188,7 @@ void Controller::InputFontHandler::SetInputFontWeight(const Controller& controll
                                                                               REORDER |
                                                                               ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
+      controller.mImpl->mRecalculateLayoutSize  = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
@@ -263,6 +266,7 @@ void Controller::InputFontHandler::SetInputFontWidth(Controller& controller, Fon
                                                                               REORDER |
                                                                               ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
+      controller.mImpl->mRecalculateLayoutSize  = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
@@ -340,6 +344,7 @@ void Controller::InputFontHandler::SetInputFontSlant(Controller& controller, Fon
                                                                               REORDER |
                                                                               ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
+      controller.mImpl->mRecalculateLayoutSize  = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
@@ -417,6 +422,7 @@ void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller,
                                                                               REORDER |
                                                                               ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
+      controller.mImpl->mRecalculateLayoutSize  = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.

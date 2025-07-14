@@ -427,8 +427,6 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           memcpy(elidedGlyphsBuffer, glyphs, numberOfGlyphs * sizeof(GlyphInfo));
           memcpy(elidedPositionsBuffer, positions, numberOfGlyphs * sizeof(Vector2));
 
-          const Size& controlSize = mModel->GetControlSize();
-
           // Set index where to set Ellipsis according to the selected position of Ellipsis.
           // Start with this index to replace its glyph by Ellipsis, if the width  is not enough, then remove more glyphs.
           GlyphIndex startIndexOfEllipsis = 0u;
@@ -523,8 +521,12 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
               actualAdvance -= glyphToRemove.advance;
               float calculatedWidth = actualAdvance + ellipsisGlyphWidth;
 
+              // Fot AutoScroll, there are cases where the layout is larger than the control.
+              // If the layout is larger than the max texture, it should be ellipsised.
+              const float controlWidth = std::max(mModel->GetControlSize().width, mModel->GetLayoutSize().width);
+
               // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
-              if((calculatedWidth < controlSize.width) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
+              if((calculatedWidth < controlWidth) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
               {
                 GlyphInfo& glyphInfo = *(elidedGlyphsBuffer + indexOfEllipsis);
                 Vector2&   position  = *(elidedPositionsBuffer + indexOfEllipsis);

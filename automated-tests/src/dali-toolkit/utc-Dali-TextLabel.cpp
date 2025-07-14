@@ -61,6 +61,7 @@ const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL       = "enableAutoScroll";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED = "autoScrollSpeed";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS = "autoScrollLoopCount";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP   = "autoScrollGap";
+const char* const PROPERTY_NAME_AUTO_SCROLL_DIRECTION    = "autoScrollDirection";
 
 const char* const PROPERTY_NAME_LINE_SPACING  = "lineSpacing";
 const char* const PROPERTY_NAME_UNDERLINE     = "underline";
@@ -358,6 +359,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED) == TextLabel::Property::AUTO_SCROLL_SPEED);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ENABLE_AUTO_SCROLL_LOOPS) == TextLabel::Property::AUTO_SCROLL_LOOP_COUNT);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_ENABLE_AUTO_SCROLL_GAP) == TextLabel::Property::AUTO_SCROLL_GAP);
+  DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_AUTO_SCROLL_DIRECTION) == DevelTextLabel::Property::AUTO_SCROLL_DIRECTION);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_LINE_SPACING) == TextLabel::Property::LINE_SPACING);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_UNDERLINE) == TextLabel::Property::UNDERLINE);
   DALI_TEST_CHECK(label.GetPropertyIndex(PROPERTY_NAME_SHADOW) == TextLabel::Property::SHADOW);
@@ -617,6 +619,12 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(SCROLL_GAP, label.GetProperty<float>(TextLabel::Property::AUTO_SCROLL_GAP), TEST_LOCATION);
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY);
   DALI_TEST_EQUALS(SCROLL_LOOP_DELAY, label.GetProperty<float>(TextLabel::Property::AUTO_SCROLL_LOOP_DELAY), TEST_LOCATION);
+
+  // AutoScroll direction
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+  DALI_TEST_EQUALS(static_cast<int>(DevelText::AutoScroll::VERTICAL), label.GetProperty<int>(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION), TEST_LOCATION);
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::HORIZONTAL);
+  DALI_TEST_EQUALS(static_cast<int>(DevelText::AutoScroll::HORIZONTAL), label.GetProperty<int>(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION), TEST_LOCATION);
 
   //Check autoscroll stop type property
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
@@ -1773,6 +1781,234 @@ int UtcDaliToolkitTextlabelScrollingWithEllipsis(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelScrollingVertical01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingVertical01");
+
+  TextLabel labelImmediate = TextLabel::New("Some text to scroll");
+  TextLabel labelFinished  = TextLabel::New("مرحبا بالعالم");
+  DALI_TEST_CHECK(labelImmediate);
+  DALI_TEST_CHECK(labelFinished);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  labelImmediate.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelImmediate.SetProperty(TextLabel::Property::AUTO_SCROLL_GAP, 50.0f);
+  labelImmediate.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3);
+  labelImmediate.SetProperty(TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  labelImmediate.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  labelImmediate.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+  application.GetScene().Add(labelImmediate);
+
+  labelFinished.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelFinished.SetProperty(TextLabel::Property::AUTO_SCROLL_GAP, 50.0f);
+  labelFinished.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3);
+  labelFinished.SetProperty(TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  labelFinished.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP);
+  labelFinished.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+  application.GetScene().Add(labelFinished);
+
+  try
+  {
+    labelImmediate.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    labelFinished.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+
+    labelImmediate.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    labelFinished.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+
+    labelImmediate.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    labelFinished.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    labelImmediate.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    labelFinished.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!labelImmediate.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+    DALI_TEST_CHECK(labelFinished.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingVertical02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingVertical02");
+
+  TextLabel label = TextLabel::New("Lorem ipsum dolor sit amet.");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  float labelWidth  = 300.0f;
+  float labelHeight = 300.0f;
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(labelWidth, labelHeight));
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_GAP, 50.0f);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+  label.SetProperty(TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER");
+  application.GetScene().Add(label);
+
+  try
+  {
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    DALI_TEST_CHECK(label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    application.SendNotification();
+    application.Render();
+
+    label.SetProperty(TextLabel::Property::VERTICAL_ALIGNMENT, "BOTTOM");
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingVertical03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingVertical03");
+
+  TextLabel label = TextLabel::New("Lorem ipsum dolor sit amet.");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_GAP, 50.0f);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+  application.GetScene().Add(label);
+
+  try
+  {
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+    label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::HORIZONTAL);
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+    label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingVertical04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingVertical04");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(0u, 0u);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float labelWidth  = 100.0f;
+  float labelHeight = 100.0f;
+  label.SetProperty(Actor::Property::SIZE, Vector2(labelWidth, labelHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 50);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
+  label.SetProperty(TextLabel::Property::TEXT, text);
+
+  // Auto scroll
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+
+  application.GetScene().Add(label);
+
+  try
+  {
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+
+    label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+    label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::HORIZONTAL);
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelEllipsis(void)
 {
   ToolkitTestApplication application;
@@ -1872,6 +2108,90 @@ int UtcDaliToolkitTextlabelEllipsisMode(void)
   DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
 
+  // Auto scroll does not work because the multi line is true.
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+  
+  // Set long text to scroll.
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  // Auto scroll does not work in multi line.
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::TRUNCATE);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  END_TEST;
+}
+
+// wonrst
+int UtcDaliToolkitTextlabelEllipsisMode02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisMode02");
+
+  // Set short text.
+  TextLabel label = TextLabel::New("H");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+
+  // Set ellipsis mode to auto scroll, but auto scroll does not work because the text is short.
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
+
+  // When ellipsis mode is auto scroll, enable auto scroll does not work.
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
   // Set long text to scroll.
   label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
   label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
@@ -1886,8 +2206,6 @@ int UtcDaliToolkitTextlabelEllipsisMode(void)
   }
   DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
 
-  // Auto scroll does not work in multi line.
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::TRUNCATE);
   try
   {

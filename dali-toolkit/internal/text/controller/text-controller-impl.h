@@ -358,6 +358,7 @@ public:
     mRawText(),
     mTextFitArray(),
     mRecalculateNaturalSize(true),
+    mRecalculateLayoutSize(true),
     mMarkupProcessorEnabled(false),
     mClipboardHideEnabled(true),
     mIsAutoScrollEnabled(false),
@@ -932,7 +933,7 @@ public:
   /**
    * @copydoc Controller::SetAutoScrollEnabled()
    */
-  void SetAutoScrollEnabled(bool enable, bool requestRelayout);
+  void SetAutoScrollEnabled(bool enable, bool requestRelayout, DevelText::AutoScroll::Direction direction);
 
   /**
    * @copydoc Controller::SetEnableCursorBlink()
@@ -1088,6 +1089,7 @@ public:
   std::vector<Toolkit::DevelTextLabel::FitOption> mTextFitArray; ///< List of FitOption for TextFitArray operation.
 
   bool mRecalculateNaturalSize : 1;         ///< Whether the natural size needs to be recalculated.
+  bool mRecalculateLayoutSize : 1;          ///< Whether the layout size needs to be recalculated.
   bool mMarkupProcessorEnabled : 1;         ///< Whether the mark-up procesor is enabled.
   bool mClipboardHideEnabled : 1;           ///< Whether the ClipboardHide function work or not
   bool mIsAutoScrollEnabled : 1;            ///< Whether auto text scrolling is enabled.

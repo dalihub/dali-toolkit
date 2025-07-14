@@ -201,17 +201,17 @@ void Typesetter::SetFontClient(TextAbstraction::FontClient& fontClient)
   mImpl->SetFontClient(fontClient);
 }
 
-PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
+PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
 {
-  Devel::PixelBuffer result    = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat);
+  Devel::PixelBuffer result    = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
   PixelData          pixelData = Devel::PixelBuffer::Convert(result);
 
   return pixelData;
 }
 
-PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer mask, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, float originAlpha)
+PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer mask, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, float originAlpha, const Vector2& originSize)
 {
-  Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat);
+  Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
   SetMaskForImageBuffer(mask, result, size.width, size.height, originAlpha);
 
   PixelData pixelData = Devel::PixelBuffer::Convert(result);
@@ -219,7 +219,7 @@ PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::
   return pixelData;
 }
 
-Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
+Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
   // @todo. This initial implementation for a TextLabel has only one visible page.
@@ -255,6 +255,11 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     }
   }
 
+  // Consider the case where pen y needs to be calculated based on the original size when rendering auto scroll texture.
+  bool  isOriginHeight = originSize.height > 0.0f ? true : false;
+  float controlHeight  = isOriginHeight ? viewModel.GetControlSize().height : size.height;
+  float layoutHeight   = isOriginHeight ? originSize.height : layoutSize.height;
+
   // Set the offset for the vertical alignment.
   int32_t penY = 0u;
   switch(viewModel.GetVerticalAlignment())
@@ -266,12 +271,12 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     }
     case VerticalAlignment::CENTER:
     {
-      penY = static_cast<int32_t>(std::round(0.5f * (size.height - layoutSize.height)));
+      penY = static_cast<int32_t>(std::round(0.5f * (controlHeight - layoutHeight)));
       break;
     }
     case VerticalAlignment::BOTTOM:
     {
-      penY = static_cast<int32_t>(size.height - layoutSize.height);
+      penY = static_cast<int32_t>(controlHeight - layoutHeight);
       break;
     }
   }
