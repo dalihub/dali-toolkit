@@ -508,6 +508,11 @@ Control::Impl::~Impl()
     mVisualData->ClearVisuals();
   }
 
+  if(mDecorationData)
+  {
+    delete mDecorationData;
+  }
+
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
 
