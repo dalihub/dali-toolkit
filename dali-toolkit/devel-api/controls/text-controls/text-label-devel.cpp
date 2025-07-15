@@ -110,6 +110,11 @@ void RequestAsyncRenderWithFixedWidth(TextLabel textLabel, float width, float he
   GetImpl(textLabel).RequestAsyncRenderWithFixedWidth(width, heightConstraint);
 }
 
+void RequestAsyncRenderWithFixedHeight(TextLabel textLabel, float widthConstraint, float height)
+{
+  GetImpl(textLabel).RequestAsyncRenderWithFixedHeight(widthConstraint, height);
+}
+
 void RequestAsyncRenderWithConstraint(TextLabel textLabel, float widthConstraint, float heightConstraint)
 {
   GetImpl(textLabel).RequestAsyncRenderWithConstraint(widthConstraint, heightConstraint);

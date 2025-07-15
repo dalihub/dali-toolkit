@@ -340,15 +340,15 @@ void MeshVisual::CreateShader()
 {
   if(mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING)
   {
-    mShader = Shader::New(SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_VERT, SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_FRAG, Shader::Hint::NONE, "MESH_VISUAL_NRMMAP");
+    mShader = Shader::New(SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_VERT, SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MESH_VISUAL_NRMMAP");
   }
   else if(mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING)
   {
-    mShader = Shader::New(SHADER_MESH_VISUAL_SHADER_VERT, SHADER_MESH_VISUAL_SHADER_FRAG, Shader::Hint::NONE, "MESH_VISUA");
+    mShader = Shader::New(SHADER_MESH_VISUAL_SHADER_VERT, SHADER_MESH_VISUAL_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MESH_VISUA");
   }
   else //Textureless
   {
-    mShader = Shader::New(SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT, SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG, Shader::Hint::NONE, "MESH_VISUAL_SIMPLE");
+    mShader = Shader::New(SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT, SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MESH_VISUAL_SIMPLE");
   }
 
   UpdateShaderUniforms();

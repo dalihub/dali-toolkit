@@ -61,7 +61,7 @@ GlyphyShader GlyphyShader::New(const Dali::Vector4& atlasInfo)
 
   Shader shaderEffectCustom = Shader::New(vertexShaderStringStream.str(),
                                           fragmentShaderStringStream.str(),
-                                          Shader::Hint::OUTPUT_IS_TRANSPARENT,
+                                          static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL | Shader::Hint::OUTPUT_IS_TRANSPARENT),
                                           "GLYPHY_SHADER");
 
   GlyphyShader handle(shaderEffectCustom);

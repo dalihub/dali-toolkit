@@ -240,7 +240,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, Shader::Hint::NONE, "TEXT_SCROLLER");
+  Shader shader = Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER");
   mRenderer.SetShader(shader);
   mRenderer.SetTextures(textureSet);
 

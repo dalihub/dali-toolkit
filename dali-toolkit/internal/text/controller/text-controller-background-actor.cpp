@@ -233,7 +233,7 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
 
       if(!textShaderBackground)
       {
-        textShaderBackground = Shader::New(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT, SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG, Shader::Hint::NONE, "TEXT_SCROLLER");
+        textShaderBackground = Shader::New(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT, SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER");
       }
 
       Dali::Renderer renderer = Dali::Renderer::New(quadGeometry, textShaderBackground);

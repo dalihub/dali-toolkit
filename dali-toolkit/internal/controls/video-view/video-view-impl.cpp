@@ -653,7 +653,7 @@ void VideoView::SetWindowSurfaceTarget()
   {
     // For underlay rendering mode, video display area have to be transparent.
     Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, Shader::Hint::NONE, "VIDEO_VIEW_OVERLAY");
+    Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "VIDEO_VIEW_OVERLAY");
     mOverlayRenderer  = Renderer::New(geometry, shader);
     mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
   }

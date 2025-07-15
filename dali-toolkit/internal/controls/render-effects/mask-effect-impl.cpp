@@ -176,7 +176,7 @@ void MaskEffectImpl::OnInitialize()
 
   // renderer
   Renderer maskRenderer = GetTargetRenderer();
-  Shader   shader       = Dali::Shader::New(BASIC_VERTEX_SOURCE, SHADER_MASK_EFFECT_FRAG);
+  Shader   shader       = Dali::Shader::New(BASIC_VERTEX_SOURCE, SHADER_MASK_EFFECT_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MASK_EFFECT");
   maskRenderer.SetShader(shader);
   maskRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
 }

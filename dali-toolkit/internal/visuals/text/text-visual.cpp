@@ -748,6 +748,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
   {
     case Text::Async::RENDER_FIXED_SIZE:
     case Text::Async::RENDER_FIXED_WIDTH:
+    case Text::Async::RENDER_FIXED_HEIGHT:
     case Text::Async::RENDER_CONSTRAINT:
     {
       mIsTextLoadingTaskRunning = false;
@@ -1126,6 +1127,10 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
       else if(parameters.requestType == Text::Async::RENDER_FIXED_WIDTH)
       {
         renderInfo.renderedSize = Size(parameters.textWidth, 0.0f);
+      }
+      else if(parameters.requestType == Text::Async::RENDER_FIXED_HEIGHT)
+      {
+        renderInfo.renderedSize = Size(0.0f, parameters.textHeight);
       }
       else
       {

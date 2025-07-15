@@ -96,7 +96,7 @@ Actor CreateBouncingEffectActor(Property::Index& bouncePropertyIndex)
   meshGeometry.SetIndexBuffer(indexData, sizeof(indexData) / sizeof(indexData[0]));
 
   // Create the shader
-  Shader shader = Shader::New(SHADER_BOUNCING_EFFECT_MESH_SHADER_VERT, SHADER_BOUNCING_EFFECT_MESH_SHADER_FRAG, Shader::Hint::NONE, "BOUNCING_EFFECT");
+  Shader shader = Shader::New(SHADER_BOUNCING_EFFECT_MESH_SHADER_VERT, SHADER_BOUNCING_EFFECT_MESH_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "BOUNCING_EFFECT");
 
   // Create renderer
   Renderer renderer = Renderer::New(meshGeometry, shader);

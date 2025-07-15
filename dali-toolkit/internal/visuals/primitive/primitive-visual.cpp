@@ -404,7 +404,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
 
 void PrimitiveVisual::CreateShader()
 {
-  mShader = Shader::New(SHADER_PRIMITIVE_VISUAL_SHADER_VERT, SHADER_PRIMITIVE_VISUAL_SHADER_FRAG, Shader::Hint::NONE, "PRIMITIVE_VISUAL");
+  mShader = Shader::New(SHADER_PRIMITIVE_VISUAL_SHADER_VERT, SHADER_PRIMITIVE_VISUAL_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PRIMITIVE_VISUAL");
   UpdateShaderUniforms();
 }
 

@@ -1025,7 +1025,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters,
   Size textNaturalSize   = naturalSize;
   bool cachedNaturalSize = useCachedNaturalSize;
 
-  if(parameters.requestType == Async::RENDER_CONSTRAINT)
+  if(parameters.requestType == Async::RENDER_FIXED_HEIGHT || parameters.requestType == Async::RENDER_CONSTRAINT)
   {
     if(!cachedNaturalSize)
     {
@@ -1362,7 +1362,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
   Size textNaturalSize   = naturalSize;
   bool cachedNaturalSize = useCachedNaturalSize;
 
-  if(parameters.requestType == Async::RENDER_CONSTRAINT)
+  if(parameters.requestType == Async::RENDER_FIXED_HEIGHT || parameters.requestType == Async::RENDER_CONSTRAINT)
   {
     if(!cachedNaturalSize)
     {

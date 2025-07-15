@@ -436,7 +436,7 @@ Shader PageTurnView::CreateShader(const Property::Map& shaderMap)
     {
       DALI_LOG_ERROR("PageTurnView::CreateShader failed: fragment shader source is not available.\n");
     }
-    shader = Shader::New(vertexShader, fragmentShader);
+    shader = Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PAGE_TURN_VIEW");
   }
   else
   {
