@@ -314,9 +314,11 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("stopBehavior", DevelImageVisual::StopBehavior::FIRST_FRAME)
     .Add("loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE)
     .Add("redrawInScalingDown", false)
+    .Add("redrawInScalingUp", false)
     .Add("enableFrameCache", false)
     .Add("notifyAfterRasterization", false)
     .Add("frameSpeedFactor", 0.5f)
+    .Add("renderScale", 1.5f)
     .Add("cornerRadius", cornerRadius)
     .Add("borderlineWidth", borderlineWidth)
     .Add("borderlineColor", borderlineColor)
@@ -388,6 +390,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false);
 
+  value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_UP, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == false);
+
   value = resultMap.Find(DevelImageVisual::Property::ENABLE_FRAME_CACHE, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == false);
@@ -399,6 +405,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   value = resultMap.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR, Property::FLOAT);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<float>() == 0.5f);
+
+  value = resultMap.Find(DevelImageVisual::Property::RENDER_SCALE, Property::FLOAT);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<float>() == 1.5f);
 
   value = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(value);
@@ -536,6 +546,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value->Get<bool>() == false); // Check default value
 
   value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<bool>() == true); // Check default value
+
+  value = resultMap.Find(DevelImageVisual::Property::REDRAW_IN_SCALING_UP, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == true); // Check default value
 

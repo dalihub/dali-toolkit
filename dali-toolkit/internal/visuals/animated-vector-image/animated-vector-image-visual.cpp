@@ -104,10 +104,12 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mPlayState(DevelImageVisual::PlayState::STOPPED),
   mEventCallback(nullptr),
   mFrameSpeedFactor(1.0f),
+  mRenderScale(1.0f),
   mLastSentPlayStateId(0u),
   mLoadFailed(false),
   mRendererAdded(false),
   mRedrawInScalingDown(true),
+  mRedrawInScalingUp(true),
   mEnableFrameCache(false),
   mUseNativeImage(false),
   mNotifyAfterRasterization(false)
@@ -206,6 +208,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mAnimationData.stopBehavior);
   map.Insert(Toolkit::DevelImageVisual::Property::LOOPING_MODE, mAnimationData.loopingMode);
   map.Insert(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, mRedrawInScalingDown);
+  map.Insert(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_UP, mRedrawInScalingUp);
 
   Property::Map layerInfo;
   mVectorAnimationTask->GetLayerInfo(layerInfo);
@@ -221,6 +224,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
   map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
   map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
+  map.Insert(Toolkit::DevelImageVisual::Property::RENDER_SCALE, mRenderScale);
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -269,6 +273,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, keyValue.second);
       }
+      else if(keyValue.first == REDRAW_IN_SCALING_UP_NAME)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_UP, keyValue.second);
+      }
       else if(keyValue.first == SYNCHRONOUS_LOADING)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
@@ -292,6 +300,10 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
       else if(keyValue.first == FRAME_SPEED_FACTOR)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, keyValue.second);
+      }
+      else if(keyValue.first == RENDER_SCALE_NAME)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::RENDER_SCALE, keyValue.second);
       }
     }
   }
@@ -360,6 +372,15 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       if(value.Get(redraw))
       {
         mRedrawInScalingDown = redraw;
+      }
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_UP:
+    {
+      bool redraw;
+      if(value.Get(redraw))
+      {
+        mRedrawInScalingUp = redraw;
       }
       break;
     }
@@ -444,6 +465,17 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
           mAnimationData.frameSpeedFactor = mFrameSpeedFactor;
           mAnimationData.resendFlag |= VectorAnimationTask::RESEND_FRAME_SPEED_FACTOR;
         }
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::RENDER_SCALE:
+    {
+      float renderScale = 1.0f;
+      if(value.Get(renderScale))
+      {
+        mRenderScale = renderScale;
+        SetVectorImageSize();
       }
       break;
     }
@@ -823,8 +855,8 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   }
   else
   {
-    width  = static_cast<uint32_t>(mVisualSize.width * mVisualScale.width);
-    height = static_cast<uint32_t>(mVisualSize.height * mVisualScale.height);
+    width  = static_cast<uint32_t>(std::roundf(mVisualSize.width * mVisualScale.width * std::fabs(mRenderScale)));
+    height = static_cast<uint32_t>(std::roundf(mVisualSize.height * mVisualScale.height * std::fabs(mRenderScale)));
   }
 
   if(mAnimationData.width != width || mAnimationData.height != height)
@@ -864,17 +896,23 @@ void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification& source
   {
     Vector3 scale = actor.GetProperty<Vector3>(Actor::Property::WORLD_SCALE);
 
-    if((!Dali::Equals(mVisualScale.width, scale.width) || !Dali::Equals(mVisualScale.height, scale.height)) && (mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f))
+    if((!Dali::Equals(mVisualScale.width, scale.width) || !Dali::Equals(mVisualScale.height, scale.height)))
     {
-      mVisualScale.width  = scale.width;
-      mVisualScale.height = scale.height;
+      bool redrawInScalingDown = mRedrawInScalingDown && (scale.width <= 1.0f || scale.height <= 1.0f);
+      bool redrawInScalingUp   = mRedrawInScalingUp && (scale.width >= 1.0f || scale.height >= 1.0f);
 
-      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnScaleNotification: scale = %f, %f [%p]\n", mVisualScale.width, mVisualScale.height, this);
+      if(redrawInScalingDown || redrawInScalingUp)
+      {
+        mVisualScale.width  = scale.width;
+        mVisualScale.height = scale.height;
 
-      SetVectorImageSize();
-      SendAnimationData();
+        DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnScaleNotification: scale = %f, %f [%p]\n", mVisualScale.width, mVisualScale.height, this);
 
-      Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+        SetVectorImageSize();
+        SendAnimationData();
+
+        Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+      }
     }
   }
 }
