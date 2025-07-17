@@ -831,3 +831,30 @@ int UtcDaliToolkitFlexNodeFlexBasisShrinkGrow(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitFlexNodeMarkDirty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitFlexNodeMarkDirty");
+  Flex::Node* flexNode = new Flex::Node();
+  DALI_TEST_CHECK(flexNode);
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK(actor);
+
+  Flex::Node* actorNode = flexNode->AddChild(actor, Extents(0, 0, 0, 0), &MeasureChild, 0);
+
+  flexNode->CalculateLayout(480, 800, false);
+
+  DALI_TEST_EQUALS(actorNode->IsDirty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(flexNode->IsDirty(), false, TEST_LOCATION);
+
+  actorNode->MarkDirty();
+
+  DALI_TEST_EQUALS(actorNode->IsDirty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(flexNode->IsDirty(), true, TEST_LOCATION);
+
+  delete flexNode;
+
+  END_TEST;
+}
