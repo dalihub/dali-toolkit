@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <toolkit-async-task-manager.h>
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit-test-suite-utils.h>
@@ -2709,6 +2710,9 @@ int UtcDaliToolkitTextLabelAsyncUnparentAndReset02(void)
   float expectedHeight = 300.0f;
   float dummySize      = 100.0f;
 
+  // Block worker thread `NotifyToReady` callback, for test.
+  Test::AsyncTaskManager::GrabNotifyToReady();
+
   // Request size computation, due to dummy's requests, text manager's loader queue is full.
   DevelTextLabel::RequestAsyncNaturalSize(dummy1);
   DevelTextLabel::RequestAsyncHeightForWidth(dummy1, dummySize);
@@ -2735,6 +2739,9 @@ int UtcDaliToolkitTextLabelAsyncUnparentAndReset02(void)
 
   label.Unparent();
   label.Reset();
+
+  // Release worker thread `NotifyToReady` callback again.
+  Test::AsyncTaskManager::UngrabNotifyToReady();
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(9, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
 

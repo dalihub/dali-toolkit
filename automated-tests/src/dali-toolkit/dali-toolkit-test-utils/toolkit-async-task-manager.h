@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOLKIT_ASYNC_TASK_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,12 @@ void ProcessSingleCompletedTasks();
 
 // Execute all completed processes synchronously.
 void ProcessAllCompletedTasks();
+
+// Let we delay to call NotifyToReady until `UngrabNotifyToReady()`.
+void GrabNotifyToReady();
+
+// Call all delayed NotifyToReady calls.
+void UngrabNotifyToReady();
 } // namespace AsyncTaskManager
 } // namespace Test
 

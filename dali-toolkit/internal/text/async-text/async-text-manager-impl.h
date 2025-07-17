@@ -19,13 +19,16 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <map>
 #include <queue>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-manager.h>
+#include <dali-toolkit/internal/text/async-text/text-loading-task.h>
 
 namespace Dali
 {
@@ -79,6 +82,14 @@ public:
    */
   void LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task);
 
+public: ///< Called from worker thread
+  /**
+   * @brief Callback function when text loaing task complete to use loader.
+   * @param[in] task The task which loader used. Could be nullptr for error case.
+   * @param[in] loader The loader used by task.
+   */
+  void ReleaseLoader(Toolkit::Internal::TextLoadingTaskPtr task, Text::AsyncTextLoader loader);
+
 private:
   /**
    * Structure to hold info about a text load during NotifyObservers.
@@ -105,30 +116,41 @@ private:
   };
 
   /**
-   * Whether there is an available loader.
-   */
-  bool IsAvailableLoader();
-
-  /**
-   * Returns available loader.
-   */
-  Text::AsyncTextLoader GetAvailableLoader();
-
-  /**
    * This is called by the AsyncTextManager when an observer is destroyed.
    * We use the callback to know when to remove an observer from our notify list.
    * @param[in] observer The observer that generated the callback.
    */
   void ObserverDestroyed(TextLoadObserver* observer);
 
+  /**
+   * Resolve all locale changed loader whenever we can.
+   */
+  void ResolveLocaleChangedLoader();
+
+private: ///< Called from worker thread
+  /**
+   * Set available loader to any waiting task.
+   */
+  void SetLoaderToWaitingTask();
+
+  /**
+   * Returns available loader.
+   * Could be called under mTasksMutex locked case.
+   */
+  Text::AsyncTextLoader GetAvailableLoader();
+
 private:
   std::string mLocale; ///< System locale.
   uint32_t    mTaskId; ///< Id for managing the requested task.
 
-  std::vector<Text::AsyncTextLoader> mAvailableLoaders; ///< List of available async text loader.
-  std::vector<Text::AsyncTextLoader> mRunningLoaders;   ///< List of running async text loader.
-  std::map<uint32_t, LoadElement>    mWaitingTasks;     ///< Waiting tasks, key is task id.
-  std::map<uint32_t, LoadElement>    mRunningTasks;     ///< Running tasks, key is task id.
+  Dali::Mutex                        mLoaderMutex;          ///< Mutex for AsyncTextLoader. Could be used under mTaskMutex.
+  std::vector<Text::AsyncTextLoader> mAvailableLoaders;     ///< List of available async text loader. Must be changed under mLoaderMutex.
+  std::vector<Text::AsyncTextLoader> mLocaleChangedLoaders; ///< List of locale cyanged async text loader. Must be changed under mLoaderMutex.
+  std::vector<Text::AsyncTextLoader> mRunningLoaders;       ///< List of running async text loader. Must be changed under mLoaderMutex.
+
+  Dali::Mutex                     mTasksMutex;   ///< Mutex for Tasks.
+  std::map<uint32_t, LoadElement> mWaitingTasks; ///< Waiting tasks, key is task id. Must be changed under mTasksMutex
+  std::map<uint32_t, LoadElement> mRunningTasks; ///< Running tasks, key is task id. Must be changed under mTasksMutex
 };
 
 } // namespace Internal

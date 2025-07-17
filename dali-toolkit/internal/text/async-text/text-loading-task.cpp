@@ -23,6 +23,11 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/signals/callback.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/async-text/async-text-manager-impl.h> ///< To call AsyncTextManager::ReleaseLoader
+#include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 
 namespace Dali
 {
@@ -41,6 +46,7 @@ TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParamet
   mParameters(parameters),
   mRenderInfo(),
   mAsyncTaskManager(asyncTaskManager),
+  mAsyncTextManager(),
   mIsReady(false),
   mMutex()
 {
@@ -48,6 +54,15 @@ TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParamet
 
 TextLoadingTask::~TextLoadingTask()
 {
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    // To avoid loader leaking. Never ever happend, but for safety.
+    if(DALI_UNLIKELY(mAsyncTextManager && mLoader))
+    {
+      DALI_LOG_ERROR("Need to release loader!!");
+      mAsyncTextManager->ReleaseLoader(nullptr, mLoader);
+    }
+  }
 }
 
 uint32_t TextLoadingTask::GetId()
@@ -55,12 +70,14 @@ uint32_t TextLoadingTask::GetId()
   return mId;
 }
 
-void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader)
+void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader, TextLoadingTask::ReleaseCallbackReceiver releaseCallbackReceiver)
 {
   {
     Dali::Mutex::ScopedLock lock(mMutex);
     mLoader = loader;
   }
+
+  mAsyncTextManager = releaseCallbackReceiver;
 
   if(DALI_LIKELY(!mIsReady && mLoader))
   {
@@ -76,8 +93,15 @@ void TextLoadingTask::Process()
   {
     return;
   }
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
-  Load();
+  {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
+    Load();
+  }
+  if(DALI_LIKELY(mAsyncTextManager))
+  {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_RELEASE");
+    ReleaseLoader();
+  }
 }
 
 bool TextLoadingTask::IsReady()
@@ -197,6 +221,20 @@ void TextLoadingTask::Load()
       DALI_LOG_ERROR("Unexpected request type recieved : %d\n", mParameters.requestType);
       break;
     }
+  }
+}
+
+void TextLoadingTask::ReleaseLoader()
+{
+  if(DALI_LIKELY(mAsyncTextManager))
+  {
+    // Release all local varaibles before execute callback.
+    if(DALI_LIKELY(mLoader))
+    {
+      auto loader = std::move(mLoader);
+      mAsyncTextManager->ReleaseLoader(this, loader);
+    }
+    mAsyncTextManager.Reset();
   }
 }
 

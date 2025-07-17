@@ -1183,10 +1183,31 @@ bool AsyncTaskManager::TaskHelper::Request()
 /*********************************  PUBLIC CLASS  *******************************/
 /********************************************************************************/
 
+namespace
+{
+std::vector<AsyncTaskPtr> gDelayedReadyTasks{};
+bool                      gGrabReadyTasks = false;
+Dali::Mutex               gMutex;
+} // namespace
+
 void AsyncTask::NotifyToReady()
 {
-  tet_printf("NotifyToReady[%s]\n", GetTaskName().data());
-  Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));
+  bool grabed = false;
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    grabed = gGrabReadyTasks;
+    if(gGrabReadyTasks)
+    {
+      tet_printf("NotifyToReady[%s] delayed\n", GetTaskName().data());
+      gDelayedReadyTasks.push_back(AsyncTaskPtr(this));
+    }
+  }
+
+  if(!grabed)
+  {
+    tet_printf("NotifyToReady[%s]\n", GetTaskName().data());
+    Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));
+  }
 }
 
 AsyncTaskManager::AsyncTaskManager() = default;
@@ -1236,6 +1257,12 @@ namespace AsyncTaskManager
 {
 void DestroyAsyncTaskManager()
 {
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    gDelayedReadyTasks.clear();
+    gGrabReadyTasks = false;
+  }
+
   Dali::Internal::Adaptor::gAsyncTaskManager.Reset();
 }
 
@@ -1249,6 +1276,28 @@ void ProcessAllCompletedTasks()
 {
   auto asyncTaskManager = Dali::AsyncTaskManager::Get();
   Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).TaskAllCompleted();
+}
+
+void GrabNotifyToReady()
+{
+  Dali::Mutex::ScopedLock lock(gMutex);
+  gGrabReadyTasks = true;
+}
+
+void UngrabNotifyToReady()
+{
+  auto                         asyncTaskManager = Dali::AsyncTaskManager::Get();
+  decltype(gDelayedReadyTasks) delayedTasks;
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    gGrabReadyTasks = false;
+    // Move tasks to another container, and notify to ready synchronously.
+    delayedTasks = std::move(gDelayedReadyTasks);
+  }
+  for(auto&& task : delayedTasks)
+  {
+    Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).NotifyToTaskReady(task);
+  }
 }
 } // namespace AsyncTaskManager
 } // namespace Test

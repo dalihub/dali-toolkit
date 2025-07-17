@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
+#include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
@@ -29,6 +30,15 @@ namespace Dali
 {
 namespace Toolkit
 {
+namespace Text
+{
+namespace Internal
+{
+class AsyncTextManager;
+using AsyncTextManagerPtr = IntrusivePtr<AsyncTextManager>;
+} // namespace Internal
+} // namespace Text
+
 namespace Internal
 {
 class TextLoadingTask;
@@ -63,13 +73,14 @@ public:
    */
   uint32_t GetId();
 
+  using ReleaseCallbackReceiver = Text::Internal::AsyncTextManagerPtr; // TODO : Make it seperated interface.
   /**
    * Set async text loader to process.
    * The task becomes ready to process.
    * @param [in] loader The async text loader, a loader can only process one task at a time.
-   * @return The task id.
+   * @param [in] releaseCallbackReceiver The callback receiver when we can release loader at worker thread.
    */
-  void SetLoader(Text::AsyncTextLoader& loader);
+  void SetLoader(Text::AsyncTextLoader& loader, ReleaseCallbackReceiver releaseCallbackReceiver);
 
 public: // Implementation of AsyncTask
   /**
@@ -102,6 +113,11 @@ private:
    */
   void Load();
 
+  /**
+   * Release AsyncTextLoader
+   */
+  void ReleaseLoader();
+
 public:
   uint32_t                  mId;
   Text::AsyncTextLoader     mLoader;
@@ -109,7 +125,8 @@ public:
   Text::AsyncTextRenderInfo mRenderInfo;
 
 private:
-  Dali::AsyncTaskManager mAsyncTaskManager; ///< Keep reference to call NotifyToReady(). TODO : Could we remove it?
+  Dali::AsyncTaskManager  mAsyncTaskManager; ///< Keep reference to call NotifyToReady(). TODO : Could we remove it?
+  ReleaseCallbackReceiver mAsyncTextManager; ///< Keep reference to call ReleaseLoader(). TODO : Could we remove it?
 
   bool  mIsReady : 1; ///< Whether this task ready to run
   Mutex mMutex;
