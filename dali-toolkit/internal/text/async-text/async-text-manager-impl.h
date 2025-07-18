@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ASYNC_TEXT_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,13 +120,6 @@ private:
    * @param[in] observer The observer that generated the callback.
    */
   void ObserverDestroyed(TextLoadObserver* observer);
-
-  /**
-   * This is a temporary function.
-   * The AsyncTaskManager does not know that the IsReady has changed after the task is added.
-   * In this function, wake up by adding an empty task to AsyncTaskManager.
-   */
-  void WakeUpAsyncTaskManager();
 
 private:
   std::string mLocale; ///< System locale.

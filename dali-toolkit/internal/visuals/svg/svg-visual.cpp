@@ -78,6 +78,8 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mPlacementActor(),
   mRasterizedSize(-Vector2::ONE), ///< Let we don't use zero since visual size could be zero after trasnform
   mDesiredSize(size),
+  mLoadCompleted(false),
+  mRasterizeCompleted(false),
   mLoadFailed(false),
   mAttemptAtlasing(false)
 {
@@ -324,6 +326,32 @@ bool SvgVisual::AttemptAtlasing() const
   return (!mImpl->mCustomShader && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }
 
+void SvgVisual::EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
+{
+  SvgVisualPtr self = this; // Keep reference until this API finished
+
+  // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+  Actor actor = mPlacementActor.GetHandle();
+  if(actor)
+  {
+    if(mImpl->mRenderer)
+    {
+      if(resourceStatus == Toolkit::Visual::ResourceStatus::FAILED)
+      {
+        Vector2 imageSize = Vector2::ZERO;
+        imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+      }
+      actor.AddRenderer(mImpl->mRenderer);
+    }
+    // reset the weak handle so that the renderer only get added to actor once
+    mPlacementActor.Reset();
+  }
+
+  // Svg loaded and ready to display
+  ResourceReady(resourceStatus);
+}
+
 void SvgVisual::AddRasterizationTask(const Vector2& size)
 {
   if(mImpl->mRenderer)
@@ -341,7 +369,8 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
     const bool attemtAtlasing       = AttemptAtlasing();
 
-    mSvgRasterizeId = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemtAtlasing, this, synchronousRasterize);
+    mRasterizeCompleted = false;
+    mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemtAtlasing, this, synchronousRasterize);
   }
 }
 
@@ -351,6 +380,8 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
   // mSvgLoadId might not be updated if svg file is cached. Update now.
   mSvgLoadId = loadId;
 
+  mLoadCompleted = true;
+
   if(DALI_LIKELY(vectorImageRenderer))
   {
     vectorImageRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
@@ -358,6 +389,13 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
     {
       // Need teo call ApplyFittingMode once again, after load completed.
       mImpl->mEventObserver->RelayoutRequest(*this);
+    }
+
+    // Very rarely, rasterize completed inovked before load completed invoke.
+    // In this case, we should send resource ready here.
+    if(DALI_UNLIKELY(mRasterizeCompleted && IsOnScene()))
+    {
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
   }
   else if(!mLoadFailed)
@@ -375,19 +413,7 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
 
     if(IsOnScene())
     {
-      Actor actor = mPlacementActor.GetHandle();
-      if(actor && mImpl->mRenderer)
-      {
-        Vector2 imageSize = Vector2::ZERO;
-        imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-        actor.AddRenderer(mImpl->mRenderer);
-        // reset the weak handle so that the renderer only get added to actor once
-        mPlacementActor.Reset();
-      }
-
-      // Emit failed signal only if this visual is scene-on
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
     }
   }
 }
@@ -397,6 +423,8 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
 {
   // rasterize id might not be updated if rasterize is cached.
   mSvgRasterizeId = rasterizeId;
+
+  mRasterizeCompleted = true;
 
   if(DALI_LIKELY(textureSet))
   {
@@ -449,21 +477,9 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
       }
     }
 
-    if(IsOnScene())
+    if(IsOnScene() && DALI_LIKELY(mLoadCompleted))
     {
-      SvgVisualPtr self = this; // Keep reference until this API finished
-
-      // Rasterized pixels are uploaded to texture. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
-      Actor actor = mPlacementActor.GetHandle();
-      if(actor)
-      {
-        actor.AddRenderer(mImpl->mRenderer);
-        // reset the weak handle so that the renderer only get added to actor once
-        mPlacementActor.Reset();
-      }
-
-      // Svg loaded and ready to display
-      ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
   }
   else if(!mLoadFailed)
@@ -474,20 +490,7 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
 
     if(IsOnScene())
     {
-      Actor actor = mPlacementActor.GetHandle();
-      if(actor && mImpl->mRenderer)
-      {
-        Vector2 imageSize = Vector2::ZERO;
-        imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-        mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-        actor.AddRenderer(mImpl->mRenderer);
-
-        // reset the weak handle so that the renderer only get added to actor once
-        mPlacementActor.Reset();
-      }
-
-      // Emit failed signal only if this visual is scene-on
-      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
     }
   }
 }

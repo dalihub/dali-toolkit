@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ namespace Internal
 EnvironmentMapLoadTask::EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback)
 : AsyncTask(callback),
   mEnvironmentMapUrl(environmentMapUrl),
-  mIsReady(true),
   mHasSucceeded(false)
 {
   mEnvironmentMapData.SetEnvironmentMapType(environmentMapType);
@@ -44,11 +43,6 @@ EnvironmentMapLoadTask::~EnvironmentMapLoadTask()
 void EnvironmentMapLoadTask::Process()
 {
   mHasSucceeded = Scene3D::Loader::LoadEnvironmentMap(mEnvironmentMapUrl, mEnvironmentMapData);
-}
-
-bool EnvironmentMapLoadTask::IsReady()
-{
-  return mIsReady;
 }
 
 bool EnvironmentMapLoadTask::HasSucceeded() const

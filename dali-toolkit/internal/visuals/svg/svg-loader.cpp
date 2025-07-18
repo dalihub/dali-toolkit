@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,9 +446,8 @@ Dali::VectorImageRenderer SvgLoader::GetVectorImageRenderer(SvgLoader::SvgLoadId
 
 void SvgLoader::Process(bool postProcessor)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss) {
-    oss << "[r:" << mRasterizeRemoveQueue.size() << ", l:" << mLoadRemoveQueue.size() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss)
+                                          { oss << "[r:" << mRasterizeRemoveQueue.size() << ", l:" << mLoadRemoveQueue.size() << "]"; });
 
   mRemoveProcessorRegistered = false;
 
@@ -670,7 +669,7 @@ void SvgLoader::LoadRequest(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObserver*
     }
   }
 
-  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, MakeCallback(this, &SvgLoader::AsyncLoadComplete));
+  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, Dali::AsyncTaskManager::Get(), MakeCallback(this, &SvgLoader::AsyncLoadComplete));
 
   Dali::AsyncTaskManager::Get().AddTask(loadInfo.mTask);
 }
@@ -691,7 +690,7 @@ void SvgLoader::LoadSynchronously(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObs
   }
 
   // Note, we will not store this task after this API called.
-  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, nullptr);
+  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, Dali::AsyncTaskManager(), nullptr);
   loadingTask->Process();
   if(!loadingTask->HasSucceeded())
   {
@@ -880,21 +879,22 @@ void SvgLoader::RasterizeRequest(SvgLoader::SvgRasterizeInfo& rasterizeInfo, Svg
   AddRasterizeObserver(rasterizeInfo, svgObserver);
   rasterizeInfo.mRasterizeState = RasterizeState::RASTERIZING;
 
-  auto vectorImageRenderer = GetVectorImageRenderer(rasterizeInfo.mLoadId);
+  auto loadCacheIndex      = GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId);
+  auto vectorImageRenderer = mLoadCache[loadCacheIndex].mVectorImageRenderer;
 
-  SvgTaskPtr rasterizingTask = new SvgRasterizingTask(vectorImageRenderer, rasterizeInfo.mId, rasterizeInfo.mWidth, rasterizeInfo.mHeight, MakeCallback(this, &SvgLoader::AsyncRasterizeComplete));
+  SvgRasterizingTaskPtr rasterizingTask = new SvgRasterizingTask(vectorImageRenderer, rasterizeInfo.mId, rasterizeInfo.mWidth, rasterizeInfo.mHeight, MakeCallback(this, &SvgLoader::AsyncRasterizeComplete));
 #ifdef TRACE_ENABLED
   {
-    SvgRasterizingTask* castedRasterizingTask = dynamic_cast<SvgRasterizingTask*>(rasterizingTask.Get());
-
-    // It should not be nullptr, but we need to check nullptr to avoid SVACE false alarm.
-    if(DALI_LIKELY(castedRasterizingTask))
-    {
-      auto loadCacheIndex = GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId);
-      castedRasterizingTask->SetUrl(mLoadCache[loadCacheIndex].mImageUrl);
-    }
+    rasterizingTask->SetUrl(mLoadCache[loadCacheIndex].mImageUrl);
   }
 #endif
+
+  if(mLoadCache[loadCacheIndex].mTask)
+  {
+    // Notify at workerthread if load completed.
+    // Need to be added before task added to task manager.
+    mLoadCache[loadCacheIndex].mTask->AddNotifyObservedTaskList(rasterizingTask);
+  }
 
   // Keep SvgTask at info.
   rasterizeInfo.mTask = std::move(rasterizingTask);
@@ -909,17 +909,11 @@ void SvgLoader::RasterizeSynchronously(SvgLoader::SvgRasterizeInfo& rasterizeInf
   auto vectorImageRenderer = GetVectorImageRenderer(rasterizeInfo.mLoadId);
 
   // Note, we will not store this task after this API called.
-  SvgTaskPtr rasterizingTask = new SvgRasterizingTask(vectorImageRenderer, rasterizeInfo.mId, rasterizeInfo.mWidth, rasterizeInfo.mHeight, nullptr);
+  SvgRasterizingTaskPtr rasterizingTask = new SvgRasterizingTask(vectorImageRenderer, rasterizeInfo.mId, rasterizeInfo.mWidth, rasterizeInfo.mHeight, nullptr);
 #ifdef TRACE_ENABLED
   {
-    SvgRasterizingTask* castedRasterizingTask = dynamic_cast<SvgRasterizingTask*>(rasterizingTask.Get());
-
-    // It should not be nullptr, but we need to check nullptr to avoid SVACE false alarm.
-    if(DALI_LIKELY(castedRasterizingTask))
-    {
-      auto loadCacheIndex = GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId);
-      castedRasterizingTask->SetUrl(mLoadCache[loadCacheIndex].mImageUrl);
-    }
+    auto loadCacheIndex = GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId);
+    rasterizingTask->SetUrl(mLoadCache[loadCacheIndex].mImageUrl);
   }
 #endif
   rasterizingTask->Process();

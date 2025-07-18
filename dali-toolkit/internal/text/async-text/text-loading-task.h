@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LOADING_TASK_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,13 @@ public:
    * Constructor.
    * @param [in] id The task id assigned from async text manager.
    * @param [in] paramaters The async text parameters.
+   * @param [in] asyncTaskManager The singletone async task manager to keep reference.
    * @param [in] callback The callback that is called when the operation is completed.
    */
   TextLoadingTask(const uint32_t                   id,
                   const Text::AsyncTextParameters& paramaters,
+                  Dali::AsyncTaskManager           asyncTaskManager,
                   CallbackBase*                    callback);
-
-  /**
-   * Constructor, empty task for wake up the async task manger.
-   * @param [in] id The task id assigned from async text manager.
-   * @param [in] callback The callback that is called when the operation is completed.
-   */
-  TextLoadingTask(const uint32_t id,
-                  CallbackBase*  callback);
 
   /**
    * Destructor.
@@ -115,6 +109,8 @@ public:
   Text::AsyncTextRenderInfo mRenderInfo;
 
 private:
+  Dali::AsyncTaskManager mAsyncTaskManager; ///< Keep reference to call NotifyToReady(). TODO : Could we remove it?
+
   bool  mIsReady : 1; ///< Whether this task ready to run
   Mutex mMutex;
 };

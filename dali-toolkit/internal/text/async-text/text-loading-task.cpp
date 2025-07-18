@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,23 +35,15 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
-TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, CallbackBase* callback)
+TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback)
 : AsyncTask(callback),
   mId(id),
   mParameters(parameters),
   mRenderInfo(),
+  mAsyncTaskManager(asyncTaskManager),
   mIsReady(false),
   mMutex()
 {
-}
-
-TextLoadingTask::TextLoadingTask(const uint32_t id, CallbackBase* callback)
-: AsyncTask(callback),
-  mId(id),
-  mIsReady(true),
-  mMutex()
-{
-  // Empty task for wake up the async task manger.
 }
 
 TextLoadingTask::~TextLoadingTask()
@@ -65,9 +57,17 @@ uint32_t TextLoadingTask::GetId()
 
 void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader)
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
-  mLoader  = loader;
-  mIsReady = true;
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+    mLoader = loader;
+  }
+
+  if(DALI_LIKELY(!mIsReady && mLoader))
+  {
+    mIsReady = true;
+    NotifyToReady();
+    mAsyncTaskManager.Reset();
+  }
 }
 
 void TextLoadingTask::Process()
@@ -125,7 +125,7 @@ void TextLoadingTask::Load()
           }
 #endif
           mParameters.isAutoScrollEnabled = true;
-          mRenderInfo = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
+          mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
         }
         else
         {

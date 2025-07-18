@@ -1999,10 +1999,10 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup01(void)
   gAsyncTextRenderedCalled = false;
 
   std::string emojiSequences =
-    "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   //case for coverage when glyph is not included in the font
-    "Text VS15 &#x262a;&#xfe0e;\n"                                                         //text presentation sequence and selector
-    "Color VS16 &#x262a;&#xfe0f;\n"                                                        //emoji presentation sequence and selector
-    "Default &#x262a; \n"                                                                  //default presentation
+    "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   // case for coverage when glyph is not included in the font
+    "Text VS15 &#x262a;&#xfe0e;\n"                                                         // text presentation sequence and selector
+    "Color VS16 &#x262a;&#xfe0f;\n"                                                        // emoji presentation sequence and selector
+    "Default &#x262a; \n"                                                                  // default presentation
     "FamilyManWomanGirlBoy &#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;\n" // emoji multi zwj sequence
     "WomanScientist &#x1f469;&#x200d;&#x1f52c;\n"                                          // emoji zwj sequence
     "WomanScientistLightSkinTone&#x1F469;&#x1F3FB;&#x200D;&#x1F52C; \n"                    // emoji modifier sequence: skin tone & JWZ
@@ -2165,7 +2165,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
 
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
   label.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 100);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 20);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   std::string longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
@@ -2332,7 +2332,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(6, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -2419,7 +2419,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncNaturalSize(label);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(6, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -2511,7 +2511,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncHeightForWidth(label, 300.0f);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(6, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -3053,7 +3053,7 @@ int UtcDaliToolkitTextLabelAsyncFontVariations(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   application.GetScene().Add(label);
 
-  std::string WGHT_KEY = "wght";
+  std::string WGHT_KEY   = "wght";
   const float WGHT_VALUE = 100.f;
 
   auto fontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, WGHT_KEY.data());
@@ -3145,7 +3145,7 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   expectedWidth  = 60.0f;
   expectedHeight = 50.0f;
 
-  asyncTextRendered = false;
+  asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
   gAsyncTextRenderedHeight = 0.0f;
@@ -3167,7 +3167,7 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   expectedWidth  = 500.0f;
   expectedHeight = 50.0f;
 
-  asyncTextRendered = false;
+  asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
   gAsyncTextRenderedHeight = 0.0f;

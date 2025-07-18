@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,10 +78,12 @@ VectorImageRenderer SvgTask::GetRenderer()
   return mVectorRenderer;
 }
 
-SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
+SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback)
 : SvgTask(vectorRenderer, id, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mImageUrl(url),
   mEncodedImageBuffer(encodedImageBuffer),
+  mAsyncTaskManager(asyncTaskManager),
+  mNotifyRequiredTasks(),
   mDpi(dpi)
 {
 }
@@ -96,6 +98,8 @@ void SvgLoadingTask::Process()
   {
     // Already loaded
     mHasSucceeded = true;
+
+    NotifyTasksReady();
     return;
   }
 
@@ -104,10 +108,10 @@ void SvgLoadingTask::Process()
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   bool loadFailed = false;
 
@@ -153,19 +157,44 @@ void SvgLoadingTask::Process()
 
   mHasSucceeded = !loadFailed;
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss) {
+  NotifyTasksReady();
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADING_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
     oss << "s:" << mHasSucceeded << " ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 }
 
-bool SvgLoadingTask::IsReady()
+void SvgLoadingTask::AddNotifyObservedTaskList(SvgRasterizingTaskPtr rasterizingTask)
 {
-  return true;
+  if(!mVectorRenderer.IsLoaded())
+  {
+    Mutex::ScopedLock lock(mMutex);
+    mNotifyRequiredTasks.emplace_back(std::move(rasterizingTask));
+  }
+}
+
+void SvgLoadingTask::NotifyTasksReady()
+{
+  decltype(mNotifyRequiredTasks) notifyRequiredTasks;
+  {
+    Mutex::ScopedLock lock(mMutex);
+    notifyRequiredTasks.swap(mNotifyRequiredTasks);
+  }
+
+  // Notify only if load successed
+  if(DALI_LIKELY(mHasSucceeded))
+  {
+    for(auto&& rasterizingTask : notifyRequiredTasks)
+    {
+      rasterizingTask->NotifyToReady();
+    }
+  }
+  mAsyncTaskManager.Reset();
 }
 
 SvgRasterizingTask::SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback)
@@ -191,31 +220,32 @@ void SvgRasterizingTask::Process()
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[s:" << mWidth << "x" << mHeight << " ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
   if(!pixelBuffer)
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss)
+                                          {
       mEndTimeNanoSceonds = GetNanoseconds();
       oss << std::fixed << std::setprecision(3);
       oss << "[failed/";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
       oss << "s:" << mWidth << "x" << mHeight << " ";
-      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-    });
+      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
     return;
   }
 
   mPixelData    = Devel::PixelBuffer::Convert(pixelBuffer);
   mHasSucceeded = true;
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
@@ -225,8 +255,7 @@ void SvgRasterizingTask::Process()
     {
       oss << "p:" << mPixelData.GetWidth() << "x" << mPixelData.GetHeight() << " ";
     }
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 }
 
 bool SvgRasterizingTask::IsReady()

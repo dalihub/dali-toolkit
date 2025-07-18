@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_ENVIRONMENT_MAP_LOAD_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,11 +85,6 @@ public: // Implementation of AsyncTask
   void Process();
 
   /**
-   * @copydoc Dali::AsyncTask::IsReady()
-   */
-  bool IsReady();
-
-  /**
    * @copydoc Dali::AsyncTask::GetTaskName()
    */
   std::string_view GetTaskName() const override
@@ -108,7 +103,6 @@ private:
   std::string                               mEnvironmentMapUrl;
   Dali::Scene3D::Loader::EnvironmentMapData mEnvironmentMapData;
 
-  bool mIsReady;
   bool mHasSucceeded;
 };
 

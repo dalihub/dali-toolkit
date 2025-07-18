@@ -156,7 +156,7 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
   // Each task must have its own unique id.
   mTaskId++;
 
-  auto task = new Dali::Toolkit::Internal::TextLoadingTask(mTaskId, parameters, MakeCallback(this, &AsyncTextManager::LoadComplete));
+  auto task = new Dali::Toolkit::Internal::TextLoadingTask(mTaskId, parameters, Dali::AsyncTaskManager::Get(), MakeCallback(this, &AsyncTextManager::LoadComplete));
 
   LoadElement element(task, observer, parameters);
 
@@ -199,6 +199,7 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
 #endif
   }
 
+  // We need to add task now, due to task completed callback could trace this task.
   Dali::AsyncTaskManager::Get().AddTask(task);
 
   return mTaskId;
@@ -329,9 +330,6 @@ void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
       // Set loader and ready to process.
       element.mTask->SetLoader(loader);
 
-      // TODO : AsyncTaskManager does not know that the IsReady has changed after the task is added.
-      // Wake up by adding an empty task to AsyncTaskManager.
-      WakeUpAsyncTaskManager();
 #ifdef TRACE_ENABLED
       if(gTraceFilter && gTraceFilter->IsTraceEnabled())
       {
@@ -383,12 +381,6 @@ void AsyncTextManager::ObserverDestroyed(TextLoadObserver* observer)
       ++it;
     }
   }
-}
-
-void AsyncTextManager::WakeUpAsyncTaskManager()
-{
-  auto emptyTask = new Dali::Toolkit::Internal::TextLoadingTask(EMPTY_TASK_ID, MakeCallback(this, &AsyncTextManager::LoadComplete));
-  Dali::AsyncTaskManager::Get().AddTask(emptyTask);
 }
 
 } // namespace Internal
