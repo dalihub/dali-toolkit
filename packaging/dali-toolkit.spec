@@ -20,10 +20,7 @@ BuildRequires:  pkgconfig(egl)
 
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
-
-%if 0%{?enable_usd_loader}
 BuildRequires:  openusd-devel
-%endif
 
 #############################
 # profile setup
@@ -164,7 +161,6 @@ Requires:   %{dali2_physics3d} = %{version}-%{release}
 %description -n %{dali2_physics3d}-devel
 Development components for dali2-physics-3d.
 
-%if 0%{?enable_usd_loader}
 ##############################
 # dali-usd-loader
 ##############################
@@ -187,7 +183,6 @@ Requires:   %{dali2_scene3d}-devel
 
 %description -n %{dali2_usdloader}-devel
 Development components for dali-usd-loader.
-%endif
 
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
@@ -382,11 +377,9 @@ pushd %{dali_toolkit_style_files}/1920x1080_rpi
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
 popd
 
-%if 0%{?enable_usd_loader}
 %post -n %{dali2_usdloader}
 /sbin/ldconfig
 exit 0
-%endif
 
 ##############################
 # Pre Uninstall
@@ -499,11 +492,9 @@ case "$1" in
   ;;
 esac
 
-%if 0%{?enable_usd_loader}
 %postun -n %{dali2_usdloader}
 /sbin/ldconfig
 exit 0
-%endif
 
 ##############################
 # Files in Binary Packages
@@ -633,7 +624,6 @@ exit 0
 %{_libdir}/pkgconfig/dali2-physics-3d.pc
 %{_libdir}/pkgconfig/bullet3.pc
 
-%if 0%{?enable_usd_loader}
 %files -n %{dali2_usdloader}
 %if 0%{?enable_dali_smack_rules}
 %manifest dali-usd-loader.manifest-smack
@@ -647,4 +637,3 @@ exit 0
 %files -n %{dali2_usdloader}-devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/dali2-usd-loader.pc
-%endif
