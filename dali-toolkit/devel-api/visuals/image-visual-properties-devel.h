@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,6 +232,22 @@ enum Type
    * @note It is used in the AnimatedImageVisual and AnimatedVectorImageVisual. The default is 1.0f.
    */
   FRAME_SPEED_FACTOR = ORIENTATION_CORRECTION + 19,
+
+  /**
+   * @brief Whether to redraw the image when the visual is scaled up.
+   * @details Name "redrawInScalingUp", type Property::BOOLEAN.
+   * @note It is used in the AnimatedVectorImageVisual. The default is true.
+   */
+  REDRAW_IN_SCALING_UP = ORIENTATION_CORRECTION + 20,
+
+  /**
+   * @brief Renders a texture at a given scale.
+   * @details Name "renderScale", type Property::FLOAT.
+   * Using render scale with Actor::Property::SCALE(= mRedrawInScalingUp is true) may scale twice.
+   * i.e RENDER_SCALE = 1.5f and SCALE = 2.0f would eventually multiply the texture by 3.0f
+   * @note It is used when scaling up AnimatedVectorImageVisual. The default is 1.0f.
+   */
+  RENDER_SCALE = ORIENTATION_CORRECTION + 21,
 };
 
 } //namespace Property

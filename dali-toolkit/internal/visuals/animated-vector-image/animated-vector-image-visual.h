@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_VECTOR_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,12 +241,14 @@ private:
   DevelImageVisual::PlayState::Type  mPlayState;
   CallbackBase*                      mEventCallback; // Not owned
   float                              mFrameSpeedFactor;
+  float                              mRenderScale;
 
   uint32_t mLastSentPlayStateId;
 
   bool mLoadFailed : 1;
   bool mRendererAdded : 1;
   bool mRedrawInScalingDown : 1;
+  bool mRedrawInScalingUp : 1;
   bool mEnableFrameCache : 1;
   bool mUseNativeImage : 1;
   bool mNotifyAfterRasterization : 1;

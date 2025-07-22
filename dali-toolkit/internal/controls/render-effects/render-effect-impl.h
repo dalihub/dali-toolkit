@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDE
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
@@ -199,6 +200,8 @@ private:
 
 private:
   Dali::Renderer mRenderer; // An additional renderer for mOwnerControl
+
+  std::vector<Constraint> mAnimationConstraints; // For corner animation on owner control.
 
   Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl;         ///< Weakhandle of owner control.
   WeakHandle<Integration::SceneHolder>     mPlacementSceneHolder; ///< Weakhandle of scene

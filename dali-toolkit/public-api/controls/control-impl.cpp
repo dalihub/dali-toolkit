@@ -702,6 +702,18 @@ void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   // @todo size negotiate background to new size, animate as well?
 }
 
+void Control::OnAnimateAnimatableProperty(Property::Index index, Animation::State state)
+{
+  if(state == Animation::State::PLAYING)
+  {
+    mImpl->CreateAnimationConstraints(index);
+  }
+  else if(state == Animation::State::STOPPED)
+  {
+    mImpl->ClearAnimationConstraints(index);
+  }
+}
+
 void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(mImpl->mRenderEffect)

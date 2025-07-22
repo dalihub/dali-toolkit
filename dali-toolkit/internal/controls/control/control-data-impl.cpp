@@ -687,12 +687,14 @@ void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visu
 {
   if(DALI_LIKELY(mVisualData))
   {
-    Property::Map map;
-    map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = DecorationData::GetCornerRadius(mDecorationData);
-    map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(mDecorationData);
-    map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(mDecorationData);
+    mVisualData->EnableCornerPropertiesOverridden(visual, enable);
 
-    mVisualData->EnableCornerPropertiesOverridden(visual, enable, map);
+    for(const auto& indexToAnimate : mPropertyOnAnimation)
+    {
+      // TODO : Optimize here to control only overridden changed visuals. For now, just full iterate.
+      mVisualData->UnbindAnimatablePropertyFromControlToVisual(indexToAnimate);
+      mVisualData->BindAnimatablePropertyFromControlToVisual(indexToAnimate);
+    }
   }
 }
 
@@ -2170,6 +2172,33 @@ void Control::Impl::UpdateBorderline()
   map[Toolkit::DevelVisual::Property::BORDERLINE_OFFSET] = DecorationData::GetBorderlineOffset(mDecorationData);
 
   SetBorderline(map, false);
+}
+
+void Control::Impl::CreateAnimationConstraints(Property::Index index)
+{
+  if(index == DevelControl::Property::CORNER_RADIUS || index == DevelControl::Property::CORNER_SQUARENESS)
+  {
+    if(mPropertyOnAnimation.find(index) == mPropertyOnAnimation.end())
+    {
+      if(DALI_LIKELY(mVisualData))
+      {
+        mVisualData->BindAnimatablePropertyFromControlToVisual(index);
+        mPropertyOnAnimation.insert(index);
+      }
+    }
+  }
+}
+
+void Control::Impl::ClearAnimationConstraints(Property::Index index)
+{
+  if(mPropertyOnAnimation.find(index) != mPropertyOnAnimation.end())
+  {
+    if(DALI_LIKELY(mVisualData))
+    {
+      mVisualData->UnbindAnimatablePropertyFromControlToVisual(index);
+      mPropertyOnAnimation.erase(index);
+    }
+  }
 }
 
 void Control::Impl::Process(bool postProcessor)
