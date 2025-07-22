@@ -1500,7 +1500,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       return;
     }
 
-    DALI_LOG_RELEASE_INFO("Request render, size : %f, %f\n", contentSize.width, contentSize.height);
+    DALI_LOG_RELEASE_INFO("Request render, size : %f, %f [%p]\n", contentSize.width, contentSize.height, static_cast<void *>(mController.Get()));
     AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_SIZE, contentSize, padding, layoutDirection);
     TextVisual::UpdateAsyncRenderer(mVisual, parameters);
     mTextUpdateNeeded    = false;
@@ -1542,7 +1542,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if((Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType)) || mTextUpdateNeeded)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout IsAutoScrollEnabled[%s] [%p]\n", (mController->IsAutoScrollEnabled()) ? "true" : "false", this);
+    DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout IsAutoScrollEnabled[%s] [%p]\n", (mController->IsAutoScrollEnabled()) ? "true" : "false", static_cast<void *>(mController.Get()));
 
     // Update the visual
     TextVisual::EnableRendererUpdate(mVisual);
@@ -1819,14 +1819,14 @@ void TextLabel::AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo)
   {
     case Async::COMPUTE_NATURAL_SIZE:
     {
-      DALI_LOG_RELEASE_INFO("Natural size : %f, %f, line count : %d\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount);
+      DALI_LOG_RELEASE_INFO("Natural size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
       mAsyncLineCount = renderInfo.lineCount;
       EmitAsyncNaturalSizeComputedSignal(renderInfo.renderedSize.width, renderInfo.renderedSize.height);
       break;
     }
     case Async::COMPUTE_HEIGHT_FOR_WIDTH:
     {
-      DALI_LOG_RELEASE_INFO("Height for width : %f, %f, line count : %d\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount);
+      DALI_LOG_RELEASE_INFO("Height for width : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
       mAsyncLineCount = renderInfo.lineCount;
       EmitAsyncHeightForWidthComputedSignal(renderInfo.renderedSize.width, renderInfo.renderedSize.height);
       break;
@@ -1842,7 +1842,7 @@ void TextLabel::AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo)
 void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
 {
   // Pure Virtual from AsyncTextInterface
-  DALI_LOG_RELEASE_INFO("Rendered size : %f, %f, line count : %d\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount);
+  DALI_LOG_RELEASE_INFO("Rendered size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
 
   // To avoid flickering issues, enable/disable the background visual when async load is completed.
   EnableControlBackground(!mController->IsTextCutout());
@@ -2068,7 +2068,7 @@ void TextLabel::RequestAsyncHeightForWidth(float width)
 
 void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 {
-  DALI_LOG_RELEASE_INFO("Request size : %f, %f\n", width, height);
+  DALI_LOG_RELEASE_INFO("Request size : %f, %f [%p]\n", width, height, static_cast<void *>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2100,7 +2100,7 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 
 void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstraint)
 {
-  DALI_LOG_RELEASE_INFO("Request width : %f, height constraint : %f\n", width, heightConstraint);
+  DALI_LOG_RELEASE_INFO("Request width : %f, height constraint : %f [%p]\n", width, heightConstraint, static_cast<void *>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2132,7 +2132,7 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
 
 void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float height)
 {
-  DALI_LOG_RELEASE_INFO("Request width constraint : %f, height : %f\n", widthConstraint, height);
+  DALI_LOG_RELEASE_INFO("Request width constraint : %f, height : %f [%p]\n", widthConstraint, height, static_cast<void *>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2164,7 +2164,7 @@ void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float h
 
 void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float heightConstraint)
 {
-  DALI_LOG_RELEASE_INFO("Request constraint : %f, %f\n", widthConstraint, heightConstraint);
+  DALI_LOG_RELEASE_INFO("Request constraint : %f, %f [%p]\n", widthConstraint, heightConstraint, static_cast<void *>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
