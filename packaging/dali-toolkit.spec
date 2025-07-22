@@ -7,16 +7,6 @@ License:    Apache-2.0 and BSD-3-Clause and MIT
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
-%ifnarch riscv64
-%if 0%{?tizen_version_major} > 9
-%define enable_usd_loader 1
-%else
-%define enable_usd_loader 0
-%endif
-%else
-%define enable_usd_loader 0
-%endif
-
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
