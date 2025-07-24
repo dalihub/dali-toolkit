@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_TASK_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -39,6 +40,10 @@ class SvgVisual;
 typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
 class SvgTask;
 typedef IntrusivePtr<SvgTask> SvgTaskPtr;
+class SvgLoadingTask;
+typedef IntrusivePtr<SvgLoadingTask> SvgLoadingTaskPtr;
+class SvgRasterizingTask;
+typedef IntrusivePtr<SvgRasterizingTask> SvgRasterizingTaskPtr;
 
 /**
  * The svg rasterizing tasks to be processed in the worker thread.
@@ -116,9 +121,10 @@ public:
    * @param[in] url The URL to svg resource to use.
    * @param[in] encodedImageBuffer The resource buffer if required.
    * @param[in] dpi The DPI of the screen.
+   * @param[in] asyncTaskManager The singletone async task manager to keep reference.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback);
+  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback);
 
   /**
    * Destructor.
@@ -132,17 +138,18 @@ public: // Implementation of AsyncTask
   void Process();
 
   /**
-   * @copydoc Dali::AsyncTask::IsReady()
-   */
-  bool IsReady();
-
-  /**
    * @copydoc Dali::AsyncTask::GetTaskName()
    */
   std::string_view GetTaskName() const override
   {
     return "SvgLoadingTask";
   }
+
+public:
+  /**
+   * @brief Collect the list of tasks to got notify to read after load completed at worker thread.
+   */
+  void AddNotifyObservedTaskList(SvgRasterizingTaskPtr rasterizingTask);
 
 private:
   // Undefined
@@ -152,9 +159,21 @@ private:
   SvgLoadingTask& operator=(const SvgLoadingTask& task) = delete;
 
 private:
+  /**
+   * @brief Notify to tasks whether it is successed so could be ready or not at worker thread.
+   */
+  void NotifyTasksReady();
+
+private:
   VisualUrl          mImageUrl;
   EncodedImageBuffer mEncodedImageBuffer;
-  float              mDpi;
+
+  Dali::AsyncTaskManager mAsyncTaskManager; ///< Keep reference to call NotifyToReady(). TODO : Could we remove it?
+
+  Dali::Mutex                        mMutex;
+  std::vector<SvgRasterizingTaskPtr> mNotifyRequiredTasks;
+
+  float mDpi;
 };
 
 class SvgRasterizingTask : public SvgTask

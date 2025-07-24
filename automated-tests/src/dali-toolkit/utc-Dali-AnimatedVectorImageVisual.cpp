@@ -814,7 +814,13 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
 
   visual.GetNaturalSize(naturalSize);
 
-  DALI_TEST_EQUALS(naturalSize, Vector2(100.0f, 100.0f), TEST_LOCATION); // 100x100 is the content default size.
+  // Some magical async-task ordering issue, Rasterize might be finished before load completed.
+  if(DALI_UNLIKELY(naturalSize != Vector2(100.0f, 100.0f)))
+  {
+    // Trigger one more time
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(naturalSize, Vector2(100.0f, 100.0f), TEST_LOCATION); // 100x100 is the content default size.
+  }
 
   actor.SetProperty(Actor::Property::SIZE, controlSize);
 

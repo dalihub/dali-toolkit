@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,7 @@ public: ///< Implement of SvgLoaderObserver
     mVectorImageRenderer = vectorImageRenderer;
 
     mLoadSuccess = !!mVectorImageRenderer;
+    tet_printf("loadId[%d] complete. Success[%d]\n", loadId, mLoadSuccess);
   }
 
   void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override
@@ -97,11 +98,13 @@ public: ///< Implement of SvgLoaderObserver
     mAtlasRect       = atlasRect;
 
     mRasterizeSuccess = !!mTextureSet;
+    tet_printf("rasterizeId[%d] complete. Success[%d]\n", rasterizeId, mRasterizeSuccess);
   }
 
 public: /// Check for test
   void CheckTest(bool loadCalled, bool loadSuccess, bool rasterizeCalled, bool rasterizeSuccess, const char* location)
   {
+    tet_printf("CheckTest value : %d %d %d %d, expect %d %d %d %d\n", mLoadCalled, mLoadSuccess, mRasterizeCalled, mRasterizeSuccess, loadCalled, loadSuccess, rasterizeCalled, rasterizeSuccess);
     DALI_TEST_EQUALS(mLoadCalled, loadCalled, location);
     DALI_TEST_EQUALS(mLoadSuccess, loadSuccess, location);
     DALI_TEST_EQUALS(mRasterizeCalled, rasterizeCalled, location);
@@ -109,11 +112,13 @@ public: /// Check for test
   }
   void CheckLoadTest(bool loadCalled, bool loadSuccess, const char* location)
   {
+    tet_printf("CheckLoadTest value : %d %d, expect %d %d\n", mLoadCalled, mLoadSuccess, loadCalled, loadSuccess);
     DALI_TEST_EQUALS(mLoadCalled, loadCalled, location);
     DALI_TEST_EQUALS(mLoadSuccess, loadSuccess, location);
   }
   void CheckRasterizeTest(bool rasterizeCalled, bool rasterizeSuccess, const char* location)
   {
+    tet_printf("CheckRasterizeTest value : %d %d, expect %d %d\n", mRasterizeCalled, mRasterizeSuccess, rasterizeCalled, rasterizeSuccess);
     DALI_TEST_EQUALS(mRasterizeCalled, rasterizeCalled, location);
     DALI_TEST_EQUALS(mRasterizeSuccess, rasterizeSuccess, location);
   }
@@ -135,12 +140,10 @@ class TestObserverWithCustomFunction : public TestObserver
 public:
   TestObserverWithCustomFunction()
   : TestObserver(),
-    mLoadSignals{},
-    mRasterizeSignals{},
+    mLoadSignal([](void*) {}),
+    mRasterizeSignal([](void*) {}),
     mLoadData{nullptr},
-    mRasterizeData{nullptr},
-    mKeepLoadSignal{false},
-    mKeepRasterizeSignal{false}
+    mRasterizeData{nullptr}
   {
   }
 
@@ -150,16 +153,7 @@ public: ///< Implement of SvgLoaderObserver
     TestObserver::LoadComplete(loadId, vectorImageRenderer);
 
     // Execute signals.
-    for(size_t i = 0; i < mLoadSignals.size(); i++)
-    {
-      mLoadSignals[i](mLoadData);
-    }
-
-    // Clear signals.
-    if(!mKeepLoadSignal)
-    {
-      mLoadSignals.clear();
-    }
+    mLoadSignal(mLoadData);
   }
 
   void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override
@@ -167,36 +161,26 @@ public: ///< Implement of SvgLoaderObserver
     TestObserver::RasterizeComplete(rasterizeId, textureSet, atlasRect);
 
     // Execute signals.
-    for(size_t i = 0; i < mRasterizeSignals.size(); i++)
-    {
-      mRasterizeSignals[i](mRasterizeData);
-    }
-
-    // Clear signals.
-    if(!mKeepRasterizeSignal)
-    {
-      mRasterizeSignals.clear();
-    }
+    mRasterizeSignal(mRasterizeData);
   }
 
 public:
   void ConnectLoadFunction(std::function<void(void*)> signal)
   {
-    mLoadSignals.push_back(signal);
+    mLoadSignal = signal;
   }
 
   void ConnectRasterizeFunction(std::function<void(void*)> signal)
   {
-    mRasterizeSignals.push_back(signal);
+    mRasterizeSignal = signal;
   }
 
+private:
 public:
-  std::vector<std::function<void(void*)>> mLoadSignals;
-  std::vector<std::function<void(void*)>> mRasterizeSignals;
-  void*                                   mLoadData;
-  void*                                   mRasterizeData;
-  bool                                    mKeepLoadSignal;
-  bool                                    mKeepRasterizeSignal;
+  std::function<void(void*)> mLoadSignal;
+  std::function<void(void*)> mRasterizeSignal;
+  void*                      mLoadData;
+  void*                      mRasterizeData;
 };
 
 } // namespace
@@ -263,15 +247,30 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
             // Wait async load complete
             DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-            observer.CheckTest(true, loadSuccess, false, false, TEST_LOCATION);
-
-            if(loadSuccess)
+            // Suprizely, Rasterize callback could be comes before Load callback.
+            // We should pass both case.
+            if(observer.mLoadCalled)
             {
-              // Wait async rasterize complete
+              observer.CheckTest(true, loadSuccess, false, false, TEST_LOCATION);
+
+              if(loadSuccess)
+              {
+                // Wait async rasterize complete
+                DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+                // TODO : We don't notify rasterize failed even if load failed. Should we notify it?
+                observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
+              }
+            }
+            else
+            {
+              observer.CheckTest(false, false, true, rasterizeSuccess, TEST_LOCATION);
+
+              // Consume the load callback.
               DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
               // TODO : We don't notify rasterize failed even if load failed. Should we notify it?
-              observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
+              observer.CheckTest(true, true, true, rasterizeSuccess, TEST_LOCATION);
             }
           }
 
@@ -312,7 +311,7 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserver observer1;
   TestObserver observer2;
@@ -407,7 +406,7 @@ int UtcSvgLoaderCacheLoadAndRasterize02(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserver observer1;
   TestObserver observer2;
@@ -470,7 +469,7 @@ int UtcSvgLoaderCacheLoadAndRasterize03(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserver observer1;
   TestObserver observer2;
@@ -531,7 +530,7 @@ int UtcSvgLoaderLoadCancel(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserver observer1;
   TestObserver observer2;
@@ -584,7 +583,7 @@ int UtcSvgLoaderDestructDuringObserver01(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction* observer1 = new TestObserverWithCustomFunction();
   TestObserverWithCustomFunction* observer2 = new TestObserverWithCustomFunction();
@@ -602,7 +601,8 @@ int UtcSvgLoaderDestructDuringObserver01(void)
   mData.other = observer2;
 
   observer1->mLoadData = &mData;
-  observer1->ConnectLoadFunction([](void* data) {
+  observer1->ConnectLoadFunction([](void* data)
+                                 {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -615,14 +615,13 @@ int UtcSvgLoaderDestructDuringObserver01(void)
     customData->loadSuccess = observer1->mLoadSuccess;
 
     delete observer1;
-    delete observer2;
-  });
+    delete observer2; });
 
-  observer2->ConnectLoadFunction([](void* data) {
+  observer2->ConnectLoadFunction([](void* data)
+                                 {
     tet_printf("observer2 Should be destroyed by observer1. Test failed\n");
 
-    tet_result(TET_FAIL);
-  });
+    tet_result(TET_FAIL); });
   tet_printf("load request for loadId1 and loadId2. observer1 should be called first.\n");
   auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer1, false);
   auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
@@ -646,7 +645,7 @@ int UtcSvgLoaderDestructDuringObserver02(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction* observer1 = new TestObserverWithCustomFunction();
   TestObserverWithCustomFunction* observer2 = new TestObserverWithCustomFunction();
@@ -664,7 +663,8 @@ int UtcSvgLoaderDestructDuringObserver02(void)
   mData.other = observer2;
 
   observer1->mRasterizeData = &mData;
-  observer1->ConnectRasterizeFunction([](void* data) {
+  observer1->ConnectRasterizeFunction([](void* data)
+                                      {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -677,14 +677,13 @@ int UtcSvgLoaderDestructDuringObserver02(void)
     customData->rasterizeSuccess = observer1->mRasterizeSuccess;
 
     delete observer1;
-    delete observer2;
-  });
+    delete observer2; });
 
-  observer2->ConnectRasterizeFunction([](void* data) {
+  observer2->ConnectRasterizeFunction([](void* data)
+                                      {
     tet_printf("observer2 Should be destroyed by observer1. Test failed\n");
 
-    tet_result(TET_FAIL);
-  });
+    tet_result(TET_FAIL); });
   tet_printf("load request for loadId1 and loadId2. observer1 should be called first.\n");
   auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer1, false);
   auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
@@ -721,7 +720,7 @@ int UtcSvgLoaderReqestDuringObserver01(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction observer1;
   TestObserver                   observer2;
@@ -753,7 +752,8 @@ int UtcSvgLoaderReqestDuringObserver01(void)
   mData.loadAndDestruct = observer6;
 
   observer1.mLoadData = &mData;
-  observer1.ConnectLoadFunction([&svgLoader](void* data) {
+  observer1.ConnectLoadFunction([&svgLoader](void* data)
+                                {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -785,8 +785,7 @@ int UtcSvgLoaderReqestDuringObserver01(void)
 
     tet_printf("Test observer6 load request and destruct\n");
     loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer6, false);
-    delete observer6;
-  });
+    delete observer6; });
 
   tet_printf("load request for loadId1.\n");
   auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
@@ -829,7 +828,7 @@ int UtcSvgLoaderReqestDuringObserver02(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction observer1;
   TestObserver                   observer2;
@@ -854,7 +853,8 @@ int UtcSvgLoaderReqestDuringObserver02(void)
   mData.loadNonCached2 = &observer4;
 
   observer1.mLoadData = &mData;
-  observer1.ConnectLoadFunction([&svgLoader](void* data) {
+  observer1.ConnectLoadFunction([&svgLoader](void* data)
+                                {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -877,8 +877,7 @@ int UtcSvgLoaderReqestDuringObserver02(void)
 
     tet_printf("Test observer4 notify, but observer3 yet\n");
     observer3->CheckLoadTest(false, false, TEST_LOCATION);
-    observer4->CheckLoadTest(true, true, TEST_LOCATION);
-  });
+    observer4->CheckLoadTest(true, true, TEST_LOCATION); });
 
   tet_printf("load request for loadId1.\n");
   auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
@@ -912,7 +911,7 @@ int UtcSvgLoaderReqestDuringObserver03(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction observer1;
   TestObserver                   observer2;
@@ -947,7 +946,8 @@ int UtcSvgLoaderReqestDuringObserver03(void)
   auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, nullptr, true);
 
   observer1.mRasterizeData = &mData;
-  observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data) {
+  observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
+                                     {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -979,8 +979,7 @@ int UtcSvgLoaderReqestDuringObserver03(void)
 
     tet_printf("Test observer6 rasterize request and destruct\n");
     rasterizeId = svgLoader.Rasterize(loadId, 200u, 200u, false, observer6, false);
-    delete observer6;
-  });
+    delete observer6; });
 
   tet_printf("rasterize request for rasterizeId1.\n");
   auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, false, &observer1, false);
@@ -1023,7 +1022,7 @@ int UtcSvgLoaderReqestDuringObserver04(void)
 
   ToolkitTestApplication application;
 
-  SvgLoader svgLoader; ///Create svg loader without visual factory cache.
+  SvgLoader svgLoader; /// Create svg loader without visual factory cache.
 
   TestObserverWithCustomFunction observer1;
   TestObserver                   observer2;
@@ -1051,7 +1050,8 @@ int UtcSvgLoaderReqestDuringObserver04(void)
   auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, nullptr, true);
 
   observer1.mRasterizeData = &mData;
-  observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data) {
+  observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
+                                     {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -1074,8 +1074,7 @@ int UtcSvgLoaderReqestDuringObserver04(void)
 
     tet_printf("Test observer4 notify, but observer3 yet\n");
     observer3->CheckRasterizeTest(false, false, TEST_LOCATION);
-    observer4->CheckRasterizeTest(true, true, TEST_LOCATION);
-  });
+    observer4->CheckRasterizeTest(true, true, TEST_LOCATION); });
 
   tet_printf("rasterize request for rasterizeId1.\n");
   auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, false, &observer1, false);

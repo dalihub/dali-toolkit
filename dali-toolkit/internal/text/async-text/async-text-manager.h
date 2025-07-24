@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ASYNC_TEXT_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 #include <dali-toolkit/internal/text/async-text/text-load-observer.h>
-#include <dali-toolkit/internal/text/async-text/text-loading-task.h>
 
 namespace Dali
 {
@@ -36,7 +35,7 @@ namespace Internal DALI_INTERNAL
 {
 class AsyncTextManager;
 
-} // namespace DALI_INTERNAL
+} // namespace Internal DALI_INTERNAL
 
 /**
  * AsyncTextManager manages an async text loader and handles async text load requests for a text visual.
@@ -95,10 +94,10 @@ public:
 
 public:
   // Default copy and move operator
-  AsyncTextManager(const AsyncTextManager& rhs) = default;
-  AsyncTextManager(AsyncTextManager&& rhs)      = default;
+  AsyncTextManager(const AsyncTextManager& rhs)            = default;
+  AsyncTextManager(AsyncTextManager&& rhs)                 = default;
   AsyncTextManager& operator=(const AsyncTextManager& rhs) = default;
-  AsyncTextManager& operator=(AsyncTextManager&& rhs) = default;
+  AsyncTextManager& operator=(AsyncTextManager&& rhs)      = default;
 };
 
 } // namespace Text

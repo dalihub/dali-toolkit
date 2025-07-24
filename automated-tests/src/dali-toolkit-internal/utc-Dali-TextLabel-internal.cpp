@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,11 +92,11 @@ int UtcDaliTextLabelMarkupUnderline(void)
   underlineRuns.Resize(numberOfUnderlineRuns);
   textLabelImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
-  //ABC are underlined
+  // ABC are underlined
   DALI_TEST_EQUALS(underlineRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(underlineRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
 
-  //GH are underlined
+  // GH are underlined
   DALI_TEST_EQUALS(underlineRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(underlineRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
 
@@ -549,7 +549,7 @@ int UtcDaliTextLabelMarkupNestedUnderlineTags(void)
   };
   DataOfCase data[] =
     {
-      //Outter
+      // Outter
       {"<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>",
        5u,
        8u,
@@ -566,7 +566,7 @@ int UtcDaliTextLabelMarkupNestedUnderlineTags(void)
          false,
        }},
 
-      //Inner
+      // Inner
       {"<u color='blue' >XYZ</u>",
        7u,
        3u,
@@ -633,7 +633,7 @@ int UtcDaliTextLabelMarkupNestedStrikethroughTags(void)
   };
   DataOfCase data[] =
     {
-      //Outter
+      // Outter
       {"<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>",
        5u,
        8u,
@@ -644,7 +644,7 @@ int UtcDaliTextLabelMarkupNestedStrikethroughTags(void)
          true,
        }},
 
-      //Inner
+      // Inner
       {"<s color='blue' >XYZ</s>",
        7u,
        3u,
@@ -853,13 +853,13 @@ int UtcDaliTextLabelBackgroundTag(void)
 
   DALI_TEST_CHECK(backgroundColorIndicesBuffer);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
 
-  //red color
+  // red color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
 
-  //yellow color
+  // yellow color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
 
   END_TEST;
@@ -884,13 +884,13 @@ int UtcDaliTextLabelSpanBackgroundTag(void)
 
   DALI_TEST_CHECK(backgroundColorIndicesBuffer);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
 
-  //red color
+  // red color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
 
-  //yellow color
+  // yellow color
   DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
 
   END_TEST;
@@ -981,13 +981,13 @@ int UtcDaliTextLabelTextWithSpan(void)
 
   DALI_TEST_CHECK(colorIndicesBuffer1);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(colorIndicesBuffer1[0], 0u, TEST_LOCATION);
 
-  //span color
+  // span color
   DALI_TEST_EQUALS(colorIndicesBuffer1[1], 1u, TEST_LOCATION);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(colorIndicesBuffer1[6], 0u, TEST_LOCATION);
 
   label.SetProperty(TextLabel::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan");
@@ -999,16 +999,16 @@ int UtcDaliTextLabelTextWithSpan(void)
 
   DALI_TEST_CHECK(colorIndicesBuffer2);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(colorIndicesBuffer2[0], 0u, TEST_LOCATION);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(colorIndicesBuffer2[1], 0u, TEST_LOCATION);
 
-  //span color
+  // span color
   DALI_TEST_EQUALS(colorIndicesBuffer2[6], 1u, TEST_LOCATION);
 
-  //default color
+  // default color
   DALI_TEST_EQUALS(colorIndicesBuffer2[7], 0u, TEST_LOCATION);
 
   END_TEST;
@@ -1040,7 +1040,7 @@ int UtcDaliTextLabelMarkupStrikethrough(void)
   strikethroughRuns.Resize(numberOfStrikethroughRuns);
   textLabelImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
 
-  //ABC have strikethrough
+  // ABC have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
   DALI_TEST_CHECK(strikethroughRuns[0u].properties.colorDefined);
@@ -1048,7 +1048,7 @@ int UtcDaliTextLabelMarkupStrikethrough(void)
   DALI_TEST_EQUALS(strikethroughRuns[0u].properties.color.g, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[0u].properties.color.b, 0u, TEST_LOCATION);
 
-  //GH have strikethrough
+  // GH have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
   DALI_TEST_CHECK(strikethroughRuns[1u].properties.colorDefined);
@@ -1133,7 +1133,7 @@ int UtcDaliTextLabelMarkupParagraphTagAlignAttribute(void)
   std::string textAlignOnPropertyLevel = "text outside<p>Paragraph end</p>text outside<p>Paragraph center</p>text outside<p>Paragraph begin</p><p>Paragraph property alignment</p>";
   std::string textAlignInMarkup        = "text outside<p align='end'>Paragraph end</p>text outside<p align='center'>Paragraph center</p>text outside<p align='begin' >Paragraph begin</p><p>Paragraph property alignment</p>";
 
-  //Set size to avoid automatic eliding
+  // Set size to avoid automatic eliding
   Vector2 controllerSize = Vector2(1025, 1025);
 
   TextLabel textLabelBeginAlign  = TextLabel::New();
@@ -1229,7 +1229,7 @@ int UtcDaliTextLabelMarkupParagraphTagAlignAttribute(void)
   DALI_TEST_EQUALS(lineBeginFromMultiAlign.alignmentOffset, lineEndFromBeginAlign.alignmentOffset, TEST_LOCATION);
   DALI_TEST_EQUALS(lineBeginFromMultiAlign.width, lineEndFromBeginAlign.width, TEST_LOCATION);
 
-  //text outside
+  // text outside
   const LineRun& lineOutsideOneFromMultiAlign  = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_1);
   const LineRun& lineOutsideOneFromCenterAlign = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_1);
   tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - text outside one");
@@ -1492,8 +1492,6 @@ int UtcDaliTextLabelLocaleChange02(void)
 
   // Request render.
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   newLocale = "label_TEST_2";
   adaptor.LocaleChangedSignal().Emit(newLocale);
