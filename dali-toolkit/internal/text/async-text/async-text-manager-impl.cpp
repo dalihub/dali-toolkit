@@ -287,7 +287,6 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
       }
       cancelledTask = std::move(it->second.mTask);
       mWaitingTasks.erase(it);
-      return;
     }
     else
     {
@@ -305,12 +304,21 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
 #endif
         }
         mRunningTasks.erase(it);
-        return;
       }
+#ifdef TRACE_ENABLED
+      else
+      {
+        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+        {
+          DALI_LOG_ERROR("There is no task in the Running queue : %u\n", taskId);
+        }
+      }
+#endif
+      return;
     }
   }
 
-  if(cancelledObserver->DisconnectDestructionSignal())
+  if(cancelledObserver && cancelledObserver->DisconnectDestructionSignal())
   {
     cancelledObserver->DestructionSignal().Disconnect(this, &AsyncTextManager::ObserverDestroyed);
   }
@@ -318,8 +326,6 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
   {
     Dali::AsyncTaskManager::Get().RemoveTask(cancelledTask);
   }
-
-  DALI_LOG_ERROR("There is no task in the Waiting queue and Running queue : %u\n", taskId);
 }
 
 void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
