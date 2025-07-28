@@ -1858,6 +1858,11 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
     mShadowMapRenderTask.SetClearColor(Color::WHITE);
     mShadowMapRenderTask.SetRenderPassTag(10);
     mShadowMapRenderTask.SetCameraActor(GetImplementation(mShadowLight).GetCamera());
+
+    if(mUseFrameBuffer)
+    {
+      RequestRenderTaskReorder();
+    }
   }
 
   if(!mUseFrameBuffer)
