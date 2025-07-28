@@ -32,6 +32,7 @@
 #include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -1524,8 +1525,7 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::OUT;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
-      {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -1591,8 +1591,7 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REPEAT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
-      {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1600,8 +1599,7 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
-        {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1653,8 +1651,7 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN_OUT;
 
-      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map&
-      {
+      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map& {
         animationMap.Clear();
         animationMap.Insert("startValue", start);
         animationMap.Insert("targetValue", target);
@@ -1722,8 +1719,7 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REFLECT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
-      {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1731,8 +1727,7 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
-        {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1788,8 +1783,7 @@ int UtcDaliVisualGetPropertyMap13(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
-      {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -2504,8 +2498,7 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       int unit_type     = DevelAnimatedGradientVisual::UnitType::USER_SPACE;
       int spread_type   = DevelAnimatedGradientVisual::SpreadType::REPEAT;
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
-      {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2618,8 +2611,7 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       application.SendNotification();
 
       // Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
-      {
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2802,8 +2794,7 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       Property::Map animationMap;
       propertyMap.Insert(Visual::Property::TYPE, DevelVisual::ANIMATED_GRADIENT);
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
-      {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2916,8 +2907,7 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       application.SendNotification();
 
       // Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
-      {
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -5131,6 +5121,106 @@ int UtcDaliColorVisualBlurRadius(void)
   END_TEST;
 }
 
+int UtcDaliColorVisualCustomShaderWithDefaultSource(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliColorVisualCustomShaderWithDefaultSource");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map shader;
+  Property::Map properties;
+
+  properties[Visual::Property::TYPE]           = Visual::COLOR;
+  properties[Visual::Property::SHADER]         = shader;
+  properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  // trigger creation through setting on stage
+  DummyControl        dummy     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  dummy.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer        renderer = dummy.GetRendererAt(0);
+  Shader          shader2  = renderer.GetShader();
+  Property::Value value    = shader2.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  Property::Value*             fragment              = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  const std::string            fragmentShader        = fragment->Get<std::string>();
+  const std::string::size_type startOfFragmentShader = fragmentShader.find("//@name");
+  DALI_TEST_EQUALS(SHADER_COLOR_VISUAL_SHADER_FRAG, fragmentShader.substr(startOfFragmentShader), TEST_LOCATION);
+
+  Property::Value*             vertex              = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  const std::string            vertexShader        = vertex->Get<std::string>();
+  const std::string::size_type startOfVertexShader = vertexShader.find("//@name");
+  DALI_TEST_EQUALS(SHADER_COLOR_VISUAL_SHADER_VERT, vertexShader.substr(startOfVertexShader), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliColorVisualCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliColorVisualCustomShader");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map     shader;
+  const std::string vertexShader                                   = "Foobar";
+  const std::string fragmentShader                                 = "Foobar";
+  shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
+
+  Property::Map properties;
+  properties[Visual::Property::TYPE]           = Visual::COLOR;
+  properties[Visual::Property::SHADER]         = shader;
+  properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  // trigger creation through setting on stage
+  DummyControl        dummy     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  dummy.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer        renderer = dummy.GetRendererAt(0);
+  Shader          shader2  = renderer.GetShader();
+  Property::Value value    = shader2.GetProperty(Shader::Property::PROGRAM);
+  Property::Map*  map      = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+
+  Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVisualGetType(void)
 {
   ToolkitTestApplication application;
@@ -5281,8 +5371,7 @@ int UtcDaliVisualGetPropertyObject01(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
-  {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5334,8 +5423,7 @@ int UtcDaliVisualGetPropertyObject02(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
-  {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5385,8 +5473,7 @@ int UtcDaliVisualGetPropertyObject03(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::COLOR);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
-  {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
