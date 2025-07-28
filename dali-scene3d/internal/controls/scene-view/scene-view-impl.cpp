@@ -38,7 +38,6 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <string_view>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
@@ -176,7 +175,8 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
 
   // Compute ViewProjectionMatrix and store it to "tempViewProjectionMatrix" property
   auto       tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
-  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs) {
+  Constraint projectionMatrixConstraint    = Constraint::New<Matrix>(shadowLightCamera, tempViewProjectionMatrixIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                                  {
     Matrix worldMatrix  = inputs[0]->GetMatrix();
     float  tangentFov_2 = tanf(inputs[4]->GetFloat());
     float  nearDistance = inputs[5]->GetFloat();
@@ -714,7 +714,8 @@ void SceneView::SetShadow(Scene3D::Light light)
     return;
   }
 
-  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool { return (lightEntity.second && lightEntity.first == light); });
+  auto foundLight = std::find_if(mLights.begin(), mLights.end(), [light](std::pair<Scene3D::Light, bool> lightEntity) -> bool
+                                 { return (lightEntity.second && lightEntity.first == light); });
 
   if(foundLight == mLights.end())
   {
@@ -1674,6 +1675,11 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
     mShadowMapRenderTask.SetClearColor(Color::WHITE);
     mShadowMapRenderTask.SetRenderPassTag(10);
     mShadowMapRenderTask.SetCameraActor(GetImplementation(mShadowLight).GetCamera());
+
+    if(mUseFrameBuffer)
+    {
+      RequestRenderTaskReorder();
+    }
   }
 
   if(!mUseFrameBuffer)
@@ -1704,7 +1710,8 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 
 void SceneView::OnCaptureFinished(Dali::RenderTask& task)
 {
-  auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) { return item.first == task; });
+  auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
+                           { return item.first == task; });
 
   if(iter != mCaptureContainer.end())
   {
@@ -1748,9 +1755,8 @@ bool SceneView::OnTimeOut()
   tempContainer.clear();
 
   int32_t tickCount = mTimerTickCount;
-  auto    it        = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item) {
-    return item.second->mStartTick + 1 < tickCount;
-  });
+  auto    it        = std::remove_if(mCaptureContainer.begin(), mCaptureContainer.end(), [tickCount](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
+                           { return item.second->mStartTick + 1 < tickCount; });
   mCaptureContainer.erase(it, mCaptureContainer.end());
   mCaptureContainer.shrink_to_fit();
 
