@@ -170,7 +170,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
 Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n");
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE");
+  DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE", "[%p]", static_cast<void*>(&controller));
   Vector3 naturalSizeVec3;
 
   // Make sure the model is up-to-date before layouting
@@ -261,7 +261,7 @@ void Controller::Relayouter::FitArrayPointSizeforLayout(Controller& controller, 
   const OperationsMask operations = impl.mOperationsPending;
   if(NO_OPERATION != (UPDATE_LAYOUT_SIZE & operations) || impl.mTextFitContentSize != layoutSize)
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_FIT_ARRAY_LAYOUT");
+    DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_FIT_ARRAY_LAYOUT", "[%p]", static_cast<void*>(&controller));
     std::vector<Toolkit::DevelTextLabel::FitOption> fitOptions = impl.mTextFitArray;
     int numberOfFitOptions = static_cast<int>(fitOptions.size());
     if(numberOfFitOptions == 0)
@@ -372,7 +372,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
   const OperationsMask operations = impl.mOperationsPending;
   if(NO_OPERATION != (UPDATE_LAYOUT_SIZE & operations) || impl.mTextFitContentSize != layoutSize)
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_FIT_LAYOUT");
+    DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_FIT_LAYOUT", "[%p]", static_cast<void*>(&controller));
     ModelPtr& model = impl.mModel;
 
     bool  actualellipsis         = model->mElideEnabled;
@@ -535,7 +535,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
 float Controller::Relayouter::GetHeightForWidth(Controller& controller, float width)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", &controller, width);
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH");
+  DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_GET_HEIGHT_FOR_WIDTH", "[%p]", static_cast<void*>(&controller));
 
   // Make sure the model is up-to-date before layouting
   EventHandler::ProcessModifyEvents(controller);
@@ -581,7 +581,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   TextUpdateInfo&   textUpdateInfo = impl.mTextUpdateInfo;
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", &controller, size.width, size.height, impl.mIsAutoScrollEnabled ? "true" : "false");
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RELAYOUT");
+  DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_RELAYOUT", "[%p]", static_cast<void*>(&controller));
 
   UpdateTextType updateTextType = NONE_UPDATED;
 

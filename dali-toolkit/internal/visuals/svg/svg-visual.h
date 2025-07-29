@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SVG_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,6 +184,12 @@ private:
    */
   bool AttemptAtlasing() const;
 
+  /**
+   * @brief Emit ResourceReady signal.
+   * @note MUST call this API end of function.
+   */
+  void EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus);
+
   // Undefined
   SvgVisual(const SvgVisual& svgRenderer);
 
@@ -205,8 +211,11 @@ private:
   WeakHandle<Actor>     mPlacementActor;
   Vector2               mRasterizedSize;
   Dali::ImageDimensions mDesiredSize{};
-  bool                  mLoadFailed : 1;
-  bool                  mAttemptAtlasing : 1; ///< If true will attempt atlasing, otherwise create unique texture
+
+  bool mLoadCompleted : 1;
+  bool mRasterizeCompleted : 1;
+  bool mLoadFailed : 1;
+  bool mAttemptAtlasing : 1; ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

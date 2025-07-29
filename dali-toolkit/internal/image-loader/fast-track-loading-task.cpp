@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,11 +151,6 @@ void FastTrackLoadingTask::Process()
   UploadToTexture();
 }
 
-bool FastTrackLoadingTask::IsReady()
-{
-  return true;
-}
-
 void FastTrackLoadingTask::Load()
 {
 #ifdef TRACE_ENABLED
@@ -163,10 +158,10 @@ void FastTrackLoadingTask::Load()
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
-    oss << "[u:" << mUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "[u:" << mUrl.GetEllipsedUrl() << "]"; });
 
   Devel::PixelBuffer              pixelBuffer;
   std::vector<Devel::PixelBuffer> pixelBuffers;
@@ -229,7 +224,8 @@ void FastTrackLoadingTask::Load()
     }
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
@@ -240,8 +236,7 @@ void FastTrackLoadingTask::Load()
       oss << "s:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
       oss << "p:" << mPremultiplied << " ";
     }
-    oss << "u:" << mUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mUrl.GetEllipsedUrl() << "]"; });
 }
 
 void FastTrackLoadingTask::MultiplyAlpha(Dali::Devel::PixelBuffer pixelBuffer)

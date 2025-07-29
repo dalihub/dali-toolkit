@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,11 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/signals/callback.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/async-text/async-text-manager-impl.h> ///< To call AsyncTextManager::ReleaseLoader
+#include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 
 namespace Dali
 {
@@ -35,27 +40,29 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
-TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, CallbackBase* callback)
+TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback)
 : AsyncTask(callback),
   mId(id),
   mParameters(parameters),
   mRenderInfo(),
+  mAsyncTaskManager(asyncTaskManager),
+  mAsyncTextManager(),
   mIsReady(false),
   mMutex()
 {
 }
 
-TextLoadingTask::TextLoadingTask(const uint32_t id, CallbackBase* callback)
-: AsyncTask(callback),
-  mId(id),
-  mIsReady(true),
-  mMutex()
-{
-  // Empty task for wake up the async task manger.
-}
-
 TextLoadingTask::~TextLoadingTask()
 {
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    // To avoid loader leaking. Never ever happend, but for safety.
+    if(DALI_UNLIKELY(mAsyncTextManager && mLoader))
+    {
+      DALI_LOG_ERROR("Need to release loader!!");
+      mAsyncTextManager->ReleaseLoader(nullptr, mLoader);
+    }
+  }
 }
 
 uint32_t TextLoadingTask::GetId()
@@ -63,11 +70,21 @@ uint32_t TextLoadingTask::GetId()
   return mId;
 }
 
-void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader)
+void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader, TextLoadingTask::ReleaseCallbackReceiver releaseCallbackReceiver)
 {
-  Dali::Mutex::ScopedLock lock(mMutex);
-  mLoader  = loader;
-  mIsReady = true;
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+    mLoader = loader;
+  }
+
+  mAsyncTextManager = releaseCallbackReceiver;
+
+  if(DALI_LIKELY(!mIsReady && mLoader))
+  {
+    mIsReady = true;
+    NotifyToReady();
+    mAsyncTaskManager.Reset();
+  }
 }
 
 void TextLoadingTask::Process()
@@ -76,8 +93,15 @@ void TextLoadingTask::Process()
   {
     return;
   }
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
-  Load();
+  {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
+    Load();
+  }
+  if(DALI_LIKELY(mAsyncTextManager))
+  {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_RELEASE");
+    ReleaseLoader();
+  }
 }
 
 bool TextLoadingTask::IsReady()
@@ -125,7 +149,7 @@ void TextLoadingTask::Load()
           }
 #endif
           mParameters.isAutoScrollEnabled = true;
-          mRenderInfo = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
+          mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
         }
         else
         {
@@ -197,6 +221,20 @@ void TextLoadingTask::Load()
       DALI_LOG_ERROR("Unexpected request type recieved : %d\n", mParameters.requestType);
       break;
     }
+  }
+}
+
+void TextLoadingTask::ReleaseLoader()
+{
+  if(DALI_LIKELY(mAsyncTextManager))
+  {
+    // Release all local varaibles before execute callback.
+    if(DALI_LIKELY(mLoader))
+    {
+      auto loader = std::move(mLoader);
+      mAsyncTextManager->ReleaseLoader(this, loader);
+    }
+    mAsyncTextManager.Reset();
   }
 }
 

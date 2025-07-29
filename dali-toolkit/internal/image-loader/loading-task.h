@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOADING_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,11 +159,6 @@ public: // Implementation of AsyncTask
   void Process() override;
 
   /**
-   * @copydoc Dali::AsyncTask::IsReady()
-   */
-  bool IsReady() override;
-
-  /**
    * @copydoc Dali::AsyncTask::GetTaskName()
    */
   std::string_view GetTaskName() const override
@@ -214,7 +209,6 @@ public:
   bool isMaskTask : 1;            ///< whether this task is for mask or not
   bool cropToMask : 1;            ///< Whether to crop the content to the mask size
   bool loadPlanes : 1;            ///< Whether to load image planes
-  bool isReady : 1;               ///< Whether this task ready to run
 };
 
 } // namespace Internal

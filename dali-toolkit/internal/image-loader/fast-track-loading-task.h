@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_FAST_TRACK_IMAGE_LOADING_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,11 +70,6 @@ public: // Implementation of AsyncTask
   void Process() override;
 
   /**
-   * @copydoc Dali::AsyncTask::IsReady()
-   */
-  bool IsReady() override;
-
-  /**
    * @copydoc Dali::AsyncTask::GetTaskName()
    */
   std::string_view GetTaskName() const override
@@ -84,7 +79,7 @@ public: // Implementation of AsyncTask
 
 private:
   // Undefined
-  FastTrackLoadingTask(const FastTrackLoadingTask& queue) = delete;
+  FastTrackLoadingTask(const FastTrackLoadingTask& queue)            = delete;
   FastTrackLoadingTask& operator=(const FastTrackLoadingTask& queue) = delete;
 
   /**

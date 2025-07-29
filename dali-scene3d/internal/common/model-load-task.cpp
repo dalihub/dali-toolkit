@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,11 +87,13 @@ void ModelLoadTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     mStartTimeNanoSceonds = GetNanoseconds();
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
+                                            { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
   }
 #endif
 
-  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type) {
+  Dali::Scene3D::Loader::ResourceBundle::PathProvider pathProvider = [&](Dali::Scene3D::Loader::ResourceType::Value type)
+  {
     return mResourceDirectoryUrl;
   };
 
@@ -135,7 +137,8 @@ void ModelLoadTask::Process()
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
     mEndTimeNanoSceonds = GetNanoseconds();
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
+                                          {
       oss << std::fixed << std::setprecision(3);
       oss << "[";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
@@ -152,11 +155,6 @@ void ModelLoadTask::Process()
   }
 
   mHasSucceeded = true;
-}
-
-bool ModelLoadTask::IsReady()
-{
-  return true;
 }
 
 bool ModelLoadTask::HasSucceeded() const

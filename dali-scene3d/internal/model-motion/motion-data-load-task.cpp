@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,11 +118,6 @@ void MotionDataLoadTask::Process()
       break;
     }
   }
-}
-
-bool MotionDataLoadTask::IsReady()
-{
-  return true;
 }
 
 const Scene3D::Loader::AnimationDefinition& MotionDataLoadTask::GetAnimationDefinition() const

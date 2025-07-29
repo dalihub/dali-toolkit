@@ -370,6 +370,18 @@ void Node::SetFlexWrap(Dali::Toolkit::Flex::WrapType wrapType)
   YGNodeStyleSetFlexWrap(mImpl->mYogaNode, static_cast<YGWrap>(wrapType));
 }
 
+void Node::MarkDirty()
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Mark dirty on mYogaNode[%p]\n", mImpl->mYogaNode);
+  YGNodeMarkDirty(mImpl->mYogaNode);
+}
+
+bool Node::IsDirty() const
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Check if dirty is mardked on mYogaNode[%p]\n", mImpl->mYogaNode);
+  return YGNodeIsDirty(mImpl->mYogaNode);
+}
+
 } // namespace Flex
 } // namespace Toolkit
 } // namespace Dali

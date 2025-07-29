@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false),
-  isReady(true)
+  loadPlanes(false)
 {
 }
 
@@ -93,8 +92,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false),
-  isReady(true)
+  loadPlanes(false)
 {
 }
 
@@ -115,8 +113,7 @@ LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dime
   orientationCorrection(orientationCorrection),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(loadPlanes),
-  isReady(true)
+  loadPlanes(loadPlanes)
 {
 }
 
@@ -137,8 +134,7 @@ LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuff
   orientationCorrection(orientationCorrection),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false),
-  isReady(true)
+  loadPlanes(false)
 {
 }
 
@@ -159,8 +155,7 @@ LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pix
   orientationCorrection(),
   isMaskTask(true),
   cropToMask(cropToMask),
-  loadPlanes(false),
-  isReady(true)
+  loadPlanes(false)
 {
   pixelBuffers.push_back(pixelBuffer);
 }
@@ -176,17 +171,16 @@ void LoadingTask::Process()
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[";
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {
       oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
     }
-    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
-  });
+    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]"; });
 
-  isReady = false;
   if(!isMaskTask)
   {
     Load();
@@ -196,9 +190,9 @@ void LoadingTask::Process()
     ApplyMask();
   }
   MultiplyAlpha();
-  isReady = true;
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
@@ -215,13 +209,7 @@ void LoadingTask::Process()
     {
       oss << "d:" << dimensions.GetWidth() << "x" << dimensions.GetHeight() << " ";
     }
-    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]";
-  });
-}
-
-bool LoadingTask::IsReady()
-{
-  return isReady;
+    oss << "u:" << (!!(animatedImageLoading) ? animatedImageLoading.GetUrl() : url.GetEllipsedUrl()) << "]"; });
 }
 
 void LoadingTask::Load()

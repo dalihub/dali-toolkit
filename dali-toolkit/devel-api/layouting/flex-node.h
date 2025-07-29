@@ -337,6 +337,17 @@ public:
    */
   void SetPadding(Extents padding);
 
+  /**
+   * @brief Marks the node with custom measure function as dirty.
+   */
+  void MarkDirty();
+
+  /**
+   * @brief Checks whether the node's layout results are dirty due to it or its children changing.
+   * @return True if the node's layout results are dirty. False otherwise.
+   */
+  bool IsDirty() const;
+
 private:
   struct Impl;
   std::unique_ptr<Impl> mImpl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ public:
 public:
   void AddTask(AsyncTaskPtr task);
   void RemoveTask(AsyncTaskPtr task);
+  void NotifyToTaskReady(AsyncTaskPtr task);
 
   Dali::AsyncTaskManager::TasksCompletedId SetCompletedCallback(CallbackBase* callback, Dali::AsyncTaskManager::CompletedCallbackTraceMask mask);
   bool                                     RemoveCompletedCallback(Dali::AsyncTaskManager::TasksCompletedId tasksCompletedId);
@@ -73,7 +74,8 @@ public: // Worker thread called method
   AsyncTaskPtr PopNextTaskToProcess();
   void         CompleteTask(AsyncTaskPtr&& task);
 
-private: /**
+private:
+  /**
    * @brief Helper class to keep the relation between AsyncTaskThread and corresponding container
    */
   class TaskHelper
@@ -93,7 +95,7 @@ private: /**
     bool Request();
 
   public:
-    TaskHelper(const TaskHelper&) = delete;
+    TaskHelper(const TaskHelper&)            = delete;
     TaskHelper& operator=(const TaskHelper&) = delete;
 
     TaskHelper(TaskHelper&& rhs);
@@ -146,6 +148,7 @@ private:
   using AsyncCompletedTaskContainer = std::list<AsyncCompletedTaskPair>;
 
   AsyncTaskContainer          mWaitingTasks;   ///< The queue of the tasks waiting to async process. Must be locked under mWaitingTasksMutex.
+  AsyncTaskContainer          mNotReadyTasks;  ///< The queue of the tasks waiting for ready to async process. Must be locked under mWaitingTasksMutex.
   AsyncRunningTaskContainer   mRunningTasks;   ///< The queue of the running tasks. Must be locked under mRunningTasksMutex.
   AsyncCompletedTaskContainer mCompletedTasks; ///< The queue of the tasks with the async process. Must be locked under mCompletedTasksMutex.
 
@@ -200,7 +203,7 @@ size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
   return (numberOfThreads > 0 && numberOfThreads <= MAX_NUMBER_OF_THREADS) ? numberOfThreads : defaultValue;
 }
 
-thread_local Dali::AsyncTaskManager gAsyncTaskManager;
+static Dali::AsyncTaskManager gAsyncTaskManager;
 } // namespace
 
 /**
@@ -599,7 +602,7 @@ private:
 
   private:
     // Delete copy operator.
-    CallbackData(const CallbackData& rhs) = delete;
+    CallbackData(const CallbackData& rhs)            = delete;
     CallbackData& operator=(const CallbackData& rhs) = delete;
 
   public:
@@ -637,7 +640,8 @@ Dali::AsyncTaskManager AsyncTaskManager::Get()
 }
 
 AsyncTaskManager::AsyncTaskManager()
-: mTasks(GetNumberOfThreads(NUMBER_OF_ASYNC_THREADS_ENV, DEFAULT_NUMBER_OF_ASYNC_THREADS), [&]() { return TaskHelper(*this); }),
+: mTasks(GetNumberOfThreads(NUMBER_OF_ASYNC_THREADS_ENV, DEFAULT_NUMBER_OF_ASYNC_THREADS), [&]()
+         { return TaskHelper(*this); }),
   mTrigger(new EventThreadCallback(MakeCallback(this, &AsyncTaskManager::TaskCompleted))),
   mTasksCompletedImpl(new TasksCompletedImpl(*this, mTrigger.get()))
 {
@@ -657,6 +661,7 @@ AsyncTaskManager::~AsyncTaskManager()
   mCompletedTasks.clear();
 }
 
+/// Main + Worker thread called
 void AsyncTaskManager::AddTask(AsyncTaskPtr task)
 {
   if(task)
@@ -664,18 +669,30 @@ void AsyncTaskManager::AddTask(AsyncTaskPtr task)
     // Lock while adding task to the queue
     Mutex::ScopedLock lock(mWaitingTasksMutex);
 
-    // push back into waiting queue.
-    mWaitingTasks.insert(mWaitingTasks.end(), task);
+    // Keep this value as stack memory, for thread safety
+    const bool isReady = task->IsReady();
 
+    if(DALI_LIKELY(isReady))
     {
-      // For thread safety
-      Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
+      // push back into waiting queue.
+      mWaitingTasks.insert(mWaitingTasks.end(), task);
 
-      // Finish all Running threads are working
-      if(mRunningTasks.size() >= mTasks.GetElementCount())
       {
-        return;
+        // For thread safety
+        Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
+
+        // Finish all Running threads are working
+        if(mRunningTasks.size() >= mTasks.GetElementCount())
+        {
+          return;
+        }
       }
+    }
+    else
+    {
+      // push back into waiting queue.
+      mNotReadyTasks.insert(mNotReadyTasks.end(), task);
+      return;
     }
   }
 
@@ -713,6 +730,19 @@ void AsyncTaskManager::RemoveTask(AsyncTaskPtr task)
         if((*iterator) == task)
         {
           iterator = mWaitingTasks.erase(iterator);
+          ++removedCount;
+        }
+        else
+        {
+          ++iterator;
+        }
+      }
+
+      for(auto iterator = mNotReadyTasks.begin(); iterator != mNotReadyTasks.end();)
+      {
+        if((*iterator) == task)
+        {
+          iterator = mNotReadyTasks.erase(iterator);
           ++removedCount;
         }
         else
@@ -771,6 +801,52 @@ void AsyncTaskManager::RemoveTask(AsyncTaskPtr task)
   }
 }
 
+/// Main + Worker thread called
+void AsyncTaskManager::NotifyToTaskReady(AsyncTaskPtr task)
+{
+  if(task)
+  {
+    // Lock while adding task to the queue
+    Mutex::ScopedLock lock(mWaitingTasksMutex);
+
+    uint32_t removedCount = 0u;
+    for(auto iterator = mNotReadyTasks.begin(); iterator != mNotReadyTasks.end();)
+    {
+      if((*iterator) == task)
+      {
+        iterator = mNotReadyTasks.erase(iterator);
+        ++removedCount;
+      }
+      else
+      {
+        ++iterator;
+      }
+    }
+    // push back into waiting queue.
+    while(removedCount > 0u)
+    {
+      --removedCount;
+      mWaitingTasks.insert(mWaitingTasks.end(), task);
+    }
+  }
+
+  {
+    Mutex::ScopedLock lock(mTasksMutex);
+    size_t            count = mTasks.GetElementCount();
+    size_t            index = 0;
+    while(index++ < count)
+    {
+      auto processHelperIt = mTasks.GetNext();
+      DALI_ASSERT_ALWAYS(processHelperIt != mTasks.End());
+      if(processHelperIt->Request())
+      {
+        break;
+      }
+      // If all threads are busy, then it's ok just to push the task because they will try to get the next job.
+    }
+  }
+}
+
 Dali::AsyncTaskManager::TasksCompletedId AsyncTaskManager::SetCompletedCallback(CallbackBase* callback, Dali::AsyncTaskManager::CompletedCallbackTraceMask mask)
 {
   // mTasksCompletedImpl will take ownership of callback.
@@ -788,6 +864,19 @@ Dali::AsyncTaskManager::TasksCompletedId AsyncTaskManager::SetCompletedCallback(
 
         // Collect all tasks from waiting tasks
         for(auto& task : mWaitingTasks)
+        {
+          auto checkMask = (task->GetCallbackInvocationThread() == Dali::AsyncTask::ThreadType::MAIN_THREAD ? Dali::AsyncTaskManager::CompletedCallbackTraceMask::THREAD_MASK_MAIN : Dali::AsyncTaskManager::CompletedCallbackTraceMask::THREAD_MASK_WORKER) |
+                           (task->GetPriorityType() == Dali::AsyncTask::PriorityType::HIGH ? Dali::AsyncTaskManager::CompletedCallbackTraceMask::PRIORITY_MASK_HIGH : Dali::AsyncTaskManager::CompletedCallbackTraceMask::PRIORITY_MASK_LOW);
+
+          if((checkMask & mask) == checkMask)
+          {
+            taskAdded = true;
+            mTasksCompletedImpl->AppendTaskTrace(tasksCompletedId, task);
+          }
+        }
+
+        // Collect all tasks from not ready waiting tasks
+        for(auto& task : mNotReadyTasks)
         {
           auto checkMask = (task->GetCallbackInvocationThread() == Dali::AsyncTask::ThreadType::MAIN_THREAD ? Dali::AsyncTaskManager::CompletedCallbackTraceMask::THREAD_MASK_MAIN : Dali::AsyncTaskManager::CompletedCallbackTraceMask::THREAD_MASK_WORKER) |
                            (task->GetPriorityType() == Dali::AsyncTask::PriorityType::HIGH ? Dali::AsyncTaskManager::CompletedCallbackTraceMask::PRIORITY_MASK_HIGH : Dali::AsyncTaskManager::CompletedCallbackTraceMask::PRIORITY_MASK_LOW);
@@ -936,7 +1025,8 @@ AsyncTaskPtr AsyncTaskManager::PopNextTaskToProcess()
       {
         Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
         auto              task = *iter;
-        auto              jter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
+        auto              jter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
+                                 { return element.first == task; });
         if(jter != mRunningTasks.end())
         {
           taskAvaliable = false;
@@ -959,6 +1049,10 @@ AsyncTaskPtr AsyncTaskManager::PopNextTaskToProcess()
       }
       break;
     }
+    else
+    {
+      DALI_LOG_ERROR("Not ready task is in wating queue! Something wrong!\n");
+    }
   }
 
   return nextTask;
@@ -980,7 +1074,8 @@ void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
       {
         Mutex::ScopedLock lock(mRunningTasksMutex);
 
-        auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
+        auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
+                                 { return element.first == task; });
         if(iter != mRunningTasks.end())
         {
           if(iter->second == RunningTaskState::RUNNING)
@@ -1016,7 +1111,8 @@ void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
 
       Mutex::ScopedLock lock(mRunningTasksMutex);
 
-      auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element) { return element.first == task; });
+      auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
+                               { return element.first == task; });
       if(iter != mRunningTasks.end())
       {
         if(iter->second == RunningTaskState::RUNNING)
@@ -1087,6 +1183,33 @@ bool AsyncTaskManager::TaskHelper::Request()
 /*********************************  PUBLIC CLASS  *******************************/
 /********************************************************************************/
 
+namespace
+{
+std::vector<AsyncTaskPtr> gDelayedReadyTasks{};
+bool                      gGrabReadyTasks = false;
+Dali::Mutex               gMutex;
+} // namespace
+
+void AsyncTask::NotifyToReady()
+{
+  bool grabed = false;
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    grabed = gGrabReadyTasks;
+    if(gGrabReadyTasks)
+    {
+      tet_printf("NotifyToReady[%s] delayed\n", GetTaskName().data());
+      gDelayedReadyTasks.push_back(AsyncTaskPtr(this));
+    }
+  }
+
+  if(!grabed)
+  {
+    tet_printf("NotifyToReady[%s]\n", GetTaskName().data());
+    Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));
+  }
+}
+
 AsyncTaskManager::AsyncTaskManager() = default;
 
 AsyncTaskManager::~AsyncTaskManager() = default;
@@ -1104,6 +1227,11 @@ void AsyncTaskManager::AddTask(AsyncTaskPtr task)
 void AsyncTaskManager::RemoveTask(AsyncTaskPtr task)
 {
   Internal::Adaptor::GetImplementation(*this).RemoveTask(task);
+}
+
+void AsyncTaskManager::NotifyToTaskReady(AsyncTaskPtr task)
+{
+  Internal::Adaptor::GetImplementation(*this).NotifyToTaskReady(task);
 }
 
 AsyncTaskManager::TasksCompletedId AsyncTaskManager::SetCompletedCallback(CallbackBase* callback, AsyncTaskManager::CompletedCallbackTraceMask mask)
@@ -1129,6 +1257,12 @@ namespace AsyncTaskManager
 {
 void DestroyAsyncTaskManager()
 {
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    gDelayedReadyTasks.clear();
+    gGrabReadyTasks = false;
+  }
+
   Dali::Internal::Adaptor::gAsyncTaskManager.Reset();
 }
 
@@ -1142,6 +1276,28 @@ void ProcessAllCompletedTasks()
 {
   auto asyncTaskManager = Dali::AsyncTaskManager::Get();
   Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).TaskAllCompleted();
+}
+
+void GrabNotifyToReady()
+{
+  Dali::Mutex::ScopedLock lock(gMutex);
+  gGrabReadyTasks = true;
+}
+
+void UngrabNotifyToReady()
+{
+  auto                         asyncTaskManager = Dali::AsyncTaskManager::Get();
+  decltype(gDelayedReadyTasks) delayedTasks;
+  {
+    Dali::Mutex::ScopedLock lock(gMutex);
+    gGrabReadyTasks = false;
+    // Move tasks to another container, and notify to ready synchronously.
+    delayedTasks = std::move(gDelayedReadyTasks);
+  }
+  for(auto&& task : delayedTasks)
+  {
+    Dali::Internal::Adaptor::GetImplementation(asyncTaskManager).NotifyToTaskReady(task);
+  }
 }
 } // namespace AsyncTaskManager
 } // namespace Test

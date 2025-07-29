@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,11 +130,6 @@ void VectorAnimationTask::Process()
   mRasterized = Rasterize();
 }
 
-bool VectorAnimationTask::IsReady()
-{
-  return true;
-}
-
 void VectorAnimationTask::Finalize()
 {
   {
@@ -180,10 +175,10 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   if(mEncodedImageBuffer)
   {
@@ -224,13 +219,13 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
       }
     }
 
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
+                                          {
       mEndTimeNanoSceonds = GetNanoseconds();
       oss << std::fixed << std::setprecision(3);
       oss << "[";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
-      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-    });
+      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
     return false;
   }
 
@@ -253,13 +248,13 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mImageUrl.GetUrl().c_str(), mTotalFrame, mFrameRate, this);
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
     oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   return true;
 }
@@ -619,11 +614,11 @@ bool VectorAnimationTask::Rasterize()
   uint64_t mStartTimeNanoSceonds = 0;
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
+                                          {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[s:" << mWidth << "x" << mHeight << " ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   ApplyAnimationData();
 
@@ -741,7 +736,8 @@ bool VectorAnimationTask::Rasterize()
     mKeepAnimation = true;
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
+                                        {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
@@ -758,8 +754,7 @@ bool VectorAnimationTask::Rasterize()
     oss << "r:" << renderSuccess << " ";
     oss << "s:" << stopped << " ";
     oss << "k:" << mKeepAnimation << " ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]";
-  });
+    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   return true;
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_LOADER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -262,13 +262,13 @@ public:
     }
 
   private:
-    SvgLoadInfo()                        = delete;            // Do not use empty constructor
-    SvgLoadInfo(const SvgLoadInfo& info) = delete;            // Do not use copy constructor
+    SvgLoadInfo()                                   = delete; // Do not use empty constructor
+    SvgLoadInfo(const SvgLoadInfo& info)            = delete; // Do not use copy constructor
     SvgLoadInfo& operator=(const SvgLoadInfo& info) = delete; // Do not use copy assign
 
   public:
-    SvgLoadId  mId;
-    SvgTaskPtr mTask; ///< Async task. It would be deleted when loading completed.
+    SvgLoadId         mId;
+    SvgLoadingTaskPtr mTask; ///< Async task. It would be deleted when loading completed.
 
     VisualUrl mImageUrl;
     float     mDpi;
@@ -351,13 +351,13 @@ public:
     }
 
   private:
-    SvgRasterizeInfo()                             = delete;            // Do not use empty constructor
-    SvgRasterizeInfo(const SvgRasterizeInfo& info) = delete;            // Do not use copy constructor
+    SvgRasterizeInfo()                                        = delete; // Do not use empty constructor
+    SvgRasterizeInfo(const SvgRasterizeInfo& info)            = delete; // Do not use copy constructor
     SvgRasterizeInfo& operator=(const SvgRasterizeInfo& info) = delete; // Do not use copy assign
 
   public:
-    SvgRasterizeId mId;
-    SvgTaskPtr     mTask; ///< Async task. It would be deleted when rasterizing completed.
+    SvgRasterizeId        mId;
+    SvgRasterizingTaskPtr mTask; ///< Async task. It would be deleted when rasterizing completed.
 
     SvgLoadId mLoadId;
     uint32_t  mWidth;
