@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_UIBUILDER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,9 +122,9 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
 {
 public:
   /**
-    * Create an Builder handle; this can be initialised with Builder::New()
-    * Calling member functions with an uninitialised handle is not allowed.
-    */
+   * Create an Builder handle; this can be initialised with Builder::New()
+   * Calling member functions with an uninitialised handle is not allowed.
+   */
   Builder();
 
   /**
@@ -177,9 +177,6 @@ public:
    *   DALI_SOUND_DIR              | The Sound Directory used by Toolkit.
    *   DALI_STYLE_DIR              | The Style directory that the Toolkit uses.
    *   DALI_STYLE_IMAGE_DIR        | The directory that stores all the images used by Toolkit's style.
-   *   DALI_SHADER_VERSION_PREFIX  | For use in custom shaders to prepend the shader version in use. @ref Shader::GetShaderVersionPrefix
-   *   DALI_VERTEX_SHADER_PREFIX   | For use in custom vertex shaders to preprocessor prefix used. @ref Shader::GetVertexShaderPrefix
-   *   DALI_FRAGMENT_SHADER_PREFIX | For use in custom vertex shaders to preprocessor prefix used. @ref Shader::GetFragmentShaderPrefix()
    *
    * @pre The Builder has been initialized.
    * @param map The user defined constants used in template expansions.

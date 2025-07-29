@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,10 +147,10 @@ ShaderDefinition::LoadRaw(const std::string& shadersPath) const
   }
   else
   {
-    raw.mVertexShaderSource         = Dali::Shader::GetVertexShaderPrefix() + SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
-    raw.mFragmentShaderSource       = Dali::Shader::GetFragmentShaderPrefix() + SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
-    raw.mShadowVertexShaderSource   = Dali::Shader::GetVertexShaderPrefix() + SHADER_SHADOW_MAP_SHADER_VERT.data();
-    raw.mShadowFragmentShaderSource = Dali::Shader::GetFragmentShaderPrefix() + SHADER_SHADOW_MAP_SHADER_FRAG.data();
+    raw.mVertexShaderSource         = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
+    raw.mFragmentShaderSource       = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
+    raw.mShadowVertexShaderSource   = SHADER_SHADOW_MAP_SHADER_VERT.data();
+    raw.mShadowFragmentShaderSource = SHADER_SHADOW_MAP_SHADER_FRAG.data();
   }
 
   if(!fail)

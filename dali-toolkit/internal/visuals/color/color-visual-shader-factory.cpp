@@ -235,8 +235,8 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     featureBuilder.GetVertexShaderPrefixList(vertexShaderPrefixList);
     featureBuilder.GetFragmentShaderPrefixList(fragmentShaderPrefixList);
 
-    std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data());
-    std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
+    std::string vertexShader   = std::string(vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data());
+    std::string fragmentShader = std::string(fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
 
     shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 

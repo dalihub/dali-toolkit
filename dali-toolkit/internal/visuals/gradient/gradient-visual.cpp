@@ -513,8 +513,8 @@ Shader GradientVisual::GenerateShader() const
     }
 
     shader = mFactoryCache.GenerateAndSaveShader(shaderType,
-                                                 Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
-                                                 Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
+                                                 vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
+                                                 fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
   }
 
   return shader;

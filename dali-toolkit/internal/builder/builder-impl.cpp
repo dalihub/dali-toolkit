@@ -150,13 +150,10 @@ Builder::Builder()
   mParser = Dali::Toolkit::JsonParser::New();
 
   Property::Map defaultConstants;
-  defaultConstants[TOKEN_STRING(DALI_IMAGE_DIR)]              = AssetManager::GetDaliImagePath();
-  defaultConstants[TOKEN_STRING(DALI_SOUND_DIR)]              = AssetManager::GetDaliSoundPath();
-  defaultConstants[TOKEN_STRING(DALI_STYLE_DIR)]              = AssetManager::GetDaliStylePath();
-  defaultConstants[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)]        = AssetManager::GetDaliStyleImagePath();
-  defaultConstants[TOKEN_STRING(DALI_SHADER_VERSION_PREFIX)]  = Shader::GetShaderVersionPrefix();
-  defaultConstants[TOKEN_STRING(DALI_VERTEX_SHADER_PREFIX)]   = Shader::GetVertexShaderPrefix();
-  defaultConstants[TOKEN_STRING(DALI_FRAGMENT_SHADER_PREFIX)] = Shader::GetFragmentShaderPrefix();
+  defaultConstants[TOKEN_STRING(DALI_IMAGE_DIR)]       = AssetManager::GetDaliImagePath();
+  defaultConstants[TOKEN_STRING(DALI_SOUND_DIR)]       = AssetManager::GetDaliSoundPath();
+  defaultConstants[TOKEN_STRING(DALI_STYLE_DIR)]       = AssetManager::GetDaliStylePath();
+  defaultConstants[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)] = AssetManager::GetDaliStyleImagePath();
 
   AddConstants(defaultConstants);
 }
@@ -473,7 +470,7 @@ Path Builder::GetPath(const std::string& name)
     {
       if(OptionalChild path = IsChild(*paths, name))
       {
-        //points property
+        // points property
         if(OptionalChild pointsProperty = IsChild(*path, "points"))
         {
           Dali::Property::Value points(Property::ARRAY);
@@ -482,7 +479,7 @@ Path Builder::GetPath(const std::string& name)
             ret = Path::New();
             ret.SetProperty(Path::Property::POINTS, points);
 
-            //controlPoints property
+            // controlPoints property
             if(OptionalChild pointsProperty = IsChild(*path, "controlPoints"))
             {
               Dali::Property::Value points(Property::ARRAY);
@@ -493,7 +490,7 @@ Path Builder::GetPath(const std::string& name)
             }
             else
             {
-              //Curvature
+              // Curvature
               float curvature(0.25f);
               if(OptionalFloat pointsProperty = IsFloat(*path, "curvature"))
               {
@@ -502,13 +499,13 @@ Path Builder::GetPath(const std::string& name)
               ret.GenerateControlPoints(curvature);
             }
 
-            //Add the new path to the hash table for paths
+            // Add the new path to the hash table for paths
             mPathLut[name] = ret;
           }
         }
         else
         {
-          //Interpolation points not specified
+          // Interpolation points not specified
           DALI_SCRIPT_WARNING("Interpolation points not specified for path '%s'\n", name.c_str());
         }
       }
@@ -522,18 +519,18 @@ PathConstrainer Builder::GetPathConstrainer(const std::string& name)
 {
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
-  //Search the pathConstrainer in the LUT
+  // Search the pathConstrainer in the LUT
   size_t count(mPathConstrainerLut.size());
   for(size_t i(0); i != count; ++i)
   {
     if(mPathConstrainerLut[i].name == name)
     {
-      //PathConstrainer has already been created
+      // PathConstrainer has already been created
       return mPathConstrainerLut[i].pathConstrainer;
     }
   }
 
-  //Create a new PathConstrainer
+  // Create a new PathConstrainer
   PathConstrainer ret;
   if(OptionalChild constrainers = IsChild(*mParser.GetRoot(), "constrainers"))
   {
@@ -546,7 +543,7 @@ PathConstrainer Builder::GetPathConstrainer(const std::string& name)
       }
       else if(*constrainerType == "PathConstrainer")
       {
-        //points property
+        // points property
         if(OptionalChild pointsProperty = IsChild(*pathConstrainer, "points"))
         {
           Dali::Property::Value points(Property::ARRAY);
@@ -555,7 +552,7 @@ PathConstrainer Builder::GetPathConstrainer(const std::string& name)
             ret = PathConstrainer::New();
             ret.SetProperty(PathConstrainer::Property::POINTS, points);
 
-            //controlPoints property
+            // controlPoints property
             if(OptionalChild pointsProperty = IsChild(*pathConstrainer, "controlPoints"))
             {
               Dali::Property::Value points(Property::ARRAY);
@@ -564,27 +561,27 @@ PathConstrainer Builder::GetPathConstrainer(const std::string& name)
                 ret.SetProperty(PathConstrainer::Property::CONTROL_POINTS, points);
               }
 
-              //Forward vector
+              // Forward vector
               OptionalVector3 forward(IsVector3(IsChild(*pathConstrainer, "forward")));
               if(forward)
               {
                 ret.SetProperty(PathConstrainer::Property::FORWARD, *forward);
               }
 
-              //Add the new constrainer to the vector of PathConstrainer
+              // Add the new constrainer to the vector of PathConstrainer
               PathConstrainerEntry entry = {name, ret};
               mPathConstrainerLut.push_back(entry);
             }
             else
             {
-              //Control points not specified
+              // Control points not specified
               DALI_SCRIPT_WARNING("Control points not specified for pathConstrainer '%s'\n", name.c_str());
             }
           }
         }
         else
         {
-          //Interpolation points not specified
+          // Interpolation points not specified
           DALI_SCRIPT_WARNING("Interpolation points not specified for pathConstrainer '%s'\n", name.c_str());
         }
       }
@@ -631,18 +628,18 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer(const std::string& name)
 {
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
-  //Search the LinearConstrainer in the LUT
+  // Search the LinearConstrainer in the LUT
   size_t count(mLinearConstrainerLut.size());
   for(size_t i(0); i != count; ++i)
   {
     if(mLinearConstrainerLut[i].name == name)
     {
-      //LinearConstrainer has already been created
+      // LinearConstrainer has already been created
       return mLinearConstrainerLut[i].linearConstrainer;
     }
   }
 
-  //Create a new LinearConstrainer
+  // Create a new LinearConstrainer
   LinearConstrainer ret;
   if(OptionalChild constrainers = IsChild(*mParser.GetRoot(), "constrainers"))
   {
@@ -655,7 +652,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer(const std::string& name)
       }
       else if(*constrainerType == "LinearConstrainer")
       {
-        //points property
+        // points property
         if(OptionalChild pointsProperty = IsChild(*linearConstrainer, "value"))
         {
           Dali::Property::Value points(Property::ARRAY);
@@ -664,7 +661,7 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer(const std::string& name)
             ret = Dali::LinearConstrainer::New();
             ret.SetProperty(LinearConstrainer::Property::VALUE, points);
 
-            //controlPoints property
+            // controlPoints property
             if(OptionalChild pointsProperty = IsChild(*linearConstrainer, "progress"))
             {
               Dali::Property::Value points(Property::ARRAY);
@@ -673,14 +670,14 @@ Dali::LinearConstrainer Builder::GetLinearConstrainer(const std::string& name)
                 ret.SetProperty(LinearConstrainer::Property::PROGRESS, points);
               }
             }
-            //Add the new constrainer to vector of LinearConstrainer
+            // Add the new constrainer to vector of LinearConstrainer
             LinearConstrainerEntry entry = {name, ret};
             mLinearConstrainerLut.push_back(entry);
           }
         }
         else
         {
-          //Interpolation points not specified
+          // Interpolation points not specified
           DALI_SCRIPT_WARNING("Values not specified for LinearConstrainer '%s'\n", name.c_str());
         }
       }
