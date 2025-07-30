@@ -125,6 +125,8 @@ Dali::Accessibility::Role ConvertV2RoleToAtspiRole(AccessibilityRole role)
     TO_V1_ROLE_TYPE(TEXT, LABEL)
     TO_SAME_ROLE_TYPE(TOGGLE_BUTTON)
     TO_SAME_ROLE_TYPE(TOOL_BAR)
+    TO_V1_ROLE_TYPE(SCENE_3D, FILLER)
+    TO_V1_ROLE_TYPE(MODEL, IMAGE)
     default:
     {
       return Role::UNKNOWN;
@@ -153,6 +155,11 @@ bool IsModalRole(int32_t rawRole)
   return IsRoleV2(rawRole) && (static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::ALERT ||
                                static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::DIALOG ||
                                static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::POPUP_MENU);
+}
+
+bool IsScene3DRole(int32_t rawRole)
+{
+  return IsRoleV2(rawRole) && (static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::SCENE_3D);
 }
 
 bool IsHighlightableRole(int32_t rawRole)
@@ -520,6 +527,7 @@ bool ControlAccessible::GrabHighlight()
   RegisterPositionPropertyNotification();
   RegisterPropertySetSignal();
 
+  mHighlightOverlay.UpdateOverlay(highlight);
   return true;
 }
 
@@ -540,6 +548,7 @@ bool ControlAccessible::ClearHighlight()
     mCurrentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
     EmitHighlighted(false);
+    mHighlightOverlay.HideOverlay();
     return true;
   }
   return false;
@@ -694,4 +703,23 @@ bool ControlAccessible::IsModal(Actor actor)
   return IsModalRole(rawRole);
 }
 
+bool ControlAccessible::IsScene3D(Actor actor)
+{
+  int32_t rawRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
+  if(actor.GetProperty(Property::ACCESSIBILITY_ROLE).Get(rawRole))
+  {
+    return IsScene3DRole(rawRole);
+  }
+  return false;
+}
+
+void ControlAccessible::SetCustomHighlightOverlay(Vector2 position, Vector2 size)
+{
+  mHighlightOverlay.SetCustomHighlight(position, size);
+}
+
+void ControlAccessible::ResetCustomHighlightOverlay()
+{
+  mHighlightOverlay.ResetCustomHighlight();
+}
 } // namespace Dali::Toolkit::DevelControl
