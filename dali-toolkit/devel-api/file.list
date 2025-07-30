@@ -8,6 +8,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/builder/builder.cpp
   ${devel_api_src_dir}/builder/json-parser.cpp
   ${devel_api_src_dir}/builder/tree-node.cpp
+  ${devel_api_src_dir}/controls/accessibility-highlight-overlay.cpp
   ${devel_api_src_dir}/controls/canvas-view/canvas-view.cpp
   ${devel_api_src_dir}/controls/control-accessible.cpp
   ${devel_api_src_dir}/controls/control-devel.cpp
@@ -102,6 +103,7 @@ SET( devel_api_asset-manager_header_files
 
 
 SET( devel_api_controls_header_files
+  ${devel_api_src_dir}/controls/accessibility-highlight-overlay.h
   ${devel_api_src_dir}/controls/canvas-view/canvas-view.h
   ${devel_api_src_dir}/controls/control-accessible.h
   ${devel_api_src_dir}/controls/control-depth-index-ranges.h

@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali-toolkit/devel-api/controls/accessibility-highlight-overlay.h>
 
 namespace Dali::Toolkit::DevelControl
 {
@@ -78,6 +79,8 @@ enum class AccessibilityRole : uint32_t
   TEXT,
   TOGGLE_BUTTON,
   TOOL_BAR,
+  SCENE_3D,
+  MODEL,
   MAX_COUNT
 };
 
@@ -251,6 +254,23 @@ public:
   bool IsScrollable() const override;
 
   /**
+  * @brief Function to set a custom highlight overlay
+  *
+  * This function sets a custom highlight overlay at the specified position and size.
+  *
+  * @param position A Vector2 representing the position of the overlay
+  * @param size A Vector2 representing the size of the overlay
+  */
+  void SetCustomHighlightOverlay(Vector2 position, Vector2 size);
+
+  /**
+  * @brief Function to reset the custom highlight overlay
+  *
+  * This function resets the custom highlight overlay.
+  */
+  void ResetCustomHighlightOverlay();
+
+  /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
   virtual Dali::Accessibility::States CalculateStates();
@@ -293,16 +313,23 @@ public:
    */
   static bool IsModal(Actor actor);
 
+  /**
+   * @brief Returns true if given actor is considered as 3D scene view by propeties set.
+   */
+  static bool IsScene3D(Actor actor);
+
 private:
   /**
    * @brief Appliys relavant accessibility properties to AT-SPI states.
    */
   void ApplyAccessibilityProps(Dali::Accessibility::States& states);
 
+private:
   /**
    * @brief Grabs snapshot of previous state when the control is highlighted.
    */
-  AccessibilityStates mStatesSnapshot;
+  AccessibilityStates           mStatesSnapshot;
+  AccessibilityHighlightOverlay mHighlightOverlay;
 };
 
 } // namespace Dali::Toolkit::DevelControl
