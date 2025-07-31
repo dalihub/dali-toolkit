@@ -98,8 +98,8 @@ constexpr const char* ACTION_ACCESSIBILITY_READING_RESUMED   = "ReadingResumed";
 constexpr const char* ACTION_ACCESSIBILITY_READING_SKIPPED   = "ReadingSkipped";
 constexpr const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 
-constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 2;
-constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::DECORATION - 1;
+constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 1;
+constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::FOREGROUND_EFFECT - 1;
 
 static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
 

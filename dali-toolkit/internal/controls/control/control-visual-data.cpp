@@ -215,12 +215,9 @@ void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVis
 
 /**
  * @brief Set visual on scene
- * When offscreen rendering(using cache renderer) is on, it only includes control's context area.
- * Swap the renderer's location to cache renderers for outer-drawn visuals.
- * When depth index is lower than background effect(i.e. shadow visual), it is probably drawn out of control's context area.
  * @param[in] visualImpl The visual
  * @param[in] controlImpl Actor with renderers
- * @note Changing depth index may not instantaneously update the visuals. (i.e. Turn offscreen rendering off and on again.)
+ * @note When offscreen rendering is on, visuals drawn out of control's area(depth index in range of BACKGROUND_EFFECT or FOREGROUND_EFFECT) should swap its renderer to cache renderers. So changing visual's depth index may not apply instantaneously. Turn offscreen rendering off and on again.
  */
 void SetVisualOnScene(Internal::Visual::Base& visualImpl, Internal::Control& controlImpl)
 {
@@ -231,7 +228,8 @@ void SetVisualOnScene(Internal::Visual::Base& visualImpl, Internal::Control& con
   DevelControl::OffScreenRenderingType offscreenRenderingType = DevelControl::OffScreenRenderingType(handle.GetProperty<int32_t>(DevelControl::Property::OFFSCREEN_RENDERING));
   if(offscreenRenderingType != DevelControl::OffScreenRenderingType::NONE)
   {
-    if(visualImpl.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+    const int32_t depthIndex = visualImpl.GetDepthIndex();
+    if(depthIndex <= DepthIndex::BACKGROUND_EFFECT || depthIndex > DepthIndex::DECORATION)
     {
       Renderer renderer = visualImpl.GetRenderer();
       self.RemoveRenderer(renderer);
@@ -254,7 +252,8 @@ void SetVisualOffScene(Internal::Visual::Base& visualImpl, Internal::Control& co
   DevelControl::OffScreenRenderingType offscreenRenderingType = DevelControl::OffScreenRenderingType(handle.GetProperty<int32_t>(DevelControl::Property::OFFSCREEN_RENDERING));
   if(offscreenRenderingType != DevelControl::OffScreenRenderingType::NONE)
   {
-    if(visualImpl.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+    const int32_t depthIndex = visualImpl.GetDepthIndex();
+    if(depthIndex <= DepthIndex::BACKGROUND_EFFECT || depthIndex > DepthIndex::DECORATION)
     {
       Renderer renderer = visualImpl.GetRenderer();
       self.RemoveCacheRenderer(renderer);
