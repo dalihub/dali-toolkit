@@ -19,6 +19,7 @@
 #include <dali-scene3d/public-api/loader/shader-definition.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/shader-integ.h>
 #include <dali/public-api/object/property-array.h>
 #include <regex>
 
@@ -50,6 +51,7 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
   mDefines(other.mDefines),
   mHints(other.mHints),
   mUniforms(other.mUniforms),
+  mUniformBlocks(other.mUniformBlocks),
   mShadowOptionHash(other.mShadowOptionHash),
   mUseBuiltInShader(other.mUseBuiltInShader)
 {
@@ -217,7 +219,9 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   array.PushBack(map[1]);
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.c_str());
-  Shader shader = Shader::New(array);
+
+  // Create strong-connected ubo shader since shader definition could be removed after scene load completed.
+  Shader shader = Dali::Integration::ShaderNewWithUniformBlock(array, mUniformBlocks, true);
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {
     auto pair = mUniforms.GetKeyValue(i0);

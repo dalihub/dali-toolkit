@@ -51,7 +51,12 @@ UNIFORM_BLOCK VertBlock
 #endif
   UNIFORM highp int uBlendShapeComponentSize;///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
+};
 
+UNIFORM_BLOCK ShadowVertBlock
+{
+  // Shadow
+  UNIFORM lowp int uIsShadowEnabled;
   UNIFORM highp mat4 uShadowLightViewProjectionMatrix;
 };
 

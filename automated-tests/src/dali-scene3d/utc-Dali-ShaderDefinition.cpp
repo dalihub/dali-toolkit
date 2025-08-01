@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/shader-definition.h"
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/shader-definition.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -28,7 +29,7 @@ using namespace Dali::Scene3D::Loader;
 int UtcDaliShaderDefinitionFailedToLoad(void)
 {
   ShaderDefinition shaderDef;
-  shaderDef.mVertexShaderPath = "nonexistent.vsh";
+  shaderDef.mVertexShaderPath   = "nonexistent.vsh";
   shaderDef.mFragmentShaderPath = "nonexistent.vsh";
 
   DALI_TEST_ASSERTION(shaderDef.LoadRaw(""), "Failed to load shader source");
@@ -42,9 +43,12 @@ int UtcDaliShaderDefinitionFailedToLoad(void)
 
   shaderDef.mHints.push_back("MODIFIES_GEOMETRY");
   shaderDef.mHints.push_back("OUTPUT_IS_TRANSPARENT");
+
   auto raw = shaderDef.LoadRaw(shaderPath);
 
-  TestApplication app;
+  ToolkitTestApplication application;
+  shaderDef.mUniformBlocks.push_back(Dali::UniformBlock::New("UniformBlock0"));
+  shaderDef.mUniformBlocks.push_back(Dali::UniformBlock::New("UniformBlock1"));
   auto shader = shaderDef.Load(std::move(raw));
   DALI_TEST_CHECK(shader);
 
