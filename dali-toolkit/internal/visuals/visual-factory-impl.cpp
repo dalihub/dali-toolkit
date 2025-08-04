@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ VisualFactory::VisualFactory(bool debugEnabled)
   mSlotDelegate(this),
   mIdleCallback(nullptr),
   mDefaultCreationOptions(Toolkit::VisualFactory::CreationOptions::NONE),
+  mAdaptorInitialized(false),
   mDebugEnabled(debugEnabled),
   mPreMultiplyOnLoad(true),
   mPrecompiledShaderRequested(false)
@@ -97,7 +98,8 @@ VisualFactory::VisualFactory(bool debugEnabled)
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   if(DALI_LIKELY(lifecycleController))
   {
-    lifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnApplicationTerminated);
+    lifecycleController.InitSignal().Connect(this, &VisualFactory::OnAdaptorInitialized);
+    lifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnAdaptorTerminated);
   }
 }
 
@@ -105,12 +107,6 @@ VisualFactory::~VisualFactory()
 {
   if(Adaptor::IsAvailable())
   {
-    Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-    if(DALI_LIKELY(lifecycleController))
-    {
-      lifecycleController.TerminateSignal().Disconnect(this, &VisualFactory::OnApplicationTerminated);
-    }
-
     if(mIdleCallback)
     {
       // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
@@ -309,11 +305,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
     }
   }
 
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n", Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT), (visualType == Toolkit::DevelVisual::IMAGE) ? "url:" : "", ((visualType == Toolkit::DevelVisual::IMAGE) ? (([&]() {
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n", Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT), (visualType == Toolkit::DevelVisual::IMAGE) ? "url:" : "", ((visualType == Toolkit::DevelVisual::IMAGE) ? (([&]()
+                                                                                                                                                                                                                                                                                                                                 {
                                                                                                                                                                                                                                                                                   // Return URL if present in PropertyMap else return "not found message"
                                                                                                                                                                                                                                                                                   Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-                                                                                                                                                                                                                                                                                  return (imageURLValue) ? imageURLValue->Get<std::string>() : std::string("url not found in PropertyMap");
-                                                                                                                                                                                                                                                                                })())
+                                                                                                                                                                                                                                                                                  return (imageURLValue) ? imageURLValue->Get<std::string>() : std::string("url not found in PropertyMap"); })())
                                                                                                                                                                                                                                                                                                                              : std::string(""))
                                                                                                                                                                                                                                                                                   .c_str());
 
@@ -324,7 +320,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
   if(mDebugEnabled && visualType != Toolkit::DevelVisual::WIREFRAME)
   {
-    //Create a WireframeVisual if we have debug enabled
+    // Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr, propertyMap);
   }
 
@@ -382,7 +378,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
 
   if(mDebugEnabled)
   {
-    //Create a WireframeVisual if we have debug enabled
+    // Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr);
   }
 
@@ -622,8 +618,15 @@ void VisualFactory::OnDiscardCallback()
   mDiscardedVisuals.clear();
 }
 
-void VisualFactory::OnApplicationTerminated()
+void VisualFactory::OnAdaptorInitialized()
 {
+  mAdaptorInitialized = true;
+}
+
+void VisualFactory::OnAdaptorTerminated()
+{
+  mAdaptorInitialized = false;
+
   if(DALI_UNLIKELY(mIdleCallback))
   {
     OnDiscardCallback();
@@ -637,6 +640,12 @@ void VisualFactory::OnApplicationTerminated()
 
 void VisualFactory::RegisterDiscardCallback()
 {
+  if(!mAdaptorInitialized)
+  {
+    // If the adaptor is not initialized, we cannot add idle. Discard visuals immediately.
+    OnDiscardCallback();
+    return;
+  }
   if(!mIdleCallback && Adaptor::IsAvailable())
   {
     // The callback manager takes the ownership of the callback object.

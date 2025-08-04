@@ -18,7 +18,9 @@
 #include "style-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/application.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -34,7 +36,7 @@
 
 namespace
 {
-//const char* LANDSCAPE_QUALIFIER = "landscape";
+// const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "fontsize";
 
@@ -114,12 +116,6 @@ StyleManager::StyleManager()
   mThemeBuilderConstants[PACKAGE_PATH_KEY]              = dataReadOnlyDir + DEFAULT_TOOLKIT_PACKAGE_PATH;
   mThemeBuilderConstants[APPLICATION_RESOURCE_PATH_KEY] = Application::GetResourcePath();
 
-  mStyleMonitor = StyleMonitor::Get();
-  if(mStyleMonitor)
-  {
-    mStyleMonitor.StyleChangeSignal().Connect(this, &StyleManager::StyleMonitorChange);
-  }
-
   // Set the full path for the default style theme.
   const std::string styleDirPath = AssetManager::GetDaliStylePath();
   mDefaultThemeFilePath          = styleDirPath + DEFAULT_THEME_FILE_NAME;
@@ -129,6 +125,28 @@ StyleManager::StyleManager()
 
   // Initialize BrokenImages
   mBrokenImageUrls.assign(COUNT_BROKEN_IMAGE_MAX, "");
+
+  // Load default theme as fast as we can.
+  [[maybe_unused]] const auto& configure = GetConfigurations();
+
+  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+  if(DALI_LIKELY(lifecycleController))
+  {
+    // Register callback for some API which we need to doing after Adaptor started.
+    lifecycleController.InitSignal().Connect(this, &StyleManager::OnAdaptorInit);
+  }
+}
+
+void StyleManager::OnAdaptorInit()
+{
+  if(Dali::Adaptor::IsAvailable())
+  {
+    mStyleMonitor = StyleMonitor::Get();
+    if(mStyleMonitor)
+    {
+      mStyleMonitor.StyleChangeSignal().Connect(this, &StyleManager::StyleMonitorChange);
+    }
+  }
 }
 
 StyleManager::~StyleManager()
@@ -486,7 +504,7 @@ void StyleManager::ApplyStyle(Toolkit::Builder builder, Toolkit::Control control
     builder.ApplyStyle(styleName, control);
   }
 
-  if(mDefaultFontSize == -1 && mStyleMonitor.EnsureFontClientCreated())
+  if(mDefaultFontSize == -1 && mStyleMonitor && mStyleMonitor.EnsureFontClientCreated())
   {
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
