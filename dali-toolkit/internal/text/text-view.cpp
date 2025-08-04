@@ -376,6 +376,19 @@ struct View::Impl
   VisualModelPtr              mVisualModel;
   LogicalModelPtr             mLogicalModel;
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
+
+  /**
+   * @brief Get the font client.
+   * @return fontClient The font client .
+   */
+  TextAbstraction::FontClient& GetFontClient()
+  {
+    if(!mFontClient)
+    {
+      mFontClient = TextAbstraction::FontClient::Get();
+    }
+    return mFontClient;
+  }
 };
 
 View::View()
@@ -387,11 +400,6 @@ View::View()
 View::~View()
 {
   delete mImpl;
-}
-
-void View::SetFontClient(TextAbstraction::FontClient& fontClient)
-{
-  mImpl->mFontClient = fontClient;
 }
 
 void View::SetVisualModel(VisualModelPtr visualModel)
@@ -613,7 +621,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
             // Get the first glyph which is going to be replaced and the ellipsis glyph.
             GlyphInfo&       glyphInfo     = *(glyphs + indexOfFirstGlyph);
-            const GlyphInfo& ellipsisGlyph = mImpl->mFontClient.GetEllipsisGlyph(mImpl->mFontClient.GetPointSize(glyphInfo.fontId));
+            const GlyphInfo& ellipsisGlyph = mImpl->GetFontClient().GetEllipsisGlyph(mImpl->GetFontClient().GetPointSize(glyphInfo.fontId));
 
             // Change the 'x' and 'y' position of the ellipsis glyph.
             Vector2& position = *(glyphPositions + indexOfFirstGlyph);
@@ -643,7 +651,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
           // The ellipsis glyph has to fit in the place where the last glyph(s) is(are) removed.
           InsertEllipsisGlyph(
-            glyphs, indexOfEllipsis, numberOfRemovedGlyphs, glyphPositions, mImpl->mFontClient, characterSpacingGlyphRuns, modelCharacterSpacing,
+            glyphs, indexOfEllipsis, numberOfRemovedGlyphs, glyphPositions, mImpl->GetFontClient(), characterSpacingGlyphRuns, modelCharacterSpacing,
             calculatedAdvance, textBuffer, glyphToCharacterMapBuffer, numberOfGlyphs, isTailMode, ellipsisLine, numberOfLaidOutGlyphs);
 
           RemoveAllGlyphsAfterEllipsisGlyph(

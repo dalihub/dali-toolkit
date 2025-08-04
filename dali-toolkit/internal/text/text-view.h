@@ -50,13 +50,6 @@ public:
   virtual ~View();
 
   /**
-   * @brief Set the font client.
-   *
-   * @param[in] fontClient The font client used by the View.
-   */
-  void SetFontClient(TextAbstraction::FontClient& fontClient);
-
-  /**
    * @brief Set the visual model.
    *
    * @param[in] visualModel The visual model used by the View.

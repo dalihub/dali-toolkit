@@ -1540,7 +1540,6 @@ int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
   };
 
   // Default New
-  // Note: TextField and TextEditor have TextSelectionPopup
   tet_infoline("Check whether ControlStyleChangeSignal connected in default New\n");
   checkup(1, Control::New());
   checkup(1, ImageView::New());
@@ -1548,8 +1547,8 @@ int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
   checkup(1, ImageView::New("url", Dali::ImageDimensions(32u, 32u)));
   checkup(1, TextLabel::New());
   checkup(1, TextLabel::New("text"));
-  checkup(2, TextField::New());
-  checkup(2, TextEditor::New());
+  checkup(1, TextField::New());
+  checkup(1, TextEditor::New());
 
   // New with additional behaviour, but enable style change signals
   tet_infoline("Check whether ControlStyleChangeSignal connected in non-disable style change signals\n");
@@ -1566,10 +1565,10 @@ int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
   checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT, "text"));
   checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
   checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION, "text"));
-  checkup(2, TextField::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
-  checkup(2, TextField::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
-  checkup(2, TextEditor::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
-  checkup(2, TextEditor::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
+  checkup(1, TextField::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
+  checkup(1, TextField::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
+  checkup(1, TextEditor::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
+  checkup(1, TextEditor::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
 
   // New with additional behaviour, so disable style change signals
   tet_infoline("Check whether ControlStyleChangeSignal did not connected\n");
@@ -1580,8 +1579,8 @@ int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
   checkup(0, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, "url", Dali::ImageDimensions(32u, 32u)));
   checkup(0, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
   checkup(0, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, "text"));
-  checkup(1, TextField::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
-  checkup(1, TextEditor::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  checkup(0, TextField::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  checkup(0, TextEditor::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
 
   END_TEST;
 }

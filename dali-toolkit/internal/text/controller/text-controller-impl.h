@@ -220,15 +220,16 @@ struct FontDefaults
     return mFontId;
   }
 
-  TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
-  float                            mDefaultPointSize; ///< The default font's point size.
-  float                            mFitPointSize;     ///< The fit font's point size.
-  FontId                           mFontId;           ///< The font's id of the default font.
-  bool                             familyDefined : 1; ///< Whether the default font's family name is defined.
-  bool                             weightDefined : 1; ///< Whether the default font's weight is defined.
-  bool                             widthDefined : 1;  ///< Whether the default font's width is defined.
-  bool                             slantDefined : 1;  ///< Whether the default font's slant is defined.
-  bool                             sizeDefined : 1;   ///< Whether the default font's point size is defined.
+  TextAbstraction::FontDescription mFontDescription;   ///< The default font's description.
+  float                            mDefaultPointSize;  ///< The default font's point size.
+  float                            mFitPointSize;      ///< The fit font's point size.
+  FontId                           mFontId;            ///< The font's id of the default font.
+  bool                             mIsDescription : 1; ///< Whether there is a default font description.
+  bool                             familyDefined : 1;  ///< Whether the default font's family name is defined.
+  bool                             weightDefined : 1;  ///< Whether the default font's weight is defined.
+  bool                             widthDefined : 1;   ///< Whether the default font's width is defined.
+  bool                             slantDefined : 1;   ///< Whether the default font's slant is defined.
+  bool                             sizeDefined : 1;    ///< Whether the default font's point size is defined.
 };
 
 /**
@@ -392,17 +393,15 @@ public:
   {
     mModel = Model::New();
 
-    mFontClient = TextAbstraction::FontClient::Get();
     if(mEditableControlInterface != nullptr && Clipboard::IsAvailable())
     {
       mClipboard = Clipboard::Get();
     }
-    mView.SetFontClient(mFontClient);
+
     mView.SetVisualModel(mModel->mVisualModel);
     mView.SetLogicalModel(mModel->mLogicalModel);
 
-    // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
-    mMetrics = Metrics::New(mFontClient);
+    mMetrics = Metrics::New();
     mLayoutEngine.SetMetrics(mMetrics);
 
     // Set the text properties to default
@@ -419,6 +418,20 @@ public:
     delete mEmbossDefaults;
     delete mOutlineDefaults;
     delete mEventData;
+  }
+
+  /**
+   * @brief Get the font client.
+   *
+   * @return fontClient The font client.
+   */
+  TextAbstraction::FontClient& GetFontClient()
+  {
+    if(!mFontClient)
+    {
+      mFontClient = TextAbstraction::FontClient::Get();
+    }
+    return mFontClient;
   }
 
   // Text Controller Implementation.
