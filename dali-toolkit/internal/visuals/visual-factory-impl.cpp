@@ -98,7 +98,7 @@ VisualFactory::VisualFactory(bool debugEnabled)
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   if(DALI_LIKELY(lifecycleController))
   {
-    lifecycleController.InitSignal().Connect(this, &VisualFactory::OnAdaptorInitialized);
+    lifecycleController.PreInitSignal().Connect(this, &VisualFactory::OnAdaptorInitialized);
     lifecycleController.TerminateSignal().Connect(this, &VisualFactory::OnAdaptorTerminated);
   }
 }

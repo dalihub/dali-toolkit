@@ -126,14 +126,11 @@ StyleManager::StyleManager()
   // Initialize BrokenImages
   mBrokenImageUrls.assign(COUNT_BROKEN_IMAGE_MAX, "");
 
-  // Load default theme as fast as we can.
-  [[maybe_unused]] const auto& configure = GetConfigurations();
-
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   if(DALI_LIKELY(lifecycleController))
   {
     // Register callback for some API which we need to doing after Adaptor started.
-    lifecycleController.InitSignal().Connect(this, &StyleManager::OnAdaptorInit);
+    lifecycleController.PreInitSignal().Connect(this, &StyleManager::OnAdaptorInit);
   }
 }
 
@@ -142,6 +139,13 @@ void StyleManager::OnAdaptorInit()
   if(Dali::Adaptor::IsAvailable())
   {
     mStyleMonitor = StyleMonitor::Get();
+
+    // Lazy signal send.
+    if(mStyleMonitor.ThemeChangedBeforeAdaptorInit())
+    {
+      StyleMonitorChange(mStyleMonitor, StyleChange::THEME_CHANGE);
+      // Dev Note : Default font & size change signal will be emitted after AdaptorInit done.
+    }
     if(mStyleMonitor)
     {
       mStyleMonitor.StyleChangeSignal().Connect(this, &StyleManager::StyleMonitorChange);

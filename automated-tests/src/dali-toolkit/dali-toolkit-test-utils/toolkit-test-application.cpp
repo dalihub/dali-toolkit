@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
   AdaptorImpl::GetImpl(*mAdaptor).SetApplication(*this);
 
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+  lifecycleController.PreInitSignal().Emit();
   lifecycleController.InitSignal().Emit();
 
   // set the DPI value for font rendering

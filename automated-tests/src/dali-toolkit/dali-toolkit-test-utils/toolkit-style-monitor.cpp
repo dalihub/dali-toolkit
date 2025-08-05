@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ std::string gTheme;
 std::string gFontFamily("LucidaSans");
 std::string gFontStyle("Regular");
 int         gFontSize(1);
+bool        gThemeChangedBeforeAdaptorInit(false);
 
 constexpr std::string_view THROW_EXCEPTION_STYLE_FILE_NAME = "throwException";
 class DummyException : public std::exception
@@ -99,6 +100,7 @@ public: // Style Information
   const std::string& GetTheme() const;
   void               SetTheme(std::string theme);
   bool               LoadThemeFile(const std::string& filename, std::string& output);
+  bool               ThemeChangedBeforeAdaptorInit() const;
 
 public: // Signals
   Dali::StyleMonitor::StyleChangeSignalType& StyleChangeSignal();
@@ -189,6 +191,11 @@ bool StyleMonitor::LoadThemeFile(const std::string& filename, std::string& outpu
   return true;
 }
 
+bool StyleMonitor::ThemeChangedBeforeAdaptorInit() const
+{
+  return gThemeChangedBeforeAdaptorInit;
+}
+
 Dali::StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
 {
   return mStyleChangeSignal;
@@ -263,6 +270,11 @@ bool StyleMonitor::LoadThemeFile(const std::string& filename, std::string& outpu
   return GetImplementation(*this).LoadThemeFile(filename, output);
 }
 
+bool StyleMonitor::ThemeChangedBeforeAdaptorInit() const
+{
+  return GetImplementation(*this).ThemeChangedBeforeAdaptorInit();
+}
+
 StyleMonitor& StyleMonitor::operator=(const StyleMonitor& monitor)
 {
   if(*this != monitor)
@@ -311,6 +323,11 @@ void SetDefaultFontStyle(const std::string& style)
 void SetDefaultFontSize(float size)
 {
   gFontSize = size;
+}
+
+void SetThemeChangedBeforeAdaptorInit(bool changed)
+{
+  gThemeChangedBeforeAdaptorInit = changed;
 }
 
 } // namespace StyleMonitor

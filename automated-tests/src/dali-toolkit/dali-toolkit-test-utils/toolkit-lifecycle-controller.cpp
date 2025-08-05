@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ public: // Creation & Destruction
   static Dali::LifecycleController Get();
 
 public: // Signals
+  Dali::LifecycleController::LifecycleSignalType& PreInitSignal();
   Dali::LifecycleController::LifecycleSignalType& InitSignal();
   Dali::LifecycleController::LifecycleSignalType& TerminateSignal();
 
 private:
+  Dali::LifecycleController::LifecycleSignalType mPreInitSignal;
   Dali::LifecycleController::LifecycleSignalType mInitSignal;
   Dali::LifecycleController::LifecycleSignalType mTerminateSignal;
   static Dali::LifecycleController               mLifecycleController;
@@ -64,6 +66,11 @@ Dali::LifecycleController LifecycleController::Get()
     mLifecycleController = Dali::LifecycleController(new Internal::Adaptor::LifecycleController());
   }
   return mLifecycleController;
+}
+
+Dali::LifecycleController::LifecycleSignalType& LifecycleController::PreInitSignal()
+{
+  return mPreInitSignal;
 }
 
 Dali::LifecycleController::LifecycleSignalType& LifecycleController::InitSignal()
@@ -95,6 +102,13 @@ LifecycleController LifecycleController::Get()
   // Get the physical keyboard handle
   LifecycleController handle = Internal::Adaptor::LifecycleController::Get();
   return handle;
+}
+
+LifecycleController::LifecycleSignalType& LifecycleController::PreInitSignal()
+{
+  BaseObject&                             object     = GetBaseObject();
+  Internal::Adaptor::LifecycleController& controller = static_cast<Internal::Adaptor::LifecycleController&>(object);
+  return controller.PreInitSignal();
 }
 
 LifecycleController::LifecycleSignalType& LifecycleController::InitSignal()
