@@ -667,6 +667,60 @@ int UtcDaliStyleManagerApplyStyle(void)
   END_TEST;
 }
 
+int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized(void)
+{
+  tet_infoline("UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized - test that a style can be applied to a single button before application initialized");
+
+  const char* json1 =
+    "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"General\"\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,1.0,0.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+
+  tet_infoline("Apply the style before application initialized");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  styleMonitor.SetTheme(themeFile);
+
+  // Set global variable to change style at style manager.
+  Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(true);
+
+  ToolkitTestApplication application;
+
+  // Reset global variable for next test
+  Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(false);
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  application.GetScene().Add(testButton);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Property::Value themedBgColor(testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR));
+  Property::Value themedFgColor(testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR));
+
+  tet_infoline("Check that the properties change for the button");
+  DALI_TEST_EQUALS(themedBgColor, Property::Value(Color::YELLOW), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(themedFgColor, Property::Value(Color::BLUE), 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliStyleManagerIncludeStyleP(void)
 {
   ToolkitTestApplication application;
@@ -1463,10 +1517,13 @@ int UtcDaliStyleManagerConfigSectionTestP(void)
 
   Property::Map config          = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
   bool          alwaysShowFocus = config["alwaysShowFocus"].Get<bool>();
+  tet_printf("alwaysShowFocus : %d\n", alwaysShowFocus);
   DALI_TEST_CHECK(!alwaysShowFocus);
   bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
+  tet_printf("clearFocusOnEscape : %d\n", clearFocusOnEscape);
   DALI_TEST_CHECK(!clearFocusOnEscape);
   std::string brokenImageUrl = config["brokenImageUrl"].Get<std::string>();
+  tet_printf("broken image url : %s\n", brokenImageUrl.c_str());
   DALI_TEST_CHECK(brokenImageUrl.compare("broken|broken|{TEST|TEST.png") == 0);
 
   // For coverage
@@ -1535,7 +1592,8 @@ int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
   Toolkit::StyleManager            styleManager     = StyleManager::Get();
   Toolkit::Internal::StyleManager& styleManagerImpl = GetImpl(styleManager);
 
-  auto checkup = [&styleManagerImpl](int enableStyleChangeSignal, const Control& control) {
+  auto checkup = [&styleManagerImpl](int enableStyleChangeSignal, const Control& control)
+  {
     DALI_TEST_EQUALS(enableStyleChangeSignal, styleManagerImpl.ControlStyleChangeSignal().GetConnectionCount(), TEST_LOCATION);
   };
 

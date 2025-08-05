@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/precompile-shader-option.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visual-factory/precompile-shader-option.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
@@ -197,9 +197,14 @@ private:
   void RegisterDiscardCallback();
 
   /**
-   * @brief Callbacks called when application is terminated.
+   * @brief Callbacks called when adaptor is initialized.
    */
-  void OnApplicationTerminated();
+  void OnAdaptorInitialized();
+
+  /**
+   * @brief Callbacks called when adaptor is terminated.
+   */
+  void OnAdaptorTerminated();
 
   VisualFactory(const VisualFactory&) = delete;
 
@@ -219,6 +224,7 @@ private:
 
   Toolkit::VisualFactory::CreationOptions mDefaultCreationOptions : 2;
 
+  bool mAdaptorInitialized : 1;
   bool mDebugEnabled : 1;
   bool mPreMultiplyOnLoad : 1; ///< Local store for this flag
   bool mPrecompiledShaderRequested : 1;

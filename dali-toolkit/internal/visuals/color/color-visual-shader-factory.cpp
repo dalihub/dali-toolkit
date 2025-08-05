@@ -235,8 +235,8 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     featureBuilder.GetVertexShaderPrefixList(vertexShaderPrefixList);
     featureBuilder.GetFragmentShaderPrefixList(fragmentShaderPrefixList);
 
-    std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data());
-    std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
+    std::string vertexShader   = std::string(vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data());
+    std::string fragmentShader = std::string(fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
 
     shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 
@@ -246,6 +246,29 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     }
   }
   return shader;
+}
+
+std::string_view ColorVisualShaderFactory::GetVertexShaderSource()
+{
+  // static string variable to cache complete vertex shader
+  static std::string gVertexShader;
+  if(gVertexShader.empty())
+  {
+    gVertexShader = SHADER_COLOR_VISUAL_SHADER_VERT.data();
+  }
+
+  return gVertexShader;
+}
+
+std::string_view ColorVisualShaderFactory::GetFragmentShaderSource()
+{
+  // static string variable to cache complete fragment shader
+  static std::string gFragmentShader;
+  if(gFragmentShader.empty())
+  {
+    gFragmentShader = SHADER_COLOR_VISUAL_SHADER_FRAG.data();
+  }
+  return gFragmentShader;
 }
 
 bool ColorVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)

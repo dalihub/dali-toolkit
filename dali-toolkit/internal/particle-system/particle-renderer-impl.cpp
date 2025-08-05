@@ -178,7 +178,7 @@ void ParticleRenderer::CreateShader()
         gl_FragColor = col;\n\
       }\n"};
 
-  mShader   = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderCode, Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderCode, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PARTICLE_RENDERER");
+  mShader   = Shader::New(vertexShaderCode, fragmentShaderCode, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PARTICLE_RENDERER");
   mGeometry = Geometry::New();
 
   // Configure geometry attributes
@@ -357,7 +357,8 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t maxByte
       const auto count = i == workerCount - 1 ? particleCount - index : partial;
 
       tasks.emplace_back(*this, list, index, count, dst + (elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE) * index);
-      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId) { t.Update(); });
+      taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId)
+                             { t.Update(); });
     }
 
     // Execute worker tasks

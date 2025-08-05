@@ -183,7 +183,7 @@ void BorderVisual::OnInitialize()
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  //Register transform properties
+  // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
@@ -195,7 +195,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader(VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT.data(), SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG.data());
     }
   }
   else
@@ -203,7 +203,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader(VisualFactoryCache::BORDER_SHADER);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::BORDER_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::BORDER_SHADER, SHADER_BORDER_VISUAL_SHADER_VERT.data(), SHADER_BORDER_VISUAL_SHADER_FRAG.data());
     }
   }
 

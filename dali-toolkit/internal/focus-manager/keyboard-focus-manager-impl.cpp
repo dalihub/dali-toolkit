@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ KeyboardFocusManager::KeyboardFocusManager()
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
-  LifecycleController::Get().InitSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnAdaptorInit);
+  LifecycleController::Get().PreInitSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnAdaptorInit);
 }
 
 void KeyboardFocusManager::OnAdaptorInit()

@@ -22,21 +22,22 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/style-monitor.h>
+#include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <dali/public-api/adaptor-framework/style-change.h>
-#include <dali/devel-api/adaptor-framework/style-monitor.h>
 
 namespace Test
 {
 namespace StyleMonitor
 {
-void SetThemeFileOutput( const std::string& name, const std::string& output );
+void SetThemeFileOutput(const std::string& name, const std::string& output);
 void SetDefaultFontFamily(const std::string& family);
 void SetDefaultFontStyle(const std::string& style);
-void SetDefaultFontSize( float size );
+void SetDefaultFontSize(float size);
+void SetThemeChangedBeforeAdaptorInit(bool changed);
 
-}
-}
+} // namespace StyleMonitor
+} // namespace Test
 
 #endif // DALI_TOOLKIT_TOOLKIT_STYLE_MONITOR_H

@@ -113,8 +113,8 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     fragmentShaderPrefixList += "#define IS_REQUIRED_DEBUG_VISUAL_SHADER\n";
   }
 
-  std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
-  std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
+  std::string vertexShader   = std::string(vertexShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
+  std::string fragmentShader = std::string(fragmentShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
 
   if(Dali::Toolkit::Internal::ImageVisualShaderDebug::DebugImageVisualShaderEnabled())
   {
@@ -170,7 +170,7 @@ std::string_view ImageVisualShaderFactory::GetVertexShaderSource()
   static std::string gVertexShader;
   if(gVertexShader.empty())
   {
-    gVertexShader = Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data();
+    gVertexShader = SHADER_IMAGE_VISUAL_SHADER_VERT.data();
   }
 
   return gVertexShader;
@@ -182,7 +182,7 @@ std::string_view ImageVisualShaderFactory::GetFragmentShaderSource()
   static std::string gFragmentShaderNoAtlas;
   if(gFragmentShaderNoAtlas.empty())
   {
-    gFragmentShaderNoAtlas = Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data();
+    gFragmentShaderNoAtlas = SHADER_IMAGE_VISUAL_SHADER_FRAG.data();
   }
   return gFragmentShaderNoAtlas;
 }

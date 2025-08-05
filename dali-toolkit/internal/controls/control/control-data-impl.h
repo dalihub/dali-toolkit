@@ -501,6 +501,7 @@ private:
   /**
    * Set off-screen rendering.
    * @param[in] offScreenRenderingType enum OffScreenRenderingType
+   * @note When offscreen rendering is on, changing visual's depth index may not apply instantaneously. Turn it off and on again.
    */
   void SetOffScreenRendering(int32_t offScreenRenderingType);
 

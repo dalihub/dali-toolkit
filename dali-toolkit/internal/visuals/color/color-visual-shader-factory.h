@@ -130,6 +130,18 @@ public:
    */
   Shader GetShader(VisualFactoryCache& factoryCache, const ColorVisualShaderFeature::FeatureBuilder& featureBuilder);
 
+  /**
+   * @brief Request the default vertex shader source.
+   * @return The default vertex shader source.
+   */
+  std::string_view GetVertexShaderSource();
+
+  /**
+   * @brief Request the default fragment shader source.
+   * @return The default fragment shader source.
+   */
+  std::string_view GetFragmentShaderSource();
+
 public: // Implementation of VisualShaderFactoryInterface
   /**
    * @copydoc Dali::Toolkit::VisualShaderFactoryInterface::AddPrecompiledShader

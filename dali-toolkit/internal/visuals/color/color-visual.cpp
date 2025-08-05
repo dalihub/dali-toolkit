@@ -288,14 +288,53 @@ void ColorVisual::OnInitialize()
 
 Shader ColorVisual::GenerateShader() const
 {
-  Shader shader = mColorVisualShaderFactory.GetShader(
-    mFactoryCache,
-    ColorVisualShaderFeature::FeatureBuilder()
-      .EnableBlur(IsBlurRequired())
-      .EnableBorderLine(IsBorderlineRequired())
-      .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
-      .EnableCutout(IsCutoutRequired()));
+  Shader shader;
 
+  const bool useStandardShader = !mImpl->mCustomShader;
+
+  if(useStandardShader)
+  {
+    shader = mColorVisualShaderFactory.GetShader(
+      mFactoryCache,
+      ColorVisualShaderFeature::FeatureBuilder()
+        .EnableBlur(IsBlurRequired())
+        .EnableBorderLine(IsBorderlineRequired())
+        .EnableRoundCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
+        .EnableCutout(IsCutoutRequired()));
+  }
+  else
+  {
+    const bool hasVertexShader   = !mImpl->mCustomShader->mVertexShader.empty();
+    const bool hasFragmentShader = !mImpl->mCustomShader->mFragmentShader.empty();
+
+    std::string_view vertexShaderView;
+    std::string_view fragmentShaderView;
+
+    if(hasVertexShader)
+    {
+      vertexShaderView = mImpl->mCustomShader->mVertexShader;
+    }
+    else
+    {
+      vertexShaderView = mColorVisualShaderFactory.GetVertexShaderSource();
+    }
+
+    if(hasFragmentShader)
+    {
+      fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
+    }
+    else
+    {
+      fragmentShaderView = mColorVisualShaderFactory.GetFragmentShaderSource();
+    }
+
+    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.RegisterVisualTransformUniform();
+    }
+  }
   return shader;
 }
 

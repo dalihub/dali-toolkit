@@ -179,8 +179,8 @@ Shader TextVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, cons
     featureBuilder.GetVertexShaderPrefixList(vertexShaderPrefixList);
     featureBuilder.GetFragmentShaderPrefixList(fragmentShaderPrefixList);
 
-    std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
-    std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
+    std::string vertexShader   = std::string(vertexShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_VERT.data());
+    std::string fragmentShader = std::string(fragmentShaderPrefixList + SHADER_TEXT_VISUAL_SHADER_FRAG.data());
 
     shader = factoryCache.GenerateAndSaveShader(shaderType, vertexShader, fragmentShader);
 

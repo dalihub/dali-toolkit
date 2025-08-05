@@ -480,7 +480,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, con
       Shader   shader   = GetShader(IMAGE_SHADER);
       if(!shader)
       {
-        shader = GenerateAndSaveShader(IMAGE_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
+        shader = GenerateAndSaveShader(IMAGE_SHADER, SHADER_IMAGE_VISUAL_SHADER_VERT.data(), SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
         shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
       }

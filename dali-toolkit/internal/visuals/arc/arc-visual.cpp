@@ -204,7 +204,7 @@ void ArcVisual::OnInitialize()
     shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, SHADER_ARC_VISUAL_SHADER_VERT.data(), SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
     }
   }
   else
@@ -212,7 +212,7 @@ void ArcVisual::OnInitialize()
     shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER);
     if(!shader)
     {
-      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
+      shader = mFactoryCache.GenerateAndSaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, SHADER_ARC_VISUAL_SHADER_VERT.data(), SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
     }
   }
 
