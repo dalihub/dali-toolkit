@@ -834,7 +834,7 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
     // Set the layout parameters.
-    Layout::Parameters layoutParameters(size, impl.mModel, impl.mFontClient, bidirectionalSupport);
+    Layout::Parameters layoutParameters(size, impl.mModel, impl.GetFontClient(), bidirectionalSupport);
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;

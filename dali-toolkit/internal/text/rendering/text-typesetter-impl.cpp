@@ -1111,6 +1111,10 @@ void Typesetter::Impl::SetFontClient(TextAbstraction::FontClient& fontClient)
 
 TextAbstraction::FontClient& Typesetter::Impl::GetFontClient()
 {
+  if(!mFontClient)
+  {
+    mFontClient = TextAbstraction::FontClient::Get();
+  }
   return mFontClient;
 }
 
@@ -1387,7 +1391,7 @@ Devel::PixelBuffer Typesetter::Impl::CreateImageBuffer(const uint32_t bufferWidt
   for(LineIndex lineIndex = 0u; lineIndex < modelNumberOfLines; ++lineIndex)
   {
     const LineRun& line = *(modelLinesBuffer + lineIndex);
-    CreateImageBufferForEachLine(mFontClient, glyphData, hyphenIndex, line, (lineIndex == 0u), inputParamsForLine, inputParamsForGlyph);
+    CreateImageBufferForEachLine(GetFontClient(), glyphData, hyphenIndex, line, (lineIndex == 0u), inputParamsForLine, inputParamsForGlyph);
   }
 
   return glyphData.bitmapBuffer;
@@ -1396,8 +1400,6 @@ Devel::PixelBuffer Typesetter::Impl::CreateImageBuffer(const uint32_t bufferWidt
 Typesetter::Impl::Impl(const ModelInterface* const model)
 : mModel(std::make_unique<ViewModel>(model))
 {
-  // Default font client set.
-  mFontClient = TextAbstraction::FontClient::Get();
 }
 
 Typesetter::Impl::~Impl() = default;
