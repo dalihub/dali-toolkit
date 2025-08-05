@@ -71,6 +71,7 @@ struct Base::Impl
     std::string               mFragmentShader;
     Dali::ImageDimensions     mGridSize;
     Dali::Shader::Hint::Value mHints; //(bitfield) values from enum Shader::Hint
+    std::string               mName;
   };
 
   struct Transform

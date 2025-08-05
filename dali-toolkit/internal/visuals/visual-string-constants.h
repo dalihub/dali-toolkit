@@ -43,6 +43,7 @@ extern const char* const CUSTOM_FRAGMENT_SHADER;
 extern const char* const CUSTOM_SUBDIVIDE_GRID_X;
 extern const char* const CUSTOM_SUBDIVIDE_GRID_Y;
 extern const char* const CUSTOM_SHADER_HINTS;
+extern const char* const CUSTOM_SHADER_NAME;
 
 // Transform
 extern const char* const TRANSFORM;

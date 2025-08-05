@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
@@ -708,10 +711,12 @@ int UtcDaliVideoViewCustomShader(void)
   application.SendNotification();
   application.Render();
 
-  /* get renderer */
-  DALI_TEST_CHECK(view.GetRendererCount() == 1u);
-  Renderer renderer = view.GetRendererAt(0);
-  Shader   shader   = renderer.GetShader();
+  /* get visual */
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(view);
+  Visual::Base                visual      = DevelControl::GetVisual(controlImpl, VideoView::Property::TEXTURE);
+  DALI_TEST_CHECK(visual);
+  Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+  Shader                           shader     = visualImpl.GetRenderer().GetShader();
   DALI_TEST_CHECK(shader);
 
   Property::Value value     = shader.GetProperty(Shader::Property::PROGRAM);

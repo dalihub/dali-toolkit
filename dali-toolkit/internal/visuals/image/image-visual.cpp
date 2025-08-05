@@ -738,8 +738,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
    * @brief Check whether FastTrackUploading is avaliable or not.
    * @return True if we can use fast track uploading feature. False otherwise.
    */
-  auto IsFastTrackUploadingAvailable = [&]()
-  {
+  auto IsFastTrackUploadingAvailable = [&]() {
     if(mUseFastTrackUploading &&
        mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::ATTACHED &&
        mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED &&
@@ -1452,11 +1451,11 @@ Shader ImageVisual::GenerateShader() const
       }
 
       // Create shader here cause fragmentShaderString scope issue
-      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
     }
     else
     {
-      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
     }
 
     if(usesWholeTexture)

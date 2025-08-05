@@ -191,6 +191,7 @@ const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
 const char* const CUSTOM_SUBDIVIDE_GRID_X("subdivideGridX");
 const char* const CUSTOM_SUBDIVIDE_GRID_Y("subdivideGridY");
 const char* const CUSTOM_SHADER_HINTS("hints");
+const char* const CUSTOM_SHADER_NAME("name");
 
 // Transform
 const char* const TRANSFORM("transform");
