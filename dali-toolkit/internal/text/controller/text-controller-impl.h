@@ -43,7 +43,7 @@ const float DEFAULT_TEXTFIT_STEP           = 1.f;
 const float DEFAULT_FONT_SIZE_SCALE        = 1.f;
 const float DEFAULT_DISABLED_COLOR_OPACITY = 0.3f;
 
-//Forward declarations
+// Forward declarations
 struct CursorInfo;
 struct FontDefaults;
 struct ControllerImplEventHandler;
@@ -220,16 +220,15 @@ struct FontDefaults
     return mFontId;
   }
 
-  TextAbstraction::FontDescription mFontDescription;   ///< The default font's description.
-  float                            mDefaultPointSize;  ///< The default font's point size.
-  float                            mFitPointSize;      ///< The fit font's point size.
-  FontId                           mFontId;            ///< The font's id of the default font.
-  bool                             mIsDescription : 1; ///< Whether there is a default font description.
-  bool                             familyDefined : 1;  ///< Whether the default font's family name is defined.
-  bool                             weightDefined : 1;  ///< Whether the default font's weight is defined.
-  bool                             widthDefined : 1;   ///< Whether the default font's width is defined.
-  bool                             slantDefined : 1;   ///< Whether the default font's slant is defined.
-  bool                             sizeDefined : 1;    ///< Whether the default font's point size is defined.
+  TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
+  float                            mDefaultPointSize; ///< The default font's point size.
+  float                            mFitPointSize;     ///< The fit font's point size.
+  FontId                           mFontId;           ///< The font's id of the default font.
+  bool                             familyDefined : 1; ///< Whether the default font's family name is defined.
+  bool                             weightDefined : 1; ///< Whether the default font's weight is defined.
+  bool                             widthDefined : 1;  ///< Whether the default font's width is defined.
+  bool                             slantDefined : 1;  ///< Whether the default font's slant is defined.
+  bool                             sizeDefined : 1;   ///< Whether the default font's point size is defined.
 };
 
 /**
