@@ -667,9 +667,9 @@ int UtcDaliStyleManagerApplyStyle(void)
   END_TEST;
 }
 
-int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized(void)
+int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized01(void)
 {
-  tet_infoline("UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized - test that a style can be applied to a single button before application initialized");
+  tet_infoline("UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized01 - test that a style can be applied to a single button before application initialized");
 
   const char* json1 =
     "{\n"
@@ -703,7 +703,7 @@ int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized(void)
   // Reset global variable for next test
   Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(false);
 
-  // Add 2 buttons
+  // Add test buttons
   Test::TestButton testButton = Test::TestButton::New();
   application.GetScene().Add(testButton);
 
@@ -717,6 +717,87 @@ int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized(void)
   tet_infoline("Check that the properties change for the button");
   DALI_TEST_EQUALS(themedBgColor, Property::Value(Color::YELLOW), 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(themedFgColor, Property::Value(Color::BLUE), 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized02(void)
+{
+  tet_infoline("UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized02 - test that a style can be applied to a single button before application initialized");
+
+  const char* json1 =
+    "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"General\"\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,1.0,0.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    },\n"
+    "    \"custombutton\":\n"
+    "    {\n"
+    "      \"backgroundColor\":[1.0,0.0,1.0,1.0],\n"
+    "      \"foregroundColor\":[0.0,1.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  ToolkitTestApplication application(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                     TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                     TestApplication::DEFAULT_HORIZONTAL_DPI,
+                                     TestApplication::DEFAULT_VERTICAL_DPI,
+                                     true); // For simulate pre-initialized application
+
+  // pre-initialize the application
+  application.InitializeAdaptor();
+  application.CreateCore();
+
+  tet_infoline("Create Controls after core and adaptor created");
+  Test::TestButton testButton1 = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+
+  tet_infoline("Apply the style before application initialized");
+
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+
+  styleMonitor.SetTheme(themeFile);
+
+  testButton1.SetStyleName("custombutton");
+  testButton2.SetStyleName("custombutton");
+
+  // Set global variable to change style at style manager.
+  Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(true);
+
+  // Destroy control before application initialized
+  testButton2.Reset();
+
+  // complete initialization of the application
+  application.CreateSceneFromMainWindow();
+  application.InitializeCore();
+  application.EmitApplicationInitialize();
+
+  // Reset global variable for next test
+  Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(false);
+
+  application.GetScene().Add(testButton1);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Property::Value themedBgColor(testButton1.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR));
+  Property::Value themedFgColor(testButton1.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR));
+
+  tet_infoline("Check that the properties change for the custom button style");
+  DALI_TEST_EQUALS(themedBgColor, Property::Value(Color::MAGENTA), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(themedFgColor, Property::Value(Color::CYAN), 0.001, TEST_LOCATION);
 
   END_TEST;
 }

@@ -23,6 +23,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <string>
 
@@ -261,6 +262,11 @@ private:
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
   std::vector<std::string> mBrokenImageUrls; ///< Broken Image Urls received from user
+
+  std::vector<Dali::WeakHandle<Toolkit::Control>> mInitializedControlsBeforeAdaptorInit{};  ///< Controls to initialized before the adaptor is initialized
+  std::vector<Dali::WeakHandle<Toolkit::Control>> mThemeAppliedControlsBeforeAdaptorInit{}; ///< Controls to theme applied before the adaptor is initialized
+
+  bool mAdaptorInitialized : 1; ///< Whether the adaptor has been initialized
 
   // Signals
   Toolkit::StyleManager::StyleChangedSignalType            mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
