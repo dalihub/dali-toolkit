@@ -118,10 +118,6 @@ UNIFORM_BLOCK FragBlock0
 
 // For Shadow Map
   UNIFORM lowp int uIsShadowReceiving;
-#ifdef SL_VERSION_LOW
-  UNIFORM int uShadowMapWidth;
-  UNIFORM int uShadowMapHeight;
-#endif
 
 //// For IBL
   UNIFORM float uIblIntensity;
@@ -274,21 +270,12 @@ void main()
   // Specular Light
   // uMaxLOD that means mipmap level of specular texture is used for bluring of reflection of specular following roughness.
   float lod = perceptualRoughness * (uMaxLOD - 1.0);
-#ifdef SL_VERSION_LOW
-  // glsl 1.0 doesn't support textureLod. Let we just use textureCube instead.
-  lowp vec3 specularLight = linear(textureCube(sSpecularEnvSampler, reflection * uYDirection).rgb);
-#else
   lowp vec3 specularLight = linear(textureLod(sSpecularEnvSampler, reflection * uYDirection, lod).rgb);
-#endif
   lowp vec3 specular = specularLight * FssEss;
 
   // Diffuse Light
   lowp vec3 diffuseColor = mix(baseColor.rgb, vec3(0), metallic);
-#ifdef SL_VERSION_LOW
-  lowp vec3 irradiance = linear(textureCube(sDiffuseEnvSampler, n * uYDirection).rgb);
-#else
   lowp vec3 irradiance = linear(TEXTURE(sDiffuseEnvSampler, n * uYDirection).rgb);
-#endif
   float Ems = (1.0 - (brdf.x + brdf.y));
   vec3 F_avg = specularWeight * (f0 + (1.0 - f0) / 21.0);
   vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
@@ -341,11 +328,7 @@ void main()
     highp float NdotL = dot(n, l);
     if(uEnableShadowSoftFiltering > 0)
     {
-#ifdef SL_VERSION_LOW
-      ivec2 texSize = ivec2(uShadowMapWidth, uShadowMapHeight);
-#else
       ivec2 texSize = textureSize(sShadowMap, 0);
-#endif
       mediump vec2 texelSize = vec2(1.0) / vec2(texSize.x, texSize.y);
       mediump vec2 pcfSample = vec2(1.0, 0.0);
       for (int i = 0; i < kPcfSampleCount; ++i)

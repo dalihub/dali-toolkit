@@ -311,7 +311,7 @@ mediump float calculateCornerOpacity()
 #endif
 
 #ifdef IS_REQUIRED_BLUR
-#if defined(SL_VERSION_LOW) || defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_BORDERLINE)
+#if defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_BORDERLINE)
 // Legacy code for low version glsl
 mediump float calculateBlurOpacity()
 {
