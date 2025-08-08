@@ -1525,7 +1525,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::OUT;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -1591,7 +1592,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REPEAT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
+      {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1599,7 +1601,8 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
+        {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1651,7 +1654,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN_OUT;
 
-      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert("startValue", start);
         animationMap.Insert("targetValue", target);
@@ -1719,7 +1723,8 @@ int UtcDaliVisualGetPropertyMap12(void)
       DALI_TEST_CHECK(value);
       DALI_TEST_CHECK(value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REFLECT);
 
-      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void {
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index& index, const Property::Value& start, const Property::Value& target, int line_num) -> void
+      {
         tet_printf("Check value at %d\n", line_num);
         value = resultMap.Find(index, Property::MAP);
         DALI_TEST_CHECK(value);
@@ -1727,7 +1732,8 @@ int UtcDaliVisualGetPropertyMap12(void)
         Property::Map* temp_map = value->GetMap();
         DALI_TEST_CHECK(temp_map);
 
-        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value {
+        auto checkMapValue = [&temp_map](const Property::Index index) -> Property::Value
+        {
           Property::Value* res = temp_map->Find(index);
           DALI_TEST_CHECK(res);
           return *res;
@@ -1783,7 +1789,8 @@ int UtcDaliVisualGetPropertyMap13(void)
       int motion     = DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP;
       int easing     = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN;
 
-      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value& start, const Property::Value& target) -> Property::Map&
+      {
         animationMap.Clear();
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
         animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
@@ -2498,7 +2505,8 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       int unit_type     = DevelAnimatedGradientVisual::UnitType::USER_SPACE;
       int spread_type   = DevelAnimatedGradientVisual::SpreadType::REPEAT;
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2611,7 +2619,8 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       application.SendNotification();
 
       // Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2794,7 +2803,8 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       Property::Map animationMap;
       propertyMap.Insert(Visual::Property::TYPE, DevelVisual::ANIMATED_GRADIENT);
 
-      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map& {
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value& start, const Property::Value& target, int tc_offset) -> Property::Map&
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -2907,7 +2917,8 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       application.SendNotification();
 
       // Compare between CPU calculated value and Shader Visual calculated value
-      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void {
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress) -> void
+      {
         int tc         = (test_case + tc_offset);
         int idx_easing = tc % 4;
         tc /= 4;
@@ -5371,7 +5382,8 @@ int UtcDaliVisualGetPropertyObject01(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5423,7 +5435,8 @@ int UtcDaliVisualGetPropertyObject02(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::IMAGE);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -5473,7 +5486,8 @@ int UtcDaliVisualGetPropertyObject03(void)
 
   DALI_TEST_CHECK(visual.GetType() == Visual::COLOR);
 
-  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect) {
+  auto propertyTest = [](Visual::Base visual, Property::Key key, bool expect)
+  {
     {
       std::ostringstream oss;
       oss << "Test for key[" << key << "]";
@@ -7171,151 +7185,6 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   callStack.Enable(false);
   // Shader not changed
   DALI_TEST_CHECK(!callStack.FindMethod("CreateShader"));
-
-  END_TEST;
-}
-
-int UtcDaliVisualUpdatePropertyChangeShader05(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliVisualUpdatePropertyChangeShader05: Test update property under glsl version is under 300");
-
-  auto originalShaderVersion = application.GetGlAbstraction().GetShaderLanguageVersion();
-
-  // Change the shader language version forcely!
-  application.GetGlAbstraction().mShaderLanguageVersion = 200;
-
-  try
-  {
-    TraceCallStack& callStack = application.GetGraphicsController().mCallStack;
-
-    VisualFactory factory = VisualFactory::Get();
-    Property::Map propertyMap;
-    // Case ImageVisual
-    propertyMap[Visual::Property::TYPE]           = Visual::Type::COLOR;
-    propertyMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
-
-    Visual::Base imageVisual = factory.CreateVisual(propertyMap);
-
-    DummyControl        dummyControl = DummyControl::New(true);
-    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
-    dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
-    application.GetScene().Add(dummyControl);
-
-    application.SendNotification();
-    application.Render();
-
-    application.SendNotification();
-    application.Render();
-
-    TestShaderCodeContainSubstrings(
-      dummyControl,
-      {
-        {"#define IS_REQUIRED_BLUR", false},
-        {"#define IS_REQUIRED_BORDERLINE", false},
-        {"#define IS_REQUIRED_ROUNDED_CORNER", false},
-        {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
-      },
-      TEST_LOCATION);
-
-    float   targetBlurRadius       = 15.0f;
-    Vector4 targetCornerRadius     = Vector4(1.0f, 0.1f, 1.1f, 0.0f);
-    Vector4 targetCornerSquareness = Vector4(0.0f, 0.1f, 0.1f, 0.0f);
-
-    Property::Map targetPropertyMap;
-    targetPropertyMap[DevelColorVisual::Property::BLUR_RADIUS]  = targetBlurRadius;
-    targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]     = targetCornerRadius;
-    targetPropertyMap[DevelVisual::Property::CORNER_SQUARENESS] = targetCornerSquareness;
-    targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH]  = 10.0f; // Don't care. just dummy
-
-    callStack.Reset();
-    callStack.Enable(true);
-
-    // Update Properties with CornerRadius
-    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
-
-    Property::Map resultMap;
-    imageVisual.CreatePropertyMap(resultMap);
-
-    // Test property values: they should be updated
-    Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
-    DALI_TEST_CHECK(blurRadiusValue);
-    DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), targetBlurRadius, TEST_LOCATION);
-
-    Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
-    DALI_TEST_CHECK(cornerRadiusValue);
-    DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
-
-    TestShaderCodeContainSubstrings(
-      dummyControl,
-      {
-        {"#define IS_REQUIRED_BLUR", true},
-        {"#define IS_REQUIRED_BORDERLINE", true},
-        {"#define IS_REQUIRED_ROUNDED_CORNER", true},
-        {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}},
-        {"#define SL_VERSION_LOW", {false, true}},
-      },
-      TEST_LOCATION);
-
-    // Send shader compile signal
-    application.SendNotification();
-    application.Render();
-
-    callStack.Enable(false);
-
-    // Shader changed
-    DALI_TEST_CHECK((callStack.FindMethod("CreateShader")));
-    callStack.Reset();
-    callStack.Enable(true);
-
-    Property::Map targetPropertyMap2;
-    targetPropertyMap2[DevelColorVisual::Property::BLUR_RADIUS] = 0.0f;
-    targetPropertyMap2[DevelVisual::Property::CORNER_RADIUS]    = Vector4::ZERO;
-    targetPropertyMap2[DevelVisual::Property::BORDERLINE_WIDTH] = 15.0f; // Don't care. just dummy
-
-    // Update Properties with CornerRadius
-    DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap2);
-
-    Property::Map resultMap2;
-    imageVisual.CreatePropertyMap(resultMap2);
-
-    // Test property values: they should be updated
-    blurRadiusValue = resultMap2.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
-    DALI_TEST_CHECK(blurRadiusValue);
-    DALI_TEST_EQUALS(blurRadiusValue->Get<float>(), 0.0f, TEST_LOCATION);
-
-    cornerRadiusValue = resultMap2.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
-    DALI_TEST_CHECK(cornerRadiusValue);
-    DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION);
-
-    TestShaderCodeContainSubstrings(
-      dummyControl,
-      {
-        {"#define IS_REQUIRED_BLUR", true},                     // Note : mAlwaysUsingBlurRadius is true.
-        {"#define IS_REQUIRED_BORDERLINE", true},               // Note : mAlwaysUsingBorderline is true.
-        {"#define IS_REQUIRED_ROUNDED_CORNER", true},           // Note : mAlwaysUsingCornerRadius is true.
-        {"#define IS_REQUIRED_SQUIRCLE_CORNER", {false, true}}, // Note : mAlwaysUsingCornerSquareness is true.
-        {"#define SL_VERSION_LOW", {false, true}},
-      },
-      TEST_LOCATION);
-
-    // Send shader compile signal
-    application.SendNotification();
-    application.Render();
-
-    callStack.Enable(false);
-
-    // Shader not changed
-    DALI_TEST_CHECK(!(callStack.FindMethod("CreateShader")));
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(false);
-  }
-
-  // Revert shader version. We should revert it even if UTC failed.
-  application.GetGlAbstraction().mShaderLanguageVersion = originalShaderVersion;
 
   END_TEST;
 }

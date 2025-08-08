@@ -749,14 +749,13 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
        !mUseSynchronousSizing &&
        !atlasing &&
        !mImpl->mCustomShader &&
-       !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) &&
-       !(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB)))
+       !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
     {
       return true;
     }
     else if(mUseFastTrackUploading)
     {
-      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s%s\n",
+      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s\n",
                           mImageUrl.GetEllipsedUrl().c_str(),
                           (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
                           (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
@@ -766,8 +765,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
                           (mUseSynchronousSizing) ? "/ useSynchronousSizing " : "",
                           (atlasing) ? "/ atlasing" : "",
                           (mImpl->mCustomShader) ? "/ use customs shader" : "",
-                          (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "",
-                          (Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB) ? "/ gles version is low" : "");
+                          (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
     }
     return false;
   };

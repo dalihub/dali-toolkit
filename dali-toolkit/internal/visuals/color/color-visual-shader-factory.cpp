@@ -70,8 +70,6 @@ enum ColorVisualRequireFlag
   CUTOUT     = (1 << 2) * 3,
 };
 
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR = 300;
-
 static constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 2u;
 
 constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
@@ -191,11 +189,6 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   if(mColorBlur == Blur::ENABLED)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR\n";
-    // If shader version doesn't support latest blur with corner radius, Let we use legacy code.
-    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_ROUNDED_BLUR))
-    {
-      fragmentShaderPrefixList += "#define SL_VERSION_LOW\n";
-    }
   }
   if(mColorBorderline == Borderline::ENABLED)
   {

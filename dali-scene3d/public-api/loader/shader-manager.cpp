@@ -47,8 +47,6 @@ namespace
 static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG  = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 10;
 static constexpr uint32_t INDEX_FOR_SHADOW_CONSTRAINT_TAG = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 100;
 
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE = 300;
-
 ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinition& meshDef)
 {
   ShaderOption option;
@@ -170,10 +168,6 @@ ShaderOption MakeOption(const MaterialDefinition& materialDef, const MeshDefinit
         option.AddOption(ShaderOption::Type::MORPH_VERSION_2_0);
       }
     }
-  }
-  if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_TEXTURE_TEXEL_AND_SIZE))
-  {
-    option.AddOption(ShaderOption::Type::SL_VERSION_LOW);
   }
 
   return option;
@@ -392,7 +386,8 @@ void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader
   std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
   lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
   auto             lightDirectionPropertyIndex = shader.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
+  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                             { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
   lightDirectionConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::WORLD_ORIENTATION});
   Dali::Integration::ConstraintSetInternalTag(lightDirectionConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
   lightDirectionConstraint.ApplyPost();
@@ -400,7 +395,8 @@ void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader
   std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
   lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
   auto             lightColorPropertyIndex = shader.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) { output = Vector3(inputs[0]->GetVector4()); });
+  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                         { output = Vector3(inputs[0]->GetVector4()); });
   lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
   Dali::Integration::ConstraintSetInternalTag(lightColorConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
   lightColorConstraint.ApplyPost();
@@ -455,7 +451,8 @@ void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
   {
     tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }
-  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs) { output = inputs[0]->GetMatrix(); });
+  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+                                                                                  { output = inputs[0]->GetMatrix(); });
   shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewProjectionMatrixIndex});
   Dali::Integration::ConstraintSetInternalTag(shadowViewProjectionConstraint, INDEX_FOR_SHADOW_CONSTRAINT_TAG);
   shadowViewProjectionConstraint.ApplyPost();
