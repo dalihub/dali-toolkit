@@ -51,6 +51,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/image-loader/image-atlas.cpp
   ${devel_api_src_dir}/image-loader/texture-manager.cpp
   ${devel_api_src_dir}/layouting/flex-node.cpp
+  ${devel_api_src_dir}/property-bridge/property-bridge.cpp
   ${devel_api_src_dir}/shader-effects/alpha-discard-effect.cpp
   ${devel_api_src_dir}/shader-effects/dissolve-effect.cpp
   ${devel_api_src_dir}/shader-effects/distance-field-effect.cpp
@@ -141,6 +142,10 @@ SET( devel_api_effects_view_header_files
 
 SET( devel_api_layouting_header_files
   ${devel_api_src_dir}/layouting/flex-node.h
+)
+
+SET( devel_api_property_bridge_header_files
+  ${devel_api_src_dir}/property-bridge/property-bridge.h
 )
 
 SET( devel_api_magnifier_header_files
@@ -321,6 +326,7 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_builder_header_files}
   ${devel_api_effects_view_header_files}
   ${devel_api_layouting_header_files}
+  ${devel_api_property_bridge_header_files}
   ${devel_api_magnifier_header_files}
   ${devel_api_navigation_view_header_files}
   ${devel_api_page_turn_view_header_files}
