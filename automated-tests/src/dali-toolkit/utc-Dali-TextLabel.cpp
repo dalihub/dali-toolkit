@@ -955,8 +955,52 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(DaliTestCheckMaps(shadowMapGet, shadowDisabledMapGet), true, TEST_LOCATION);
 
   // Check the emboss property
-  label.SetProperty(TextLabel::Property::EMBOSS, "Emboss properties");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+  Property::Map embossMapSet;
+  Property::Map embossMapGet;
+
+  embossMapSet["enable"] = true;
+  embossMapSet["direction"] = Vector2(-1.0f, -1.0f);
+  embossMapSet["strength"] = 5.f;
+  embossMapSet["lightColor"] = Color::WHITE;
+  embossMapSet["shadowColor"] = Color::BLACK;
+  label.SetProperty(TextLabel::Property::EMBOSS, embossMapSet);
+
+  application.SendNotification();
+  application.Render();
+
+  embossMapGet = label.GetProperty<Property::Map>(TextLabel::Property::EMBOSS);
+  DALI_TEST_EQUALS(embossMapGet.Count(), embossMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(embossMapGet, embossMapSet), true, TEST_LOCATION);
+
+  // Check the emboss property with string value
+  Property::Map embossMapSet2;
+  Property::Map embossMapGet2;
+
+  embossMapSet2["enable"] = "true";
+  embossMapSet2["direction"] = "-1.0f, -1.0f";
+  embossMapSet2["strength"] = "5.f";
+  embossMapSet2["lightColor"] = "#FFFFFF";
+  embossMapSet2["shadowColor"] = "#000000";
+  label.SetProperty(TextLabel::Property::EMBOSS, embossMapSet2);
+
+  application.SendNotification();
+  application.Render();
+
+  embossMapGet2 = label.GetProperty<Property::Map>(TextLabel::Property::EMBOSS);
+  DALI_TEST_EQUALS(embossMapGet2.Count(), embossMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(embossMapGet2, embossMapSet), true, TEST_LOCATION);
+
+  // Check the emboss property with empty map
+  Property::Map embossMapSet3;
+  Property::Map embossMapGet3;
+
+  label.SetProperty(TextLabel::Property::EMBOSS, embossMapSet3);
+
+  application.SendNotification();
+  application.Render();
+
+  embossMapGet3 = label.GetProperty<Property::Map>(TextLabel::Property::EMBOSS);
+  DALI_TEST_EQUALS(embossMapGet3["enable"].Get<bool>(), false, TEST_LOCATION);
 
   // Check the outline property
 

@@ -1024,12 +1024,19 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
 
   // Check the emboss property
-  editor.SetProperty(TextEditor::Property::EMBOSS, "Emboss properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+  Property::Map embossMapSet;
+  Property::Map embossMapGet;
 
-  // Check the input emboss property
-  editor.SetProperty(TextEditor::Property::INPUT_EMBOSS, "Emboss input properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_EMBOSS), std::string("Emboss input properties"), TEST_LOCATION);
+  embossMapSet["enable"] = true;
+  embossMapSet["direction"] = Vector2(-1.0f, -1.0f);
+  embossMapSet["strength"] = 5.f;
+  embossMapSet["lightColor"] = Color::WHITE;
+  embossMapSet["shadowColor"] = Color::BLACK;
+  editor.SetProperty(TextEditor::Property::EMBOSS, embossMapSet);
+
+  embossMapGet = editor.GetProperty<Property::Map>(TextEditor::Property::EMBOSS);
+  DALI_TEST_EQUALS(embossMapGet.Count(), embossMapSet.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DaliTestCheckMaps(embossMapGet, embossMapSet), true, TEST_LOCATION);
 
   // Check the outline property
 

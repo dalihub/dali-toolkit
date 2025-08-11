@@ -67,8 +67,8 @@ namespace TextStyle
  */
 enum Type
 {
-  NO_STYLES = 0, ///< The text contains contains no styles.
-  HAS_STYLES     ///< The text contains contains styles.
+  NO_STYLES = 0, ///< The text contains no styles.
+  HAS_STYLES     ///< The text contains styles.
 };
 } // namespace TextStyle
 
@@ -79,10 +79,22 @@ namespace TextOverlay
  */
 enum Type
 {
-  NO_OVERLAY = 0, ///< The text contains contains no overlay.
-  HAS_OVERLAY     ///< The text contains contains overlay.
+  NO_OVERLAY = 0, ///< The text contains no overlay.
+  HAS_OVERLAY     ///< The text contains overlay.
 };
 } // namespace TextOverlay
+
+namespace TextEmboss
+{
+/**
+ * @brief Whether text contains emboss or not.
+ */
+enum Type
+{
+  NO_EMBOSS = 0, ///< The text contains no emboss.
+  HAS_EMBOSS     ///< The text contains emboss.
+};
+}
 
 /**
  * @brief Collection of current text visual feature.
@@ -95,6 +107,7 @@ public:
   FeatureBuilder& EnableEmoji(bool enableEmoji);
   FeatureBuilder& EnableStyle(bool enableStyle);
   FeatureBuilder& EnableOverlay(bool enableOverlay);
+  FeatureBuilder& EnableEmboss(bool enableEmboss);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
   void                           GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const;
@@ -116,12 +129,17 @@ public:
   {
     return mTextOverlay == TextOverlay::HAS_OVERLAY;
   }
+  bool isEnabledEmboss() const
+  {
+    return mTextEmboss == TextEmboss::HAS_EMBOSS;
+  }
 
 private:
   TextMultiColor::Type mTextMultiColor : 2; ///< Whether text has multiple color, or not. default as TextMultiColor::SINGLE_COLOR_TEXT
   TextEmoji::Type      mTextEmoji : 2;      ///< Whether text has emoji, or not. default as TextEmoji::NO_EMOJI
   TextStyle::Type      mTextStyle : 2;      ///< Whether text has style, or not. default as TextStyle::NO_STYLES
   TextOverlay::Type    mTextOverlay : 2;    ///< Whether text has overlay style, or not. default as TextOverlay::NO_OVERLAY
+  TextEmboss::Type     mTextEmboss : 2;     ///< Whether text has emboss style, or not. default as TextEmboss::NO_EMBOSS
 };
 
 } // namespace TextVisualShaderFeature

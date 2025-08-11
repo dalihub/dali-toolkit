@@ -28,6 +28,14 @@ UNIFORM_BLOCK FragBlock
   #endif
   UNIFORM lowp vec4 uTextColorAnimatable;
   UNIFORM lowp vec4 uColor;
+
+  #ifdef IS_REQUIRED_EMBOSS
+  UNIFORM lowp vec2 uEmbossSize;
+  UNIFORM lowp vec2 uEmbossDirection;
+  UNIFORM lowp float uEmbossStrength;
+  UNIFORM lowp vec4 uEmbossLightColor;
+  UNIFORM lowp vec4 uEmbossShadowColor;
+  #endif
 };
 void main()
 {
@@ -39,9 +47,26 @@ void main()
   mediump vec4 overlayStyleTexture = TEXTURE( sOverlayStyle, vTexCoord );
 #endif
 
+mediump vec4 textColor;
 #if defined(IS_REQUIRED_MULTI_COLOR) || defined(IS_REQUIRED_EMOJI)
   // Multiple color or use emoji.
-  mediump vec4 textColor = TEXTURE(sTexture, vTexCoord);
+  textColor = TEXTURE(sTexture, vTexCoord);
+#ifdef IS_REQUIRED_EMBOSS
+  // Multiple color or use emoji, with emboss
+  mediump float textAlpha = textColor.a;
+  mediump vec2 offset = normalize(uEmbossDirection) * uEmbossSize * uEmbossStrength;
+  float light = TEXTURE(sTexture, clamp(vTexCoord - offset, 0.0, 1.0)).a;
+  float shadow = TEXTURE(sTexture, clamp(vTexCoord + offset, 0.0, 1.0)).a;
+
+  vec4 lightColor = vec4(uEmbossLightColor.rgb * light, light);
+  vec4 shadowColor = vec4(uEmbossShadowColor.rgb * shadow, shadow);
+  vec4 embossColor = lightColor + shadowColor;
+
+  vec4 baseColor = vec4(uTextColorAnimatable.rgb * textAlpha, textAlpha);
+  textColor = embossColor * (1.0 - textAlpha) + baseColor;
+  textColor.a = max(textAlpha, embossColor.a);
+#endif
+#endif
 
 #ifdef IS_REQUIRED_MULTI_COLOR
 #elif defined(IS_REQUIRED_EMOJI)
@@ -53,11 +78,25 @@ void main()
   // Emoji color are not animated.
   mediump float vstep = step( 0.0001, textColor.a );
   textColor.rgb = mix(textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * (1.0 - uHasMultipleTextColors));
-#endif
+#elif defined(IS_REQUIRED_EMBOSS)
+// Single color with emboss, without emoji.
+  mediump float textAlpha = TEXTURE(sTexture, vTexCoord).r;
+  mediump vec2 offset = normalize(uEmbossDirection) * uEmbossSize * uEmbossStrength;
+  float light = TEXTURE(sTexture, clamp(vTexCoord - offset, 0.0, 1.0)).r;
+  float shadow = TEXTURE(sTexture, clamp(vTexCoord + offset, 0.0, 1.0)).r;
+
+  vec4 lightColor = vec4(uEmbossLightColor.rgb * light, light);
+  vec4 shadowColor = vec4(uEmbossShadowColor.rgb * shadow, shadow);
+  vec4 embossColor = lightColor + shadowColor;
+
+  vec4 baseColor = vec4(uTextColorAnimatable.rgb * textAlpha, textAlpha);
+  textColor = embossColor * (1.0 - textAlpha) + baseColor;
+  textColor.a = max(textAlpha, embossColor.a);
+
 #else
   // Single color without emoji.
   mediump float textTexture = TEXTURE(sTexture, vTexCoord).r;
-  mediump vec4 textColor = uTextColorAnimatable * textTexture;
+  textColor = uTextColorAnimatable * textTexture;
 #endif
 
   // Draw the text as overlay above the style

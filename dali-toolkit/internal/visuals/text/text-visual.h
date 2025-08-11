@@ -336,8 +336,9 @@ private:
    * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
+   * @param[in] embossEnabled Whether the style contains emboss.
    */
-  void AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
+  void AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle, bool embossEnabled);
 
   /**
    * Get the texture of the text for rendering. It will use cached shader feature for text visual.

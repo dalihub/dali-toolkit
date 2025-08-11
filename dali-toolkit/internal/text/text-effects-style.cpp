@@ -44,6 +44,10 @@ const char* ENABLE_KEY = "enable";
 const char* TYPE_KEY = "type";
 const char* DASH_WIDTH_KEY = "dashWidth";
 const char* DASH_GAP_KEY = "dashGap";
+const char* DIRECTION_KEY = "direction";
+const char* STRENGTH_KEY = "strength";
+const char* LIGHT_COLOR_KEY = "lightColor";
+const char* SHADOW_COLOR_KEY = "shadowColor";
 const char* TRUE_TOKEN = "true";
 } // namespace
 
@@ -105,6 +109,101 @@ bool ParseShadowProperties(const Property::Map& shadowPropertiesMap,
       else
       {
         blurRadius = valueGet.second.Get<float>();
+      }
+    }
+  }
+
+  return 0u == numberOfItems;
+}
+
+bool ParseEmbossProperties(const Property::Map& embossPropertiesMap,
+                           bool&                enabled,
+                           bool&                directionDefined,
+                           Vector2&             direction,
+                           bool&                strengthDefined,
+                           float&               strength,
+                           bool&                lightColorDefined,
+                           Vector4&             lightColor,
+                           bool&                shadowColorDefined,
+                           Vector4&             shadowColor)
+{
+  const unsigned int numberOfItems = embossPropertiesMap.Count();
+  // Parses and applies the style.
+  for(unsigned int index = 0u; index < numberOfItems; ++index)
+  {
+    const KeyValuePair& valueGet = embossPropertiesMap.GetKeyValue(index);
+
+    if((DevelText::Emboss::Property::ENABLE == valueGet.first.indexKey) || (ENABLE_KEY == valueGet.first.stringKey))
+    {
+      /// Enable key.
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string enableStr = valueGet.second.Get<std::string>();
+        enabled                     = Text::TokenComparison(TRUE_TOKEN, enableStr.c_str(), enableStr.size());
+      }
+      else
+      {
+        enabled = valueGet.second.Get<bool>();
+      }
+    }
+    else if((DevelText::Emboss::Property::DIRECTION == valueGet.first.indexKey) || (DIRECTION_KEY == valueGet.first.stringKey))
+    {
+      /// Direction key.
+      directionDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string directionStr = valueGet.second.Get<std::string>();
+        StringToVector2(directionStr.c_str(), directionStr.size(), direction);
+      }
+      else
+      {
+        direction = valueGet.second.Get<Vector2>();
+      }
+    }
+    else if((DevelText::Emboss::Property::STRENGTH == valueGet.first.indexKey) || (STRENGTH_KEY == valueGet.first.stringKey))
+    {
+      /// Strength key.
+      strengthDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string strengthStr = valueGet.second.Get<std::string>();
+        strength                      = StringToFloat(strengthStr.c_str());
+      }
+      else
+      {
+        strength = valueGet.second.Get<float>();
+      }
+    }
+    else if((DevelText::Emboss::Property::LIGHT_COLOR == valueGet.first.indexKey) || (LIGHT_COLOR_KEY == valueGet.first.stringKey))
+    {
+      /// Light Color key.
+      lightColorDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string lightColorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4(lightColorStr.c_str(), lightColorStr.size(), lightColor);
+      }
+      else
+      {
+        lightColor = valueGet.second.Get<Vector4>();
+      }
+    }
+    else if((DevelText::Emboss::Property::SHADOW_COLOR == valueGet.first.indexKey) || (SHADOW_COLOR_KEY == valueGet.first.stringKey))
+    {
+      /// Shadow Color key.
+      shadowColorDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string shadowColorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4(shadowColorStr.c_str(), shadowColorStr.size(), shadowColor);
+      }
+      else
+      {
+        shadowColor = valueGet.second.Get<Vector4>();
       }
     }
   }
@@ -738,14 +837,83 @@ bool SetEmbossProperties(ControllerPtr controller, const Property::Value& value,
     {
       case EffectStyle::DEFAULT:
       {
-        // Stores the default emboss's properties string to be recovered by the GetEmbossProperties() function.
-        controller->SetDefaultEmbossProperties(properties);
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool                  enabled            = false;
+        bool                  directionDefined   = false;
+        Vector2               direction;
+        bool                  strengthDefined    = false;
+        float                 strength           = 0.f;
+        bool                  lightColorDefined  = false;
+        Vector4               lightColor;
+        bool                  shadowColorDefined = false;
+        Vector4               shadowColor;
+
+        bool empty = true;
+
+        if(!propertiesMap.Empty())
+        {
+          empty = ParseEmbossProperties(propertiesMap,
+                                        enabled,
+                                        directionDefined,
+                                        direction,
+                                        strengthDefined,
+                                        strength,
+                                        lightColorDefined,
+                                        lightColor,
+                                        shadowColorDefined,
+                                        shadowColor);
+        }
+
+        if(!empty)
+        {
+          if(enabled != controller->IsEmbossEnabled())
+          {
+            controller->SetEmbossEnabled(enabled);
+            update = true;
+          }
+
+          // Sets the default emboss values.
+          if(directionDefined && (controller->GetEmbossDirection() != direction))
+          {
+            controller->SetEmbossDirection(direction);
+            update = true;
+          }
+
+          if(strengthDefined && (fabsf(controller->GetEmbossStrength() - strength) > Math::MACHINE_EPSILON_1000))
+          {
+            controller->SetEmbossStrength(strength);
+            update = true;
+          }
+
+          if(lightColorDefined && (controller->GetEmbossLightColor() != lightColor))
+          {
+            controller->SetEmbossLightColor(lightColor);
+            update = true;
+          }
+
+          if(shadowColorDefined && (controller->GetEmbossShadowColor() != shadowColor))
+          {
+            controller->SetEmbossShadowColor(shadowColor);
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable emboss.
+          if(controller->IsEmbossEnabled())
+          {
+            controller->SetEmbossEnabled(false);
+            update = true;
+          }
+        }
         break;
       }
       case EffectStyle::INPUT:
       {
-        // Stores the input emboss's properties string to be recovered by the GetEmbossProperties() function.
-        controller->SetInputEmbossProperties(properties);
+        const std::string& embossString = value.Get<std::string>();
+
+        controller->SetInputEmbossProperties(embossString);
         break;
       }
     }
@@ -762,7 +930,22 @@ void GetEmbossProperties(ControllerPtr controller, Property::Value& value, Effec
     {
       case EffectStyle::DEFAULT:
       {
-        value = controller->GetDefaultEmbossProperties();
+        const bool     enabled     = controller->IsEmbossEnabled();
+        const Vector2& direction   = controller->GetEmbossDirection();
+        const float    strength    = controller->GetEmbossStrength();
+        const Vector4& lightColor  = controller->GetEmbossLightColor();
+        const Vector4& shadowColor = controller->GetEmbossShadowColor();
+
+        Property::Map map;
+
+        map.Insert(ENABLE_KEY, enabled);
+        map.Insert(DIRECTION_KEY, direction);
+        map.Insert(STRENGTH_KEY, strength);
+        map.Insert(LIGHT_COLOR_KEY, lightColor);
+        map.Insert(SHADOW_COLOR_KEY, shadowColor);
+
+        value = map;
+
         break;
       }
       case EffectStyle::INPUT:
