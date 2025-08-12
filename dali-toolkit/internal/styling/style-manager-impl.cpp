@@ -109,7 +109,8 @@ StyleManager::StyleManager()
 : mDefaultFontSize(-1),
   mDefaultFontFamily(""),
   mDefaultThemeFilePath(),
-  mFeedbackStyle(nullptr)
+  mFeedbackStyle(nullptr),
+  mAdaptorInitialized(false)
 {
   // Add theme builder constants
   const std::string dataReadOnlyDir                     = AssetManager::GetDaliDataReadOnlyPath();
@@ -126,6 +127,8 @@ StyleManager::StyleManager()
   // Initialize BrokenImages
   mBrokenImageUrls.assign(COUNT_BROKEN_IMAGE_MAX, "");
 
+  mStyleMonitor = StyleMonitor::Get();
+
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   if(DALI_LIKELY(lifecycleController))
   {
@@ -138,7 +141,7 @@ void StyleManager::OnAdaptorInit()
 {
   if(Dali::Adaptor::IsAvailable())
   {
-    mStyleMonitor = StyleMonitor::Get();
+    mAdaptorInitialized = true;
 
     // Lazy signal send.
     if(mStyleMonitor.ThemeChangedBeforeAdaptorInit())
@@ -146,6 +149,35 @@ void StyleManager::OnAdaptorInit()
       StyleMonitorChange(mStyleMonitor, StyleChange::THEME_CHANGE);
       // Dev Note : Default font & size change signal will be emitted after AdaptorInit done.
     }
+
+    // Apply theme to controls initialized before adaptor init
+    if(mInitializedControlsBeforeAdaptorInit.size() > 0)
+    {
+      uint32_t actualAlivedControls = 0;
+      DALI_LOG_DEBUG_INFO("Applying theme to controls initialized before adaptor init [%zu + %zu]\n", mInitializedControlsBeforeAdaptorInit.size(), mThemeAppliedControlsBeforeAdaptorInit.size());
+      for(auto& weakControl : mInitializedControlsBeforeAdaptorInit)
+      {
+        Toolkit::Control controlHandle = weakControl.GetHandle();
+        if(controlHandle)
+        {
+          ++actualAlivedControls;
+          ApplyThemeStyleAtInit(controlHandle);
+        }
+      }
+      for(auto& weakControl : mThemeAppliedControlsBeforeAdaptorInit)
+      {
+        Toolkit::Control controlHandle = weakControl.GetHandle();
+        if(controlHandle)
+        {
+          ++actualAlivedControls;
+          ApplyThemeStyle(controlHandle);
+        }
+      }
+      DALI_LOG_DEBUG_INFO("Actually alived control count [%zu]\n", actualAlivedControls);
+      mInitializedControlsBeforeAdaptorInit.clear();
+      mThemeAppliedControlsBeforeAdaptorInit.clear();
+    }
+
     if(mStyleMonitor)
     {
       mStyleMonitor.StyleChangeSignal().Connect(this, &StyleManager::StyleMonitorChange);
@@ -192,6 +224,13 @@ bool StyleManager::GetStyleConstant(const std::string& key, Property::Value& val
 
 void StyleManager::ApplyThemeStyle(Toolkit::Control control)
 {
+  // If the adaptor is not initialized yet, we will style the control later
+  if(!mAdaptorInitialized)
+  {
+    mThemeAppliedControlsBeforeAdaptorInit.push_back(control);
+    return;
+  }
+
   if(!mThemeBuilder)
   {
     ApplyDefaultTheme();
@@ -205,6 +244,13 @@ void StyleManager::ApplyThemeStyle(Toolkit::Control control)
 
 void StyleManager::ApplyThemeStyleAtInit(Toolkit::Control control)
 {
+  // If the adaptor is not initialized yet, we will style the control later
+  if(!mAdaptorInitialized)
+  {
+    mInitializedControlsBeforeAdaptorInit.push_back(control);
+    return;
+  }
+
   ApplyThemeStyle(control);
 
   if(mFeedbackStyle)
@@ -508,7 +554,7 @@ void StyleManager::ApplyStyle(Toolkit::Builder builder, Toolkit::Control control
     builder.ApplyStyle(styleName, control);
   }
 
-  if(mDefaultFontSize == -1 && mStyleMonitor && mStyleMonitor.EnsureFontClientCreated())
+  if(mDefaultFontSize == -1 && mStyleMonitor.EnsureFontClientCreated())
   {
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }

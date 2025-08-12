@@ -256,7 +256,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * impl.GetFontSizeScale();
 
       //Get the number of points per one unit of point-size
-      uint32_t numberOfPointsPerOneUnitOfPointSize = impl.mFontClient.GetNumberOfPointsPerOneUnitOfPointSize();
+      uint32_t numberOfPointsPerOneUnitOfPointSize = impl.GetFontClient().GetNumberOfPointsPerOneUnitOfPointSize();
 
       if(impl.IsShowingPlaceholderText() && impl.mEventData && (nullptr != impl.mEventData->mPlaceholderFont))
       {
@@ -290,7 +290,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
-      multilanguageSupport.ValidateFonts(impl.mFontClient,
+      multilanguageSupport.ValidateFonts(impl.GetFontClient(),
                                          utf32Characters,
                                          scripts,
                                          fontDescriptionRuns,
@@ -386,7 +386,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
     // Shapes the text.
     ShapeText(shaping,
-              impl.mFontClient,
+              impl.GetFontClient(),
               textToShape,
               lineBreakInfo,
               scripts,

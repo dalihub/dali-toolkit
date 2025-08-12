@@ -31,43 +31,28 @@ namespace Dali
 {
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
-ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfaceHeight, float horizontalDpi, float verticalDpi)
+ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfaceHeight, float horizontalDpi, float verticalDpi, bool preInitialize)
 : TestApplication(surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi, false /* Do not Initialize Core */),
   mMainWindow(),
-  mAdaptor(&AdaptorImpl::New()) // Need to create Adaptor first as many singletons in dali-adaptor need it
+  mAdaptor(nullptr),
+  mPreInitialized(preInitialize)
 {
-  // Create Core next
-  CreateCore();
-
-  // Override Scene creation in TestApplication by creating a window.
-  // The window will create a Scene & surface and set up the scene's surface appropriately.
-  mMainWindow = Window::New(PositionSize(0, 0, surfaceWidth, surfaceHeight), "");
-  mScene      = AdaptorImpl::GetScene(mMainWindow);
-  mScene.SetDpi(Vector2(horizontalDpi, verticalDpi));
-
-  // Create render target for the scene
-  Graphics::RenderTargetCreateInfo rtInfo{};
-  rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
-  mScene.SetSurfaceRenderTarget(rtInfo);
-
-  mScenes.push_back(mScene);
-
-  // Core needs to be initialized next before we start the adaptor
-  InitializeCore();
-
-  // This will also emit the window created signals
-  AdaptorImpl::GetImpl(*mAdaptor).Start(mMainWindow);
-  AdaptorImpl::GetImpl(*mAdaptor).SetApplication(*this);
-
-  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-  lifecycleController.PreInitSignal().Emit();
-  lifecycleController.InitSignal().Emit();
-
-  // set the DPI value for font rendering
-  TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
-  if(fontClient)
+  if(!preInitialize)
   {
-    fontClient.SetDpi(mDpi.x, mDpi.y);
+    InitializeAdaptor(); // Need to create Adaptor first as many singletons in dali-adaptor need it
+
+    // Create Core next
+    CreateCore();
+
+    // Create Scene from main window
+    // Must not call TestApplication::CreateScene().
+    CreateSceneFromMainWindow();
+
+    // Core needs to be initialized next before we start the adaptor
+    InitializeCore();
+
+    // This will also emit the window created signals
+    EmitApplicationInitialize();
   }
 }
 
@@ -85,6 +70,45 @@ ToolkitTestApplication::~ToolkitTestApplication()
   // Need to delete core before we delete the adaptor.
   delete mCore;
   mCore = NULL;
+}
+
+void ToolkitTestApplication::InitializeAdaptor()
+{
+  mAdaptor.reset(&AdaptorImpl::New());
+}
+
+void ToolkitTestApplication::CreateSceneFromMainWindow()
+{
+  // Override Scene creation in TestApplication by creating a window.
+  // The window will create a Scene & surface and set up the scene's surface appropriately.
+  mMainWindow = Window::New(PositionSize(0, 0, mSurfaceWidth, mSurfaceHeight), "");
+
+  mScene = AdaptorImpl::GetScene(mMainWindow);
+  mScene.SetDpi(Vector2(mDpi.x, mDpi.y));
+
+  // Create render target for the scene
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
+  mScene.SetSurfaceRenderTarget(rtInfo);
+
+  mScenes.push_back(mScene);
+}
+
+void ToolkitTestApplication::EmitApplicationInitialize()
+{
+  AdaptorImpl::GetImpl(*mAdaptor).Start(mMainWindow);
+  AdaptorImpl::GetImpl(*mAdaptor).SetApplication(*this);
+
+  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+  lifecycleController.PreInitSignal().Emit();
+  lifecycleController.InitSignal().Emit();
+
+  // set the DPI value for font rendering
+  TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+  if(fontClient)
+  {
+    fontClient.SetDpi(mDpi.x, mDpi.y);
+  }
 }
 
 void ToolkitTestApplication::RunIdles()

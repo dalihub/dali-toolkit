@@ -49,6 +49,14 @@ public:
   }
 
   /**
+   * Create a new Metrics object without font client.
+   */
+  static Metrics* New()
+  {
+    return new Metrics();
+  }
+
+  /**
    * @brief Used to switch between bitmap & vector based glyphs
    *
    * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
@@ -66,7 +74,7 @@ public:
    */
   void GetFontMetrics(FontId fontId, FontMetrics& metrics)
   {
-    mFontClient.GetFontMetrics(fontId, metrics); // inline for performance
+    GetFontClient().GetFontMetrics(fontId, metrics); // inline for performance
   }
 
   /**
@@ -80,7 +88,7 @@ public:
    */
   bool GetGlyphMetrics(GlyphInfo* array, uint32_t size)
   {
-    return mFontClient.GetGlyphMetrics(array, size, mGlyphType, true); // inline for performance
+    return GetFontClient().GetGlyphMetrics(array, size, mGlyphType, true); // inline for performance
   }
 
   /**
@@ -90,9 +98,9 @@ public:
    *
    * @return true if the font has italic style.
    */
-  bool HasItalicStyle(FontId fontId) const
+  bool HasItalicStyle(FontId fontId)
   {
-    return mFontClient.HasItalicStyle(fontId);
+    return GetFontClient().HasItalicStyle(fontId);
   }
 
 protected:
@@ -111,6 +119,28 @@ private:
   : mFontClient(fontClient),
     mGlyphType(TextAbstraction::BITMAP_GLYPH)
   {
+  }
+
+  /**
+   * Constructor.
+   */
+  Metrics()
+  : mGlyphType(TextAbstraction::BITMAP_GLYPH)
+  {
+  }
+
+  /**
+   * @brief Get the font client.
+   *
+   * @return fontClient The font client.
+   */
+  TextAbstraction::FontClient& GetFontClient()
+  {
+    if(!mFontClient)
+    {
+      mFontClient = TextAbstraction::FontClient::Get();
+    }
+    return mFontClient;
   }
 
   // Undefined

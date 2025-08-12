@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,7 +207,8 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
           std::transform(reinterpret_cast<uint16_t*>(indicesBuffer.data()),
                          reinterpret_cast<uint16_t*>(indicesBuffer.data()) + accessor.mSparse->mCount,
                          sparseIndices->begin(),
-                         [](const uint16_t& value) {
+                         [](const uint16_t& value)
+                         {
                            return uint32_t(value);
                          });
         }
@@ -604,7 +605,8 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
         // Find the max distance to normalize the deltas.
         const auto* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.data());
 
-        auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+        auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta                                                  = deltasBuffer[deltaIndex];
           return std::max(maxDistanceSquared, delta.LengthSquared());
@@ -674,7 +676,8 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
@@ -748,7 +751,8 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex) {
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
@@ -1237,7 +1241,8 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinitio
 
   uint32_t totalTextureSize(0u);
 
-  auto processAccessor = [&](const MeshDefinition::Accessor& accessor, uint32_t vector3Size) {
+  auto processAccessor = [&](const MeshDefinition::Accessor& accessor, uint32_t vector3Size)
+  {
     if(accessor.IsDefined())
     {
       blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
@@ -1313,8 +1318,6 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, std::vector<MeshDefinitio
   }
 }
 
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID = 300;
-
 } // namespace
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
@@ -1374,9 +1377,12 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
   const auto numComponents = std::max(min.size(), max.size());
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
-  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value) { value = std::min(max[i], value); })
-                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value) { value = std::max(min[i], value); }
-                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value) { value = std::min(std::max(min[i], value), max[i]); }));
+  ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
+                                     { value = std::min(max[i], value); })
+                                : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value)
+                                     { value = std::max(min[i], value); }
+                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
+                                                                      { value = std::min(std::max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {
@@ -1476,7 +1482,7 @@ MeshDefinition::RawData
 MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers)
 {
   RawData raw;
-  if (IsQuad())
+  if(IsQuad())
   {
     return raw;
   }
@@ -1485,8 +1491,8 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   meshPath = modelsPath + mUri;
 
   std::unique_ptr<Dali::FileStream> daliFileStream(nullptr);
-  std::iostream* fileStream = nullptr;
-  if (!mUri.empty())
+  std::iostream*                    fileStream = nullptr;
+  if(!mUri.empty())
   {
     daliFileStream.reset(new Dali::FileStream(meshPath, FileStream::READ | FileStream::BINARY));
     fileStream = &daliFileStream->GetStream();
@@ -1556,29 +1562,6 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
       {
         meshGeometry.geometry.SetIndexBuffer(raw.mIndices.data(), raw.mIndices.size());
       }
-    }
-
-    if(DALI_UNLIKELY(Dali::Shader::GetShaderLanguageVersion() < MINIMUM_SHADER_VERSION_SUPPORT_VERTEX_ID && !raw.mAttribs.empty()))
-    {
-      auto numElements = raw.mAttribs[0].mNumElements;
-
-      // gl_VertexID not support. We should add buffer hard.
-      Property::Map attribMap;
-      attribMap["aVertexID"] = Property::FLOAT;
-
-      VertexBuffer attribBuffer = VertexBuffer::New(attribMap);
-
-      std::vector<uint8_t> buffer(numElements * sizeof(float));
-      auto                 ids = reinterpret_cast<float*>(buffer.data());
-
-      for(uint32_t i = 0; i < numElements; i++)
-      {
-        ids[i] = static_cast<float>(i);
-      }
-
-      attribBuffer.SetData(buffer.data(), numElements);
-
-      meshGeometry.geometry.AddVertexBuffer(attribBuffer);
     }
 
     for(auto& a : raw.mAttribs)

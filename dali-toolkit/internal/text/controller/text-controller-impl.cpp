@@ -777,11 +777,11 @@ float Controller::Impl::GetDefaultFontLineHeight()
   if(nullptr == mFontDefaults)
   {
     TextAbstraction::FontDescription fontDescription;
-    defaultFontId = mFontClient.GetFontId(fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * GetFontSizeScale());
+    defaultFontId = GetFontClient().GetFontId(fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * GetFontSizeScale());
   }
   else
   {
-    defaultFontId = mFontDefaults->GetFontId(mFontClient, mFontDefaults->mDefaultPointSize * GetFontSizeScale());
+    defaultFontId = mFontDefaults->GetFontId(GetFontClient(), mFontDefaults->mDefaultPointSize * GetFontSizeScale());
   }
 
   Text::FontMetrics fontMetrics;

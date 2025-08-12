@@ -617,7 +617,7 @@ void TextEditor::OnInitialize()
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
   // Creates an extra control to be used as stencil buffer.
-  mStencil = Control::New();
+  mStencil = Control::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
   mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);

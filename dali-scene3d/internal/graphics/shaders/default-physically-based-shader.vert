@@ -29,10 +29,6 @@ INPUT vec3 aTangent;
 
 INPUT vec4 aVertexColor;
 
-#ifdef SL_VERSION_LOW
-INPUT float aVertexID;
-#endif
-
 #ifdef SKINNING
 INPUT vec4 aJoints0;
 INPUT vec4 aWeights0;
@@ -45,25 +41,10 @@ UNIFORM highp sampler2D sBlendShapeGeometry;
 
 UNIFORM_BLOCK VertBlock0
 {
-#ifdef MORPH
-#ifdef SL_VERSION_LOW
-  UNIFORM highp int uBlendShapeGeometryWidth;
-  UNIFORM highp int uBlendShapeGeometryHeight;
-#endif
-#endif
-
   UNIFORM highp mat4 uViewMatrix;
   UNIFORM highp mat3 uNormalMatrix;
   UNIFORM highp mat4 uModelMatrix;
   UNIFORM highp mat4 uProjection;
-
-#ifdef SKINNING
-
-#ifdef SL_VERSION_LOW
-#define MAX_BONES 80
-  UNIFORM highp mat4 uBone[MAX_BONES];
-#endif
-#endif
 
 #ifdef MORPH
 #define MAX_BLEND_SHAPE_NUMBER 256
@@ -95,13 +76,11 @@ UNIFORM_BLOCK ShadowEnabled
 
 // Additional uniform block if using more bones
 #ifdef SKINNING
-#ifndef SL_VERSION_LOW
 #define MAX_BONES 256
 UNIFORM_BLOCK Bones
 {
   UNIFORM highp mat4 uBone[MAX_BONES];
 };
-#endif
 #endif
 OUTPUT highp vec3 positionFromLightView;
 
@@ -117,20 +96,9 @@ void main()
   highp vec3 tangent = aTangent.xyz;
 
 #ifdef MORPH
-#ifdef SL_VERSION_LOW
-  highp int width = uBlendShapeGeometryWidth;
-#else
   highp int width = textureSize( sBlendShapeGeometry, 0 ).x;
-#endif
 
   highp int blendShapeBufferOffset = 0;
-
-#ifdef SL_VERSION_LOW
-  highp float blendShapeWidth = float(uBlendShapeGeometryWidth);
-  highp float blendShapeHeight = float(uBlendShapeGeometryHeight);
-  highp float invertBlendShapeWidth = 1.0 / blendShapeWidth;
-  highp float invertBlendShapeHeight = 1.0 / blendShapeHeight;
-#endif
 
   for( highp int index = 0; index < uNumberOfBlendShapes; ++index )
   {
@@ -142,15 +110,9 @@ void main()
 
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
-#ifdef SL_VERSION_LOW
-    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
-    y = vertexId / width;
-    x = vertexId - y * width;
-#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
-#endif
 
     // Retrieves the blend shape geometry from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
@@ -161,13 +123,7 @@ void main()
        highp float unnormalizeFactor = uBlendShapeUnnormalizeFactor[index];
 #endif
 
-#ifdef SL_VERSION_LOW
-      highp float floatX = float(x) + 0.5;
-      highp float floatY = float(y) + 0.5;
-      diff = weight * unnormalizeFactor * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
-#else
       diff = weight * unnormalizeFactor * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
-#endif
     }
 
     position.xyz += diff;
@@ -177,26 +133,14 @@ void main()
 
 #ifdef MORPH_NORMAL
     // Calculate the index to retrieve the normal from the texture.
-#ifdef SL_VERSION_LOW
-    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
-    y = vertexId / width;
-    x = vertexId - y * width;
-#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
-#endif
 
     // Retrieves the blend shape normal from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
     {
-#ifdef SL_VERSION_LOW
-      highp float floatX = float(x) + 0.5;
-      highp float floatY = float(y) + 0.5;
-      diff = weight * 2.0 * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
-#else
       diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
-#endif
     }
 
     normal += diff.xyz;
@@ -206,26 +150,14 @@ void main()
 
 #ifdef MORPH_TANGENT
     // Calculate the index to retrieve the tangent from the texture.
-#ifdef SL_VERSION_LOW
-    vertexId = int(floor(aVertexID + 0.5)) + blendShapeBufferOffset;
-    y = vertexId / width;
-    x = vertexId - y * width;
-#else
     vertexId = gl_VertexID + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
-#endif
 
     // Retrieves the blend shape tangent from the texture, unnormalizes it and multiply by the weight.
     if(0.0 != weight)
     {
-#ifdef SL_VERSION_LOW
-      highp float floatX = float(x) + 0.5;
-      highp float floatY = float(y) + 0.5;
-      diff = weight * 2.0 * ( texture2D( sBlendShapeGeometry, vec2(floatX * invertBlendShapeWidth, floatY * invertBlendShapeHeight) ).xyz - 0.5 );
-#else
       diff = weight * 2.0 * ( texelFetch( sBlendShapeGeometry, ivec2(x, y), 0 ).xyz - 0.5 );
-#endif
     }
 
     tangent += diff.xyz;
@@ -259,15 +191,7 @@ void main()
 
   highp vec4 positionV = uViewMatrix * positionW;
 
-#ifdef SL_VERSION_LOW
-  highp vec3 i0 = uViewMatrix[0].xyz;
-  highp vec3 i1 = uViewMatrix[1].xyz;
-  highp vec3 i2 = uViewMatrix[2].xyz;
-
-  vPositionToCamera = mat3(vec3(i0.x, i1.x, i2.x), vec3(i0.y, i1.y, i2.y), vec3(i0.z, i1.z, i2.z)) * -vec3(positionV.xyz / positionV.w);
-#else
   vPositionToCamera = transpose(mat3(uViewMatrix)) * -vec3(positionV.xyz / positionV.w);
-#endif
 
   normal = normalize(normal);
   tangent = normalize(tangent);

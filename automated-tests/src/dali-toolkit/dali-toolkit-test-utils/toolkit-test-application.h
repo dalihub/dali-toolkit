@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include "test-application.h"
 
-//#undef assert
+// #undef assert
 
 namespace Dali
 {
@@ -45,13 +45,20 @@ class Window;
 class ToolkitTestApplication : public TestApplication
 {
 public:
-
-  ToolkitTestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
-                          size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
-                          float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                          float  verticalDpi   = DEFAULT_VERTICAL_DPI );
+  ToolkitTestApplication(size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
+                         size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
+                         float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
+                         float  verticalDpi   = DEFAULT_VERTICAL_DPI,
+                         bool   preInitialize = false);
 
   ~ToolkitTestApplication() override;
+
+  /**
+   * @brief Initializes the Adaptor and Scene for emulate pre-initialize application case.
+   */
+  void InitializeAdaptor();
+  void CreateSceneFromMainWindow();
+  void EmitApplicationInitialize();
 
   /**
    * @brief Executes the idle callbacks.
@@ -71,9 +78,15 @@ public:
     return *mAdaptor;
   }
 
+  bool IsPreInitialized() const
+  {
+    return mPreInitialized;
+  }
+
 private:
-  Dali::Window mMainWindow;
-  std::unique_ptr< Adaptor > mAdaptor;
+  Dali::Window             mMainWindow;
+  std::unique_ptr<Adaptor> mAdaptor;
+  const bool               mPreInitialized{false};
 };
 
 } // namespace Dali

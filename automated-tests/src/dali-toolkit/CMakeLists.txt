@@ -32,6 +32,7 @@ SET(TC_SOURCES
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-ParticleSystem.cpp
+  utc-Dali-PropertyBridge.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp

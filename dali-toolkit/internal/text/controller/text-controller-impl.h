@@ -43,7 +43,7 @@ const float DEFAULT_TEXTFIT_STEP           = 1.f;
 const float DEFAULT_FONT_SIZE_SCALE        = 1.f;
 const float DEFAULT_DISABLED_COLOR_OPACITY = 0.3f;
 
-//Forward declarations
+// Forward declarations
 struct CursorInfo;
 struct FontDefaults;
 struct ControllerImplEventHandler;
@@ -392,17 +392,15 @@ public:
   {
     mModel = Model::New();
 
-    mFontClient = TextAbstraction::FontClient::Get();
     if(mEditableControlInterface != nullptr && Clipboard::IsAvailable())
     {
       mClipboard = Clipboard::Get();
     }
-    mView.SetFontClient(mFontClient);
+
     mView.SetVisualModel(mModel->mVisualModel);
     mView.SetLogicalModel(mModel->mLogicalModel);
 
-    // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
-    mMetrics = Metrics::New(mFontClient);
+    mMetrics = Metrics::New();
     mLayoutEngine.SetMetrics(mMetrics);
 
     // Set the text properties to default
@@ -419,6 +417,20 @@ public:
     delete mEmbossDefaults;
     delete mOutlineDefaults;
     delete mEventData;
+  }
+
+  /**
+   * @brief Get the font client.
+   *
+   * @return fontClient The font client.
+   */
+  TextAbstraction::FontClient& GetFontClient()
+  {
+    if(!mFontClient)
+    {
+      mFontClient = TextAbstraction::FontClient::Get();
+    }
+    return mFontClient;
   }
 
   // Text Controller Implementation.

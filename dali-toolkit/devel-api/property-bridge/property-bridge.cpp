@@ -15,37 +15,45 @@
  *
  */
 
-// HEADER
-#include <dali-toolkit/public-api/dali-toolkit-version.h>
+// CLASS HEADER
+#include "property-bridge.h"
 
 // EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <iostream>
-#endif
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/property-bridge/property-bridge-impl.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-const unsigned int TOOLKIT_MAJOR_VERSION = 2;
-const unsigned int TOOLKIT_MINOR_VERSION = 4;
-const unsigned int TOOLKIT_MICRO_VERSION = 31;
-const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
+PropertyBridge::PropertyBridge()
+{
+}
 
-#ifdef DEBUG_ENABLED
-namespace
+PropertyBridge::~PropertyBridge()
 {
-/// Allows the printing of the version number ONLY when debug is enabled
-struct PrintVersion
+}
+
+PropertyBridge PropertyBridge::Get()
 {
-  PrintVersion()
-  {
-    std::cerr << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
-  }
-};
-PrintVersion TOOLKIT_VERSION;
-} // unnamed namespace
-#endif
+  return Internal::PropertyBridge::Get();
+}
+
+PropertyBridge::PropertyBridge(Internal::PropertyBridge* impl)
+: BaseHandle(impl)
+{
+}
+
+std::string PropertyBridge::GetStringProperty(Actor actor, const std::string& propertyName)
+{
+  return GetImplementation(*this).GetStringProperty(actor, propertyName);
+}
+
+void PropertyBridgeRegisterStringGetter(StringGetterDelegate getter)
+{
+  Internal::PropertyBridge::RegisterStringGetter(getter);
+}
 
 } // namespace Toolkit
 

@@ -626,6 +626,7 @@ void TextVisual::UpdateRenderer()
       const bool backgroundWithCutoutEnabled = mController->GetTextModel()->IsBackgroundWithCutoutEnabled();
       const bool styleEnabled                = (shadowEnabled || outlineEnabled || backgroundEnabled || markupOrSpannedText || backgroundMarkupSet || cutoutEnabled || backgroundWithCutoutEnabled);
       const bool isOverlayStyle              = underlineEnabled || strikethroughEnabled;
+      const bool embossEnabled               = mController->IsEmbossEnabled();
 
       // if background with cutout is enabled, This text visual must render the entire control size.
 
@@ -648,7 +649,7 @@ void TextVisual::UpdateRenderer()
         visualTransform.mOffset.y = 0;
       }
 
-      AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
+      AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle, embossEnabled);
 
       // Text rendered and ready to display
       ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -856,7 +857,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
     SetTransformAndSize(visualTransform, textControlSize);
 
-    Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(renderInfo.hasMultipleTextColors).EnableEmoji(renderInfo.containsColorGlyph).EnableStyle(renderInfo.styleEnabled).EnableOverlay(renderInfo.isOverlayStyle));
+    Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(renderInfo.hasMultipleTextColors).EnableEmoji(renderInfo.containsColorGlyph).EnableStyle(renderInfo.styleEnabled).EnableOverlay(renderInfo.isOverlayStyle).EnableEmboss(renderInfo.embossEnabled));
     mImpl->mRenderer.SetShader(shader);
 
     // Remove the texture set and any renderer previously set.
@@ -984,6 +985,23 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       if(renderer)
       {
         control.AddRenderer(renderer);
+
+        if(renderInfo.embossEnabled)
+        {
+          float sizeX = std::max(layoutSize.x, Math::MACHINE_EPSILON_100);
+          float sizeY = std::max(std::min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
+          const Vector2& embossSize = Vector2(1.0f / sizeX, 1.0f / sizeY);
+          const Vector2& embossDirection = parameters.embossDirection;
+          const float embossStrength = parameters.embossStrength;
+          const Vector4& embossLightColor = parameters.embossLightColor;
+          const Vector4& embossShadowColor = parameters.embossShadowColor;
+
+          renderer.RegisterProperty("uEmbossSize", embossSize);
+          renderer.RegisterProperty("uEmbossDirection", embossDirection);
+          renderer.RegisterProperty("uEmbossStrength", embossStrength);
+          renderer.RegisterProperty("uEmbossLightColor", embossLightColor);
+          renderer.RegisterProperty("uEmbossShadowColor", embossShadowColor);
+        }
 
         if(renderer != mImpl->mRenderer)
         {
@@ -1174,9 +1192,9 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
   return true;
 }
 
-void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
+void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle, bool embossEnabled)
 {
-  Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle));
+  Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle).EnableEmboss(embossEnabled));
   mImpl->mRenderer.SetShader(shader);
 
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
@@ -1289,6 +1307,23 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     {
       // Note, AddRenderer will ignore renderer if it is already added. @SINCE 2_3.22
       actor.AddRenderer(renderer);
+
+      if(embossEnabled)
+      {
+        float sizeX = std::max(size.x, Math::MACHINE_EPSILON_100);
+        float sizeY = std::max(std::min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
+        const Vector2& embossSize = Vector2(1.0f / sizeX, 1.0f / sizeY);
+        const Vector2& embossDirection = mController->GetEmbossDirection();
+        const float embossStrength = mController->GetEmbossStrength();
+        const Vector4& embossLightColor = mController->GetEmbossLightColor();
+        const Vector4& embossShadowColor = mController->GetEmbossShadowColor();
+
+        renderer.RegisterProperty("uEmbossSize", embossSize);
+        renderer.RegisterProperty("uEmbossDirection", embossDirection);
+        renderer.RegisterProperty("uEmbossStrength", embossStrength);
+        renderer.RegisterProperty("uEmbossLightColor", embossLightColor);
+        renderer.RegisterProperty("uEmbossShadowColor", embossShadowColor);
+      }
 
       if(renderer != mImpl->mRenderer)
       {

@@ -328,7 +328,7 @@ Shader ColorVisual::GenerateShader() const
       fragmentShaderView = mColorVisualShaderFactory.GetFragmentShaderSource();
     }
 
-    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
 
     if(mImpl->mRenderer)
     {

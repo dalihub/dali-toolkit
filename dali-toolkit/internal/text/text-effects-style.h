@@ -60,6 +60,31 @@ bool ParseShadowProperties(const Property::Map& shadowProperties,
                            Vector2&             offset);
 
 /**
+ * @brief Parses the emboss properties.
+ *
+ * @param[in] embossProperties The map with the emboss properties.
+ * @param[out] enabled Whether the emboss is enabled.
+ * @param[out] directionDefined Whether the emboss's direction is defined.
+ * @param[out] direction The emboss's direction.
+ * @param[out] strengthDefined Whether the emboss's strength is defined.
+ * @param[out] strength The emboss's strength.
+ * @param[out] lightColorDefined Whether the emboss's light color is defined.
+ * @param[out] lightColor The emboss's light color.
+ * @param[out] shadowColorDefined Whether the emboss's shadow color is defined.
+ * @param[out] shadowColor The emboss's shadow color.
+ */
+bool ParseEmbossProperties(const Property::Map& embossProperties,
+                           bool&                enabled,
+                           bool&                directionDefined,
+                           Vector2&             direction,
+                           bool&                strengthDefined,
+                           float&               strength,
+                           bool&                lightColorDefined,
+                           Vector4&             lightColor,
+                           bool&                shadowColorDefined,
+                           Vector4&             shadowColor);
+
+/**
  * @brief Parses the underline properties.
  *
  * @param[in] underlineProperties The map with the underline properties.
@@ -72,6 +97,7 @@ bool ParseShadowProperties(const Property::Map& shadowProperties,
  * @param[out] dashWidth The dashed underline's width.
  * @param[out] dashGap The dashed underline's gap.
  */
+
 bool ParseUnderlineProperties(const Property::Map&   underlineProperties,
                               bool&                  enabled,
                               bool&                  colorDefined,

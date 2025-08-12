@@ -686,7 +686,7 @@ public: // Configure the text controller.
   NoTextTap::Action GetNoTextDoubleTapAction() const;
 
   /**
-   * @briefSets the action when there is a long press event on top of a text area with no text.
+   * @brief Sets the action when there is a long press event on top of a text area with no text.
    *
    * @param[in] action The action to do.
    */
@@ -1212,6 +1212,76 @@ public: // Default style & Input style
    * @return The shadow blur radius.
    */
   const float& GetShadowBlurRadius() const;
+
+  /**
+   * @brief Set the emboss enabled flag.
+   *
+   * @param[in] enable The emboss enabled flag.
+   */
+  void SetEmbossEnabled(const bool enable);
+
+  /**
+   * @brief Returns whether the text is embossed or not.
+   *
+   * @return The emboss state.
+   */
+  bool IsEmbossEnabled() const;
+
+  /**
+   * @brief Set the emboss direction.
+   *
+   * @param[in] direction The emboss direction.
+   */
+  void SetEmbossDirection(const Vector2& direction);
+
+  /**
+   * @brief Retrieve the emboss direction.
+   *
+   * @return The emboss direction.
+   */
+  const Vector2& GetEmbossDirection() const;
+
+  /**
+   * @brief Set the emboss strength.
+   *
+   * @param[in] strength The emboss strength.
+   */
+  void SetEmbossStrength(const float strength);
+
+  /**
+   * @brief Retrieve the emboss strength.
+   *
+   * @return The emboss strength.
+   */
+  float GetEmbossStrength() const;
+
+  /**
+   * @brief Set the emboss light color.
+   *
+   * @param[in] lightColor The emboss light color.
+   */
+  void SetEmbossLightColor(const Vector4& lightColor);
+
+  /**
+   * @brief Retrieve the emboss light color.
+   *
+   * @return The emboss light color.
+   */
+  const Vector4& GetEmbossLightColor() const;
+
+  /**
+   * @brief Set the emboss shadow color.
+   *
+   * @param[in] shadowColor The emboss shadow color.
+   */
+  void SetEmbossShadowColor(const Vector4& shadowColor);
+
+  /**
+   * @brief Retrieve the emboss shadow color.
+   *
+   * @return The emboss shadow color.
+   */
+  const Vector4& GetEmbossShadowColor() const;
 
   /**
    * @brief Set the underline color.
