@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
@@ -59,6 +63,8 @@ DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "volume", MAP, VOLUME)
 DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY)
 DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "playPosition", INTEGER, PLAY_POSITION)
 DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "displayMode", INTEGER, DISPLAY_MODE)
+DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "texture", MAP, TEXTURE)
+DALI_PROPERTY_REGISTRATION(Toolkit, VideoView, "overlay", MAP, OVERLAY)
 
 DALI_SIGNAL_REGISTRATION(Toolkit, VideoView, "finished", FINISHED_SIGNAL)
 
@@ -81,8 +87,6 @@ const char* const NATIVE_IMAGE_TARGET("nativeImageTarget");
 const char* const CUSTOM_SHADER("shader");
 const char* const CUSTOM_VERTEX_SHADER("vertexShader");
 const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
-const char* const DEFAULT_SAMPLER_TYPE_NAME("sampler2D");
-const char* const CUSTOM_SAMPLER_TYPE_NAME("samplerExternalOES");
 
 const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 
@@ -168,10 +172,34 @@ void VideoView::SetPropertyMap(Property::Map map)
     }
   }
 
-  if(mTextureRenderer && !mEffectPropertyMap.Empty())
+  if(mTextureVisual && !mEffectPropertyMap.Empty())
   {
-    Dali::Shader shader = CreateShader();
-    mTextureRenderer.SetShader(shader);
+    Toolkit::Control control     = Toolkit::Control(GetOwner());
+    Control&         controlImpl = GetImplementation(control);
+
+    Property::Map properties;
+    properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
+    properties[Toolkit::Visual::Property::SHADER] = CreateShader();
+
+    // Regenerate mTextureVisual
+    if(Dali::Adaptor::IsAvailable() && mTextureVisual)
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(mTextureVisual);
+    }
+    mTextureVisual.Reset();
+
+    mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
+    if(mTextureVisual)
+    {
+      /// Initialize shader properties
+      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mTextureVisual);
+      Shader                           shader     = visualImpl.GetRenderer().GetShader();
+      shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
+      shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
+
+      Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
+      Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
+    }
   }
 
   RelayoutRequest();
@@ -502,9 +530,9 @@ Property::Value VideoView::GetProperty(BaseObject* object, Property::Index prope
 
 void VideoView::SetDepthIndex(int depthIndex)
 {
-  if(mTextureRenderer)
+  if(mTextureVisual)
   {
-    mTextureRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, depthIndex);
+    mTextureVisual.SetDepthIndex(depthIndex);
   }
 }
 
@@ -639,9 +667,18 @@ void VideoView::SetWindowSurfaceTarget()
   mSizeUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
   mScaleUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
 
-  if(mTextureRenderer)
+  Toolkit::Control            control     = Toolkit::Control(GetOwner());
+  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
+
+  if(mTextureVisual)
   {
-    self.RemoveRenderer(mTextureRenderer);
+    Toolkit::DevelControl::UnregisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE);
+
+    if(Dali::Adaptor::IsAvailable() && mTextureVisual)
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(mTextureVisual);
+    }
+    mTextureVisual.Reset();
   }
 
   // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
@@ -649,15 +686,43 @@ void VideoView::SetWindowSurfaceTarget()
 
   ApplyBackupProperties();
 
-  if(!mOverlayRenderer)
+  if(!mOverlayVisual)
   {
-    // For underlay rendering mode, video display area have to be transparent.
-    Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "VIDEO_VIEW_OVERLAY");
-    mOverlayRenderer  = Renderer::New(geometry, shader);
-    mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
+    //// For underlay rendering mode, video display area have to be transparent.
+    Property::Map shader;
+    shader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = std::string(SHADER_VIDEO_VIEW_VERT);
+    shader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = std::string(SHADER_VIDEO_VIEW_FRAG);
+    shader[Toolkit::Visual::Shader::Property::HINTS]           = static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
+    shader[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW_OVERLAY";
+
+    Property::Map properties;
+    properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
+    properties[Toolkit::Visual::Property::SHADER] = shader;
+
+    mOverlayVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
+    if(mOverlayVisual)
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayVisual);
+
+      Renderer renderer = visualImpl.GetRenderer();
+
+      // Set default(prevent trash values)
+      Shader shader = renderer.GetShader();
+      shader.RegisterProperty("cornerRadius", Vector4::ZERO);
+      shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
+      shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
+
+      renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ZERO);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, DevelBlendEquation::MIN);
+
+      Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY, mOverlayVisual);
+
+      // Sync corner values to Control
+      Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayVisual, true);
+    }
   }
-  Self().AddRenderer(mOverlayRenderer);
 
   if(mIsPlay)
   {
@@ -686,11 +751,18 @@ void VideoView::SetNativeImageTarget()
 
   Actor self(Self());
 
-  if(mOverlayRenderer)
-  {
-    self.RemoveRenderer(mOverlayRenderer);
+  Toolkit::Control            control     = Toolkit::Control(GetOwner());
+  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
 
-    mOverlayRenderer.Reset();
+  if(mOverlayVisual)
+  {
+    Toolkit::DevelControl::UnregisterVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY);
+
+    if(Dali::Adaptor::IsAvailable() && mOverlayVisual)
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(mOverlayVisual);
+    }
+    mOverlayVisual.Reset();
   }
 
   self.RemovePropertyNotification(mPositionUpdateNotification);
@@ -703,23 +775,31 @@ void VideoView::SetNativeImageTarget()
   Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New(source);
   mNativeTexture                                  = Dali::Texture::New(*nativeImageSourcePtr);
 
-  if(!mTextureRenderer)
+  if(!mTextureVisual)
   {
-    Dali::Geometry   geometry   = VisualFactoryCache::CreateQuadGeometry();
-    Dali::Shader     shader     = CreateShader();
-    Dali::TextureSet textureSet = Dali::TextureSet::New();
-    textureSet.SetTexture(0u, mNativeTexture);
+    Toolkit::ImageUrl imageUrl = Toolkit::ImageUrl::New(mNativeTexture);
 
-    mTextureRenderer = Renderer::New(geometry, shader);
-    mTextureRenderer.SetTextures(textureSet);
+    Property::Map shaderSource = CreateShader();
+
+    Property::Map properties;
+    properties[Toolkit::Visual::Property::TYPE]     = Toolkit::Visual::Type::IMAGE;
+    properties[Toolkit::ImageVisual::Property::URL] = imageUrl.GetUrl();
+    properties[Toolkit::Visual::Property::SHADER]   = shaderSource;
+
+    mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
+    if(mTextureVisual)
+    {
+      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mTextureVisual);
+      visualImpl.GetRenderer().SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
+
+      Shader shader = visualImpl.GetRenderer().GetShader();
+      shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
+      shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
+
+      Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
+      Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
+    }
   }
-  else
-  {
-    Dali::TextureSet textureSet = mTextureRenderer.GetTextures();
-    textureSet.SetTexture(0u, mNativeTexture);
-  }
-  Self().AddRenderer(mTextureRenderer);
-  mTextureRenderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
 
   // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
   mVideoPlayer.SetRenderingTarget(nativeImageSourcePtr);
@@ -860,7 +940,7 @@ void VideoView::PlayAnimation(Dali::Animation animation)
   animation.Play();
 }
 
-Dali::Shader VideoView::CreateShader()
+Property::Map VideoView::CreateShader()
 {
   std::string fragmentShader;
   std::string vertexShader;
@@ -904,10 +984,12 @@ Dali::Shader VideoView::CreateShader()
     DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
   }
 
-  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, Shader::Hint::NONE, "VIDEO_VIEW");
-    // Initialize shader properties
-  shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
-  shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
+  Property::Map shader;
+  shader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
+  shader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Toolkit::Visual::Shader::Property::HINTS]           = Shader::Hint::NONE;
+  shader[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW";
+
   return shader;
 }
 
@@ -994,7 +1076,6 @@ bool VideoView::IsLetterBoxEnabled() const
 {
   return mVideoPlayer.IsLetterBoxEnabled();
 }
-
 
 } // namespace Internal
 

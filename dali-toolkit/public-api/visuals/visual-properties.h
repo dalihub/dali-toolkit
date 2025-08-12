@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,6 +311,15 @@ enum
    * @note If not supplied, the default is Dali::Shader::Hint::NONE.
    */
   HINTS,
+
+  /**
+   * @brief Name for shader.
+   * @details Name "name", type Property::STRING. Once set, the value should not change afterwards(for caching).
+   * @SINCE_2_4.31
+   * @note Optional
+   * @note If not supplied, the default is empty string.
+   */
+  NAME,
 };
 
 } // namespace Property

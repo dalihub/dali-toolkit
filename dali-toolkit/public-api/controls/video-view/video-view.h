@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,19 @@ public:
         * @brief The display mode of the video.
         * @SINCE_1_3_15
         */
-      DISPLAY_MODE
+      DISPLAY_MODE,
+
+      /**
+       * @brief name "texture", type map. Property index to register visual.
+       * @SINCE_2_4.31
+       */
+      TEXTURE,
+
+      /**
+       * @brief name "overlay", type map. Property index to register visual.
+       * @SINCE_2_4.31
+       */
+      OVERLAY
     };
   };
 

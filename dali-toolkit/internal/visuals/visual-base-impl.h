@@ -66,6 +66,7 @@ using FittingMode = DevelVisual::FittingMode;
  * | subdivideGridX          | INT              |
  * | subdivideGridY          | INT              |
  * | shaderHints             | INT              |
+ * | name                    | STRING           |
  */
 class Base : public BaseObject
 {

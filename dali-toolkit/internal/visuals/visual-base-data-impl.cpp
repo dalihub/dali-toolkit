@@ -149,7 +149,8 @@ Internal::Visual::Base::Impl::~Impl()
 
 Internal::Visual::Base::Impl::CustomShader::CustomShader(const Property::Map& map)
 : mGridSize(1, 1),
-  mHints(Shader::Hint::NONE)
+  mHints(Shader::Hint::NONE),
+  mName("")
 {
   SetPropertyMap(map);
 }
@@ -160,6 +161,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
   mFragmentShader.clear();
   mGridSize = ImageDimensions(1, 1);
   mHints    = Shader::Hint::NONE;
+  mName     = "";
 
   Property::Value* vertexShaderValue = shaderMap.Find(Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER);
   if(vertexShaderValue)
@@ -215,6 +217,15 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
       DALI_LOG_ERROR("'%s' parameter does not correctly specify a hint or an array of hint strings\n", CUSTOM_SHADER_HINTS);
     }
   }
+
+  Property::Value* nameValue = shaderMap.Find(Toolkit::Visual::Shader::Property::NAME, CUSTOM_SHADER_NAME);
+  if(nameValue)
+  {
+    if(!GetStringFromProperty(*nameValue, mName))
+    {
+      DALI_LOG_ERROR("'%s' parameter does not correctly specify a string\n", CUSTOM_SHADER_NAME);
+    }
+  }
 }
 
 void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap(Property::Map& map) const
@@ -243,6 +254,11 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap(Property::Map
     if(mHints != Dali::Shader::Hint::NONE)
     {
       customShader.Insert(Toolkit::Visual::Shader::Property::HINTS, static_cast<int>(mHints));
+    }
+
+    if(!mName.empty())
+    {
+      customShader.Insert(Toolkit::Visual::Shader::Property::NAME, mName);
     }
 
     map.Insert(Toolkit::Visual::Property::SHADER, customShader);

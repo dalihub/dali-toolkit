@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
@@ -350,7 +351,7 @@ private:
   /**
    * @brief CreateShader for native image target
    */
-  Dali::Shader CreateShader();
+  Property::Map CreateShader();
 
   /**
    * @brief Checks whether the property has a string value.
@@ -422,8 +423,9 @@ private:
 
   std::string       mUrl;
   Dali::DisplayArea mDisplayArea;
-  Dali::Renderer    mOverlayRenderer;
-  Dali::Renderer    mTextureRenderer;
+
+  Dali::Toolkit::Visual::Base mOverlayVisual;
+  Dali::Toolkit::Visual::Base mTextureVisual;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
