@@ -954,6 +954,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(shadowMapGet.Count(), shadowDisabledMapGet.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(DaliTestCheckMaps(shadowMapGet, shadowDisabledMapGet), true, TEST_LOCATION);
 
+  // Check the emboss property with string
+  label.SetProperty(TextLabel::Property::EMBOSS, "Emboss properties");
+  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+
   // Check the emboss property
   Property::Map embossMapSet;
   Property::Map embossMapGet;

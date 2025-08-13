@@ -1089,6 +1089,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty(TextField::Property::INPUT_SHADOW, "Shadow input properties");
   DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
 
+  // Check the emboss property with string
+  field.SetProperty(TextField::Property::EMBOSS, "Emboss properties");
+  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+
   // Check the emboss property
   Property::Map embossMapSet;
   Property::Map embossMapGet;

@@ -1023,6 +1023,10 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty(TextEditor::Property::INPUT_SHADOW, "Shadow input properties");
   DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
 
+  // Check the emboss property with string
+  editor.SetProperty(TextEditor::Property::EMBOSS, "Emboss properties");
+  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+
   // Check the emboss property
   Property::Map embossMapSet;
   Property::Map embossMapGet;
