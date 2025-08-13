@@ -524,7 +524,7 @@ int UtcDaliControlAccessibilityState(void)
   }
 
   // state-changed:selected event is emitted if the object is highlighted and selectable
-  const std::array<DevelControl::AccessibilityRole, 3> selectableRoles{DevelControl::AccessibilityRole::BUTTON, DevelControl::AccessibilityRole::LIST_ITEM, DevelControl::AccessibilityRole::MENU_ITEM};
+  const std::array<DevelControl::AccessibilityRole, 4> selectableRoles{DevelControl::AccessibilityRole::BUTTON, DevelControl::AccessibilityRole::LIST_ITEM, DevelControl::AccessibilityRole::MENU_ITEM, DevelControl::AccessibilityRole::TAB};
   for(auto role : selectableRoles)
   {
     control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, role);
