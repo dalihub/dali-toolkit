@@ -969,17 +969,17 @@ int UtcDaliRenderEffectReInitialize(void)
   DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(effect.GetBlurRadius(), 20u, TEST_LOCATION);
 
-  effect.SetBlurRadius(2u); // invalid blur radius value(too small)
+  effect.SetBlurRadius(0u); // invalid blur radius value(too small)
   application.SendNotification();
 
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(effect.GetBlurRadius(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(effect.GetBlurRadius(), 0u, TEST_LOCATION);
 
-  control.SetRenderEffect(GaussianBlurEffect::New(2u)); // invalid blur radius value(too small)
+  control.SetRenderEffect(GaussianBlurEffect::New(0u)); // invalid blur radius value(too small)
   application.SendNotification();
 
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(effect.GetBlurRadius(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(effect.GetBlurRadius(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1016,16 +1016,21 @@ int UtcDaliBlurEffectBlurOnce(void)
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
     application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
 
     RenderTaskList taskList = scene.GetRenderTaskList();
 
     // Render effect activated.
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-    DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
     effect.SetBlurOnce(false);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    application.SendNotification(); // reordering render tasks
 
     DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
     tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
@@ -1042,11 +1047,16 @@ int UtcDaliBlurEffectBlurOnce(void)
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
     application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
 
     RenderTaskList taskList = scene.GetRenderTaskList();
 
     // Render effect activated.
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
     effect.SetBlurOnce(false);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
@@ -1191,7 +1201,7 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-    effect.SetBlurRadius(2u);
+    effect.SetBlurRadius(0u);
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
     // animation will not be added but cannot check
     animation.Clear();
@@ -1218,7 +1228,7 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-    effect.SetBlurRadius(2u);
+    effect.SetBlurRadius(0u);
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
     // animation will not be added but cannot check
     animation.Clear();
@@ -1290,7 +1300,7 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-    effect.SetBlurRadius(2u);
+    effect.SetBlurRadius(0u);
     effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
     // animation will not be added but cannot check
     animation.Clear();
@@ -1315,7 +1325,7 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
 
-    effect.SetBlurRadius(2u);
+    effect.SetBlurRadius(0u);
     effect.AddBlurOpacityAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
     // animation will not be added but cannot check
     animation.Clear();
