@@ -19,6 +19,7 @@ SET(TC_SOURCES
   utc-Dali-ModelCacheManager.cpp
   utc-Dali-ModelPrimitiveImpl.cpp
   utc-Dali-SceneViewImpl.cpp
+  utc-Dali-SceneView-Accessibility.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)

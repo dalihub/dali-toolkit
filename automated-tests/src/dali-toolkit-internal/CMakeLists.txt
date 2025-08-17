@@ -54,6 +54,7 @@ IF(ELDBUS_AVAILABLE)
     utc-Dali-Accessibility-Accessible.cpp
     utc-Dali-Accessibility-Controls.cpp
     utc-Dali-Accessibility-Controls-BridgeUp.cpp
+    utc-Dali-Accessibility-Highlight-Overlay.cpp
     utc-Dali-Accessibility-Text.cpp
     utc-Dali-Accessibility-Value.cpp
     )
