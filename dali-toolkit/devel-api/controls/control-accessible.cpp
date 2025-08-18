@@ -752,7 +752,7 @@ void ControlAccessible::OnStatePropertySet(AccessibilityStates newStates)
     }
 
     if(newStates[AccessibilityState::SELECTED] != mStatesSnapshot[AccessibilityState::SELECTED] &&
-       (role == AccessibilityRole::BUTTON || role == AccessibilityRole::LIST_ITEM || role == AccessibilityRole::MENU_ITEM))
+       (role == AccessibilityRole::BUTTON || role == AccessibilityRole::LIST_ITEM || role == AccessibilityRole::MENU_ITEM || role == AccessibilityRole::TAB))
     {
       EmitStateChanged(Accessibility::State::SELECTED, newStates[AccessibilityState::SELECTED]);
     }
