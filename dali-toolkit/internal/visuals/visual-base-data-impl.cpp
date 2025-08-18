@@ -116,8 +116,7 @@ bool GetPolicyFromValue(const Property::Value& value, Vector2& policy)
 } // unnamed namespace
 
 Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Type type)
-: mCustomShader(nullptr),
-  mEventObserver(nullptr),
+: mEventObserver(nullptr),
   mTransform(nullptr),
   mMixColor(Color::WHITE),
   mControlSize(Vector2::ZERO),
@@ -140,7 +139,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
 
 Internal::Visual::Base::Impl::~Impl()
 {
-  delete mCustomShader;
+  mCustomShaders.clear();
   if(mDecorationData)
   {
     delete mDecorationData;
@@ -209,6 +208,15 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
+  Property::Value* renderPassTagValue = shaderMap.Find(Toolkit::Visual::Shader::Property::RENDER_PASS_TAG, CUSTOM_RENDER_PASS_TAG);
+  if(renderPassTagValue)
+  {
+    if(!renderPassTagValue->Get(mRenderPassTag) || mRenderPassTag < 0)
+    {
+      DALI_LOG_ERROR("'%s' parameter does not correctly specify a value greater than or equal 0\n", CUSTOM_RENDER_PASS_TAG);
+    }
+  }
+
   Property::Value* hintsValue = shaderMap.Find(Toolkit::Visual::Shader::Property::HINTS, CUSTOM_SHADER_HINTS);
   if(hintsValue)
   {
@@ -228,7 +236,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
   }
 }
 
-void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap(Property::Map& map) const
+Property::Map Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap() const
 {
   if(!mVertexShader.empty() || !mFragmentShader.empty())
   {
@@ -261,7 +269,7 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap(Property::Map
       customShader.Insert(Toolkit::Visual::Shader::Property::NAME, mName);
     }
 
-    map.Insert(Toolkit::Visual::Property::SHADER, customShader);
+    return customShader;
   }
 }
 

@@ -141,7 +141,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
         }
 
         // Change shader
-        if(!mImpl->mCustomShader)
+        if(!IsUsingCustomShader())
         {
           UpdateShader();
         }
@@ -290,9 +290,7 @@ Shader ColorVisual::GenerateShader() const
 {
   Shader shader;
 
-  const bool useStandardShader = !mImpl->mCustomShader;
-
-  if(useStandardShader)
+  if(!IsUsingCustomShader())
   {
     shader = mColorVisualShaderFactory.GetShader(
       mFactoryCache,
@@ -304,31 +302,55 @@ Shader ColorVisual::GenerateShader() const
   }
   else
   {
-    const bool hasVertexShader   = !mImpl->mCustomShader->mVertexShader.empty();
-    const bool hasFragmentShader = !mImpl->mCustomShader->mFragmentShader.empty();
-
-    std::string_view vertexShaderView;
-    std::string_view fragmentShaderView;
-
-    if(hasVertexShader)
+    if(mImpl->GetCustomShaderCount() == 0)
     {
-      vertexShaderView = mImpl->mCustomShader->mVertexShader;
+      return shader;
+    }
+
+    Property::Array shaderArray;
+    for(uint32_t i = 0; i < mImpl->GetCustomShaderCount(); ++i)
+    {
+      const bool hasVertexShader   = !mImpl->GetCustomShaderAt(i)->mVertexShader.empty();
+      const bool hasFragmentShader = !mImpl->GetCustomShaderAt(i)->mFragmentShader.empty();
+
+      std::string_view vertexShaderView;
+      std::string_view fragmentShaderView;
+
+      if(hasVertexShader)
+      {
+        vertexShaderView = mImpl->GetCustomShaderAt(i)->mVertexShader;
+      }
+      else
+      {
+        vertexShaderView = mColorVisualShaderFactory.GetVertexShaderSource();
+      }
+
+      if(hasFragmentShader)
+      {
+        fragmentShaderView = mImpl->GetCustomShaderAt(i)->mFragmentShader;
+      }
+      else
+      {
+        fragmentShaderView = mColorVisualShaderFactory.GetFragmentShaderSource();
+      }
+
+      Property::Map shaderMap;
+      shaderMap["vertex"]        = vertexShaderView.data();
+      shaderMap["fragment"]      = fragmentShaderView.data();
+      shaderMap["renderPassTag"] = mImpl->GetCustomShaderAt(i)->mRenderPassTag;
+      shaderMap["hints"]         = mImpl->GetCustomShaderAt(i)->mHints;
+      shaderMap["name"]          = mImpl->GetCustomShaderAt(i)->mName;
+      shaderArray.PushBack(shaderMap);
+    }
+
+    if(shaderArray.Size() == 1)
+    {
+      shader = Shader::New(shaderArray.GetElementAt(0));
     }
     else
     {
-      vertexShaderView = mColorVisualShaderFactory.GetVertexShaderSource();
+      shader = Shader::New(shaderArray);
     }
-
-    if(hasFragmentShader)
-    {
-      fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
-    }
-    else
-    {
-      fragmentShaderView = mColorVisualShaderFactory.GetFragmentShaderSource();
-    }
-
-    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
 
     if(mImpl->mRenderer)
     {
@@ -349,7 +371,7 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
   if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
      (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
   {
-    const bool updateShader = !mImpl->mCustomShader && !IsBlurRequired();
+    const bool updateShader = !IsUsingCustomShader() && !IsBlurRequired();
 
     // Blur is animated now. we always have to use blur feature.
     mAlwaysUsingBlurRadius = true;

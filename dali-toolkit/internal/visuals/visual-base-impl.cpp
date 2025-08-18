@@ -203,17 +203,40 @@ void Visual::Base::Initialize()
 
 void Visual::Base::SetCustomShader(const Property::Map& shaderMap)
 {
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
-    mImpl->mCustomShader->SetPropertyMap(shaderMap);
+    mImpl->ClearCustomShader();
   }
-  else
+  mImpl->AddCustomShader(shaderMap);
+
+  // Let derived class know
+  UpdateShader();
+}
+
+void Visual::Base::SetCustomShader(const Property::Array& shaderArray)
+{
+  if(IsUsingCustomShader())
   {
-    mImpl->mCustomShader = new Impl::CustomShader(shaderMap);
+    mImpl->ClearCustomShader();
+  }
+
+  uint32_t arraySize = shaderArray.Count();
+  for(uint32_t i = 0; i < arraySize; ++i)
+  {
+    const Dali::Property::Map* shaderMap = shaderArray.GetElementAt(i).GetMap();
+    if(shaderMap)
+    {
+      mImpl->AddCustomShader(*shaderMap);
+    }
   }
 
   // Let derived class know
   UpdateShader();
+}
+
+bool Visual::Base::IsUsingCustomShader() const
+{
+  return !mImpl->mCustomShaders.empty();
 }
 
 void Visual::Base::SetProperties(const Property::Map& propertyMap)
@@ -230,9 +253,22 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       case Toolkit::Visual::Property::SHADER:
       {
         Property::Map shaderMap;
-        if(value.Get(shaderMap))
+        value.Get(shaderMap);
+        if(value.GetType() == Property::MAP)
         {
-          SetCustomShader(shaderMap);
+          const Dali::Property::Map* map = value.GetMap();
+          if(map)
+          {
+            SetCustomShader(*map);
+          }
+        }
+        else if(value.GetType() == Property::ARRAY)
+        {
+          const Dali::Property::Array* array = value.GetArray();
+          if(array)
+          {
+            SetCustomShader(*array);
+          }
         }
         break;
       }
@@ -351,7 +387,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             mImpl->mAlwaysUsingBorderline = true;
 
             // Change shader
-            if(!mImpl->mCustomShader)
+            if(!IsUsingCustomShader())
             {
               needUpdateShader = true;
             }
@@ -438,7 +474,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             }
 
             // Change shader
-            if(!mImpl->mCustomShader)
+            if(!IsUsingCustomShader())
             {
               needUpdateShader = true;
             }
@@ -523,7 +559,7 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             }
 
             // Change shader
-            if(!mImpl->mCustomShader)
+            if(!IsUsingCustomShader())
             {
               needUpdateShader = true;
             }
@@ -720,9 +756,9 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
 
   DoCreatePropertyMap(map);
 
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
-    mImpl->mCustomShader->CreatePropertyMap(map);
+    mImpl->CreateCustomShaderPropertyMap(map);
   }
 
   Property::Map transform;
@@ -767,9 +803,9 @@ void Visual::Base::CreateInstancePropertyMap(Property::Map& map) const
 {
   DoCreateInstancePropertyMap(map);
 
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
-    mImpl->mCustomShader->CreatePropertyMap(map);
+    mImpl->CreateCustomShaderPropertyMap(map);
   }
 }
 
@@ -1457,7 +1493,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForCornerRadius(mImpl->mType))
       {
-        const bool updateShader = !mImpl->mCustomShader && !IsRoundedCornerRequired();
+        const bool updateShader = !IsUsingCustomShader() && !IsRoundedCornerRequired();
 
         // CornerRadius is animated now. we always have to use corner radius feature.
         mImpl->mAlwaysUsingCornerRadius = true;
@@ -1493,7 +1529,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForCornerRadius(mImpl->mType))
       {
-        const bool updateShader = !mImpl->mCustomShader && !IsSquircleCornerRequired();
+        const bool updateShader = !IsUsingCustomShader() && !IsSquircleCornerRequired();
 
         // CornerSquareness is animated now. we always have to use corner squareness feature.
         mImpl->mAlwaysUsingCornerSquareness = true;
@@ -1524,7 +1560,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForBorderline(mImpl->mType))
       {
-        const bool updateShader = !mImpl->mCustomShader && !IsBorderlineRequired();
+        const bool updateShader = !IsUsingCustomShader() && !IsBorderlineRequired();
 
         // Borderline is animated now. we always have to use borderline feature.
         mImpl->mAlwaysUsingBorderline = true;
