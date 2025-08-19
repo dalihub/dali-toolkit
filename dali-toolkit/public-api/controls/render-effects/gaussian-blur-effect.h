@@ -65,8 +65,8 @@ public:
    * @param[in] blurRadius The radius of Gaussian kernel.
    * @SINCE_2_4.20
    * @return A handle to a newly allocated Dali resource
-   * @note For performance, blur radius is internally recalculated. It should be greater than or equal to (4 / downscale factor).
-   * @note As default downscale factor is set to 0.25, minimum initial blurRadius is 16u.
+   * @note Due to the downscale factor and kernel optimizations, the actual applied blur changes only in fixed increments.
+   * @note The increment size is (2 / downscaleFactor). For example, with downscaleFactor = 0.25, the effective blur radius changes in steps of 8 pixels, so small adjustments below that threshold will have no visual effect.
    */
   static GaussianBlurEffect New(uint32_t blurRadius);
 
@@ -106,7 +106,8 @@ public:
    * @brief Set blur radius value.
    * @param[in] blurRadius The radius of Gaussian kernel.
    * @SINCE_2_4.20
-   * @note For performance, blur radius is internally recalculated. It should be greater than or equal to (4 / downscale factor).
+   * @note Due to the downscale factor and kernel optimizations, the actual applied blur changes only in fixed increments.
+   * @note The increment size is (2 / downscaleFactor). For example, with downscaleFactor = 0.25, the effective blur radius changes in steps of 8 pixels, so small adjustments below that threshold will have no visual effect.
    */
   void SetBlurRadius(uint32_t blurRadius);
 

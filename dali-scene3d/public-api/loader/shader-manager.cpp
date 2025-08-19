@@ -447,7 +447,7 @@ void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
   auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
   Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
   auto              tempViewProjectionMatrixIndex     = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
-  if(tempViewProjectionMatrixIndex != Dali::Property::INVALID_INDEX)
+  if(tempViewProjectionMatrixIndex == Dali::Property::INVALID_INDEX)
   {
     tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }

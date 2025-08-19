@@ -114,8 +114,13 @@ void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
 {
   mBlurOnce = blurOnce;
 
-  if(!mSkipBlur && IsActivated()) // if false, no render task exists yet(nothing to do)
+  if(!mSkipBlur && IsActivated())
   {
+    if(!mSourceRenderTask)
+    {
+      OnRefresh();
+    }
+
     if(mBlurOnce)
     {
       mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -435,9 +440,19 @@ void GaussianBlurEffectImpl::OnRefresh()
   // Reset buffers and renderers
   CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
 
-  mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
-  mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
-  mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
+  if(!mSourceRenderTask)
+  {
+    Toolkit::Control ownerControl = GetOwnerControl();
+    ownerControl.Add(mInternalRoot);
+    CreateRenderTasks(GetSceneHolder(), ownerControl);
+    GetImplementation(ownerControl).RequestRenderTaskReorder();
+  }
+  else
+  {
+    mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
+    mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
+    mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
+  }
 
   {
     Renderer renderer = mHorizontalBlurActor.GetRendererAt(0);
@@ -543,25 +558,6 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   }
 }
 
-void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
-{
-  mFinishedSignal.Emit();
-}
-
-void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius()
-{
-  mInternalDownscaleFactor = mDownscaleFactor;
-  mInternalBlurRadius      = mBlurRadius;
-  mDownscaledBlurRadius    = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mInternalDownscaleFactor, mInternalBlurRadius);
-
-  mSkipBlur = false;
-  if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
-  {
-    mSkipBlur = true;
-    DALI_LOG_ERROR("Blur radius is too small. This blur will be ignored.\n");
-  }
-}
-
 void GaussianBlurEffectImpl::DestroyRenderTasks()
 {
   auto sceneHolder = GetSceneHolder();
@@ -576,6 +572,37 @@ void GaussianBlurEffectImpl::DestroyRenderTasks()
   mHorizontalBlurTask.Reset();
   mVerticalBlurTask.Reset();
   mSourceRenderTask.Reset();
+}
+
+void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
+{
+  mFinishedSignal.Emit();
+
+  DestroyFrameBuffers();
+  DestroyRenderTasks();
+  mInternalRoot.Unparent();
+}
+
+void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius()
+{
+  mInternalDownscaleFactor = mDownscaleFactor;
+  mInternalBlurRadius      = mBlurRadius;
+  mDownscaledBlurRadius    = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mInternalDownscaleFactor, mInternalBlurRadius);
+
+  mSkipBlur = false;
+  if(DALI_UNLIKELY((mDownscaledBlurRadius >> 1) < MINIMUM_GPU_ARRAY_SIZE))
+  {
+    if(mInternalBlurRadius == 0u)
+    {
+      mSkipBlur = true;
+      DALI_LOG_ERROR("Zero blur radius. This blur will be ignored.\n");
+    }
+    else
+    {
+      mDownscaledBlurRadius = MINIMUM_GPU_ARRAY_SIZE * 2;
+      DALI_LOG_ERROR("Blur radius is too small. This blur will use minimum radius value.\n");
+    }
+  }
 }
 
 Dali::Toolkit::GaussianBlurEffect::FinishedSignalType& GaussianBlurEffectImpl::FinishedSignal()
