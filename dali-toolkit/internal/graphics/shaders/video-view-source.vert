@@ -1,0 +1,43 @@
+//@name video-view-source.vert
+
+//@version 100
+
+precision highp float;
+
+INPUT highp vec2 aPosition;
+
+UNIFORM_BLOCK SharedBlock
+{
+  UNIFORM highp vec3 uSize;
+};
+
+UNIFORM_BLOCK VertBlock
+{
+  UNIFORM highp mat4 uMvpMatrix;
+  UNIFORM highp vec4 cornerRadius; //input
+  UNIFORM lowp float cornerRadiusPolicy; //input
+};
+
+OUTPUT highp vec2 vPosition;
+OUTPUT highp vec2 vOptRectSize;
+OUTPUT highp vec4 vCornerRadius; //output
+OUTPUT highp vec2 vTexCoord;
+
+void main()
+{
+  highp vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
+  vPosition = aPosition + vec2(0.5);
+  vertexPosition.xyz *= uSize;
+  gl_Position = uMvpMatrix * vertexPosition;
+
+  highp float minSize = min(uSize.x, uSize.y);
+  vCornerRadius = mix(cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);
+  vCornerRadius = min(vCornerRadius, minSize * 0.5);
+
+  vOptRectSize = uSize.xy * 0.5;
+
+  // Optimize fragment shader. 0.2929 ~= 1.0 - sqrt(0.5)
+  highp float maxRadius = max(max(vCornerRadius.x, vCornerRadius.y), max(vCornerRadius.z, vCornerRadius.w));
+  vOptRectSize -= 0.2929 * maxRadius + min(1.0, maxRadius);
+  vTexCoord = vPosition;
+}

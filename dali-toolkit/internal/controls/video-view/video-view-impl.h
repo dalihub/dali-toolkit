@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-conditions.h>
@@ -303,6 +304,34 @@ public:
    */
   bool IsLetterBoxEnabled() const;
 
+  /**
+   * @brief Sets the time interval for frame interpolation.
+   *
+   * The interpolation factor will progress from 0.0 to 1.0 over this duration.
+   * This interval is applied after the next call to SetNativeImageSourceForCurrentFrame.
+   *
+   * @param[in] intervalSeconds The duration in seconds for interpolation.
+   */
+  void SetFrameInterpolationInterval(float intervalSeconds);
+
+  /**
+   * @brief Gets the time interval for frame interpolation.
+   *
+   * @return The duration in seconds for interpolation.
+   */
+  float GetFrameInterpolationInterval() const;
+
+  /**
+   * @brief Sets the NativeImageSource for the current video frame.
+   *
+   * This method updates the texture used for the current frame and resets the interpolation timer.
+   * The VideoView will then start interpolating between the previous frame and this new frame
+   * over the interval set by SetFrameInterpolationInterval.
+   *
+   * @param[in] nativeImageSource A handle to the NativeImageSource containing the current video frame (tbm_surface).
+   */
+  void SetNativeImageSourceForCurrentFrame(NativeImageSourcePtr nativeImageSource);
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -389,6 +418,12 @@ private:
   void SetFrameRenderCallback();
 
   /*
+   * @brief Create OverlayTextureVisual
+   *
+   */
+  void CreateOverlayTextureVisual();
+
+  /*
    * @brief resize/move animation finished callback function
    *
    * This function is called the resize/move animation is finished,
@@ -424,7 +459,9 @@ private:
   std::string       mUrl;
   Dali::DisplayArea mDisplayArea;
 
+  Property::Index             mOverlayTextureVisualIndex{Property::INVALID_INDEX};
   Dali::Toolkit::Visual::Base mOverlayVisual;
+  Dali::Toolkit::Visual::Base mOverlayTextureVisual;
   Dali::Toolkit::Visual::Base mTextureVisual;
 
   Dali::PropertyNotification mPositionUpdateNotification;
@@ -441,6 +478,15 @@ private:
 
   Dali::VideoSyncMode mSyncMode;
   int                 mSiblingOrder;
+
+  // For frame interpolation
+  Texture mPreviousFrameTexture; ///< Texture for mNativeImageSourcePrevious
+  Texture mCurrentFrameTexture;  ///< Texture for mNativeImageSourceCurrent
+
+  float mInterpolationInterval;    ///< Target duration for interpolation in seconds
+
+  Property::Index mInterpolationFactorPropertyIndex; ///< Uniform index for uInterpolationFactor in shader
+  Dali::Animation mInterpolationAnimation;           ///< Animation to drive the interpolation factor
 };
 
 } // namespace Internal

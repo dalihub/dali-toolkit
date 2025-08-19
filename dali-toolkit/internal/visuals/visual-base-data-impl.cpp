@@ -275,7 +275,6 @@ Property::Map Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap() co
       customShader.Insert(Toolkit::Visual::Shader::Property::NAME, mName);
     }
   }
-
   return customShader;
 }
 
