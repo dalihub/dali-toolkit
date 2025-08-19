@@ -49,18 +49,18 @@ public:
   static Dali::Renderer CreateRenderer(const uint32_t blurRadius);
 
   /**
-  * @brief Get cached fragment shader with given blurRadius.
-  * @param[in] blurRadius Blur intensity
-  * @return Gaussian blur shader
-  */
+   * @brief Get cached fragment shader with given blurRadius.
+   * @param[in] blurRadius Blur intensity
+   * @return Gaussian blur shader
+   */
   static Dali::Shader& GetGaussianBlurShader(const uint32_t blurRadius);
 
   /**
-  * @brief Gets blur radius in a downscaled size. If the value is too big, fit arguments in desired range.
-  * @param[in] downscaleFactor Reference value of downscale factor.
-  * @param[in] blurRadius Reference value of blur radius.
-  * @return Downscaled(optimized) blur radius
-  */
+   * @brief Gets blur radius in a downscaled size. If the value is too big, fit arguments in desired range.
+   * @param[in] downscaleFactor Reference value of downscale factor.
+   * @param[in] blurRadius Reference value of blur radius.
+   * @return Downscaled(optimized) blur radius
+   */
   static uint32_t GetDownscaledBlurRadius(float& downscaleFactor, uint32_t& blurRadius);
 };
 } // namespace Internal

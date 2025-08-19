@@ -1412,3 +1412,121 @@ int UtcDaliMaskEffectMaskOnce(void)
 
   END_TEST;
 }
+
+int UtcDaliBackgroundBlurEffectSetSourceActor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliBackgroundBlurEffectSetSourceActor");
+
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Integration::Scene scene = application.GetScene();
+
+  Control grandParentActor = Control::New();
+  grandParentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  grandParentActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  grandParentActor.SetBackgroundColor(Color::BLACK);
+
+  Control parentActor = Control::New();
+  parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  parentActor.SetBackgroundColor(Color::RED);
+
+  scene.Add(grandParentActor);
+  grandParentActor.Add(parentActor);
+
+  Control control1 = Control::New();
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  control1.SetBackgroundColor(Color::GREEN);
+
+  Control control2 = Control::New();
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  control2.SetBackgroundColor(Color::BLUE);
+
+  Control control3 = Control::New();
+  control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control3.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  control3.SetBackgroundColor(Color::WHITE);
+
+  parentActor.Add(control1);
+  parentActor.Add(control2);
+  parentActor.Add(control3);
+
+  // Add render effect during scene on.
+  BackgroundBlurEffect effect = BackgroundBlurEffect::New(200u);
+  DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
+  // Render effect not activated.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 5 times : grand parent, parent, and control1~3\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 5, TEST_LOCATION);
+  drawTrace.Reset();
+
+  control2.SetRenderEffect(effect);
+
+  // Render effect activated.
+  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  drawTrace.Reset();
+
+  effect.SetSourceActor(parentActor);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 7 times : orignal + parent, and control1\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 7, TEST_LOCATION);
+  drawTrace.Reset();
+
+  effect.SetStopperActor(control1);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 6 times : orignal + parent\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 6, TEST_LOCATION);
+  drawTrace.Reset();
+
+  effect.SetSourceActor(Dali::Actor()); // Set empty handle
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 7 times : orignal + grand parent, parent\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 7, TEST_LOCATION);
+  drawTrace.Reset();
+
+  effect.SetStopperActor(Dali::Actor()); // Set empty handle
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  drawTrace.Reset();
+
+  effect.SetSourceActor(control1); // Set non-parent of control2
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  drawTrace.Reset();
+
+  END_TEST;
+}

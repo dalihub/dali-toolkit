@@ -35,10 +35,20 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+static constexpr uint32_t RENDER_EFFECT_RENDER_PASS_TAG = 11;
+} // namespace
+
 #if defined(DEBUG_ENABLED)
 // Keep this log filter inside of Dali::Toolkit::Internal, so subclass of RenderEffect can also use this.
 Debug::Filter* gRenderEffectLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_RENDER_EFFECT");
 #endif
+
+uint32_t RenderEffectImpl::GetRenderPassTag()
+{
+  return RENDER_EFFECT_RENDER_PASS_TAG;
+}
 
 RenderEffectImpl::RenderEffectImpl()
 : mRenderer(),

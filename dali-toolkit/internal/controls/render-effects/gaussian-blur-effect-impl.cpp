@@ -508,6 +508,7 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mSourceRenderTask.SetScreenToFrameBufferMappingActor(mHorizontalBlurActor);
   mSourceRenderTask.SetCameraActor(mCamera);
   mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
+  mSourceRenderTask.SetRenderPassTag(GetRenderPassTag());
 
   // Clear inputBackgroundTexture as scene holder
   mSourceRenderTask.SetClearEnabled(true);
