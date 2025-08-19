@@ -506,6 +506,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
   mSourceRenderTask.SetCameraActor(mCamera);
   mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
   mSourceRenderTask.SetInputEnabled(false);
+  mSourceRenderTask.SetRenderPassTag(GetRenderPassTag());
 
   ApplyRenderTaskSourceActor(mSourceRenderTask, sourceControl);
 

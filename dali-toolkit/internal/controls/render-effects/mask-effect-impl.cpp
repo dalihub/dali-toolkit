@@ -276,6 +276,7 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   mMaskTargetRenderTask.SetFrameBuffer(mMaskTargetFrameBuffer);
   mMaskTargetRenderTask.SetClearEnabled(true);
   mMaskTargetRenderTask.SetClearColor(Color::TRANSPARENT);
+  mMaskTargetRenderTask.SetRenderPassTag(GetRenderPassTag());
 
   mMaskSourceRenderTask = taskList.CreateTask();
   mMaskSourceRenderTask.SetCameraActor(mCamera);
@@ -285,6 +286,7 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   mMaskSourceRenderTask.SetFrameBuffer(mMaskSourceFrameBuffer);
   mMaskSourceRenderTask.SetClearEnabled(true);
   mMaskSourceRenderTask.SetClearColor(Color::TRANSPARENT);
+  mMaskSourceRenderTask.SetRenderPassTag(GetRenderPassTag());
 }
 
 void MaskEffectImpl::ResetMaskData()

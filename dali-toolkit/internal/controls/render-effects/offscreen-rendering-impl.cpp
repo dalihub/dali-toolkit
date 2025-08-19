@@ -153,6 +153,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
   mRenderTask.SetFrameBuffer(mFrameBuffer);
   mRenderTask.SetClearEnabled(true);
   mRenderTask.SetClearColor(Color::TRANSPARENT);
+  mRenderTask.SetRenderPassTag(GetRenderPassTag());
 }
 
 void OffScreenRenderingImpl::DestroyRenderTask()
