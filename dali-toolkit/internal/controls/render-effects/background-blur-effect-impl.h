@@ -113,6 +113,16 @@ public:
    */
   Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType& FinishedSignal();
 
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetSourceActor
+   */
+  void SetSourceActor(Dali::Actor sourceActor);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetStopperActor
+   */
+  void SetStopperActor(Dali::Actor stopperActor);
+
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation
@@ -225,6 +235,9 @@ private:
   // Variables
   float    mDownscaleFactor;
   uint32_t mBlurRadius;
+
+  Dali::WeakHandle<Dali::Actor> mUserSourceActor;  ///< Weakhandle of source actor from user.
+  Dali::WeakHandle<Dali::Actor> mUserStopperActor; ///< Weakhandle of stopper actor from user.
 
   float    mInternalDownscaleFactor;
   uint32_t mInternalBlurRadius;

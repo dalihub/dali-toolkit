@@ -612,20 +612,33 @@ void BackgroundBlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRende
   }
 
   bool        isExclusiveRequired = false;
+  bool        useUserSourceActor  = false;
+  Dali::Actor userSourceActor     = mUserSourceActor.GetHandle();
   Dali::Actor sourceActor         = sourceControl;
-  Dali::Actor stopperActor        = Dali::Actor(); // Give empty handle to invalidate previous render until option.
+  Dali::Actor stopperActor        = mUserStopperActor.GetHandle() ? mUserStopperActor.GetHandle() : Dali::Actor::DownCast(sourceControl);
 
-  stopperActor = sourceControl;
   while(sourceActor && sourceActor.GetParent())
   {
-    sourceActor              = sourceActor.GetParent();
+    sourceActor = sourceActor.GetParent();
+
+    if(userSourceActor == sourceActor)
+    {
+      useUserSourceActor = true;
+    }
+
     Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
-    if(control && GetImplementation(control).GetOffScreenRenderableType() == OffScreenRenderable::Type::FORWARD)
+    if(control && (GetImplementation(control).GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD) == OffScreenRenderable::Type::FORWARD)
     {
       sourceActor         = GetImplementation(control).GetOffScreenRenderableSourceActor();
       isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
       break;
     }
+  }
+
+  // Use user defined source actor only if it is parent of sourceControl.
+  if(useUserSourceActor)
+  {
+    sourceActor = userSourceActor;
   }
 
   sourceRenderTask.SetExclusive(isExclusiveRequired);
@@ -636,6 +649,30 @@ void BackgroundBlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRende
 Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType& BackgroundBlurEffectImpl::FinishedSignal()
 {
   return mFinishedSignal;
+}
+
+void BackgroundBlurEffectImpl::SetSourceActor(Dali::Actor sourceActor)
+{
+  mUserSourceActor = sourceActor;
+
+  if(mSourceRenderTask)
+  {
+    // Re-initialize source actor of rendertask
+    Toolkit::Control ownerControl = GetOwnerControl();
+    ApplyRenderTaskSourceActor(mSourceRenderTask, ownerControl);
+  }
+}
+
+void BackgroundBlurEffectImpl::SetStopperActor(Dali::Actor stopperActor)
+{
+  mUserStopperActor = stopperActor;
+
+  if(mSourceRenderTask)
+  {
+    // Re-initialize stopper actor of rendertask
+    Toolkit::Control ownerControl = GetOwnerControl();
+    ApplyRenderTaskSourceActor(mSourceRenderTask, ownerControl);
+  }
 }
 
 } // namespace Internal
