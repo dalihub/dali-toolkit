@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,22 +35,20 @@ namespace Text
 {
 namespace
 {
-const char* COLOR_KEY        = "color";
-const char* OFFSET_KEY       = "offset";
-const char* BLUR_RADIUS_KEY  = "blurRadius";
-const char* WIDTH_KEY        = "width";
-const char* HEIGHT_KEY       = "height";
-const char* ENABLE_KEY       = "enable";
-const char* TYPE_KEY         = "type";
-const char* DASH_WIDTH_KEY   = "dashWidth";
-const char* DASH_GAP_KEY     = "dashGap";
-const char* DIRECTION_KEY    = "direction";
-const char* STRENGTH_KEY     = "strength";
-const char* LIGHT_COLOR_KEY  = "lightColor";
+const char* COLOR_KEY = "color";
+const char* OFFSET_KEY = "offset";
+const char* BLUR_RADIUS_KEY = "blurRadius";
+const char* WIDTH_KEY = "width";
+const char* HEIGHT_KEY = "height";
+const char* ENABLE_KEY = "enable";
+const char* TYPE_KEY = "type";
+const char* DASH_WIDTH_KEY = "dashWidth";
+const char* DASH_GAP_KEY = "dashGap";
+const char* DIRECTION_KEY = "direction";
+const char* STRENGTH_KEY = "strength";
+const char* LIGHT_COLOR_KEY = "lightColor";
 const char* SHADOW_COLOR_KEY = "shadowColor";
-const char* TRUE_TOKEN       = "true";
-
-const char* EMPTY_STRING = "";
+const char* TRUE_TOKEN = "true";
 } // namespace
 
 bool ParseShadowProperties(const Property::Map& shadowPropertiesMap,
@@ -607,7 +605,7 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
         break;
       }
     } // switch
-  } // if( controller )
+  }   // if( controller )
 
   return update;
 }
@@ -771,7 +769,7 @@ bool SetShadowProperties(ControllerPtr controller, const Property::Value& value,
         break;
       }
     } // switch
-  } // if( controller )
+  }   // if( controller )
 
   return update;
 }
@@ -833,80 +831,72 @@ bool SetEmbossProperties(ControllerPtr controller, const Property::Value& value,
 
   if(controller)
   {
+    const std::string properties = value.Get<std::string>();
+
     switch(type)
     {
       case EffectStyle::DEFAULT:
       {
         const Property::Map& propertiesMap = value.Get<Property::Map>();
 
+        bool                  enabled            = false;
+        bool                  directionDefined   = false;
+        Vector2               direction;
+        bool                  strengthDefined    = false;
+        float                 strength           = 0.f;
+        bool                  lightColorDefined  = false;
+        Vector4               lightColor;
+        bool                  shadowColorDefined = false;
+        Vector4               shadowColor;
+
+        bool empty = true;
+
         if(!propertiesMap.Empty())
         {
-          bool    enabled          = false;
-          bool    directionDefined = false;
-          Vector2 direction;
-          bool    strengthDefined   = false;
-          float   strength          = 0.f;
-          bool    lightColorDefined = false;
-          Vector4 lightColor;
-          bool    shadowColorDefined = false;
-          Vector4 shadowColor;
+          empty = ParseEmbossProperties(propertiesMap,
+                                        enabled,
+                                        directionDefined,
+                                        direction,
+                                        strengthDefined,
+                                        strength,
+                                        lightColorDefined,
+                                        lightColor,
+                                        shadowColorDefined,
+                                        shadowColor);
+        }
 
-          bool empty = ParseEmbossProperties(propertiesMap,
-                                             enabled,
-                                             directionDefined,
-                                             direction,
-                                             strengthDefined,
-                                             strength,
-                                             lightColorDefined,
-                                             lightColor,
-                                             shadowColorDefined,
-                                             shadowColor);
-
-          if(!empty)
+        if(!empty)
+        {
+          if(enabled != controller->IsEmbossEnabled())
           {
-            if(enabled != controller->IsEmbossEnabled())
-            {
-              controller->SetEmbossEnabled(enabled);
-              update = true;
-            }
-
-            // Sets the default emboss values.
-            if(directionDefined && (controller->GetEmbossDirection() != direction))
-            {
-              controller->SetEmbossDirection(direction);
-              update = true;
-            }
-
-            if(strengthDefined && (fabsf(controller->GetEmbossStrength() - strength) > Math::MACHINE_EPSILON_1000))
-            {
-              controller->SetEmbossStrength(strength);
-              update = true;
-            }
-
-            if(lightColorDefined && (controller->GetEmbossLightColor() != lightColor))
-            {
-              controller->SetEmbossLightColor(lightColor);
-              update = true;
-            }
-
-            if(shadowColorDefined && (controller->GetEmbossShadowColor() != shadowColor))
-            {
-              controller->SetEmbossShadowColor(shadowColor);
-              update = true;
-            }
-          }
-          else
-          {
-            // Disable emboss.
-            if(controller->IsEmbossEnabled())
-            {
-              controller->SetEmbossEnabled(false);
-              update = true;
-            }
+            controller->SetEmbossEnabled(enabled);
+            update = true;
           }
 
-          // Note : This code is for keep legacy logics, which is not using Property::Map.
-          controller->SetDefaultEmbossProperties(EMPTY_STRING);
+          // Sets the default emboss values.
+          if(directionDefined && (controller->GetEmbossDirection() != direction))
+          {
+            controller->SetEmbossDirection(direction);
+            update = true;
+          }
+
+          if(strengthDefined && (fabsf(controller->GetEmbossStrength() - strength) > Math::MACHINE_EPSILON_1000))
+          {
+            controller->SetEmbossStrength(strength);
+            update = true;
+          }
+
+          if(lightColorDefined && (controller->GetEmbossLightColor() != lightColor))
+          {
+            controller->SetEmbossLightColor(lightColor);
+            update = true;
+          }
+
+          if(shadowColorDefined && (controller->GetEmbossShadowColor() != shadowColor))
+          {
+            controller->SetEmbossShadowColor(shadowColor);
+            update = true;
+          }
         }
         else
         {
@@ -916,11 +906,6 @@ bool SetEmbossProperties(ControllerPtr controller, const Property::Value& value,
             controller->SetEmbossEnabled(false);
             update = true;
           }
-
-          // Note : This code is for keep legacy logics, which is not using Property::Map.
-          const std::string embossString = value.Get<std::string>();
-
-          controller->SetDefaultEmbossProperties(embossString);
         }
         break;
       }
@@ -945,30 +930,22 @@ void GetEmbossProperties(ControllerPtr controller, Property::Value& value, Effec
     {
       case EffectStyle::DEFAULT:
       {
-        // Note : This code is for keep legacy logics, which is not using Property::Map.
-        const std::string embossString = controller->GetDefaultEmbossProperties();
-        if(embossString.empty())
-        {
-          const bool     enabled     = controller->IsEmbossEnabled();
-          const Vector2& direction   = controller->GetEmbossDirection();
-          const float    strength    = controller->GetEmbossStrength();
-          const Vector4& lightColor  = controller->GetEmbossLightColor();
-          const Vector4& shadowColor = controller->GetEmbossShadowColor();
+        const bool     enabled     = controller->IsEmbossEnabled();
+        const Vector2& direction   = controller->GetEmbossDirection();
+        const float    strength    = controller->GetEmbossStrength();
+        const Vector4& lightColor  = controller->GetEmbossLightColor();
+        const Vector4& shadowColor = controller->GetEmbossShadowColor();
 
-          Property::Map map;
+        Property::Map map;
 
-          map.Insert(ENABLE_KEY, enabled);
-          map.Insert(DIRECTION_KEY, direction);
-          map.Insert(STRENGTH_KEY, strength);
-          map.Insert(LIGHT_COLOR_KEY, lightColor);
-          map.Insert(SHADOW_COLOR_KEY, shadowColor);
+        map.Insert(ENABLE_KEY, enabled);
+        map.Insert(DIRECTION_KEY, direction);
+        map.Insert(STRENGTH_KEY, strength);
+        map.Insert(LIGHT_COLOR_KEY, lightColor);
+        map.Insert(SHADOW_COLOR_KEY, shadowColor);
 
-          value = map;
-        }
-        else
-        {
-          value = embossString;
-        }
+        value = map;
+
         break;
       }
       case EffectStyle::INPUT:
@@ -992,7 +969,7 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
       {
         const Property::Map& propertiesMap = value.Get<Property::Map>();
 
-        bool     colorDefined = false;
+        bool     colorDefined  = false;
         Vector4  color;
         bool     widthDefined  = false;
         uint16_t width         = 0u;
@@ -1075,7 +1052,7 @@ bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value
         break;
       }
     } // switch
-  } // if( controller )
+  }   // if( controller )
 
   return update;
 }
@@ -1177,7 +1154,7 @@ bool SetBackgroundProperties(ControllerPtr controller, const Property::Value& va
         break;
       }
     } // switch
-  } // if( controller )
+  }   // if( controller )
 
   return update;
 }
@@ -1302,7 +1279,7 @@ bool SetStrikethroughProperties(ControllerPtr controller, const Property::Value&
         break;
       }
     } // switch
-  } // if( controller )
+  }   // if( controller )
 
   return update;
 }
