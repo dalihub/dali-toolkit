@@ -505,7 +505,7 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mSourceRenderTask.SetSourceActor(sourceControl); // -> should use cache renderer
   mSourceRenderTask.SetExclusive(true);
   mSourceRenderTask.SetInputEnabled(true);
-  mSourceRenderTask.SetScreenToFrameBufferMappingActor(mHorizontalBlurActor);
+  mSourceRenderTask.SetScreenToFrameBufferMappingActor(sourceControl);
   mSourceRenderTask.SetCameraActor(mCamera);
   mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
 
@@ -519,7 +519,7 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetExclusive(true);
   mHorizontalBlurTask.SetInputEnabled(true);
-  mHorizontalBlurTask.SetScreenToFrameBufferMappingActor(mVerticalBlurActor);
+  mHorizontalBlurTask.SetScreenToFrameBufferMappingActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
 
@@ -533,7 +533,7 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
   mVerticalBlurTask.SetExclusive(true);
   mVerticalBlurTask.SetInputEnabled(true);
-  mVerticalBlurTask.SetScreenToFrameBufferMappingActor(sourceControl);
+  mVerticalBlurTask.SetScreenToFrameBufferMappingActor(mVerticalBlurActor);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
 

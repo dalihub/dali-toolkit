@@ -127,7 +127,10 @@ void RenderEffectImpl::ClearOwnerControl()
     mPlacementSceneHolder.Reset();
 
     // Make previous owner don't have render effect, after make we don't have owner control now.
-    previousOwnerControl.ClearRenderEffect();
+    if(previousOwnerControl.GetRenderEffect().GetObjectPtr() == this)
+    {
+      previousOwnerControl.ClearRenderEffect();
+    }
   }
 }
 
