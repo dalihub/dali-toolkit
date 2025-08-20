@@ -5232,6 +5232,87 @@ int UtcDaliColorVisualCustomShader(void)
   END_TEST;
 }
 
+int UtcDaliColorVisualMultipleCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliColorVisualMultipleCustomShader");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Array shaderArray;
+  Property::Map     shaderA;
+  const std::string vertexShaderA                                   = "FoobarA";
+  const std::string fragmentShaderA                                 = "FoobarA";
+  shaderA[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderA;
+  shaderA[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderA;
+
+  Property::Map     shaderB;
+  const std::string vertexShaderB                                   = "FoobarB";
+  const std::string fragmentShaderB                                 = "FoobarB";
+  shaderB[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderB;
+  shaderB[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderB;
+
+  shaderArray.PushBack(shaderA);
+  shaderArray.PushBack(shaderB);
+
+  Property::Map properties;
+  properties[Visual::Property::TYPE]           = Visual::COLOR;
+  properties[Visual::Property::SHADER]         = shaderArray;
+  properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+
+  Visual::Base visual = factory.CreateVisual(properties);
+
+  // trigger creation through setting on stage
+  DummyControl        dummy     = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Property::Map createdMap;
+  visual.CreatePropertyMap(createdMap);
+  Property::Array* createdArray = createdMap[Visual::Property::SHADER].GetArray();
+  DALI_TEST_CHECK(createdArray != nullptr);
+  DALI_TEST_CHECK(createdArray->Count() == 2);
+
+  dummy.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  application.GetScene().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer        renderer = dummy.GetRendererAt(0);
+  Shader          shader   = renderer.GetShader();
+  Property::Value value    = shader.GetProperty(Shader::Property::PROGRAM);
+
+  DALI_TEST_CHECK(value.GetType() == Property::ARRAY);
+  Property::Array* programArray = value.GetArray();
+  DALI_TEST_CHECK(programArray != nullptr);
+  DALI_TEST_CHECK(programArray->Count() == 2);
+
+  Property::Map* shaderMapA = programArray->GetElementAt(0).GetMap();
+  DALI_TEST_CHECK(shaderMapA != nullptr);
+
+  Property::Value* vertexA = shaderMapA->Find("vertex"); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS(vertexShaderA, vertexA->Get<std::string>(), TEST_LOCATION);
+
+  Property::Value* fragmentA = shaderMapA->Find("fragment"); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS(fragmentShaderA, fragmentA->Get<std::string>(), TEST_LOCATION);
+
+  Property::Map* shaderMapB = programArray->GetElementAt(1).GetMap();
+  DALI_TEST_CHECK(shaderMapB != nullptr);
+
+  Property::Value* vertexB = shaderMapB->Find("vertex"); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS(vertexShaderB, vertexB->Get<std::string>(), TEST_LOCATION);
+
+  Property::Value* fragmentB = shaderMapB->Find("fragment"); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS(fragmentShaderB, fragmentB->Get<std::string>(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVisualGetType(void)
 {
   ToolkitTestApplication application;

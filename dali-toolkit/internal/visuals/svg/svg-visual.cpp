@@ -118,7 +118,7 @@ void SvgVisual::OnInitialize()
   mImpl->mRenderer  = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
     mImpl->mRenderer.RegisterVisualTransformUniform();
   }
@@ -323,7 +323,7 @@ void SvgVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 
 bool SvgVisual::AttemptAtlasing() const
 {
-  return (!mImpl->mCustomShader && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
+  return (!IsUsingCustomShader() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }
 
 void SvgVisual::EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
@@ -540,7 +540,7 @@ void SvgVisual::UpdateShader()
 Shader SvgVisual::GenerateShader() const
 {
   Shader shader;
-  if(!mImpl->mCustomShader)
+  if(!IsUsingCustomShader())
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
@@ -551,9 +551,9 @@ Shader SvgVisual::GenerateShader() const
   }
   else
   {
-    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
-                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
-                         mImpl->mCustomShader->mHints);
+    shader = Shader::New(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->GetCustomShaderAt(0)->mVertexShader,
+                         mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->GetCustomShaderAt(0)->mFragmentShader,
+                         mImpl->GetCustomShaderAt(0)->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
 

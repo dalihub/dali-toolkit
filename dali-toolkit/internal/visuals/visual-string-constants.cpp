@@ -202,6 +202,7 @@ const char* const CUSTOM_VERTEX_SHADER("vertexShader");
 const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
 const char* const CUSTOM_SUBDIVIDE_GRID_X("subdivideGridX");
 const char* const CUSTOM_SUBDIVIDE_GRID_Y("subdivideGridY");
+const char* const CUSTOM_RENDER_PASS_TAG("renderPassTag");
 const char* const CUSTOM_SHADER_HINTS("hints");
 const char* const CUSTOM_SHADER_NAME("name");
 

@@ -78,7 +78,7 @@ void NPatchVisual::LoadImages()
 
   if(mId == NPatchData::INVALID_NPATCH_DATA_ID)
   {
-    bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
+    bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !IsUsingCustomShader() ? true : false;
     mId                    = mLoader.Load(textureManager, this, mImageUrl, mBorder, preMultiplyOnLoad, synchronousLoading);
 
     NPatchDataPtr data;
@@ -90,7 +90,7 @@ void NPatchVisual::LoadImages()
 
   if(mAuxiliaryTextureId == TextureManager::INVALID_TEXTURE_ID && mAuxiliaryUrl.IsValid())
   {
-    auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
+    auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !IsUsingCustomShader()
                                ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
@@ -459,7 +459,7 @@ Shader NPatchVisual::CreateShader()
     yStretchCount = data->GetStretchPixelsY().Count();
   }
 
-  if(DALI_LIKELY(!mImpl->mCustomShader))
+  if(DALI_LIKELY(!IsUsingCustomShader()))
   {
     if(DALI_LIKELY((xStretchCount == 1 && yStretchCount == 1) ||
                    (xStretchCount == 0 && yStretchCount == 0)))
@@ -492,11 +492,11 @@ Shader NPatchVisual::CreateShader()
   {
     Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
 
-    if(!mImpl->mCustomShader->mFragmentShader.empty())
+    if(!mImpl->GetCustomShaderAt(0)->mFragmentShader.empty())
     {
-      fragmentShader = mImpl->mCustomShader->mFragmentShader.c_str();
+      fragmentShader = mImpl->GetCustomShaderAt(0)->mFragmentShader.c_str();
     }
-    hints = mImpl->mCustomShader->mHints;
+    hints = mImpl->GetCustomShaderAt(0)->mHints;
 
     /* Apply Custom Vertex Shader only if image is 9-patch */
     if((xStretchCount == 1 && yStretchCount == 1) ||
@@ -504,9 +504,9 @@ Shader NPatchVisual::CreateShader()
     {
       const char* vertexShader = SHADER_NPATCH_VISUAL_3X3_SHADER_VERT.data();
 
-      if(!mImpl->mCustomShader->mVertexShader.empty())
+      if(!mImpl->GetCustomShaderAt(0)->mVertexShader.empty())
       {
-        vertexShader = mImpl->mCustomShader->mVertexShader.c_str();
+        vertexShader = mImpl->GetCustomShaderAt(0)->mVertexShader.c_str();
       }
       shader = Shader::New(vertexShader, fragmentShader, hints);
     }

@@ -174,6 +174,18 @@ public:
   void SetCustomShader(const Property::Map& propertyMap);
 
   /**
+   * @brief Sets properties of custom shader
+   * @param[in] propertyArray Property array containing multiple custom shader data
+   */
+  void SetCustomShader(const Property::Array& propertyArray);
+
+  /**
+   * @brief Retrieves whether the visual uses Custom shader or not.
+   * @return True if the visual uses Custom Shader.
+   */
+  bool IsUsingCustomShader() const;
+
+  /**
    * @copydoc Toolkit::Visual::Base::SetProperty
    */
   void SetProperty(Dali::Property::Index index, const Dali::Property::Value& propertyValue);
