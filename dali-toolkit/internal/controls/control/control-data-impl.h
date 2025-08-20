@@ -555,8 +555,9 @@ public:
   std::unordered_set<Property::Index> mPropertyOnAnimation; ///< Properties that are currently on animation
 
   // Off screen rendering context
-  std::unique_ptr<OffScreenRenderingImpl> mOffScreenRenderingImpl;
-  DevelControl::OffScreenRenderingType    mOffScreenRenderingType;
+  std::unique_ptr<OffScreenRenderingImpl>                mOffScreenRenderingImpl;
+  DevelControl::OffScreenRenderingType                   mOffScreenRenderingType;
+  Toolkit::Control::OffScreenRenderingFinishedSignalType mOffScreenRenderingFinishedSignal; ///< Emits only when type is REFRESH_ONCE
 
   // Tooltip
   TooltipPtr mTooltip;

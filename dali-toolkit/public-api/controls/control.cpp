@@ -165,6 +165,14 @@ Control::ResourceReadySignalType& Control::ResourceReadySignal()
   return controlImpl.mResourceReadySignal;
 }
 
+Control::OffScreenRenderingFinishedSignalType& Control::OffScreenRenderingFinishedSignal()
+{
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+
+  return controlImpl.mOffScreenRenderingFinishedSignal;
+}
+
 Control::Control(Internal::Control& implementation)
 : CustomActor(implementation)
 {
