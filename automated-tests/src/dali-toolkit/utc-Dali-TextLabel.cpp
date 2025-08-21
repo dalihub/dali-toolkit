@@ -3714,3 +3714,27 @@ int utcDaliTextLabelSetMaskEffect(void)
 
   END_TEST;
 }
+
+int utcDaliTextLabelNaturalSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelNaturalSize");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world");
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize = label.GetNaturalSize();
+  DALI_TEST_CHECK(naturalSize.x > 0);
+  DALI_TEST_CHECK(naturalSize.y > 0);
+
+  // Set empty text.
+  label.SetProperty(TextLabel::Property::TEXT, "");
+  DALI_TEST_EQUALS(Vector3(0.f, 0.f, 0.f), label.GetNaturalSize(), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
