@@ -30,7 +30,7 @@ namespace Internal DALI_INTERNAL
 class PropertyBridge;
 }
 
-using StringGetterDelegate = const char* (*)(Actor actor, const char* propertyName);
+using StringGetterDelegate = void(*)(void* obj, const char* propertyName, std::string* result);
 
 /**
  * PropertyBridge

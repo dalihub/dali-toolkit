@@ -73,16 +73,13 @@ Dali::Toolkit::PropertyBridge PropertyBridge::Get()
   return bridgeHandle;
 }
 
-std::string PropertyBridge::GetStringProperty(Actor actor, const std::string& propertyName)
+std::string PropertyBridge::GetStringProperty(Dali::Actor actor, const std::string& propertyName)
 {
   std::string result;
   if(EnsureStringGetter())
   {
-    const char* stringProperty = mStringGetter(actor, propertyName.c_str());
-    if(stringProperty)
-    {
-      result = stringProperty;
-    }
+    void* refObject = actor ? actor.GetObjectPtr() : nullptr;
+    mStringGetter(refObject, propertyName.c_str(), &result);
   }
   return result;
 }
@@ -91,7 +88,7 @@ bool PropertyBridge::EnsureStringGetter()
 {
   if(!gStringGetter)
   {
-    DALI_LOG_ERROR("No gStringGetter!\n");
+    DALI_LOG_ERROR("StringGetter not registered!\n");
     return false;
   }
 
