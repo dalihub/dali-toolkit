@@ -5245,12 +5245,14 @@ int UtcDaliColorVisualMultipleCustomShader(void)
   const std::string fragmentShaderA                                 = "FoobarA";
   shaderA[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderA;
   shaderA[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderA;
+  shaderA[Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 1;
 
   Property::Map     shaderB;
   const std::string vertexShaderB                                   = "FoobarB";
   const std::string fragmentShaderB                                 = "FoobarB";
   shaderB[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderB;
   shaderB[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderB;
+  shaderB[Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 2;
 
   shaderArray.PushBack(shaderA);
   shaderArray.PushBack(shaderB);
@@ -5272,6 +5274,15 @@ int UtcDaliColorVisualMultipleCustomShader(void)
   Property::Array* createdArray = createdMap[Visual::Property::SHADER].GetArray();
   DALI_TEST_CHECK(createdArray != nullptr);
   DALI_TEST_CHECK(createdArray->Count() == 2);
+
+  Property::Map* createdMapA = createdArray->GetElementAt(0).GetMap();
+  DALI_TEST_CHECK(createdMapA != nullptr);
+
+  Property::Map* createdMapB = createdArray->GetElementAt(1).GetMap();
+  DALI_TEST_CHECK(createdMapB != nullptr);
+
+  DALI_TEST_CHECK(createdMapA->Find(Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG)->Get<int>() == 1);
+  DALI_TEST_CHECK(createdMapB->Find(Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG)->Get<int>() == 2);
 
   dummy.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

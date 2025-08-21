@@ -252,8 +252,6 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
     {
       case Toolkit::Visual::Property::SHADER:
       {
-        Property::Map shaderMap;
-        value.Get(shaderMap);
         if(value.GetType() == Property::MAP)
         {
           const Dali::Property::Map* map = value.GetMap();

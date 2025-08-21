@@ -149,6 +149,7 @@ Internal::Visual::Base::Impl::~Impl()
 Internal::Visual::Base::Impl::CustomShader::CustomShader(const Property::Map& map)
 : mGridSize(1, 1),
   mHints(Shader::Hint::NONE),
+  mRenderPassTag(0),
   mName("")
 {
   SetPropertyMap(map);
@@ -238,9 +239,9 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
 
 Property::Map Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap() const
 {
+  Property::Map customShader;
   if(!mVertexShader.empty() || !mFragmentShader.empty())
   {
-    Property::Map customShader;
     if(!mVertexShader.empty())
     {
       customShader.Insert(Toolkit::Visual::Shader::Property::VERTEX_SHADER, mVertexShader);
@@ -259,6 +260,11 @@ Property::Map Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap() co
       customShader.Insert(Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y, mGridSize.GetHeight());
     }
 
+    if(mRenderPassTag >= 0)
+    {
+      customShader.Insert(Toolkit::Visual::Shader::Property::RENDER_PASS_TAG, mRenderPassTag);
+    }
+
     if(mHints != Dali::Shader::Hint::NONE)
     {
       customShader.Insert(Toolkit::Visual::Shader::Property::HINTS, static_cast<int>(mHints));
@@ -268,9 +274,9 @@ Property::Map Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap() co
     {
       customShader.Insert(Toolkit::Visual::Shader::Property::NAME, mName);
     }
-
-    return customShader;
   }
+
+  return customShader;
 }
 
 Internal::Visual::Base::Impl::Transform::Transform()
