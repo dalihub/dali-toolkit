@@ -327,6 +327,9 @@ int UtcDaliControlAccessibilityRole(void)
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::NONE);
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::UNKNOWN), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::NOTIFICATION);
+  DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::NOTIFICATION), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
+
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::PASSWORD_TEXT);
   DALI_TEST_EQUALS(static_cast<uint32_t>(Dali::Accessibility::Role::PASSWORD_TEXT), TestGetRole(accessible->GetAddress()), TEST_LOCATION);
 
