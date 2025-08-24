@@ -35,69 +35,161 @@ void dali_property_bridge_cleanup(void)
 
 namespace
 {
-static const char* EMPTY_STRING = "";
+static std::unordered_map<void*, std::string> gActorStringTable;
 
-static const char* TestStringGetter(Actor actor, const char* propertyName)
+// Normal case: return mapped NAME property
+static void TestStringGetter_Default(void* refObject, const char* propertyName, std::string* out)
 {
-  if(actor)
+  if(!out)
   {
-    if(std::string(propertyName) == "NAME")
-    {
-      thread_local std::string value = actor.GetProperty<std::string>(Actor::Property::NAME).c_str();
-      return value.c_str();
-    }
+    return;
   }
-  return EMPTY_STRING;
+
+  if(!refObject || !propertyName)
+  {
+    *out = std::string();
+    return;
+  }
+
+  if(std::string(propertyName) != "NAME")
+  {
+    *out = std::string();
+    return;
+  }
+
+  auto it = gActorStringTable.find(refObject);
+  if(it == gActorStringTable.end())
+  {
+    *out = std::string(); // empty string
+    return;
+  }
+
+  *out = it->second;
 }
+
+// Always empty string
+static void TestStringGetter_Empty(void* /*refObject*/, const char* /*propertyName*/, std::string* out)
+{
+  if(!out)
+  {
+    return;
+  }
+  *out = std::string();
+}
+
+// Always null (no value)
+static void TestStringGetter_Null(void* /*refObject*/, const char* /*propertyName*/, std::string* /*out*/)
+{
+  // intentionally no write
+}
+
+// Write
+static void TestStringGetter_ChangedRequired(void* /*refObject*/, const char* /*propertyName*/, std::string* out)
+{
+  if(!out)
+  {
+    return;
+  }
+  *out = "ABC";
+}
+
 } // namespace
 
-int UtcDaliToolkitPropertyBridgeGetStringPropertyN(void)
+int UtcDaliToolkitPropertyBridge_GetStringProperty_N(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitPropertyBridgeGetStringPropertyN");
-
-  const char* propertyName   = "NAME";
-  const char* expectedResult = "PROPERTY_BRIDGE";
+  tet_infoline(" UtcDaliToolkitPropertyBridge_GetStringProperty_N");
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::NAME, expectedResult);
-  DALI_TEST_EQUALS(expectedResult, actor.GetProperty<std::string>(Actor::Property::NAME).c_str(), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::NAME, "PROPERTY_BRIDGE");
 
-  std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, propertyName);
-  DALI_TEST_EQUALS(EMPTY_STRING, result, TEST_LOCATION);
+  // Getter not registered, should return empty
+  std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, "NAME");
+  DALI_TEST_EQUALS(result, std::string(), TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcDaliToolkitPropertyBridgeGetStringPropertyP(void)
+int UtcDaliToolkitPropertyBridge_GetStringProperty_P(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitPropertyBridgeGetStringPropertyP");
+  tet_infoline(" UtcDaliToolkitPropertyBridge_GetStringProperty_P");
 
   const char* propertyName   = "NAME";
   const char* expectedResult = "PROPERTY_BRIDGE";
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, expectedResult);
-  DALI_TEST_EQUALS(expectedResult, actor.GetProperty<std::string>(Actor::Property::NAME).c_str(), TEST_LOCATION);
 
-  StringGetterDelegate getter = TestStringGetter;
-  DALI_TEST_CHECK(getter);
+  gActorStringTable[actor.GetObjectPtr()] = expectedResult;
 
+  StringGetterDelegate getter = TestStringGetter_Default;
   Dali::Toolkit::PropertyBridgeRegisterStringGetter(getter);
 
+  // Getter registered, should return NAME
   std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, propertyName);
-  DALI_TEST_EQUALS(expectedResult, result.c_str(), TEST_LOCATION);
+  DALI_TEST_EQUALS(result, std::string(expectedResult), TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcDaliToolkitPropertyBridgeRegisterStringGetter(void)
+int UtcDaliToolkitPropertyBridge_GetStringProperty_Empty(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitPropertyBridgeRegisterStringGetter");
+  tet_infoline(" UtcDaliToolkitPropertyBridge_GetStringProperty_Empty");
 
-  StringGetterDelegate getter = TestStringGetter;
+  Actor actor = Actor::New();
+
+  // Getter returns Empty string, result should be empty
+  StringGetterDelegate getter = TestStringGetter_Empty;
+  Dali::Toolkit::PropertyBridgeRegisterStringGetter(getter);
+
+  std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, "ANY");
+  DALI_TEST_EQUALS(result, std::string(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitPropertyBridge_GetStringProperty_Null(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitPropertyBridge_GetStringProperty_Null");
+
+  Actor actor = Actor::New();
+
+  // Getter writes nothing, result should be empty
+  StringGetterDelegate getter = TestStringGetter_Null;
+  Dali::Toolkit::PropertyBridgeRegisterStringGetter(getter);
+
+  std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, "ANY");
+  DALI_TEST_EQUALS(result, std::string(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitPropertyBridge_GetStringProperty_ChangedRequired(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitPropertyBridge_GetStringProperty_ChangedRequired");
+
+  Actor actor = Actor::New();
+
+  // Getter writes "ABC"
+  StringGetterDelegate getter = TestStringGetter_ChangedRequired;
+  Dali::Toolkit::PropertyBridgeRegisterStringGetter(getter);
+
+  std::string result = Dali::Toolkit::PropertyBridge::Get().GetStringProperty(actor, "NAME");
+  DALI_TEST_EQUALS(result, std::string("ABC"), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitPropertyBridge_RegisterStringGetter(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitPropertyBridge_RegisterStringGetter");
+
+  StringGetterDelegate getter = TestStringGetter_Default;
   DALI_TEST_CHECK(getter);
 
   Dali::Toolkit::PropertyBridgeRegisterStringGetter(getter);
