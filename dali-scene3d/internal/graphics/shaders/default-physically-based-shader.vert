@@ -57,8 +57,12 @@ UNIFORM_BLOCK VertBlock0
 #endif
   UNIFORM highp int uBlendShapeComponentSize;///< The size in the texture of either the vertices, normals or tangents. Used to calculate the offset to address them.
 #endif
+};
 
+UNIFORM_BLOCK ShadowVertBlock
+{
   // Shadow
+  UNIFORM lowp int uIsShadowEnabled;
   UNIFORM highp mat4 uShadowLightViewProjectionMatrix;
 };
 
@@ -68,11 +72,6 @@ UNIFORM_BLOCK YDirection
     UNIFORM mediump vec3 uYDirection;
 };
 #endif
-
-UNIFORM_BLOCK ShadowEnabled
-{
-  UNIFORM lowp int uIsShadowEnabled;
-};
 
 // Additional uniform block if using more bones
 #ifdef SKINNING
@@ -88,6 +87,7 @@ OUTPUT highp vec2 vUV;
 OUTPUT highp mat3 vTBN;
 OUTPUT highp vec4 vColor;
 OUTPUT highp vec3 vPositionToCamera;
+FLAT OUTPUT lowp float vIsShadowEnabled;
 
 void main()
 {
@@ -210,6 +210,7 @@ void main()
   vColor = aVertexColor;
 
   positionFromLightView = vec3(1.0);
+  vIsShadowEnabled = float(uIsShadowEnabled);
   if(uIsShadowEnabled > 0)
   {
     highp vec4 positionInLightView = uShadowLightViewProjectionMatrix * positionW;

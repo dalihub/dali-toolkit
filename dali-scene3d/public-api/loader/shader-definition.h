@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 #define DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/uniform-block.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -51,7 +52,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other) = delete;
 
-  ShaderDefinition(ShaderDefinition&&) = default;
+  ShaderDefinition(ShaderDefinition&&)            = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /**
@@ -81,6 +82,8 @@ public: // DATA
   std::vector<ShaderOption::MacroDefinition> mMacros;
   std::vector<std::string>                   mHints;
   Property::Map                              mUniforms;
+
+  std::vector<Dali::UniformBlock> mUniformBlocks{}; ///< Uniform blocks to be connected to shader.
 
   uint64_t mShadowOptionHash{0u};
   bool     mUseBuiltInShader{false};
