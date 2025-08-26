@@ -59,6 +59,7 @@ class Control;
  * | keyInputFocusGained    | @ref KeyInputFocusGainedSignal()                    |
  * | keyInputFocusLost      | @ref KeyInputFocusLostSignal()                      |
  * | resourceReady          | @ref ResourceReadySignal()                          |
+ * | offscreenRenderingFinished | @ref OffScreenRenderingFinishedSignal()       |
  * | tapped                 | @ref GetTapGestureDetector().DetectedSignal()       |
  * | panned                 | @ref GetPanGestureDetector().DetectedSignal()       |
  * | pinched                | @ref GetPinchGestureDetector().DetectedSignal()     |
@@ -171,6 +172,9 @@ public:
 
   /// @brief ResourceReady signal type. @SINCE_1_2.60
   typedef Signal<void(Control)> ResourceReadySignalType;
+
+  /// @brief Offscreen rendering finished signal type. @SINCE_2_4.33
+  typedef Signal<void()> OffScreenRenderingFinishedSignalType;
 
 public: // Creation & Destruction
   /**
@@ -508,6 +512,22 @@ public:
    * @note A RelayoutRequest is queued by Control before this signal is emitted
    */
   ResourceReadySignalType& ResourceReadySignal();
+
+  /**
+   * @brief This signal is emitted when offscreen rendering is finished.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName();
+   * @endcode
+   *
+   * @SINCE_2_4.33
+   * @return The signal to connect to
+   * @pre The Control has been initialized.
+   * @note This signal is emitted when the offscreen rendering task is completed.
+   * @note This signal is only emitted when OffScreenRenderingType is set to RENDER_ONCE.
+   */
+  OffScreenRenderingFinishedSignalType& OffScreenRenderingFinishedSignal();
 
 public: // Intended for control developers
   /**

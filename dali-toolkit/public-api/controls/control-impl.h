@@ -28,6 +28,7 @@
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/type-info.h>
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -294,6 +295,12 @@ public:
    * @return true if this control is set as a focus group for keyboard navigation
    */
   bool IsKeyboardFocusGroup();
+
+  /**
+   * @brief Get texture output of offscreen rendering.
+   * @note Valid only when OffScreenRenderingType::RENDER_ONCE
+   */
+  Dali::Texture GetOffScreenRenderingOutput() const;
 
   /// @cond internal
   /**

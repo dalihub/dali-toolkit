@@ -63,6 +63,11 @@ void OffScreenRenderingImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTas
 {
 }
 
+Dali::Texture OffScreenRenderingImpl::GetTexture() const
+{
+  return mTexture;
+}
+
 void OffScreenRenderingImpl::OnInitialize()
 {
 }
@@ -154,6 +159,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
   mRenderTask.SetClearEnabled(true);
   mRenderTask.SetClearColor(Color::TRANSPARENT);
   mRenderTask.SetRenderPassTag(GetRenderPassTag());
+  mRenderTask.FinishedSignal().Connect(this, &OffScreenRenderingImpl::OnRenderFinished);
 }
 
 void OffScreenRenderingImpl::DestroyRenderTask()
@@ -166,6 +172,13 @@ void OffScreenRenderingImpl::DestroyRenderTask()
   }
 
   mRenderTask.Reset();
+}
+
+void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask& task)
+{
+  mTexture = mFrameBuffer.GetColorTexture();
+
+  GetOwnerControl().OffScreenRenderingFinishedSignal().Emit();
 }
 
 } // namespace Internal

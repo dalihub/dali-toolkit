@@ -479,6 +479,16 @@ bool Control::EmitKeyEventSignal(const KeyEvent& event)
   return consumed;
 }
 
+Dali::Texture Control::GetOffScreenRenderingOutput() const
+{
+  if(mImpl->mOffScreenRenderingType != DevelControl::OffScreenRenderingType::REFRESH_ONCE)
+  {
+    DALI_LOG_ERROR("Precondition unsatisfied: Set property OFFSCREEN_RENDERING to OffScreenRenderingType::REFRESH_ONCE\n");
+    return Dali::Texture();
+  }
+  return mImpl->mOffScreenRenderingImpl->GetTexture();
+}
+
 Control::Control(ControlBehaviour behaviourFlags)
 : CustomActorImpl(static_cast<ActorFlags>(behaviourFlags)),
   mImpl(new Impl(*this))
