@@ -48,7 +48,7 @@ void SetAutoRotationEnabled(VideoView videoView, bool enable)
 
 bool IsAutoRotationEnabled(VideoView videoView)
 {
-return Dali::Toolkit::GetImpl(videoView).IsAutoRotationEnabled();
+  return Dali::Toolkit::GetImpl(videoView).IsAutoRotationEnabled();
 }
 
 void SetLetterBoxEnabled(VideoView videoView, bool enable)
@@ -59,6 +59,21 @@ void SetLetterBoxEnabled(VideoView videoView, bool enable)
 bool IsLetterBoxEnabled(VideoView videoView)
 {
   return Dali::Toolkit::GetImpl(videoView).IsLetterBoxEnabled();
+}
+
+void SetFrameInterpolationInterval(VideoView videoView, float intervalSeconds)
+{
+  Dali::Toolkit::GetImpl(videoView).SetFrameInterpolationInterval(intervalSeconds);
+}
+
+float GetFrameInterpolationInterval(VideoView videoView)
+{
+  return Dali::Toolkit::GetImpl(videoView).GetFrameInterpolationInterval();
+}
+
+void SetNativeImageSourceForCurrentFrame(VideoView videoView, NativeImageSourcePtr nativeImageSource)
+{
+  Dali::Toolkit::GetImpl(videoView).SetNativeImageSourceForCurrentFrame(nativeImageSource);
 }
 
 } // namespace DevelVideoView

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
+#include <dali/public-api/adaptor-framework/native-image-source.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
@@ -91,6 +92,42 @@ DALI_TOOLKIT_API void SetLetterBoxEnabled(VideoView videoView, bool enable);
  * @return true if letter box is enabled, false otherwise. Default value is false.
  */
 DALI_TOOLKIT_API bool IsLetterBoxEnabled(VideoView videoView);
+
+/**
+ * @brief Sets the time interval for frame interpolation.
+ *
+ * The interpolation factor will progress from 0.0 to 1.0 over this duration.
+ * This interval is applied after the next call to SetNativeImageSourceForCurrentFrame.
+ *
+ * @param[in] videoView The current VideoView
+ * @param[in] intervalSeconds The duration in seconds for interpolation.
+ * @SINCE_2_4.34
+ */
+DALI_TOOLKIT_API void SetFrameInterpolationInterval(VideoView videoView, float intervalSeconds);
+
+/**
+ * @brief Gets the time interval for frame interpolation.
+ *
+ * @param[in] videoView The current VideoView
+ * @return The duration in seconds for interpolation.
+ * @note This method must be called on the main thread.
+ * @SINCE_2_4.34
+ */
+DALI_TOOLKIT_API float GetFrameInterpolationInterval(VideoView videoView);
+
+/**
+ * @brief Sets the NativeImageSource for the current video frame.
+ *
+ * This method updates the texture used for the current frame and resets the interpolation timer.
+ * The VideoView will then start interpolating between the previous frame and this new frame
+ * over the interval set by SetFrameInterpolationInterval.
+ *
+ * @param[in] videoView The current VideoView
+ * @param[in] nativeImageSource A handle to the NativeImageSource containing the current video frame (tbm_surface).
+ * @note This method must be called on the main thread.
+ * @SINCE_2_4.34
+ */
+DALI_TOOLKIT_API void SetNativeImageSourceForCurrentFrame(VideoView videoView, NativeImageSourcePtr nativeImageSource);
 
 } // namespace DevelVideoView
 
