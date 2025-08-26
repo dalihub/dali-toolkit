@@ -68,6 +68,7 @@ enum class AccessibilityRole : uint32_t
   MENU_BAR,
   MENU_ITEM,
   NONE,
+  NOTIFICATION,
   PASSWORD_TEXT,
   POPUP_MENU,
   PROGRESS_BAR,

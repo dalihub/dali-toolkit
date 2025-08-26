@@ -35,12 +35,21 @@ namespace Internal
 {
 namespace
 {
-static constexpr uint32_t         MAX_NUMBER_OF_LIGHT = 5;
+static constexpr uint32_t MAX_NUMBER_OF_LIGHT = 5;
+
+static constexpr std::string_view SHADOW_VERTEX_UNIFORM_BLOCK_NAME_STRING("ShadowVertBlock");
+static constexpr std::string_view SHADOW_ENABLED_STRING("uIsShadowEnabled");
+static constexpr std::string_view SHADOW_VIEW_PROJECTION_MATRIX_STRING("uShadowLightViewProjectionMatrix");
+
+static constexpr std::string_view LIGHT_UNIFORM_BLOCK_NAME_STRING("PunctualLightBlock");
 static constexpr std::string_view LIGHT_COUNT_STRING("uLightCount");
 static constexpr std::string_view LIGHT_DIRECTION_STRING("uLightDirection");
 static constexpr std::string_view LIGHT_COLOR_STRING("uLightColor");
-static constexpr std::string_view SHADOW_ENABLED_STRING("uIsShadowEnabled");
-static constexpr std::string_view SHADOW_VIEW_PROJECTION_MATRIX_STRING("uShadowLightViewProjectionMatrix");
+
+static constexpr std::string_view SHADOW_LIGHT_INDEX_STRING("uShadowLightIndex");
+static constexpr std::string_view SHADOW_SOFT_FILTERING_ENABLE_STRING("uEnableShadowSoftFiltering");
+static constexpr std::string_view SHADOW_INTENSITY_STRING("uShadowIntensity");
+static constexpr std::string_view SHADOW_BIAS_STRING("uShadowBias");
 
 /**
  * Creates control through type registry
@@ -311,6 +320,28 @@ uint32_t Light::GetMaximumEnabledLightCount()
   return MAX_NUMBER_OF_LIGHT;
 }
 
+// Shadow uniforms for vertex shader
+std::string_view Light::GetShadowVertexUniformBlockName()
+{
+  return SHADOW_VERTEX_UNIFORM_BLOCK_NAME_STRING;
+}
+
+std::string_view Light::GetShadowEnabledUniformName()
+{
+  return SHADOW_ENABLED_STRING;
+}
+
+std::string_view Light::GetShadowViewProjectionMatrixUniformName()
+{
+  return SHADOW_VIEW_PROJECTION_MATRIX_STRING;
+}
+
+// Light uniforms for fragment shader
+std::string_view Light::GetLightUniformBlockName()
+{
+  return LIGHT_UNIFORM_BLOCK_NAME_STRING;
+}
+
 std::string_view Light::GetLightCountUniformName()
 {
   return LIGHT_COUNT_STRING;
@@ -326,14 +357,25 @@ std::string_view Light::GetLightColorUniformName()
   return LIGHT_COLOR_STRING;
 }
 
-std::string_view Light::GetShadowEnabledUniformName()
+// Shadow uniforms for fragment shader
+std::string_view Light::GetShadowLightIndexUniformName()
 {
-  return SHADOW_ENABLED_STRING;
+  return SHADOW_LIGHT_INDEX_STRING;
 }
 
-std::string_view Light::GetShadowViewProjectionMatrixUniformName()
+std::string_view Light::GetShadowSoftFilteringEnableUniformName()
 {
-  return SHADOW_VIEW_PROJECTION_MATRIX_STRING;
+  return SHADOW_SOFT_FILTERING_ENABLE_STRING;
+}
+
+std::string_view Light::GetShadowIntensityUniformName()
+{
+  return SHADOW_INTENSITY_STRING;
+}
+
+std::string_view Light::GetShadowBiasUniformName()
+{
+  return SHADOW_BIAS_STRING;
 }
 
 // Private Method

@@ -29,7 +29,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
 
 namespace Dali
@@ -45,6 +45,12 @@ using RenderEffectImplPtr = IntrusivePtr<RenderEffectImpl>;
 class RenderEffectImpl : public BaseObject, public ConnectionTracker
 {
 public:
+  /**
+   * @brief Gets the value of render pass tag for render effects.
+   * @return The render pass tag for render effects.
+   */
+  static uint32_t GetRenderPassTag();
+
   /**
    * @brief Sets owner Control. Applies effect on the owner.
    * @note Activates render effect on default.
@@ -118,9 +124,9 @@ protected:
    */
   virtual ~RenderEffectImpl() override;
 
-  RenderEffectImpl(const RenderEffectImpl&) = delete;
-  RenderEffectImpl(RenderEffectImpl&&)      = delete;
-  RenderEffectImpl& operator=(RenderEffectImpl&&) = delete;      // no move()
+  RenderEffectImpl(const RenderEffectImpl&)            = delete;
+  RenderEffectImpl(RenderEffectImpl&&)                 = delete;
+  RenderEffectImpl& operator=(RenderEffectImpl&&)      = delete; // no move()
   RenderEffectImpl& operator=(const RenderEffectImpl&) = delete; // no copy()
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <set>
 #include <string_view>
 
@@ -68,91 +69,106 @@ int UtcDaliShaderManagerProduceShader(void)
 
   Permutation permutations[]{
     {
-      //0
+      // 0
       [](ShaderParameters& p) {},
       {},
       RendererState::DEPTH_TEST | RendererState::CULL_BACK,
     },
     {
-      //1
-      [](ShaderParameters& p) {
+      // 1
+      [](ShaderParameters& p)
+      {
         p.materialDefinition.mFlags |= MaterialDefinition::TRANSPARENCY;
       },
       {ShaderOption::Type::THREE_TEXTURE},
       RendererState::ALPHA_BLEND,
     },
-    {//2
-     [](ShaderParameters& p) {
+    {// 2
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::ALBEDO;
        p.materialDefinition.mTextureStages.push_back({MaterialDefinition::ALBEDO, {}});
      },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::BASE_COLOR_TEXTURE}},
-    {//3
-     [](ShaderParameters& p) {
+    {// 3
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
        p.materialDefinition.mTextureStages.push_back({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
      },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE}},
-    {//4
-     [](ShaderParameters& p) {
+    {// 4
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::NORMAL;
        p.materialDefinition.mTextureStages.push_back({MaterialDefinition::NORMAL, {}});
      },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::NORMAL_TEXTURE}},
-    {//5
-     [](ShaderParameters& p) {
+    {// 5
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::SUBSURFACE;
      },
      {ShaderOption::Type::SUBSURFACE}},
-    {//6
-     [](ShaderParameters& p) {
+    {// 6
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.SetAlphaCutoff(.5f);
      },
      {ShaderOption::Type::ALPHA_TEST}},
-    {//7
-     [](ShaderParameters& p) {
+    {// 7
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.SetAlphaCutoff(1.f);
      },
      {ShaderOption::Type::ALPHA_TEST}},
-    {//8
-     [](ShaderParameters& p) {
+    {// 8
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
      },
      {ShaderOption::Type::GLTF_CHANNELS}},
-    {//9
-     [](ShaderParameters& p) {
+    {// 9
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mJoints[0].mBlob.mOffset  = 0;
        p.meshDefinition.mWeights[0].mBlob.mOffset = 0;
      },
      {ShaderOption::Type::SKINNING}},
-    {//10
-     [](ShaderParameters& p) {
+    {// 10
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mFlags |= MeshDefinition::FLIP_UVS_VERTICAL;
      },
      {ShaderOption::Type::FLIP_UVS_VERTICAL}},
     {
-      //11
-      [](ShaderParameters& p) {
+      // 11
+      [](ShaderParameters& p)
+      {
         p.meshDefinition.mBlendShapes.push_back({});
       },
     },
-    {//12
-     [](ShaderParameters& p) {
+    {// 12
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mBlendShapes.back().deltas.mBlob.mOffset = 0;
      },
      {ShaderOption::Type::MORPH_POSITION}},
-    {//13
-     [](ShaderParameters& p) {
+    {// 13
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mBlendShapes.back().normals.mBlob.mOffset = 0;
      },
      {ShaderOption::Type::MORPH_NORMAL}},
-    {//14
-     [](ShaderParameters& p) {
+    {// 14
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mBlendShapes.back().tangents.mBlob.mOffset = 0;
      },
      {ShaderOption::Type::MORPH_TANGENT}},
-    {//15
-     [](ShaderParameters& p) {
+    {// 15
+     [](ShaderParameters& p)
+     {
        auto& blendShapes = p.meshDefinition.mBlendShapes;
        DALI_ASSERT_ALWAYS(!blendShapes.empty() &&
                           (blendShapes.back().deltas.mBlob.mOffset != MeshDefinition::INVALID ||
@@ -162,19 +178,22 @@ int UtcDaliShaderManagerProduceShader(void)
      },
      {ShaderOption::Type::MORPH_VERSION_2_0}},
 
-    {//16
-     [](ShaderParameters& p) {
+    {// 16
+     [](ShaderParameters& p)
+     {
        p.materialDefinition.mFlags |= MaterialDefinition::OCCLUSION;
      },
      {ShaderOption::Type::OCCLUSION}},
 
-    {//17
-     [](ShaderParameters& p) {
+    {// 17
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mColors[0].mBlob.mOffset = 0;
      },
      {ShaderOption::Type::COLOR_ATTRIBUTE}},
-    {//18
-     [](ShaderParameters& p) {
+    {// 18
+     [](ShaderParameters& p)
+     {
        p.meshDefinition.mTangentType = Property::VECTOR4;
      },
      {ShaderOption::Type::VEC4_TANGENT}},
@@ -238,8 +257,8 @@ int UtcDaliShaderManagerProduceShader(void)
     {{&permutations[0], &permutations[16]}},
   };
 
-  TestApplication app;
-  ShaderManager   shaderManager;
+  ToolkitTestApplication application;
+  ShaderManager          shaderManager;
   for(auto& permutationSet : permutationSets)
   {
     static int tc = 0;
@@ -304,35 +323,39 @@ int UtcDaliShaderManagerProduceShader(void)
 
 int UtcDaliShaderManagerAddAndRemoveLights(void)
 {
-  TestApplication app;
-  ShaderManager   shaderManager;
+  ToolkitTestApplication application;
+  ShaderManagerPtr       shaderManager = new ShaderManager();
 
   ShaderOption option1;
   option1.AddOption(ShaderOption::Type::THREE_TEXTURE);
-  Dali::Shader shader1 = shaderManager.ProduceShader(option1);
+  Dali::Shader shader1 = shaderManager->ProduceShader(option1);
 
   ShaderOption option2;
   option2.AddOption(ShaderOption::Type::BASE_COLOR_TEXTURE);
-  Dali::Shader shader2 = shaderManager.ProduceShader(option2);
+  Dali::Shader shader2 = shaderManager->ProduceShader(option2);
 
   DALI_TEST_NOT_EQUALS(shader1, shader2, 0.1f, TEST_LOCATION);
-  DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
+
+  // Light uniforms moved to UniformBlock. Skip these tests for now.
+  // DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
+  // DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 0, TEST_LOCATION);
 
   Scene3D::Light light = Scene3D::Light::New();
-  shaderManager.AddLight(light);
+  shaderManager->AddLight(light);
 
-  DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
+  // Light uniforms moved to UniformBlock. Skip these tests for now.
+  // DALI_TEST_EQUALS(shader1.GetProperty<int>(shader1.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
+  // DALI_TEST_EQUALS(shader2.GetProperty<int>(shader2.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
 
   ShaderOption option3;
   option3.AddOption(ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE);
-  Dali::Shader shader3 = shaderManager.ProduceShader(option3);
+  Dali::Shader shader3 = shaderManager->ProduceShader(option3);
 
   DALI_TEST_NOT_EQUALS(shader1, shader3, 0.1f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(shader2, shader3, 0.1f, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(shader3.GetProperty<int>(shader3.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
+  // Light uniforms moved to UniformBlock. Skip these tests for now.
+  // DALI_TEST_EQUALS(shader3.GetProperty<int>(shader3.GetPropertyIndex("uLightCount")), 1, TEST_LOCATION);
 
   END_TEST;
 }

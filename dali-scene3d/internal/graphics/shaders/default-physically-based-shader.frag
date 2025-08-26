@@ -110,12 +110,6 @@ UNIFORM_BLOCK FragBlock0
   UNIFORM float uSpecularFactor;
   UNIFORM vec3  uSpecularColorFactor;
 
-// For Light (Currently Directional Only)
-#define MAX_LIGHTS 5
-  UNIFORM mediump int uLightCount;
-  UNIFORM mediump vec3 uLightDirection[MAX_LIGHTS];
-  UNIFORM mediump vec3 uLightColor[MAX_LIGHTS];
-
 // For Shadow Map
   UNIFORM lowp int uIsShadowReceiving;
 
@@ -129,22 +123,25 @@ UNIFORM_BLOCK FragBlock0
   UNIFORM lowp float uAlphaThreshold;
 };
 
-UNIFORM_BLOCK YDirection
+// For Light (Currently Directional Only)
+#define MAX_LIGHTS 5
+UNIFORM_BLOCK PunctualLightBlock
 {
-  UNIFORM mediump vec3 uYDirection;
-};
+  UNIFORM mediump int uLightCount;
 
-UNIFORM_BLOCK ShadowEnabled
-{
-  UNIFORM lowp int uIsShadowEnabled;
-};
+  UNIFORM mediump vec3 uLightDirection[MAX_LIGHTS];
+  UNIFORM mediump vec3 uLightColor[MAX_LIGHTS];
 
-UNIFORM_BLOCK ShadowFragBlock
-{
+  // Shadow relative properties.
   UNIFORM mediump int uShadowLightIndex;
   UNIFORM lowp int uEnableShadowSoftFiltering;
   UNIFORM highp float uShadowIntensity;
   UNIFORM highp float uShadowBias;
+};
+
+UNIFORM_BLOCK YDirection
+{
+  UNIFORM mediump vec3 uYDirection;
 };
 
 // TODO: Multiple texture coordinate will be supported.
@@ -153,6 +150,7 @@ INPUT highp mat3 vTBN;
 INPUT highp vec4 vColor;
 INPUT highp vec3 vPositionToCamera;
 INPUT highp vec3 positionFromLightView;
+FLAT INPUT lowp float vIsShadowEnabled;
 
 const highp float c_MinRoughness = 0.04;
 const highp float M_PI = 3.141592653589793;
@@ -320,7 +318,7 @@ void main()
     }
   }
 
-  if(float(uIsShadowReceiving) * float(uIsShadowEnabled) * uShadowIntensity > 0.0)
+  if(float(uIsShadowReceiving) * vIsShadowEnabled * uShadowIntensity * (clamp(float(uShadowLightIndex + 1), 0.0, 1.0)) > 0.0)
   {
     mediump float exposureFactor = 0.0;
 

@@ -304,6 +304,16 @@ enum
   SUBDIVIDE_GRID_Y,
 
   /**
+   * @brief Render Pass key to synchonize Shader and RenderTask.
+   * @details Name "renderPassTag", type Property::INTEGER.
+   * @SINCE_2_4.33
+   * @note Optional
+   * @note If not supplied, the default is 0.
+   * @note Value should be greater than or equal to 0.
+   */
+  RENDER_PASS_TAG,
+
+  /**
    * @brief Hints for rendering.
    * @details Name "hints", type Dali::Shader::Hint (Property::INTEGER), Property::STRING or Property::ARRAY of Property::STRING.
    * @SINCE_1_1.45

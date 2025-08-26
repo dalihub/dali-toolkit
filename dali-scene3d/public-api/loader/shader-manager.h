@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_MANAGER_H_
 #define DALI_SCENE3D_LOADER_SHADER_MANAGER_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDER
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/uniform-block.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -126,29 +127,16 @@ public:
 private:
   /// @cond internal
   /**
-   * @brief Sets constraint to the shaders with light of light index.
-   * @param[in] lightIndex index of light that will be connected with shaders by constraint.
+   * @brief Sets constraint to the uniform block with light of light index.
+   * @param[in] lightIndex index of light that will be connected with uniform block by constraint.
    */
   DALI_INTERNAL void SetLightConstraint(uint32_t lightIndex);
 
   /**
-   * @brief Sets constraint to a shader with light of light index.
-   * @param[in] lightIndex index of light that will be connected with input shader by constraint.
-   * @param[in] shader Shader that the constraint will be applied.
-   */
-  DALI_INTERNAL void SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader shader);
-
-  /**
-   * @brief Removes constraint of shaders and light of light index.
-   * @param[in] lightIndex index of light that will be disconnected with shaders.
+   * @brief Removes constraint of uniform block and light of light index.
+   * @param[in] lightIndex index of light that will be disconnected with uniform block.
    */
   DALI_INTERNAL void RemoveLightConstraint(uint32_t lightIndex);
-
-  /**
-   * @brief Sets uniform about the shadow.
-   * @param[in] shader Shader that the constraint will be applied.
-   */
-  DALI_INTERNAL void SetShadowUniformToShader(Dali::Shader shader);
 
   /**
    * @brief Sets properties and constraint to the shaders.
@@ -156,10 +144,16 @@ private:
   DALI_INTERNAL void SetShadowProperty();
 
   /**
-   * @brief Sets constraint to a shader about shadow
-   * @param[in] shader Shader that the constraint will be applied.
+   * @brief Sets uniform about the shadow.
+   * @param[in] uniformBlock UniformBlock that the uniform values will be applied.
    */
-  DALI_INTERNAL void SetShadowConstraintToShader(Dali::Shader shader);
+  DALI_INTERNAL void SetShadowUniformToUniformBlock();
+
+  /**
+   * @brief Sets constraint to a uniform block about shadow
+   * @param[in] uniformBlock UniformBlock that the constraint will be applied.
+   */
+  DALI_INTERNAL void SetShadowConstraintToUniformBlock();
 
   /// @endcond
 private:

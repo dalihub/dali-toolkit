@@ -515,7 +515,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
     mImpl->mRenderer.RegisterVisualTransformUniform();
   }
@@ -960,11 +960,11 @@ void AnimatedVectorImageVisual::OnProcessEvents()
 Shader AnimatedVectorImageVisual::GenerateShader() const
 {
   Shader shader;
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
-    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
-                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
-                         mImpl->mCustomShader->mHints);
+    shader = Shader::New(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->GetCustomShaderAt(0)->mVertexShader,
+                         mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->GetCustomShaderAt(0)->mFragmentShader,
+                         mImpl->GetCustomShaderAt(0)->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
 

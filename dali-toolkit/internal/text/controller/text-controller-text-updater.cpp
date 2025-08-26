@@ -154,7 +154,15 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   }
   else
   {
-    PlaceholderHandler::ShowPlaceholderText(impl);
+    if (nullptr != eventData)
+    {
+      PlaceholderHandler::ShowPlaceholderText(impl);
+    }
+    else
+    {
+      // Clear the layout size cache when the label's text is set to empty.
+      impl.mModel->mVisualModel->SetLayoutSize(Size::ZERO);
+    }
   }
 
   unsigned int oldCursorPos = (nullptr != eventData ? eventData->mPrimaryCursorPosition : 0);

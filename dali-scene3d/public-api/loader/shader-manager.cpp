@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/rendering/uniform-block.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -181,6 +182,27 @@ struct ShaderManager::Impl
   std::vector<Scene3D::Light> mLights;
 
   Scene3D::Light mShadowLight;
+
+  Dali::UniformBlock mLightUniformBlock;
+  Dali::UniformBlock mShadowVertexUniformBlock;
+
+  void EnsureUniformBlock()
+  {
+    if(!mLightUniformBlock)
+    {
+      mLightUniformBlock = Dali::UniformBlock::New(std::string(Scene3D::Internal::Light::GetLightUniformBlockName()));
+      mLightUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetLightCountUniformName(), static_cast<int32_t>(mLights.size()));
+
+      mLightUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowLightIndexUniformName(), static_cast<int32_t>(-1));
+      mLightUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowSoftFilteringEnableUniformName(), static_cast<int32_t>(0));
+      mLightUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowIntensityUniformName(), static_cast<float>(0.5f));
+      mLightUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowBiasUniformName(), static_cast<float>(0.001f));
+
+      mShadowVertexUniformBlock = Dali::UniformBlock::New(std::string(Scene3D::Internal::Light::GetShadowVertexUniformBlockName()));
+      mShadowVertexUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowEnabledUniformName(), static_cast<int32_t>(!!mShadowLight));
+      mShadowVertexUniformBlock.RegisterUniqueProperty(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName(), Matrix::IDENTITY);
+    }
+  }
 };
 
 ShaderManager::ShaderManager()
@@ -240,24 +262,28 @@ Dali::Shader ShaderManager::ProduceShader(const ShaderOption& shaderOption)
 
     shaderMap[hash] = mImpl->mShaders.size();
 
+    if(!mImpl->mLightUniformBlock)
+    {
+      mImpl->EnsureUniformBlock();
+
+      for(uint32_t index = 0; index < mImpl->mLights.size(); ++index)
+      {
+        SetLightConstraint(index);
+      }
+
+      if(!!mImpl->mShadowLight)
+      {
+        SetShadowProperty();
+      }
+    }
+
+    // Add light uniform block before Load().
+    shaderDef.mUniformBlocks.push_back(mImpl->mLightUniformBlock);
+    shaderDef.mUniformBlocks.push_back(mImpl->mShadowVertexUniformBlock);
+
     auto raw = shaderDef.LoadRaw("");
     mImpl->mShaders.emplace_back(shaderDef.Load(std::move(raw)));
     result = mImpl->mShaders.back();
-
-    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-    result.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
-
-    for(uint32_t index = 0; index < mImpl->mLights.size(); ++index)
-    {
-      SetLightConstraintToShader(index, result);
-    }
-
-    result.RegisterProperty("uIsShadowEnabled", static_cast<int32_t>(!!mImpl->mShadowLight));
-    if(!!mImpl->mShadowLight)
-    {
-      SetShadowConstraintToShader(result);
-      SetShadowUniformToShader(result);
-    }
   }
 
   return result;
@@ -291,13 +317,16 @@ bool ShaderManager::AddLight(Scene3D::Light light)
   uint32_t lightIndex = mImpl->mLights.size();
   mImpl->mLights.push_back(light);
 
-  for(auto&& shader : mImpl->mShaders)
-  {
-    std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-    shader.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
-  }
+  mImpl->EnsureUniformBlock();
+  mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetLightCountUniformName(), static_cast<int32_t>(mImpl->mLights.size()));
 
   SetLightConstraint(lightIndex);
+
+  // Update properties if shadow enabled light added
+  if(DALI_UNLIKELY(light == mImpl->mShadowLight))
+  {
+    UpdateShadowUniform(light);
+  }
 
   return true;
 }
@@ -319,16 +348,26 @@ void ShaderManager::RemoveLight(Scene3D::Light light)
       RemoveLightConstraint(mImpl->mLights.size() - 1);
       mImpl->mLights[index] = mImpl->mLights.back();
       SetLightConstraint(index);
+
+      if(mImpl->mShadowLight && mImpl->mLights[index] == mImpl->mShadowLight && DALI_LIKELY(mImpl->mLightUniformBlock))
+      {
+        mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowLightIndexUniformName(), static_cast<int32_t>(index));
+      }
     }
 
     mImpl->mLights.pop_back();
 
-    for(auto&& shader : mImpl->mShaders)
+    if(DALI_LIKELY(mImpl->mLightUniformBlock))
     {
-      std::string lightCountPropertyName(Scene3D::Internal::Light::GetLightCountUniformName());
-      shader.RegisterProperty(lightCountPropertyName, static_cast<int32_t>(mImpl->mLights.size()));
+      mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetLightCountUniformName(), static_cast<int32_t>(mImpl->mLights.size()));
     }
     break;
+  }
+
+  // Update properties if shadow enabled light removed
+  if(DALI_UNLIKELY(light == mImpl->mShadowLight))
+  {
+    UpdateShadowUniform(light);
   }
 }
 
@@ -340,22 +379,20 @@ uint32_t ShaderManager::GetLightCount() const
 void ShaderManager::SetShadow(Scene3D::Light light)
 {
   mImpl->mShadowLight = light;
-  for(auto&& shader : mImpl->mShaders)
-  {
-    std::string shadowEnabledPropertyName(Scene3D::Internal::Light::GetShadowEnabledUniformName());
-    shader.RegisterProperty(shadowEnabledPropertyName, static_cast<int32_t>(true));
-  }
+
+  mImpl->EnsureUniformBlock();
+
+  mImpl->mShadowVertexUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowEnabledUniformName(), static_cast<int32_t>(true));
 
   SetShadowProperty();
 }
 
 void ShaderManager::RemoveShadow()
 {
-  for(auto&& shader : mImpl->mShaders)
+  if(mImpl->mShadowVertexUniformBlock)
   {
-    std::string shadowEnabledPropertyName(Scene3D::Internal::Light::GetShadowEnabledUniformName());
-    shader.RegisterProperty(shadowEnabledPropertyName, static_cast<int32_t>(false));
-    Dali::Integration::HandleRemoveConstraints(shader, INDEX_FOR_SHADOW_CONSTRAINT_TAG);
+    mImpl->mShadowVertexUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowEnabledUniformName(), static_cast<int32_t>(false));
+    Dali::Integration::HandleRemoveConstraints(mImpl->mShadowVertexUniformBlock, INDEX_FOR_SHADOW_CONSTRAINT_TAG);
   }
   mImpl->mShadowLight.Reset();
 }
@@ -367,50 +404,54 @@ void ShaderManager::UpdateShadowUniform(Scene3D::Light light)
     return;
   }
 
-  for(auto&& shader : mImpl->mShaders)
-  {
-    SetShadowUniformToShader(shader);
-  }
+  mImpl->EnsureUniformBlock();
+
+  SetShadowUniformToUniformBlock();
 }
 
 void ShaderManager::SetLightConstraint(uint32_t lightIndex)
 {
-  for(auto&& shader : mImpl->mShaders)
+  if(DALI_LIKELY(mImpl->mLightUniformBlock))
   {
-    SetLightConstraintToShader(lightIndex, shader);
+    RemoveLightConstraint(lightIndex);
+
+    std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
+    lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
+    auto             lightDirectionPropertyIndex = mImpl->mLightUniformBlock.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
+    Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(mImpl->mLightUniformBlock, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                               { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
+    lightDirectionConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::WORLD_ORIENTATION});
+    Dali::Integration::ConstraintSetInternalTag(lightDirectionConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+    lightDirectionConstraint.ApplyPost();
+
+    std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
+    lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
+    auto             lightColorPropertyIndex = mImpl->mLightUniformBlock.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
+    Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(mImpl->mLightUniformBlock, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                                           { output = Vector3(inputs[0]->GetVector4()); });
+    lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
+    Dali::Integration::ConstraintSetInternalTag(lightColorConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+    lightColorConstraint.ApplyPost();
   }
-}
-
-void ShaderManager::SetLightConstraintToShader(uint32_t lightIndex, Dali::Shader shader)
-{
-  std::string lightDirectionPropertyName(Scene3D::Internal::Light::GetLightDirectionUniformName());
-  lightDirectionPropertyName += "[" + std::to_string(lightIndex) + "]";
-  auto             lightDirectionPropertyIndex = shader.RegisterProperty(lightDirectionPropertyName, Vector3::ZAXIS);
-  Dali::Constraint lightDirectionConstraint    = Dali::Constraint::New<Vector3>(shader, lightDirectionPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                             { output = inputs[0]->GetQuaternion().Rotate(Vector3::ZAXIS); });
-  lightDirectionConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::WORLD_ORIENTATION});
-  Dali::Integration::ConstraintSetInternalTag(lightDirectionConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
-  lightDirectionConstraint.ApplyPost();
-
-  std::string lightColorPropertyName(Scene3D::Internal::Light::GetLightColorUniformName());
-  lightColorPropertyName += "[" + std::to_string(lightIndex) + "]";
-  auto             lightColorPropertyIndex = shader.RegisterProperty(lightColorPropertyName, Vector3(Color::WHITE));
-  Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(shader, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                                         { output = Vector3(inputs[0]->GetVector4()); });
-  lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
-  Dali::Integration::ConstraintSetInternalTag(lightColorConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
-  lightColorConstraint.ApplyPost();
 }
 
 void ShaderManager::RemoveLightConstraint(uint32_t lightIndex)
 {
-  for(auto&& shader : mImpl->mShaders)
+  if(DALI_LIKELY(mImpl->mLightUniformBlock))
   {
-    Dali::Integration::HandleRemoveConstraints(shader, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
+    Dali::Integration::HandleRemoveConstraints(mImpl->mLightUniformBlock, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
   }
 }
 
-void ShaderManager::SetShadowUniformToShader(Dali::Shader shader)
+void ShaderManager::SetShadowProperty()
+{
+  mImpl->EnsureUniformBlock();
+
+  SetShadowUniformToUniformBlock();
+  SetShadowConstraintToUniformBlock();
+}
+
+void ShaderManager::SetShadowUniformToUniformBlock()
 {
   uint32_t index = mImpl->mLights.size();
   for(uint32_t i = 0; i < mImpl->mLights.size(); ++i)
@@ -422,36 +463,28 @@ void ShaderManager::SetShadowUniformToShader(Dali::Shader shader)
     }
   }
 
-  shader.RegisterProperty("uShadowLightIndex", index < mImpl->mLights.size() ? static_cast<int32_t>(index) : -1);
-  shader.RegisterProperty("uShadowIntensity", mImpl->mShadowLight.GetShadowIntensity());
-  shader.RegisterProperty("uShadowBias", mImpl->mShadowLight.GetShadowBias());
-  shader.RegisterProperty("uEnableShadowSoftFiltering", static_cast<int>(mImpl->mShadowLight.IsShadowSoftFilteringEnabled()));
+  mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowLightIndexUniformName(), index < mImpl->mLights.size() ? static_cast<int32_t>(index) : -1);
+  mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowSoftFilteringEnableUniformName(), static_cast<int>(mImpl->mShadowLight.IsShadowSoftFilteringEnabled()));
+  mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowIntensityUniformName(), mImpl->mShadowLight.GetShadowIntensity());
+  mImpl->mLightUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowBiasUniformName(), mImpl->mShadowLight.GetShadowBias());
 }
 
-void ShaderManager::SetShadowProperty()
-{
-  for(auto&& shader : mImpl->mShaders)
-  {
-    SetShadowUniformToShader(shader);
-    SetShadowConstraintToShader(shader);
-  }
-}
-
-void ShaderManager::SetShadowConstraintToShader(Dali::Shader shader)
+void ShaderManager::SetShadowConstraintToUniformBlock()
 {
   // Constraint is applied before View/Projection Matrix is computed in update thread.
   // So, it could show not plausible result if camera properties are changed discontinuesly.
   // If we want to make it be synchronized, View/Projection matrix are needed to be conputed in below constraint.
 
-  std::string       shadowViewProjectionPropertyName(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName());
-  auto              shadowViewProjectionPropertyIndex = shader.RegisterProperty(shadowViewProjectionPropertyName, Matrix::IDENTITY);
+  Dali::Integration::HandleRemoveConstraints(mImpl->mShadowVertexUniformBlock, INDEX_FOR_SHADOW_CONSTRAINT_TAG);
+
+  auto              shadowViewProjectionPropertyIndex = mImpl->mShadowVertexUniformBlock.RegisterProperty(Scene3D::Internal::Light::GetShadowViewProjectionMatrixUniformName(), Matrix::IDENTITY);
   Dali::CameraActor shadowLightCamera                 = Dali::Scene3D::Internal::GetImplementation(mImpl->mShadowLight).GetCamera();
   auto              tempViewProjectionMatrixIndex     = shadowLightCamera.GetPropertyIndex("tempViewProjectionMatrix");
   if(tempViewProjectionMatrixIndex == Dali::Property::INVALID_INDEX)
   {
-    tempViewProjectionMatrixIndex = shadowLightCamera.RegisterProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
+    tempViewProjectionMatrixIndex = shadowLightCamera.RegisterUniqueProperty("tempViewProjectionMatrix", Matrix::IDENTITY);
   }
-  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(shader, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
+  Dali::Constraint shadowViewProjectionConstraint = Dali::Constraint::New<Matrix>(mImpl->mShadowVertexUniformBlock, shadowViewProjectionPropertyIndex, [](Matrix& output, const PropertyInputContainer& inputs)
                                                                                   { output = inputs[0]->GetMatrix(); });
   shadowViewProjectionConstraint.AddSource(Source{shadowLightCamera, tempViewProjectionMatrixIndex});
   Dali::Integration::ConstraintSetInternalTag(shadowViewProjectionConstraint, INDEX_FOR_SHADOW_CONSTRAINT_TAG);

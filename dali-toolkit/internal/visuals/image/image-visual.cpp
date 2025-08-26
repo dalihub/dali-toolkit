@@ -683,7 +683,7 @@ void ImageVisual::OnInitialize()
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-  if(mImpl->mCustomShader)
+  if(IsUsingCustomShader())
   {
     mImpl->mRenderer.RegisterVisualTransformUniform();
   }
@@ -712,7 +712,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     atlasUploadObserver = this;
   }
 
-  auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
+  auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !IsUsingCustomShader()
                              ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                              : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
@@ -747,7 +747,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
        !synchronousLoading &&
        !mUseSynchronousSizing &&
        !atlasing &&
-       !mImpl->mCustomShader &&
+       !IsUsingCustomShader() &&
        !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
     {
       return true;
@@ -763,7 +763,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
                           (synchronousLoading) ? "/ synchronousLoading" : "",
                           (mUseSynchronousSizing) ? "/ useSynchronousSizing " : "",
                           (atlasing) ? "/ atlasing" : "",
-                          (mImpl->mCustomShader) ? "/ use customs shader" : "",
+                          (IsUsingCustomShader()) ? "/ use customs shader" : "",
                           (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
     }
     return false;
@@ -843,7 +843,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
 
 bool ImageVisual::AttemptAtlasing() const
 {
-  return (!mImpl->mCustomShader && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
+  return (!IsUsingCustomShader() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }
 
 void ImageVisual::InitializeRenderer()
@@ -1394,7 +1394,7 @@ Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 
-  const bool useStandardShader = !mImpl->mCustomShader;
+  const bool useStandardShader = !IsUsingCustomShader();
   const bool useNativeImage    = (!!mNativeTexture);
 
   if(useStandardShader)
@@ -1418,9 +1418,9 @@ Shader ImageVisual::GenerateShader() const
     std::string_view vertexShaderView;
     std::string_view fragmentShaderView;
 
-    if(mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty())
+    if(IsUsingCustomShader() && !mImpl->GetCustomShaderAt(0)->mVertexShader.empty())
     {
-      vertexShaderView = mImpl->mCustomShader->mVertexShader;
+      vertexShaderView = mImpl->GetCustomShaderAt(0)->mVertexShader;
       usesWholeTexture = false; // Impossible to tell.
     }
     else
@@ -1428,9 +1428,9 @@ Shader ImageVisual::GenerateShader() const
       vertexShaderView = mImageVisualShaderFactory.GetVertexShaderSource();
     }
 
-    if(mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty())
+    if(IsUsingCustomShader() && !mImpl->GetCustomShaderAt(0)->mFragmentShader.empty())
     {
-      fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
+      fragmentShaderView = mImpl->GetCustomShaderAt(0)->mFragmentShader;
     }
     else
     {
@@ -1451,11 +1451,11 @@ Shader ImageVisual::GenerateShader() const
       }
 
       // Create shader here cause fragmentShaderString scope issue
-      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->GetCustomShaderAt(0)->mHints, mImpl->GetCustomShaderAt(0)->mName);
     }
     else
     {
-      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints, mImpl->mCustomShader->mName);
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->GetCustomShaderAt(0)->mHints, mImpl->GetCustomShaderAt(0)->mName);
     }
 
     if(usesWholeTexture)
@@ -1595,11 +1595,11 @@ Geometry ImageVisual::GenerateGeometry(TextureManager::TextureId textureId, bool
   Geometry geometry;
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    if(mImpl->mCustomShader)
+    if(IsUsingCustomShader())
     {
       if(createForce)
       {
-        geometry = CreateGeometry(mFactoryCache, mImpl->mCustomShader->mGridSize);
+        geometry = CreateGeometry(mFactoryCache, mImpl->GetCustomShaderAt(0)->mGridSize);
       }
     }
     else

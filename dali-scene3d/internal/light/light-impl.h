@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LIGHT_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,23 +222,12 @@ public: // Public Static Method
    */
   static uint32_t GetMaximumEnabledLightCount();
 
+  // Shadow uniforms for vertex shader
   /**
-   * @brief Retrieves Light Enabled Uniform Name for shader()
-   * @return string_view for LightEnabledUniformName
+   * @brief Retrieves Shadow Uniform Block Name for vertex shader
+   * @return string_view for ShadowVertexUniformBlockName
    */
-  static std::string_view GetLightCountUniformName();
-
-  /**
-   * @brief Retrieves Light Direction Uniform Name for shader()
-   * @return string_view for LightDirectionUniformName
-   */
-  static std::string_view GetLightDirectionUniformName();
-
-  /**
-   * @brief Retrieves Light Color Uniform Name for shader()
-   * @return string_view for LightColorUniformName
-   */
-  static std::string_view GetLightColorUniformName();
+  static std::string_view GetShadowVertexUniformBlockName();
 
   /**
    * @brief Retrieves Uniform Name to define shadow is enabled or not.
@@ -252,6 +241,56 @@ public: // Public Static Method
    */
   static std::string_view GetShadowViewProjectionMatrixUniformName();
 
+  // Light uniforms for fragment shader
+  /**
+   * @brief Retrieves Light Uniform Block Name for fragment shader
+   * @return string_view for LightUniformBlockName
+   */
+  static std::string_view GetLightUniformBlockName();
+
+  /**
+   * @brief Retrieves Light Enabled Uniform Name for LightUniformBlock()
+   * @return string_view for LightEnabledUniformName
+   */
+  static std::string_view GetLightCountUniformName();
+
+  /**
+   * @brief Retrieves Light Direction Uniform Name for LightUniformBlock()
+   * @return string_view for LightDirectionUniformName
+   */
+  static std::string_view GetLightDirectionUniformName();
+
+  /**
+   * @brief Retrieves Light Color Uniform Name for LightUniformBlock()
+   * @return string_view for LightColorUniformName
+   */
+  static std::string_view GetLightColorUniformName();
+
+  // Shadow uniforms for fragment shader
+  /**
+   * @brief Retrieves Shadow Light Index Uniform Name for ShadowFragmentUniformBlock()
+   * @return string_view for ShadowLightIndexUniformName
+   */
+  static std::string_view GetShadowLightIndexUniformName();
+
+  /**
+   * @brief Retrieves Shadow Soft Filtering Enable Uniform Name for ShadowFragmentUniformBlock()
+   * @return string_view for ShadowSoftFilteringEnableUniformName
+   */
+  static std::string_view GetShadowSoftFilteringEnableUniformName();
+
+  /**
+   * @brief Retrieves Shadow Intensity Uniform Name for ShadowFragmentUniformBlock()
+   * @return string_view for ShadowIntensityUniformName
+   */
+  static std::string_view GetShadowIntensityUniformName();
+
+  /**
+   * @brief Retrieves Shadow Bias Uniform Name for ShadowFragmentUniformBlock()
+   * @return string_view for ShadowBiasUniformName
+   */
+  static std::string_view GetShadowBiasUniformName();
+
 private:
   void UpdateShadowUniforms();
 
@@ -259,10 +298,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL Light(const Light&) = delete;            ///< Deleted copy constructor.
-  DALI_INTERNAL Light(Light&&)      = delete;            ///< Deleted move constructor.
+  DALI_INTERNAL        Light(const Light&)     = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL        Light(Light&&)          = delete; ///< Deleted move constructor.
   DALI_INTERNAL Light& operator=(const Light&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Light& operator=(Light&&) = delete;      ///< Deleted move assignment operator.
+  DALI_INTERNAL Light& operator=(Light&&)      = delete; ///< Deleted move assignment operator.
 
 private:
   Dali::CameraActor              mLightSourceActor;

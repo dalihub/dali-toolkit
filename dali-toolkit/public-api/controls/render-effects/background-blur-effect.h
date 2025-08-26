@@ -29,7 +29,7 @@ namespace Toolkit
 namespace Internal DALI_INTERNAL
 {
 class BackgroundBlurEffectImpl;
-} // namespace DALI_INTERNAL
+} // namespace Internal DALI_INTERNAL
 
 /**
  * @brief BackgroundBlurEffect is a visual effect that blurs owner control's background.
@@ -162,6 +162,23 @@ public:
    */
   void AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
 
+  /**
+   * @brief Set specific source actor of background blur effects. If empty handle, works same as normal.
+   * @note If given source actor is not a parent of source control, it has no efforts.
+   * @warning RenderEffect didn't hold source actor reference.
+   * @param[in] sourceActor The source actor of background blur effects.
+   * @SINCE_2_4.33
+   */
+  void SetSourceActor(Dali::Actor sourceActor);
+
+  /**
+   * @brief Set specific stopper actor of background blur effects. If empty handle, works same as normal.
+   * @warning RenderEffect didn't hold stopper actor reference.
+   * @param[in] stopperActor The stopper actor of background blur effects.
+   * @SINCE_2_4.33
+   */
+  void SetStopperActor(Dali::Actor stopperActor);
+
 public: // Signals
   /**
    * @brief If blurOnce is true and effect is activated, then connect to this signal to be notified when the
@@ -183,4 +200,4 @@ public: // Not intended for use by Application developers
 };
 } // namespace Toolkit
 } // namespace Dali
-#endif //DALI_TOOLKIT_BACKGROUND_BLUR_EFFECT_H
+#endif // DALI_TOOLKIT_BACKGROUND_BLUR_EFFECT_H

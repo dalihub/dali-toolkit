@@ -111,6 +111,11 @@ int NativeImageSource::GetTextureTarget() const
 
 bool NativeImageSource::ApplyNativeFragmentShader(std::string& shader)
 {
+  return ApplyNativeFragmentShader(shader, 1);
+}
+
+bool NativeImageSource::ApplyNativeFragmentShader(std::string& shader, int count)
+{
   shader = Dali::NativeImageSourceTest::GetCustomFragmentPrefix() + shader;
   return true;
 }
