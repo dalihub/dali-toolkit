@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_LOADER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public:
   bool GetNPatchData(const NPatchData::NPatchDataId id, NPatchDataPtr& data);
 
   /**
-   * @brief Request remove a texture matching id.
+   * @brief Request to remove a texture matching id.
    * Erase the observer from the observer list of cache if we need.
    *
    * @param [in] id cache data id
@@ -148,8 +148,8 @@ private:
       return *this;
     }
 
-    NPatchInfo()                       = delete;            // Do not use default constructor
-    NPatchInfo(const NPatchInfo& info) = delete;            // Do not use copy constructor
+    NPatchInfo()                                  = delete; // Do not use default constructor
+    NPatchInfo(const NPatchInfo& info)            = delete; // Do not use copy constructor
     NPatchInfo& operator=(const NPatchInfo& info) = delete; // Do not use copy assign
 
     NPatchDataPtr mData;

@@ -127,7 +127,7 @@ public:
   SvgRasterizeId Rasterize(SvgLoadId loaderId, uint32_t width, uint32_t height, bool attemptAtlasing, SvgLoaderObserver* svgObserver, bool synchronousLoading);
 
   /**
-   * @brief Request remove a texture matching id.
+   * @brief Request to remove a texture matching id.
    * Erase the observer from the observer list of cache if we need.
    *
    * @param[in] loadId cache data id
@@ -136,7 +136,7 @@ public:
   void RequestLoadRemove(SvgLoadId loadId, SvgLoaderObserver* svgObserver);
 
   /**
-   * @brief Request remove a texture matching id.
+   * @brief Request to remove a texture matching id.
    * Erase the observer from the observer list of cache if we need.
    *
    * @param[in] rasterizeId cache data id
