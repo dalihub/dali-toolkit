@@ -694,17 +694,9 @@ void VideoView::SetWindowSurfaceTarget()
 
   if(!mOverlayVisual)
   {
-    //// For underlay rendering mode, video display area have to be transparent.
-    Property::Map shaderMap;
-    shaderMap[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = SHADER_VIDEO_VIEW_VERT.data();
-    shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = SHADER_VIDEO_VIEW_FRAG.data();
-    shaderMap[Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 0;
-    shaderMap[Toolkit::Visual::Shader::Property::HINTS]           = static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
-    shaderMap[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW_OVERLAY";
-
     Property::Map properties;
-    properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
-    properties[Toolkit::Visual::Property::SHADER] = shaderMap;
+    properties[Toolkit::Visual::Property::TYPE]      = Toolkit::Visual::Type::COLOR;
+    properties[Toolkit::Visual::Property::MIX_COLOR] = Color::BLACK;
 
     mOverlayVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mOverlayVisual)
@@ -713,16 +705,22 @@ void VideoView::SetWindowSurfaceTarget()
 
       Renderer renderer = visualImpl.GetRenderer();
 
-      // Set default(prevent trash values)
-      Shader shader = renderer.GetShader();
-      shader.RegisterProperty("cornerRadius", Vector4::ZERO);
-      shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
-      shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
-
+      //// For underlay rendering mode, video display area have to be transparent.
+      // Note :  The actuall result is like this.
+      //
+      // Final RGB = (Dest RGB) * (Dest A - Src A) / (Dest A)
+      // Final A   = (Dest A - Src A)
+      //
+      // But their is limitation that we cannot explain (1 - Src A / Dest A) by blend factor.
+      // So it will have problem if we overlap 2 or more Underlay VideoView.
+      // Else, most of cases are Dest A == 1. So just use ONE_MINUS_SRC_ALPHA as DEST_RGB.
       renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
       renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ZERO);
-      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE);
-      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, DevelBlendEquation::MIN);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::REVERSE_SUBTRACT);
 
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY, mOverlayVisual);
 
@@ -791,7 +789,7 @@ void VideoView::SetNativeImageTarget()
   // Reset frame interpolation related members as they are not used in native image target mode
   mPreviousFrameTexture.Reset();
   mCurrentFrameTexture.Reset();
-  mInterpolationInterval = 0.0f;
+  mInterpolationInterval            = 0.0f;
   mInterpolationFactorPropertyIndex = Property::INVALID_INDEX;
   if(mInterpolationAnimation)
   {
@@ -1076,7 +1074,7 @@ void VideoView::CreateOverlayTextureVisual()
     return;
   }
 
-  std::string          fragmentShaderString = std::string(SHADER_VIDEO_VIEW_SOURCE_FRAG);
+  std::string fragmentShaderString = std::string(SHADER_VIDEO_VIEW_SOURCE_FRAG);
   DevelTexture::ApplyNativeFragmentShader(mCurrentFrameTexture, fragmentShaderString, 2);
 
   //// For underlay rendering mode, video display area have to be transparent.
