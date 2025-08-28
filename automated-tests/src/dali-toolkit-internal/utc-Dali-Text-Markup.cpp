@@ -455,8 +455,11 @@ int UtcDaliTextXHTMLEntityToUTF8(void)
        "Testing of "},
       {"Testing of & < > special character",
        "Testing of \\& \\< \\> special character",
-       "Testing of & < > special character"}};
-  const unsigned int numberOfTests = 6u;
+       "Testing of & < > special character"},
+      {"Testing of Legacy XHTML Named Entities",
+        "Checking Named Entitities &Aelig;",
+        "Checking Named Entitities Æ"}};
+  const unsigned int numberOfTests = 7u;
 
   for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
