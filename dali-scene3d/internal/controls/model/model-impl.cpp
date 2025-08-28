@@ -229,7 +229,8 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mIblDiffuseDirty(false),
   mIblSpecularDirty(false),
   mIsShadowCasting(true),
-  mIsShadowReceiving(true)
+  mIsShadowReceiving(true),
+  mModelLoadFailed(false)
 {
 }
 
@@ -796,6 +797,22 @@ bool Model::IsShadowReceiving() const
   return mIsShadowReceiving;
 }
 
+Scene3D::Model::ResourceStatus Model::GetModelResourceStatus() const
+{
+  if(mModelLoadFailed)
+  {
+    return Scene3D::Model::ResourceStatus::FAILED;
+  }
+  else if(IsResourceReady())
+  {
+    return Scene3D::Model::ResourceStatus::READY;
+  }
+  else
+  {
+    return Scene3D::Model::ResourceStatus::PREPARING;
+  }
+}
+
 ///////////////////////////////////////////////////////////
 //
 // Private methods
@@ -1086,46 +1103,47 @@ void Model::OnModelLoadComplete()
       ModelCacheManager::Get().UnreferenceModelCache(mModelUrl);
     }
 
-    EmitLoadCompletedSignal(false);
-
-    return;
+    mModelLoadFailed = true;
   }
-
-  if(!mModelRoot)
+  else
   {
-    CreateModelRoot();
-  }
-  CreateModel();
-
-  auto& resources = mModelLoadTask->GetResources();
-  auto& scene     = mModelLoadTask->GetScene();
-  CreateAnimations(scene);
-  ResetCameraParameters();
-  if(!resources.mEnvironmentMaps.empty())
-  {
-    if(resources.mEnvironmentMaps.front().second.mDiffuse)
+    if(!mModelRoot)
     {
-      mDefaultDiffuseTexture = resources.mEnvironmentMaps.front().second.mDiffuse;
+      CreateModelRoot();
     }
-    if(resources.mEnvironmentMaps.front().second.mSpecular)
+    CreateModel();
+
+    auto& resources = mModelLoadTask->GetResources();
+    auto& scene     = mModelLoadTask->GetScene();
+    CreateAnimations(scene);
+    ResetCameraParameters();
+    if(!resources.mEnvironmentMaps.empty())
     {
-      mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
+      if(resources.mEnvironmentMaps.front().second.mDiffuse)
+      {
+        mDefaultDiffuseTexture = resources.mEnvironmentMaps.front().second.mDiffuse;
+      }
+      if(resources.mEnvironmentMaps.front().second.mSpecular)
+      {
+        mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
+      }
     }
-  }
 
-  if(mShadowMapTexture)
-  {
-    ModelNodeTreeUtility::UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
-  }
-  UpdateImageBasedLightTexture();
-  UpdateImageBasedLightScaleFactor();
-  Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
+    if(mShadowMapTexture)
+    {
+      ModelNodeTreeUtility::UpdateShadowMapTextureRecursively(mModelRoot, mShadowMapTexture);
+    }
+    UpdateImageBasedLightTexture();
+    UpdateImageBasedLightScaleFactor();
+    Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
 
+    mModelLoadFailed = false;
+  }
   mModelResourceReady = true;
   ResetResourceTask(mModelLoadTask);
   NotifyResourceReady();
 
-  EmitLoadCompletedSignal(true);
+  EmitLoadCompletedSignal(!mModelLoadFailed);
 }
 
 void Model::OnIblDiffuseLoadComplete()
@@ -1228,7 +1246,8 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
   mAnimations.clear();
   if(!mModelLoadTask->GetAnimations().empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
+    {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
