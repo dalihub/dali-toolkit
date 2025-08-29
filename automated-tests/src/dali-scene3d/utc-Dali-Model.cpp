@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2116,6 +2116,67 @@ int UtcDaliModelLoadComplete(void)
   application.SendNotification();
   application.Render();
 
+  DALI_TEST_EQUALS(gLoadCompletedCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelLoadingStatus(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
+
+  // Check initial loading status
+  auto loadingStatus = model.GetModelResourceStatus();
+  DALI_TEST_EQUALS(Scene3D::Model::ResourceStatus::PREPARING, loadingStatus, TEST_LOCATION);
+
+  gLoadCompletedCalled = false;
+  model.LoadCompletedSignal().Connect(&OnLoadCompleted);
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Check loading status after successful load
+  loadingStatus = model.GetModelResourceStatus();
+  DALI_TEST_EQUALS(Scene3D::Model::ResourceStatus::READY, loadingStatus, TEST_LOCATION);
+  DALI_TEST_EQUALS(gLoadCompletedCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliModelLoadingStatusFailed(void)
+{
+  ToolkitTestApplication application;
+
+  // Try to load a non-existent model file
+  Scene3D::Model model = Scene3D::Model::New("non_existent_file.gltf");
+
+  // Check initial loading status
+  auto loadingStatus = model.GetModelResourceStatus();
+  DALI_TEST_EQUALS(Scene3D::Model::ResourceStatus::PREPARING, loadingStatus, TEST_LOCATION);
+
+  gLoadCompletedCalled = false;
+  model.LoadCompletedSignal().Connect(&OnLoadCompleted);
+
+  application.GetScene().Add(model);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  // Check loading status after failed load
+  loadingStatus = model.GetModelResourceStatus();
+  DALI_TEST_EQUALS(Scene3D::Model::ResourceStatus::FAILED, loadingStatus, TEST_LOCATION);
   DALI_TEST_EQUALS(gLoadCompletedCalled, true, TEST_LOCATION);
 
   END_TEST;

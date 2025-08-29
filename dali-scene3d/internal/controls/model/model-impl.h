@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_MODEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,6 +193,11 @@ public:
    * @copydoc Model::IsShadowReceiving()
    */
   bool IsShadowReceiving() const;
+
+  /**
+   * @copydoc Model::GetModelResourceStatus()
+   */
+  Scene3D::Model::ResourceStatus GetModelResourceStatus() const;
 
   /**
    * @copydoc Scene3D::Model::MeshHitSignal()
@@ -479,6 +484,7 @@ private:
   bool          mIblSpecularDirty;
   bool          mIsShadowCasting;
   bool          mIsShadowReceiving;
+  bool          mModelLoadFailed;
 };
 
 } // namespace Internal
