@@ -520,7 +520,6 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetExclusive(true);
   mHorizontalBlurTask.SetInputEnabled(true);
-  mHorizontalBlurTask.SetScreenToFrameBufferMappingActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
 
@@ -534,7 +533,6 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHol
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
   mVerticalBlurTask.SetExclusive(true);
   mVerticalBlurTask.SetInputEnabled(true);
-  mVerticalBlurTask.SetScreenToFrameBufferMappingActor(mVerticalBlurActor);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
 
