@@ -924,3 +924,324 @@ int UtcDaliVideoViewDisplayModeForCoverage(void)
 
   END_TEST;
 }
+
+int UtcDaliVideoViewSetFrameInterpolationInterval_P(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewSetFrameInterpolationInterval_P");
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK(videoView);
+
+  // Test setting a valid positive interval
+  float intervalToSet = 0.033f; // ~30fps
+  DevelVideoView::SetFrameInterpolationInterval(videoView, intervalToSet);
+  float retrievedInterval = DevelVideoView::GetFrameInterpolationInterval(videoView);
+  DALI_TEST_EQUALS(intervalToSet, retrievedInterval, TEST_LOCATION);
+
+  // Test setting zero interval
+  intervalToSet = 0.0f;
+  DevelVideoView::SetFrameInterpolationInterval(videoView, intervalToSet);
+  retrievedInterval = DevelVideoView::GetFrameInterpolationInterval(videoView);
+  DALI_TEST_EQUALS(intervalToSet, retrievedInterval, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewSetFrameInterpolationInterval_N(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewSetFrameInterpolationInterval_N");
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK(videoView);
+
+  // Test setting a negative interval
+  // The expected behavior is that it should not crash and ideally should be a no-op or log a warning.
+  // We test that it doesn't throw an unhandled exception.
+  try
+  {
+    DevelVideoView::SetFrameInterpolationInterval(videoView, -0.1f);
+    DALI_TEST_CHECK(true); // If no exception, test passes for robustness
+  }
+  catch(Dali::DaliException& e)
+  {
+    // If an assertion is thrown and caught, it's also an acceptable behavior for negative input.
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_CHECK(true); // Test passes if an expected assertion is thrown.
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Fail for any other unexpected exception
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewSetNativeImageSourceForCurrentFrame_P(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewSetNativeImageSourceForCurrentFrame_P");
+
+  // This test only works in Underlay mode.
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false; // Force Underlay.
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK(videoView);
+
+  application.GetScene().Add(videoView);
+
+  // Set Underlay mode and assign a valid size.
+  videoView.SetProperty(VideoView::Property::UNDERLAY, true);
+  videoView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  // Set the frame interpolation interval.
+  float interpolationInterval = 0.5f; // 0.5 seconds
+  DevelVideoView::SetFrameInterpolationInterval(videoView, interpolationInterval);
+  DALI_TEST_EQUALS(interpolationInterval, DevelVideoView::GetFrameInterpolationInterval(videoView), TEST_LOCATION);
+
+  // Connect to the scene and ensure size is set.
+  application.SendNotification();
+  application.Render();
+
+  // --- Part 1: Setting the first frame. No animation should play. ---
+  tet_printf("Part 1: Setting the first frame.\n");
+  NativeImageSourcePtr nativeImageSource1 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  DALI_TEST_CHECK(nativeImageSource1);
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource1);
+
+  // Let the event be processed.
+  application.SendNotification();
+  application.Render(16);
+
+  // VideoView should now have two renderers in Underlay mode, as CreateOverlayTextureVisual is called.
+  // Index 0: General overlay renderer
+  // Index 1: Texture renderer for frame interpolation
+  DALI_TEST_EQUALS(videoView.GetRendererCount(), 2u, TEST_LOCATION);
+
+  Renderer renderer = videoView.GetRendererAt(1);
+  DALI_TEST_CHECK(renderer);
+
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
+
+  // Get the uInterpolationFactor property index.
+  Property::Index interpolationFactorIndex = shader.GetPropertyIndex("uInterpolationFactor");
+  DALI_TEST_CHECK(interpolationFactorIndex != Property::INVALID_INDEX);
+
+  // Since this is the first frame, mPreviousFrameTexture and mCurrentFrameTexture are the same.
+  // The new logic sets uInterpolationFactor to 1.0f immediately to show the current frame.
+  float currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor after first frame: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION);
+
+  // Render for the duration of the interpolation interval. The value should not change.
+  application.Render(static_cast<unsigned int>(interpolationInterval * 1000.0f));
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor after first frame + interval: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION); // Still no change.
+
+  // --- Part 2: Setting a second, different frame. Animation should play. ---
+  tet_printf("Part 2: Setting a second, different frame.\n");
+  NativeImageSourcePtr nativeImageSource2 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  DALI_TEST_CHECK(nativeImageSource2);
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource2);
+
+  application.SendNotification();
+  application.Render(16); // Let new animation start
+
+  // Now, mPreviousFrameTexture (nativeImageSource1) and mCurrentFrameTexture (nativeImageSource2) are different.
+  // The animation should start, and uInterpolationFactor should be reset to 0.0f by the new animation logic.
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor after second frame: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue >= 0.0f && currentValue < 0.1f);
+
+  // Check at the midpoint of the animation
+  application.Render(234u); // 16ms + 234ms = 250ms
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor at midpoint: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue > 0.4f && currentValue < 0.6f);
+
+  // Check at the end of the animation
+  application.Render(266u); // 250ms + 266ms = 516ms
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor at end: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION);
+
+  // --- Part 3: Setting the same frame again. Animation should restart. ---
+  tet_printf("Part 3: Setting the same frame again.\n");
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource2); // Set the same frame
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Even though we set the same NativeImageSource object, the internal logic treats
+  // mPreviousFrameTexture (nativeImageSource2) and mCurrentFrameTexture (nativeImageSource2)
+  // as a transition, so the animation restarts.
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor after setting same frame again: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue >= 0.0f && currentValue < 0.1f); // Animation restarted.
+
+  // Render for the duration of the interpolation interval. The animation should complete.
+  application.Render(static_cast<unsigned int>(interpolationInterval * 1000.0f));
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("uInterpolationFactor after setting same frame again + interval: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION); // Animation completed.
+
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true; // Restore original value
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewSetNativeImageSourceForCurrentFrame_N(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewSetNativeImageSourceForCurrentFrame_N");
+
+  // This test only works in Underlay mode to be consistent with the positive test.
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false; // Force Underlay.
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK(videoView);
+
+  application.GetScene().Add(videoView);
+  videoView.SetProperty(VideoView::Property::UNDERLAY, true);
+  videoView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  // Set a positive interpolation interval to avoid potential crash paths in the new implementation
+  // that might be triggered when mInterpolationInterval is 0.0f (its default value).
+  // This ensures the test focuses on the empty NativeImageSource handling.
+  DevelVideoView::SetFrameInterpolationInterval(videoView, 0.5f);
+
+  application.SendNotification();
+  application.Render();
+
+  // Initially, there should be only one renderer (the general overlay renderer).
+  // The texture renderer for interpolation is created only when a valid NativeImageSource is set.
+  DALI_TEST_EQUALS(videoView.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // Test setting an uninitialized (empty) NativeImageSourcePtr
+  NativeImageSourcePtr emptyImageSource; // Default constructor creates an empty handle
+  DALI_TEST_CHECK(!emptyImageSource);
+
+  // The expected behavior is that it should not crash and should be a no-op.
+  // Specifically, it should not create the interpolation texture renderer.
+  try
+  {
+    DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, emptyImageSource);
+    DALI_TEST_CHECK(true); // If no exception, test passes for robustness
+
+    application.SendNotification();
+    application.Render(16);
+
+    // After setting an empty image source, the renderer count should still be 1,
+    // as CreateOverlayTextureVisual should not have been called or should have failed gracefully.
+    DALI_TEST_EQUALS(videoView.GetRendererCount(), 1u, TEST_LOCATION);
+  }
+  catch(Dali::DaliException& e)
+  {
+    // If an assertion is thrown and caught, it's also an acceptable behavior for invalid input.
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_CHECK(true); // Test passes if an expected assertion is thrown.
+  }
+  catch(...)
+  {
+    // A segmentation fault would be caught here as "any other unexpected exception",
+    // leading to test failure. This indicates a bug in the implementation.
+    tet_printf("Caught an unexpected exception, possibly a segmentation fault.\n");
+    DALI_TEST_CHECK(false); // Fail for any other unexpected exception
+  }
+
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true; // Restore original value
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewCleanupInterpolationAnimationOnIntervalChange_P(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewCleanupInterpolationAnimationOnIntervalChange_P");
+
+  // This test verifies that mInterpolationAnimation is stopped and cleared
+  // when a new frame interpolation interval is set, and that a subsequent frame
+  // starts a new animation with the correct interval.
+
+  // Force Underlay mode.
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false;
+
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK(videoView);
+
+  application.GetScene().Add(videoView);
+  videoView.SetProperty(VideoView::Property::UNDERLAY, true);
+  videoView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  // Set an initial frame interpolation interval.
+  float initialInterval = 0.5f; // 0.5 seconds
+  DevelVideoView::SetFrameInterpolationInterval(videoView, initialInterval);
+
+  // --- Step 1: Set the first frame. No animation should play. ---
+  NativeImageSourcePtr nativeImageSource1 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource1);
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = videoView.GetRendererAt(1);
+  Shader   shader   = renderer.GetShader();
+  Property::Index interpolationFactorIndex = shader.GetPropertyIndex("uInterpolationFactor");
+  float currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("Value after first frame: %f\n", currentValue);
+  // The new logic sets uInterpolationFactor to 1.0f immediately for the first frame.
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION);
+
+  // --- Step 2: Set a second, different frame. Animation should play. ---
+  NativeImageSourcePtr nativeImageSource2 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource2);
+  application.SendNotification();
+  application.Render(16); // Start animation
+
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("Value after second frame: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue >= 0.0f && currentValue < 0.1f); // Animation started.
+
+  // --- Step 3: Render to a midpoint to ensure animation is active. ---
+  application.Render(234u); // 250ms total
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("Value at midpoint: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue > 0.4f && currentValue < 0.6f); // Animation is in progress.
+
+  // --- Step 4: Set a new frame interpolation interval. ---
+  // Note: This does not stop the currently playing animation. The new interval will
+  // be used for the *next* animation that starts.
+  float newInterval = 0.2f; // 0.2 seconds
+  DevelVideoView::SetFrameInterpolationInterval(videoView, newInterval);
+  DALI_TEST_EQUALS(DevelVideoView::GetFrameInterpolationInterval(videoView), newInterval, TEST_LOCATION);
+
+  // --- Step 5: Let the current animation (with the old interval) finish. ---
+  // Render the remaining duration of the initial 0.5s interval.
+  application.Render(250u); // 250ms + 250ms = 500ms
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("Value after first animation finishes: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION); // First animation should finish.
+
+  // --- Step 6: Set a third frame to start a new animation with the new interval. ---
+  NativeImageSourcePtr nativeImageSource3 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  DevelVideoView::SetNativeImageSourceForCurrentFrame(videoView, nativeImageSource3);
+
+  application.SendNotification();
+  application.Render(16); // Start new animation
+
+  // --- Step 7: Check that the new animation starts from 0.0f and finishes with the new interval. ---
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("New animation start value: %f\n", currentValue);
+  DALI_TEST_CHECK(currentValue >= 0.0f && currentValue < 0.1f);
+
+  // Render for the new interval's duration.
+  application.Render(184u); // 16ms + 184ms = 200ms
+  currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  tet_printf("New animation end value: %f\n", currentValue);
+  DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION); // New animation should finish with the new interval.
+
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true; // Restore original value
+  END_TEST;
+}

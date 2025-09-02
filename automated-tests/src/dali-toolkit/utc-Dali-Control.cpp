@@ -1659,6 +1659,42 @@ int UtcDaliControlOffScreenRenderingSizeSet(void)
   END_TEST;
 }
 
+int UtcDaliControlOffScreenRenderingGetOutput(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  application.GetScene().Add(control);
+
+  control.SetBackgroundColor(Color::RED);
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ALWAYS);
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  control.OffScreenRenderingFinishedSignal().Connect([]() -> void { tet_printf("Signal emitted\n"); });
+
+  DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  Dali::Texture texture = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+  DALI_TEST_EQUALS(texture.GetHeight(), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetWidth(), 50.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliControlNewWithDisableVisuals(void)
 {
   ToolkitTestApplication application;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
                 PixelData maskPixelData = Devel::PixelBuffer::Convert(maskPixelBuffer); // takes ownership of buffer
                 maskTexture             = Texture::New(Dali::TextureType::TEXTURE_2D, maskPixelData.GetPixelFormat(), maskPixelData.GetWidth(), maskPixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-                maskTexture.Upload(maskPixelData,maskTextureInfo.url.GetUrl(), maskTextureInfo.textureId);
+                maskTexture.Upload(maskPixelData, maskTextureInfo.url.GetUrl(), maskTextureInfo.textureId);
 #else
                 maskTexture.Upload(maskPixelData);
 #endif
@@ -753,6 +753,18 @@ void TextureManager::RequestRemove(const TextureManager::TextureId textureId, Te
   }
 }
 
+void TextureManager::RequestRemoveExternalResourceByUrl(const std::string& url)
+{
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestRemoveExternalResourceByUrl( url=%s )\n", url.c_str());
+
+  mRemoveExternalQueue.push_back(VisualUrl(url));
+  if(!mRemoveProcessorRegistered && Adaptor::IsAvailable())
+  {
+    mRemoveProcessorRegistered = true;
+    Adaptor::Get().RegisterProcessorOnce(*this, true);
+  }
+}
+
 void TextureManager::Remove(const TextureManager::TextureId textureId)
 {
   if(textureId != INVALID_TEXTURE_ID)
@@ -795,9 +807,8 @@ void TextureManager::Remove(const TextureManager::TextureId textureId)
 
 void TextureManager::ProcessRemoveQueue()
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss) {
-    oss << "[" << mRemoveQueue.Count() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss)
+                                          { oss << "[" << mRemoveQueue.Count() << ", " << mRemoveExternalQueue.size() << "]"; });
 
   // Note that RemoveQueue is not be changed during Remove().
   for(auto&& textureId : mRemoveQueue)
@@ -808,7 +819,20 @@ void TextureManager::ProcessRemoveQueue()
     }
   }
 
+  for(auto&& visualUrl : mRemoveExternalQueue)
+  {
+    if(VisualUrl::TEXTURE == visualUrl.GetProtocolType())
+    {
+      RemoveExternalTexture(visualUrl);
+    }
+    else if(VisualUrl::BUFFER == visualUrl.GetProtocolType())
+    {
+      RemoveEncodedImageBuffer(visualUrl);
+    }
+  }
+
   mRemoveQueue.Clear();
+  mRemoveExternalQueue.clear();
 
   DALI_TRACE_END(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE");
 }

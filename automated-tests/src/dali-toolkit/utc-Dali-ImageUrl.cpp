@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,5 +75,39 @@ int UtcImageUrlConstructor02(void)
   baseUrl              = imageUrl;
   ImageUrl downcastUrl = ImageUrl::DownCast(baseUrl);
   DALI_TEST_CHECK(downcastUrl);
+  END_TEST;
+}
+
+int UtcImageUrlInvalidateUrlAfterProcess(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcImageUrlInvalidateUrlAfterProcess ");
+
+  // Test default constructor.
+  ImageUrl imageUrl;
+  DALI_TEST_CHECK(!imageUrl);
+
+  // Test object creation
+  Texture image = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u); // test texture
+  imageUrl      = ImageUrl::New(image);
+  DALI_TEST_CHECK(imageUrl);
+  DALI_TEST_EQUALS(imageUrl.GetUrl(), std::string("dali://0"), TEST_LOCATION);
+
+  tet_printf("Reset previous image, and re-create new ImageUrl immediately. Check previous image still available\n");
+  imageUrl.Reset();
+  imageUrl = ImageUrl::New(image);
+  DALI_TEST_CHECK(imageUrl);
+  DALI_TEST_EQUALS(imageUrl.GetUrl(), std::string("dali://1"), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Now we can use invalidated image url\n");
+  imageUrl.Reset();
+  imageUrl = ImageUrl::New(image);
+  DALI_TEST_CHECK(imageUrl);
+  DALI_TEST_EQUALS(imageUrl.GetUrl(), std::string("dali://0"), TEST_LOCATION);
+
   END_TEST;
 }

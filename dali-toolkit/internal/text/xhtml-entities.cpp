@@ -300,9 +300,15 @@ const XHTMLEntityLookup XHTMLEntityLookupTable[] =
   {"&lang;\0"    ,"\xe2\x9f\xa8\0" },
   {"&rang;\0"    ,"\xe2\x9f\xa9\0" }
 };
+
+const XHTMLEntityLookup XHTMLEntityLegacyLookupTable[] =
+{
+  {"&Aelig;\0"   ,"\xc3\x86\0"     }
+};
 // clang-format on
 
 const std::size_t XHTMLENTITY_LOOKUP_COUNT = (sizeof(XHTMLEntityLookupTable)) / (sizeof(XHTMLEntityLookup));
+const std::size_t XHTMLENTITY_LEGACY_LOOPKUP_COUNT =  (sizeof(XHTMLEntityLegacyLookupTable)) / (sizeof(XHTMLEntityLookup));
 
 } // unnamed namespace
 
@@ -320,6 +326,20 @@ const char* const NamedEntityToUtf8(const char* const markupText, unsigned int l
       }
     }
   }
+
+  // finding in legacy lookup table which was supported in EFL.
+  for(size_t i = 0; i < XHTMLENTITY_LEGACY_LOOPKUP_COUNT; ++i)
+  {
+    unsigned int entityLen = strlen(XHTMLEntityLegacyLookupTable[i].entityName);
+    if(len == entityLen)
+    {
+      if(strncmp(markupText, XHTMLEntityLegacyLookupTable[i].entityName, len) == 0) // if named Entity found in table
+      {
+        return XHTMLEntityLegacyLookupTable[i].entityCode;
+      }
+    }
+  }
+
   return NULL;
 }
 

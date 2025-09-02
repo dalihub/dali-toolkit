@@ -21,6 +21,7 @@ FLAT OUTPUT highp vec2 vRectSize;      // Added
 FLAT OUTPUT highp vec2 vOptRectSize;
 FLAT OUTPUT highp vec4 vCornerRadius; //output
 FLAT OUTPUT highp float vAliasMargin;  // Added
+OUTPUT highp vec2 vTexCoord;
 
 void main()
 {
@@ -71,4 +72,8 @@ void main()
   // For VideoView, anchorPoint, visualOffset, origin are effectively 0.
   // So, gl_Position = uMvpMatrix * vec4(vPosition, 0.0, 1.0);
   gl_Position = uMvpMatrix * vec4(vPosition, 0.0, 1.0);
+
+  // Texture coordinate calculation (matches original video-view-source.vert)
+  // aPosition is -0.5 to 0.5, vTexCoord should be 0.0 to 1.0
+  vTexCoord = aPosition + vec2(0.5);
 }

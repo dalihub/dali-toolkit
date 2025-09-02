@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,7 @@ ImageUrl::~ImageUrl()
     if(visualFactory)
     {
       auto& textureManager = GetImplementation(visualFactory).GetTextureManager();
-      if(VisualUrl::TEXTURE == VisualUrl::GetProtocolType(mUrl))
-      {
-        textureManager.RemoveExternalTextureByUrl(mUrl);
-      }
-      else if(VisualUrl::BUFFER == VisualUrl::GetProtocolType(mUrl))
-      {
-        textureManager.RemoveEncodedImageBufferByUrl(mUrl);
-      }
+      textureManager.RequestRemoveExternalResourceByUrl(mUrl);
     }
   }
 }

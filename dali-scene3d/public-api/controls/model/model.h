@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,17 @@ public:
   using ColliderMeshPtr   = std::unique_ptr<Algorithm::NavigationMesh>;
 
   using LoadCompletedSignalType = Signal<void(Model, bool)>; ///< Model load completed signal type @SINCE_2_3.46
+
+  /**
+   * @brief Enumeration for the resource status of the model.
+   * @SINCE_2_4.34
+   */
+  enum class ResourceStatus
+  {
+    PREPARING, ///< Loading is in progress or preparing.
+    READY,     ///< All resources are loaded and ready.
+    FAILED     ///< Resource loading has failed.
+  };
 
   /**
    * @brief Create an initialized Model.
@@ -449,6 +460,14 @@ public:
    * @return The signal to connect to
    */
   LoadCompletedSignalType& LoadCompletedSignal();
+
+  /**
+   * @brief Retrieves the resource loading status of the model.
+   *
+   * @SINCE_2_4.34
+   * @return The current resource status of the model.
+   */
+  ResourceStatus GetModelResourceStatus() const;
 
 public: // Not intended for application developers
   /// @cond internal

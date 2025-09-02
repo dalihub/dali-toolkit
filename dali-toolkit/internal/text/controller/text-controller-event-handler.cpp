@@ -116,6 +116,7 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
 bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyEvent& keyEvent)
 {
   DALI_ASSERT_DEBUG(controller.mImpl->mEventData && "Unexpected KeyEvent");
+  DALI_LOG_RELEASE_INFO("EventHandler KeyEvent: [%d] [%s]\n", keyEvent.GetKeyCode(), keyEvent.GetKeyString().c_str());
 
   bool textChanged    = false;
   bool relayoutNeeded = false;
@@ -797,6 +798,8 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
 
 InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextEvent(Controller& controller, InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
+  DALI_LOG_RELEASE_INFO("EventHandler eventName: [%d] predictveString: [%s]\n", inputMethodContextEvent.eventName, inputMethodContextEvent.predictiveString.c_str());
+
   // Whether the text needs to be relaid-out.
   bool requestRelayout = false;
 

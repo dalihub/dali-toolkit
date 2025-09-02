@@ -20,11 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/native-image-source-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -39,7 +41,8 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
+
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 namespace Dali
 {
@@ -99,7 +102,10 @@ VideoView::VideoView(Dali::VideoSyncMode syncMode)
   mIsPlay(false),
   mIsUnderlay(true),
   mSyncMode(syncMode),
-  mSiblingOrder(0)
+  mSiblingOrder(0),
+  // For frame interpolation
+  mInterpolationInterval(0.0f),
+  mInterpolationFactorPropertyIndex(Property::INVALID_INDEX)
 {
 }
 
@@ -126,7 +132,7 @@ void VideoView::OnInitialize()
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::VIDEO);
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
-  //update self property
+  // update self property
   self.RegisterProperty(IS_VIDEO_VIEW_PROPERTY_NAME, true, Property::READ_WRITE);
 }
 
@@ -566,7 +572,7 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
     // it will be re-designed and implemented.
     // Until it is completed, the below code will be commented.
 
-    //SetFrameRenderCallback();
+    // SetFrameRenderCallback();
     mVideoPlayer.StartSynchronization();
   }
   Control::OnSizeSet(targetSize);
@@ -688,16 +694,9 @@ void VideoView::SetWindowSurfaceTarget()
 
   if(!mOverlayVisual)
   {
-    //// For underlay rendering mode, video display area have to be transparent.
-    Property::Map shader;
-    shader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = std::string(SHADER_VIDEO_VIEW_VERT);
-    shader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = std::string(SHADER_VIDEO_VIEW_FRAG);
-    shader[Toolkit::Visual::Shader::Property::HINTS]           = static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
-    shader[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW_OVERLAY";
-
     Property::Map properties;
-    properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
-    properties[Toolkit::Visual::Property::SHADER] = shader;
+    properties[Toolkit::Visual::Property::TYPE]      = Toolkit::Visual::Type::COLOR;
+    properties[Toolkit::Visual::Property::MIX_COLOR] = Color::BLACK;
 
     mOverlayVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mOverlayVisual)
@@ -706,22 +705,33 @@ void VideoView::SetWindowSurfaceTarget()
 
       Renderer renderer = visualImpl.GetRenderer();
 
-      // Set default(prevent trash values)
-      Shader shader = renderer.GetShader();
-      shader.RegisterProperty("cornerRadius", Vector4::ZERO);
-      shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
-      shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
-
+      //// For underlay rendering mode, video display area have to be transparent.
+      // Note :  The actuall result is like this.
+      //
+      // Final RGB = (Dest RGB) * (Dest A - Src A) / (Dest A)
+      // Final A   = (Dest A - Src A)
+      //
+      // But their is limitation that we cannot explain (1 - Src A / Dest A) by blend factor.
+      // So it will have problem if we overlap 2 or more Underlay VideoView.
+      // Else, most of cases are Dest A == 1. So just use ONE_MINUS_SRC_ALPHA as DEST_RGB.
       renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
       renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ZERO);
-      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE);
-      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, DevelBlendEquation::MIN);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::REVERSE_SUBTRACT);
 
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY, mOverlayVisual);
 
       // Sync corner values to Control
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayVisual, true);
     }
+  }
+
+  if(!mOverlayTextureVisual)
+  {
+    CreateOverlayTextureVisual();
   }
 
   if(mIsPlay)
@@ -763,6 +773,28 @@ void VideoView::SetNativeImageTarget()
       Toolkit::VisualFactory::Get().DiscardVisual(mOverlayVisual);
     }
     mOverlayVisual.Reset();
+  }
+
+  if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
+  {
+    Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
+
+    if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(mOverlayTextureVisual);
+    }
+    mOverlayTextureVisual.Reset();
+  }
+
+  // Reset frame interpolation related members as they are not used in native image target mode
+  mPreviousFrameTexture.Reset();
+  mCurrentFrameTexture.Reset();
+  mInterpolationInterval            = 0.0f;
+  mInterpolationFactorPropertyIndex = Property::INVALID_INDEX;
+  if(mInterpolationAnimation)
+  {
+    mInterpolationAnimation.Stop();
+    mInterpolationAnimation.Clear();
   }
 
   self.RemovePropertyNotification(mPositionUpdateNotification);
@@ -916,7 +948,7 @@ void VideoView::OnAnimationFinished(Animation& animation)
   // it will be re-designed and implemented.
   // Until it is completed, the below code will be commented.
 
-  //SetFrameRenderCallback();
+  // SetFrameRenderCallback();
 }
 
 void VideoView::OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size)
@@ -1035,6 +1067,60 @@ void VideoView::SetFrameRenderCallback()
                                         mFrameID);
 }
 
+void VideoView::CreateOverlayTextureVisual()
+{
+  if(!mCurrentFrameTexture || mOverlayTextureVisual)
+  {
+    return;
+  }
+
+  std::string fragmentShaderString = std::string(SHADER_VIDEO_VIEW_SOURCE_FRAG);
+  DevelTexture::ApplyNativeFragmentShader(mCurrentFrameTexture, fragmentShaderString, 2);
+
+  //// For underlay rendering mode, video display area have to be transparent.
+  Property::Map shaderMap;
+  shaderMap[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = SHADER_VIDEO_VIEW_SOURCE_VERT.data();
+  shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderString;
+  shaderMap[Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 11;
+  shaderMap[Toolkit::Visual::Shader::Property::HINTS]           = static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
+  shaderMap[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW_OVERLAY_SOURCE_TEXTURE";
+
+  Property::Map properties;
+  properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
+  properties[Toolkit::Visual::Property::SHADER] = shaderMap;
+  mOverlayTextureVisual                         = Toolkit::VisualFactory::Get().CreateVisual(properties);
+
+  if(mOverlayTextureVisual)
+  {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
+    Renderer                renderer   = visualImpl.GetRenderer();
+
+    // Set default(prevent trash values)
+    Shader shader = renderer.GetShader();
+    shader.RegisterProperty("cornerRadius", Vector4::ZERO);
+    shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
+    shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
+    mInterpolationFactorPropertyIndex = shader.RegisterProperty("uInterpolationFactor", 0.0f);
+
+    auto                     self = Self();
+    Dali::Toolkit::VideoView handle(Dali::Toolkit::VideoView::DownCast(self));
+    if(mOverlayTextureVisualIndex == Property::INVALID_INDEX)
+    {
+      mOverlayTextureVisualIndex = handle.RegisterProperty("videoViewTextureVisual", "videoViewTextureVisual", Property::AccessMode::READ_WRITE);
+    }
+    Toolkit::Control control     = Toolkit::Control(GetOwner());
+    Control&         controlImpl = GetImplementation(control);
+    Toolkit::DevelControl::RegisterVisual(controlImpl, mOverlayTextureVisualIndex, mOverlayTextureVisual);
+
+    Dali::TextureSet textures = Dali::TextureSet::New();
+    textures.SetTexture(0, mPreviousFrameTexture);
+    textures.SetTexture(1, mCurrentFrameTexture);
+    renderer.SetTextures(textures);
+    // Sync corner values to Control
+    Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayTextureVisual, true);
+  }
+}
+
 bool VideoView::IsVideoView(Actor actor) const
 {
   // Check whether the actor is a VideoView
@@ -1075,6 +1161,74 @@ void VideoView::SetLetterBoxEnabled(bool enable)
 bool VideoView::IsLetterBoxEnabled() const
 {
   return mVideoPlayer.IsLetterBoxEnabled();
+}
+
+void VideoView::SetFrameInterpolationInterval(float intervalSeconds)
+{
+  mInterpolationInterval = intervalSeconds;
+  // If not interpolating, just update the interval. It will be used on the next SetNativeImageSourceForCurrentFrame.
+}
+
+float VideoView::GetFrameInterpolationInterval() const
+{
+  return mInterpolationInterval;
+}
+
+void VideoView::SetNativeImageSourceForCurrentFrame(NativeImageSourcePtr nativeImageSource)
+{
+  if(!nativeImageSource)
+  {
+    return;
+  }
+
+  mPreviousFrameTexture = mCurrentFrameTexture;
+  mCurrentFrameTexture  = Texture::New(*nativeImageSource);
+
+  if(!Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  {
+    mPreviousFrameTexture = mCurrentFrameTexture;
+    return;
+  }
+
+  if(!mOverlayTextureVisual)
+  {
+    mPreviousFrameTexture = (mPreviousFrameTexture) ? mPreviousFrameTexture : mCurrentFrameTexture;
+    CreateOverlayTextureVisual();
+  }
+
+  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
+  Renderer                renderer   = visualImpl.GetRenderer();
+
+  TextureSet textures = renderer.GetTextures();
+  textures.SetTexture(0u, mPreviousFrameTexture);
+  textures.SetTexture(1u, mCurrentFrameTexture);
+
+  if(mInterpolationAnimation && mInterpolationAnimation.GetState() == Dali::Animation::State::PLAYING)
+  {
+    mInterpolationAnimation.Stop();
+    mInterpolationAnimation.Clear();
+  }
+
+  mInterpolationAnimation.Reset();
+
+  Shader shader = renderer.GetShader();
+  if(mCurrentFrameTexture != mPreviousFrameTexture && mInterpolationInterval > 0.0f)
+  {
+    // Use KeyFrames to ensure the animation always starts from 0.0f
+    KeyFrames interpolationKeyFrames = KeyFrames::New();
+    interpolationKeyFrames.Add(0.0f, 0.0f); // At time 0.0s, value is 0.0f
+    interpolationKeyFrames.Add(1.0f, 1.0f); // At time 1.0f, value is 1.0f
+
+    // Set default(prevent trash values)
+    mInterpolationAnimation = Animation::New(mInterpolationInterval);
+    mInterpolationAnimation.AnimateBetween(Dali::Property(shader, mInterpolationFactorPropertyIndex), interpolationKeyFrames, AlphaFunction::LINEAR);
+    mInterpolationAnimation.Play();
+  }
+  else
+  {
+    // Show current texture
+    shader.SetProperty(mInterpolationFactorPropertyIndex, 1.0f);
+  }
 }
 
 } // namespace Internal

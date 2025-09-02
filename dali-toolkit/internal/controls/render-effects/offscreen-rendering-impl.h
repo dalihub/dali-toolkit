@@ -66,6 +66,12 @@ public:
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
+  /**
+   * @brief Get rendered output. Only valid when type is set to OffScreenRenderingType::RENDER_ONCE
+   * @return mTexture, the output
+   */
+  Dali::Texture GetTexture() const;
+
 protected:
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnInitialize
   void OnInitialize() override;
@@ -100,10 +106,16 @@ private:
    */
   void DestroyRenderTask();
 
+  /**
+   * @brief Saves texture after render once is finished.
+   */
+  void OnRenderFinished(Dali::RenderTask& task);
+
 private:
   RenderTask                           mRenderTask;
   CameraActor                          mCamera;
   FrameBuffer                          mFrameBuffer;
+  Dali::Texture                        mTexture; // saved when render once
   DevelControl::OffScreenRenderingType mType;
 };
 } // namespace Internal

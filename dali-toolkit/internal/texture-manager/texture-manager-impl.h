@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,14 +276,6 @@ public:
   }
 
   /**
-   * @copydoc TextureCacheManager::RemoveEncodedImageBuffer
-   */
-  inline EncodedImageBuffer RemoveEncodedImageBufferByUrl(const std::string& url)
-  {
-    return RemoveEncodedImageBuffer(url);
-  }
-
-  /**
    * @copydoc TextureCacheManager::UseExternalResource
    */
   inline void UseExternalResource(const VisualUrl& url)
@@ -486,7 +478,7 @@ private: // Internal Load Request API
 
 public: // Remove Request API
   /**
-   * @brief Request Remove a Texture from the TextureManager.
+   * @brief Request to remove a Texture from the TextureManager.
    *
    * Textures are cached and therefore only the removal of the last
    * occurrence of a Texture will cause its removal internally.
@@ -495,6 +487,16 @@ public: // Remove Request API
    * @param[in] textureObserver The texture observer.
    */
   void RequestRemove(const TextureManager::TextureId textureId, TextureUploadObserver* textureObserver);
+
+  /**
+   * @brief Request to remove a ExternalTexture or EncodedImageBuffer from the TextureManager.
+   *
+   * Textures are cached and therefore only the removal of the last
+   * occurrence of a Texture will cause its removal internally.
+   *
+   * @param[in] url external texture's url
+   */
+  void RequestRemoveExternalResourceByUrl(const std::string& url);
 
 private:
   /**
@@ -680,7 +682,8 @@ private:                                    // Member Variables:
   Dali::Vector<QueueElement> mLoadQueue;             ///< Queue of textures to load after NotifyObservers
   TextureManager::TextureId  mLoadingQueueTextureId; ///< TextureId when it is loading. it causes Load Textures to be queued.
 
-  Dali::Vector<TextureManager::TextureId> mRemoveQueue; ///< Queue of textures to remove at PostProcess. It will be cleared after PostProcess.
+  Dali::Vector<TextureManager::TextureId> mRemoveQueue;         ///< Queue of textures to remove at PostProcess. It will be cleared after PostProcess.
+  std::vector<VisualUrl>                  mRemoveExternalQueue; ///< Queue of external resources to remove at PostProcess. It will be cleared after PostProcess.
 
   const bool mLoadYuvPlanes;             ///< A global flag to specify if the image should be loaded as yuv planes
   bool       mRemoveProcessorRegistered; ///< Flag if remove processor registered or not.

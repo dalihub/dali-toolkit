@@ -1,4 +1,4 @@
-//@name video-view.frag
+//@name video-view-source.frag
 
 //@version 100
 
@@ -10,6 +10,11 @@ FLAT INPUT highp vec2 vRectSize;      // Added
 FLAT INPUT highp vec2 vOptRectSize;
 FLAT INPUT highp vec4 vCornerRadius;
 FLAT INPUT highp float vAliasMargin;  // Added
+INPUT highp vec2 vTexCoord;
+
+// Textures
+UNIFORM sampler2D sPreviousTexture;
+UNIFORM sampler2D sCurrentTexture;
 
 // Uniform blocks
 UNIFORM_BLOCK FragBlock
@@ -120,7 +125,10 @@ mediump float calculateCornerOpacity()
 void main()
 {
   // Texture interpolation logic (from original video-view-source.frag)
-  lowp vec4 targetColor = vec4(0.0); // Apply uColor modulation
+  vec4 currentColor = TEXTURE(sCurrentTexture, vTexCoord);
+  vec4 previousColor = TEXTURE(sPreviousTexture, vTexCoord);
+  vec4 interpolatedColor = mix(previousColor, currentColor, uInterpolationFactor);
+  lowp vec4 targetColor = vec4(interpolatedColor.rgb * uColor.rgb, interpolatedColor.a); // Apply uColor modulation
 
   // Corner radius logic (from color-visual-shader.frag)
   // skip most potential calculate for performance
@@ -147,7 +155,7 @@ void main()
       gl_FragColor = targetColor;
 
       mediump float opacity = calculateCornerOpacity();
-      gl_FragColor.a *= (1.0 - opacity); // Apply opacity to the alpha channel
+      gl_FragColor.a *= opacity; // Apply opacity to the alpha channel
     }
   }
 }
