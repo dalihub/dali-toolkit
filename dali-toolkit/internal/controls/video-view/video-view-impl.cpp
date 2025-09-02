@@ -1006,14 +1006,14 @@ Property::Map VideoView::CreateShader()
     if(!fragmentShaderValue || !checkShader)
     {
       fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
-      DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
+      DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader, 1);
     }
   }
   else
   {
     vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
     fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
-    DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
+    DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader, 1);
   }
 
   Property::Map shader;

@@ -738,7 +738,8 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
    * @brief Check whether FastTrackUploading is avaliable or not.
    * @return True if we can use fast track uploading feature. False otherwise.
    */
-  auto IsFastTrackUploadingAvailable = [&]() {
+  auto IsFastTrackUploadingAvailable = [&]()
+  {
     if(mUseFastTrackUploading &&
        mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::ATTACHED &&
        mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED &&
@@ -1444,7 +1445,7 @@ Shader ImageVisual::GenerateShader() const
       bool        modifiedFragmentShader = false;
       std::string fragmentShaderString   = std::string(fragmentShaderView);
 
-      modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShaderString);
+      modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShaderString, 1);
       if(modifiedFragmentShader)
       {
         fragmentShaderView = fragmentShaderString;

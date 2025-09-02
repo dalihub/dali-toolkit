@@ -197,7 +197,7 @@ Shader GlView::CreateShader()
 
   if(mNativeImageQueue)
   {
-    mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader);
+    mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader, 1);
   }
 
   return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "GL_VIEW");
