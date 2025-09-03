@@ -55,6 +55,7 @@
 #include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 namespace Dali
 {
@@ -105,7 +106,7 @@ static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolki
 
 /**
  * @brief Constraint function for InnerShadow's CornerRadius
- * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : Offset, [4] : ExtraSize
+ * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : ExtraSize, [4] : Borderline Width
  * @param[out] current InnerShadow's corner radius value.
  * @param[in] inputs Input properties.
  */
@@ -124,21 +125,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
   const int     viewCornerRadiusPolicy = inputs[1]->GetInteger();
   const Vector3 visualSize             = inputs[2]->GetVector3(); // We use VisualSize as ViewSize.
 
-  Vector2 offset    = inputs[3]->GetVector2();
-  Vector2 extraSize = inputs[4]->GetVector2();
-
-  // InnerShadowRadius = ViewRadius + 0.5f * (dx + dy)
-  //
-  // +-------------
-  // |        | dy
-  // |--------*****
-  // | dx     *   | ViewRadius
-  // |        *   x << Centour of View's corner radius.
-  // |----------x << Centour of InnerShadow's corner radius.
-  // |  InnerShadowRadius
-  //
-  // Note that we cannot make ellipse rounded corner now,
-  // just use heuristic position.
+  Vector2 extraSize = inputs[3]->GetVector2();
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
@@ -146,11 +133,15 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
     viewCornerRadius *= minViewSize;
   }
 
+  float borderlineWidth = inputs[4]->GetFloat();
+
+  // Corner Radius for Innershadow is expand about borderlineWidth.
+
   // Calculate on pixel scale.
-  current.x = viewCornerRadius.x + 0.5f * ((-offset.x + extraSize.x * 0.5f) + (-offset.y + extraSize.y * 0.5f));
-  current.y = viewCornerRadius.y + 0.5f * ((offset.x + extraSize.x * 0.5f) + (-offset.y + extraSize.y * 0.5f));
-  current.z = viewCornerRadius.z + 0.5f * ((offset.x + extraSize.x * 0.5f) + (offset.y + extraSize.y * 0.5f));
-  current.w = viewCornerRadius.w + 0.5f * ((-offset.x + extraSize.x * 0.5f) + (offset.y + extraSize.y * 0.5f));
+  current.x = viewCornerRadius.x + borderlineWidth;
+  current.y = viewCornerRadius.y + borderlineWidth;
+  current.z = viewCornerRadius.z + borderlineWidth;
+  current.w = viewCornerRadius.w + borderlineWidth;
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
@@ -1867,8 +1858,10 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
       }
 
       auto visualCornerRadiusProperty = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
+      auto visualBorderlineProperty = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
 
-      if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object))
+      if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object) &&
+         DALI_LIKELY(visualBorderlineProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineProperty.object))
       {
         Dali::CustomActor handle(mControlImpl.GetOwner());
 
@@ -1876,8 +1869,8 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
         mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS));
         mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS_POLICY));
         mInnerShadowCornerRadiusConstraint.AddSource(Source(handle, Dali::Actor::Property::SIZE));
-        mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::TRANSFORM_OFFSET));
         mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::EXTRA_SIZE));
+        mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
 
         Dali::Integration::ConstraintSetInternalTag(mInnerShadowCornerRadiusConstraint, INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG);
         mInnerShadowCornerRadiusConstraint.Apply();
