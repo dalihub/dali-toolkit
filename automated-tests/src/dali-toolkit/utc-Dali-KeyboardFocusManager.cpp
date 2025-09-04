@@ -1688,6 +1688,65 @@ int UtcDaliKeyboardFocusManagerFocusPerWindow(void)
   END_TEST;
 }
 
+int UtcDaliKeyboardFocusManagerClearFocusPerWindow(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Ensure Memory focus actors for each window ");
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(!manager.GetCurrentFocusActor());
+
+  Window firstWindow = Window::New(PositionSize(0, 0, 300, 500), "", false);
+  DALI_TEST_CHECK(firstWindow);
+  Control first = Control::New();
+  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  firstWindow.Add(first);
+
+  Window secondWindow = Window::New(PositionSize(0, 0, 400, 600), "", false);
+  DALI_TEST_CHECK(secondWindow);
+  Control second = Control::New();
+  second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  secondWindow.Add(second);
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  // secondWindow loses focus.
+  secondWindow.Lower();
+  // When a window loses focus, the actor also loses focus.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // firstWindow gets focus.
+  firstWindow.Raise();
+  // The actor that was focused in that window gains focus again.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  // Clears the focus of the current window.
+  manager.ClearFocus();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  firstWindow.Lower();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  secondWindow.Raise();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  secondWindow.Lower();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // firstWindow gets focus.
+  firstWindow.Raise();
+  // The actor that was focused in that window gains focus again.
+  // There is no focused actor because focus was previously cleared.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  firstWindow.Reset();
+  secondWindow.Reset();
+  END_TEST;
+}
+
 int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
 {
   ToolkitTestApplication application;
