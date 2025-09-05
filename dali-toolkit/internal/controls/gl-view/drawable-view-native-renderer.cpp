@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -360,6 +360,11 @@ struct DrawableViewNativeRenderer::Impl
 
   void ThreadRunRender()
   {
+    if(mOnInitCallback)
+    {
+      CallbackBase::Execute(*mOnInitCallback);
+    }
+
     while(mRunning)
     {
       // If there is a resize request waiting, then recreate all framebuffers
@@ -403,6 +408,11 @@ struct DrawableViewNativeRenderer::Impl
       fb.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
       EnqueueTextureReadBuffer(index);
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    if(mOnTerminateCallback)
+    {
+      CallbackBase::Execute(*mOnTerminateCallback);
     }
   }
 
@@ -625,15 +635,21 @@ struct DrawableViewNativeRenderer::Impl
     return offscreenTexture;
   }
 
+  // Call from DALi render thread
   void GlViewInit(const Dali::RenderCallbackInput& input)
   {
-    if(mOnInitCallback)
+    // Create worker thread solution's context
+    GlViewPreInit(input);
+    if(!mCreateInfo.threadEnabled)
     {
-      GlViewPreInit(input);
-      CallbackBase::Execute(*mOnInitCallback, input);
+      if(mOnInitCallback)
+      {
+        CallbackBase::Execute(*mOnInitCallback, input);
+      }
     }
   }
 
+  // Call from DALi render thread
   int GlViewRender(const Dali::RenderCallbackInput& input)
   {
     // Non-threaded solution invokes callback directly
@@ -652,6 +668,7 @@ struct DrawableViewNativeRenderer::Impl
     return retval;
   }
 
+  // Call from DALi render thread
   void GlViewTerminate(const Dali::RenderCallbackInput& input)
   {
     // Non-threaded solution invokes callback directly
@@ -661,6 +678,10 @@ struct DrawableViewNativeRenderer::Impl
       {
         CallbackBase::Execute(*mOnTerminateCallback, input);
       }
+    }
+    else
+    {
+      Terminate();
     }
   }
 

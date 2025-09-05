@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,6 +93,11 @@ public:
    * @copydoc Dali::Toolkit::GlView::BindTextureResources()
    */
   virtual void BindTextureResources(std::vector<Dali::Texture> textures) = 0;
+
+  /**
+   * @copydoc Dali::Toolkit::GlView::Terminate()
+   */
+  virtual void Terminate() = 0;
 
 private: // From Control
   /**

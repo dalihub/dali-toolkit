@@ -292,7 +292,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
       if(!mTextureSet)
       {
         std::string fragmentShader = SHADER_CANVAS_VIEW_FRAG.data();
-        DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader);
+        DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader, 1);
 
         mTextureSet       = TextureSet::New();
         Geometry geometry = VisualFactoryCache::CreateQuadGeometry();

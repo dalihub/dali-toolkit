@@ -197,12 +197,6 @@ void VideoView::SetPropertyMap(Property::Map map)
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
-      /// Initialize shader properties
-      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mTextureVisual);
-      Shader                           shader     = visualImpl.GetRenderer().GetShader();
-      shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
-      shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
-
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -821,13 +815,6 @@ void VideoView::SetNativeImageTarget()
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
-      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mTextureVisual);
-      visualImpl.GetRenderer().SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
-
-      Shader shader = visualImpl.GetRenderer().GetShader();
-      shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
-      shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
-
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -1006,14 +993,14 @@ Property::Map VideoView::CreateShader()
     if(!fragmentShaderValue || !checkShader)
     {
       fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
-      DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
+      DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader, 1);
     }
   }
   else
   {
     vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
     fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
-    DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
+    DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader, 1);
   }
 
   Property::Map shader;

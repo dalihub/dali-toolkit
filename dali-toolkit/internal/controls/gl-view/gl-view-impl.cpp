@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,7 @@ GlView::GlView(Dali::Toolkit::GlView::ColorFormat colorFormat)
 
 GlView::~GlView()
 {
-  if(mRenderThread)
-  {
-    mRenderThread->Stop();
-    mRenderThread->Join();
-  }
+  Terminate();
 }
 
 void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
@@ -141,9 +137,20 @@ void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
   // Not supported in the indirect mode
 }
 
+void GlView::Terminate()
+{
+  if(mRenderThread)
+  {
+    mRenderThread->Stop();
+    mRenderThread->Join();
+
+    mRenderThread.reset();
+  }
+}
+
 void GlView::OnInitialize()
 {
-  //Create NativeImageSourceQueue with the size of 1,1
+  // Create NativeImageSourceQueue with the size of 1,1
   mNativeImageQueue = Dali::NativeImageSourceQueue::New(1, 1, GetColorFormat(mColorFormat));
 
   if(!mNativeImageQueue)
@@ -156,7 +163,7 @@ void GlView::OnInitialize()
 
   Actor self = Self();
 
-  //Create a RenderThread
+  // Create a RenderThread
   mRenderThread = std::unique_ptr<GlViewRenderThread>(new GlViewRenderThread(mNativeImageQueue));
   if(!mRenderThread)
   {
@@ -164,7 +171,7 @@ void GlView::OnInitialize()
     return;
   }
 
-  //Adding VisibilityChange Signal.
+  // Adding VisibilityChange Signal.
   self.InheritedVisibilityChangedSignal().Connect(this, &GlView::OnControlInheritedVisibilityChanged);
 }
 
@@ -190,7 +197,7 @@ Shader GlView::CreateShader()
 
   if(mNativeImageQueue)
   {
-    mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader);
+    mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader, 1);
   }
 
   return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "GL_VIEW");
@@ -241,11 +248,11 @@ Dali::Geometry GlView::CreateTexturedQuad()
   Dali::Property::Map vertexFormat;
   vertexFormat["aPosition"] = Dali::Property::VECTOR2;
 
-  //Create a vertex buffer for vertex positions and texture coordinates
+  // Create a vertex buffer for vertex positions and texture coordinates
   vertexBuffer = Dali::VertexBuffer::New(vertexFormat);
   vertexBuffer.SetData(data, numberOfVertices);
 
-  //Create the geometry
+  // Create the geometry
   Dali::Geometry geometry = Dali::Geometry::New();
   geometry.AddVertexBuffer(vertexBuffer);
   geometry.SetType(Dali::Geometry::TRIANGLE_STRIP);

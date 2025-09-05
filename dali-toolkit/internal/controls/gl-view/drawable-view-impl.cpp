@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,57 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/update/frame-callback-interface.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Toolkit::Internal
 {
+/**
+ * FrameCallback implementation. Will run the OnUpdate method.
+ */
+class DrawableView::FrameCallback : public Dali::FrameCallbackInterface
+{
+public:
+  FrameCallback(EventThreadCallback* eventThreadCallback, Dali::Actor actor, uint32_t updateCount)
+  : mEventTrigger(eventThreadCallback),
+    mReferenceHolder(actor),
+    mUpdateCount(updateCount)
+  {
+  }
+
+private:
+  /**
+   * Called each frame.
+   * @param[in] updateProxy Used to set world matrix and size
+   * @param[in] elapsedSeconds Time since last frame
+   * @return Whether we should keep rendering.
+   */
+  bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  {
+    if(mUpdateCount > 0)
+    {
+      if(--mUpdateCount == 0u)
+      {
+        mEventTrigger->Trigger();
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+private:
+  EventThreadCallback* mEventTrigger{nullptr};
+  Dali::Actor          mReferenceHolder{};
+  uint32_t             mUpdateCount{0u};
+};
+
 Dali::Toolkit::GlView DrawableView::New(GlView::BackendMode backendMode)
 {
   auto*                 impl   = new DrawableView(backendMode);
@@ -55,16 +99,26 @@ DrawableView::DrawableView(GlView::BackendMode backendMode)
   mNativeRenderer = std::make_unique<Dali::Internal::DrawableViewNativeRenderer>(createInfo);
 }
 
-DrawableView::~DrawableView() = default;
+DrawableView::~DrawableView()
+{
+  // Ensure to unregister frame callback
+  OnTerminateCompleted();
+}
 
 void DrawableView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
-  mNativeRenderer->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+  if(DALI_LIKELY(!mTerminateRequested.load()))
+  {
+    mNativeRenderer->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+  }
 }
 
 void DrawableView::SetResizeCallback(CallbackBase* resizeCallback)
 {
-  mOnResizeCallback.reset(resizeCallback);
+  if(DALI_LIKELY(!mTerminateRequested.load()))
+  {
+    mOnResizeCallback.reset(resizeCallback);
+  }
 }
 
 bool DrawableView::SetGraphicsConfig(bool depth, bool stencil, int msaa, Dali::Toolkit::GlView::GraphicsApiVersion version)
@@ -100,6 +154,16 @@ void DrawableView::RenderOnce()
   // TODO: without rendering on the separate thread the RenderOnce won't
   // work as expected. Potential implementation of threading may enable that
   // feature.
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    Dali::Adaptor::Get().RenderOnce();
+    Dali::Window window = DevelWindow::Get(Self());
+    if(DALI_LIKELY(window))
+    {
+      // TODO : Change it as SceneHolder in future, for OffscreenApplication or GlWindow case.
+      window.KeepRendering(0.016f); // Trigger event processing, and keep rendering.
+    }
+  }
 }
 
 void DrawableView::BindTextureResources(std::vector<Dali::Texture> textures)
@@ -107,12 +171,59 @@ void DrawableView::BindTextureResources(std::vector<Dali::Texture> textures)
   mRenderCallback->BindTextureResources(std::move(textures));
 }
 
+void DrawableView::Terminate()
+{
+  if(!mTerminateRequested.load())
+  {
+    mTerminateRequested.store(true);
+    Actor self = Self();
+
+    // Make render callback execute forcibly next frame.
+    mRenderer.TerminateRenderCallback(true);
+    self.RemoveRenderer(mRenderer);
+
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+    {
+      mEventTrigger = std::unique_ptr<EventThreadCallback>(new EventThreadCallback(MakeCallback(this, &DrawableView::OnTerminateCompleted)));
+      DALI_LOG_DEBUG_INFO("DrawableView::Terminate Trigger Id(%d)\n", mEventTrigger->GetId());
+
+      // Ensure to trigger callbacks after 2 frames.
+      mFrameCallback = std::make_unique<FrameCallback>(mEventTrigger.get(), self, 2u);
+
+      // Register global frame callbacks.
+      DevelStage::AddFrameCallback(Stage::GetCurrent(), *mFrameCallback, Dali::Actor());
+      Dali::Window window = DevelWindow::Get(Self());
+      if(DALI_LIKELY(window))
+      {
+        // TODO : Change it as SceneHolder in future, for OffscreenApplication or GlWindow case.
+        window.KeepRendering(0.0f); // Trigger event processing, and frame callback.
+      }
+    }
+  }
+}
+
+void DrawableView::OnTerminateCompleted()
+{
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && mFrameCallback))
+  {
+    // Unregister global frame callbacks.
+    DevelStage::RemoveFrameCallback(Stage::GetCurrent(), *mFrameCallback);
+    mFrameCallback.reset();
+  }
+
+  // Now we can assume that native draw call completed.
+  mRenderer.Reset();
+}
+
 void DrawableView::OnInitialize()
 {
-  AddRenderer();
+  Actor self = Self();
+
+  // Initialize Renderer
+  mRenderer = Renderer::New(*mRenderCallback);
+  self.AddRenderer(mRenderer);
 
   // Adding VisibilityChange Signal.
-  Actor self = Self();
   Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &DrawableView::OnControlVisibilityChanged);
 }
 
@@ -170,55 +281,49 @@ void DrawableView::OnSceneDisconnection()
   }
 }
 
-void DrawableView::AddRenderer()
-{
-  Actor    self     = Self();
-  Renderer renderer = Renderer::New(*mRenderCallback);
-  self.AddRenderer(renderer);
-}
-
+// Call from DALi render thread
 bool DrawableView::OnRenderCallback(const RenderCallbackInput& renderCallbackInput)
 {
-  if(mNativeRenderer)
+  if(DALI_LIKELY(!mTerminated.load()) && mNativeRenderer)
   {
     mNativeRenderer->PushRenderCallbackInputData(renderCallbackInput);
-  }
 
-  // Init state
-  if(mCurrentViewState == ViewState::INIT)
-  {
-    mNativeRenderer->InvokeGlInitCallback(renderCallbackInput);
-    mCurrentViewState = ViewState::RENDER;
-  }
-
-  if(mSurfaceResized)
-  {
-    mNativeRenderer->Resize(uint32_t(mSurfaceSize.width), uint32_t(mSurfaceSize.height));
-    mSurfaceResized = false;
-  }
-
-  if(mCurrentViewState == ViewState::RENDER)
-  {
-    // The mSurfaceResized is set by another thread so atomic check must be provided
-    bool expected{true};
-    if(mSurfaceResized.compare_exchange_weak(expected, false, std::memory_order_release, std::memory_order_relaxed) && mOnResizeCallback)
+    // Init state
+    if(mCurrentViewState == ViewState::INIT)
     {
-      CallbackBase::Execute(*mOnResizeCallback, static_cast<int>(mSurfaceSize.x), static_cast<int>(mSurfaceSize.y));
+      mNativeRenderer->InvokeGlInitCallback(renderCallbackInput);
+      mCurrentViewState = ViewState::RENDER;
     }
 
-    mNativeRenderer->InvokeGlRenderCallback(renderCallbackInput);
-  }
+    if(renderCallbackInput.isTerminated)
+    {
+      mCurrentViewState = ViewState::TERMINATE;
+    }
 
-  // The terminate callback isn't easy to implement for DR. The NativeImage backend
-  // calls it when the GlView is being destroyed. For DrawableView it means that
-  // the RenderCallback won't be executed (as it is a part of graphics pipeline).
-  // We don't have currently have any way to know whether the View will be destroyed and
-  // to execute last native draw command in the pipeline.
-  //
-  // else if( mCurrentViewState == ViewState::TERMINATE )
-  // {
-  //    CallbackBase::Execute(*mOnTerminateCallback);
-  // }
+    if(mSurfaceResized)
+    {
+      mNativeRenderer->Resize(uint32_t(mSurfaceSize.width), uint32_t(mSurfaceSize.height));
+      mSurfaceResized = false;
+    }
+
+    if(mCurrentViewState == ViewState::RENDER)
+    {
+      // The mSurfaceResized is set by another thread so atomic check must be provided
+      bool expected{true};
+      if(mSurfaceResized.compare_exchange_weak(expected, false, std::memory_order_release, std::memory_order_relaxed) && mOnResizeCallback)
+      {
+        CallbackBase::Execute(*mOnResizeCallback, static_cast<int>(mSurfaceSize.x), static_cast<int>(mSurfaceSize.y));
+      }
+
+      mNativeRenderer->InvokeGlRenderCallback(renderCallbackInput);
+    }
+
+    if(mCurrentViewState == ViewState::TERMINATE)
+    {
+      mNativeRenderer->InvokeGlTerminateCallback(renderCallbackInput);
+      mTerminated.store(true);
+    }
+  }
 
   return true;
 }

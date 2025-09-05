@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,80 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+
+namespace DirectRenderingCode
+{
+// Internal callback function
+int gDRFrameInitializedCount;
+int gDRFrameRenderedCount;
+int gDRFrameTerminatedCount;
+
+void ClearFlags()
+{
+  gDRFrameInitializedCount = 0;
+  gDRFrameRenderedCount    = 0;
+  gDRFrameTerminatedCount  = 0;
+}
+
+void glInit(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameInitializedCount;
+}
+
+int glRenderFrame(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameRenderedCount;
+  static unsigned int retFlag = 0;
+  return retFlag++;
+}
+
+int gBoundTextureCount = 0;
+
+int glRenderFrameWithTextures(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameRenderedCount;
+  gBoundTextureCount = input.textureBindings.size();
+  return 1;
+}
+
+void glTerminate(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameTerminatedCount;
+}
+
+// Internal callback function
+void glInitMT(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameInitializedCount;
+}
+
+int glRenderFrameMT(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameRenderedCount;
+  return 1;
+}
+
+void glTerminateMT(Dali::RenderCallbackInput& input)
+{
+  ++gDRFrameTerminatedCount;
+}
+
+void resizeCB(Vector2 size)
+{
+}
+
+} // namespace DirectRenderingCode
+
+void dali_gl_view_direct_rendering_startup(void)
+{
+  test_return_value = TET_UNDEF;
+  DirectRenderingCode::ClearFlags();
+}
+
+void dali_gl_view_direct_rendering_cleanup(void)
+{
+  test_return_value = TET_PASS;
+}
 
 // Positive test case for a method
 int UtcDaliGlViewDirectRenderingNew(void)
@@ -211,54 +285,6 @@ int UtcDaliGlViewDirectRenderingOnSizeSet(void)
   END_TEST;
 }
 
-namespace DirectRenderingCode
-{
-// Internal callback function
-void glInit(Dali::RenderCallbackInput& input)
-{
-}
-
-int glRenderFrame(Dali::RenderCallbackInput& input)
-{
-  static unsigned int retFlag = 0;
-  return retFlag++;
-}
-
-int gBoundTextureCount = 0;
-
-int glRenderFrameWithTextures(Dali::RenderCallbackInput& input)
-{
-  gBoundTextureCount = input.textureBindings.size();
-  return 1;
-}
-
-void glTerminate(Dali::RenderCallbackInput& input)
-{
-}
-
-// Internal callback function
-void glInitMT(Dali::RenderCallbackInput& input)
-{
-}
-
-int gDRFramesRendered = 0;
-
-int glRenderFrameMT(Dali::RenderCallbackInput& input)
-{
-  gDRFramesRendered++;
-  return 1;
-}
-
-void glTerminateMT(Dali::RenderCallbackInput& input)
-{
-}
-
-void resizeCB(Vector2 size)
-{
-}
-
-} // namespace DirectRenderingCode
-
 int UtcDaliGlViewDirectRenderingRegisterGlCallbacksN(void)
 {
   ToolkitTestApplication application;
@@ -319,6 +345,26 @@ int UtcDaliGlViewDirectRenderingRenderOnce(void)
   END_TEST;
 }
 
+int UtcDaliGlViewDirectRenderingTerminate(void)
+{
+  ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
+  tet_infoline("UtcDaliGlViewDirectRenderingTerminate");
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
+
+  try
+  {
+    view.Terminate();
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+  END_TEST;
+}
+
 int UtcDaliGlViewDirectRenderingWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
@@ -351,7 +397,7 @@ int UtcDaliGlViewDirectRenderingOnScene(void)
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
-  //Onscene
+  // Onscene
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
@@ -360,9 +406,42 @@ int UtcDaliGlViewDirectRenderingOnScene(void)
   application.SendNotification();
   application.Render();
 
-  //Offscene
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
+  // Offscene
   application.GetScene().Remove(view);
 
+  application.SendNotification();
+  application.Render();
+
+  DirectRenderingCode::ClearFlags();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
+  // Call Terminate
+  view.Terminate();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Terminate callback comes even if it is offscened\n");
+
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  // DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION); ///< Don't know exact behavior after terminate
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
+  DirectRenderingCode::ClearFlags();
+
+  // run 2 more frames, for line coverage.
+  application.SendNotification();
+  application.Render();
   application.SendNotification();
   application.Render();
 
@@ -412,7 +491,7 @@ int UtcDaliGlViewDirectRenderingResize(void)
   application.SendNotification();
   application.Render();
 
-  //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
+  // To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   application.SendNotification();
@@ -440,7 +519,7 @@ int UtcDaliGlViewDirectRenderingDirectResize(void)
   application.SendNotification();
   application.Render();
 
-  //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
+  // To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   application.SendNotification();
@@ -468,7 +547,7 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
   application.SendNotification();
   application.Render();
 
-  //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
+  // To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   application.SendNotification();
@@ -542,14 +621,14 @@ int UtcDaliGlViewDirectRenderingThreadedNew(void)
   END_TEST;
 }
 
-int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
+int UtcDaliGlViewDirectRenderingThreadedOnScene01(void)
 {
   ToolkitTestApplication application;
   Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
 
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING_THREADED, GlView::ColorFormat::RGB888);
 
-  //Onscene
+  // Onscene
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
@@ -561,11 +640,29 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while(DirectRenderingCode::gDRFramesRendered < 1)
+  while(DirectRenderingCode::gDRFrameRenderedCount < 1)
   {
     application.SendNotification();
     application.Render();
   }
+
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
+  DirectRenderingCode::ClearFlags();
+
+  view.Terminate();
+
+  while(DirectRenderingCode::gDRFrameTerminatedCount < 1)
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  // DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION); ///< Don't know exact behavior after terminate
+  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
   DALI_TEST_CHECK(true);
   END_TEST;
 }
@@ -573,7 +670,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene(void)
 extern "C" bool gDirectRenderingFailCreateShader;
 extern "C" bool gDirectRenderingFailCreateProgram;
 
-int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
+int UtcDaliGlViewDirectRenderingThreadedOnScene02(void)
 {
   ToolkitTestApplication application;
   Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
@@ -583,7 +680,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
   // This test will fail instantiating shaders
   gDirectRenderingFailCreateShader = true;
 
-  //Onscene
+  // Onscene
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
@@ -595,7 +692,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while(DirectRenderingCode::gDRFramesRendered < 1)
+  while(DirectRenderingCode::gDRFrameRenderedCount < 1)
   {
     application.SendNotification();
     application.Render();
@@ -604,7 +701,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene1(void)
   END_TEST;
 }
 
-int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
+int UtcDaliGlViewDirectRenderingThreadedOnScene03(void)
 {
   ToolkitTestApplication application;
   Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
@@ -614,7 +711,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
   // This test will fail instantiating shaders
   gDirectRenderingFailCreateProgram = true;
 
-  //Onscene
+  // Onscene
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
@@ -626,7 +723,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene2(void)
   view.SetProperty(Actor::Property::SIZE, Size(100, 100));
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
 
-  while(DirectRenderingCode::gDRFramesRendered < 1)
+  while(DirectRenderingCode::gDRFrameRenderedCount < 1)
   {
     application.SendNotification();
     application.Render();

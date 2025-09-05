@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/signals/render-callback.h>
-#include "gl-view-interface-impl.h"
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/drawable-view-native-renderer.h>
 #include <dali-toolkit/internal/controls/gl-view/gl-view-interface-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
+#include "gl-view-interface-impl.h"
 
 namespace Dali::Toolkit
 {
@@ -98,6 +100,11 @@ public:
    */
   void BindTextureResources(std::vector<Dali::Texture> textures) override;
 
+  /**
+   * @copydoc Dali::Toolkit::GlView::Terminate()
+   */
+  void Terminate() override;
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -134,13 +141,13 @@ private:
    */
   void OnWindowVisibilityChanged(Dali::Window window, bool visible);
 
-  /**
-   * Adds renderer to Actor.
-   */
-  void AddRenderer();
-
 private:
   bool OnRenderCallback(const RenderCallbackInput& renderCallbackInput);
+
+  /**
+   * @brief Callback after that we can assume the Terminate callback called.
+   */
+  void OnTerminateCompleted();
 
 private:
   WeakHandle<Window>                   mPlacementWindow;
@@ -162,11 +169,19 @@ private:
     TERMINATE
   };
 
+  Dali::Renderer mRenderer;
+
+  class FrameCallback;
+  std::unique_ptr<EventThreadCallback> mEventTrigger{};  ///< Be used when terminated completed.
+  std::unique_ptr<FrameCallback>       mFrameCallback{}; ///< Be used when terminated completed.
+
   ViewState mCurrentViewState{ViewState::INIT}; ///< state within RenderCallback
 
   std::unique_ptr<CallbackBase> mOnResizeCallback; ///< Resize callback called when surface size changes
 
-  std::atomic_bool mSurfaceResized{false}; ///< Flag to invoke surface resize callback
+  std::atomic_bool mSurfaceResized{false};     ///< Flag to invoke surface resize callback.
+  std::atomic_bool mTerminateRequested{false}; ///< Flag to invoke terminate call requested.
+  std::atomic_bool mTerminated{false};         ///< Flag to terminated.
 
   Size mSurfaceSize{}; ///< Surface size
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,6 +263,25 @@ int UtcDaliGlViewRenderOnce(void)
   END_TEST;
 }
 
+int UtcDaliGlViewTerminate(void)
+{
+  ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+  tet_infoline("UtcDaliGlViewTerminate");
+  GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
+
+  try
+  {
+    view.Terminate();
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+  END_TEST;
+}
+
 int UtcDaliGlViewWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
@@ -294,7 +313,7 @@ int UtcDaliGlViewOnScene(void)
 
   GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
 
-  //Onscene
+  // Onscene
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
@@ -303,7 +322,7 @@ int UtcDaliGlViewOnScene(void)
   application.SendNotification();
   application.Render();
 
-  //Offscene
+  // Offscene
   application.GetScene().Remove(view);
 
   application.SendNotification();
@@ -355,7 +374,7 @@ int UtcDaliGlViewResize(void)
   application.SendNotification();
   application.Render();
 
-  //To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
+  // To GlViewRenderThread can recognize Resize signal the main thread have to sleep.
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   application.SendNotification();

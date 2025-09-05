@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_GL_VIEW_H
 #define DALI_TOOLKIT_GL_VIEW_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ class GlViewImpl;
  * GlView allows drawing with OpenGL.
  * GlView creates a GL context, a GL surface and a render thread.
  * The render thread invokes user's callbacks.
+ *
+ * Need to call Terminate() to make ensure call terminate callback invoke.
  *
  * @SINCE_2_0.45
  */
@@ -264,7 +266,7 @@ public:
    * @code
    *   void terminateGL();
    * @endcode
-   * This callback is called when GlView is deleted.
+   * This callback is called when GlView call Terminate().
    *
    * @note Ownership of the callbacks is passed onto this class.
    * <b>You can't call Dali APIs in your callbacks because it is invoked in GlView's own render thread.</b>
@@ -358,6 +360,15 @@ public:
    * @SINCE_2_2.2
    */
   void BindTextureResources(std::vector<Dali::Texture> textures);
+
+  /**
+   * @brief Request to terminate the gl rendering.
+   * For next frame commited, It will invoke terminateCallback, and GL callback functions will not be working anymore
+   * @note Restart the GL callback is impossible. There is no way to cancel the terminate request.
+   *
+   * @SINCE_2_4.35
+   */
+  void Terminate();
 
 public: // Not intended for application developers
   /// @cond internal

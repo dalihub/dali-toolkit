@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,13 +186,9 @@ Dali::Shader CameraView::CreateShader(Dali::NativeImageSourcePtr nativeImageSour
   std::string vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
   std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
 
-  nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader);
+  nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader, 1);
 
   Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
-  // Initialize shader properties
-  shader.RegisterProperty("uRotationMatrix", Property::Value(Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
-  shader.RegisterProperty("uSizeRatio", Property::Value(Vector2(0.0f, 0.0f)));
-
   return shader;
 }
 
