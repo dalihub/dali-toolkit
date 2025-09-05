@@ -508,6 +508,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
   // Clear inputBackgroundTexture as scene holder background.
   mSourceRenderTask.SetClearEnabled(true);
   mSourceRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+  mSourceRenderTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, mInternalDownscaleFactor);
 
   // draw half-blurred output
   SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
@@ -534,6 +535,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
   // Clear sourceTexture as Transparent.
   mVerticalBlurTask.SetClearEnabled(true);
   mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
+  mVerticalBlurTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, 1.0f / std::max(mInternalDownscaleFactor, Dali::Math::MACHINE_EPSILON_1000));
 
   // Adjust refresh rate
   if(mBlurOnce)
