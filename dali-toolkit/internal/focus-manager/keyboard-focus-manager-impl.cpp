@@ -686,6 +686,17 @@ void KeyboardFocusManager::ClearFocus(Actor actor)
   {
     DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
     actor.OffSceneSignal().Disconnect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
+
+    // Remove the actor from mCurrentFocusActors if present
+    for(auto iter = mCurrentFocusActors.begin(); iter != mCurrentFocusActors.end(); ++iter)
+    {
+      if(iter->first == mCurrentFocusedWindow && iter->second.GetHandle() == actor)
+      {
+        mCurrentFocusActors.erase(iter);
+        break;
+      }
+    }
+
     // Send notification for the change of focus actor
     if(!mFocusChangedSignal.Empty())
     {
