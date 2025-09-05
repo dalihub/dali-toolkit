@@ -1068,45 +1068,60 @@ void ProcessMarkupStringBuffer(
   unsigned char count        = GetUtf8Length(character);
   char          utf8[8];
 
-  // checking if contains XHTML entity or not
-  const unsigned int len = GetXHTMLEntityLength(markupStringBuffer, markupStringEndBuffer);
-
-  // Parse markupStringTxt if it contains XHTML Entity between '&' and ';'
-  if(len > 0)
+  if((BACK_SLASH == character) && (markupStringBuffer + 1u < markupStringEndBuffer))
   {
-    char* entityCode = NULL;
-    bool  result     = false;
-    count            = 0;
+    // Adding < , >  or & special character.
+    const unsigned char nextCharacter = *(markupStringBuffer + 1u);
+    if((LESS_THAN == nextCharacter) || (GREATER_THAN == nextCharacter) || (AMPERSAND == nextCharacter))
+    {
+      character = nextCharacter;
+      ++markupStringBuffer;
 
-    // Checking if XHTML Numeric Entity
-    if(HASH == *(markupBuffer + 1u))
-    {
-      entityCode = &utf8[0];
-      // markupBuffer is currently pointing to '&'. By adding 2u to markupBuffer it will point to numeric string by skipping "&#'
-      result = XHTMLNumericEntityToUtf8((markupBuffer + 2u), entityCode);
-    }
-    else // Checking if XHTML Named Entity
-    {
-      entityCode = const_cast<char*>(NamedEntityToUtf8(markupBuffer, len));
-      result     = (entityCode != NULL);
-    }
-    if(result)
-    {
-      markupBuffer = entityCode; //utf8 text assigned to markupBuffer
-      character    = markupBuffer[0];
-    }
-    else
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Not valid XHTML entity : (%.*s) \n", len, markupBuffer);
-      markupBuffer = NULL;
+      count        = GetUtf8Length(character);
+      markupBuffer = markupStringBuffer;
     }
   }
-  else // in case string conatins Start of XHTML Entity('&') but not its end character(';')
+  else // checking if contains XHTML entity or not
   {
-    if(character == AMPERSAND)
+    const unsigned int len = GetXHTMLEntityLength(markupStringBuffer, markupStringEndBuffer);
+
+    // Parse markupStringTxt if it contains XHTML Entity between '&' and ';'
+    if(len > 0)
     {
-      markupBuffer = NULL;
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Not Well formed XHTML content \n");
+      char* entityCode = NULL;
+      bool  result     = false;
+      count            = 0;
+
+      // Checking if XHTML Numeric Entity
+      if(HASH == *(markupBuffer + 1u))
+      {
+        entityCode = &utf8[0];
+        // markupBuffer is currently pointing to '&'. By adding 2u to markupBuffer it will point to numeric string by skipping "&#'
+        result = XHTMLNumericEntityToUtf8((markupBuffer + 2u), entityCode);
+      }
+      else // Checking if XHTML Named Entity
+      {
+        entityCode = const_cast<char*>(NamedEntityToUtf8(markupBuffer, len));
+        result     = (entityCode != NULL);
+      }
+      if(result)
+      {
+        markupBuffer = entityCode; //utf8 text assigned to markupBuffer
+        character    = markupBuffer[0];
+      }
+      else
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Not valid XHTML entity : (%.*s) \n", len, markupBuffer);
+        markupBuffer = NULL;
+      }
+    }
+    else // in case string conatins Start of XHTML Entity('&') but not its end character(';')
+    {
+      if(character == AMPERSAND)
+      {
+        markupBuffer = NULL;
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Not Well formed XHTML content \n");
+      }
     }
   }
 
