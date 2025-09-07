@@ -1479,8 +1479,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  tet_printf("Rendering 9 times : orignal + grand parent, parent, and control1 + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 9, TEST_LOCATION);
   drawTrace.Reset();
 
   effect.SetSourceActor(parentActor);
@@ -1488,8 +1488,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 7 times : orignal + parent, and control1\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 7, TEST_LOCATION);
+  tet_printf("Rendering 8 times : orignal + parent, and control1 + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
   drawTrace.Reset();
 
   effect.SetStopperActor(control1);
@@ -1497,8 +1497,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 6 times : orignal + parent\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 6, TEST_LOCATION);
+  tet_printf("Rendering 7 times : orignal + parent + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 7, TEST_LOCATION);
   drawTrace.Reset();
 
   effect.SetSourceActor(Dali::Actor()); // Set empty handle
@@ -1506,8 +1506,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 7 times : orignal + grand parent, parent\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 7, TEST_LOCATION);
+  tet_printf("Rendering 8 times : orignal + grand parent, parent + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
   drawTrace.Reset();
 
   effect.SetStopperActor(Dali::Actor()); // Set empty handle
@@ -1515,8 +1515,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  tet_printf("Rendering 9 times : orignal + grand parent, parent, and control1 + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 9, TEST_LOCATION);
   drawTrace.Reset();
 
   effect.SetSourceActor(control1); // Set non-parent of control2
@@ -1524,8 +1524,8 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Rendering 8 times : orignal + grand parent, parent, and control1\n");
-  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 8, TEST_LOCATION);
+  tet_printf("Rendering 9 times : orignal + grand parent, parent, and control1 + RenderEffect itself\n");
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 9, TEST_LOCATION);
   drawTrace.Reset();
 
   END_TEST;

@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 // EXTERNAL INCLUDES
 #include <integration-api/debug.h>

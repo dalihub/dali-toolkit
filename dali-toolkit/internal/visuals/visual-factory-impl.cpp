@@ -385,6 +385,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
   return Toolkit::Visual::Base(visualPtr.Get());
 }
 
+Dali::Geometry VisualFactory::GetDefaultQuadGeometry()
+{
+  return GetFactoryCache().GetGeometry(VisualFactoryCache::GeometryType::QUAD_GEOMETRY);
+}
+
 void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
 {
   if(mPreMultiplyOnLoad != preMultiply)

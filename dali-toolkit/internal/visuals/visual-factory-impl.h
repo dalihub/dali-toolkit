@@ -91,6 +91,11 @@ public:
   Toolkit::Visual::Base CreateVisual(const std::string& image, ImageDimensions size, Toolkit::VisualFactory::CreationOptions creationOptions);
 
   /**
+   * @copydoc Toolkit::VisualFactory::GetDefaultQuadGeometry()
+   */
+  Dali::Geometry GetDefaultQuadGeometry();
+
+  /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
    */
   void SetPreMultiplyOnLoad(bool preMultiply);

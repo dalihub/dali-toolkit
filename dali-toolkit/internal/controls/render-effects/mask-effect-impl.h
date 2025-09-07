@@ -26,6 +26,7 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/shader.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -75,7 +76,7 @@ public:
    */
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
-    /**
+  /**
    * @copydoc Toolkit::MaskEffect::SetTargetMaskOnce
    */
   void SetTargetMaskOnce(bool targetMaskOnce);
@@ -203,6 +204,9 @@ private:
   bool                 mTargetMaskOnce : 1;
   bool                 mSourceMaskOnce : 1;
   bool                 mReverseMaskDirection : 1;
+
+  // Cached shader
+  thread_local static Dali::Shader gMaskEffectShader;
 };
 } // namespace Internal
 
