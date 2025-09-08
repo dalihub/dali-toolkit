@@ -586,6 +586,11 @@ void TextEditor::OnInitialize()
 
   self.LayoutDirectionChangedSignal().Connect(this, &TextEditor::OnLayoutDirectionChanged);
 
+  if(Dali::Adaptor::IsAvailable())
+  {
+    Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &TextEditor::OnLocaleChanged);
+  }
+
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS));
   GetTapGestureDetector().SetMaximumTapsRequired(2);
@@ -1386,6 +1391,11 @@ void TextEditor::SetEditable(bool editable)
 void TextEditor::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   mController->ChangedLayoutDirection();
+}
+
+void TextEditor::OnLocaleChanged(std::string locale)
+{
+  mController->ResetFontAndStyleData();
 }
 
 void TextEditor::SetRemoveFrontInset(bool remove)
