@@ -87,6 +87,16 @@ float CalculateBellCurveWidth(uint32_t blurRadius)
  */
 void CalculateGaussianConstants(uint32_t numSamples, std::vector<float>& weights, std::vector<float>& offsets)
 {
+  weights.clear();
+  weights.resize(numSamples);
+  offsets.clear();
+  offsets.resize(numSamples);
+
+  if(DALI_UNLIKELY(numSamples == 0u))
+  {
+    return;
+  }
+
   const float bellCurveWidth = CalculateBellCurveWidth(numSamples);
 
   const uint32_t kernelSize     = numSamples * 4 - 1;
@@ -109,11 +119,6 @@ void CalculateGaussianConstants(uint32_t numSamples, std::vector<float>& weights
   }
   halfSideKernel[0] *= 0.5f;
 
-  weights.clear();
-  weights.resize(numSamples);
-  offsets.clear();
-  offsets.resize(numSamples);
-
   // Compress kernel to half size
   for(unsigned int i = 0; i < numSamples; i++)
   {
@@ -129,7 +134,7 @@ void CalculateGaussianConstants(uint32_t numSamples, std::vector<float>& weights
  */
 inline static Dali::UniformBlock& GetCachedUniformBlock(const uint32_t numSamples)
 {
-  static Dali::UniformBlock gPredefinedUniformBlock[MAXIMUM_NUMBER_OF_SAMPLES + 1u];
+  thread_local static Dali::UniformBlock gPredefinedUniformBlock[MAXIMUM_NUMBER_OF_SAMPLES + 1u];
   DALI_ASSERT_DEBUG(numSamples <= MAXIMUM_NUMBER_OF_SAMPLES && "numSamples too big!");
   return gPredefinedUniformBlock[numSamples];
 }
@@ -141,7 +146,7 @@ inline static Dali::UniformBlock& GetCachedUniformBlock(const uint32_t numSample
  */
 inline static Dali::Shader& GetCachedShader(const uint32_t numSamples)
 {
-  static Dali::Shader gPredefinedShader[MAXIMUM_NUMBER_OF_SAMPLES + 1u];
+  thread_local static Dali::Shader gPredefinedShader[MAXIMUM_NUMBER_OF_SAMPLES + 1u];
   DALI_ASSERT_DEBUG(numSamples <= MAXIMUM_NUMBER_OF_SAMPLES && "numSamples too big!");
   return gPredefinedShader[numSamples];
 }
@@ -152,7 +157,7 @@ inline static Dali::Shader& GetCachedShader(const uint32_t numSamples)
  */
 inline static Dali::Geometry& GetCachedGeometry()
 {
-  static Dali::Geometry gPredefinedGeometry;
+  thread_local static Dali::Geometry gPredefinedGeometry;
   if(!gPredefinedGeometry)
   {
     // TODO : Can't we share the geometry what VisualFactoryCache using, for performance?
@@ -183,6 +188,17 @@ inline static Dali::Geometry& GetCachedGeometry()
   return gPredefinedGeometry;
 }
 
+inline static Dali::Sampler GetCachedSampler()
+{
+  thread_local static Dali::Sampler gPredefinedSampler;
+  if(!gPredefinedSampler)
+  {
+    gPredefinedSampler = Dali::Sampler::New();
+    gPredefinedSampler.SetWrapMode(Dali::WrapMode::MIRRORED_REPEAT, Dali::WrapMode::MIRRORED_REPEAT);
+  }
+  return gPredefinedSampler;
+}
+
 } // namespace
 
 namespace Dali
@@ -195,10 +211,14 @@ Dali::Renderer GaussianBlurAlgorithm::CreateRenderer(const uint32_t blurRadius)
 {
   Dali::Renderer   renderer   = Dali::Renderer::New();
   Dali::TextureSet textureSet = Dali::TextureSet::New();
+
   renderer.SetTextures(textureSet);
   renderer.SetGeometry(GetCachedGeometry());
   renderer.SetShader(GetGaussianBlurShader(blurRadius));
   renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use premultiplied alpha
+
+  // Make textureSet use WrapMode::MIRRORED_REPEAT
+  textureSet.SetSampler(0u, GetCachedSampler());
   return renderer;
 }
 

@@ -277,11 +277,6 @@ void GaussianBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, Alpha
 
 void GaussianBlurEffectImpl::OnInitialize()
 {
-  if(DALI_UNLIKELY(mSkipBlur))
-  {
-    return;
-  }
-
   // Create blur actors
   {
     mInternalRoot.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
