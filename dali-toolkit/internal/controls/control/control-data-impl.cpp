@@ -683,8 +683,8 @@ void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visu
     for(const auto& indexToAnimate : mPropertyOnAnimation)
     {
       // TODO : Optimize here to control only overridden changed visuals. For now, just full iterate.
-      mVisualData->UnbindAnimatablePropertyFromControlToVisual(indexToAnimate);
-      mVisualData->BindAnimatablePropertyFromControlToVisual(indexToAnimate);
+      mVisualData->UnbindAnimatablePropertyFromControlToVisual(indexToAnimate.first);
+      mVisualData->BindAnimatablePropertyFromControlToVisual(indexToAnimate.first);
     }
   }
 }
@@ -1858,7 +1858,7 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
       }
 
       auto visualCornerRadiusProperty = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
-      auto visualBorderlineProperty = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
+      auto visualBorderlineProperty   = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
 
       if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object) &&
          DALI_LIKELY(visualBorderlineProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineProperty.object))
@@ -2167,29 +2167,56 @@ void Control::Impl::UpdateBorderline()
   SetBorderline(map, false);
 }
 
-void Control::Impl::CreateAnimationConstraints(Property::Index index)
+void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Property::Index index)
 {
-  if(index == DevelControl::Property::CORNER_RADIUS || index == DevelControl::Property::CORNER_SQUARENESS)
+  if(DALI_LIKELY(mVisualData))
   {
-    if(mPropertyOnAnimation.find(index) == mPropertyOnAnimation.end())
+    if(index == DevelControl::Property::CORNER_RADIUS || index == DevelControl::Property::CORNER_SQUARENESS)
     {
-      if(DALI_LIKELY(mVisualData))
+      if(mPropertyOnAnimation.find(index) == mPropertyOnAnimation.end())
       {
         mVisualData->BindAnimatablePropertyFromControlToVisual(index);
-        mPropertyOnAnimation.insert(index);
+      }
+
+      // Get or create counter
+      auto& animationCounter   = mPropertyOnAnimation[index];
+      auto* animationObjectPtr = animation.GetObjectPtr();
+
+      auto iter = animationCounter.find(animationObjectPtr);
+      if(iter == animationCounter.end())
+      {
+        animationCounter.insert({animationObjectPtr, 1});
+      }
+      else
+      {
+        ++(iter->second);
       }
     }
   }
 }
 
-void Control::Impl::ClearAnimationConstraints(Property::Index index)
+void Control::Impl::ClearAnimationConstraints(Dali::Animation& animation, Property::Index index)
 {
-  if(mPropertyOnAnimation.find(index) != mPropertyOnAnimation.end())
+  if(DALI_LIKELY(mVisualData))
   {
-    if(DALI_LIKELY(mVisualData))
+    auto indexIter = mPropertyOnAnimation.find(index);
+    if(indexIter != mPropertyOnAnimation.end())
     {
-      mVisualData->UnbindAnimatablePropertyFromControlToVisual(index);
-      mPropertyOnAnimation.erase(index);
+      auto& animationCounter   = indexIter->second;
+      auto* animationObjectPtr = animation.GetObjectPtr();
+      auto  iter               = animationCounter.find(animationObjectPtr);
+      if(DALI_LIKELY(iter != animationCounter.end()))
+      {
+        if(iter->second == 0 || --(iter->second) == 0)
+        {
+          animationCounter.erase(iter);
+          if(animationCounter.empty())
+          {
+            mVisualData->UnbindAnimatablePropertyFromControlToVisual(index);
+            mPropertyOnAnimation.erase(index);
+          }
+        }
+      }
     }
   }
 }

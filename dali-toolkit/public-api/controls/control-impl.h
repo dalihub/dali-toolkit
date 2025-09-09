@@ -394,8 +394,9 @@ protected: // From CustomActorImpl
 
   /**
    * @copydoc CustomActorImpl::OnAnimateAnimatableProperty()
+   * @note If overridden, then an up-call to Control::OnAnimateAnimatableProperty MUST be made at the end.
    */
-  void OnAnimateAnimatableProperty(Property::Index index, Dali::Animation::State state) override;
+  void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state) override;
 
   /**
    * @copydoc CustomActorImpl::GetOffScreenRenderTasks()
@@ -765,10 +766,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL Control(const Control&) = delete;            ///< Deleted copy constructor.
-  DALI_INTERNAL Control(Control&&)      = delete;            ///< Deleted move constructor.
+  DALI_INTERNAL          Control(const Control&)   = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL          Control(Control&&)        = delete; ///< Deleted move constructor.
   DALI_INTERNAL Control& operator=(const Control&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Control& operator=(Control&&) = delete;      ///< Deleted move assignment operator.
+  DALI_INTERNAL Control& operator=(Control&&)      = delete; ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
