@@ -62,6 +62,29 @@ const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "isKeyboardFocusGroup"; // This
 
 const char* const FOCUS_BORDER_IMAGE_FILE_NAME = "keyboard_focus.9.png";
 
+// Key name constants for OnKeyEvent
+constexpr const char* KEY_NAME_LEFT      = "Left";
+constexpr const char* KEY_NAME_RIGHT     = "Right";
+constexpr const char* KEY_NAME_UP        = "Up";
+constexpr const char* KEY_NAME_DOWN      = "Down";
+constexpr const char* KEY_NAME_PRIOR     = "Prior";
+constexpr const char* KEY_NAME_NEXT      = "Next";
+constexpr const char* KEY_NAME_TAB       = "Tab";
+constexpr const char* KEY_NAME_SPACE     = "space";
+constexpr const char* KEY_NAME_EMPTY     = "";
+constexpr const char* KEY_NAME_BACKSPACE = "Backspace";
+constexpr const char* KEY_NAME_ESCAPE    = "Escape";
+constexpr const char* KEY_NAME_RETURN    = "Return";
+
+// Logical key name constants for OnKeyEvent
+constexpr const char* LOGICAL_KEY_NAME_KP_LEFT  = "KP_Left";
+constexpr const char* LOGICAL_KEY_NAME_KP_RIGHT = "KP_Right";
+constexpr const char* LOGICAL_KEY_NAME_KP_UP    = "KP_Up";
+constexpr const char* LOGICAL_KEY_NAME_KP_DOWN  = "KP_Down";
+constexpr const char* LOGICAL_KEY_NAME_KP_PRIOR = "KP_Prior";
+constexpr const char* LOGICAL_KEY_NAME_KP_NEXT  = "KP_Next";
+constexpr const char* LOGICAL_KEY_NAME_KP_ENTER = "KP_Enter";
+
 BaseHandle Create()
 {
   BaseHandle handle = KeyboardFocusManager::Get();
@@ -839,8 +862,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
   }
 
-  const std::string& keyName    = event.GetKeyName();
-  const std::string& deviceName = event.GetDeviceName();
+  const std::string& keyName        = event.GetKeyName();
+  const std::string& logicalKeyName = event.GetLogicalKey();
+  const std::string& deviceName     = event.GetDeviceName();
 
   if(mIsFocusIndicatorShown == UNKNOWN)
   {
@@ -851,7 +875,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   if(event.GetState() == KeyEvent::DOWN)
   {
-    if(keyName == "Left")
+    if(keyName == KEY_NAME_LEFT || logicalKeyName == LOGICAL_KEY_NAME_KP_LEFT)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -866,7 +890,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Right")
+    else if(keyName == KEY_NAME_RIGHT || logicalKeyName == LOGICAL_KEY_NAME_KP_RIGHT)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -881,7 +905,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Up")
+    else if(keyName == KEY_NAME_UP || logicalKeyName == LOGICAL_KEY_NAME_KP_UP)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -896,7 +920,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Down")
+    else if(keyName == KEY_NAME_DOWN || logicalKeyName == LOGICAL_KEY_NAME_KP_DOWN)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -911,7 +935,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Prior")
+    else if(keyName == KEY_NAME_PRIOR || logicalKeyName == LOGICAL_KEY_NAME_KP_PRIOR)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -926,7 +950,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Next")
+    else if(keyName == KEY_NAME_NEXT || logicalKeyName == LOGICAL_KEY_NAME_KP_NEXT)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -941,7 +965,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Tab")
+    else if(keyName == KEY_NAME_TAB)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -961,7 +985,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "space")
+    else if(keyName == KEY_NAME_SPACE)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
@@ -971,7 +995,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "")
+    else if(keyName == KEY_NAME_EMPTY)
     {
       // Check the fake key event for evas-plugin case
       if(mIsFocusIndicatorShown == HIDE)
@@ -982,17 +1006,17 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if(keyName == "Backspace")
+    else if(keyName == KEY_NAME_BACKSPACE)
     {
       // Emit signal to go back to the previous view???
     }
-    else if(keyName == "Escape")
+    else if(keyName == KEY_NAME_ESCAPE)
     {
     }
   }
   else if(event.GetState() == KeyEvent::UP)
   {
-    if(keyName == "Return")
+    if(keyName == KEY_NAME_RETURN || logicalKeyName == LOGICAL_KEY_NAME_KP_ENTER)
     {
       if(mIsFocusIndicatorShown == HIDE)
       {
