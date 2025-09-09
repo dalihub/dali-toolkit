@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
   mShadowPlane.SetProperty(Actor::Property::NAME, "SHADOW_PLANE");
   mShadowPlane.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mShadowPlane.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  Renderer   shadowRenderer = CreateRenderer(SHADER_SHADOW_VIEW_RENDER_SHADER_VERT, SHADER_SHADOW_VIEW_RENDER_SHADER_FRAG, Shader::Hint::OUTPUT_IS_TRANSPARENT, Uint16Pair(20, 20));
+  Renderer   shadowRenderer = CreateRenderer(SHADER_SHADOW_VIEW_RENDER_SHADER_VERT, SHADER_SHADOW_VIEW_RENDER_SHADER_FRAG, Shader::Hint::OUTPUT_IS_TRANSPARENT, "SHADOW_VIEW_RENDER_SHADER", Uint16Pair(20, 20));
   TextureSet textureSet     = shadowRenderer.GetTextures();
   textureSet.SetTexture(0u, mOutputFrameBuffer.GetColorTexture());
   mShadowPlane.AddRenderer(shadowRenderer);

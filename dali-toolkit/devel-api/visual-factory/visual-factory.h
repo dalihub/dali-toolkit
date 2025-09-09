@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -135,6 +136,13 @@ public:
   Visual::Base CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions);
 
   /**
+   * @brief Get the default quad geometry which general visuals be used.
+   *
+   * @return The default quad geometry for visual factory.
+   */
+  Dali::Geometry GetDefaultQuadGeometry();
+
+  /**
    * @brief Enable or disable premultiplying alpha in images and image visuals.
    *
    * The default is to enable pre-multiplication on load.
@@ -161,7 +169,7 @@ public:
   void SetDefaultCreationOptions(CreationOptions creationOptions);
 
   /**
-   * @brief Set the default creation options when we skip the creation options parameter.
+   * @brief Get the default creation options when we skip the creation options parameter.
    *
    * @return The default creation options for the visual factory.
    */

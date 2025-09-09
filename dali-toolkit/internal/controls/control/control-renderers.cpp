@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -27,6 +34,16 @@ Geometry CreateGridGeometry(Uint16Pair gridSize)
 {
   uint16_t gridWidth  = gridSize.GetWidth();
   uint16_t gridHeight = gridSize.GetHeight();
+
+  if(DALI_LIKELY(gridWidth == 1 && gridHeight == 1 && Dali::Adaptor::IsAvailable()))
+  {
+    // Let we use default quad geometry if possible.
+    auto factory = Dali::Toolkit::VisualFactory::Get();
+    if(factory)
+    {
+      return factory.GetDefaultQuadGeometry();
+    }
+  }
 
   // Create vertices
   Vector<Vector2> vertices;
@@ -89,47 +106,12 @@ Geometry CreateGridGeometry(Uint16Pair gridSize)
 
 Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc)
 {
-  Dali::Shader shader = Dali::Shader::New(vertexSrc, fragmentSrc);
-
-  Dali::Geometry texturedQuadGeometry = Dali::Geometry::New();
-
-  struct VertexPosition
-  {
-    Dali::Vector2 position;
-  };
-  struct VertexTexture
-  {
-    Dali::Vector2 texture;
-  };
-
-  VertexPosition positionArray[] =
-    {
-      {Dali::Vector2(-0.5f, -0.5f)},
-      {Dali::Vector2(0.5f, -0.5f)},
-      {Dali::Vector2(-0.5f, 0.5f)},
-      {Dali::Vector2(0.5f, 0.5f)}};
-  uint32_t numberOfVertices = sizeof(positionArray) / sizeof(VertexPosition);
-
-  Dali::Property::Map positionVertexFormat;
-  positionVertexFormat["aPosition"]   = Dali::Property::VECTOR2;
-  Dali::VertexBuffer positionVertices = Dali::VertexBuffer::New(positionVertexFormat);
-  positionVertices.SetData(positionArray, numberOfVertices);
-  texturedQuadGeometry.AddVertexBuffer(positionVertices);
-
-  const uint16_t indices[] = {0, 3, 1, 0, 2, 3};
-  texturedQuadGeometry.SetIndexBuffer(&indices[0], sizeof(indices) / sizeof(indices[0]));
-
-  Dali::Renderer renderer = Dali::Renderer::New(texturedQuadGeometry, shader);
-
-  Dali::TextureSet textureSet = Dali::TextureSet::New();
-  renderer.SetTextures(textureSet);
-
-  return renderer;
+  return CreateRenderer(vertexSrc, fragmentSrc, Dali::Shader::Hint::NONE, "", Uint16Pair(1, 1));
 }
 
-Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Uint16Pair gridSize)
+Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName, Uint16Pair gridSize)
 {
-  Dali::Shader shader = Dali::Shader::New(vertexSrc, fragmentSrc, hints);
+  Dali::Shader shader = Dali::Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
 
   Dali::Geometry gridGeometry = CreateGridGeometry(gridSize);
 

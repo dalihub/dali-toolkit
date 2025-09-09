@@ -280,11 +280,6 @@ void BackgroundBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, Alp
 
 void BackgroundBlurEffectImpl::OnInitialize()
 {
-  if(DALI_UNLIKELY(mSkipBlur))
-  {
-    return;
-  }
-
   // Create blur actors
   {
     mInternalRoot.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

@@ -151,7 +151,7 @@ int UtcDaliVisualFactoryGet(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactory");
 
-  //Register type
+  // Register type
   TypeInfo type;
   type = TypeRegistry::Get().GetTypeInfo("VisualFactory");
   DALI_TEST_CHECK(type);
@@ -192,7 +192,7 @@ int UtcDaliVisualFactoryCopyAndAssignment(void)
   emptyFactoryEquals = emptyFactory;
   DALI_TEST_CHECK(emptyFactory == emptyFactoryEquals);
 
-  //self assignment
+  // self assignment
   factory = factory;
   DALI_TEST_CHECK(factory = factoryCopy);
 
@@ -1433,7 +1433,7 @@ int UtcDaliNPatchVisualAuxiliaryImage02(void)
 
 int UtcDaliVisualFactoryGetNPatchVisualN1(void)
 {
-  //This should still load but display an error image
+  // This should still load but display an error image
 
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid image url");
@@ -1461,7 +1461,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
 
 int UtcDaliVisualFactoryGetNPatchVisualN2(void)
 {
-  //This should still load but display an error image
+  // This should still load but display an error image
 
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetNPatchVisualN: Request n-patch visual with an invalid URL");
@@ -1635,18 +1635,18 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
 
 namespace
 {
-//Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
-//This is expected to succeed, which will then pass the test.
+// Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
+// This is expected to succeed, which will then pass the test.
 void MeshVisualLoadsCorrectlyTest(Property::Map& propertyMap, ToolkitTestApplication& application)
 {
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  //Create a mesh visual.
+  // Create a mesh visual.
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
 
-  //Create an actor on stage to house the visual.
+  // Create an actor on stage to house the visual.
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
@@ -1654,14 +1654,14 @@ void MeshVisualLoadsCorrectlyTest(Property::Map& propertyMap, ToolkitTestApplica
   application.GetScene().Add(actor);
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
-  //Ensure set on stage.
+  // Ensure set on stage.
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-  //Attempt to render to queue resource load requests.
+  // Attempt to render to queue resource load requests.
   application.SendNotification();
   application.Render(0);
 
-  //Render again to upload the now-loaded textures.
+  // Render again to upload the now-loaded textures.
   application.SendNotification();
   application.Render(0);
 
@@ -1669,27 +1669,27 @@ void MeshVisualLoadsCorrectlyTest(Property::Map& propertyMap, ToolkitTestApplica
   testScaleMatrix.SetIdentityAndScale(Vector3(1.0, -1.0, 1.0));
   Matrix actualScaleMatrix;
 
-  //Test to see if the object has been successfully loaded.
+  // Test to see if the object has been successfully loaded.
   DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Matrix>("uObjectMatrix", actualScaleMatrix));
   DALI_TEST_EQUALS(actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
-  //Finish by setting off stage, and ensuring this was successful.
+  // Finish by setting off stage, and ensuring this was successful.
   actor.Unparent();
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
 }
 
-//Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
-//This is expected to fail, which will then pass the test.
+// Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
+// This is expected to fail, which will then pass the test.
 void MeshVisualDoesNotLoadCorrectlyTest(Property::Map& propertyMap, ToolkitTestApplication& application)
 {
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  //Create a mesh visual.
+  // Create a mesh visual.
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
 
-  //Create an actor on stage to house the visual.
+  // Create an actor on stage to house the visual.
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
@@ -1697,31 +1697,31 @@ void MeshVisualDoesNotLoadCorrectlyTest(Property::Map& propertyMap, ToolkitTestA
   application.GetScene().Add(actor);
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
-  //Ensure set on stage.
+  // Ensure set on stage.
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-  //Attempt to render to queue resource load requests.
+  // Attempt to render to queue resource load requests.
   application.SendNotification();
   application.Render(0);
 
-  //Render again to upload the now-loaded textures.
+  // Render again to upload the now-loaded textures.
   application.SendNotification();
   application.Render(0);
 
-  //Test to see if the object has not been loaded, as expected.
+  // Test to see if the object has not been loaded, as expected.
   Matrix scaleMatrix;
   DALI_TEST_CHECK(!application.GetGlAbstraction().GetUniformValue<Matrix>("uObjectMatrix", scaleMatrix));
 
-  //Finish by setting off stage, and ensuring this was successful.
+  // Finish by setting off stage, and ensuring this was successful.
   actor.Unparent();
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
 }
 } // namespace
 
-//Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
+// Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
 int UtcDaliVisualFactoryGetMeshVisual1(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual1:  Request mesh visual with a valid object file only");
@@ -1734,21 +1734,21 @@ int UtcDaliVisualFactoryGetMeshVisual1(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh loads correctly when supplied with an object file as well as a blank material file and images directory.
+// Test if mesh loads correctly when supplied with an object file as well as a blank material file and images directory.
 int UtcDaliVisualFactoryGetMeshVisual2(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual2:  Request mesh visual with blank material file and images directory");
@@ -1761,23 +1761,23 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, "");
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, "");
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location, but duff optional parameters
+// Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location, but duff optional parameters
 int UtcDaliVisualFactoryGetMeshVisual3b(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct");
@@ -1790,7 +1790,7 @@ int UtcDaliVisualFactoryGetMeshVisual3b(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
@@ -1800,16 +1800,16 @@ int UtcDaliVisualFactoryGetMeshVisual3b(void)
   propertyMap.Insert(MeshVisual::Property::LIGHT_POSITION, 1.0f);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location.
+// Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location.
 int UtcDaliVisualFactoryGetMeshVisual3(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct");
@@ -1822,7 +1822,7 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
@@ -1832,16 +1832,16 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
   propertyMap.Insert(MeshVisual::Property::LIGHT_POSITION, Vector3::XAXIS);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual can load a correctly supplied mesh without a normal map or gloss map in the material file.
+// Test if mesh visual can load a correctly supplied mesh without a normal map or gloss map in the material file.
 int UtcDaliVisualFactoryGetMeshVisual4(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual4:  Request mesh visual with diffuse texture but not normal or gloss.");
@@ -1854,23 +1854,23 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_SIMPLE_MTL_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual can load when made to use diffuse textures only.
+// Test if mesh visual can load when made to use diffuse textures only.
 int UtcDaliVisualFactoryGetMeshVisual5(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual and make it only use diffuse textures.");
@@ -1883,7 +1883,7 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert("objectUrl", TEST_OBJ_FILE_NAME);
@@ -1894,16 +1894,16 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
   propertyMap.Insert("lightPosition", Vector3::ZAXIS);
   propertyMap.Insert("shadingMode", MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING);
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual can load when made to not use the supplied textures.
+// Test if mesh visual can load when made to not use the supplied textures.
 int UtcDaliVisualFactoryGetMeshVisual6(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual6:  Request mesh visual and make it not use any textures.");
@@ -1916,7 +1916,7 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
@@ -1924,15 +1924,15 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
   propertyMap.Insert(MeshVisual::Property::SHADING_MODE, MeshVisual::ShadingMode::TEXTURELESS_WITH_DIFFUSE_LIGHTING);
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
-//Test if mesh visual loads correctly when light position is manually set.
+// Test if mesh visual loads correctly when light position is manually set.
 int UtcDaliVisualFactoryGetMeshVisual7(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual7:  Request mesh visual with custom light position.");
@@ -1945,7 +1945,7 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
@@ -1953,17 +1953,17 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
   propertyMap.Insert(MeshVisual::Property::LIGHT_POSITION, Vector3(0.0, 1.0, 2.0));
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual loads correctly when supplied an object file without face normals or texture points.
-//Note that this notably tests object loader functionality.
+// Test if mesh visual loads correctly when supplied an object file without face normals or texture points.
+// Note that this notably tests object loader functionality.
 int UtcDaliVisualFactoryGetMeshVisual8(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual with normal-less object file.");
@@ -1976,91 +1976,91 @@ int UtcDaliVisualFactoryGetMeshVisual8(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_SIMPLE_OBJ_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh loads correctly.
+  // Test to see if mesh loads correctly.
   MeshVisualLoadsCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual handles the case of lacking an object file.
+// Test if mesh visual handles the case of lacking an object file.
 int UtcDaliVisualFactoryGetMeshVisualN1(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisualN1:  Request mesh visual without object file");
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh doesn't load with these properties, as expected.
+  // Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual handles the case of being passed invalid material and images urls.
+// Test if mesh visual handles the case of being passed invalid material and images urls.
 int UtcDaliVisualFactoryGetMeshVisualN2(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetMeshVisualN2:  Request mesh visual with invalid material and images urls");
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, "invalid");
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, "also invalid");
 
-  //Test to see if mesh doesn't load with these properties, as expected.
+  // Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if mesh visual handles the case of being passed an invalid object url
+// Test if mesh visual handles the case of being passed an invalid object url
 int UtcDaliVisualFactoryGetMeshVisualN3(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetMeshVisualN3:  Request mesh visual with invalid object url");
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, "invalid");
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 
-  //Test to see if mesh doesn't load with these properties, as expected.
+  // Test to see if mesh doesn't load with these properties, as expected.
   MeshVisualDoesNotLoadCorrectlyTest(propertyMap, application);
 
   END_TEST;
 }
 
-//Creates a primitive visual with the given property map and tests to see if it correctly loads in the given application.
+// Creates a primitive visual with the given property map and tests to see if it correctly loads in the given application.
 void TestPrimitiveVisualWithProperties(Property::Map& propertyMap, ToolkitTestApplication& application)
 {
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  //Create a primitive visual.
+  // Create a primitive visual.
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
 
-  //Create an actor on stage to house the visual.
+  // Create an actor on stage to house the visual.
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
@@ -2069,10 +2069,10 @@ void TestPrimitiveVisualWithProperties(Property::Map& propertyMap, ToolkitTestAp
   application.GetScene().Add(actor);
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
-  //Ensure set on stage.
+  // Ensure set on stage.
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-  //Tell test application to load the visual.
+  // Tell test application to load the visual.
   application.SendNotification();
   application.Render(0);
 
@@ -2080,19 +2080,19 @@ void TestPrimitiveVisualWithProperties(Property::Map& propertyMap, ToolkitTestAp
   testScaleMatrix.SetIdentityAndScale(Vector3(1.0, -1.0, 1.0));
   Matrix actualScaleMatrix;
 
-  //Test to see if the object has been successfully loaded.
+  // Test to see if the object has been successfully loaded.
   DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Matrix>("uObjectMatrix", actualScaleMatrix));
   DALI_TEST_EQUALS(actualScaleMatrix, testScaleMatrix, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
-  //Finish by setting off stage, and ensuring this was successful.
+  // Finish by setting off stage, and ensuring this was successful.
   actor.Unparent();
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
 }
 
-//Test if primitive shape loads correctly when supplied with only the bare minimum requirements, the shape to use.
+// Test if primitive shape loads correctly when supplied with only the bare minimum requirements, the shape to use.
 int UtcDaliVisualFactoryGetPrimitiveVisual1(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual1:  Request primitive visual with a shape only");
@@ -2105,21 +2105,21 @@ int UtcDaliVisualFactoryGetPrimitiveVisual1(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when supplied with all possible parameters
+// Test if primitive shape loads correctly when supplied with all possible parameters
 int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual2:  Request primitive visual with everything");
@@ -2132,7 +2132,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE);
@@ -2147,16 +2147,16 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_SMOOTHNESS, 0.8f);
   propertyMap.Insert(MeshVisual::Property::LIGHT_POSITION, Vector3(0.9, 1.0, 1.1));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads a sphere correctly.
+// Test if primitive shape loads a sphere correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual3:  Request primitive visual to display a sphere");
@@ -2169,7 +2169,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
@@ -2177,16 +2177,16 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
   propertyMap.Insert(PrimitiveVisual::Property::SLICES, 10);
   propertyMap.Insert(PrimitiveVisual::Property::STACKS, 20);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads a conic section correctly.
+// Test if primitive shape loads a conic section correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual4:  Request primitive visual to display a conic section");
@@ -2199,7 +2199,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTUM);
@@ -2209,16 +2209,16 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f);
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads a bevelled cube correctly.
+// Test if primitive shape loads a bevelled cube correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual5:  Request primitive visual to display a bevelled cube");
@@ -2231,23 +2231,23 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::BEVELLED_CUBE);
   propertyMap.Insert(PrimitiveVisual::Property::MIX_COLOR, Vector4(0.5, 0.5, 0.5, 1.0));
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads an octahedron correctly.
+// Test if primitive shape loads an octahedron correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual6:  Request primitive visual to display an octahedron");
@@ -2260,22 +2260,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::OCTAHEDRON);
   propertyMap.Insert(PrimitiveVisual::Property::MIX_COLOR, Vector4(0.5, 0.5, 0.5, 1.0));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads a cone correctly.
+// Test if primitive shape loads a cone correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual7:  Request primitive visual to display a cone");
@@ -2288,7 +2288,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONE);
@@ -2297,16 +2297,16 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f);
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when light position is manually set.
+// Test if primitive shape loads correctly when light position is manually set.
 int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual8:  Request primitive visual with set light position");
@@ -2319,23 +2319,23 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::MIX_COLOR, Vector4(0.5, 0.5, 0.5, 1.0));
   propertyMap.Insert(MeshVisual::Property::LIGHT_POSITION, Vector3(0.0, 1.0, 2.0));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too many slices.
+// Test if primitive shape loads correctly when told to use too many slices.
 int UtcDaliVisualFactoryGetPrimitiveVisual9(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual9:  Request primitive visual with above-cap slices.");
@@ -2348,22 +2348,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual9(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::SLICES, Property::Value(1000000));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too few slices. (2 slices or less.)
+// Test if primitive shape loads correctly when told to use too few slices. (2 slices or less.)
 int UtcDaliVisualFactoryGetPrimitiveVisual10(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual10:  Request primitive visual with too few slices.");
@@ -2376,22 +2376,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual10(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::SLICES, Property::Value(2));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too many stacks.
+// Test if primitive shape loads correctly when told to use too many stacks.
 int UtcDaliVisualFactoryGetPrimitiveVisual11(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual11:  Request primitive visual with too many stacks.");
@@ -2404,22 +2404,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual11(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::STACKS, Property::Value(1000000));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too few stacks. (1 stack or less.)
+// Test if primitive shape loads correctly when told to use too few stacks. (1 stack or less.)
 int UtcDaliVisualFactoryGetPrimitiveVisual12(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual12:  Request primitive visual with too few stacks.");
@@ -2432,22 +2432,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual12(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::STACKS, Property::Value(1));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use invalid (zero or negative) dimensions.
+// Test if primitive shape loads correctly when told to use invalid (zero or negative) dimensions.
 int UtcDaliVisualFactoryGetPrimitiveVisual13(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual13:  Request primitive visual with invalid scale dimensions.");
@@ -2460,22 +2460,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual13(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_DIMENSIONS, Vector3::ZERO);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too low a bevel percentage.
+// Test if primitive shape loads correctly when told to use too low a bevel percentage.
 int UtcDaliVisualFactoryGetPrimitiveVisual14(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual14:  Request primitive visual with too low a bevel percentage.");
@@ -2488,22 +2488,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual14(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value(-1.0f));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too high a bevel percentage.
+// Test if primitive shape loads correctly when told to use too high a bevel percentage.
 int UtcDaliVisualFactoryGetPrimitiveVisual15(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual15:  Request primitive visual with too high a bevel percentage.");
@@ -2516,22 +2516,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual15(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value(2.0f));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too low a bevel smoothness.
+// Test if primitive shape loads correctly when told to use too low a bevel smoothness.
 int UtcDaliVisualFactoryGetPrimitiveVisual16(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual16:  Request primitive visual with too low a bevel smoothness.");
@@ -2544,22 +2544,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual16(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value(-1.0f));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads correctly when told to use too high a bevel smoothness.
+// Test if primitive shape loads correctly when told to use too high a bevel smoothness.
 int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual17:  Request primitive visual with too high a bevel smoothness.");
@@ -2572,22 +2572,22 @@ int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE);
   propertyMap.Insert(PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value(2.0f));
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape loads a conic section correctly.
+// Test if primitive shape loads a conic section correctly.
 int UtcDaliVisualFactoryGetPrimitiveVisual18(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisual18:  Request primitive visual to display a conic section");
@@ -2600,7 +2600,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual18(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties.
+  // Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
   propertyMap.Insert(PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTUM);
@@ -2610,16 +2610,16 @@ int UtcDaliVisualFactoryGetPrimitiveVisual18(void)
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f);
   propertyMap.Insert(PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f);
 
-  //Test to see if shape loads correctly.
+  // Test to see if shape loads correctly.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
 }
 
-//Test if primitive shape visual handles the case of not being passed a specific shape to use.
+// Test if primitive shape visual handles the case of not being passed a specific shape to use.
 int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 {
-  //Set up test application first, so everything else can be handled.
+  // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
   tet_infoline("UtcDaliVisualFactoryGetPrimitiveVisualN1:  Request primitive visual without shape");
@@ -2632,11 +2632,11 @@ int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  //Set up visual properties, without supplying shape.
+  // Set up visual properties, without supplying shape.
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE);
 
-  //Test to see if shape loads regardless of missing input.
+  // Test to see if shape loads regardless of missing input.
   TestPrimitiveVisualWithProperties(propertyMap, application);
 
   END_TEST;
@@ -3085,6 +3085,24 @@ int UtcDaliVisualFactoryUsePreCompiledShaderN(void)
   ShaderPreCompiler::Get().GetPreCompileShaderList(precompiledShaderList);
 
   DALI_TEST_EQUALS(precompiledShaderList.size(), PLATFORM_DEFAULT_PRECOMPILED_SHADER_COUNT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetDefaultQuadGeometry(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetDefaultQuadGeometry: Test a GetDefaultQuadGeometry fucntion return same object always");
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Geometry geometry1 = factory.GetDefaultQuadGeometry();
+  DALI_TEST_CHECK(geometry1);
+
+  Geometry geometry2 = factory.GetDefaultQuadGeometry();
+  DALI_TEST_CHECK(geometry2);
+
+  DALI_TEST_EQUALS(geometry1, geometry2, TEST_LOCATION);
 
   END_TEST;
 }

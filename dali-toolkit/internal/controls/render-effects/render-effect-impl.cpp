@@ -153,7 +153,7 @@ void RenderEffectImpl::Initialize()
 {
   if(!mRenderer)
   {
-    mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG);
+    mRenderer = CreateRenderer(SHADER_RENDER_EFFECT_VERT, SHADER_RENDER_EFFECT_FRAG, Dali::Shader::Hint::NONE, "RENDER_EFFECT", Uint16Pair(1, 1));
     mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha
 
     mRenderer.RegisterProperty("uCornerRadius", Vector4::ZERO);

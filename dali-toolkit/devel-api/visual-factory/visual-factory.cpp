@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ VisualFactory VisualFactory::Get()
     BaseHandle handle = singletonService.GetSingleton(typeid(VisualFactory));
     if(handle)
     {
-      //If so, downcast the handle of singleton to VisualFactory
+      // If so, downcast the handle of singleton to VisualFactory
       factory = VisualFactory(dynamic_cast<Internal::VisualFactory*>(handle.GetObjectPtr()));
     }
 
@@ -109,6 +109,11 @@ Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions
 Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions)
 {
   return GetImplementation(*this).CreateVisual(url, size, creationOptions);
+}
+
+Dali::Geometry VisualFactory::GetDefaultQuadGeometry()
+{
+  return GetImplementation(*this).GetDefaultQuadGeometry();
 }
 
 void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)

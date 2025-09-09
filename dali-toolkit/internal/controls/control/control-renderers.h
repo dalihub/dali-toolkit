@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_RENDERERS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragm
  * @param[in] gridSize The number of grid sub-divisions required.
  * @return A newly created renderer.
  */
-Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Dali::Uint16Pair gridSize);
+Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName, Dali::Uint16Pair gridSize);
 
 /**
  * Helper method for setting the first texture passed to a renderer.
