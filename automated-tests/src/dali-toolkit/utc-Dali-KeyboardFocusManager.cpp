@@ -993,6 +993,57 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
   END_TEST;
 }
 
+int UtcDaliKeyboardFocusManagerSignalFocusedActorActivatedLogicalKeyEvent(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerSignalFocusedActorActivatedLogicalKeyEvent");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool                          focusedActorActivatedSignalVerified = false;
+  FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
+  manager.FocusedActorEnterKeySignal().Connect(&focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback);
+
+  Integration::KeyEvent returnEvent("", "KP_Enter", "", 0, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(returnEvent);
+
+  // Create the first button and add it to the stage
+  PushButton firstPushButton = PushButton::New();
+  firstPushButton.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(firstPushButton);
+
+  // Create the second button and add it to the stage
+  PushButton secondPushButton = PushButton::New();
+  secondPushButton.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(secondPushButton);
+
+  // Check that the focus is set on the first button
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(firstPushButton) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == firstPushButton);
+
+  // Send the return event to activate the first button
+  application.ProcessEvent(returnEvent);
+  DALI_TEST_CHECK(focusedActorActivatedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusedActorActivatedCallback.mActivatedActor == firstPushButton);
+  focusedActorActivatedCallback.Reset();
+
+  // Check that the focus is set on the second button
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(secondPushButton) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == secondPushButton);
+
+  // Send the return event again to activate the second button
+  application.ProcessEvent(returnEvent);
+  DALI_TEST_CHECK(focusedActorActivatedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusedActorActivatedCallback.mActivatedActor == secondPushButton);
+  focusedActorActivatedCallback.Reset();
+  END_TEST;
+}
+
 int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
 {
   ToolkitTestApplication application;
@@ -1159,6 +1210,167 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   Integration::KeyEvent downEvent("Down", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   Integration::KeyEvent pageUpEvent("Prior", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   Integration::KeyEvent pageDownEvent("Next", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(leftEvent);
+
+  // Create a 2x2 table view and try to move focus inside it
+  TableView tableView = TableView::New(2, 2);
+  application.GetScene().Add(tableView);
+
+  // Create the first actor
+  Actor first = Actor::New();
+  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  // Create the second actor
+  Actor second = Actor::New();
+  second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  // Create the third actor
+  Actor third = Actor::New();
+  third.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  // Create the fourth actor
+  Actor fourth = Actor::New();
+  fourth.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+
+  // Add the four children to table view
+  tableView.AddChild(first, TableView::CellPosition(0, 0));
+  tableView.AddChild(second, TableView::CellPosition(0, 1));
+  tableView.AddChild(third, TableView::CellPosition(1, 0));
+  tableView.AddChild(fourth, TableView::CellPosition(1, 1));
+
+  // Set the focus to the first actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
+
+  // Send the right key event to move the focus towards right
+  application.ProcessEvent(rightEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == second);
+  focusChangedCallback.Reset();
+
+  // Send the down key event to move the focus towards down
+  application.ProcessEvent(downEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == fourth);
+  focusChangedCallback.Reset();
+
+  // Send the down event to move the focus towards left
+  application.ProcessEvent(leftEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == fourth);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == third);
+  focusChangedCallback.Reset();
+
+  // Send the up event to move the focus towards up
+  application.ProcessEvent(upEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == third);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
+
+  // Send the pape up event, but focus should not be moved because page up is not supported by table view
+  application.ProcessEvent(pageUpEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::PAGE_UP);
+  preFocusChangeCallback.Reset();
+
+  // Send the pape down event, but focus should not be moved because page down is not supported by table view
+  application.ProcessEvent(pageDownEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::PAGE_DOWN);
+  preFocusChangeCallback.Reset();
+
+  // Clear the focus
+  manager.ClearFocus();
+
+  // Send the pape up event, but nothing was focued so focus manager will try the initial focus
+  preFocusChangeCallback.Reset();
+  application.ProcessEvent(pageUpEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::RIGHT);
+
+  // Clear the focus again
+  manager.ClearFocus();
+
+  // Send the pape down event, but nothing was focued so focus manager will try the initial focus
+  preFocusChangeCallback.Reset();
+  application.ProcessEvent(pageDownEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::RIGHT);
+
+  // Clear the focus again
+  manager.ClearFocus();
+
+  // Send the up event for line coverage, but nothing was focued so focus manager will try the initial focus
+  preFocusChangeCallback.Reset();
+  application.ProcessEvent(upEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
+
+  // Clear the focus again
+  manager.ClearFocus();
+
+  // Send the down event for line coverage, but nothing was focued so focus manager will try the initial focus
+  preFocusChangeCallback.Reset();
+  application.ProcessEvent(downEvent);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerChangeFocusDirectionByLogicalKeyEvents(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerChangeFocusDirectionByLogicalKeyEvents");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool                   preFocusChangeSignalVerified = false;
+  PreFocusChangeCallback preFocusChangeCallback(preFocusChangeSignalVerified);
+  manager.PreFocusChangeSignal().Connect(&preFocusChangeCallback, &PreFocusChangeCallback::Callback);
+
+  bool                 focusChangedSignalVerified = false;
+  FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
+  manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
+
+  Integration::KeyEvent leftEvent("", "KP_Left", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Integration::KeyEvent rightEvent("", "KP_Right", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Integration::KeyEvent upEvent("", "KP_Up", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Integration::KeyEvent downEvent("", "KP_Down", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Integration::KeyEvent pageUpEvent("", "KP_Prior", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Integration::KeyEvent pageDownEvent("", "KP_Next", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
