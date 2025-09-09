@@ -717,6 +717,12 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
                              : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   bool synchronousLoading = IsSynchronousLoadingRequired();
+  if(synchronousLoading && mImageUrl.IsValid() && mImageUrl.GetProtocolType() == VisualUrl::REMOTE)
+  {
+    DALI_LOG_DEBUG_INFO("Download image(%s) can’t use synchronous loading. it is forced to load asynchronously instead.", mImageUrl.GetEllipsedUrl().c_str());
+    synchronousLoading = false;
+  }
+
   bool loadingStatus      = false;
 
   // Remove previous loading task.

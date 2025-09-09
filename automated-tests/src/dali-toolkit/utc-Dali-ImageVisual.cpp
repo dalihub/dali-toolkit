@@ -4726,6 +4726,60 @@ int UtcDaliImageVisualSynchronousSizing03(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualSynchronousRemoteImageLoading(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Test synchronous loading with remote image should be forced to async and not fail");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_REMOTE_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true); // Request synchronous loading
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+  application.SendNotification();
+
+  // For remote images, even with synchronous loading requested, it should be forced to async
+  // So we need to wait for async loading to complete
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Verify that the image loaded successfully (renderer created and texture bound)
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  // Verify that the resource is ready (async loading completed successfully)
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  // Verify that the visual resource status is READY (not FAILED)
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(Control::CONTROL_PROPERTY_END_INDEX + 1);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::READY, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualUpdatePixelAreaByAction(void)
 {
   ToolkitTestApplication application;
