@@ -508,6 +508,11 @@ void TextField::OnInitialize()
 
   self.LayoutDirectionChangedSignal().Connect(this, &TextField::OnLayoutDirectionChanged);
 
+  if(Dali::Adaptor::IsAvailable())
+  {
+    Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &TextField::OnLocaleChanged);
+  }
+
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS));
   GetTapGestureDetector().SetMaximumTapsRequired(2);
@@ -1178,6 +1183,11 @@ bool TextField::OnTouched(Actor actor, const TouchEvent& touch)
 void TextField::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   mController->ChangedLayoutDirection();
+}
+
+void TextField::OnLocaleChanged(std::string locale)
+{
+  mController->ResetFontAndStyleData();
 }
 
 TextField::TextField(ControlBehaviour additionalBehaviour)

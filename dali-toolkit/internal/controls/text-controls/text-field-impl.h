@@ -515,6 +515,12 @@ private: // Implementation
   void OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type);
 
   /**
+   * @brief Callback function for when the locale is changed.
+   * @param[in] locale The new system locale.
+   */
+  void OnLocaleChanged(std::string locale);
+
+  /**
   * @brief Add a layer for active or cursor.
   * @param[in] layer The actor in which to store the layer.
   * @param[in] actor The new layer to add.
