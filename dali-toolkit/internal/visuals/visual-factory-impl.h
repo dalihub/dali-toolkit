@@ -140,6 +140,11 @@ public:
    */
   Internal::SvgLoader& GetSvgLoader();
 
+  /**
+   * Get the factory cache, creating it if necessary.
+   */
+  Internal::VisualFactoryCache& GetFactoryCache();
+
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -152,11 +157,6 @@ private:
    * @param[in] styleManager The instance of StyleManager
    */
   void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
-
-  /**
-   * Get the factory cache, creating it if necessary.
-   */
-  Internal::VisualFactoryCache& GetFactoryCache();
 
   /**
    * Get the image visual shader factory, creating it if necessary.

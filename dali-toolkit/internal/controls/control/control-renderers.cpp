@@ -30,79 +30,33 @@ namespace Toolkit
 {
 namespace Internal
 {
-Geometry CreateGridGeometry(Uint16Pair gridSize)
+namespace
 {
-  uint16_t gridWidth  = gridSize.GetWidth();
-  uint16_t gridHeight = gridSize.GetHeight();
-
-  if(DALI_LIKELY(gridWidth == 1 && gridHeight == 1 && Dali::Adaptor::IsAvailable()))
+Shader CreateShader(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName)
+{
+  if(Dali::Adaptor::IsAvailable() && !shaderName.empty())
   {
-    // Let we use default quad geometry if possible.
     auto factory = Dali::Toolkit::VisualFactory::Get();
-    if(factory)
+    if(DALI_LIKELY(factory))
     {
-      return factory.GetDefaultQuadGeometry();
+      thread_local static std::unordered_map<std::string, VisualFactoryCache::ExternalShaderId> gShaderIdMap;
+
+      auto& visualFactoryCache = GetImplementation(factory).GetFactoryCache();
+
+      auto iter = gShaderIdMap.find(shaderName);
+      if(iter != gShaderIdMap.end())
+      {
+        return visualFactoryCache.GetExternalShader(iter->second);
+      }
+      Shader shader            = Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
+      gShaderIdMap[shaderName] = visualFactoryCache.RegisterExternalShader(shader);
+      return shader;
     }
   }
 
-  // Create vertices
-  Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1u) * (gridHeight + 1u));
-
-  for(uint16_t y = 0u; y < gridHeight + 1u; ++y)
-  {
-    for(uint16_t x = 0u; x < gridWidth + 1u; ++x)
-    {
-      vertices.PushBack(Vector2((float)x / gridWidth - 0.5f, (float)y / gridHeight - 0.5f));
-    }
-  }
-
-  // Create indices
-  Vector<unsigned short> indices;
-  indices.Reserve((gridWidth + 2u) * gridHeight * 2u - 2u);
-
-  for(uint16_t row = 0u; row < gridHeight; ++row)
-  {
-    uint32_t rowStartIndex     = row * (gridWidth + 1u);
-    uint32_t nextRowStartIndex = rowStartIndex + gridWidth + 1u;
-
-    if(row != 0u) // degenerate index on non-first row
-    {
-      indices.PushBack(rowStartIndex);
-    }
-
-    for(unsigned int column = 0u; column < gridWidth + 1u; column++) // main strip
-    {
-      indices.PushBack(rowStartIndex + column);
-      indices.PushBack(nextRowStartIndex + column);
-    }
-
-    if(row != gridHeight - 1u) // degenerate index on non-last row
-    {
-      indices.PushBack(nextRowStartIndex + gridWidth);
-    }
-  }
-
-  Property::Map vertexFormat;
-  vertexFormat["aPosition"] = Property::VECTOR2;
-  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
-  if(vertices.Size() > 0)
-  {
-    vertexBuffer.SetData(&vertices[0], vertices.Size());
-  }
-
-  // Create the geometry object
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer(vertexBuffer);
-  if(indices.Size() > 0)
-  {
-    geometry.SetIndexBuffer(&indices[0], indices.Size());
-  }
-
-  geometry.SetType(Geometry::TRIANGLE_STRIP);
-
-  return geometry;
+  return Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
 }
+} // namespace
 
 Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc)
 {
@@ -111,9 +65,9 @@ Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragm
 
 Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName, Uint16Pair gridSize)
 {
-  Dali::Shader shader = Dali::Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
+  Dali::Shader shader = CreateShader(vertexSrc, fragmentSrc, hints, shaderName);
 
-  Dali::Geometry gridGeometry = CreateGridGeometry(gridSize);
+  Dali::Geometry gridGeometry = VisualFactoryCache::CreateGridGeometry(gridSize, true);
 
   Dali::Renderer renderer = Dali::Renderer::New(gridGeometry, shader);
 
