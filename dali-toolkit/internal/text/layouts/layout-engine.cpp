@@ -1760,8 +1760,8 @@ struct Engine::Impl
 
     if(updateCurrentBuffer)
     {
-      // Increase Vector size by 1 to prevent out-of-bounds access during Ellipsis calculation.
-      newGlyphPositions.Resize(layoutParameters.numberOfGlyphs + 1);
+      // Increase Vector size by 2 to prevent out-of-bounds access during Ellipsis calculation.
+      newGlyphPositions.Resize(layoutParameters.numberOfGlyphs + 2);
       glyphPositionsBuffer = newGlyphPositions.Begin();
 
       newLines.Resize(linesCapacity);
