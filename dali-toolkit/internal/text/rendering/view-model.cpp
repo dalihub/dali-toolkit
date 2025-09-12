@@ -491,6 +491,15 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           Length     numberOfRemovedGlyphs = 0u;
           GlyphIndex indexOfEllipsis       = startIndexOfEllipsis;
 
+          float actualAdvance = 0.f;
+          for(Length i = 0; i < ellipsisLine->glyphRun.numberOfGlyphs; i++)
+          {
+            const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + i);
+            float            currentAdvance = currentGlyph.advance;
+
+            actualAdvance += currentAdvance;
+          }
+
           // Tail Mode: start by the end of line.
           bool isTailMode = (ellipsisPosition == DevelText::EllipsisPosition::END) ||
                             (ellipsisPosition == DevelText::EllipsisPosition::MIDDLE && numberOfLines != 1u);
@@ -522,23 +531,24 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                   firstPenX = -ellipsisGlyph.xBearing;
                 }
 
-                removedGlypsWidth = -ellipsisGlyph.xBearing;
-
                 firstPenSet = true;
               }
 
               calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
-              removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
+              removedGlypsWidth += calculatedAdvance;
 
               // Calculate the width of the ellipsis glyph and check if it fits.
-              const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
+              const float ellipsisGlyphWidth = ellipsisGlyph.advance;
+
+              actualAdvance -= glyphToRemove.advance;
+              float calculatedWidth = actualAdvance + ellipsisGlyphWidth;
 
               // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
-              if((ellipsisGlyphWidth < removedGlypsWidth) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
+              if((calculatedWidth < controlSize.width) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
               {
                 GlyphInfo& glyphInfo = *(elidedGlyphsBuffer + indexOfEllipsis);
                 Vector2&   position  = *(elidedPositionsBuffer + indexOfEllipsis);
-                position.x -= (0.f > glyphInfo.xBearing) ? glyphInfo.xBearing : 0.f;
+                position.x -= glyphInfo.xBearing;
 
                 // Replace the glyph by the ellipsis glyph.
                 glyphInfo = ellipsisGlyph;

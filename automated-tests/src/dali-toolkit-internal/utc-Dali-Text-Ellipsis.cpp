@@ -420,22 +420,22 @@ int UtcDaliTextLabelElideTextLocation(void)
   Size textSize00(100.f, 100.f);
 
   Size  textSize01(120.0f, 50.0f);
-  float positions01[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 93.0f};
+  float positions01[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f};
 
   Size  textSize02(120.0f, 50.0f);
-  float positions02[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 111.0f, 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 71.0f, 81.0f, 92.0f};
+  float positions02[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 111.0f, 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 71.0f, 81.0f, 91.0f, 101.0f};
 
   Size  textSize03(120.0f, 60.0f);
-  float positions03[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 83.0f, 0.0f, 14.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 77.0f, 89.0f};
+  float positions03[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 83.0f, 0.0f, 14.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 77.0f, 88.0f, 99.0f, 103.0f, 107.0f};
 
   Size  textSize04(120.0f, 60.0f);
   float positions04[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 84.0f, 93.0f, 104.0f, 110.0f, 0.0f, 14.0f, 25.0f, 34.0f, 39.0f, 53.0f, 64.0f, 67.0f, 76.0f, 86.0f, 100.0f, 110.0f, 0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 84.0f, 94.0f};
 
   Size  textSize05(110.0f, 60.0f);
-  float positions05[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 0.0f, 9.0f, 20.0f, 26.0f, 30.0f, 44.0f, 55.0f, 64.0f, 69.0f, 83.0f, 94.0f, 0.0f, 9.0f, 19.0f, 33.0f, 43.0f, 49.0f, 60.0f, 71.0f, 75.0f, 79.0f};
+  float positions05[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 0.0f, 9.0f, 20.0f, 26.0f, 30.0f, 44.0f, 55.0f, 64.0f, 69.0f, 83.0f, 94.0f, 0.0f, 9.0f, 19.0f, 33.0f, 43.0f, 49.0f, 60.0f, 71.0f, 75.0f, 78.0f, 87.0f, 93.0f};
 
   Size  textSize06(110.0f, 60.0f);
-  float positions06[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 83.0f, 0.0f, 14.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 78.0f};
+  float positions06[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 83.0f, 0.0f, 14.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 77.0f, 88.0f, 99.0f, 103.0f};
 
   Size  textSize07(120.0f, 50.0f);
   float positions07[] = {6.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 111.0f};
@@ -444,40 +444,40 @@ int UtcDaliTextLabelElideTextLocation(void)
   float positions08[] = {6.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 111.0f};
 
   Size  textSize09(120.0f, 60.0f);
-  float positions09[] = {8.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 77.0f, 88.0f, 99.0f, 103.0f, 106.0f, 115.0f};
+  float positions09[] = {-2.0f, 14.0f, 25.0f, 28.0f, 37.0f, 47.0f, 61.0f, 71.0f, 77.0f, 88.0f, 99.0f, 103.0f, 106.0f, 115.0f};
 
   Size  textSize10(120.0f, 60.0f);
-  float positions10[] = {8.0f, 25.0f, 34.0f, 39.0f, 53.0f, 64.0f, 67.0f, 76.0f, 86.0f, 100.0f, 110.0f};
+  float positions10[] = {-2.0f, 14.0f, 25.0f, 34.0f, 39.0f, 53.0f, 64.0f, 67.0f, 76.0f, 86.0f, 100.0f, 110.0f};
 
   Size  textSize11(100.0f, 60.0f);
-  float positions11[] = {4.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f};
+  float positions11[] = {-5.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f};
 
   Size  textSize12(100.0f, 60.0f);
-  float positions12[] = {4.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f};
+  float positions12[] = {-5.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f};
 
   Size  textSize13(120.0f, 60.0f);
-  float positions13[] = {118.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 64.0f, 59.0f, 54.0f, 45.0f, 37.0f, 31.0f, 22.0f, 7.0f};
+  float positions13[] = {118.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 64.0f, 59.0f, 54.0f, 45.0f, 37.0f, 31.0f, 22.0f, 8.0f};
 
   Size  textSize14(120.0f, 60.0f);
-  float positions14[] = {116.0f, 109.0f, 95.0f, 87.0f, 78.0f, 72.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f, 30.0f, 113.0f, 104.0f, 94.0f, 89.0f, 86.0f, 80.0f, 77.0f, 67.0f, 59.0f, 54.0f, 45.0f, 38.0f, 35.0f, 30.0f, 145.0f, 133.0f, 128.0f, 123.0f, 120.0f, 111.0f, 107.0f, 93.0f, 84.0f, 75.0f, 73.0f, 67.0f, 61.0f, 56.0f, 47.0f, 33.0f};
+  float positions14[] = {116.0f, 109.0f, 95.0f, 87.0f, 78.0f, 72.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f, 30.0f, 113.0f, 104.0f, 94.0f, 89.0f, 86.0f, 80.0f, 77.0f, 67.0f, 59.0f, 54.0f, 45.0f, 38.0f, 35.0f, 30.0f, 145.0f, 133.0f, 128.0f, 123.0f, 120.0f, 111.0f, 107.0f, 93.0f, 84.0f, 75.0f, 73.0f, 67.0f, 61.0f, 56.0f, 42.0f};
 
   Size  textSize15(110.0f, 60.0f);
-  float positions15[] = {108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 35.0f, 27.0f, 21.0f, 12.0f, 3.0f, 96.0f, 91.0f, 88.0f, 82.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 31.0f, 28.0f, 16.0f, 11.0f, 6.0f, 3.0f, 102.0f, 98.0f, 84.0f, 75.0f, 66.0f, 64.0f, 58.0f, 52.0f, 47.0f, 38.0f, 24.0f, 9.0f};
+  float positions15[] = {108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 35.0f, 27.0f, 21.0f, 12.0f, 3.0f, 96.0f, 91.0f, 88.0f, 82.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 31.0f, 28.0f, 16.0f, 11.0f, 6.0f, 3.0f, 102.0f, 98.0f, 84.0f, 75.0f, 66.0f, 64.0f, 58.0f, 52.0f, 47.0f, 38.0f, 24.0f, 21.0f, 5.0f};
 
   Size  textSize16(110.0f, 60.0f);
-  float positions16[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 25.0f, 20.0f, 118.0f, 106.0f, 101.0f, 96.0f, 93.0f, 84.0f, 80.0f, 66.0f, 57.0f, 48.0f, 46.0f, 40.0f, 24.0f};
+  float positions16[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 25.0f, 20.0f, 118.0f, 106.0f, 101.0f, 96.0f, 93.0f, 84.0f, 80.0f, 66.0f, 57.0f, 48.0f, 46.0f, 30.0f};
 
   Size  textSize17(110.0f, 60.0f);
-  float positions17[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 25.0f, 20.0f, 118.0f, 106.0f, 101.0f, 96.0f, 93.0f, 84.0f, 80.0f, 66.0f, 57.0f, 48.0f, 46.0f, 40.0f, 24.0f};
+  float positions17[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 25.0f, 20.0f, 118.0f, 106.0f, 101.0f, 96.0f, 93.0f, 84.0f, 80.0f, 66.0f, 57.0f, 48.0f, 46.0f, 30.0f};
 
   Size  textSize18(120.0f, 60.0f);
   float positions18[] = {90.0f, 79.0f, 70.0f, 68.0f, 62.0f, 56.0f, 51.0f, 42.0f, 28.0f, 25.0f, 14.0f, 7.0f, 0.0f};
 
   Size  textSize19(120.0f, 60.0f);
-  float positions19[] = {103.0f, 91.0f, 86.0f, 83.0f, 77.0f, 74.0f, 64.0f, 56.0f, 51.0f, 42.0f, 35.0f, 32.0f, 27.0f};
+  float positions19[] = {112.0f, 101.0f, 91.0f, 86.0f, 83.0f, 77.0f, 74.0f, 64.0f, 56.0f, 51.0f, 42.0f, 35.0f, 32.0f, 27.0f};
 
   Size  textSize20(110.0f, 60.0f);
-  float positions20[] = {89.0f, 82.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 31.0f, 28.0f, 16.0f, 11.0f, 6.0f, 3.0f};
+  float positions20[] = {71.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 31.0f, 28.0f, 16.0f, 11.0f, 6.0f, 3.0f};
 
   Size  textSize21(110.0f, 60.0f);
   float positions21[] = {93.0f, 81.0f, 76.0f, 73.0f, 67.0f, 64.0f, 54.0f, 46.0f, 41.0f, 32.0f, 25.0f, 22.0f, 17.0f};
@@ -489,49 +489,49 @@ int UtcDaliTextLabelElideTextLocation(void)
   float positions23[] = {0.0f, 12.0f, 21.0f, 33.0f, 45.0f};
 
   Size  textSize24(120.0f, 50.0f);
-  float positions24[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 93.0f};
+  float positions24[] = {0.0f, 12.0f, 22.0f, 32.0f, 42.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f};
 
   Size  textSize25(120.0f, 60.0f);
-  float positions25[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 64.0f};
+  float positions25[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 84.0f};
 
   Size  textSize26(120.0f, 60.0f);
-  float positions26[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 84.0f, 93.0f, 104.0f, 110.0f, 0.0f, 14.0f, 25.0f, 34.0f, 39.0f, 53.0f, 64.0f, 67.0f, 76.0f, 87.0f};
+  float positions26[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 84.0f, 93.0f, 104.0f, 110.0f, 0.0f, 14.0f, 25.0f, 34.0f, 39.0f, 53.0f, 64.0f, 67.0f, 76.0f, 86.0f, 100.0f, 111.0f};
 
   Size  textSize27(110.0f, 60.0f);
-  float positions27[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 0.0f, 9.0f, 20.0f, 26.0f, 30.0f, 44.0f, 55.0f, 64.0f, 70.0f};
+  float positions27[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 0.0f, 9.0f, 20.0f, 26.0f, 30.0f, 44.0f, 55.0f, 64.0f, 69.0f, 83.0f, 94.0f};
 
   Size  textSize28(110.0f, 60.0f);
-  float positions28[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 64.0f};
+  float positions28[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 0.0f, 9.0f, 19.0f, 28.0f, 39.0f, 45.0f, 49.0f, 63.0f, 74.0f, 84.0f};
 
   Size  textSize29(120.0f, 60.0f);
   float positions29[] = {116.0f, 109.0f, 95.0f, 87.0f, 78.0f, 72.0f, 62.0f};
 
   Size  textSize30(120.0f, 60.0f);
-  float positions30[] = {116.0f, 109.0f, 95.0f, 87.0f, 78.0f, 72.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f, 30.0f, 113.0f, 104.0f, 94.0f, 89.0f, 86.0f, 80.0f, 77.0f, 67.0f, 59.0f, 54.0f, 34.0f};
+  float positions30[] = {116.0f, 109.0f, 95.0f, 87.0f, 78.0f, 72.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f, 30.0f, 113.0f, 104.0f, 94.0f, 89.0f, 86.0f, 80.0f, 77.0f, 67.0f, 59.0f, 54.0f, 45.0f, 38.0f, 35.0f, 31.0f};
 
   Size  textSize31(110.0f, 60.0f);
-  float positions31[] = {108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 35.0f, 27.0f, 21.0f, 12.0f, 3.0f, 96.0f, 91.0f, 88.0f, 82.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 31.0f, 28.0f, 11.0f};
+  float positions31[] = {108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 35.0f, 27.0f, 21.0f, 12.0f, 3.0f, 96.0f, 91.0f, 88.0f, 82.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 37.0f, 21.0f};
 
   Size  textSize32(110.0f, 60.0f);
-  float positions32[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 24.0f};
+  float positions32[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 22.0f};
 
   Size  textSize33(110.0f, 60.0f);
-  float positions33[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 24.0f};
+  float positions33[] = {106.0f, 99.0f, 85.0f, 77.0f, 68.0f, 62.0f, 52.0f, 47.0f, 42.0f, 33.0f, 25.0f, 20.0f, 103.0f, 94.0f, 84.0f, 79.0f, 76.0f, 70.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 22.0f};
 
   Size  textSize34(120.0f, 30.0f);
   float positions34[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f, 59.0f, 65.0f, 74.0f, 84.0f, 94.0f};
 
   Size  textSize35(120.0f, 30.0f);
-  float positions35[] = {8.0f, 24.0f, 35.0f, 44.0f, 49.0f, 63.0f, 74.0f, 77.0f, 86.0f, 96.0f, 110.0f};
+  float positions35[] = {-10.0f, 6.0f, 10.0f, 24.0f, 35.0f, 44.0f, 49.0f, 63.0f, 74.0f, 77.0f, 86.0f, 96.0f, 110.0f};
 
   Size  textSize36(120.0f, 30.0f);
   float positions36[] = {0.0f, 11.0f, 22.0f, 26.0f, 29.0f, 38.0f, 44.0f, 56.0f};
 
   Size  textSize37(145.0f, 30.0f);
-  float positions37[] = {128.0f, 123.0f, 118.0f, 113.0f, 104.0f, 99.0f, 89.0f, 83.0f, 16.0f, 25.0f, 30.0f, 38.0f, 43.0f, 53.0f, 63.0f};
+  float positions37[] = {128.0f, 123.0f, 118.0f, 113.0f, 104.0f, 99.0f, 89.0f, 83.0f, 16.0f, 25.0f, 30.0f, 38.0f, 43.0f, 53.0f, 62.0f, 68.0f, 78.0f, 12.0f};
 
   Size  textSize38(145.0f, 30.0f);
-  float positions38[] = {77.0f, 92.0f, 97.0f, 107.0f, 116.0f, 122.0f, 132.0f, 64.0f, 50.0f, 45.0f, 40.0f, 35.0f, 26.0f, 21.0f, 11.0f};
+  float positions38[] = {138.0f, 70.0f, 79.0f, 84.0f, 92.0f, 97.0f, 107.0f, 116.0f, 122.0f, 132.0f, 64.0f, 50.0f, 45.0f, 40.0f, 35.0f, 26.0f, 21.0f, 11.0f};
 
   struct ElideData data[] =
     {
@@ -578,7 +578,7 @@ int UtcDaliTextLabelElideTextLocation(void)
         false,
         textSize01,
         1u,
-        10u,
+        11u,
         positions01},
 
       {"EllipsisPosition: TextLabel: Basic case Mulitlines LineWrap-WORD LTR END",
@@ -589,7 +589,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize02,
        2u,
-       22u,
+       23u,
        positions02},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-WORD LTR END",
@@ -600,7 +600,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize03,
        3u,
-       29u,
+       32u,
        positions03},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER LTR END",
@@ -622,7 +622,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize05,
        3u,
-       32u,
+       34,
        positions05},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-MIXED LTR END",
@@ -633,7 +633,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize06,
        3u,
-       28u,
+       31u,
        positions06},
 
       //START LTR cases
@@ -670,7 +670,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize09,
        3u,
-       33u,
+       34u,
        positions09},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER LTR START",
@@ -681,7 +681,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize10,
        3u,
-       37u,
+       38u,
        positions10},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-HYPHAN LTR START",
@@ -692,7 +692,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize11,
        3u,
-       25u,
+       26u,
        positions11},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-MIXED LTR START",
@@ -703,7 +703,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize12,
        3u,
-       25u,
+       26u,
        positions12},
 
       //END RTL cases
@@ -727,7 +727,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize14,
        3u,
-       42u,
+       41u,
        positions14},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER RTL END",
@@ -738,7 +738,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize15,
        3u,
-       43u,
+       44u,
        positions15},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-HYPHENATION RTL END",
@@ -749,7 +749,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize16,
        3u,
-       39u,
+       38u,
        positions16},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-MIXED RTL END",
@@ -760,7 +760,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize17,
        3u,
-       39u,
+       38u,
        positions17},
 
       //START RTL cases
@@ -784,7 +784,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize19,
        3u,
-       33u,
+       34u,
        positions19},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER RTL START",
@@ -795,7 +795,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize20,
        3u,
-       30u,
+       27u,
        positions20},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-HYPHENATION RTL START",
@@ -830,7 +830,7 @@ int UtcDaliTextLabelElideTextLocation(void)
         false,
         textSize23,
         1u,
-        10u,
+        12u,
         positions23},
 
       {"EllipsisPosition: TextLabel: Basic case Mulitlines LineWrap-WORD LTR MIDDLE",
@@ -841,7 +841,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize24,
        2u,
-       22u,
+       23u,
        positions24},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-WORD LTR MIDDLE",
@@ -852,7 +852,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize25,
        3u,
-       24u,
+       26u,
        positions25},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER LTR MIDDLE",
@@ -863,7 +863,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize26,
        3u,
-       36u,
+       38u,
        positions26},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-HYPHAN LTR MIDDLE",
@@ -874,7 +874,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize27,
        3u,
-       27u,
+       29u,
        positions27},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-MIXED LTR MIDDLE",
@@ -885,7 +885,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize28,
        3u,
-       24u,
+       26u,
        positions28},
 
       //MIDDLE RTL cases
@@ -898,7 +898,7 @@ int UtcDaliTextLabelElideTextLocation(void)
         false,
         textSize29,
         1u,
-        13u,
+        15u,
         positions29},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-WORD RTL MIDDLE",
@@ -909,7 +909,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize30,
        3u,
-       31u,
+       34u,
        positions30},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-CHARACTER RTL MIDDLE",
@@ -920,7 +920,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize31,
        3u,
-       29u,
+       27u,
        positions31},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-HYPHENATION RTL MIDDLE",
@@ -931,7 +931,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize32,
        3u,
-       31u,
+       32u,
        positions32},
 
       {"EllipsisPosition: TextLabel: Mulitlines LineWrap-MIXED RTL MIDDLE",
@@ -942,7 +942,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize33,
        3u,
-       31u,
+       32u,
        positions33},
 
       {"EllipsisPosition: TextLabel: One-Line for Mulitlines LineWrap-WORD LTR END",
@@ -964,7 +964,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize35,
        1u,
-       11u,
+       13u,
        positions35},
 
       {"EllipsisPosition: TextLabel: One-Line for Mulitlines LineWrap-WORD LTR MIDDLE",
@@ -975,7 +975,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize36,
        1u,
-       12u,
+       14u,
        positions36},
 
       {"EllipsisPosition: TextLabel: Mixed Directions Languages END",
@@ -986,7 +986,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize37,
        1u,
-       15u,
+       18u,
        positions37},
 
       {"EllipsisPosition: TextLabel: Mixed Directions Languages START",
@@ -997,7 +997,7 @@ int UtcDaliTextLabelElideTextLocation(void)
        false,
        textSize38,
        1u,
-       15u,
+       18u,
        positions38},
 
     };
