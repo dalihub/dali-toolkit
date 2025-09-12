@@ -886,6 +886,11 @@ void AnimatedVectorImageVisual::TriggerVectorRasterization()
     auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
     vectorAnimationManager.RegisterEventCallback(mEventCallback);
     Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+    {
+      // Request ProcessEvents on idle to make ensure Processor executed.
+      Dali::Adaptor::Get().RequestProcessEventsOnIdle();
+    }
   }
 }
 
