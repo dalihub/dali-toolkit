@@ -60,7 +60,7 @@ BaseHandle Create()
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Light, Dali::CustomActor, Create);
+DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Light, Dali::Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 } // unnamed namespace
 
