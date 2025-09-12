@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,12 +93,12 @@ void JumpToWhiteSpace(const char*&      stringBuffer,
                       const char* const stringEndBuffer);
 
 /**
-* @brief Converts a string into an unsigned int.
-*
-* @param[in] uintStr An unsigned int packed inside a string.
-*
-* @return The unsigned int value.
-*/
+ * @brief Converts a string into an unsigned int.
+ *
+ * @param[in] uintStr An unsigned int packed inside a string.
+ *
+ * @return The unsigned int value.
+ */
 unsigned int StringToUint(const char* const uintStr);
 
 /**

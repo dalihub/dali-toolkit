@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_DICTIONARY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,13 +76,13 @@ private:
   {
     return std::find_if(
       Begin(), End(), [key](auto& e)
-      { return Dali::CaseInsensitiveStringCompare(e.key, key); });
+    { return Dali::CaseInsensitiveStringCompare(e.key, key); });
   }
 
   auto FindElement(std::string_view key)
   {
     return std::find_if(container.begin(), container.end(), [key](auto& e)
-                        { return bool(key == e.key); });
+    { return bool(key == e.key); });
   }
 
 public:

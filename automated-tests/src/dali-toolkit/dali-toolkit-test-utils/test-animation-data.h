@@ -34,12 +34,12 @@ public:
    */
   struct AnimationDataElement
   {
-    std::string target;
-    std::string property;
-    Dali::Property::Value value;
+    std::string                          target;
+    std::string                          property;
+    Dali::Property::Value                value;
     Dali::AlphaFunction::BuiltinFunction alphaFunction;
-    float timePeriodDelay;
-    float timePeriodDuration;
+    float                                timePeriodDelay;
+    float                                timePeriodDuration;
 
     AnimationDataElement();
   };
@@ -48,13 +48,13 @@ public:
    * @brief AnimationData holds the required data required to define an
    * animation to be performed on a property source.
    */
-  typedef Dali::Vector< AnimationDataElement* > AnimationDataList;
+  typedef Dali::Vector<AnimationDataElement*> AnimationDataList;
 
   /**
    * @brief Adds one AnimationDataElement to the list to describe one animation.
    * @param[in] animationDataElement A pre-populated struct to add
    */
-  void Add( AnimationDataElement* animationDataElement );
+  void Add(AnimationDataElement* animationDataElement);
 
   std::size_t Size() const;
 
@@ -63,9 +63,9 @@ public:
   AnimationDataList mAnimationDataList;
 };
 
-void NewAnimator( const Dali::Property::Map& map, TestAnimationData::AnimationDataElement& element );
-void NewAnimation( const Dali::Property::Map& map, TestAnimationData& outputAnimationData );
-void NewAnimation( const Dali::Property::Array& array, TestAnimationData& outputAnimationData );
-} // Test
+void NewAnimator(const Dali::Property::Map& map, TestAnimationData::AnimationDataElement& element);
+void NewAnimation(const Dali::Property::Map& map, TestAnimationData& outputAnimationData);
+void NewAnimation(const Dali::Property::Array& array, TestAnimationData& outputAnimationData);
+} //namespace Test
 
-#endif  //DALI_TOOLKIT_TEST_TEST_ANIMATION_DATA_H
+#endif //DALI_TOOLKIT_TEST_TEST_ANIMATION_DATA_H

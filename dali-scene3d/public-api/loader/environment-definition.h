@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,10 +59,10 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   EnvironmentDefinition() = default;
 
-  EnvironmentDefinition(const EnvironmentDefinition&) = delete;
+  EnvironmentDefinition(const EnvironmentDefinition&)            = delete;
   EnvironmentDefinition& operator=(const EnvironmentDefinition&) = delete;
 
-  EnvironmentDefinition(EnvironmentDefinition&&) = default;
+  EnvironmentDefinition(EnvironmentDefinition&&)            = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**

@@ -723,7 +723,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     synchronousLoading = false;
   }
 
-  bool loadingStatus      = false;
+  bool loadingStatus = false;
 
   // Remove previous loading task.
   ResetFastTrackLoadingTask();
@@ -1388,7 +1388,7 @@ Vector2 ImageVisual::ComputeMaskTextureRatio()
             float textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
             float textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
             maskTextureRatio    = Vector2(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
-                                       std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+                                          std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
           }
         }
       }

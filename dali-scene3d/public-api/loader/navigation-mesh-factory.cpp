@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,8 +164,8 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVert
 
   // Build navigationMeshBinary binary
   navigationMeshBinary.insert(navigationMeshBinary.end(),
-              reinterpret_cast<uint8_t*>(&header),
-              reinterpret_cast<uint8_t*>(&header) + sizeof(Internal::Algorithm::NavigationMeshHeader_V10));
+                              reinterpret_cast<uint8_t*>(&header),
+                              reinterpret_cast<uint8_t*>(&header) + sizeof(Internal::Algorithm::NavigationMeshHeader_V10));
 
   auto& h = *reinterpret_cast<decltype(header)*>(navigationMeshBinary.data());
 
@@ -183,14 +183,14 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVert
 
   // Copy data
   navigationMeshBinary.insert(navigationMeshBinary.end(),
-              reinterpret_cast<uint8_t*>(meshVertices.data()),
-              reinterpret_cast<uint8_t*>(meshVertices.data()) + (meshVertices.size() * sizeof(NavigationMesh::Vertex)));
+                              reinterpret_cast<uint8_t*>(meshVertices.data()),
+                              reinterpret_cast<uint8_t*>(meshVertices.data()) + (meshVertices.size() * sizeof(NavigationMesh::Vertex)));
   navigationMeshBinary.insert(navigationMeshBinary.end(),
-              reinterpret_cast<uint8_t*>(meshEdges.data()),
-              reinterpret_cast<uint8_t*>(meshEdges.data()) + (meshEdges.size() * sizeof(NavigationMesh::Edge)));
+                              reinterpret_cast<uint8_t*>(meshEdges.data()),
+                              reinterpret_cast<uint8_t*>(meshEdges.data()) + (meshEdges.size() * sizeof(NavigationMesh::Edge)));
   navigationMeshBinary.insert(navigationMeshBinary.end(),
-              reinterpret_cast<uint8_t*>(meshFaces.data()),
-              reinterpret_cast<uint8_t*>(meshFaces.data()) + (meshFaces.size() * sizeof(NavigationMesh::Face)));
+                              reinterpret_cast<uint8_t*>(meshFaces.data()),
+                              reinterpret_cast<uint8_t*>(meshFaces.data()) + (meshFaces.size() * sizeof(NavigationMesh::Face)));
 
   return NavigationMeshFactory::CreateFromBuffer(navigationMeshBinary);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1776,7 +1776,7 @@ struct Engine::Impl
     }
 
     float penY            = CalculateLineOffset(lines,
-                                     layoutParameters.startLineIndex);
+                                                layoutParameters.startLineIndex);
     bool  anyLineIsEliped = false;
     for(GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne;)
     {
@@ -1944,9 +1944,9 @@ struct Engine::Impl
         if(!isMultiline)
         {
           // Recalculate line spacing and line height
-          LineRun& firstLineRun = *(lines.Begin());
+          LineRun& firstLineRun    = *(lines.Begin());
           firstLineRun.lineSpacing = GetLineSpacing(firstLineRun.ascender + -firstLineRun.descender, layout.relativeLineSize);
-          layoutSize.height = GetLineHeight(firstLineRun, false);
+          layoutSize.height        = GetLineHeight(firstLineRun, false);
         }
 
         // No more lines to layout.
@@ -2030,7 +2030,7 @@ struct Engine::Impl
         // Increase the glyph index.
         index = nextIndex;
       } // no ellipsis
-    }   // end for() traversing glyphs.
+    } // end for() traversing glyphs.
 
     //Shift lines to up if ellipsis and multilines and set ellipsis of first line to true
     if(anyLineIsEliped && numberOfLines > 1u)

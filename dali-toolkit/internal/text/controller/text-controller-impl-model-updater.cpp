@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/controller/text-controller-impl-model-updater.h>
 
 // EXTERNAL INCLUDES
-#include <chrono>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
+#include <chrono>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -282,7 +282,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
         }
       }
 
-      Property::Map *variationsMapPtr = nullptr;
+      Property::Map* variationsMapPtr = nullptr;
       if(!impl.mModel->mLogicalModel->mVariationsMap.Empty())
       {
         variationsMapPtr = &impl.mModel->mLogicalModel->mVariationsMap;
@@ -696,11 +696,11 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   if(logEnabled)
   {
     timeStamps[timeStampIndex++] = GetMilliSeconds();
-    uint32_t timeShape   = timeStamps[1] - timeStamps[0];
-    uint32_t timeGlyph   = timeStamps[2] - timeStamps[1];
-    uint32_t timePreedit = timeStamps[3] - timeStamps[2];
-    uint32_t timeColor   = timeStamps[4] - timeStamps[3];
-    uint32_t timeCopy    = timeStamps[5] - timeStamps[4];
+    uint32_t timeShape           = timeStamps[1] - timeStamps[0];
+    uint32_t timeGlyph           = timeStamps[2] - timeStamps[1];
+    uint32_t timePreedit         = timeStamps[3] - timeStamps[2];
+    uint32_t timeColor           = timeStamps[4] - timeStamps[3];
+    uint32_t timeCopy            = timeStamps[5] - timeStamps[4];
 
     if(timeStamps[5] - timeStamps[0] > logThreshold)
     {

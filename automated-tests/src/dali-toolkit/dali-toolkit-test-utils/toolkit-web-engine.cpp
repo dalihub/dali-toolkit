@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,12 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-hit-test.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-load-error.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-plugin.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -43,8 +45,6 @@
 #include <string.h>
 #include <toolkit-application.h>
 #include <memory>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-plugin.h>
 
 namespace Dali
 {
@@ -2120,48 +2120,48 @@ public:
   float mScaleFactor;
   bool  mVisible;
 
-  Dali::Vector2             mScrollPosition;
-  Dali::Vector2             mScrollSize;
-  Dali::Vector2             mContentSize;
-  WebEngineBackForwardList* mockWebEngineBackForwardList;
-  WebEngineSettings*        mockWebEngineSettings;
+  Dali::Vector2                mScrollPosition;
+  Dali::Vector2                mScrollSize;
+  Dali::Vector2                mContentSize;
+  WebEngineBackForwardList*    mockWebEngineBackForwardList;
+  WebEngineSettings*           mockWebEngineSettings;
   Dali::Accessibility::Address mAccessibilityAddress{};
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
 
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadStartedCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadInProgressCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadFinishedCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback           mPageLoadErrorCallback;
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
-  Dali::WebEnginePlugin::WebEngineOverScrolledCallback            mOverScrolledCallback;
-  Dali::WebEnginePlugin::WebEngineUrlChangedCallback              mUrlChangedCallback;
-  Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback       mFormRepostDecidedCallback;
-  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback           mFrameRenderedCallback;
-  Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback  mConsoleMessageCallback;
-  Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback   mResponsePolicyDecisionCallback;
-  Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
-  Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback        mNewWindowCreatedCallback;
-  Dali::WebEnginePlugin::WebEngineCertificateCallback             mCertificateConfirmCallback;
-  Dali::WebEnginePlugin::WebEngineCertificateCallback             mSslCertificateChangedCallback;
-  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback         mHttpAuthHandlerCallback;
-  Dali::WebEnginePlugin::WebEngineContextMenuShownCallback        mContextMenuShownCallback;
-  Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback       mContextMenuHiddenCallback;
-  Dali::WebEnginePlugin::JavaScriptAlertCallback                  mJavaScriptAlertCallback;
-  Dali::WebEnginePlugin::JavaScriptConfirmCallback                mJavaScriptConfirmCallback;
-  Dali::WebEnginePlugin::JavaScriptPromptCallback                 mJavaScriptPromptCallback;
-  Dali::WebEnginePlugin::ScreenshotCapturedCallback               mScreenshotCapturedCallback;
-  Dali::WebEnginePlugin::VideoPlayingCallback                     mVideoPlayingCallback;
-  Dali::WebEnginePlugin::GeolocationPermissionCallback            mGeolocationPermissionCallback;
-  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback          mHitTestCreatedCallback;
-  Dali::WebEnginePlugin::PlainTextReceivedCallback                mPlainTextReceivedCallback;
-  Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback  mNewWindowPolicyDecidedCallback;
-  Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback       mFullscreenEnteredCallback;
-  Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback        mFullscreenExitedCallback;
-  Dali::WebEnginePlugin::WebEngineTextFoundCallback               mTextFoundCallback;
-  bool                                                            mWebAuthenticationCancel;
-  Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback        mWebAuthDisplayQRCallback;
-  Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback         mWebAuthResponseCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                   mPageLoadStartedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                   mPageLoadInProgressCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                   mPageLoadFinishedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback              mPageLoadErrorCallback;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback          mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineOverScrolledCallback               mOverScrolledCallback;
+  Dali::WebEnginePlugin::WebEngineUrlChangedCallback                 mUrlChangedCallback;
+  Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback          mFormRepostDecidedCallback;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback              mFrameRenderedCallback;
+  Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback     mConsoleMessageCallback;
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback      mResponsePolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback    mNavigationPolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineNewWindowCreatedCallback           mNewWindowCreatedCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback                mCertificateConfirmCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback                mSslCertificateChangedCallback;
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback            mHttpAuthHandlerCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuShownCallback           mContextMenuShownCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback          mContextMenuHiddenCallback;
+  Dali::WebEnginePlugin::JavaScriptAlertCallback                     mJavaScriptAlertCallback;
+  Dali::WebEnginePlugin::JavaScriptConfirmCallback                   mJavaScriptConfirmCallback;
+  Dali::WebEnginePlugin::JavaScriptPromptCallback                    mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::ScreenshotCapturedCallback                  mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::VideoPlayingCallback                        mVideoPlayingCallback;
+  Dali::WebEnginePlugin::GeolocationPermissionCallback               mGeolocationPermissionCallback;
+  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback             mHitTestCreatedCallback;
+  Dali::WebEnginePlugin::PlainTextReceivedCallback                   mPlainTextReceivedCallback;
+  Dali::WebEnginePlugin::WebEngineNewWindowPolicyDecidedCallback     mNewWindowPolicyDecidedCallback;
+  Dali::WebEnginePlugin::WebEngineFullscreenEnteredCallback          mFullscreenEnteredCallback;
+  Dali::WebEnginePlugin::WebEngineFullscreenExitedCallback           mFullscreenExitedCallback;
+  Dali::WebEnginePlugin::WebEngineTextFoundCallback                  mTextFoundCallback;
+  bool                                                               mWebAuthenticationCancel;
+  Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback           mWebAuthDisplayQRCallback;
+  Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback            mWebAuthResponseCallback;
   Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback mUserMediaPermissionRequestCallback;
 };
 

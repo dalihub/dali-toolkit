@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/controller/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
-#include <dali-toolkit/internal/text/controller/text-controller-impl-event-handler.h>
 
 using namespace Dali;
 
@@ -502,13 +502,13 @@ void SelectionHandleController::Reposition(Controller::Impl& impl, float visualX
   CharacterIndex selectionEnd(0);
   CharacterIndex noTextHitIndex(0);
   const bool     characterHit = FindSelectionIndices(visualModel,
-                                                 model->mLogicalModel,
-                                                 impl.mMetrics,
-                                                 visualX,
-                                                 visualY,
-                                                 selectionStart,
-                                                 selectionEnd,
-                                                 noTextHitIndex);
+                                                     model->mLogicalModel,
+                                                     impl.mMetrics,
+                                                     visualX,
+                                                     visualY,
+                                                     selectionStart,
+                                                     selectionEnd,
+                                                     noTextHitIndex);
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "%p selectionStart %d selectionEnd %d\n", &impl, selectionStart, selectionEnd);
 
   if(characterHit || (Controller::NoTextTap::HIGHLIGHT == action))

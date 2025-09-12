@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,8 @@ void PhysicsActor::AsyncSetPhysicsPosition(Dali::Vector3 actorPosition)
   // Queue task
   cpBody* body = mBody.Get<cpBody*>();
   cpVect  pos  = fromVec3(mAdaptor.TranslateToPhysicsSpace(actorPosition));
-  mAdaptor.Queue([body, pos] { cpBodySetPosition(body, pos); });
+  mAdaptor.Queue([body, pos]
+  { cpBodySetPosition(body, pos); });
 }
 
 void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
@@ -75,7 +76,8 @@ void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
   Vector3 axis;
   Radian  angle;
   q.ToAxisAngle(axis, angle);
-  mAdaptor.Queue([body, angle]() { cpBodySetAngle(body, angle); });
+  mAdaptor.Queue([body, angle]()
+  { cpBodySetAngle(body, angle); });
 }
 
 Dali::Vector3 PhysicsActor::GetPhysicsPosition() const

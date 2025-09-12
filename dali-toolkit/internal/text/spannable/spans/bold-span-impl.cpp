@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ BoldSpan::~BoldSpan()
 
 Dali::Toolkit::Text::BoldSpan BoldSpan::New()
 {
-  BoldSpanPtr object = new BoldSpan();
+  BoldSpanPtr                   object = new BoldSpan();
   Dali::Toolkit::Text::BoldSpan handle = Dali::Toolkit::Text::BoldSpan(object.Get());
   return handle;
 }
@@ -48,8 +48,8 @@ Dali::Toolkit::Text::BoldSpan BoldSpan::New()
 void BoldSpan::CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const
 {
   FontDescriptionRun fontRun;
-  fontRun.weight        = TextAbstraction::FontWeight::BOLD;
-  fontRun.weightDefined = true;
+  fontRun.weight                          = TextAbstraction::FontWeight::BOLD;
+  fontRun.weightDefined                   = true;
   fontRun.characterRun.characterIndex     = range.GetStartIndex();
   fontRun.characterRun.numberOfCharacters = range.GetNumberOfIndices();
   logicalModel->mFontDescriptionRuns.PushBack(fontRun);

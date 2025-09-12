@@ -123,7 +123,8 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg)
+  { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -314,7 +315,8 @@ void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
 void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
 {
   auto id   = node.GetProperty<int>(Actor::Property::ID);
-  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item) {
+  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item)
+  {
     return item.first == id;
   });
   if(iter != mColliderMeshes.end())

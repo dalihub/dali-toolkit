@@ -231,13 +231,13 @@ private:
   void SetupAnimation();
 
   /**
-  * @brief Play animations
-  */
+   * @brief Play animations
+   */
   void PlayAnimation();
 
   /**
-  * @brief Stop animations
-  */
+   * @brief Stop animations
+   */
   void StopAnimation();
 
   /**

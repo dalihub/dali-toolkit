@@ -76,10 +76,10 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
     const LineRun* lineRun         = textVisualModel->mLines.Begin();
     float          alignmentOffset = lineRun->alignmentOffset;
     numberOfGlyphs                 = textView.GetGlyphs(glyphs.Begin(),
-                                        positions.Begin(),
-                                        alignmentOffset,
-                                        0u,
-                                        numberOfGlyphs);
+                                                        positions.Begin(),
+                                                        alignmentOffset,
+                                                        0u,
+                                                        numberOfGlyphs);
 
     glyphs.Resize(numberOfGlyphs);
     positions.Resize(numberOfGlyphs);

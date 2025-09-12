@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_NAVIGATION_MESH_HEADER_H
 #define DALI_SCENE3D_NAVIGATION_MESH_HEADER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,5 +54,5 @@ struct NavigationMeshHeader_V10 : public NavigationMeshHeader
   float gravityVector[3]; /// Gravity vector for the data (down vector)
 };
 
-}
+} //namespace Dali::Scene3D::Internal::Algorithm
 #endif // DALI_SCENE3D_NAVIGATION_MESH_HEADER_H

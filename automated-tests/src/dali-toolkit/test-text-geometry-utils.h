@@ -1,8 +1,8 @@
-#ifndef  TOOLKIT_TEXT_GEOMETRY_UTILS_H
-#define  TOOLKIT_TEXT_GEOMETRY_UTILS_H
+#ifndef TOOLKIT_TEXT_GEOMETRY_UTILS_H
+#define TOOLKIT_TEXT_GEOMETRY_UTILS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,13 @@
  *
  */
 
-
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-
-
 
 namespace TestTextGeometryUtils
 {
 void CheckGeometryResult(Vector<Vector2> positionsList, Vector<Vector2> sizeList, Vector<Vector2> expectedPositions, Vector<Vector2> expectedSizes);
 void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry);
-}
+} //namespace TestTextGeometryUtils
 
 #endif // TOOLKIT_TEXT_GEOMETRY_UTILS_H

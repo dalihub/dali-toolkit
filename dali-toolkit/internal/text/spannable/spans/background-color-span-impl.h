@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_BACKGROUND_COLOR_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public:
   /**
    * @brief Creates a new BackgroundColorSpan object.
    */
-  static Dali::Toolkit::Text::BackgroundColorSpan New(const Vector4 &color);
+  static Dali::Toolkit::Text::BackgroundColorSpan New(const Vector4& color);
 
   /**
    * Default Constructor
@@ -90,7 +90,7 @@ public: //Methods. Not intended for application developers
    *
    * @param[in] color The background-color.
    */
-  void SetBackgroundColor(const Vector4 &color);
+  void SetBackgroundColor(const Vector4& color);
 
 public: //Methods for internal only
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -143,7 +144,7 @@ int UtcDaliGlbLoaderFailedToParse(void)
 
 int UtcDaliGlbLoaderSuccess1(void)
 {
-  Context                 ctx;
+  Context ctx;
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/BoxAnimated.glb", ctx.loadResult);
 
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());

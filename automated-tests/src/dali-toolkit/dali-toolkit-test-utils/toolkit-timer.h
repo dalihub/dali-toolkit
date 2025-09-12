@@ -35,7 +35,7 @@ namespace Adaptor
 {
 class Timer;
 }
-}
+} //namespace Internal
 
 class Timer : public BaseHandle
 {
@@ -43,19 +43,20 @@ public:
   void MockEmitSignal();
 
 public:
-  typedef Signal< bool () > TimerSignalType;
+  typedef Signal<bool()> TimerSignalType;
   Timer();
-  static Timer New( unsigned int milliSec );
-  Timer( const Timer& timer );
-  Timer& operator=( const Timer& timer );
+  static Timer New(unsigned int milliSec);
+  Timer(const Timer& timer);
+  Timer& operator=(const Timer& timer);
   ~Timer();
-  static Timer DownCast( BaseHandle handle );
-  void Start();
-  void Stop();
-  void SetInterval( unsigned int milliSec );
-  unsigned int GetInterval() const;
-  bool IsRunning() const;
+  static Timer     DownCast(BaseHandle handle);
+  void             Start();
+  void             Stop();
+  void             SetInterval(unsigned int milliSec);
+  unsigned int     GetInterval() const;
+  bool             IsRunning() const;
   TimerSignalType& TickSignal();
+
 private:
   Timer(Internal::Adaptor::Timer* timer);
 };
@@ -64,9 +65,9 @@ private:
 
 namespace Test
 {
-int GetTimerCount();
+int  GetTimerCount();
 void EmitGlobalTimerSignal();
 bool AreTimersRunning();
-}
+} //namespace Test
 
 #endif // DALI_TOOLKIT_TOOLKIT_TIMER_H

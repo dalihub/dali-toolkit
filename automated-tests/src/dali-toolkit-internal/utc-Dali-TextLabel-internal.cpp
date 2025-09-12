@@ -1293,10 +1293,10 @@ int UtcDaliTextLabelMarkupCharacterSpacingTag(void)
 
   float alignmentOffset = 0u;
   numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                  positions.Begin(),
-                                  alignmentOffset,
-                                  0u,
-                                  numberOfGlyphs);
+                                         positions.Begin(),
+                                         alignmentOffset,
+                                         0u,
+                                         numberOfGlyphs);
 
   const Length numberOfGlyphsOneLine = 7u;
   for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
@@ -1354,10 +1354,10 @@ int UtcDaliTextLabelMarkupSpanCharacterSpacing(void)
 
   float alignmentOffset = 0u;
   numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                  positions.Begin(),
-                                  alignmentOffset,
-                                  0u,
-                                  numberOfGlyphs);
+                                         positions.Begin(),
+                                         alignmentOffset,
+                                         0u,
+                                         numberOfGlyphs);
 
   const Length numberOfGlyphsOneLine = 7u;
   for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)

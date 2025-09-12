@@ -445,7 +445,7 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
     Matrix inverseMatrix = boneData.inverseMatrix;
     // Constrain bone matrix to joint transform.
     boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
-                                                  { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
+    { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
 
     Actor joint = Self();
     boneData.constraint.AddSource(Source{joint, Actor::Property::WORLD_MATRIX});

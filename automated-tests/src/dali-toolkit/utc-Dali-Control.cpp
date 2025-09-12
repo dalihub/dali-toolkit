@@ -1677,7 +1677,8 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
-  control.OffScreenRenderingFinishedSignal().Connect([]() -> void { tet_printf("Signal emitted\n"); });
+  control.OffScreenRenderingFinishedSignal().Connect([]() -> void
+  { tet_printf("Signal emitted\n"); });
 
   DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
 

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_JSON_UTIL_H_
 #define DALI_SCENE3D_LOADER_JSON_UTIL_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,12 @@ bool ReadVector(const Toolkit::TreeNode* node, int* num, unsigned int size);
 
 /**
  * @brief Reads a color.
- * 
+ *
  * The node contents could be a vector of 4 floats [r,g,b,a].
- * 
+ *
  * @param[in] node The tree node with the color.
  * @param[out] color The RGBA color.
- * 
+ *
  * @return true if succedded to read the color.
  */
 bool ReadColor(const Toolkit::TreeNode* node, Vector4& color);

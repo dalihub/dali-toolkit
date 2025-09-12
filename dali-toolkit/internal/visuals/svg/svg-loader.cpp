@@ -447,7 +447,7 @@ Dali::VectorImageRenderer SvgLoader::GetVectorImageRenderer(SvgLoader::SvgLoadId
 void SvgLoader::Process(bool postProcessor)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss)
-                                          { oss << "[r:" << mRasterizeRemoveQueue.size() << ", l:" << mLoadRemoveQueue.size() << "]"; });
+  { oss << "[r:" << mRasterizeRemoveQueue.size() << ", l:" << mLoadRemoveQueue.size() << "]"; });
 
   mRemoveProcessorRegistered = false;
 

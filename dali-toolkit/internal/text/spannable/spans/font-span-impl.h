@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FONT_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,10 +58,10 @@ public:
    */
   FontSpan();
 
-  FontSpan(const FontSpan&) = delete;            ///< Deleted copy constructor
-  FontSpan(FontSpan&&)      = delete;            ///< Deleted move constructor
+  FontSpan(const FontSpan&)            = delete; ///< Deleted copy constructor
+  FontSpan(FontSpan&&)                 = delete; ///< Deleted move constructor
   FontSpan& operator=(const FontSpan&) = delete; ///< Deleted copy assignment operator
-  FontSpan& operator=(FontSpan&&) = delete;      ///< Deleted move assignment operator
+  FontSpan& operator=(FontSpan&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief Destructor
@@ -168,8 +168,8 @@ private: //Methods
 
 public: //Methods for internal only
         /**
-   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-   */
+         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+         */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
 
 private:

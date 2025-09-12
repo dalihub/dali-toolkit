@@ -159,7 +159,7 @@ void FastTrackLoadingTask::Load()
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+  {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[u:" << mUrl.GetEllipsedUrl() << "]"; });
 
@@ -225,7 +225,7 @@ void FastTrackLoadingTask::Load()
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
-                                        {
+  {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";

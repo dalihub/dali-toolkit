@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_BUTTON_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,21 +32,21 @@ namespace Property
 enum Type
 {
   /**
-       * @brief name "labelRelativeAlignment", type STRING
-       * @details Sets the position of the the label in relation to the foreground/icon if both present
-       */
+   * @brief name "labelRelativeAlignment", type STRING
+   * @details Sets the position of the the label in relation to the foreground/icon if both present
+   */
   LABEL_RELATIVE_ALIGNMENT = Dali::Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL + 1,
 
   /**
-       * @brief name "labelPadding", type Vector4
-       * @details Sets the padding around the text
-       */
+   * @brief name "labelPadding", type Vector4
+   * @details Sets the padding around the text
+   */
   LABEL_PADDING,
 
   /**
-       * @brief name "visualPadding", type Vector4
-       * @details Sets the padding around the foreground visual
-       */
+   * @brief name "visualPadding", type Vector4
+   * @details Sets the padding around the foreground visual
+   */
   VISUAL_PADDING
 };
 } // namespace Property

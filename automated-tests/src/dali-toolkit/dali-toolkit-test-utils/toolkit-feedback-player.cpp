@@ -34,26 +34,26 @@ class FeedbackPlayer : public Dali::BaseObject
 public:
   static Dali::FeedbackPlayer New()
   {
-    Dali::FeedbackPlayer player = Dali::FeedbackPlayer( new FeedbackPlayer() );
+    Dali::FeedbackPlayer player = Dali::FeedbackPlayer(new FeedbackPlayer());
     return player;
   }
 
   static Dali::FeedbackPlayer Get()
   {
-    Dali::FeedbackPlayer player;
-    Dali::SingletonService service( Dali::SingletonService::Get() );
-    if( service )
+    Dali::FeedbackPlayer   player;
+    Dali::SingletonService service(Dali::SingletonService::Get());
+    if(service)
     {
       // Check whether the singleton is already created
-      Dali::BaseHandle handle = service.GetSingleton( typeid( Dali::FeedbackPlayer ) );
-      if( handle )
+      Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::FeedbackPlayer));
+      if(handle)
       {
-        player = Dali::FeedbackPlayer( dynamic_cast< FeedbackPlayer* >( handle.GetObjectPtr() ) );
+        player = Dali::FeedbackPlayer(dynamic_cast<FeedbackPlayer*>(handle.GetObjectPtr()));
       }
       else
       {
-        player = Dali::FeedbackPlayer( New() );
-        service.Register( typeid( player ), player );
+        player = Dali::FeedbackPlayer(New());
+        service.Register(typeid(player), player);
       }
     }
     return player;
@@ -62,7 +62,7 @@ public:
   {
   }
 
-  void PlayFile( const std::string& filePath )
+  void PlayFile(const std::string& filePath)
   {
   }
 
@@ -70,16 +70,16 @@ public:
   {
   }
 
-  int PlaySound( const std::string& fileName )
+  int PlaySound(const std::string& fileName)
   {
     return 0;
   }
 
-  void StopSound( int handle )
+  void StopSound(int handle)
   {
   }
 
-  void PlayFeedbackPattern( int type, int pattern )
+  void PlayFeedbackPattern(int type, int pattern)
   {
   }
 
@@ -115,19 +115,19 @@ private:
   bool mLoadFileReturn;
 };
 
-} // Adaptor
-} // Internal
+} //namespace Adaptor
+} //namespace Internal
 
 inline Internal::Adaptor::FeedbackPlayer& GetImplementation(Dali::FeedbackPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "FeedbackPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "FeedbackPlayer handle is empty");
   BaseObject& handle = player.GetBaseObject();
   return static_cast<Internal::Adaptor::FeedbackPlayer&>(handle);
 }
 
 inline const Internal::Adaptor::FeedbackPlayer& GetImplementation(const Dali::FeedbackPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "FeedbackPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "FeedbackPlayer handle is empty");
   const BaseObject& handle = player.GetBaseObject();
   return static_cast<const Internal::Adaptor::FeedbackPlayer&>(handle);
 }
@@ -160,17 +160,17 @@ void FeedbackPlayer::Stop()
   GetImplementation(*this).Stop();
 }
 
-int FeedbackPlayer::PlaySound( const std::string& fileName )
+int FeedbackPlayer::PlaySound(const std::string& fileName)
 {
   return GetImplementation(*this).PlaySound(fileName);
 }
 
-void FeedbackPlayer::StopSound( int handle )
+void FeedbackPlayer::StopSound(int handle)
 {
   GetImplementation(*this).StopSound(handle);
 }
 
-void FeedbackPlayer::PlayFeedbackPattern( int type, int pattern )
+void FeedbackPlayer::PlayFeedbackPattern(int type, int pattern)
 {
   GetImplementation(*this).PlayFeedbackPattern(type, pattern);
 }
@@ -180,8 +180,8 @@ bool FeedbackPlayer::LoadFile(const std::string& filename, std::string& data)
   return GetImplementation(*this).LoadFile(filename, data);
 }
 
-FeedbackPlayer::FeedbackPlayer( Internal::Adaptor::FeedbackPlayer* player )
-: BaseHandle( player )
+FeedbackPlayer::FeedbackPlayer(Internal::Adaptor::FeedbackPlayer* player)
+: BaseHandle(player)
 {
 }
 
@@ -192,10 +192,10 @@ namespace Adaptor
 
 void SetLoadFileReturnValue(Dali::FeedbackPlayer feedbackPlayer, bool returnValue)
 {
-  GetImplementation(feedbackPlayer).SetLoadFileReturnValue( returnValue );
+  GetImplementation(feedbackPlayer).SetLoadFileReturnValue(returnValue);
 }
 
-} // Adaptor
-} // Internal
+} //namespace Adaptor
+} //namespace Internal
 
-} // Dali
+} //namespace Dali

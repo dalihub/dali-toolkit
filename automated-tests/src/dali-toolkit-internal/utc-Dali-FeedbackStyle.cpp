@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
 
-#include <dali-toolkit/internal/feedback/feedback-style.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/internal/feedback/feedback-style.h>
 #include <dali/devel-api/adaptor-framework/feedback-player.h>
 
 using namespace Dali;
@@ -43,13 +43,13 @@ namespace Adaptor
  * @param[in] feedbackPlayer The FeedbackPlayer singleton.
  * @param[in] returnValue The desired return value for the FeedbackPlayer::LoadFile() method. Either true or false.
  */
-void SetLoadFileReturnValue( Dali::FeedbackPlayer feedbackPlayer, bool returnValue );
+void SetLoadFileReturnValue(Dali::FeedbackPlayer feedbackPlayer, bool returnValue);
 
-}
+} //namespace Adaptor
 
-}
+} //namespace Internal
 
-}
+} //namespace Dali
 
 int UtcDaliFeedbackStyle(void)
 {

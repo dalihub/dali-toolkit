@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ namespace Text
 namespace
 {
 const char* WEIGHT_KEY = "weight";
-const char* WIDTH_KEY = "width";
-const char* SLANT_KEY = "slant";
+const char* WIDTH_KEY  = "width";
+const char* SLANT_KEY  = "slant";
 const char* FAMILY_KEY = "family";
-const char* TYPE_KEY = "type";
+const char* TYPE_KEY   = "type";
 
 const char* SYSTEM_TOKEN = "system";
 
@@ -230,7 +230,7 @@ void SetFontStyleProperty(ControllerPtr controller, const Property::Value& value
           break;
         }
       } // switch
-    }   // map not empty
+    } // map not empty
     else
     {
       switch(type)
@@ -257,8 +257,8 @@ void SetFontStyleProperty(ControllerPtr controller, const Property::Value& value
           break;
         }
       } // switch
-    }   // map.Empty()
-  }     // controller
+    } // map.Empty()
+  } // controller
 }
 
 void GetFontStyleProperty(ControllerPtr controller, Property::Value& value, FontStyle::Type type)
@@ -435,7 +435,7 @@ void GetFontStyleProperty(ControllerPtr controller, Property::Value& value, Font
 
       value = fontStyleProperties;
     } // SetbyString
-  }   // controller
+  } // controller
 }
 
 FontWeight StringToWeight(const char* const weightStr)

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_LAYOUTING_FLEX_NODE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,9 +134,9 @@ public:
    */
   ~Node();
 
-  Node& operator=(Node&&) = default;
-  Node(Node&&)            = default;
-  Node(const Node&)       = delete;
+  Node& operator=(Node&&)      = default;
+  Node(Node&&)                 = default;
+  Node(const Node&)            = delete;
   Node& operator=(const Node&) = delete;
 
   /**

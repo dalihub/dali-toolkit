@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -901,7 +901,7 @@ int UtcDaliTextControllerCheckInputColorChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -952,7 +952,7 @@ int UtcDaliTextControllerCheckInputFontFamilyChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -1000,7 +1000,7 @@ int UtcDaliTextControllerCheckInputFontWeightChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -1048,7 +1048,7 @@ int UtcDaliTextControllerCheckInputFontWidthChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -1096,7 +1096,7 @@ int UtcDaliTextControllerCheckInputFontSlantChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
@@ -1144,7 +1144,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
-                                                      *controller);
+                                                               *controller);
   InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);

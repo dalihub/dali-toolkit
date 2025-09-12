@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <fstream>
 #include <memory>
 

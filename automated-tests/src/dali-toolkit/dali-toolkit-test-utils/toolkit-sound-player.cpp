@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/sound-player.h>
+#include <dali/devel-api/common/singleton-service.h>
+#include <dali/public-api/object/base-object.h>
 
 using namespace Dali;
 
@@ -29,13 +29,12 @@ namespace Internal
 namespace Adaptor
 {
 
-
 class SoundPlayer : public Dali::BaseObject
 {
 public:
   static Dali::SoundPlayer New()
   {
-    Dali::SoundPlayer player = Dali::SoundPlayer( new SoundPlayer() );
+    Dali::SoundPlayer player = Dali::SoundPlayer(new SoundPlayer());
     return player;
   }
 
@@ -43,20 +42,20 @@ public:
   {
     Dali::SoundPlayer player;
 
-    Dali::SingletonService service( Dali::SingletonService::Get() );
-    if ( service )
+    Dali::SingletonService service(Dali::SingletonService::Get());
+    if(service)
     {
       // Check whether the singleton is already created
-      Dali::BaseHandle handle = service.GetSingleton( typeid( Dali::SoundPlayer ) );
-      if ( handle )
+      Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::SoundPlayer));
+      if(handle)
       {
         // If so, downcast the handle
-        player = Dali::SoundPlayer( dynamic_cast< SoundPlayer* >( handle.GetObjectPtr() ) );
+        player = Dali::SoundPlayer(dynamic_cast<SoundPlayer*>(handle.GetObjectPtr()));
       }
       else
       {
-        player = Dali::SoundPlayer( New() );
-        service.Register( typeid( player ), player );
+        player = Dali::SoundPlayer(New());
+        service.Register(typeid(player), player);
       }
     }
     return player;
@@ -84,19 +83,19 @@ private:
   SoundPlayer& operator=(SoundPlayer&);
 };
 
-} // Adaptor namespace
-} // Internal namespace
+} //namespace Adaptor
+} //namespace Internal
 
 inline Internal::Adaptor::SoundPlayer& GetImplementation(Dali::SoundPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "SoundPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "SoundPlayer handle is empty");
   BaseObject& handle = player.GetBaseObject();
   return static_cast<Internal::Adaptor::SoundPlayer&>(handle);
 }
 
 inline const Internal::Adaptor::SoundPlayer& GetImplementation(const Dali::SoundPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "SoundPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "SoundPlayer handle is empty");
   const BaseObject& handle = player.GetBaseObject();
   return static_cast<const Internal::Adaptor::SoundPlayer&>(handle);
 }
@@ -110,8 +109,8 @@ SoundPlayer::SoundPlayer()
 {
 }
 
-SoundPlayer::SoundPlayer(Internal::Adaptor::SoundPlayer*player)
-:BaseHandle(player)
+SoundPlayer::SoundPlayer(Internal::Adaptor::SoundPlayer* player)
+: BaseHandle(player)
 {
 }
 
@@ -124,4 +123,4 @@ int SoundPlayer::PlaySound(const std::string fileName)
   return GetImplementation(*this).PlaySound(fileName);
 }
 
-} // Dali
+} //namespace Dali

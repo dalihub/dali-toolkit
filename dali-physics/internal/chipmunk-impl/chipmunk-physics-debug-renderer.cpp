@@ -111,8 +111,8 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
   mDebugDrawOptions.drawDot        = DebugDrawDotImpl;
 
   mDebugDrawOptions.flags               = static_cast<cpSpaceDebugDrawFlags>(CP_SPACE_DEBUG_DRAW_SHAPES |
-                                                               CP_SPACE_DEBUG_DRAW_COLLISION_POINTS |
-                                                               CP_SPACE_DEBUG_DRAW_CONSTRAINTS);
+                                                                             CP_SPACE_DEBUG_DRAW_COLLISION_POINTS |
+                                                                             CP_SPACE_DEBUG_DRAW_CONSTRAINTS);
   mDebugDrawOptions.colorForShape       = DebugDrawColorForShapeImpl;
   mDebugDrawOptions.shapeOutlineColor   = cpSpaceDebugColor{0.0f, 1.0f, 1.0f, 0.9f};
   mDebugDrawOptions.constraintColor     = cpSpaceDebugColor{0.5f, 0.5f, 0.5f, 0.9f};

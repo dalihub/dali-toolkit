@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -643,7 +643,8 @@ int UtcDaliNavigationMeshCreateFromVerticesAndFaces(void)
   auto buffer0 = COLLIDER_BUFFER(0);
 
   // All calculations in the navmesh local space
-  auto fn = [&](const auto& vertices, const auto& normals, const auto& indices) {
+  auto fn = [&](const auto& vertices, const auto& normals, const auto& indices)
+  {
     auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(vertices, normals, indices);
     navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
     DALI_TEST_EQUALS(navmesh->GetVertexCount(), vertices.size(), TEST_LOCATION);
@@ -688,7 +689,8 @@ int UtcDaliNavigationMeshCreateFromVerticesAndFacesNoNormals(void)
   auto buffer0 = COLLIDER_BUFFER(0);
 
   // All calculations in the navmesh local space
-  auto fn = [&](const auto& vertices, const auto& indices) {
+  auto fn = [&](const auto& vertices, const auto& indices)
+  {
     auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(vertices.data(), nullptr, vertices.size(), indices.data(), indices.size());
     navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
     DALI_TEST_EQUALS(navmesh->GetVertexCount(), vertices.size(), TEST_LOCATION);

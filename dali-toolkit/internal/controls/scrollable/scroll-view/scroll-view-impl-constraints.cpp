@@ -376,7 +376,7 @@ struct InternalFinalConstraint
     const float& overshootx = inputs[1]->GetFloat();
     const float& overshooty = inputs[2]->GetFloat();
     Vector2      offset(mFunctionX(overshootx),
-                   mFunctionY(overshooty));
+                        mFunctionY(overshooty));
 
     current = inputs[0]->GetVector2() - offset;
   }

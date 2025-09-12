@@ -18,7 +18,6 @@
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
 
-
 namespace Dali
 {
 
@@ -63,35 +62,35 @@ public:
   {
     return mStateChangedSignal;
   }
+
 private:
   Dali::TtsPlayer::StateChangedSignalType mStateChangedSignal;
 };
 
-
 inline TtsPlayer& GetImplementation(Dali::TtsPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "TtsPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "TtsPlayer handle is empty");
   BaseObject& handle = player.GetBaseObject();
   return static_cast<Internal::Adaptor::TtsPlayer&>(handle);
 }
 
 inline const TtsPlayer& GetImplementation(const Dali::TtsPlayer& player)
 {
-  DALI_ASSERT_ALWAYS( player && "TtsPlayer handle is empty" );
+  DALI_ASSERT_ALWAYS(player && "TtsPlayer handle is empty");
   const BaseObject& handle = player.GetBaseObject();
   return static_cast<const Internal::Adaptor::TtsPlayer&>(handle);
 }
 
-} // Adaptor
-} // Internal
+} //namespace Adaptor
+} //namespace Internal
 
 static IntrusivePtr<Internal::Adaptor::TtsPlayer> ttsSingleton = NULL;
 
 TtsPlayer TtsPlayer::Get(Dali::TtsPlayer::Mode mode)
 {
-  if( ! ttsSingleton )
+  if(!ttsSingleton)
   {
-    ttsSingleton.Reset( new Dali::Internal::Adaptor::TtsPlayer() );
+    ttsSingleton.Reset(new Dali::Internal::Adaptor::TtsPlayer());
   }
   TtsPlayer playerHandle(ttsSingleton.Get());
 
@@ -143,8 +142,8 @@ TtsPlayer::StateChangedSignalType& TtsPlayer::StateChangedSignal()
   return Internal::Adaptor::GetImplementation(*this).StateChangedSignal();
 }
 
-TtsPlayer::TtsPlayer( Internal::Adaptor::TtsPlayer* player )
-: BaseHandle( player )
+TtsPlayer::TtsPlayer(Internal::Adaptor::TtsPlayer* player)
+: BaseHandle(player)
 {
 }
 

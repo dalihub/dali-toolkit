@@ -145,7 +145,8 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
 {
   Dali::PixelData pixelData;
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss)
+  {
     oss << "[";
     if(info.mDimensions.GetWidth() > 0 || info.mDimensions.GetHeight() > 0)
     {
@@ -160,7 +161,8 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
   {
     pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);
   }
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss)
+  {
     oss << "[";
     if(pixelData)
     {

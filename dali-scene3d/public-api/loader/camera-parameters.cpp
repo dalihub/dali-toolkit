@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,17 +96,17 @@ void Perspective(Matrix& result, float fovy, float aspect, float nearPlane, floa
 }
 
 /**
-* @brief Creates an orthographic projection matrix.
-*
-* @param[out] result The orthographic projection matrix.
-* @param[in] left The coordinate for the left vertical clipping plane.
-* @param[in] right The coordinate for the right vertical clipping plane.
-* @param[in] bottom The coordinate for the bottom horizontal clipping plane.
-* @param[in] top The coordinate for the top horizontal clipping plane.
-* @param[in] nearPlane The distance to the near depth clipping plane.
-* @param[in] farPlane The distance to the far depth clipping plane.
-* @param[in] invertYAxis Whether to invert the 'Y' axis.
-*/
+ * @brief Creates an orthographic projection matrix.
+ *
+ * @param[out] result The orthographic projection matrix.
+ * @param[in] left The coordinate for the left vertical clipping plane.
+ * @param[in] right The coordinate for the right vertical clipping plane.
+ * @param[in] bottom The coordinate for the bottom horizontal clipping plane.
+ * @param[in] top The coordinate for the top horizontal clipping plane.
+ * @param[in] nearPlane The distance to the near depth clipping plane.
+ * @param[in] farPlane The distance to the far depth clipping plane.
+ * @param[in] invertYAxis Whether to invert the 'Y' axis.
+ */
 void Orthographic(Matrix& result, float left, float right, float bottom, float top, float nearPlane, float farPlane, bool invertYAxis)
 {
   if(Equals(right, left) || Equals(top, bottom) || Equals(farPlane, nearPlane))

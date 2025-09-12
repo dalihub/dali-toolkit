@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
-#include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
+#include <dali-toolkit/internal/text/controller/text-controller.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1087,10 +1087,10 @@ int UtcDaliTextEditorTextPositionWithMinLineAndBigFont(void)
 
   float alignmentOffset = 0u;
   numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                  positions.Begin(),
-                                  alignmentOffset,
-                                  0u,
-                                  numberOfGlyphs);
+                                         positions.Begin(),
+                                         alignmentOffset,
+                                         0u,
+                                         numberOfGlyphs);
 
   DALI_TEST_EQUALS(positions[2].y, 165.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -1363,10 +1363,10 @@ int UtcDaliTextEditorMarkupCharacterSpacingTag(void)
 
   float alignmentOffset = 0u;
   numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                  positions.Begin(),
-                                  alignmentOffset,
-                                  0u,
-                                  numberOfGlyphs);
+                                         positions.Begin(),
+                                         alignmentOffset,
+                                         0u,
+                                         numberOfGlyphs);
 
   const Length numberOfGlyphsOneLine = 7u;
   for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
@@ -1423,10 +1423,10 @@ int UtcDaliTextEditorMarkupSpanCharacterSpacing(void)
 
   float alignmentOffset = 0u;
   numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                  positions.Begin(),
-                                  alignmentOffset,
-                                  0u,
-                                  numberOfGlyphs);
+                                         positions.Begin(),
+                                         alignmentOffset,
+                                         0u,
+                                         numberOfGlyphs);
 
   const Length numberOfGlyphsOneLine = 7u;
   for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)

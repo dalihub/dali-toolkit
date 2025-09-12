@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -985,9 +985,10 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
         // Remove from the embedded items those exceding the last laid out glyph.
         embeddedItemLayout.Erase(std::remove_if(embeddedItemLayout.Begin(),
                                                 embeddedItemLayout.End(),
-                                                [finalNumberOfGlyphs](const EmbeddedItemInfo& item) {
-                                                  return item.glyphIndex >= finalNumberOfGlyphs;
-                                                }),
+                                                [finalNumberOfGlyphs](const EmbeddedItemInfo& item)
+        {
+          return item.glyphIndex >= finalNumberOfGlyphs;
+        }),
                                  embeddedItemLayout.End());
       }
     }
@@ -1064,10 +1065,10 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   textModel->mIgnoreSpacesAfterText = false;
 
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
-  Text::Layout::Parameters layoutParameters(internalDataModel.textLayoutArea,
-                                            textModel,
-                                            fontClient,
-                                            bidirectionalSupport);
+  Text::Layout::Parameters              layoutParameters(internalDataModel.textLayoutArea,
+                                                         textModel,
+                                                         fontClient,
+                                                         bidirectionalSupport);
 
   // Whether the last character is a new paragraph character.
   const Vector<Character>& textToShape = isTextMirrored ? mirroredUtf32Characters : textModel->mLogicalModel->mText;

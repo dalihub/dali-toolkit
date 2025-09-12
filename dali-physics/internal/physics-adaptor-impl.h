@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_INTERNAL_ADAPTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public:
   ~PhysicsAdaptor() override;
 
   // Remove copy constructor and copy assignment
-  PhysicsAdaptor(const PhysicsAdaptor& handle) = delete;
+  PhysicsAdaptor(const PhysicsAdaptor& handle)            = delete;
   PhysicsAdaptor& operator=(const PhysicsAdaptor& handle) = delete;
 
   /**

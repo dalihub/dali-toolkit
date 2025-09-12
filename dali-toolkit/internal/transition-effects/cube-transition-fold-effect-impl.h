@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_FOLD_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,28 +44,28 @@ public:
 
 protected:
   /**
-    * @copydoc Toolkit::CubeTransitionEffect::OnInitialize
-    */
+   * @copydoc Toolkit::CubeTransitionEffect::OnInitialize
+   */
   void OnInitialize() override;
 
   /**
-    * @copydoc Toolkit::CubeTransitionEffect::OnStartTransition
-    */
+   * @copydoc Toolkit::CubeTransitionEffect::OnStartTransition
+   */
   void OnStartTransition(Vector2 panPosition, Vector2 panDisplacement) override;
 
 private:
   /**
-    * Construct a new CubeTransitionFoldEffect object
-    * @param[in] numRows How many rows of cubes
-    * @param[in] numColumns How many columns of cubes
-    */
+   * Construct a new CubeTransitionFoldEffect object
+   * @param[in] numRows How many rows of cubes
+   * @param[in] numColumns How many columns of cubes
+   */
   CubeTransitionFoldEffect(unsigned int numRows, unsigned int numColumns);
 
   /**
-    * Set up animation to an Actor
-    * @param[in] actorIndex The index of the cube in the cube array
-    * @param[in] angle The angle of the rotation animation
-    */
+   * Set up animation to an Actor
+   * @param[in] actorIndex The index of the cube in the cube array
+   * @param[in] angle The angle of the rotation animation
+   */
   void SetupAnimation(unsigned int actorIndex, unsigned int x, float angle);
 
 }; //class CubeTransitionFoldEffect

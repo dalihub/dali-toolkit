@@ -35,8 +35,8 @@ class Timer;
 typedef IntrusivePtr<Timer> TimerPtr;
 
 Dali::Timer::TimerSignalType gTickSignal;
-int gTimerCount = 0;
-bool gKeepTimersRunning = false;
+int                          gTimerCount        = 0;
+bool                         gKeepTimersRunning = false;
 
 /**
  * Implementation of the timer
@@ -47,31 +47,28 @@ public:
   void MockEmitSignal();
 
 public:
-  static TimerPtr New( unsigned int milliSec );
-  Timer( unsigned int milliSec );
+  static TimerPtr New(unsigned int milliSec);
+  Timer(unsigned int milliSec);
   virtual ~Timer();
 
-  void Start();
-  void Stop();
-  void SetInterval( unsigned int interval );
+  void         Start();
+  void         Stop();
+  void         SetInterval(unsigned int interval);
   unsigned int GetInterval() const;
-  bool IsRunning() const;
-  bool Tick();
+  bool         IsRunning() const;
+  bool         Tick();
 
 public: // Signals
-
   Dali::Timer::TimerSignalType& TickSignal();
 
 private: // Implementation
-
   // not implemented
-  Timer( const Timer& );
-  Timer& operator=( const Timer& );
+  Timer(const Timer&);
+  Timer& operator=(const Timer&);
 
 private: // Data
-
   unsigned int mInterval;
-  bool mRunning;
+  bool         mRunning;
 };
 
 inline Timer& GetImplementation(Dali::Timer& timer)
@@ -92,15 +89,15 @@ inline const Timer& GetImplementation(const Dali::Timer& timer)
   return static_cast<const Internal::Adaptor::Timer&>(handle);
 }
 
-TimerPtr Timer::New( unsigned int milliSec )
+TimerPtr Timer::New(unsigned int milliSec)
 {
-  TimerPtr timerImpl = new Timer( milliSec );
+  TimerPtr timerImpl = new Timer(milliSec);
   return timerImpl;
 }
 
-Timer::Timer( unsigned int milliSec )
-: mInterval( milliSec ),
-  mRunning( false )
+Timer::Timer(unsigned int milliSec)
+: mInterval(milliSec),
+  mRunning(false)
 {
   ++gTimerCount;
 }
@@ -120,7 +117,7 @@ void Timer::Stop()
   mRunning = false;
 }
 
-void Timer::SetInterval( unsigned int interval )
+void Timer::SetInterval(unsigned int interval)
 {
   mInterval = interval;
 }
@@ -149,7 +146,7 @@ Dali::Timer::TimerSignalType& Timer::TickSignal()
 
 void Timer::MockEmitSignal()
 {
-  if( gTimerCount > 1 )
+  if(gTimerCount > 1)
   {
     // Only emit the signal if we have more than just the timer created in the test function
     gTickSignal.Emit();
@@ -166,24 +163,23 @@ void Timer::MockEmitSignal()
 
 Timer::Timer()
 {
-
 }
 
-Timer Timer::New( unsigned int milliSec )
+Timer Timer::New(unsigned int milliSec)
 {
-  Internal::Adaptor::TimerPtr internal = Internal::Adaptor::Timer::New( milliSec );
+  Internal::Adaptor::TimerPtr internal = Internal::Adaptor::Timer::New(milliSec);
   return Timer(internal.Get());
 }
 
-Timer::Timer( const Timer& timer )
-:BaseHandle( timer )
+Timer::Timer(const Timer& timer)
+: BaseHandle(timer)
 {
 }
 
-Timer& Timer::operator=( const Timer& timer )
+Timer& Timer::operator=(const Timer& timer)
 {
   // check self assignment
-  if( *this != timer )
+  if(*this != timer)
   {
     BaseHandle::operator=(timer);
   }
@@ -196,23 +192,23 @@ Timer::~Timer()
 
 void Timer::Start()
 {
-  Internal::Adaptor::GetImplementation( *this ).Start();
+  Internal::Adaptor::GetImplementation(*this).Start();
   Dali::Internal::Adaptor::gKeepTimersRunning = true;
 }
 
 void Timer::Stop()
 {
-  Internal::Adaptor::GetImplementation( *this ).Stop();
+  Internal::Adaptor::GetImplementation(*this).Stop();
 }
 
-void Timer::SetInterval( unsigned int milliSec )
+void Timer::SetInterval(unsigned int milliSec)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetInterval( milliSec );
+  Internal::Adaptor::GetImplementation(*this).SetInterval(milliSec);
 }
 
 unsigned int Timer::GetInterval() const
 {
-  return Internal::Adaptor::GetImplementation( *this ).GetInterval();
+  return Internal::Adaptor::GetImplementation(*this).GetInterval();
 }
 
 bool Timer::IsRunning() const
@@ -222,7 +218,7 @@ bool Timer::IsRunning() const
 
 Timer::TimerSignalType& Timer::TickSignal()
 {
-  return Internal::Adaptor::GetImplementation( *this ).TickSignal();
+  return Internal::Adaptor::GetImplementation(*this).TickSignal();
 }
 
 Timer::Timer(Internal::Adaptor::Timer* timer)
@@ -234,11 +230,10 @@ Timer::Timer(Internal::Adaptor::Timer* timer)
 
 void Timer::MockEmitSignal()
 {
-  Internal::Adaptor::GetImplementation( *this ).MockEmitSignal();
+  Internal::Adaptor::GetImplementation(*this).MockEmitSignal();
 }
 
 } // namespace Dali
-
 
 namespace Test
 {
@@ -259,4 +254,4 @@ bool AreTimersRunning()
   return Dali::Internal::Adaptor::gKeepTimersRunning;
 }
 
-}
+} //namespace Test

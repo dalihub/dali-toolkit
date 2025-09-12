@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -806,7 +806,8 @@ void Material::NotifyObserver()
     mObserverNotifying = false;
 
     // Resolve observer queue during notify
-    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e) { return !e.second; }),
+    mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(), [](auto& e)
+    { return !e.second; }),
                      mObservers.end());
   }
 }

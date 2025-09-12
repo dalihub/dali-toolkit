@@ -40,11 +40,11 @@ namespace
 const int CUSTOM_PROPERTY_COUNT(5); // 5 transform properties
 
 /**
-   * @brief Loads a texture from a file
-   * @param[in] imageUrl The url of the file
-   * @param[in] generateMipmaps Indicates whether to generate mipmaps for the texture
-   * @return A texture if loading succeeds, an empty handle otherwise
-   */
+ * @brief Loads a texture from a file
+ * @param[in] imageUrl The url of the file
+ * @param[in] generateMipmaps Indicates whether to generate mipmaps for the texture
+ * @return A texture if loading succeeds, an empty handle otherwise
+ */
 Texture LoadTexture(const char* imageUrl, bool generateMipmaps)
 {
   Texture texture;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/ktx-loader.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/ktx-loader.h"
 
 #include <fstream>
 
@@ -72,14 +72,14 @@ int UtcDaliKtxLoaderFailValidHeaderOnly(void)
 int UtcDaliKtxLoaderSuccess(void)
 {
   EnvironmentMapData environmentMapData;
-  auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
+  auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
   DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
-  for (auto& face: environmentMapData.mPixelData)
+  for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 64;
-    for (auto& mipData: face)
+    for(auto& mipData : face)
     {
       DALI_TEST_EQUAL(size, mipData.GetWidth());
       DALI_TEST_EQUAL(size, mipData.GetHeight());
@@ -94,9 +94,9 @@ int UtcDaliKtxLoaderSuccess(void)
 int UtcDaliKtxLoaderFormats(void)
 {
   auto resPath = TEST_RESOURCE_DIR "/";
-#define FORMAT_PATH(x) { #x, Pixel::x }
-#define FORMAT_COMPRESSED_PATH(x) { #x, Pixel::COMPRESSED_ ## x ## _KHR }
-  std::pair<std::string, Pixel::Format> pathFormats[] {
+#define FORMAT_PATH(x) {#x, Pixel::x}
+#define FORMAT_COMPRESSED_PATH(x) {#x, Pixel::COMPRESSED_##x##_KHR}
+  std::pair<std::string, Pixel::Format> pathFormats[]{
     FORMAT_COMPRESSED_PATH(RGBA_ASTC_4x4),
     FORMAT_COMPRESSED_PATH(RGBA_ASTC_5x4),
     FORMAT_COMPRESSED_PATH(RGBA_ASTC_5x5),
@@ -114,7 +114,7 @@ int UtcDaliKtxLoaderFormats(void)
     FORMAT_PATH(RGB32F),
     FORMAT_PATH(RGBA8888),
   };
-  for (auto i : pathFormats)
+  for(auto i : pathFormats)
   {
     EnvironmentMapData environmentMapData;
     DALI_TEST_CHECK(LoadKtxData(resPath + i.first + ".ktx", environmentMapData));
@@ -127,7 +127,7 @@ int UtcDaliKtxLoaderFormats(void)
 int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
 {
   uint32_t pixelBufferSize = 3;
-  uint8_t* pixelBuffer = new uint8_t[pixelBufferSize];
+  uint8_t* pixelBuffer     = new uint8_t[pixelBufferSize];
 
   EnvironmentMapData environmentMapData;
   environmentMapData.mPixelData.push_back({});
@@ -136,7 +136,7 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
   environmentMapData.mPixelData[0].push_back(pixelData);
 
   TestApplication app;
-  auto texture = environmentMapData.GetTexture();
+  auto            texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(1u, texture.GetWidth());
@@ -148,11 +148,11 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
 int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture2(void)
 {
   EnvironmentMapData environmentMapData;
-  auto path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
+  auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
   TestApplication app;
-  auto texture = environmentMapData.GetTexture();
+  auto            texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
@@ -164,16 +164,15 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture2(void)
 int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture3(void)
 {
   EnvironmentMapData environmentMapData;
-  auto path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
+  auto               path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
   TestApplication app;
-  auto texture = environmentMapData.GetTexture();
+  auto            texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
   DALI_TEST_EQUAL(64u, texture.GetHeight());
 
   END_TEST;
-
 }

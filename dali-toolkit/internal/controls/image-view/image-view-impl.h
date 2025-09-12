@@ -140,7 +140,7 @@ public:
 
   /**
    * @brief Set the transition effect option.
-  */
+   */
   void SetTransitionEffectOption(const Property::Map& map);
 
   /**

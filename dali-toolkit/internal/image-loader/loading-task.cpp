@@ -172,7 +172,7 @@ void LoadingTask::Process()
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+  {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[";
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
@@ -192,7 +192,7 @@ void LoadingTask::Process()
   MultiplyAlpha();
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
-                                        {
+  {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";

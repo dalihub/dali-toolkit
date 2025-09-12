@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/animated-property.h"
 #include <dali-test-suite-utils.h>
+#include "dali-scene3d/public-api/loader/animated-property.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -27,18 +27,17 @@ using namespace Dali::Scene3D::Loader;
 int UtcDaliAnimatedPropertyGetPropertyType(void)
 {
   TestApplication app;
-  auto actor = Actor::New();
+  auto            actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
-  AnimatedProperty animProp {
+  AnimatedProperty animProp{
     INVALID_INDEX,
-   "ChristopherPlummer",
-   "position",
-   KeyFrames(),
-   std::unique_ptr<AnimatedProperty::Value>{ new AnimatedProperty::Value{
-     Property::Value{ Vector3::XAXIS * 100.f },
-     true
-   } },
+    "ChristopherPlummer",
+    "position",
+    KeyFrames(),
+    std::unique_ptr<AnimatedProperty::Value>{new AnimatedProperty::Value{
+      Property::Value{Vector3::XAXIS * 100.f},
+      true}},
   };
 
   Property expected(actor, Actor::Property::POSITION);
@@ -50,11 +49,3 @@ int UtcDaliAnimatedPropertyGetPropertyType(void)
 
   END_TEST;
 }
-
-
-
-
-
-
-
-

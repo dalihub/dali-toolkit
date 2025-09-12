@@ -1,5 +1,5 @@
-#ifndef  TOOLKIT_CLIPBOARD_H
-#define  TOOLKIT_CLIPBOARD_H
+#ifndef TOOLKIT_CLIPBOARD_H
+#define TOOLKIT_CLIPBOARD_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -35,7 +35,7 @@ namespace Adaptor
 {
 class Clipboard;
 }
-}
+} //namespace Internal DALI_INTERNAL
 
 /**
  * The Clipboard can operate using various funtion.
@@ -72,8 +72,8 @@ public:
     }
 
   private:
-    const char* mimeType {nullptr}; ///< The mime type of clip data.
-    const char* data {nullptr};     ///< The clip data.
+    const char* mimeType{nullptr}; ///< The mime type of clip data.
+    const char* data{nullptr};     ///< The clip data.
   };
 
   /// @brief Data send completed signal.
@@ -81,7 +81,6 @@ public:
 
   /// @brief Data receive completed signal.
   typedef Signal<void(uint32_t, const char*, const char*)> DataReceivedSignalType;
-
 
   /**
    * Create an uninitialized Clipboard;
@@ -168,12 +167,11 @@ public:
   void HideClipboard();
 
   /**
-  * @brief Retrieves the clipboard's visibility
-  * @return bool true if the clipboard is visible.
-  */
+   * @brief Retrieves the clipboard's visibility
+   * @return bool true if the clipboard is visible.
+   */
   bool IsVisible() const;
-
 };
-} // namespace Dali
+} //namespace Dali DALI_IMPORT_API
 
 #endif // TOOLKIT_CLIPBOARD_H

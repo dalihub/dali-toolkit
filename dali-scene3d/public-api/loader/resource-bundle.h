@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADERERERER_RESOURCE_BUNDLE_H_
 #define DALI_SCENE3D_LOADERERERER_RESOURCE_BUNDLE_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,10 +85,10 @@ public:
 
   ResourceBundle();
 
-  ResourceBundle(const ResourceBundle&) = delete;
+  ResourceBundle(const ResourceBundle&)            = delete;
   ResourceBundle& operator=(const ResourceBundle&) = delete;
 
-  ResourceBundle(ResourceBundle&&) = default;
+  ResourceBundle(ResourceBundle&&)            = default;
   ResourceBundle& operator=(ResourceBundle&&) = default;
 
   /**

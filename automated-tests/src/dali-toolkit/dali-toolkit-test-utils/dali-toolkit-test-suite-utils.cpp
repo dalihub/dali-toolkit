@@ -16,8 +16,7 @@
 
 #include "dali-toolkit-test-suite-utils.h"
 
-
-std::ostream& operator<<( std::ostream& ostream, Dali::Toolkit::Visual::ResourceStatus status )
+std::ostream& operator<<(std::ostream& ostream, Dali::Toolkit::Visual::ResourceStatus status)
 {
   switch(status)
   {

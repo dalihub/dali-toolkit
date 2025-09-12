@@ -87,14 +87,14 @@ int UtcDaliToolkitTextICU(void)
   Text::MultilanguageSupport::Get();
   Text::AsyncTextManager::Get();
 
-  Adaptor &adaptor = application.GetAdaptor();
-  std::string locale = "en_US";
+  Adaptor&    adaptor = application.GetAdaptor();
+  std::string locale  = "en_US";
   adaptor.LocaleChangedSignal().Emit(locale);
 
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK(label);
 
-  float expectedWidth = 300.0f;
+  float expectedWidth  = 300.0f;
   float expectedHeight = 300.0f;
 
   // Sync test.

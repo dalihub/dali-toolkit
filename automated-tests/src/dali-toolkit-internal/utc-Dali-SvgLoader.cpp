@@ -602,7 +602,7 @@ int UtcSvgLoaderDestructDuringObserver01(void)
 
   observer1->mLoadData = &mData;
   observer1->ConnectLoadFunction([](void* data)
-                                 {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -618,7 +618,7 @@ int UtcSvgLoaderDestructDuringObserver01(void)
     delete observer2; });
 
   observer2->ConnectLoadFunction([](void* data)
-                                 {
+  {
     tet_printf("observer2 Should be destroyed by observer1. Test failed\n");
 
     tet_result(TET_FAIL); });
@@ -664,7 +664,7 @@ int UtcSvgLoaderDestructDuringObserver02(void)
 
   observer1->mRasterizeData = &mData;
   observer1->ConnectRasterizeFunction([](void* data)
-                                      {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -680,7 +680,7 @@ int UtcSvgLoaderDestructDuringObserver02(void)
     delete observer2; });
 
   observer2->ConnectRasterizeFunction([](void* data)
-                                      {
+  {
     tet_printf("observer2 Should be destroyed by observer1. Test failed\n");
 
     tet_result(TET_FAIL); });
@@ -753,7 +753,7 @@ int UtcSvgLoaderReqestDuringObserver01(void)
 
   observer1.mLoadData = &mData;
   observer1.ConnectLoadFunction([&svgLoader](void* data)
-                                {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -854,7 +854,7 @@ int UtcSvgLoaderReqestDuringObserver02(void)
 
   observer1.mLoadData = &mData;
   observer1.ConnectLoadFunction([&svgLoader](void* data)
-                                {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -947,7 +947,7 @@ int UtcSvgLoaderReqestDuringObserver03(void)
 
   observer1.mRasterizeData = &mData;
   observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
-                                     {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;
@@ -1051,7 +1051,7 @@ int UtcSvgLoaderReqestDuringObserver04(void)
 
   observer1.mRasterizeData = &mData;
   observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
-                                     {
+  {
     DALI_TEST_CHECK(data);
     CustomData*   customData = static_cast<CustomData*>(data);
     TestObserver* observer1  = customData->self;

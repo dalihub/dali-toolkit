@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,10 +192,10 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   MaterialDefinition() = default;
 
-  MaterialDefinition(const MaterialDefinition&) = delete;
+  MaterialDefinition(const MaterialDefinition&)            = delete;
   MaterialDefinition& operator=(const MaterialDefinition&) = delete;
 
-  MaterialDefinition(MaterialDefinition&&) = default;
+  MaterialDefinition(MaterialDefinition&&)            = default;
   MaterialDefinition& operator=(MaterialDefinition&&) = default;
 
   /**

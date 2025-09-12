@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_RANGE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,21 +122,21 @@ public: // Not intended for application developers
 
 public: //Methods
         /**
-  * @brief Retrive the start index of range
-  * @return the 32-bit unsigned int.
-  */
+         * @brief Retrive the start index of range
+         * @return the 32-bit unsigned int.
+         */
   u_int32_t GetStartIndex() const;
 
   /**
-  * @brief Retrive the end index of range
-  * @return the 32-bit unsigned int.
-  */
+   * @brief Retrive the end index of range
+   * @return the 32-bit unsigned int.
+   */
   u_int32_t GetEndIndex() const;
 
   /**
-  * @brief Retrive the number of indices of range (endIndex - startIndex +1)
-  * @return the 32-bit unsigned int.
-  */
+   * @brief Retrive the number of indices of range (endIndex - startIndex +1)
+   * @return the 32-bit unsigned int.
+   */
   u_int32_t GetNumberOfIndices() const;
 };
 

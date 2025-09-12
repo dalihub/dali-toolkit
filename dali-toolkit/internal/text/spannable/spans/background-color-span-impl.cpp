@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ BackgroundColorSpan ::~BackgroundColorSpan()
 {
 }
 
-Dali::Toolkit::Text::BackgroundColorSpan BackgroundColorSpan::New(const Vector4 &color)
+Dali::Toolkit::Text::BackgroundColorSpan BackgroundColorSpan::New(const Vector4& color)
 {
   BackgroundColorSpanPtr object = new BackgroundColorSpan();
   object->SetBackgroundColor(color);
@@ -66,7 +66,7 @@ bool BackgroundColorSpan::IsBackgroundColorDefined() const
   return mImpl->mBackgroundColorDefined;
 }
 
-void BackgroundColorSpan::SetBackgroundColor(const Vector4 &color)
+void BackgroundColorSpan::SetBackgroundColor(const Vector4& color)
 {
   mImpl->mBackgroundColor        = color;
   mImpl->mBackgroundColorDefined = true;

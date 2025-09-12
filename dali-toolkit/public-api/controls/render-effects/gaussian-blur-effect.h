@@ -29,7 +29,7 @@ namespace Toolkit
 namespace Internal DALI_INTERNAL
 {
 class GaussianBlurEffectImpl;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @brief GaussianBlurEffect is a visual effect that blurs owner control and its children.
@@ -154,7 +154,7 @@ public:
    * @param[in] toValue End value of blur opacity. Must be in range of [0.0f, 1.0f]
    * @note If toValue is smaller than fromValue, animation would show reversed(blurred->clarified) animation.
    * @note When choosing alpha function, note that gaussian curve itself is innately non-linear.
-*
+   *
    * @SINCE_2_4.20
    */
   void AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);

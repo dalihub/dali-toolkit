@@ -19,9 +19,9 @@
 #include "property-bridge-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/debug.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -41,7 +41,6 @@ namespace
 PropertyBridge::PropertyBridge()
 : mStringGetter(nullptr)
 {
-
 }
 
 PropertyBridge::~PropertyBridge()
@@ -61,7 +60,7 @@ Dali::Toolkit::PropertyBridge PropertyBridge::Get()
     {
       // If so, downcast the handle
       PropertyBridge* impl = dynamic_cast<Dali::Toolkit::Internal::PropertyBridge*>(handle.GetObjectPtr());
-      bridgeHandle = Dali::Toolkit::PropertyBridge(impl);
+      bridgeHandle         = Dali::Toolkit::PropertyBridge(impl);
     }
     else // create and register the object
     {

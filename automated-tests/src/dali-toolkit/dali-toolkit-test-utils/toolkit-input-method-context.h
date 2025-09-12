@@ -20,11 +20,11 @@
 
 // EXTERNAL INCLUDES
 #define DALI_INPUT_METHOD_CONTEXT_H
+#include <dali/devel-api/adaptor-framework/input-method-options.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <dali/devel-api/adaptor-framework/input-method-options.h>
-#include <dali/public-api/events/key-event.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -35,7 +35,7 @@ namespace Adaptor
 {
 class InputMethodContext;
 }
-}
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @brief The InputMethodContext class
@@ -45,10 +45,9 @@ class InputMethodContext;
 class InputMethodContext : public BaseHandle
 {
 public:
-
   /**
-  * @brief The direction of text.
-  */
+   * @brief The direction of text.
+   */
   enum TextDirection
   {
     LeftToRight,
@@ -74,10 +73,10 @@ public:
    */
   enum State
   {
-    DEFAULT = 0,   ///< Unknown state
-    SHOW,          ///< Input panel is shown
-    HIDE,          ///< Input panel is hidden
-    WILL_SHOW      ///< Input panel in process of being shown
+    DEFAULT = 0, ///< Unknown state
+    SHOW,        ///< Input panel is shown
+    HIDE,        ///< Input panel is hidden
+    WILL_SHOW    ///< Input panel in process of being shown
   };
 
   /**
@@ -85,8 +84,8 @@ public:
    */
   enum KeyboardType
   {
-    SOFTWARE_KEYBOARD,  ///< Software keyboard (Virtual keyboard) is default
-    HARDWARE_KEYBOARD   ///< Hardware keyboard
+    SOFTWARE_KEYBOARD, ///< Software keyboard (Virtual keyboard) is default
+    HARDWARE_KEYBOARD  ///< Hardware keyboard
   };
 
   /**
@@ -94,8 +93,8 @@ public:
    */
   enum class InputPanelLanguage
   {
-    AUTOMATIC,    ///< IME Language automatically set depending on the system display
-    ALPHABET      ///< Latin alphabet at all times
+    AUTOMATIC, ///< IME Language automatically set depending on the system display
+    ALPHABET   ///< Latin alphabet at all times
   };
 
   /**
@@ -119,15 +118,15 @@ public:
   struct PreeditAttributeData
   {
     PreeditAttributeData()
-    : preeditType( PreeditStyle::NONE ),
-      startIndex( 0 ),
-      endIndex( 0 )
+    : preeditType(PreeditStyle::NONE),
+      startIndex(0),
+      endIndex(0)
     {
     }
 
-    PreeditStyle preeditType;  /// The preedit style type
-    unsigned int startIndex;   /// The start index of preedit
-    unsigned int endIndex;     /// The end index of preedit
+    PreeditStyle preeditType; /// The preedit style type
+    unsigned int startIndex;  /// The start index of preedit
+    unsigned int endIndex;    /// The end index of preedit
   };
 
   /**
@@ -140,13 +139,12 @@ public:
      */
     EventData()
     : predictiveString(),
-      eventName( VOID ),
-      cursorOffset( 0 ),
-      numberOfChars ( 0 ),
-      startIndex ( 0 ),
-      endIndex ( 0 )
-    {
-    };
+      eventName(VOID),
+      cursorOffset(0),
+      numberOfChars(0),
+      startIndex(0),
+      endIndex(0) {
+      };
 
     /**
      * @brief Constructor
@@ -156,13 +154,13 @@ public:
      * @param[in] aCursorOffset Start position from the current cursor position to start deleting characters.
      * @param[in] aNumberOfChars The number of characters to delete from the cursorOffset.
      */
-    EventData( EventType aEventName, const std::string& aPredictiveString, int aCursorOffset, int aNumberOfChars )
-    : predictiveString( aPredictiveString ),
-      eventName( aEventName ),
-      cursorOffset( aCursorOffset ),
-      numberOfChars( aNumberOfChars ),
-      startIndex ( 0 ),
-      endIndex ( 0 )
+    EventData(EventType aEventName, const std::string& aPredictiveString, int aCursorOffset, int aNumberOfChars)
+    : predictiveString(aPredictiveString),
+      eventName(aEventName),
+      cursorOffset(aCursorOffset),
+      numberOfChars(aNumberOfChars),
+      startIndex(0),
+      endIndex(0)
     {
     }
 
@@ -185,11 +183,11 @@ public:
 
     // Data
     std::string predictiveString; ///< The pre-edit or commit string.
-    EventType eventName;          ///< The name of the event from the input method context.
-    int cursorOffset;             ///< Start position from the current cursor position to start deleting characters.
-    int numberOfChars;            ///< number of characters to delete from the cursorOffset.
-    int startIndex;               ///< The start index of selection.
-    int endIndex;                 ///< The end index of selection.
+    EventType   eventName;        ///< The name of the event from the input method context.
+    int         cursorOffset;     ///< Start position from the current cursor position to start deleting characters.
+    int         numberOfChars;    ///< number of characters to delete from the cursorOffset.
+    int         startIndex;       ///< The start index of selection.
+    int         endIndex;         ///< The end index of selection.
   };
 
   /**
@@ -202,9 +200,9 @@ public:
      */
     CallbackData()
     : currentText(),
-      cursorPosition( 0 ),
-      update( false ),
-      preeditResetRequired( false )
+      cursorPosition(0),
+      update(false),
+      preeditResetRequired(false)
     {
     }
 
@@ -215,29 +213,28 @@ public:
      * @param[in] aCurrentText current text string
      * @param[in] aPreeditResetRequired flag if preedit reset is required.
      */
-    CallbackData( bool aUpdate, int aCursorPosition, const std::string& aCurrentText, bool aPreeditResetRequired )
-    : currentText( aCurrentText ),
-      cursorPosition( aCursorPosition ),
-      update( aUpdate ),
-      preeditResetRequired( aPreeditResetRequired )
+    CallbackData(bool aUpdate, int aCursorPosition, const std::string& aCurrentText, bool aPreeditResetRequired)
+    : currentText(aCurrentText),
+      cursorPosition(aCursorPosition),
+      update(aUpdate),
+      preeditResetRequired(aPreeditResetRequired)
     {
     }
 
-    std::string currentText;      ///< current text string
-    int cursorPosition;           ///< new position of cursor
-    bool update               :1; ///< if cursor position needs to be updated
-    bool preeditResetRequired :1; ///< flag if preedit reset is required.
+    std::string currentText;              ///< current text string
+    int         cursorPosition;           ///< new position of cursor
+    bool        update : 1;               ///< if cursor position needs to be updated
+    bool        preeditResetRequired : 1; ///< flag if preedit reset is required.
   };
 
-  typedef Signal< void (InputMethodContext&) > ActivatedSignalType; ///< Keyboard actived signal
-  typedef Signal< CallbackData ( InputMethodContext&, const EventData& ) > KeyboardEventSignalType; ///< keyboard events
-  typedef Signal< void () > VoidSignalType;
-  typedef Signal< void (bool) > StatusSignalType;
+  typedef Signal<void(InputMethodContext&)>                           ActivatedSignalType;     ///< Keyboard actived signal
+  typedef Signal<CallbackData(InputMethodContext&, const EventData&)> KeyboardEventSignalType; ///< keyboard events
+  typedef Signal<void()>                                              VoidSignalType;
+  typedef Signal<void(bool)>                                          StatusSignalType;
 
-  using PreEditAttributeDataContainer = Vector< Dali::InputMethodContext::PreeditAttributeData >;
+  using PreEditAttributeDataContainer = Vector<Dali::InputMethodContext::PreeditAttributeData>;
 
 public:
-
   /**
    * @brief Create a handle to the instance of InputMethodContext.
    * @return A handle to the InputMethodContext.
@@ -250,7 +247,7 @@ public:
    * @param[in] actor The actor that uses the new InputMethodContext instance.
    * @return A handle to the InputMethodContext.
    */
-  static InputMethodContext New( Actor actor );
+  static InputMethodContext New(Actor actor);
 
   /**
    * @brief Finalize the InputMethodContext.
@@ -287,7 +284,7 @@ public:
    *
    * @param[in] toggle True means that keyboard should be restored after focus lost and regained.
    */
-  void SetRestoreAfterFocusLost( bool toggle );
+  void SetRestoreAfterFocusLost(bool toggle);
 
   /**
    * @brief Send message reset the pred-edit state / input method context module.
@@ -306,7 +303,7 @@ public:
    *
    * @param[in] cursorPosition position of cursor
    */
-  void SetCursorPosition( unsigned int cursorPosition );
+  void SetCursorPosition(unsigned int cursorPosition);
 
   /**
    * @brief Gets cursor position stored in VirtualKeyboard, this is required by the ImfContext.
@@ -320,7 +317,7 @@ public:
    *
    * @param[in] text The text string surrounding the current cursor point.
    */
-  void SetSurroundingText( const std::string& text );
+  void SetSurroundingText(const std::string& text);
 
   /**
    * @brief Gets current text string set within the input method context, this is used to offer predictive suggestions.
@@ -330,15 +327,15 @@ public:
   const std::string& GetSurroundingText() const;
 
   /**
-  * @brief Notifies ImfContext that text input is set to multi line or not
-  */
-  void NotifyTextInputMultiLine( bool multiLine );
+   * @brief Notifies ImfContext that text input is set to multi line or not
+   */
+  void NotifyTextInputMultiLine(bool multiLine);
 
   /**
    * @brief Set one or more of the Input Method options
    * @param[in] options The options to be applied
    */
-  void ApplyOptions( const InputMethodOptions& options );
+  void ApplyOptions(const InputMethodOptions& options);
 
   /**
    * @brief Process event key down or up, whether filter a key to isf.
@@ -346,24 +343,23 @@ public:
    * @param[in] keyEvent The event key to be handled.
    * @return Whether the event key is handled.
    */
-  bool FilterEventKey( const Dali::KeyEvent& keyEvent );
+  bool FilterEventKey(const Dali::KeyEvent& keyEvent);
 
   /**
    * @brief Sets the preedit type.
    *
    * @param[in] type The preedit style type
    */
-  void SetPreeditStyle( PreeditStyle type );
+  void SetPreeditStyle(PreeditStyle type);
 
   /**
    * @brief Gets the preedit attributes data.
    *
    * @param[out] attrs The preedit attributes data.
    */
-  void GetPreeditStyle( Dali::InputMethodContext::PreEditAttributeDataContainer& attrs ) const;
+  void GetPreeditStyle(Dali::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
 
 public:
-
   // Signals
 
   /**
@@ -437,9 +433,9 @@ public:
    *
    * @param[in] inputMethodContext A pointer to the input method context.
    */
-  explicit InputMethodContext( Internal::Adaptor::InputMethodContext* inputMethodContext );
+  explicit InputMethodContext(Internal::Adaptor::InputMethodContext* inputMethodContext);
 };
 
-} // namespace Dali
+} //namespace Dali DALI_IMPORT_API
 
 #endif // DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H

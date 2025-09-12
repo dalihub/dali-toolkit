@@ -17,11 +17,10 @@
 
 #include <iostream>
 
-#include <stdlib.h>
-#include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-
+#include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <stdlib.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -50,9 +49,9 @@ struct GetNumberOfUtf8CharactersData
   unsigned int numberOfCharacters; ///< The expected number of characters.
 };
 
-bool GetNumberOfUtf8CharactersTest( const GetNumberOfUtf8CharactersData& data )
+bool GetNumberOfUtf8CharactersTest(const GetNumberOfUtf8CharactersData& data)
 {
-  return GetNumberOfUtf8Characters( reinterpret_cast<const uint8_t*>( data.text.c_str() ), data.text.size() ) == data.numberOfCharacters;
+  return GetNumberOfUtf8Characters(reinterpret_cast<const uint8_t*>(data.text.c_str()), data.text.size()) == data.numberOfCharacters;
 }
 
 //////////////////////////////////////////////////////////
@@ -65,9 +64,9 @@ struct GetNumberOfUtf8BytesData
   unsigned int  numberOfBytes;      ///< The expected number of bytes in utf8.
 };
 
-bool GetNumberOfUtf8BytesTest( const GetNumberOfUtf8BytesData& data )
+bool GetNumberOfUtf8BytesTest(const GetNumberOfUtf8BytesData& data)
 {
-  return GetNumberOfUtf8Bytes( data.utf32, data.numberOfCharacters ) == data.numberOfBytes;
+  return GetNumberOfUtf8Bytes(data.utf32, data.numberOfCharacters) == data.numberOfBytes;
 }
 
 //////////////////////////////////////////////////////////
@@ -79,19 +78,18 @@ struct Utf8ToUtf32Data
   unsigned int* utf32;       ///< The expected text (array of bytes with text encoded in utf32).
 };
 
-
-bool Utf8ToUtf32Test( const Utf8ToUtf32Data& data )
+bool Utf8ToUtf32Test(const Utf8ToUtf32Data& data)
 {
   Vector<uint32_t> utf32;
-  utf32.Resize( data.text.size() );
+  utf32.Resize(data.text.size());
 
-  const uint32_t numberOfCharacters = Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( data.text.c_str() ),
-                                                   data.text.size(),
-                                                   utf32.Begin() );
+  const uint32_t numberOfCharacters = Utf8ToUtf32(reinterpret_cast<const uint8_t* const>(data.text.c_str()),
+                                                  data.text.size(),
+                                                  utf32.Begin());
 
-  for( unsigned int index = 0u; index < numberOfCharacters; ++index )
+  for(unsigned int index = 0u; index < numberOfCharacters; ++index)
   {
-    if( data.utf32[index] != utf32[index] )
+    if(data.utf32[index] != utf32[index])
     {
       return false;
     }
@@ -112,11 +110,11 @@ struct Utf32ToUtf8Data
   std::string   text;               ///< The expected text.
 };
 
-bool Utf32ToUtf8Test( const Utf32ToUtf8Data& data )
+bool Utf32ToUtf8Test(const Utf32ToUtf8Data& data)
 {
   std::string text;
 
-  Utf32ToUtf8( data.utf32, data.numberOfCharacters, text );
+  Utf32ToUtf8(data.utf32, data.numberOfCharacters, text);
 
   return text == data.text;
 }
@@ -130,6 +128,7 @@ int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
 
   // Copy of the table used to get the size in bytes of a character encoded with utf8.
   // If the table used by the GetUtf8Length() function is updated, this one needs to be updated as well.
+  // clang-format off
   const static uint8_t U1 = 1u;
   const static uint8_t U2 = 2u;
   const static uint8_t U3 = 3u;
@@ -175,10 +174,10 @@ int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
 
     U0, U0,                                 // Non valid.
   };
-
-  for( unsigned int index = 0; index < 256u; ++index )
+  // clang-format on
+  for(unsigned int index = 0; index < 256u; ++index)
   {
-    if( GetUtf8Length( index ) != UTF8_LENGTH[static_cast<uint8_t>(index)] )
+    if(GetUtf8Length(index) != UTF8_LENGTH[static_cast<uint8_t>(index)])
     {
       tet_result(TET_FAIL);
     }
@@ -188,50 +187,49 @@ int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
   END_TEST;
 }
 
-
 int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Characters(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Characters");
 
   const GetNumberOfUtf8CharactersData data[] =
-  {
     {
-      "Latin script",
-      "Hello World",
-      11u,
-    },
-    {
-      "Arabic script",
-      "مرحبا بالعالم",
-      13u,
-    },
-    {
-      "Devanagari script",
-      "हैलो वर्ल्ड",
-      11u,
-    },
-    {
-      "Emojis",
-      "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
-      7u,
-    },
-    {
-      "5 bytes test",
-      "\xF8\xA0\x80\x80\x80",
-      1u,
-    },
-    {
-      "6 bytes test",
-      "\xFC\x84\x80\x80\x80\x80",
-      1u,
-    },
-  };
+      {
+        "Latin script",
+        "Hello World",
+        11u,
+      },
+      {
+        "Arabic script",
+        "مرحبا بالعالم",
+        13u,
+      },
+      {
+        "Devanagari script",
+        "हैलो वर्ल्ड",
+        11u,
+      },
+      {
+        "Emojis",
+        "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
+        7u,
+      },
+      {
+        "5 bytes test",
+        "\xF8\xA0\x80\x80\x80",
+        1u,
+      },
+      {
+        "6 bytes test",
+        "\xFC\x84\x80\x80\x80\x80",
+        1u,
+      },
+    };
   const unsigned int numberOfTests = 6u;
 
-  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
-    if( !GetNumberOfUtf8CharactersTest( data[index] ) )
+    if(!GetNumberOfUtf8CharactersTest(data[index]))
     {
       tet_result(TET_FAIL);
     }
@@ -246,57 +244,57 @@ int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes");
 
-  unsigned int utf32_01[] = { 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World
-  unsigned int utf32_02[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
-  unsigned int utf32_03[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
-  unsigned int utf32_04[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
-  unsigned int utf32_05[] = { 0x800000 };
-  unsigned int utf32_06[] = { 0x4000000 };
+  unsigned int utf32_01[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};                         // Hello World
+  unsigned int utf32_02[] = {0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645}; // مرحبا بالعالم
+  unsigned int utf32_03[] = {0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921};               // हैलो वर्ल्ड
+  unsigned int utf32_04[] = {0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604};                                     // Emojis
+  unsigned int utf32_05[] = {0x800000};
+  unsigned int utf32_06[] = {0x4000000};
 
   const GetNumberOfUtf8BytesData data[] =
-  {
     {
-      "Latin script",
-      utf32_01,
-      11u,
-      11u,
-    },
-    {
-      "Arabic script",
-      utf32_02,
-      13u,
-      25u,
-    },
-    {
-      "Devanagari script",
-      utf32_03,
-      11u,
-      31u,
-    },
-    {
-      "Emojis",
-      utf32_04,
-      7u,
-      19u,
-    },
-    {
-      "5 bytes test",
-      utf32_05,
-      1u,
-      5u,
-    },
-    {
-      "6 bytes test",
-      utf32_06,
-      1u,
-      6u
-    },
-  };
+      {
+        "Latin script",
+        utf32_01,
+        11u,
+        11u,
+      },
+      {
+        "Arabic script",
+        utf32_02,
+        13u,
+        25u,
+      },
+      {
+        "Devanagari script",
+        utf32_03,
+        11u,
+        31u,
+      },
+      {
+        "Emojis",
+        utf32_04,
+        7u,
+        19u,
+      },
+      {
+        "5 bytes test",
+        utf32_05,
+        1u,
+        5u,
+      },
+      {
+        "6 bytes test",
+        utf32_06,
+        1u,
+        6u,
+      },
+    };
   const unsigned int numberOfTests = 6u;
 
-  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
-    if( !GetNumberOfUtf8BytesTest( data[index] ) )
+    if(!GetNumberOfUtf8BytesTest(data[index]))
     {
       tet_result(TET_FAIL);
     }
@@ -311,65 +309,65 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes");
 
-  char utf8_06[] = { -2, -1 }; // Invalid string
+  char utf8_06[] = {-2, -1}; // Invalid string
 
-  unsigned int utf32_01[] = { 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World
-  unsigned int utf32_02[] = { 0xA, 0x20, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xA, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World + CR and CR+LF
-  unsigned int utf32_03[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
-  unsigned int utf32_04[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
-  unsigned int utf32_05[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
-  unsigned int utf32_06[] = { 0x800000 };
-  unsigned int utf32_07[] = { 0x4000000 };
-  unsigned int utf32_08[] = { 0x20, 0x20 }; // Invalid string
+  unsigned int utf32_01[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};                         // Hello World
+  unsigned int utf32_02[] = {0xA, 0x20, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xA, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};         // Hello World + CR and CR+LF
+  unsigned int utf32_03[] = {0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645}; // مرحبا بالعالم
+  unsigned int utf32_04[] = {0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921};               // हैलो वर्ल्ड
+  unsigned int utf32_05[] = {0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604};                                     // Emojis
+  unsigned int utf32_06[] = {0x800000};
+  unsigned int utf32_07[] = {0x4000000};
+  unsigned int utf32_08[] = {0x20, 0x20}; // Invalid string
 
   const Utf8ToUtf32Data data[] =
-  {
     {
-      "Latin script",
-      "Hello World",
-      utf32_01,
-    },
-    {
-      "Latin script with 'CR' and 'CR'+'LF'",
-      "\xd Hello\xd\xa World",
-      utf32_02,
-    },
-    {
-      "Arabic script",
-      "مرحبا بالعالم",
-      utf32_03,
-    },
-    {
-      "Devanagari script",
-      "हैलो वर्ल्ड",
-      utf32_04,
-    },
-    {
-      "Emojis",
-      "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
-      utf32_05,
-    },
-    {
-      "5 bytes test",
-      "\xF8\xA0\x80\x80\x80",
-      utf32_06,
-    },
-    {
-      "6 bytes test",
-      "\xFC\x84\x80\x80\x80\x80",
-      utf32_07,
-    },
-    {
-      "Invalid text",
-      utf8_06,
-      utf32_08,
-    },
-  };
+      {
+        "Latin script",
+        "Hello World",
+        utf32_01,
+      },
+      {
+        "Latin script with 'CR' and 'CR'+'LF'",
+        "\xd Hello\xd\xa World",
+        utf32_02,
+      },
+      {
+        "Arabic script",
+        "مرحبا بالعالم",
+        utf32_03,
+      },
+      {
+        "Devanagari script",
+        "हैलो वर्ल्ड",
+        utf32_04,
+      },
+      {
+        "Emojis",
+        "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
+        utf32_05,
+      },
+      {
+        "5 bytes test",
+        "\xF8\xA0\x80\x80\x80",
+        utf32_06,
+      },
+      {
+        "6 bytes test",
+        "\xFC\x84\x80\x80\x80\x80",
+        utf32_07,
+      },
+      {
+        "Invalid text",
+        utf8_06,
+        utf32_08,
+      },
+    };
   const unsigned int numberOfTests = 8u;
 
-  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
-    if( !Utf8ToUtf32Test( data[index] ) )
+    if(!Utf8ToUtf32Test(data[index]))
     {
       tet_result(TET_FAIL);
     }
@@ -384,58 +382,58 @@ int UtcDaliTextCharacterSetConversionUtf32ToUtf8(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionUtf32ToUtf8");
 
-  unsigned int utf32_01[] = { 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World
-  unsigned int utf32_02[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
-  unsigned int utf32_03[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
-  unsigned int utf32_04[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
-  unsigned int utf32_05[] = { 0x800000 };
-  unsigned int utf32_06[] = { 0x4000000 };
+  unsigned int utf32_01[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};                         // Hello World
+  unsigned int utf32_02[] = {0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645}; // مرحبا بالعالم
+  unsigned int utf32_03[] = {0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921};               // हैलो वर्ल्ड
+  unsigned int utf32_04[] = {0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604};                                     // Emojis
+  unsigned int utf32_05[] = {0x800000};
+  unsigned int utf32_06[] = {0x4000000};
 
   struct Utf32ToUtf8Data data[] =
-  {
     {
-      "Latin script",
-      utf32_01,
-      11u,
-      "Hello World",
-    },
-    {
-      "Arabic script",
-      utf32_02,
-      13u,
-      "مرحبا بالعالم",
-    },
-    {
-      "Devanagari script",
-      utf32_03,
-      11u,
-      "हैलो वर्ल्ड",
-    },
-    {
-      "Emojis",
-      utf32_04,
-      7u,
-      "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
-    },
-    {
-      "5 bytes test",
-      utf32_05,
-      1u,
-      "\xF8\xA0\x80\x80\x80",
-    },
-    {
-      "6 bytes test",
-      utf32_06,
-      1u,
-      "\xFC\x84\x80\x80\x80\x80",
-    },
-  };
+      {
+        "Latin script",
+        utf32_01,
+        11u,
+        "Hello World",
+      },
+      {
+        "Arabic script",
+        utf32_02,
+        13u,
+        "مرحبا بالعالم",
+      },
+      {
+        "Devanagari script",
+        utf32_03,
+        11u,
+        "हैलो वर्ल्ड",
+      },
+      {
+        "Emojis",
+        utf32_04,
+        7u,
+        "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
+      },
+      {
+        "5 bytes test",
+        utf32_05,
+        1u,
+        "\xF8\xA0\x80\x80\x80",
+      },
+      {
+        "6 bytes test",
+        utf32_06,
+        1u,
+        "\xFC\x84\x80\x80\x80\x80",
+      },
+    };
 
   const unsigned int numberOfTests = 6u;
 
-  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
-    if( !Utf32ToUtf8Test( data[index] ) )
+    if(!Utf32ToUtf8Test(data[index]))
     {
       tet_result(TET_FAIL);
     }

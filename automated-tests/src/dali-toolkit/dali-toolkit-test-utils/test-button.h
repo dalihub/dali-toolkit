@@ -33,7 +33,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000
   };
   struct Property
   {
@@ -51,10 +51,10 @@ public:
   TestButton(const TestButton& button);
   TestButton(Impl::TestButton& impl);
   TestButton(Dali::Internal::CustomActor* internal);
-  TestButton& operator=( const TestButton& button);
+  TestButton& operator=(const TestButton& button);
   ~TestButton();
   static TestButton New();
-  static TestButton DownCast( Dali::BaseHandle handle );
+  static TestButton DownCast(Dali::BaseHandle handle);
 };
 
 namespace Impl
@@ -65,12 +65,12 @@ class TestButton : public Dali::Toolkit::Internal::Control
 public:
   static Test::TestButton New();
 
-  static void SetProperty( Dali::BaseObject* object,
-                           Dali::Property::Index index,
-                           const Dali::Property::Value& value );
+  static void SetProperty(Dali::BaseObject*            object,
+                          Dali::Property::Index        index,
+                          const Dali::Property::Value& value);
 
-  static Dali::Property::Value GetProperty( Dali::BaseObject* object,
-                                            Dali::Property::Index propertyIndex );
+  static Dali::Property::Value GetProperty(Dali::BaseObject*     object,
+                                           Dali::Property::Index propertyIndex);
 
 protected:
   TestButton();
@@ -81,27 +81,25 @@ public:
   Test::TestAnimationData mReleaseTransitionData;
   Test::TestAnimationData mDisabledTransitionData;
   Test::TestAnimationData mEnabledTransitionData;
-  Dali::Vector4 mBackgroundColor;
-  Dali::Vector4 mForegroundColor;
+  Dali::Vector4           mBackgroundColor;
+  Dali::Vector4           mForegroundColor;
 };
 
-inline TestButton& GetImpl( Test::TestButton& handle )
+inline TestButton& GetImpl(Test::TestButton& handle)
 {
-  DALI_ASSERT_ALWAYS( handle );
+  DALI_ASSERT_ALWAYS(handle);
   Dali::RefObject& object = handle.GetImplementation();
-  return static_cast<TestButton&>( object );
+  return static_cast<TestButton&>(object);
 }
 
-inline const TestButton& GetImpl( const Test::TestButton& handle )
+inline const TestButton& GetImpl(const Test::TestButton& handle)
 {
-  DALI_ASSERT_ALWAYS( handle );
+  DALI_ASSERT_ALWAYS(handle);
   const Dali::RefObject& object = handle.GetImplementation();
-  return static_cast<const TestButton&>( object );
+  return static_cast<const TestButton&>(object);
 }
 
-} // Impl
-} // Test
-
-
+} //namespace Impl
+} //namespace Test
 
 #endif // DALI_TOOLKIT_TEST_TEST_BUTTON_H

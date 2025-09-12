@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MESH_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MESH_DEFINITION_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,10 +115,10 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Blob() = default;
 
-    Blob(const Blob&) = default;
+    Blob(const Blob&)            = default;
     Blob& operator=(const Blob&) = default;
 
-    Blob(Blob&&)  = default;
+    Blob(Blob&&)            = default;
     Blob& operator=(Blob&&) = default;
 
     Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0, const std::vector<float>& min = {}, const std::vector<float>& max = {});
@@ -181,10 +181,10 @@ struct DALI_SCENE3D_API MeshDefinition
   {
     SparseBlob() = default;
 
-    SparseBlob(const SparseBlob&) = default;
+    SparseBlob(const SparseBlob&)            = default;
     SparseBlob& operator=(const SparseBlob&) = default;
 
-    SparseBlob(SparseBlob&&) = default;
+    SparseBlob(SparseBlob&&)            = default;
     SparseBlob& operator=(SparseBlob&&) = default;
 
     SparseBlob(const Blob& indices, const Blob& values, uint32_t count);
@@ -204,21 +204,21 @@ struct DALI_SCENE3D_API MeshDefinition
 
     Accessor() = default;
 
-    Accessor(const Accessor&) = delete;
+    Accessor(const Accessor&)            = delete;
     Accessor& operator=(const Accessor&) = delete;
 
-    Accessor(Accessor&&) = default;
+    Accessor(Accessor&&)            = default;
     Accessor& operator=(Accessor&&) = default;
 
     Accessor(const MeshDefinition::Blob&       blob,
              const MeshDefinition::SparseBlob& sparse,
              Index                             bufferIndex = INVALID_INDEX,
-             bool                              normalized = false);
+             bool                              normalized  = false);
 
     Accessor(MeshDefinition::Blob&&       blob,
              MeshDefinition::SparseBlob&& sparse,
              Index                        bufferIndex = INVALID_INDEX,
-             bool                         normalized = false);
+             bool                         normalized  = false);
 
     bool IsDefined() const
     {
@@ -262,10 +262,10 @@ struct DALI_SCENE3D_API MeshDefinition
 
   MeshDefinition() = default;
 
-  MeshDefinition(const MeshDefinition&) = delete;
+  MeshDefinition(const MeshDefinition&)            = delete;
   MeshDefinition& operator=(const MeshDefinition&) = delete;
 
-  MeshDefinition(MeshDefinition&&) = default;
+  MeshDefinition(MeshDefinition&&)            = default;
   MeshDefinition& operator=(MeshDefinition&&) = default;
 
   /**

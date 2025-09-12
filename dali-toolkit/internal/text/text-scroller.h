@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SCROLLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,13 +184,13 @@ private:
   Shader             mShader;            // Shader originally used by the renderer while not scrolling
   TextureSet         mTextureSet;        // Texture originally used by the renderer while not scrolling
 
-  int                                 mScrollSpeed;           ///< Speed which text should automatically scroll at
-  int                                 mLoopCount;             ///< Number of time the text should scroll
-  float                               mLoopDelay;             ///< Time delay of loop start
-  float                               mWrapGap;               ///< Gap before text wraps around when scrolling
-  TextLabel::AutoScrollStopMode::Type mStopMode;              ///< Stop mode of scrolling text, when loop count is 0.
-  bool                                mIsStop : 1;            ///< Whether the stop scrolling has been triggered or not.
-  std::atomic<bool>                   mIsStoppedImmediately;  ///< Whether the stop is triggered by immediate stop.
+  int                                 mScrollSpeed;          ///< Speed which text should automatically scroll at
+  int                                 mLoopCount;            ///< Number of time the text should scroll
+  float                               mLoopDelay;            ///< Time delay of loop start
+  float                               mWrapGap;              ///< Gap before text wraps around when scrolling
+  TextLabel::AutoScrollStopMode::Type mStopMode;             ///< Stop mode of scrolling text, when loop count is 0.
+  bool                                mIsStop : 1;           ///< Whether the stop scrolling has been triggered or not.
+  std::atomic<bool>                   mIsStoppedImmediately; ///< Whether the stop is triggered by immediate stop.
 
 }; // TextScroller class
 

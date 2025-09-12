@@ -449,8 +449,8 @@ Shader NPatchVisual::CreateShader()
 
   auto fragmentShader = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
                                                                                            : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                                                                       : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto shaderType     = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                                                                           : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))

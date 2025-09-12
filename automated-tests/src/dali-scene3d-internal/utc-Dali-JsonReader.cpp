@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/internal/loader/json-reader.h"
 #include <dali-test-suite-utils.h>
 #include <string>
+#include "dali-scene3d/internal/loader/json-reader.h"
 
 using namespace Dali;
 
@@ -28,9 +28,9 @@ using namespace Dali;
 
 int UtcDaliJsonReaderStrCmp(void)
 {
-  json_string_s jstr[] {
-    { JSON_STRING(hello) },
-    { JSON_STRING(hellew) },
+  json_string_s jstr[]{
+    {JSON_STRING(hello)},
+    {JSON_STRING(hellew)},
   };
   DALI_TEST_EQUAL(json::StrCmp(jstr[0], "hello"), 0);
   DALI_TEST_EQUAL(json::StrCmp(jstr[1], "hello"), 'e' - 'o');
@@ -40,7 +40,7 @@ int UtcDaliJsonReaderStrCmp(void)
 
 int UtcDaliJsonReaderValidateThrow(void)
 {
-  json_value_s jval { nullptr, json_type_array };
+  json_value_s jval{nullptr, json_type_array};
   DALI_TEST_THROWS(json::Validate(jval, json_type_object), std::runtime_error);
   json::Validate(jval, json_type_array);
 
@@ -49,12 +49,12 @@ int UtcDaliJsonReaderValidateThrow(void)
 
 int UtcDaliJsonReaderFindObjectChild(void)
 {
-  json_string_s jkey{ JSON_STRING(fudgeFactor) };
-  json_number_s jActualValue{ JSON_STRING(5.2) };
-  json_value_s jvalue { &jActualValue, json_type_number };
-  json_object_element_s jobjelem { &jkey, &jvalue, nullptr };
+  json_string_s         jkey{JSON_STRING(fudgeFactor)};
+  json_number_s         jActualValue{JSON_STRING(5.2)};
+  json_value_s          jvalue{&jActualValue, json_type_number};
+  json_object_element_s jobjelem{&jkey, &jvalue, nullptr};
 
-  json_object_s jobj{ &jobjelem, 1 };
+  json_object_s jobj{&jobjelem, 1};
 
   DALI_TEST_EQUAL(json::FindObjectChild(jkey.string, jobj), &jvalue);
   DALI_TEST_EQUAL(json::FindObjectChild("fudgeFactory", jobj), static_cast<json_value_s*>(nullptr));

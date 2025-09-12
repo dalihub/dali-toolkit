@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_UTILS_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,8 +107,8 @@ struct DALI_TOOLKIT_API EmbeddedItemInfo
 };
 
 /**
-* @brief Struct with the parameters needed to build a shadow for the given pixel buffer.
-*/
+ * @brief Struct with the parameters needed to build a shadow for the given pixel buffer.
+ */
 struct DALI_TOOLKIT_API ShadowParameters
 {
   Devel::PixelBuffer input;       ///< The input pixel buffer used to create the shadow.
@@ -182,19 +182,19 @@ DALI_TOOLKIT_API Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowP
 DALI_TOOLKIT_API Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBuffer, const Vector4& color, bool multiplyByAlpha);
 
 /**
-* @brief Updates the @p dst pixel buffer with the data from @p src pixel buffer.
-*
-* @note Both pixel buffers must have the same pixel format. Does nothing if both pixel format are different.
-* @note The function does nothing if the @p src pixel buffer doesn't fit into the @p dst pixel buffer.
-*
-* The @p src pixel buffer could be blended with the @p dst pixel buffer if @p blend is set to @e true.
-*
-* @param[in] src The pixel buffer from where the data is read.
-* @param[in] dst The pixel buffer where the data is written..
-* @param[in] x The top left corner's X within the destination pixel buffer.
-* @param[in] y The top left corner's y within the destination pixel buffer.
-* @param[in] blend Whether to blend the source pixel buffer with the destination pixel buffer as background.
-*/
+ * @brief Updates the @p dst pixel buffer with the data from @p src pixel buffer.
+ *
+ * @note Both pixel buffers must have the same pixel format. Does nothing if both pixel format are different.
+ * @note The function does nothing if the @p src pixel buffer doesn't fit into the @p dst pixel buffer.
+ *
+ * The @p src pixel buffer could be blended with the @p dst pixel buffer if @p blend is set to @e true.
+ *
+ * @param[in] src The pixel buffer from where the data is read.
+ * @param[in] dst The pixel buffer where the data is written..
+ * @param[in] x The top left corner's X within the destination pixel buffer.
+ * @param[in] y The top left corner's y within the destination pixel buffer.
+ * @param[in] blend Whether to blend the source pixel buffer with the destination pixel buffer as background.
+ */
 DALI_TOOLKIT_API void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x, unsigned int y, bool blend);
 
 /**

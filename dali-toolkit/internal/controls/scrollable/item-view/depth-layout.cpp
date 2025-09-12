@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -562,11 +562,11 @@ Vector3 DepthLayout::GetItemPosition(int itemID, float currentLayoutPosition, co
   Vector3 itemSize;
   GetItemSize(itemID, layoutSize, itemSize);
   DepthPositionConstraint  positionFunctor = DepthPositionConstraint(itemID,
-                                                                    mImpl->mNumberOfColumns,
-                                                                    itemID % mImpl->mNumberOfColumns,
-                                                                    itemSize,
-                                                                    heightScale,
-                                                                    depthScale);
+                                                                     mImpl->mNumberOfColumns,
+                                                                     itemID % mImpl->mNumberOfColumns,
+                                                                     itemSize,
+                                                                     heightScale,
+                                                                     depthScale);
   ControlOrientation::Type orientation     = GetOrientation();
   if(orientation == ControlOrientation::Up)
   {

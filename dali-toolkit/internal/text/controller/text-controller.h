@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ class View;
 class RenderingController;
 
 /**
-   * @brief Text selection operations .
-   */
+ * @brief Text selection operations .
+ */
 enum SelectionType
 {
   INTERACTIVE = 0x0000, ///< Select the word where the cursor is located.
@@ -833,12 +833,12 @@ public: // Update.
   Length GetNumberOfCharacters() const;
 
   /**
- * @brief Set the @p spannedText
- * the spanned text contains content (text) and  format (spans with ranges)
- * the text is copied into text-controller and the spans are applied on ranges
- *
- * @param[in] spannedText the text with spans.
- */
+   * @brief Set the @p spannedText
+   * the spanned text contains content (text) and  format (spans with ranges)
+   * the text is copied into text-controller and the spans are applied on ranges
+   *
+   * @param[in] spannedText the text with spans.
+   */
   void SetSpannedText(const Text::Spanned& spannedText);
 
   /**
@@ -2135,7 +2135,6 @@ public: // Queries & retrieves.
    */
   DevelTextLabel::Render::Mode GetRenderMode();
 
-
 public: // Relayout.
   /**
    * @brief Triggers a relayout which updates View (if necessary).
@@ -2461,7 +2460,7 @@ private: // Private contructors & copy operator.
              SelectableControlInterface* selectableControlInterface,
              AnchorControlInterface*     anchorControlInterface);
 
-  Controller(const Controller& handle) = delete;
+  Controller(const Controller& handle)            = delete;
   Controller& operator=(const Controller& handle) = delete;
 
 protected: // Destructor.

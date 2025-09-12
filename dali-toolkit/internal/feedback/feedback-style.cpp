@@ -299,8 +299,8 @@ void FeedbackStyle::LoadFromString(const std::string& data)
         mStyleInfoLut[key] = themeInfo;
 
       } // for styles
-    }   // if(style)
-  }     // if(root)
+    } // if(style)
+  } // if(root)
 
 } // LoadFromString()
 

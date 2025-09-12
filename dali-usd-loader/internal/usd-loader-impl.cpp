@@ -422,7 +422,8 @@ void UsdLoaderImpl::Impl::GetXformableTransformation(const UsdPrim& prim, Vector
 NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, const std::string nodeName, const Index parentIndex, const Vector3& position, const Quaternion& rotation, const Vector3& scale, bool setTransformation)
 {
   // Add the node to the scene graph
-  auto weakNode = scene.AddNode([&]() {
+  auto weakNode = scene.AddNode([&]()
+  {
         std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
         nodeDefinition->mParentIdx = parentIndex;

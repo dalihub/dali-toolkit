@@ -1648,7 +1648,8 @@ void Controller::Impl::ProcessInputStyleChangedSignals()
       // Emit the input style changed signal for each mask
       std::for_each(mEventData->mInputStyleChangedQueue.begin(),
                     mEventData->mInputStyleChangedQueue.end(),
-                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); });
+                    [&](const auto mask)
+      { mEditableControlInterface->InputStyleChanged(mask); });
     }
 
     mEventData->mInputStyleChangedQueue.Clear();

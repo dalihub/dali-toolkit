@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CHARACTER_SEQUENCE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,25 +108,25 @@ public: // Not intended for application developers
 
 public: //Methods
   /**
-  * @brief Retrive the characters
-  *
-  * @return the utf32 characters.
-  */
+   * @brief Retrive the characters
+   *
+   * @return the utf32 characters.
+   */
   Vector<uint32_t> GetCharacters() const;
 
   /**
-  * @brief Retrive number of characters in container
-  *
-  * @return the number of characters.
-  */
+   * @brief Retrive number of characters in container
+   *
+   * @return the number of characters.
+   */
   uint32_t GetNumberOfCharacters() const;
 
   /**
-  * @brief Retrieve constructed string form Character Sequence.
-  * Copy the characters from container to string
-  *
-  * @return the std string.
-  */
+   * @brief Retrieve constructed string form Character Sequence.
+   * Copy the characters from container to string
+   *
+   * @return the std string.
+   */
   std::string ToString() const;
 };
 

@@ -77,125 +77,125 @@ int UtcDaliShaderManagerProduceShader(void)
     {
       // 1
       [](ShaderParameters& p)
-      {
-        p.materialDefinition.mFlags |= MaterialDefinition::TRANSPARENCY;
-      },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::TRANSPARENCY;
+  },
       {ShaderOption::Type::THREE_TEXTURE},
       RendererState::ALPHA_BLEND,
     },
     {// 2
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::ALBEDO;
-       p.materialDefinition.mTextureStages.push_back({MaterialDefinition::ALBEDO, {}});
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::ALBEDO;
+    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::ALBEDO, {}});
+  },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::BASE_COLOR_TEXTURE}},
     {// 3
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
-       p.materialDefinition.mTextureStages.push_back({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
+    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
+  },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE}},
     {// 4
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::NORMAL;
-       p.materialDefinition.mTextureStages.push_back({MaterialDefinition::NORMAL, {}});
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::NORMAL;
+    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::NORMAL, {}});
+  },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::NORMAL_TEXTURE}},
     {// 5
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::SUBSURFACE;
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::SUBSURFACE;
+  },
      {ShaderOption::Type::SUBSURFACE}},
     {// 6
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.SetAlphaCutoff(.5f);
-     },
+  {
+    p.materialDefinition.SetAlphaCutoff(.5f);
+  },
      {ShaderOption::Type::ALPHA_TEST}},
     {// 7
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.SetAlphaCutoff(1.f);
-     },
+  {
+    p.materialDefinition.SetAlphaCutoff(1.f);
+  },
      {ShaderOption::Type::ALPHA_TEST}},
     {// 8
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
+  },
      {ShaderOption::Type::GLTF_CHANNELS}},
     {// 9
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mJoints[0].mBlob.mOffset  = 0;
-       p.meshDefinition.mWeights[0].mBlob.mOffset = 0;
-     },
+  {
+    p.meshDefinition.mJoints[0].mBlob.mOffset  = 0;
+    p.meshDefinition.mWeights[0].mBlob.mOffset = 0;
+  },
      {ShaderOption::Type::SKINNING}},
     {// 10
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mFlags |= MeshDefinition::FLIP_UVS_VERTICAL;
-     },
+  {
+    p.meshDefinition.mFlags |= MeshDefinition::FLIP_UVS_VERTICAL;
+  },
      {ShaderOption::Type::FLIP_UVS_VERTICAL}},
     {
       // 11
       [](ShaderParameters& p)
-      {
-        p.meshDefinition.mBlendShapes.push_back({});
-      },
+  {
+    p.meshDefinition.mBlendShapes.push_back({});
+  },
     },
     {// 12
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mBlendShapes.back().deltas.mBlob.mOffset = 0;
-     },
+  {
+    p.meshDefinition.mBlendShapes.back().deltas.mBlob.mOffset = 0;
+  },
      {ShaderOption::Type::MORPH_POSITION}},
     {// 13
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mBlendShapes.back().normals.mBlob.mOffset = 0;
-     },
+  {
+    p.meshDefinition.mBlendShapes.back().normals.mBlob.mOffset = 0;
+  },
      {ShaderOption::Type::MORPH_NORMAL}},
     {// 14
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mBlendShapes.back().tangents.mBlob.mOffset = 0;
-     },
+  {
+    p.meshDefinition.mBlendShapes.back().tangents.mBlob.mOffset = 0;
+  },
      {ShaderOption::Type::MORPH_TANGENT}},
     {// 15
      [](ShaderParameters& p)
-     {
-       auto& blendShapes = p.meshDefinition.mBlendShapes;
-       DALI_ASSERT_ALWAYS(!blendShapes.empty() &&
-                          (blendShapes.back().deltas.mBlob.mOffset != MeshDefinition::INVALID ||
-                           blendShapes.back().normals.mBlob.mOffset != MeshDefinition::INVALID ||
-                           blendShapes.back().tangents.mBlob.mOffset != MeshDefinition::INVALID));
-       p.meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
-     },
+  {
+    auto& blendShapes = p.meshDefinition.mBlendShapes;
+    DALI_ASSERT_ALWAYS(!blendShapes.empty() &&
+                       (blendShapes.back().deltas.mBlob.mOffset != MeshDefinition::INVALID ||
+                        blendShapes.back().normals.mBlob.mOffset != MeshDefinition::INVALID ||
+                        blendShapes.back().tangents.mBlob.mOffset != MeshDefinition::INVALID));
+    p.meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
+  },
      {ShaderOption::Type::MORPH_VERSION_2_0}},
 
     {// 16
      [](ShaderParameters& p)
-     {
-       p.materialDefinition.mFlags |= MaterialDefinition::OCCLUSION;
-     },
+  {
+    p.materialDefinition.mFlags |= MaterialDefinition::OCCLUSION;
+  },
      {ShaderOption::Type::OCCLUSION}},
 
     {// 17
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mColors[0].mBlob.mOffset = 0;
-     },
+  {
+    p.meshDefinition.mColors[0].mBlob.mOffset = 0;
+  },
      {ShaderOption::Type::COLOR_ATTRIBUTE}},
     {// 18
      [](ShaderParameters& p)
-     {
-       p.meshDefinition.mTangentType = Property::VECTOR4;
-     },
+  {
+    p.meshDefinition.mTangentType = Property::VECTOR4;
+  },
      {ShaderOption::Type::VEC4_TANGENT}},
   };
 

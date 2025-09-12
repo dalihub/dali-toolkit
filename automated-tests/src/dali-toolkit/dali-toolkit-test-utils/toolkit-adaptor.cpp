@@ -115,10 +115,10 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
   mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current)
-                                  { return callback == current; }),
+  { return callback == current; }),
                    mCallbacks.End());
   mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current)
-                                        { return callback == current; }),
+  { return callback == current; }),
                          mReturnCallbacks.End());
 }
 

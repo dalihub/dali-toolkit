@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMul
 
 Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageInterfacePtr nativeImageInterface, bool preMultiplied)
 {
-  Texture texture = Dali::Texture::New(*nativeImageInterface);
+  Texture                 texture  = Dali::Texture::New(*nativeImageInterface);
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
   return imageUrl;
 }
@@ -69,7 +69,7 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageB
 
 Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer)
 {
-  Texture texture = Dali::DevelFrameBuffer::GetDepthTexture(frameBuffer);
+  Texture                 texture  = Dali::DevelFrameBuffer::GetDepthTexture(frameBuffer);
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, false);
   return imageUrl;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ struct PhysicsAdaptor::ScopedPhysicsAccessor::Impl
   {
     mPhysicsWorld.Lock();
   }
-  Impl(Impl&)         = delete;
+  Impl(Impl&)                        = delete;
   const Impl& operator=(const Impl&) = delete;
 
   ~Impl()

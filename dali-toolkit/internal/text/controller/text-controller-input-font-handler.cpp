@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,13 +112,13 @@ void Controller::InputFontHandler::SetInputFontFamily(Controller& controller, co
 
       // Request to relayout.
       controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
-                                                                         VALIDATE_FONTS |
-                                                                         SHAPE_TEXT |
-                                                                         GET_GLYPH_METRICS |
-                                                                         LAYOUT |
-                                                                         UPDATE_LAYOUT_SIZE |
-                                                                         REORDER |
-                                                                         ALIGN);
+                                                                              VALIDATE_FONTS |
+                                                                              SHAPE_TEXT |
+                                                                              GET_GLYPH_METRICS |
+                                                                              LAYOUT |
+                                                                              UPDATE_LAYOUT_SIZE |
+                                                                              REORDER |
+                                                                              ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
@@ -178,13 +178,13 @@ void Controller::InputFontHandler::SetInputFontWeight(const Controller& controll
 
       // Request to relayout.
       controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
-                                                                         VALIDATE_FONTS |
-                                                                         SHAPE_TEXT |
-                                                                         GET_GLYPH_METRICS |
-                                                                         LAYOUT |
-                                                                         UPDATE_LAYOUT_SIZE |
-                                                                         REORDER |
-                                                                         ALIGN);
+                                                                              VALIDATE_FONTS |
+                                                                              SHAPE_TEXT |
+                                                                              GET_GLYPH_METRICS |
+                                                                              LAYOUT |
+                                                                              UPDATE_LAYOUT_SIZE |
+                                                                              REORDER |
+                                                                              ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
@@ -255,13 +255,13 @@ void Controller::InputFontHandler::SetInputFontWidth(Controller& controller, Fon
 
       // Request to relayout.
       controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
-                                                                         VALIDATE_FONTS |
-                                                                         SHAPE_TEXT |
-                                                                         GET_GLYPH_METRICS |
-                                                                         LAYOUT |
-                                                                         UPDATE_LAYOUT_SIZE |
-                                                                         REORDER |
-                                                                         ALIGN);
+                                                                              VALIDATE_FONTS |
+                                                                              SHAPE_TEXT |
+                                                                              GET_GLYPH_METRICS |
+                                                                              LAYOUT |
+                                                                              UPDATE_LAYOUT_SIZE |
+                                                                              REORDER |
+                                                                              ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
@@ -332,13 +332,13 @@ void Controller::InputFontHandler::SetInputFontSlant(Controller& controller, Fon
 
       // Request to relayout.
       controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
-                                                                         VALIDATE_FONTS |
-                                                                         SHAPE_TEXT |
-                                                                         GET_GLYPH_METRICS |
-                                                                         LAYOUT |
-                                                                         UPDATE_LAYOUT_SIZE |
-                                                                         REORDER |
-                                                                         ALIGN);
+                                                                              VALIDATE_FONTS |
+                                                                              SHAPE_TEXT |
+                                                                              GET_GLYPH_METRICS |
+                                                                              LAYOUT |
+                                                                              UPDATE_LAYOUT_SIZE |
+                                                                              REORDER |
+                                                                              ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
@@ -409,13 +409,13 @@ void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller,
 
       // Request to relayout.
       controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
-                                                                         VALIDATE_FONTS |
-                                                                         SHAPE_TEXT |
-                                                                         GET_GLYPH_METRICS |
-                                                                         LAYOUT |
-                                                                         UPDATE_LAYOUT_SIZE |
-                                                                         REORDER |
-                                                                         ALIGN);
+                                                                              VALIDATE_FONTS |
+                                                                              SHAPE_TEXT |
+                                                                              GET_GLYPH_METRICS |
+                                                                              LAYOUT |
+                                                                              UPDATE_LAYOUT_SIZE |
+                                                                              REORDER |
+                                                                              ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 

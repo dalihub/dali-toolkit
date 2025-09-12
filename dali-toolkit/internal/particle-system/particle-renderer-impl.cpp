@@ -358,7 +358,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t maxByte
 
       tasks.emplace_back(*this, list, index, count, dst + (elementByte * NUMBER_OF_VERTEX_ELEMENTS_PER_PARTICLE) * index);
       taskQueue.emplace_back([&t = tasks.back()](uint32_t threadId)
-                             { t.Update(); });
+      { t.Update(); });
     }
 
     // Execute worker tasks

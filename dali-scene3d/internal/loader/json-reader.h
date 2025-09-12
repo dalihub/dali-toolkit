@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_JSON_READER_H_
 #define DALI_SCENE3D_LOADER_JSON_READER_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -325,7 +325,7 @@ private:
  * @brief Helper function to make a Property for a member of type U, of object of type T.
  */
 template<class T, typename U>
-Property<T, U>* MakeProperty(const std::string& key, typename Property<T, U>::ReadFn readFn, U T::*ptr)
+Property<T, U>* MakeProperty(const std::string& key, typename Property<T, U>::ReadFn readFn, U T::* ptr)
 {
   return new Property<T, U>(key, readFn, ptr);
 }
@@ -340,10 +340,10 @@ protected:
 
   ReaderCore() = default;
 
-  ReaderCore(const ReaderCore& other) = delete;
+  ReaderCore(const ReaderCore& other)            = delete;
   ReaderCore& operator=(const ReaderCore& other) = delete;
 
-  ReaderCore(ReaderCore&& other) = default;
+  ReaderCore(ReaderCore&& other)            = default;
   ReaderCore& operator=(ReaderCore&& other) = default;
 };
 
@@ -357,10 +357,10 @@ class Reader : protected ReaderCore
 public:
   Reader() = default;
 
-  Reader(const Reader<T>& other) = delete;
+  Reader(const Reader<T>& other)               = delete;
   Reader<T>& operator=(const Reader<T>& other) = delete;
 
-  Reader(Reader<T>&& other) = default;
+  Reader(Reader<T>&& other)            = default;
   Reader<T>& operator=(Reader&& other) = default;
 
   ~Reader()

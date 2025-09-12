@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
@@ -274,7 +274,7 @@ public:
   Vector<BoundedParagraphRun>           mBoundedParagraphRuns;          ///< The bounded paragraph is used to handle a paragraph mark-up tag and it's attributes. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
   Vector<CharacterSpacingCharacterRun>  mCharacterSpacingCharacterRuns; ///< The character-spacing character run from markup-processor.
 
-  Property::Map                         mVariationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
+  Property::Map mVariationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
   bool                      mSpannedTextPlaced : 1;  ///< Whether the spanned-text is placed.

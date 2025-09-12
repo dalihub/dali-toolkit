@@ -39,79 +39,79 @@ public:
   AccessibilityHighlightOverlay();
 
   /**
-  * @brief Function to set a custom highlight overlay
-  *
-  * This function sets a custom highlight overlay at the specified position and size.
-  *
-  * @param position A Vector2 representing the position of the overlay
-  * @param size A Vector2 representing the size of the overlay
-  */
+   * @brief Function to set a custom highlight overlay
+   *
+   * This function sets a custom highlight overlay at the specified position and size.
+   *
+   * @param position A Vector2 representing the position of the overlay
+   * @param size A Vector2 representing the size of the overlay
+   */
   void SetCustomHighlight(Vector2 position, Vector2 size);
 
   /**
- * @brief Function to reset the custom highlight overlay
- *
- * This function resets the custom highlight overlay.
- */
+   * @brief Function to reset the custom highlight overlay
+   *
+   * This function resets the custom highlight overlay.
+   */
   void ResetCustomHighlight();
 
   /**
-  * @brief Updates the currently active highlight overlay. If no overlay exists, it creates a new one.
-  * @param activeHighlight The currently active highlight actor.
-  */
+   * @brief Updates the currently active highlight overlay. If no overlay exists, it creates a new one.
+   * @param activeHighlight The currently active highlight actor.
+   */
   void UpdateOverlay(Dali::Actor& activeHighlight);
 
   /**
-  * @brief Hides the currently displayed highlight overlay.
-  */
+   * @brief Hides the currently displayed highlight overlay.
+   */
   void HideOverlay();
 
   /**
-  * @brief Sets the currently overlay mode
-  * @param mode The currently OverlayHighlightMode to set.
-  */
+   * @brief Sets the currently overlay mode
+   * @param mode The currently OverlayHighlightMode to set.
+   */
   void SetOverlayMode(OverlayHighlightMode mode);
 
   /**
-  * @brief Gets the currently overlay mode
-  */
+   * @brief Gets the currently overlay mode
+   */
   OverlayHighlightMode GetOverlayMode() const;
 
 private:
   /**
-  * @brief Finds the parent SceneView of the given actor and returns the SceneView along with a boolean indicating whether the parent contains a model.
-  * @param current The current actor.
-  * @return Returns the SceneView containing the current object. If the current object is not a child of any SceneView, returns null.
-  */
+   * @brief Finds the parent SceneView of the given actor and returns the SceneView along with a boolean indicating whether the parent contains a model.
+   * @param current The current actor.
+   * @return Returns the SceneView containing the current object. If the current object is not a child of any SceneView, returns null.
+   */
   Dali::Actor FindParentSceneView(Dali::Actor current);
 
   /**
-  * @brief Creates a highlight overlay for the given SceneView.
-  * @param sceneView The SceneView for which the highlight overlay will be created.
-  */
+   * @brief Creates a highlight overlay for the given SceneView.
+   * @param sceneView The SceneView for which the highlight overlay will be created.
+   */
   void CreateOverlay(Dali::Actor& sceneView);
 
   /**
-  * @brief Updates the position of the highlight based on the given SceneView and the previous highlight actor.
-  * @param sceneView The SceneView for which the highlight position will be updated.
-  * @param highlight The previously used highlight actor.
-  */
+   * @brief Updates the position of the highlight based on the given SceneView and the previous highlight actor.
+   * @param sceneView The SceneView for which the highlight position will be updated.
+   * @param highlight The previously used highlight actor.
+   */
   void UpdateOverlayPosition(Dali::Actor& sceneView, Dali::Actor& highlight);
 
   /**
-  * @brief Returns the size and position of the screen overlay based on the given SceneView and the previous highlight actor.
-  * @param sceneView The SceneView for which the screen overlay extents will be calculated.
-  * @param highlight The previously used highlight actor.
-  * @return A Rect<float> representing the extents of the screen overlay.
-  */
+   * @brief Returns the size and position of the screen overlay based on the given SceneView and the previous highlight actor.
+   * @param sceneView The SceneView for which the screen overlay extents will be calculated.
+   * @param highlight The previously used highlight actor.
+   * @return A Rect<float> representing the extents of the screen overlay.
+   */
   Rect<float> GetOverlayExtents(Dali::Actor& sceneView, Dali::Actor& highlight);
 
 private:
-  bool                           mHasOverlayActor;
-  OverlayHighlightMode           mOverlayMode;
-  Vector2                        mManualPosition;
-  Vector2                        mManualSize;
-  Dali::WeakHandle<Dali::Actor>  mOverlayActor;
+  bool                          mHasOverlayActor;
+  OverlayHighlightMode          mOverlayMode;
+  Vector2                       mManualPosition;
+  Vector2                       mManualSize;
+  Dali::WeakHandle<Dali::Actor> mOverlayActor;
 };
 
 } // namespace Dali::Toolkit::DevelControl

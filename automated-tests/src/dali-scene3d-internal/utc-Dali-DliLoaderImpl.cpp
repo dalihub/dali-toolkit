@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,7 +183,7 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 int UtcDaliDliLoaderLoadSceneExercise(void)
 {
   TestApplication app;
-  Context ctx;
+  Context         ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
   DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
@@ -253,44 +253,44 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   uint32_t                 metadataCount = 0;
   ctx.input.mPreNodeCategoryProcessors.push_back({"metadata",
                                                   [&](const Property::Array& array, StringCallback)
-                                                  {
-                                                    std::string key, value;
-                                                    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-                                                    {
-                                                      auto& data = array.GetElementAt(i0);
-                                                      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  {
+    std::string key, value;
+    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+    {
+      auto& data = array.GetElementAt(i0);
+      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-                                                      auto map   = data.GetMap();
-                                                      auto key   = map->Find("key");
-                                                      auto value = map->Find("value");
-                                                      DALI_TEST_EQUAL(key->GetType(), Property::STRING);
-                                                      DALI_TEST_EQUAL(value->GetType(), Property::STRING);
-                                                      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
+      auto map   = data.GetMap();
+      auto key   = map->Find("key");
+      auto value = map->Find("value");
+      DALI_TEST_EQUAL(key->GetType(), Property::STRING);
+      DALI_TEST_EQUAL(value->GetType(), Property::STRING);
+      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
 
-                                                      ++metadataCount;
-                                                    }
-                                                  }});
+      ++metadataCount;
+    }
+  }});
 
   std::vector<std::string> behaviors;
   uint32_t                 behaviorCount = 0;
   ctx.input.mPostNodeCategoryProcessors.push_back({"behaviors",
                                                    [&](const Property::Array& array, StringCallback)
-                                                   {
-                                                     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-                                                     {
-                                                       auto& data = array.GetElementAt(i0);
-                                                       DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  {
+    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+    {
+      auto& data = array.GetElementAt(i0);
+      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-                                                       auto map   = data.GetMap();
-                                                       auto event = map->Find("event");
-                                                       auto url   = map->Find("url");
-                                                       DALI_TEST_EQUAL(event->GetType(), Property::STRING);
-                                                       DALI_TEST_EQUAL(url->GetType(), Property::STRING);
-                                                       behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
+      auto map   = data.GetMap();
+      auto event = map->Find("event");
+      auto url   = map->Find("url");
+      DALI_TEST_EQUAL(event->GetType(), Property::STRING);
+      DALI_TEST_EQUAL(url->GetType(), Property::STRING);
+      behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
 
-                                                       ++behaviorCount;
-                                                     }
-                                                   }});
+      ++behaviorCount;
+    }
+  }});
 
   size_t numNodes                  = 0;
   ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, const Property::Map&, StringCallback)

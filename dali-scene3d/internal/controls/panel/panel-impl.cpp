@@ -372,7 +372,8 @@ void Panel::OnInitialize()
   mDoubleSidedPlaneNode.AddModelPrimitive(doubleSidedPlanePrimitive);
 
   mResolutionPropertyIndex   = mPanelNode.RegisterProperty("resolution", mPanelResolution);
-  Constraint scaleConstraint = Constraint::New<Vector3>(mPanelNode, Dali::Actor::Property::SCALE, [](Vector3& output, const PropertyInputContainer& inputs) {
+  Constraint scaleConstraint = Constraint::New<Vector3>(mPanelNode, Dali::Actor::Property::SCALE, [](Vector3& output, const PropertyInputContainer& inputs)
+  {
     Vector3 panelSize = inputs[0]->GetVector3();
     Vector2 panelResolution = inputs[1]->GetVector2();
     output = Y_DIRECTION;

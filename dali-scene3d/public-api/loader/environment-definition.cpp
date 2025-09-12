@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ EnvironmentDefinition::RawData
 EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
 {
   RawData raw;
-  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData) {
+  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData)
+  {
     if(path.empty())
     {
       environmentMapData.mPixelData.resize(6);

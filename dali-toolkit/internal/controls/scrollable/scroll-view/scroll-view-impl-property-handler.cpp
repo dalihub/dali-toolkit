@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,8 +211,8 @@ void ScrollViewPropertyHandler::UpdatePropertyDomain(ScrollView& scrollView)
       // make sure new scroll value is within new domain
       if(scrollView.mScrollPrePosition.x < min.x || scrollView.mScrollPrePosition.x > max.x)
       {
-        scrollPositionChanged = true;
-        scrollView.mScrollPrePosition.x  = Clamp(scrollView.mScrollPrePosition.x, -(max.x - size.x), -min.x);
+        scrollPositionChanged           = true;
+        scrollView.mScrollPrePosition.x = Clamp(scrollView.mScrollPrePosition.x, -(max.x - size.x), -min.x);
       }
     }
     if((fabsf(rulerDomain.max - rulerDomain.min) - size.x) > Math::MACHINE_EPSILON_100)
@@ -241,8 +241,8 @@ void ScrollViewPropertyHandler::UpdatePropertyDomain(ScrollView& scrollView)
       // make sure new scroll value is within new domain
       if(scrollView.mScrollPrePosition.y < min.y || scrollView.mScrollPrePosition.y > max.y)
       {
-        scrollPositionChanged = true;
-        scrollView.mScrollPrePosition.y  = Clamp(scrollView.mScrollPrePosition.y, -(max.y - size.y), -min.y);
+        scrollPositionChanged           = true;
+        scrollView.mScrollPrePosition.y = Clamp(scrollView.mScrollPrePosition.y, -(max.y - size.y), -min.y);
       }
     }
     if((fabsf(rulerDomain.max - rulerDomain.min) - size.y) > Math::MACHINE_EPSILON_100)

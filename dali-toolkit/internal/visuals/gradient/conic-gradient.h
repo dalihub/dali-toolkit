@@ -75,7 +75,7 @@ private:
    */
   void SetCenterAndStartAngle(const Vector2& center, Dali::Radian startAngle);
 
-  Vector2 mCenter;
+  Vector2      mCenter;
   Dali::Radian mStartAngle;
 };
 

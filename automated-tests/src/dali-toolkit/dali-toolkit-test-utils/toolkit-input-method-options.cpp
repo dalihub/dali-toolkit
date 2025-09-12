@@ -34,16 +34,16 @@ struct InputMethodOptions::Impl
 {
   Impl()
   {
-    mPanelLayout = PanelLayout::NORMAL;
-    mAutoCapital = AutoCapital::SENTENCE;
+    mPanelLayout  = PanelLayout::NORMAL;
+    mAutoCapital  = AutoCapital::SENTENCE;
     mButtonAction = ButtonAction::DEFAULT;
-    mVariation = NormalLayout::NORMAL;
+    mVariation    = NormalLayout::NORMAL;
   }
 
-  PanelLayout::Type mPanelLayout;
-  AutoCapital::Type mAutoCapital;
+  PanelLayout::Type  mPanelLayout;
+  AutoCapital::Type  mAutoCapital;
   ButtonAction::Type mButtonAction;
-  int mVariation:4;
+  int                mVariation : 4;
 };
 
 InputMethodOptions::InputMethodOptions()
@@ -62,47 +62,47 @@ bool InputMethodOptions::IsPassword() const
   return (mImpl->mPanelLayout == Dali::InputMethod::PanelLayout::PASSWORD);
 }
 
-void InputMethodOptions::ApplyProperty( const Property::Map& settings )
+void InputMethodOptions::ApplyProperty(const Property::Map& settings)
 {
-  for ( unsigned int i = 0, count = settings.Count(); i < count; ++i )
+  for(unsigned int i = 0, count = settings.Count(); i < count; ++i)
   {
-    Property::Key key = settings.GetKeyAt( i );
-    if( key.type == Property::Key::INDEX )
+    Property::Key key = settings.GetKeyAt(i);
+    if(key.type == Property::Key::INDEX)
     {
       continue;
     }
 
     Property::Value item = settings.GetValue(i);
 
-    if( key == TOKEN_STRING( PANEL_LAYOUT ) )
+    if(key == TOKEN_STRING(PANEL_LAYOUT))
     {
-      if( item.GetType() == Property::INTEGER )
+      if(item.GetType() == Property::INTEGER)
       {
-        int value = item.Get< int >();
+        int value           = item.Get<int>();
         mImpl->mPanelLayout = static_cast<InputMethod::PanelLayout::Type>(value);
       }
     }
-    else if ( key == TOKEN_STRING( BUTTON_ACTION ) )
+    else if(key == TOKEN_STRING(BUTTON_ACTION))
     {
-      if ( item.GetType() == Property::INTEGER )
+      if(item.GetType() == Property::INTEGER)
       {
-        int value = item.Get< int >();
+        int value            = item.Get<int>();
         mImpl->mButtonAction = static_cast<InputMethod::ButtonAction::Type>(value);
       }
     }
-    else if ( key == TOKEN_STRING( AUTO_CAPITALIZE ) )
+    else if(key == TOKEN_STRING(AUTO_CAPITALIZE))
     {
-      if ( item.GetType() == Property::INTEGER )
+      if(item.GetType() == Property::INTEGER)
       {
-        int value = item.Get< int >();
+        int value           = item.Get<int>();
         mImpl->mAutoCapital = static_cast<InputMethod::AutoCapital::Type>(value);
       }
     }
-    else if( key == TOKEN_STRING( VARIATION ) )
+    else if(key == TOKEN_STRING(VARIATION))
     {
-      if( item.GetType() == Property::INTEGER )
+      if(item.GetType() == Property::INTEGER)
       {
-        int value = item.Get< int >();
+        int value         = item.Get<int>();
         mImpl->mVariation = value;
       }
     }
@@ -112,58 +112,58 @@ void InputMethodOptions::ApplyProperty( const Property::Map& settings )
   }
 }
 
-void InputMethodOptions::RetrieveProperty( Property::Map& settings )
+void InputMethodOptions::RetrieveProperty(Property::Map& settings)
 {
-  settings[TOKEN_STRING( PANEL_LAYOUT )] = mImpl->mPanelLayout;
-  settings[TOKEN_STRING( BUTTON_ACTION )] = mImpl->mButtonAction;
-  settings[TOKEN_STRING( AUTO_CAPITALIZE )] = mImpl->mAutoCapital;
-  settings[TOKEN_STRING( VARIATION )] = mImpl->mVariation;
+  settings[TOKEN_STRING(PANEL_LAYOUT)]    = mImpl->mPanelLayout;
+  settings[TOKEN_STRING(BUTTON_ACTION)]   = mImpl->mButtonAction;
+  settings[TOKEN_STRING(AUTO_CAPITALIZE)] = mImpl->mAutoCapital;
+  settings[TOKEN_STRING(VARIATION)]       = mImpl->mVariation;
 }
 
-bool InputMethodOptions::CompareAndSet( InputMethod::Category::Type type, const InputMethodOptions& options, int& index)
+bool InputMethodOptions::CompareAndSet(InputMethod::Category::Type type, const InputMethodOptions& options, int& index)
 {
   return true;
   bool updated = false;
 
-  switch (type)
+  switch(type)
   {
     case PANEL_LAYOUT:
     {
-      if ( options.mImpl->mPanelLayout != mImpl->mPanelLayout )
+      if(options.mImpl->mPanelLayout != mImpl->mPanelLayout)
       {
         mImpl->mPanelLayout = options.mImpl->mPanelLayout;
-        index = static_cast<int>(mImpl->mPanelLayout);
-        updated = true;
+        index               = static_cast<int>(mImpl->mPanelLayout);
+        updated             = true;
       }
       break;
     }
     case BUTTON_ACTION:
     {
-      if ( options.mImpl->mButtonAction != mImpl->mButtonAction )
+      if(options.mImpl->mButtonAction != mImpl->mButtonAction)
       {
         mImpl->mButtonAction = options.mImpl->mButtonAction;
-        index = static_cast<int>(mImpl->mButtonAction);
-        updated = true;
+        index                = static_cast<int>(mImpl->mButtonAction);
+        updated              = true;
       }
       break;
     }
     case AUTO_CAPITALIZE:
     {
-      if ( options.mImpl->mAutoCapital != mImpl->mAutoCapital )
+      if(options.mImpl->mAutoCapital != mImpl->mAutoCapital)
       {
         mImpl->mAutoCapital = options.mImpl->mAutoCapital;
-        index = static_cast<int>(mImpl->mAutoCapital);
-        updated = true;
+        index               = static_cast<int>(mImpl->mAutoCapital);
+        updated             = true;
       }
       break;
     }
     case VARIATION:
     {
-      if ( options.mImpl->mVariation != mImpl->mVariation )
+      if(options.mImpl->mVariation != mImpl->mVariation)
       {
         mImpl->mVariation = options.mImpl->mVariation;
-        index = static_cast<int>(mImpl->mVariation);
-        updated = true;
+        index             = static_cast<int>(mImpl->mVariation);
+        updated           = true;
       }
       break;
     }

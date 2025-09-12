@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_CONTROL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ private: // From CustomActorImpl
   void OnKeyInputFocusLost() override;
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
-  DALI_INTERNAL DummyControl(const DummyControl&);
+  DALI_INTERNAL               DummyControl(const DummyControl&);
   DALI_INTERNAL DummyControl& operator=(const DummyControl&);
 
 public:

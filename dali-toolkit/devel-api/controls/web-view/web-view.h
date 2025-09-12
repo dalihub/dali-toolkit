@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class WebSettings;
 namespace Internal DALI_INTERNAL
 {
 class WebView;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @addtogroup dali_toolkit_controls_web_view

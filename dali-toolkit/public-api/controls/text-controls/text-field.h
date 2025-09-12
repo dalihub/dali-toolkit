@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -476,10 +476,10 @@ public:
   struct InputStyle
   {
     /**
-   * @brief Mask used by the signal InputStyleChangedSignal().
-   *
-   * @SINCE_1_2_2
-   */
+     * @brief Mask used by the signal InputStyleChangedSignal().
+     *
+     * @SINCE_1_2_2
+     */
     enum Mask
     {
       NONE          = 0x0000, ///< @SINCE_1_2_2

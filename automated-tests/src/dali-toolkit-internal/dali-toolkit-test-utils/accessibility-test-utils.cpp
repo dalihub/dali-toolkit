@@ -49,36 +49,43 @@ void TestEnableSC(bool b)
       std::abort();
     }
 
-    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", MethodType::Getter}] = [wr](const MessagePtr& m) -> MessagePtr {
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", MethodType::Getter}] = [wr](const MessagePtr& m) -> MessagePtr
+    {
       auto reply = wr->newReplyMessage(m);
       wr->Encode(reply, std::tuple<TestDBusWrapper::Variant<bool>>{ScreenReaderEnabled});
       return reply;
     };
-    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Status", "IsEnabled", MethodType::Getter}] = [wr](const MessagePtr& m) -> MessagePtr {
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Status", "IsEnabled", MethodType::Getter}] = [wr](const MessagePtr& m) -> MessagePtr
+    {
       auto reply = wr->newReplyMessage(m);
       wr->Encode(reply, std::tuple<TestDBusWrapper::Variant<bool>>{IsEnabled});
       return reply;
     };
-    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Bus", "GetAddress", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr {
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/bus", "org.a11y.Bus", "GetAddress", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr
+    {
       auto reply = wr->newReplyMessage(m);
       wr->Encode(reply, std::tuple<const char*>{"bus"});
       return reply;
     };
-    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Embed", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr {
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Embed", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr
+    {
       auto reply = wr->newReplyMessage(m);
       wr->Encode(reply, std::tuple<Address>{{"bus", "root"}});
       return reply;
     };
-    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Unembed", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr {
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/root", "org.a11y.atspi.Socket", "Unembed", MethodType::Method}] = [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "PropertyChange", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       gPropertyChangeCalled = true;
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "StateChanged", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       std::tuple<std::string, int> decoded;
       wr->Decode(m, decoded);
       gStateChangedResult.state = std::get<0>(decoded);
@@ -87,33 +94,40 @@ void TestEnableSC(bool b)
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "BoundsChanged", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "ActiveDescendantChanged", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "TextChanged", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "TextCaretMoved", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "MoveOuted", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       gMoveOutedCalled = true;
       return wr->newReplyMessage(m);
     };
 
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Activate", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
     wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Deactivate", MethodType::Method}] =
-      [wr](const MessagePtr& m) -> MessagePtr {
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
       return wr->newReplyMessage(m);
     };
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
-
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -82,7 +81,7 @@ struct TransitionFinishCheck
   bool& mSignalReceived; // owned by individual tests
 };
 
-}
+} //namespace
 
 int UtcDaliSceneViewImplCameraTransitionFail(void)
 {
@@ -175,7 +174,7 @@ int UtcDaliSceneViewImplCameraChangeDuringTransition(void)
   finishCheck.CheckSignalNotReceived();
 
   Dali::Scene3D::Internal::SceneView& sceneViewImpl = Dali::Scene3D::GetImpl(view);
-  auto renderTask = sceneViewImpl.GetRenderTask();
+  auto                                renderTask    = sceneViewImpl.GetRenderTask();
   DALI_TEST_CHECK(renderTask);
 
   CameraActor currentCamera = renderTask.GetCameraActor();
@@ -324,9 +323,8 @@ int UtcDaliSceneViewImplCameraTransition1(void)
   // We didn't expect the animation to finish yet
   finishCheck.CheckSignalNotReceived();
 
-
   Dali::Scene3D::Internal::SceneView& sceneViewImpl = Dali::Scene3D::GetImpl(view);
-  auto renderTask = sceneViewImpl.GetRenderTask();
+  auto                                renderTask    = sceneViewImpl.GetRenderTask();
   DALI_TEST_CHECK(renderTask);
 
   CameraActor currentCamera = renderTask.GetCameraActor();
@@ -338,7 +336,7 @@ int UtcDaliSceneViewImplCameraTransition1(void)
   DALI_TEST_EQUALS(currentPosition, Vector3::ONE * 50.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(currentCamera.GetNearClippingPlane(), 5.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(currentCamera.GetFarClippingPlane(), 100.0f, TEST_LOCATION);
-  float currentFov =  (0.533293254f + 1.0f) / 2.0f;
+  float currentFov = (0.533293254f + 1.0f) / 2.0f;
   DALI_TEST_EQUALS(currentCamera.GetProperty<Dali::DevelCameraActor::ProjectionDirection>(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION), Dali::DevelCameraActor::ProjectionDirection::HORIZONTAL, TEST_LOCATION);
   DALI_TEST_EQUALS(currentCamera.GetCurrentProperty<float>(Dali::CameraActor::Property::FIELD_OF_VIEW), currentFov, 0.05f, TEST_LOCATION);
 
@@ -398,8 +396,8 @@ int UtcDaliSceneViewImplCameraTransition2(void)
   camera1.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, Dali::DevelCameraActor::ProjectionDirection::VERTICAL);
   camera2.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, Dali::DevelCameraActor::ProjectionDirection::HORIZONTAL);
 
-  camera1.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 10.0f);  // Vertical : 10.0f, Horizontal : 5.0f
-  camera2.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 10.0f);  // Vertical : 20.0f, Horizontal : 10.0f
+  camera1.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 10.0f); // Vertical : 10.0f, Horizontal : 5.0f
+  camera2.SetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE, 10.0f); // Vertical : 20.0f, Horizontal : 10.0f
   camera1.SetAspectRatio(0.5f);
   camera2.SetAspectRatio(0.5f);
 
@@ -421,7 +419,7 @@ int UtcDaliSceneViewImplCameraTransition2(void)
   finishCheck.CheckSignalNotReceived();
 
   Dali::Scene3D::Internal::SceneView& sceneViewImpl = Dali::Scene3D::GetImpl(view);
-  auto renderTask = sceneViewImpl.GetRenderTask();
+  auto                                renderTask    = sceneViewImpl.GetRenderTask();
   DALI_TEST_CHECK(renderTask);
 
   CameraActor currentCamera = renderTask.GetCameraActor();

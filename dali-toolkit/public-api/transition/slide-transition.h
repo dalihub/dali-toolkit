@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SLIDE_TRANSITION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,11 @@ class SlideTransition;
  */
 namespace SlideTransitionDirection
 {
-  static constexpr Vector2 TOP(0, -1); // TOP
-  static constexpr Vector2 BOTTOM(0,  1); // BOTTOM
-  static constexpr Vector2 LEFT(-1, 0); // LEFT
-  static constexpr Vector2 RIGHT(1,  0); // RIGHT
-}
+static constexpr Vector2 TOP(0, -1);   // TOP
+static constexpr Vector2 BOTTOM(0, 1); // BOTTOM
+static constexpr Vector2 LEFT(-1, 0);  // LEFT
+static constexpr Vector2 RIGHT(1, 0);  // RIGHT
+} //namespace SlideTransitionDirection
 
 /**
  * @brief SlideTransition provides smoothly appearing/disappearing effects for target Control.
@@ -50,7 +50,6 @@ namespace SlideTransitionDirection
 class DALI_TOOLKIT_API SlideTransition : public TransitionBase
 {
 public:
-
   /**
    * @brief Creates an uninitialized SlideTransition; this can be initialized with SlideTransition::New().
    *

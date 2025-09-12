@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ enum Type
   NO_EMBOSS = 0, ///< The text contains no emboss.
   HAS_EMBOSS     ///< The text contains emboss.
 };
-}
+} //namespace TextEmboss
 
 /**
  * @brief Collection of current text visual feature.

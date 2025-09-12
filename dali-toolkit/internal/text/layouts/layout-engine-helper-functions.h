@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,17 +31,17 @@ namespace Text
 namespace Layout
 {
 /**
-   * @brief Calculate glyph positions when set glyph positions for left to right.
-   *
-   * @param[in] visualModel The visual model.
-   * @param[in] logicalModel The logical model.
-   * @param[in] interGlyphExtraAdvance Extra advance added to each glyph.
-   * @param[in] numberOfGlyphs The number of glyphs.
-   * @param[in] startIndexForGlyph The index of the first glyph in the line.
-   * @param[in] startIndexForGlyphPositions The index of the first glyph for GlyphPositions.
-   * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
-   * @param[in,out] penX The current position for the horizontal pen.
-   */
+ * @brief Calculate glyph positions when set glyph positions for left to right.
+ *
+ * @param[in] visualModel The visual model.
+ * @param[in] logicalModel The logical model.
+ * @param[in] interGlyphExtraAdvance Extra advance added to each glyph.
+ * @param[in] numberOfGlyphs The number of glyphs.
+ * @param[in] startIndexForGlyph The index of the first glyph in the line.
+ * @param[in] startIndexForGlyphPositions The index of the first glyph for GlyphPositions.
+ * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
+ * @param[in,out] penX The current position for the horizontal pen.
+ */
 void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
                                 const LogicalModelPtr& logicalModel,
                                 const float            interGlyphExtraAdvance,
@@ -52,17 +52,17 @@ void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
                                 float&                 penX);
 
 /**
-   * @brief Calculate glyph positions when set glyph positions for right to left.
-   *
-   * @param[in] visualModel The visual model.
-   * @param[in] logicalModel The logical model.
-   * @param[in] bidiLineIndex Index to the line's bidirectional info.
-   * @param[in] startGlyphIndex The index of the first glyph in the line.
-   * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
-   * @param[in] characterVisualIndex The character visual index.
-   * @param[in] characterLogicalIndex The character logical index.
-   * @param[in,out] penX The current position for the horizontal pen.
-   */
+ * @brief Calculate glyph positions when set glyph positions for right to left.
+ *
+ * @param[in] visualModel The visual model.
+ * @param[in] logicalModel The logical model.
+ * @param[in] bidiLineIndex Index to the line's bidirectional info.
+ * @param[in] startGlyphIndex The index of the first glyph in the line.
+ * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
+ * @param[in] characterVisualIndex The character visual index.
+ * @param[in] characterLogicalIndex The character logical index.
+ * @param[in,out] penX The current position for the horizontal pen.
+ */
 void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
                                 const LogicalModelPtr&           logicalModel,
                                 const BidirectionalLineRunIndex& bidiLineIndex,
@@ -73,18 +73,18 @@ void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
                                 float&                           penX);
 
 /**
-   * @brief Calculate glyph positions when set glyph positions for right to left.
-   *
-   * @param[in] visualModel The visual model.
-   * @param[in] textBuffer The text buffer.
-   * @param[in] startGlyphIndex The index of the first glyph in the line.
-   * @param[in] interGlyphExtraAdvance Extra advance added to each glyph.
-   * @param[in] bidiLineCharacterRun The initial character index within the whole text and the number of characters of the run for BidirectionalLine.
-   * @param[in] bidiLineVisualToLogicalMap Pointer to the visual to logical map table for BidirectionalLine.
-   * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
-   * @param[in,out] characterLogicalIndex The character logical index.
-   * @param[in,out] penX The current position for the horizontal pen.
-   */
+ * @brief Calculate glyph positions when set glyph positions for right to left.
+ *
+ * @param[in] visualModel The visual model.
+ * @param[in] textBuffer The text buffer.
+ * @param[in] startGlyphIndex The index of the first glyph in the line.
+ * @param[in] interGlyphExtraAdvance Extra advance added to each glyph.
+ * @param[in] bidiLineCharacterRun The initial character index within the whole text and the number of characters of the run for BidirectionalLine.
+ * @param[in] bidiLineVisualToLogicalMap Pointer to the visual to logical map table for BidirectionalLine.
+ * @param[in,out] glyphPositionsBuffer The glyph positions buffer.
+ * @param[in,out] characterLogicalIndex The character logical index.
+ * @param[in,out] penX The current position for the horizontal pen.
+ */
 void TraversesCharactersForGlyphPositionsRTL(const VisualModelPtr&  visualModel,
                                              const Character* const textBuffer,
                                              const GlyphIndex&      startGlyphIndex,

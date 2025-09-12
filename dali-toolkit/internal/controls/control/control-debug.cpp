@@ -260,10 +260,12 @@ std::ostream& DumpProperties(std::ostream& o, Handle handle)
   Property::IndexContainer indices;
   handle.GetPropertyIndices(indices);
 
-  auto childPropertiesP = [](int index) -> bool {
+  auto childPropertiesP = [](int index) -> bool
+  {
     return CHILD_PROPERTY_REGISTRATION_START_INDEX <= index && index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX;
   };
-  auto propertiesP = [](int index) -> bool {
+  auto propertiesP = [](int index) -> bool
+  {
     return !(CHILD_PROPERTY_REGISTRATION_START_INDEX <= index && index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX);
   };
 

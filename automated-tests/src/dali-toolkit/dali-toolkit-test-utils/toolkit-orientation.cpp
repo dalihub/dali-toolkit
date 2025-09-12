@@ -33,7 +33,6 @@ namespace Adaptor
 {
 class Window;
 
-
 struct RotationEvent
 {
   int angle;     ///< one of 0, 90, 180, 270
@@ -60,6 +59,7 @@ protected:
   virtual ~Orientation()
   {
   }
+
 public:
   int GetDegrees() const
   {
@@ -69,7 +69,7 @@ public:
   {
     return 0.0f;
   }
-  void OnOrientationChanged( const RotationEvent& rotation )
+  void OnOrientationChanged(const RotationEvent& rotation)
   {
   }
   OrientationSignalType& ChangedSignal()
@@ -79,14 +79,14 @@ public:
 
 private:
   Orientation(const Orientation&);
-  Orientation& operator=(Orientation&);
+  Orientation&          operator=(Orientation&);
   OrientationSignalType mChangedSignal;
 };
 
-} // Adaptor namespace
-} // Internal namespace
+} //namespace Adaptor
+} //namespace Internal
 
-inline Internal::Adaptor::Orientation& GetImplementation (Dali::Orientation& orientation)
+inline Internal::Adaptor::Orientation& GetImplementation(Dali::Orientation& orientation)
 {
   DALI_ASSERT_ALWAYS(orientation && "Orientation handle is empty");
   BaseObject& handle = orientation.GetBaseObject();
@@ -131,9 +131,9 @@ Orientation::OrientationSignalType& Orientation::ChangedSignal()
   return GetImplementation(*this).ChangedSignal();
 }
 
-Orientation::Orientation( Internal::Adaptor::Orientation* orientation )
+Orientation::Orientation(Internal::Adaptor::Orientation* orientation)
 : BaseHandle(orientation)
 {
 }
 
-} // Dali
+} //namespace Dali

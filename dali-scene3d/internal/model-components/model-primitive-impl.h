@@ -231,9 +231,9 @@ private:
 
 private:
   // Delete copy & move operator
-  ModelPrimitive(const ModelPrimitive&) = delete;
-  ModelPrimitive(ModelPrimitive&&)      = delete;
-  ModelPrimitive& operator=(const ModelPrimitive& rhs) = delete;
+  ModelPrimitive(const ModelPrimitive&)                    = delete;
+  ModelPrimitive(ModelPrimitive&&)                         = delete;
+  ModelPrimitive& operator=(const ModelPrimitive& rhs)     = delete;
   ModelPrimitive& operator=(ModelPrimitive&& rhs) noexcept = delete;
 
 private:

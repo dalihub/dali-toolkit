@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,8 @@ void Node::RemoveChild(Actor child)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "RemoveChild child:[%s] from internal nodeCount[%d] childCount[%d]\n", child.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), YGNodeGetChildCount(mImpl->mYogaNode), mImpl->mChildNodes.size());
 
-  auto iterator = std::find_if(mImpl->mChildNodes.begin(), mImpl->mChildNodes.end(), [&child](NodePtr& childNode) { return childNode->mImpl->mActor.GetHandle() == child; });
+  auto iterator = std::find_if(mImpl->mChildNodes.begin(), mImpl->mChildNodes.end(), [&child](NodePtr& childNode)
+  { return childNode->mImpl->mActor.GetHandle() == child; });
 
   if(iterator != mImpl->mChildNodes.end())
   {

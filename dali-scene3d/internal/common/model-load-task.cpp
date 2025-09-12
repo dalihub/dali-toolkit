@@ -88,7 +88,7 @@ void ModelLoadTask::Process()
   {
     mStartTimeNanoSceonds = GetNanoseconds();
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
-                                            { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
+    { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
   }
 #endif
 
@@ -138,7 +138,7 @@ void ModelLoadTask::Process()
   {
     mEndTimeNanoSceonds = GetNanoseconds();
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+    {
       oss << std::fixed << std::setprecision(3);
       oss << "[";
       oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SPANNED_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,10 +58,10 @@ public:
 
   // Removed constructors and assignment operators
 public:                                        // Constructors
-  Spanned(const Spanned&) = delete;            ///< Deleted copy constructor
-  Spanned(Spanned&&)      = delete;            ///< Deleted move constructor
+  Spanned(const Spanned&)            = delete; ///< Deleted copy constructor
+  Spanned(Spanned&&)                 = delete; ///< Deleted move constructor
   Spanned& operator=(const Spanned&) = delete; ///< Deleted copy assignment operator
-  Spanned& operator=(Spanned&&) = delete;      ///< Deleted move assignment operator
+  Spanned& operator=(Spanned&&)      = delete; ///< Deleted move assignment operator
 
 public: //Methods
   /**

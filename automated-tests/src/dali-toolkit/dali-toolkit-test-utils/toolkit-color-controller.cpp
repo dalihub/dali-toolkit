@@ -30,30 +30,35 @@ namespace Adaptor
 class ColorController : public BaseObject
 {
 public:
-  ColorController(){}
+  ColorController()
+  {
+  }
   static Dali::ColorController Get()
   {
-    return Dali::ColorController( new ColorController() );
+    return Dali::ColorController(new ColorController());
   }
 
-  bool RetrieveColor( const std::string& colorCode, Vector4& colorValue )
+  bool RetrieveColor(const std::string& colorCode, Vector4& colorValue)
   {
     return false;
   }
 
-  bool RetrieveColor( const std::string& colorCode ,
-                      Vector4&           textColor,
-                      Vector4&           textOutlineColor,
-                      Vector4&           textShadowColor)
+  bool RetrieveColor(const std::string& colorCode,
+                     Vector4&           textColor,
+                     Vector4&           textOutlineColor,
+                     Vector4&           textShadowColor)
   {
     return false;
   }
+
 protected:
-  virtual ~ColorController(){}
+  virtual ~ColorController()
+  {
+  }
 };
 
-} // Adaptor
-} // Internal
+} //namespace Adaptor
+} //namespace Internal
 
 inline Internal::Adaptor::ColorController& GetImplementation(Dali::ColorController& controller)
 {
@@ -83,9 +88,9 @@ ColorController::~ColorController()
 {
 }
 
-bool ColorController::RetrieveColor( const std::string& colorCode, Vector4& colorValue )
+bool ColorController::RetrieveColor(const std::string& colorCode, Vector4& colorValue)
 {
-  return GetImplementation(*this).RetrieveColor( colorCode, colorValue );
+  return GetImplementation(*this).RetrieveColor(colorCode, colorValue);
 }
 
-} // Dali
+} //namespace Dali

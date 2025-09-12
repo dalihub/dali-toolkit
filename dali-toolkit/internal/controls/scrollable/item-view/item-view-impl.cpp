@@ -291,10 +291,10 @@ void InsertToItemContainer(ItemContainer& items, Item item)
 }
 
 /**
-  * Helper to apply size constraint to mOvershootOverlay
-  * @param[in] overshootOverlay The overshootOverlay actor
-  * @param[in] The required height
-  */
+ * Helper to apply size constraint to mOvershootOverlay
+ * @param[in] overshootOverlay The overshootOverlay actor
+ * @param[in] The required height
+ */
 void ApplyOvershootSizeConstraint(Actor overshootOverlay, float height)
 {
   Constraint constraint = Constraint::New<Vector3>(overshootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint(height));

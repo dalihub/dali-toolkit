@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class PhysicsActor : public Dali::BaseObject
 public:
   PhysicsActor(Dali::Actor actor, Dali::Any body, PhysicsAdaptor& adaptor);
   ~PhysicsActor() override;
-  PhysicsActor(const PhysicsActor& handle) = delete;
+  PhysicsActor(const PhysicsActor& handle)            = delete;
   PhysicsActor& operator=(const PhysicsActor& handle) = delete;
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/alpha-function-helper.h"
 #include <dali-test-suite-utils.h>
+#include "dali-scene3d/public-api/loader/alpha-function-helper.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
 
-#define ALPHA_FN_PAIR(x) { #x, AlphaFunction::x }
+#define ALPHA_FN_PAIR(x) {#x, AlphaFunction::x}
 
-const std::pair<std::string, AlphaFunction::BuiltinFunction> BUILTIN_FUNCTIONS[] {
+const std::pair<std::string, AlphaFunction::BuiltinFunction> BUILTIN_FUNCTIONS[]{
   ALPHA_FN_PAIR(DEFAULT),
   ALPHA_FN_PAIR(LINEAR),
   ALPHA_FN_PAIR(REVERSE),
@@ -46,7 +46,7 @@ const std::pair<std::string, AlphaFunction::BuiltinFunction> BUILTIN_FUNCTIONS[]
 int UtcDaliAlphaFunctionHelperGet(void)
 {
   bool found;
-  for (auto& a: BUILTIN_FUNCTIONS)
+  for(auto& a : BUILTIN_FUNCTIONS)
   {
     auto result = GetAlphaFunction(a.first, &found);
     DALI_TEST_EQUAL(result.GetBuiltinFunction(), a.second);
@@ -64,12 +64,13 @@ int UtcDaliAlphaFunctionHelperGet(void)
 
 int UtcDaliAlphaFunctionHelperRegister(void)
 {
-  for (auto& a: BUILTIN_FUNCTIONS)
+  for(auto& a : BUILTIN_FUNCTIONS)
   {
     DALI_TEST_ASSERTION(RegisterAlphaFunction(a.first, AlphaFunction()), "given key already exists");
   }
 
-  AlphaFunctionPrototype testFn = [](float f) {
+  AlphaFunctionPrototype testFn = [](float f)
+  {
     return f > .5f ? 1.f : 0.f;
   };
   RegisterAlphaFunction("step", AlphaFunction(testFn));

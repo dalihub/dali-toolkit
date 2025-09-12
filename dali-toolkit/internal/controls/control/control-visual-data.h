@@ -42,8 +42,8 @@ class Base;
 }
 
 /**
-  * @brief Struct used to store Visual within the control, index is a unique key for each visual.
-  */
+ * @brief Struct used to store Visual within the control, index is a unique key for each visual.
+ */
 struct RegisteredVisual
 {
   Property::Index       index;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,9 +57,9 @@ public:
   static DummyVisualPtr New(const Property::Map& properties);
 
   // Prevent default methods being used.
-  DummyVisual(const DummyVisual& dummyVisual)  = delete;
-  DummyVisual(const DummyVisual&& dummyVisual) = delete;
-  DummyVisual& operator=(const DummyVisual& dummyVisual) = delete;
+  DummyVisual(const DummyVisual& dummyVisual)             = delete;
+  DummyVisual(const DummyVisual&& dummyVisual)            = delete;
+  DummyVisual& operator=(const DummyVisual& dummyVisual)  = delete;
   DummyVisual& operator=(const DummyVisual&& dummyVisual) = delete;
 
   // Get the Action counter, action counter incremented with every successful Action

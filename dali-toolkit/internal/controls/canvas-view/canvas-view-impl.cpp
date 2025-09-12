@@ -214,8 +214,8 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
 void CanvasView::Process(bool postProcessor)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_PROCESS", [&](std::ostringstream& oss)
-                                          { oss << "[s:" << mIsSynchronous << ", l:" << mLastCommitRasterized << ", "
-                                                << "m:" << mManualRasterization << ", s:" << mSize.width << "x" << mSize.height << "]"; });
+  { oss << "[s:" << mIsSynchronous << ", l:" << mLastCommitRasterized << ", "
+        << "m:" << mManualRasterization << ", s:" << mSize.width << "x" << mSize.height << "]"; });
 
   bool rasterizeRequired = false;
 
@@ -252,7 +252,7 @@ void CanvasView::Process(bool postProcessor)
 void CanvasView::AddRasterizationTask(bool forceProcess)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_ADD_RASTERIZE", [&](std::ostringstream& oss)
-                                          { oss << "[f:" << forceProcess << "]"; });
+  { oss << "[f:" << forceProcess << "]"; });
   if(DALI_LIKELY(mCanvasRenderer) && (mCanvasRenderer.Commit() || forceProcess))
   {
     mLastCommitRasterized = false;

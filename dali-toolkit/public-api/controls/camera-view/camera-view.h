@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CAMERA_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace Toolkit
 namespace Internal DALI_INTERNAL
 {
 class CameraView;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @addtogroup dali_toolkit_controls_camera_view

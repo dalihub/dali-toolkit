@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal DALI_INTERNAL
 {
 class VideoView;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @addtogroup dali_toolkit_controls_video_view
@@ -129,9 +129,9 @@ public:
       PLAY_POSITION,
 
       /**
-        * @brief The display mode of the video.
-        * @SINCE_1_3_15
-        */
+       * @brief The display mode of the video.
+       * @SINCE_1_3_15
+       */
       DISPLAY_MODE,
 
       /**

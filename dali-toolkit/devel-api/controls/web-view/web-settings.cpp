@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ void WebSettings::UseScrollbarThumbFocusNotifications(bool used)
   mWebEngineSettings.UseScrollbarThumbFocusNotifications(used);
 }
 
-void WebSettings::EnableDoNotTrack( bool enabled )
+void WebSettings::EnableDoNotTrack(bool enabled)
 {
   mWebEngineSettings.EnableDoNotTrack(enabled);
 }
@@ -154,7 +154,7 @@ bool WebSettings::IsFormCandidateDataEnabled() const
   return mWebEngineSettings.IsFormCandidateDataEnabled();
 }
 
-void WebSettings::EnableFormCandidateData( bool enabled )
+void WebSettings::EnableFormCandidateData(bool enabled)
 {
   mWebEngineSettings.EnableFormCandidateData(enabled);
 }
@@ -164,7 +164,7 @@ bool WebSettings::IsTextSelectionEnabled() const
   return mWebEngineSettings.IsTextSelectionEnabled();
 }
 
-void WebSettings::EnableTextSelection( bool enabled )
+void WebSettings::EnableTextSelection(bool enabled)
 {
   return mWebEngineSettings.EnableTextSelection(enabled);
 }
@@ -174,7 +174,7 @@ bool WebSettings::IsTextAutosizingEnabled() const
   return mWebEngineSettings.IsTextAutosizingEnabled();
 }
 
-void WebSettings::EnableTextAutosizing( bool enabled )
+void WebSettings::EnableTextAutosizing(bool enabled)
 {
   return mWebEngineSettings.EnableTextAutosizing(enabled);
 }
@@ -184,7 +184,7 @@ bool WebSettings::IsArrowScrollEnabled() const
   return mWebEngineSettings.IsArrowScrollEnabled();
 }
 
-void WebSettings::EnableArrowScroll( bool enabled )
+void WebSettings::EnableArrowScroll(bool enabled)
 {
   return mWebEngineSettings.EnableArrowScroll(enabled);
 }
@@ -194,7 +194,7 @@ bool WebSettings::IsClipboardEnabled() const
   return mWebEngineSettings.IsClipboardEnabled();
 }
 
-void WebSettings::EnableClipboard( bool enabled )
+void WebSettings::EnableClipboard(bool enabled)
 {
   return mWebEngineSettings.EnableClipboard(enabled);
 }
@@ -204,7 +204,7 @@ bool WebSettings::IsImePanelEnabled() const
   return mWebEngineSettings.IsImePanelEnabled();
 }
 
-void WebSettings::EnableImePanel( bool enabled )
+void WebSettings::EnableImePanel(bool enabled)
 {
   return mWebEngineSettings.EnableImePanel(enabled);
 }

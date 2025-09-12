@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_CHARACTER_SPACING_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ public:
    */
   CharacterSpacingSpan();
 
-  CharacterSpacingSpan(const CharacterSpacingSpan&) = delete;            ///< Deleted copy constructor
-  CharacterSpacingSpan(CharacterSpacingSpan&&)      = delete;            ///< Deleted move constructor
+  CharacterSpacingSpan(const CharacterSpacingSpan&)            = delete; ///< Deleted copy constructor
+  CharacterSpacingSpan(CharacterSpacingSpan&&)                 = delete; ///< Deleted move constructor
   CharacterSpacingSpan& operator=(const CharacterSpacingSpan&) = delete; ///< Deleted copy assignment operator
-  CharacterSpacingSpan& operator=(CharacterSpacingSpan&&) = delete;      ///< Deleted move assignment operator
+  CharacterSpacingSpan& operator=(CharacterSpacingSpan&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief Destructor

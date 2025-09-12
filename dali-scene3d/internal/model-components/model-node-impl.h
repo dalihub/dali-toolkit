@@ -314,9 +314,9 @@ public: // Public Method
   [[nodiscard]] const Scene3D::Algorithm::ColliderMesh& GetColliderMesh() const;
 
   /**
-  * @brief Sets a root model for the ModelNode
-  * @param[in] model Valid Model or nullptr to disconnect node from tree
-  */
+   * @brief Sets a root model for the ModelNode
+   * @param[in] model Valid Model or nullptr to disconnect node from tree
+   */
   void SetRootModel(Dali::Scene3D::Internal::Model* model)
   {
     mParentModel = model;
@@ -333,10 +333,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL ModelNode(const ModelNode&) = delete;            ///< Deleted copy constructor.
-  DALI_INTERNAL ModelNode(ModelNode&&)      = delete;            ///< Deleted move constructor.
+  DALI_INTERNAL            ModelNode(const ModelNode&) = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL            ModelNode(ModelNode&&)      = delete; ///< Deleted move constructor.
   DALI_INTERNAL ModelNode& operator=(const ModelNode&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL ModelNode& operator=(ModelNode&&) = delete;      ///< Deleted move assignment operator.
+  DALI_INTERNAL ModelNode& operator=(ModelNode&&)      = delete; ///< Deleted move assignment operator.
 
 private:
   Scene3D::Loader::ShaderManagerPtr mShaderManager;

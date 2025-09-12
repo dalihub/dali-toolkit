@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SPANS_CONTAINER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,10 +103,10 @@ public:
 
   // Removed constructors and assignment operators
 public:                                                                // Constructors
-  SpanRangesContainer(const SpanRangesContainer&) = delete;            ///< Deleted copy constructor
-  SpanRangesContainer(SpanRangesContainer&&)      = delete;            ///< Deleted move constructor
+  SpanRangesContainer(const SpanRangesContainer&)            = delete; ///< Deleted copy constructor
+  SpanRangesContainer(SpanRangesContainer&&)                 = delete; ///< Deleted move constructor
   SpanRangesContainer& operator=(const SpanRangesContainer&) = delete; ///< Deleted copy assignment operator
-  SpanRangesContainer& operator=(SpanRangesContainer&&) = delete;      ///< Deleted move assignment operator
+  SpanRangesContainer& operator=(SpanRangesContainer&&)      = delete; ///< Deleted move assignment operator
 
 private:
   // Data

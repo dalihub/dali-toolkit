@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -454,11 +454,11 @@ int UtcDaliTextXHTMLEntityToUTF8(void)
        "Testing of & special character",
        "Testing of "},
       {"Testing of Legacy XHTML Named Entities",
-        "Checking Named Entitities &Aelig;",
-        "Checking Named Entitities Æ"},
+       "Checking Named Entitities &Aelig;",
+       "Checking Named Entitities Æ"},
       {"Testing of Non-XHTML Entity",
-        "Checking Named Entitities A&nonentity;B",
-        "Checking Named Entitities AB"}};
+       "Checking Named Entitities A&nonentity;B",
+       "Checking Named Entitities AB"}};
 
   const unsigned int numberOfTests = 7u;
 

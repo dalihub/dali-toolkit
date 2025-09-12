@@ -641,7 +641,7 @@ Dali::AsyncTaskManager AsyncTaskManager::Get()
 
 AsyncTaskManager::AsyncTaskManager()
 : mTasks(GetNumberOfThreads(NUMBER_OF_ASYNC_THREADS_ENV, DEFAULT_NUMBER_OF_ASYNC_THREADS), [&]()
-         { return TaskHelper(*this); }),
+{ return TaskHelper(*this); }),
   mTrigger(new EventThreadCallback(MakeCallback(this, &AsyncTaskManager::TaskCompleted))),
   mTasksCompletedImpl(new TasksCompletedImpl(*this, mTrigger.get()))
 {
@@ -1026,7 +1026,7 @@ AsyncTaskPtr AsyncTaskManager::PopNextTaskToProcess()
         Mutex::ScopedLock lock(mRunningTasksMutex); // We can lock this mutex under mWaitingTasksMutex.
         auto              task = *iter;
         auto              jter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
-                                 { return element.first == task; });
+                     { return element.first == task; });
         if(jter != mRunningTasks.end())
         {
           taskAvaliable = false;
@@ -1075,7 +1075,7 @@ void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
         Mutex::ScopedLock lock(mRunningTasksMutex);
 
         auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
-                                 { return element.first == task; });
+        { return element.first == task; });
         if(iter != mRunningTasks.end())
         {
           if(iter->second == RunningTaskState::RUNNING)
@@ -1112,7 +1112,7 @@ void AsyncTaskManager::CompleteTask(AsyncTaskPtr&& task)
       Mutex::ScopedLock lock(mRunningTasksMutex);
 
       auto iter = std::find_if(mRunningTasks.begin(), mRunningTasks.end(), [task](const AsyncRunningTaskPair& element)
-                               { return element.first == task; });
+      { return element.first == task; });
       if(iter != mRunningTasks.end())
       {
         if(iter->second == RunningTaskState::RUNNING)

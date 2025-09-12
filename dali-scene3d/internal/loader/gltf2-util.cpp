@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -629,7 +629,8 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
 
 void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info) {
+  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
+  {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
@@ -1166,7 +1167,8 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   auto& resources = output.mResources;
 
   const auto index    = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]() {
+  auto       weakNode = scene.AddNode([&]()
+  {
     std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;

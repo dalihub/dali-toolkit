@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -528,7 +528,7 @@ int UtcDaliKeyInputFocusManagerKeyEventOtherWindow(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  KeyInputFocusManager   manager = KeyInputFocusManager::Get();
+  KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
   PushButton pushButton1 = PushButton::New();

@@ -2,7 +2,7 @@
 #define TEST_GL_CONTEXT_HELPER_ABSTRACTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,27 +32,27 @@ public:
   /**
    * Constructor
    */
-  TestGlContextHelperAbstraction(){};
+  TestGlContextHelperAbstraction() {};
 
   /**
    * Destructor
    */
-  ~TestGlContextHelperAbstraction() override{};
+  ~TestGlContextHelperAbstraction() override {};
 
   /**
    * @brief Switch to the surfaceless GL context
    */
-  void MakeSurfacelessContextCurrent() override{};
+  void MakeSurfacelessContextCurrent() override {};
 
   /**
    * @brief Clear the GL context
    */
-  void MakeContextNull() override{};
+  void MakeContextNull() override {};
 
   /**
    * @brief Wait until all GL rendering calls for the current GL context are executed
    */
-  void WaitClient() override{};
+  void WaitClient() override {};
 
 private:
   TestGlContextHelperAbstraction(const TestGlContextHelperAbstraction&);            ///< Undefined

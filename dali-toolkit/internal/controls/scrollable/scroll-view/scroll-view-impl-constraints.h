@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_CONSTRAINTS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,14 @@ class ScrollView;
 class ScrollViewConstraints
 {
 public:
-
-  ScrollViewConstraints() = default;  ///< Default Constructor
+  ScrollViewConstraints()  = default; ///< Default Constructor
   ~ScrollViewConstraints() = default; ///< Default Non-Virtual Destructor
 
   // Not copyable or moveable
-  ScrollViewConstraints(const ScrollViewConstraints&) = delete;
-  ScrollViewConstraints(ScrollViewConstraints&&) = delete;
+  ScrollViewConstraints(const ScrollViewConstraints&)            = delete;
+  ScrollViewConstraints(ScrollViewConstraints&&)                 = delete;
   ScrollViewConstraints& operator=(const ScrollViewConstraints&) = delete;
-  ScrollViewConstraints& operator=(ScrollViewConstraints&&) = delete;
+  ScrollViewConstraints& operator=(ScrollViewConstraints&&)      = delete;
 
   /**
    * Updates the main internal scroll constraints with new ruler and domain values
@@ -68,7 +67,6 @@ public:
   void SetInternalConstraints(ScrollView& scrollView);
 
 public:
-
   Constraint mScrollMainInternalPrePositionConstraint;
   Constraint mScrollMainInternalPositionConstraint;
   Constraint mScrollMainInternalOvershootXConstraint;

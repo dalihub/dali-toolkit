@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LINE_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,25 +30,25 @@ namespace Toolkit
 namespace Text
 {
 /**
-  * @brief Retrieves the vertical offset to shift text inside line to up by negative value and to down by positive value.
-  * The shifting depends on the vertical line alignment @p verLineAlign and lineSpacing when the lineSpacing is poistive.
-  * When the lineSpacing is negative then ignore @p verLineAlign
-  * @param[in] line the line.
-  * @param[in] line the line.
-  *
-  * @return The vertical offset before text.
-  */
+ * @brief Retrieves the vertical offset to shift text inside line to up by negative value and to down by positive value.
+ * The shifting depends on the vertical line alignment @p verLineAlign and lineSpacing when the lineSpacing is poistive.
+ * When the lineSpacing is negative then ignore @p verLineAlign
+ * @param[in] line the line.
+ * @param[in] line the line.
+ *
+ * @return The vertical offset before text.
+ */
 float GetPreOffsetVerticalLineAlignment(const LineRun& line, const Dali::Toolkit::DevelText::VerticalLineAlignment::Type& verLineAlign);
 
 /**
-  * @brief Retrieves the vertical offset to shift the next line to up by negative value and to down by positive value.
-  * The shifting depends on the vertical line alignment @p verLineAlign and lineSpacing when the lineSpacing is poistive.
-  * When the lineSpacing is negative then ignore @p verLineAlign
-  * @param[in] line the line.
-  * @param[in] line the line.
-  *
-  * @return The vertical offset after text.
-  */
+ * @brief Retrieves the vertical offset to shift the next line to up by negative value and to down by positive value.
+ * The shifting depends on the vertical line alignment @p verLineAlign and lineSpacing when the lineSpacing is poistive.
+ * When the lineSpacing is negative then ignore @p verLineAlign
+ * @param[in] line the line.
+ * @param[in] line the line.
+ *
+ * @return The vertical offset after text.
+ */
 float GetPostOffsetVerticalLineAlignment(const LineRun& line, const Dali::Toolkit::DevelText::VerticalLineAlignment::Type& verLineAlign);
 } // namespace Text
 

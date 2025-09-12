@@ -2,7 +2,7 @@
 #define DALI_SCRIPT_TREE_NODE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 {
 class TreeNodeManipulator;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /*
  * TreeNode describes a tree of nodes.
@@ -209,7 +209,7 @@ private:
   DALI_INTERNAL TreeNode();
 
   // non copyable or assignable
-  DALI_INTERNAL TreeNode(TreeNode&);
+  DALI_INTERNAL           TreeNode(TreeNode&);
   DALI_INTERNAL TreeNode& operator=(const TreeNode&);
 
   const char* mName; ///< The nodes name (if any)

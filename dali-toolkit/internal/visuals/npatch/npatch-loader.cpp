@@ -183,7 +183,8 @@ void NPatchLoader::Remove(NPatchData::NPatchDataId id, TextureUploadObserver* te
 
 void NPatchLoader::Process(bool postProcessor)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NPATCH_LOADER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss)
+  {
     oss << "[" << mRemoveQueue.size() << "]";
   });
 

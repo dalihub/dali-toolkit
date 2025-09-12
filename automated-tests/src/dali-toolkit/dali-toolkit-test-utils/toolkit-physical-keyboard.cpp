@@ -34,7 +34,6 @@ namespace Adaptor
 class PhysicalKeyboard : public BaseObject
 {
 public: // Creation & Destruction
-
   PhysicalKeyboard();
   ~PhysicalKeyboard();
   static Dali::PhysicalKeyboard Get();
@@ -47,8 +46,8 @@ public: // Signals
 
 private:
   Dali::PhysicalKeyboard::PhysicalKeyboardSignalType mStatusChangedSignal;
-  bool mIsAttached;
-  static Dali::PhysicalKeyboard mPhysicalKeyboard;
+  bool                                               mIsAttached;
+  static Dali::PhysicalKeyboard                      mPhysicalKeyboard;
 };
 
 Dali::PhysicalKeyboard PhysicalKeyboard::mPhysicalKeyboard;
@@ -64,7 +63,7 @@ PhysicalKeyboard::~PhysicalKeyboard()
 
 Dali::PhysicalKeyboard PhysicalKeyboard::Get()
 {
-  if( ! mPhysicalKeyboard )
+  if(!mPhysicalKeyboard)
   {
     mPhysicalKeyboard = Dali::PhysicalKeyboard(new Internal::Adaptor::PhysicalKeyboard());
   }
@@ -84,13 +83,16 @@ Dali::PhysicalKeyboard::PhysicalKeyboardSignalType& PhysicalKeyboard::StatusChan
 } // namespace Adaptor
 } // namespace Internal
 
-
 /********************************************************************************
  * Stub for Dali::PhysicalKeyboard
  ********************************************************************************/
 
-PhysicalKeyboard::PhysicalKeyboard(){}
-PhysicalKeyboard::~PhysicalKeyboard(){}
+PhysicalKeyboard::PhysicalKeyboard()
+{
+}
+PhysicalKeyboard::~PhysicalKeyboard()
+{
+}
 
 PhysicalKeyboard PhysicalKeyboard::Get()
 {
@@ -101,23 +103,21 @@ PhysicalKeyboard PhysicalKeyboard::Get()
 
 bool PhysicalKeyboard::IsAttached() const
 {
-  const BaseObject& object = GetBaseObject();
-  const Internal::Adaptor::PhysicalKeyboard& pyke = static_cast< const Internal::Adaptor::PhysicalKeyboard& >( object );
+  const BaseObject&                          object = GetBaseObject();
+  const Internal::Adaptor::PhysicalKeyboard& pyke   = static_cast<const Internal::Adaptor::PhysicalKeyboard&>(object);
   return pyke.IsAttached();
 }
 
 PhysicalKeyboard::PhysicalKeyboardSignalType& PhysicalKeyboard::StatusChangedSignal()
 {
-  BaseObject& object = GetBaseObject();
-  Internal::Adaptor::PhysicalKeyboard& pyke = static_cast< Internal::Adaptor::PhysicalKeyboard& >( object );
+  BaseObject&                          object = GetBaseObject();
+  Internal::Adaptor::PhysicalKeyboard& pyke   = static_cast<Internal::Adaptor::PhysicalKeyboard&>(object);
   return pyke.StatusChangedSignal();
 }
 
-PhysicalKeyboard::PhysicalKeyboard( Internal::Adaptor::PhysicalKeyboard *impl )
+PhysicalKeyboard::PhysicalKeyboard(Internal::Adaptor::PhysicalKeyboard* impl)
 : BaseHandle(impl)
 {
 }
-
-
 
 } // namespace Dali

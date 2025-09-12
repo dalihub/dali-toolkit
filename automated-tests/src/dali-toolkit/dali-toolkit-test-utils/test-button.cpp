@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/dali.h>
 #include <test-button.h>
 
 using namespace Dali;
@@ -23,25 +23,25 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-Property::Value ConvertAnimationMap( const Test::TestAnimationData& animationMap )
+Property::Value ConvertAnimationMap(const Test::TestAnimationData& animationMap)
 {
   // We have a data structure. Now convert it back into an array:
   Property::Array animators;
-  for( unsigned int i=0; i<animationMap.Size(); ++i )
+  for(unsigned int i = 0; i < animationMap.Size(); ++i)
   {
     Property::Map animator;
-    animator.Insert( "target", Property::Value(animationMap.mAnimationDataList[i]->target ));
-    animator.Insert( "property", Property::Value(animationMap.mAnimationDataList[i]->property ));
-    animator.Insert( "value", Property::Value(animationMap.mAnimationDataList[i]->value ));
-    animator.Insert( "alphaFunction", Property::Value(animationMap.mAnimationDataList[i]->alphaFunction ));
-    animator.Insert( "timePeriodDelay", Property::Value(animationMap.mAnimationDataList[i]->timePeriodDelay ));
-    animator.Insert( "timePeriodDuration", Property::Value(animationMap.mAnimationDataList[i]->timePeriodDuration ));
-    animators.PushBack( animator );
+    animator.Insert("target", Property::Value(animationMap.mAnimationDataList[i]->target));
+    animator.Insert("property", Property::Value(animationMap.mAnimationDataList[i]->property));
+    animator.Insert("value", Property::Value(animationMap.mAnimationDataList[i]->value));
+    animator.Insert("alphaFunction", Property::Value(animationMap.mAnimationDataList[i]->alphaFunction));
+    animator.Insert("timePeriodDelay", Property::Value(animationMap.mAnimationDataList[i]->timePeriodDelay));
+    animator.Insert("timePeriodDuration", Property::Value(animationMap.mAnimationDataList[i]->timePeriodDuration));
+    animators.PushBack(animator);
   }
-  Property::Value animation( animators );
+  Property::Value animation(animators);
   return animation;
 }
-}
+} //namespace
 
 namespace Test
 {
@@ -51,13 +51,13 @@ namespace Impl
 Test::TestButton TestButton::New()
 {
   IntrusivePtr<TestButton> internalTestButton = new TestButton();
-  Test::TestButton button( *internalTestButton );
+  Test::TestButton         button(*internalTestButton);
   internalTestButton->Initialize();
   return button;
 }
 
 TestButton::TestButton()
-: Control( ControlBehaviour() )
+: Control(ControlBehaviour())
 {
 }
 
@@ -65,28 +65,28 @@ TestButton::~TestButton()
 {
 }
 
-void TestButton::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+void TestButton::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Test::TestButton button = Test::TestButton::DownCast( Dali::BaseHandle( object ) );
+  Test::TestButton button = Test::TestButton::DownCast(Dali::BaseHandle(object));
 
-  if ( button )
+  if(button)
   {
     TestButton& buttonImpl = GetImpl(button);
-    switch ( index )
+    switch(index)
     {
       case Test::TestButton::Property::PRESS_TRANSITION:
       {
-        if( value.GetType() == Property::MAP )
+        if(value.GetType() == Property::MAP)
         {
           const Property::Map* valueMap = value.GetMap();
           buttonImpl.mPressTransitionData.Clear();
-          NewAnimation( *valueMap, buttonImpl.mPressTransitionData );
+          NewAnimation(*valueMap, buttonImpl.mPressTransitionData);
         }
-        else if( value.GetType() == Property::ARRAY )
+        else if(value.GetType() == Property::ARRAY)
         {
           const Property::Array* valueArray = value.GetArray();
           buttonImpl.mPressTransitionData.Clear();
-          NewAnimation( *valueArray, buttonImpl.mPressTransitionData );
+          NewAnimation(*valueArray, buttonImpl.mPressTransitionData);
         }
         break;
       }
@@ -105,16 +105,16 @@ void TestButton::SetProperty( BaseObject* object, Property::Index index, const P
   }
 }
 
-Property::Value TestButton::GetProperty( BaseObject* object, Property::Index propertyIndex )
+Property::Value TestButton::GetProperty(BaseObject* object, Property::Index propertyIndex)
 {
-  Test::TestButton button = Test::TestButton::DownCast( Dali::BaseHandle( object ) );
+  Test::TestButton button = Test::TestButton::DownCast(Dali::BaseHandle(object));
 
   Property::Value value;
 
-  if ( button )
+  if(button)
   {
     TestButton& buttonImpl = GetImpl(button);
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Test::TestButton::Property::PRESS_TRANSITION:
       {
@@ -151,18 +151,18 @@ BaseHandle Create()
 }
 
 // Generates typeRegistration static variable.
-DALI_TYPE_REGISTRATION_BEGIN( Test::TestButton, Dali::Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_BEGIN(Test::TestButton, Dali::Toolkit::Control, Create)
 
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "pressTransition", ARRAY, PRESS_TRANSITION )
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "releaseTransition", ARRAY, RELEASE_TRANSITION)
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "disabledTransition", ARRAY, DISABLED_TRANSITION )
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "enabledTransition", ARRAY, ENABLED_TRANSITION )
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "backgroundColor", VECTOR4, BACKGROUND_COLOR )
-DALI_PROPERTY_REGISTRATION( Test, TestButton, "foregroundColor", VECTOR4, FOREGROUND_COLOR )
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "pressTransition", ARRAY, PRESS_TRANSITION)
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "releaseTransition", ARRAY, RELEASE_TRANSITION)
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "disabledTransition", ARRAY, DISABLED_TRANSITION)
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "enabledTransition", ARRAY, ENABLED_TRANSITION)
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "backgroundColor", VECTOR4, BACKGROUND_COLOR)
+DALI_PROPERTY_REGISTRATION(Test, TestButton, "foregroundColor", VECTOR4, FOREGROUND_COLOR)
 
 DALI_TYPE_REGISTRATION_END()
 
-} // Impl Namespace
+} //namespace Impl
 
 TestButton::TestButton()
 : Control()
@@ -170,7 +170,7 @@ TestButton::TestButton()
 }
 
 TestButton::TestButton(const TestButton& button)
-: Control( button )
+: Control(button)
 {
 }
 
@@ -185,7 +185,7 @@ TestButton::TestButton(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Impl::TestButton>(internal);
 }
 
-TestButton& TestButton::operator=( const TestButton& button)
+TestButton& TestButton::operator=(const TestButton& button)
 {
   if(&button != this)
   {
@@ -203,9 +203,9 @@ TestButton TestButton::New()
   return Impl::TestButton::New();
 }
 
-TestButton TestButton::DownCast( BaseHandle handle )
+TestButton TestButton::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<TestButton,Impl::TestButton>(handle);
+  return Control::DownCast<TestButton, Impl::TestButton>(handle);
 }
 
 } // namespace Test

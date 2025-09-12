@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,8 @@ bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentR
     return false;
   }
 
-  auto InsertScriptMap = [](Property::Map& result, const TreeNode* node, const std::string_view& jsonKey, const std::string_view& macroKey, const std::string_view& defaultValue, const std::string_view& prefixString) {
+  auto InsertScriptMap = [](Property::Map& result, const TreeNode* node, const std::string_view& jsonKey, const std::string_view& macroKey, const std::string_view& defaultValue, const std::string_view& prefixString)
+  {
     std::ostringstream oss;
     oss.clear();
 
@@ -240,7 +241,8 @@ bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentR
     }
   };
 
-  auto InsertChannelScriptMap = [&InsertScriptMap](Property::Map& result, const TreeNode* node, const std::string_view& channelJsonKey, const std::string_view& triggerMacroKey, const std::string_view& ratioMacroKey) {
+  auto InsertChannelScriptMap = [&InsertScriptMap](Property::Map& result, const TreeNode* node, const std::string_view& channelJsonKey, const std::string_view& triggerMacroKey, const std::string_view& ratioMacroKey)
+  {
     const auto* channelNode = node->GetChild(channelJsonKey);
     InsertScriptMap(result, channelNode, DEBUG_TRIGGER_CODE_JSON_KEY, triggerMacroKey, DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE, EMPTY_STRING);
     InsertScriptMap(result, channelNode, DEBUG_RATIO_CODE_JSON_KEY, ratioMacroKey, DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE, EMPTY_STRING);

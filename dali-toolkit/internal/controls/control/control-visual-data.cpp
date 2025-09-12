@@ -1170,7 +1170,7 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
           {
             auto availableVisualSize = finalSize;
             finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+                                                              (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
             auto originalOffset = finalOffset;
 

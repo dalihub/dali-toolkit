@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/matrix-stack.h"
 #include <dali-test-suite-utils.h>
 #include <string_view>
+#include "dali-scene3d/public-api/loader/matrix-stack.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -32,8 +32,8 @@ int UtcDaliMatrixStack(void)
 
   Matrix testMatrix;
   testMatrix.SetTransformComponents(Vector3::ONE * 5.f,
-    Quaternion(Radian(Degree(-45.f)), Vector3::XAXIS),
-    Vector3(100.f, 0.f, -200.f));
+                                    Quaternion(Radian(Degree(-45.f)), Vector3::XAXIS),
+                                    Vector3(100.f, 0.f, -200.f));
 
   stack.Push(testMatrix);
   DALI_TEST_CHECK(!stack.IsEmpty());

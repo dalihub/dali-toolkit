@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PAGE_TURN_VIEW_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ protected:
     /**
      * Destructor
      */
-    ~Page(){};
+    ~Page() {};
 
     /**
      * Set the page texture content
@@ -200,8 +200,8 @@ private:
   Shader CreateShader(const Property::Map& shaderMap);
 
   /**
-  * Set up the shadow view control to cast shadow
-  */
+   * Set up the shadow view control to cast shadow
+   */
   void SetupShadowView();
 
   /**
@@ -334,14 +334,14 @@ public: //signal and property
   Toolkit::PageTurnView::PagePanSignal& PagePanFinishedSignal();
 
   /**
-    * Connects a callback function with the object's signals.
-    * @param[in] object The object providing the signal.
-    * @param[in] tracker Used to disconnect the signal.
-    * @param[in] signalName The signal to connect to.
-    * @param[in] functor A newly allocated FunctorDelegate.
-    * @return True if the signal was connected.
-    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-    */
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   // Properties

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ITALICSPAN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public:
    */
   ItalicSpan& operator=(const ItalicSpan& rhs);
 
-   /**
+  /**
    * @brief Move assignment operator.
    * @param[in] rhs A reference to the moved handle.
    * @return A reference to this.
@@ -99,10 +99,9 @@ public:
    * @param[in] italicSpan Pointer to internal ItalicSpan.
    */
   explicit DALI_INTERNAL ItalicSpan(Internal::ItalicSpan* italicSpan);
-
 };
 
-}// namespace Text
+} // namespace Text
 
 } // namespace Toolkit
 

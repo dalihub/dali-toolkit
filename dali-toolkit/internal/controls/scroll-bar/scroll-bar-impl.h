@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,57 +151,57 @@ public:
   void ShowTransientIndicator();
 
   /**
-  * @copydoc Toolkit::ScrollBar::PanFinishedSignal()
-  */
+   * @copydoc Toolkit::ScrollBar::PanFinishedSignal()
+   */
   PanFinishedSignalType& PanFinishedSignal()
   {
     return mPanFinishedSignal;
   }
 
   /**
-  * @copydoc Toolkit::ScrollBar::ScrollPositionIntervalReachedSignal()
-  */
+   * @copydoc Toolkit::ScrollBar::ScrollPositionIntervalReachedSignal()
+   */
   ScrollPositionIntervalReachedSignalType& ScrollPositionIntervalReachedSignal()
   {
     return mScrollPositionIntervalReachedSignal;
   }
 
   /**
-  * Connects a callback function with the object's signals.
-  * @param[in] object The object providing the signal.
-  * @param[in] tracker Used to disconnect the signal.
-  * @param[in] signalName The signal to connect to.
-  * @param[in] functor A newly allocated FunctorDelegate.
-  * @return True if the signal was connected.
-  * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-  */
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   // Properties
 
   /**
-  * Called when a property of an object of this type is set.
-  * @param[in] object The object whose property is set.
-  * @param[in] index The property index.
-  * @param[in] value The new property value.
-  */
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
   static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
-  * Called to retrieve a property of an object of this type.
-  * @param[in] object The object whose property is to be retrieved.
-  * @param[in] index The property index.
-  * @return The current value of the property.
-  */
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
-  * Performs actions as requested using the action name.
-  * @param[in] object The object on which to perform the action.
-  * @param[in] actionName The action to perform.
-  * @param[in] attributes The attributes with which to perfrom this action.
-  * @return true if action has been accepted by this control
-  */
+   * Performs actions as requested using the action name.
+   * @param[in] object The object on which to perform the action.
+   * @param[in] actionName The action to perform.
+   * @param[in] attributes The attributes with which to perfrom this action.
+   * @return true if action has been accepted by this control
+   */
   static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 private: // from Control

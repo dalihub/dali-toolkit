@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ const char* TEST_IMAGE_FILE_NAME2_9 = TEST_RESOURCE_DIR "/button-up.9.png";
 int         CountFunctionCalls(const std::vector<std::string>& callstack, const std::string& function)
 {
   int counter = 0;
-  std::find_if(callstack.begin(), callstack.end(), [&counter, &function](const std::string& item) {
+  std::find_if(callstack.begin(), callstack.end(), [&counter, &function](const std::string& item)
+  {
     if(item == function)
     {
       counter++;

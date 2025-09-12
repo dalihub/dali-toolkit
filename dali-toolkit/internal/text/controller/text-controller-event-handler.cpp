@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,12 +389,12 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
   // Whether to touch point hits on a glyph.
   bool matchedCharacter = false;
   cursorPosition        = Text::GetClosestCursorIndex(controller.mImpl->mModel->mVisualModel,
-                                               controller.mImpl->mModel->mLogicalModel,
-                                               controller.mImpl->mMetrics,
-                                               xPosition,
-                                               yPosition - visualTransformOffset.y,
-                                               CharacterHitTest::TAP,
-                                               matchedCharacter);
+                                                      controller.mImpl->mModel->mLogicalModel,
+                                                      controller.mImpl->mMetrics,
+                                                      xPosition,
+                                                      yPosition - visualTransformOffset.y,
+                                                      CharacterHitTest::TAP,
+                                                      matchedCharacter);
 
   for(auto& anchor : controller.mImpl->mModel->mLogicalModel->mAnchors)
   {
@@ -413,12 +413,12 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
             if(controller.mImpl->mModel->mLogicalModel->mColorRuns.Count() > anchor.colorRunIndex)
             {
               ColorRun& colorRun = *(controller.mImpl->mModel->mLogicalModel->mColorRuns.Begin() + anchor.colorRunIndex);
-              colorRun.color = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
+              colorRun.color     = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
             }
             if(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Count() > anchor.underlinedCharacterRunIndex)
             {
               UnderlinedCharacterRun& underlineRun = *(controller.mImpl->mModel->mLogicalModel->mUnderlinedCharacterRuns.Begin() + anchor.underlinedCharacterRunIndex);
-              underlineRun.properties.color = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
+              underlineRun.properties.color        = anchor.isMarkupClickedColorSet ? anchor.markupClickedColor : controller.mImpl->mAnchorClickedColor;
             }
 
             controller.mImpl->ClearFontData();
@@ -891,7 +891,7 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
   }
 
   std::string    text;
-  CharacterIndex cursorPosition      = 0u;
+  CharacterIndex cursorPosition = 0u;
 
   if(retrieveCursor)
   {

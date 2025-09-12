@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_GAUSSIAN_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class GaussianBlurView;
  */
 class BloomView;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_gaussian_blur_view
  * @{
@@ -149,37 +149,37 @@ public:
   static GaussianBlurView DownCast(BaseHandle handle);
 
   /**
-  * @brief Create an initialized GaussianBlurView, using default settings. The default settings are:-\n
-  *
-  * numSamples = 5\n
-  * blurBellCurveWidth = 1.5\n
-  * renderTargetPixelFormat = RGB888\n
-  * downsampleWidthScale = 0.5\n
-  * downsampleHeightScale = 0.5\n
-  * blurUserImage = false
-  * @SINCE_1_0.0
-  * @return A handle to a newly allocated Dali resource
-  */
+   * @brief Create an initialized GaussianBlurView, using default settings. The default settings are:-\n
+   *
+   * numSamples = 5\n
+   * blurBellCurveWidth = 1.5\n
+   * renderTargetPixelFormat = RGB888\n
+   * downsampleWidthScale = 0.5\n
+   * downsampleHeightScale = 0.5\n
+   * blurUserImage = false
+   * @SINCE_1_0.0
+   * @return A handle to a newly allocated Dali resource
+   */
   static GaussianBlurView New();
 
   /**
-  * @brief Create an initialized GaussianBlurView.
-  * @SINCE_1_0.0
-  * @param numSamples The size of the Gaussian blur kernel (number of samples in horizontal / vertical blur directions).
-  * @param blurBellCurveWidth The constant controlling the Gaussian function, must be > 0.0. Controls the width of the bell curve, i.e. the look of the blur and also indirectly
-  * the amount of blurriness Smaller numbers for a tighter curve. Useful values in the range [0.5..3.0] - near the bottom of that range the curve is weighted heavily towards
-  * the centre pixel of the kernel (so there won't be much blur), near the top of that range the pixels have nearly equal weighting (closely approximating a box filter
-  * therefore). Values close to zero result in the bell curve lying almost entirely within a single pixel, in other words there will be basically no blur as neighbouring pixels
-  * have close to zero weights.
-  * @param renderTargetPixelFormat The pixel format of the render targets we are using to perform the blur.
-  * @param downsampleWidthScale The width scale factor applied during the blur process, scaling the size of the source image to the size of the final blurred image output.
-  * Useful for downsampling - trades visual quality for processing speed. A value of 1.0f results in no scaling applied.
-  * @param downsampleHeightScale The height scale factor applied during the blur process, scaling the size of the source image to the size of the final blurred image output.
-  * Useful for downsampling - trades visual quality for processing speed. A value of 1.0f results in no scaling applied.
-  * @param blurUserImage If this is set to true, the GaussianBlurView object will operate in a special mode that allows the user to blur an image of their choice. See
-  * SetUserImageAndOutputRenderTarget().
-  * @return A handle to a newly allocated Dali resource
-  */
+   * @brief Create an initialized GaussianBlurView.
+   * @SINCE_1_0.0
+   * @param numSamples The size of the Gaussian blur kernel (number of samples in horizontal / vertical blur directions).
+   * @param blurBellCurveWidth The constant controlling the Gaussian function, must be > 0.0. Controls the width of the bell curve, i.e. the look of the blur and also indirectly
+   * the amount of blurriness Smaller numbers for a tighter curve. Useful values in the range [0.5..3.0] - near the bottom of that range the curve is weighted heavily towards
+   * the centre pixel of the kernel (so there won't be much blur), near the top of that range the pixels have nearly equal weighting (closely approximating a box filter
+   * therefore). Values close to zero result in the bell curve lying almost entirely within a single pixel, in other words there will be basically no blur as neighbouring pixels
+   * have close to zero weights.
+   * @param renderTargetPixelFormat The pixel format of the render targets we are using to perform the blur.
+   * @param downsampleWidthScale The width scale factor applied during the blur process, scaling the size of the source image to the size of the final blurred image output.
+   * Useful for downsampling - trades visual quality for processing speed. A value of 1.0f results in no scaling applied.
+   * @param downsampleHeightScale The height scale factor applied during the blur process, scaling the size of the source image to the size of the final blurred image output.
+   * Useful for downsampling - trades visual quality for processing speed. A value of 1.0f results in no scaling applied.
+   * @param blurUserImage If this is set to true, the GaussianBlurView object will operate in a special mode that allows the user to blur an image of their choice. See
+   * SetUserImageAndOutputRenderTarget().
+   * @return A handle to a newly allocated Dali resource
+   */
   static GaussianBlurView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage = false);
 
   /**
@@ -240,17 +240,17 @@ public:
   Dali::FrameBuffer GetBlurredRenderTarget() const;
 
   /**
-  * @brief Set background color for the view. The background will be filled with this color.
-  * @SINCE_1_0.0
-  * @param[in] color The background color.
-  */
+   * @brief Set background color for the view. The background will be filled with this color.
+   * @SINCE_1_0.0
+   * @param[in] color The background color.
+   */
   void SetBackgroundColor(const Vector4& color);
 
   /**
-  * @brief Get the background color.
-  * @SINCE_1_0.0
-  * @return The background color.
-  */
+   * @brief Get the background color.
+   * @SINCE_1_0.0
+   * @return The background color.
+   */
   Vector4 GetBackgroundColor() const;
 
 public: // Signals

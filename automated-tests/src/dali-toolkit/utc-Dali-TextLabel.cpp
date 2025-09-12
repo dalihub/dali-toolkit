@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,9 +80,9 @@ const char* const PROPERTY_NAME_ELLIPSIS_POSITION    = "ellipsisPosition";
 const char* const PROPERTY_NAME_ANCHOR_COLOR         = "anchorColor";
 const char* const PROPERTY_NAME_ANCHOR_CLICKED_COLOR = "anchorClickedColor";
 
-const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
-const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
-const char* const PROPERTY_NAME_REMOVE_CUTOUT         = "cutout";
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET  = "removeBackInset";
+const char* const PROPERTY_NAME_REMOVE_CUTOUT      = "cutout";
 
 const char* const PROPERTY_NAME_RENDER_MODE               = "renderMode";
 const char* const PROPERTY_NAME_MANUAL_RENDERED           = "manualRendered";
@@ -962,10 +962,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map embossMapSet;
   Property::Map embossMapGet;
 
-  embossMapSet["enable"] = true;
-  embossMapSet["direction"] = Vector2(-1.0f, -1.0f);
-  embossMapSet["strength"] = 5.f;
-  embossMapSet["lightColor"] = Color::WHITE;
+  embossMapSet["enable"]      = true;
+  embossMapSet["direction"]   = Vector2(-1.0f, -1.0f);
+  embossMapSet["strength"]    = 5.f;
+  embossMapSet["lightColor"]  = Color::WHITE;
   embossMapSet["shadowColor"] = Color::BLACK;
   label.SetProperty(TextLabel::Property::EMBOSS, embossMapSet);
 
@@ -980,10 +980,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map embossMapSet2;
   Property::Map embossMapGet2;
 
-  embossMapSet2["enable"] = "true";
-  embossMapSet2["direction"] = "-1.0f, -1.0f";
-  embossMapSet2["strength"] = "5.f";
-  embossMapSet2["lightColor"] = "#FFFFFF";
+  embossMapSet2["enable"]      = "true";
+  embossMapSet2["direction"]   = "-1.0f, -1.0f";
+  embossMapSet2["strength"]    = "5.f";
+  embossMapSet2["lightColor"]  = "#FFFFFF";
   embossMapSet2["shadowColor"] = "#000000";
   label.SetProperty(TextLabel::Property::EMBOSS, embossMapSet2);
 
@@ -1017,9 +1017,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
-  outlineMapSet["color"] = Color::RED;
-  outlineMapSet["width"] = 2.0f;
-  outlineMapSet["offset"] = Vector2(2.0f, 2.0f);
+  outlineMapSet["color"]      = Color::RED;
+  outlineMapSet["width"]      = 2.0f;
+  outlineMapSet["offset"]     = Vector2(2.0f, 2.0f);
   outlineMapSet["blurRadius"] = 3.0f;
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
 
@@ -1028,9 +1028,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS(DaliTestCheckMaps(outlineMapGet, outlineMapSet), true, TEST_LOCATION);
 
   outlineMapSet.Clear();
-  outlineMapSet[Toolkit::DevelText::Outline::Property::COLOR] = Color::BLUE;
-  outlineMapSet[Toolkit::DevelText::Outline::Property::WIDTH] = 3.0f;
-  outlineMapSet[Toolkit::DevelText::Outline::Property::OFFSET] = Vector2(3.0f, 3.0f);
+  outlineMapSet[Toolkit::DevelText::Outline::Property::COLOR]       = Color::BLUE;
+  outlineMapSet[Toolkit::DevelText::Outline::Property::WIDTH]       = 3.0f;
+  outlineMapSet[Toolkit::DevelText::Outline::Property::OFFSET]      = Vector2(3.0f, 3.0f);
   outlineMapSet[Toolkit::DevelText::Outline::Property::BLUR_RADIUS] = 4.0f;
 
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
@@ -1175,9 +1175,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map invalidFontVariationsMapSet;
   Property::Map invalidFontVariationsMapGet;
 
-  invalidFontVariationsMapSet.Insert("abcde", 0.f);    // invalid because key length is not 4.
-  invalidFontVariationsMapSet.Insert("abc", 0.f);     // invalid because key length is not 4.
-  invalidFontVariationsMapSet.Insert("abcd", "str");  // invalid because value is not float.
+  invalidFontVariationsMapSet.Insert("abcde", 0.f);  // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abc", 0.f);    // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abcd", "str"); // invalid because value is not float.
   label.SetProperty(DevelTextLabel::Property::FONT_VARIATIONS, invalidFontVariationsMapSet);
 
   invalidFontVariationsMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::FONT_VARIATIONS);
@@ -2046,9 +2046,9 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
-  outlineMapSet["color"] = Color::BLUE;
-  outlineMapSet["width"] = 2.0f;
-  outlineMapSet["offset"] = "2 2";
+  outlineMapSet["color"]      = Color::BLUE;
+  outlineMapSet["width"]      = 2.0f;
+  outlineMapSet["offset"]     = "2 2";
   outlineMapSet["blurRadius"] = "3";
   label.SetProperty(TextLabel::Property::OUTLINE, outlineMapSet);
 
@@ -2361,9 +2361,9 @@ int UtcDaliToolkitTextlabelFastTextFitStressTest(void)
   application.GetScene().Add(label);
 
   // check text label width at range [100, 299]
-  for(int i=100; i<300; i++)
+  for(int i = 100; i < 300; i++)
   {
-    Vector2   size((float)i, 200.f);
+    Vector2 size((float)i, 200.f);
     label.SetProperty(Actor::Property::SIZE, size);
 
     // check point size with veryvery big range
@@ -2459,8 +2459,8 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   bool enable = Dali::Toolkit::DevelTextLabel::IsTextFitArrayEnabled(label);
   DALI_TEST_EQUALS(true, enable, TEST_LOCATION);
 
-  std::vector<Dali::Toolkit::DevelTextLabel::FitOption> getFitOptions = Dali::Toolkit::DevelTextLabel::GetTextFitArray(label);
-  size_t numberOfFitOptions = getFitOptions.size();
+  std::vector<Dali::Toolkit::DevelTextLabel::FitOption> getFitOptions      = Dali::Toolkit::DevelTextLabel::GetTextFitArray(label);
+  size_t                                                numberOfFitOptions = getFitOptions.size();
   DALI_TEST_EQUALS(7u, numberOfFitOptions, TEST_LOCATION);
 
   const Vector3 EXPECTED_NATURAL_SIZE(276.0f, 16.0f, 0.0f);
@@ -2953,9 +2953,9 @@ int UtcDaliTextLabelHyphenWrapMode(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextLabelHyphenWrapMode ");
 
-  int       lineCount = 0;
+  int       lineCount    = 0;
   int       getLineCount = 0;
-  TextLabel label     = TextLabel::New();
+  TextLabel label        = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
@@ -3583,10 +3583,10 @@ int utcDaliTextLabelGetTextBoundingRectangle(void)
   application.SendNotification();
   application.Render();
 
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 15;
+  unsigned int startIndex = 0;
+  unsigned int endIndex   = 15;
 
-  Rect<> textBoundingRectangle = DevelTextLabel::GetTextBoundingRectangle(label, startIndex, endIndex);
+  Rect<> textBoundingRectangle         = DevelTextLabel::GetTextBoundingRectangle(label, startIndex, endIndex);
   Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
 
   TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
@@ -3645,16 +3645,16 @@ int utcDaliTextLabelFontVariationsRegister(void)
   application.Render();
 
   // Invalid key check
-  std::string INVALID_KEY = "invalid";
-  auto invalidFontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, INVALID_KEY.data());
+  std::string INVALID_KEY                = "invalid";
+  auto        invalidFontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, INVALID_KEY.data());
   DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
 
   application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
 
-  std::string WGHT_KEY = "wght";
-  const float WGHT_VALUE = 100.f;
+  std::string WGHT_KEY       = "wght";
+  const float WGHT_VALUE     = 100.f;
   const float WGHT_VALUE_END = 900.f;
 
   // Check with no previous variations.

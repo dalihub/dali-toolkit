@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,12 @@ inline void SetColorAdjusterProperties(Actor& actor, const Vector3& hsvDelta, bo
 }
 
 /**
-* Creates a new ColorAdjuster effect.
-* ColorAdjuster is a custom shader effect to adjust the image color in HSV space.
-* @param[in] hsvDelta The color difference to apply to the HSV channel.
-* @param[in] ignoreAlpha If true, the result color will be opaque even though source has alpha value
-* @return A handle to a newly allocated Dali resource.
-*/
+ * Creates a new ColorAdjuster effect.
+ * ColorAdjuster is a custom shader effect to adjust the image color in HSV space.
+ * @param[in] hsvDelta The color difference to apply to the HSV channel.
+ * @param[in] ignoreAlpha If true, the result color will be opaque even though source has alpha value
+ * @return A handle to a newly allocated Dali resource.
+ */
 inline Property::Map CreateColorAdjuster()
 {
   Property::Map customShader;

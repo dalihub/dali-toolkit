@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,8 @@ void PhysicsActor::AsyncSetPhysicsPosition(Dali::Vector3 actorPosition)
   // Queue task
   btRigidBody* body = mBody.Get<btRigidBody*>();
   auto         pos  = fromVec3(mAdaptor.TranslateToPhysicsSpace(actorPosition));
-  mAdaptor.Queue([body, pos] { body->getWorldTransform().setOrigin(pos); });
+  mAdaptor.Queue([body, pos]
+  { body->getWorldTransform().setOrigin(pos); });
 }
 
 void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
@@ -77,7 +78,8 @@ void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
   // Queue task
   btRigidBody* body = mBody.Get<btRigidBody*>();
   auto         q    = fromQuat(mAdaptor.TranslateToPhysicsSpace(rotation));
-  mAdaptor.Queue([body, q]() { body->getWorldTransform().setRotation(q); });
+  mAdaptor.Queue([body, q]()
+  { body->getWorldTransform().setRotation(q); });
 }
 
 Dali::Vector3 PhysicsActor::GetPhysicsPosition() const
