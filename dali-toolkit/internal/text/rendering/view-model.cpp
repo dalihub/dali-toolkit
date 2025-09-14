@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -410,7 +410,6 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
         }
 
         // Make sure there are laid out glyphs.
-        if(numberOfActualLaidOutGlyphs >= 0u)
         {
           // There are elided glyphs.
           mIsTextElided = true;
