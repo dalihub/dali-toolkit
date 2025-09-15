@@ -988,7 +988,7 @@ void TextEditor::RequestTextRelayout()
 void TextEditor::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
+  if(DALI_LIKELY(accessible))
   {
     accessible->EmitTextInserted(position, length, content);
   }
