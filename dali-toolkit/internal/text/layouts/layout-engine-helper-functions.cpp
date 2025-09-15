@@ -52,15 +52,9 @@ void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
   float calculatedAdvance = 0.f;
 
   unsigned int numberOfGlyphsToCalculate = numberOfGlyphs;
-  if(startIndexForGlyph + numberOfGlyphsToCalculate < (unsigned int)visualModel->mGlyphs.Count())
+  if(startIndexForGlyph + numberOfGlyphs < (unsigned int)visualModel->mGlyphs.Count())
   {
     ++numberOfGlyphsToCalculate;
-
-    // Calculate one more glyph to calculate zero-length ellipsis.
-    if(startIndexForGlyph + numberOfGlyphsToCalculate < (unsigned int)visualModel->mGlyphs.Count())
-    {
-      ++numberOfGlyphsToCalculate;
-    }
   }
 
   for(GlyphIndex i = 0u; i < numberOfGlyphsToCalculate; ++i)
