@@ -148,6 +148,19 @@ public:
     return false;
   }
 
+  void SetFrameInterpolationInterval(float intervalSeconds)
+  {
+    mIntervalSeconds = std::max(0.0f, intervalSeconds);
+  }
+
+  void EnableOffscreenFrameRendering(bool useOffScreenFrame)
+  {
+  }
+
+  void SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+  {
+  }
+
 public:
   std::string                                    mUrl;
   float                                          mVolumeLeft;
@@ -155,6 +168,7 @@ public:
   Dali::VideoPlayerPlugin::VideoPlayerSignalType mFinishedSignal;
 
 private:
+  float                                      mIntervalSeconds{0.0f};
   bool                                       mMuted;
   bool                                       mLooping;
   int                                        mPlayPosition;
@@ -409,6 +423,21 @@ void VideoPlayer::SetLetterBoxEnabled(bool enable)
 bool VideoPlayer::IsLetterBoxEnabled() const
 {
   return Internal::Adaptor::GetImplementation(*this).IsLetterBoxEnabled();
+}
+
+void VideoPlayer::SetFrameInterpolationInterval(float intervalSeconds)
+{
+  Internal::Adaptor::GetImplementation(*this).SetFrameInterpolationInterval(intervalSeconds);
+}
+
+void VideoPlayer::EnableOffscreenFrameRendering(bool useOffScreenFrame, Dali::NativeImageSourcePtr previousFrameBufferNativeImageSourcePtr, Dali::NativeImageSourcePtr currentFrameBufferNativeImageSourcePtr)
+{
+  Internal::Adaptor::GetImplementation(*this).EnableOffscreenFrameRendering(useOffScreenFrame);
+}
+
+void VideoPlayer::SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+{
+  Internal::Adaptor::GetImplementation(*this).SetVideoFrameBuffer(source);
 }
 
 } //namespace Dali

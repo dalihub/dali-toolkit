@@ -116,18 +116,28 @@ DALI_TOOLKIT_API void SetFrameInterpolationInterval(VideoView videoView, float i
 DALI_TOOLKIT_API float GetFrameInterpolationInterval(VideoView videoView);
 
 /**
- * @brief Sets the NativeImageSource for the current video frame.
+ * @brief Enables or disables offscreen frame rendering for video interpolation.
  *
- * This method updates the texture used for the current frame and resets the interpolation timer.
- * The VideoView will then start interpolating between the previous frame and this new frame
- * over the interval set by SetFrameInterpolationInterval.
+ * When enabled, the video player will use offscreen rendering for frame interpolation,
+ * which can improve visual quality for certain video content.
  *
  * @param[in] videoView The current VideoView
- * @param[in] nativeImageSource A handle to the NativeImageSource containing the current video frame (tbm_surface).
- * @note This method must be called on the main thread.
- * @SINCE_2_4.34
+ * @param[in] useCoverFrame true to enable offscreen frame rendering, false to disable
+ * @SINCE_2_4.41
  */
-DALI_TOOLKIT_API void SetNativeImageSourceForCurrentFrame(VideoView videoView, NativeImageSourcePtr nativeImageSource);
+DALI_TOOLKIT_API void EnableOffscreenFrameRendering(VideoView videoView, bool useCoverFrame);
+
+/**
+ * @brief Sets the video frame buffer for rendering.
+ *
+ * This method sets the native image source that will be used as the frame buffer
+ * for video rendering. The frame buffer contains the surface data for video playback.
+ *
+ * @param[in] videoView The current VideoView
+ * @param[in] source The native image source for video frame buffer
+ * @SINCE_2_4.41
+ */
+DALI_TOOLKIT_API void SetVideoFrameBuffer(VideoView videoView, Dali::NativeImageSourcePtr source);
 
 } // namespace DevelVideoView
 

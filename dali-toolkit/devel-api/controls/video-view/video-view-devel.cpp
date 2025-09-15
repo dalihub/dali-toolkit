@@ -71,9 +71,14 @@ float GetFrameInterpolationInterval(VideoView videoView)
   return Dali::Toolkit::GetImpl(videoView).GetFrameInterpolationInterval();
 }
 
-void SetNativeImageSourceForCurrentFrame(VideoView videoView, NativeImageSourcePtr nativeImageSource)
+void EnableOffscreenFrameRendering(VideoView videoView, bool useCoverFrame)
 {
-  Dali::Toolkit::GetImpl(videoView).SetNativeImageSourceForCurrentFrame(nativeImageSource);
+  Dali::Toolkit::GetImpl(videoView).EnableOffscreenFrameRendering(useCoverFrame);
+}
+
+void SetVideoFrameBuffer(VideoView videoView, Dali::NativeImageSourcePtr source)
+{
+  Dali::Toolkit::GetImpl(videoView).SetVideoFrameBuffer(source);
 }
 
 } // namespace DevelVideoView
