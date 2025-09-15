@@ -725,8 +725,8 @@ void TextEditor::OnPropertySet(Property::Index index, const Property::Value& pro
     {
       if(Self().DoesCustomPropertyExist(index) && mVariationIndexMap.find(index) != mVariationIndexMap.end())
       {
-        std::string tag   = mVariationIndexMap[index];
-        float       value = propertyValue.Get<float>();
+        std::string tag = mVariationIndexMap[index];
+        float value = propertyValue.Get<float>();
 
         Property::Map map;
         mController->GetVariationsMap(map);
@@ -992,7 +992,7 @@ void TextEditor::TextInserted(unsigned int position, unsigned int length, const 
 void TextEditor::TextDeleted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextDeleted(position, length, content);
   }
@@ -1000,6 +1000,12 @@ void TextEditor::TextDeleted(unsigned int position, unsigned int length, const s
 
 void TextEditor::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
+  {
+    accessible->EmitTextCursorMoved(newPosition);
+  }
+
   if((oldPosition != newPosition) && !mCursorPositionChanged)
   {
     mCursorPositionChanged = true;
@@ -1416,7 +1422,7 @@ Dali::Property::Index TextEditor::RegisterFontVariationProperty(std::string tag)
   mController->GetVariationsMap(variationsMap);
 
   float variationValue = 0.f;
-  auto  tagPtr         = variationsMap.Find(tag);
+  auto tagPtr = variationsMap.Find(tag);
 
   if(tagPtr)
   {
@@ -1442,11 +1448,11 @@ void TextEditor::OnVariationPropertyNotify(PropertyNotification& source)
   Property::Map map;
   mController->GetVariationsMap(map);
 
-  for(auto& [index, tag] : mVariationIndexMap)
+  for(auto &[index, tag] : mVariationIndexMap)
   {
     if(Self().DoesCustomPropertyExist(index))
     {
-      float value     = Self().GetCurrentProperty(index).Get<float>();
+      float value = Self().GetCurrentProperty(index).Get<float>();
       map[tag.data()] = std::round(value);
     }
   }
