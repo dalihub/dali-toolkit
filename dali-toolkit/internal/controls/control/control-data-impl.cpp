@@ -674,11 +674,11 @@ void Control::Impl::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visua
   }
 }
 
-void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable)
+void Control::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
   if(DALI_LIKELY(mVisualData))
   {
-    mVisualData->EnableCornerPropertiesOverridden(visual, enable);
+    mVisualData->EnableCornerPropertiesOverridden(visual, enable, cornerRadiusConstraint);
 
     for(const auto& indexToAnimate : mPropertyOnAnimation)
     {
@@ -1848,7 +1848,6 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
     if(visual)
     {
       mVisualData->RegisterVisual(Toolkit::DevelControl::Property::INNER_SHADOW, visual, INNER_SHADOW_DEPTH_INDEX);
-      EnableCornerPropertiesOverridden(visual, true);
 
       if(mInnerShadowCornerRadiusConstraint)
       {
@@ -1873,8 +1872,8 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
         mInnerShadowCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
 
         Dali::Integration::ConstraintSetInternalTag(mInnerShadowCornerRadiusConstraint, INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG);
-        mInnerShadowCornerRadiusConstraint.Apply();
       }
+      EnableCornerPropertiesOverridden(visual, true, mInnerShadowCornerRadiusConstraint);
 
       mControlImpl.RelayoutRequest();
     }
