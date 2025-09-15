@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -410,7 +410,6 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
         }
 
         // Make sure there are laid out glyphs.
-        if(0u != numberOfActualLaidOutGlyphs)
         {
           // There are elided glyphs.
           mIsTextElided = true;
@@ -447,7 +446,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           else // DevelText::EllipsisPosition::END
           {
             // It's the last glyph in line.
-            startIndexOfEllipsis = ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs - 1u;
+            startIndexOfEllipsis = (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) - ((ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) > 0u ? 1u : 0u);
           }
 
           // When the hight is not enough then show one glyph and that should be the first laid out glyph.

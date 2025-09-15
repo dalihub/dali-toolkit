@@ -48,7 +48,7 @@ BaseHandle Create()
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelNode, Dali::CustomActor, Create);
+DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelNode, Dali::Toolkit::Control, Create);
 DALI_TYPE_REGISTRATION_END()
 
 static constexpr uint32_t BONE_MATRIX_CONSTRAINT_TAG = Dali::Scene3D::ConstraintTagRanges::SCENE3D_CONSTRAINT_TAG_START + 110;
@@ -444,7 +444,8 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
 
     Matrix inverseMatrix = boneData.inverseMatrix;
     // Constrain bone matrix to joint transform.
-    boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs) { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
+    boneData.constraint = Constraint::New<Matrix>(renderer, propBoneXform, [inverseMatrix](Matrix& output, const PropertyInputContainer& inputs)
+                                                  { Matrix::Multiply(output, inverseMatrix, inputs[0]->GetMatrix()); });
 
     Actor joint = Self();
     boneData.constraint.AddSource(Source{joint, Actor::Property::WORLD_MATRIX});

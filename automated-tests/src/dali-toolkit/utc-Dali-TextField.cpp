@@ -6346,3 +6346,33 @@ int utcDaliTextFieldFontVariationsRegister(void)
 
   END_TEST;
 }
+
+int utcDaliTextFieldLocaleChangedCoverage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldLocaleChangedCoverage");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  field.SetProperty(TextField::Property::TEXT, "Hello world");
+  application.GetScene().Add(field);
+
+  application.SendNotification();
+  application.Render();
+
+  Adaptor &adaptor = application.GetAdaptor();
+  std::string locale = "en_US";
+  adaptor.LocaleChangedSignal().Emit(locale);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS("Hello world", field.GetProperty(TextField::Property::TEXT).Get<std::string>(), TEST_LOCATION);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
