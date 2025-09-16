@@ -303,7 +303,11 @@ const XHTMLEntityLookup XHTMLEntityLookupTable[] =
 
 const XHTMLEntityLookup XHTMLEntityLegacyLookupTable[] =
 {
-  {"&Aelig;\0"   ,"\xc3\x86\0"     }
+  {"&Aelig;\0"   ,"\xc3\x86\0"     },
+  {"&Eth;\0"     ,"\xc3\x90\0"     },
+  {"&Thorn;\0"   ,"\xc3\x9e\0"     },
+  {"&larr;\0"    ,"\xe2\x87\x90\0" },
+  {"&rarr;\0"    ,"\xe2\x87\x92\0" }
 };
 // clang-format on
 
