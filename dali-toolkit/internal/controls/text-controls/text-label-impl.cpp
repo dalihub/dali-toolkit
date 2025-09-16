@@ -319,12 +319,13 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
 
         if(impl.mController->HasAnchors())
         {
-          // Forward input events to controller
-          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = true;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
-          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = false;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
 
         break;
@@ -388,12 +389,13 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
 
         if(impl.mController->HasAnchors())
         {
-          // Forward input events to controller
-          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = true;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
-          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = false;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
         break;
       }
@@ -1227,6 +1229,34 @@ DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
   return new TextLabelAccessible(Self());
 }
 
+bool TextLabel::OnInterceptTouched(Actor actor, const TouchEvent& touch)
+{
+  if (touch.GetState(0) == PointState::STARTED)
+  {
+    mIsIntercepted = true;
+    mTouchPosition = touch.GetScreenPosition(0);
+  }
+  else if (touch.GetState(0) == PointState::FINISHED)
+  {
+    if (mIsIntercepted && mIsHasAnchors)
+    {
+      const Vector2& screen(touch.GetScreenPosition(0));
+      Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
+                                    std::abs(mTouchPosition.y - screen.y));
+      if(distanceDelta.x < 20 &&
+        distanceDelta.y < 20)
+      {
+        Extents padding;
+        padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+        const Vector2& localPoint = touch.GetLocalPosition(0);
+        mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
+      }
+    }
+    mIsIntercepted = false;
+  }
+  return false;
+}
+
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::OnStyleChange\n");
@@ -1257,17 +1287,6 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
 
   // Up call to Control
   Control::OnStyleChange(styleManager, change);
-}
-
-void TextLabel::OnTap(const TapGesture& gesture)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::OnTap %p\n", mController.Get());
-
-  // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  Extents padding;
-  padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  const Vector2& localPoint = gesture.GetLocalPoint();
-  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 }
 
 void TextLabel::AnchorClicked(const std::string& href)
@@ -1929,6 +1948,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mLocale(std::string()),
   mSize(),
+  mTouchPosition(),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mAsyncLineCount(0),
   mTextUpdateNeeded(false),
@@ -1938,7 +1958,9 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mIsSizeChanged(false),
   mIsManualRender(false),
   mIsManualRendered(false),
-  mManualRendered(false)
+  mManualRendered(false),
+  mIsIntercepted(false),
+  mIsHasAnchors(false)
 {
   mLocale = TextAbstraction::GetLocaleFull();
 }
