@@ -581,7 +581,6 @@ int utcDaliAccessibilityTextLabelGetTextAtOffset(void)
   END_TEST;
 }
 
-
 int utcDaliAccessibilityTextLabelGetRangeExtents(void)
 {
   ToolkitTestApplication application;

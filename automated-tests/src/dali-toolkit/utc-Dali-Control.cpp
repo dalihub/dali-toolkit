@@ -2165,7 +2165,7 @@ int UtcDaliControlEnableCornerPropertiesOverriddenDisableN(void)
   Property::Map          visualMap;
   visualMap[Visual::Property::TYPE]           = Visual::COLOR;
   visualMap[ColorVisual::Property::MIX_COLOR] = Color::GREEN;
-  Toolkit::Visual::Base visual = visualFactory.CreateVisual(visualMap);
+  Toolkit::Visual::Base visual                = visualFactory.CreateVisual(visualMap);
 
   Property::Index visualIndex = 101;
   Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex, visual);
@@ -2318,7 +2318,7 @@ int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
     Property::Map          visualMap;
     visualMap[Visual::Property::TYPE]           = Visual::COLOR;
     visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
-    Toolkit::Visual::Base visual = visualFactory.CreateVisual(visualMap);
+    Toolkit::Visual::Base visual                = visualFactory.CreateVisual(visualMap);
 
     Property::Index visualIndex = 300; // Arbitrary index
     Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex, visual);
@@ -2352,7 +2352,7 @@ int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
 
     tet_infoline("Control with overridden corner properties is about to go out of scope.");
   } // <- Control 'control' goes out of scope here. Its destructor (~Control) -> ~ControlImpl -> ~VisualData is called.
-    // This is where the new cleanup logic in control-visual-data.cpp should be executed.
+  // This is where the new cleanup logic in control-visual-data.cpp should be executed.
 
   tet_infoline("Control has been destroyed. If no crash occurred, the cleanup was successful.");
 
