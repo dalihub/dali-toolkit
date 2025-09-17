@@ -60,12 +60,11 @@ static const std::vector<std::pair<uint8_t*, uint32_t>> TEST_COLLIDER_MESH = {
   {col_test_9, col_test_9_len},
 };
 
-#define COLLIDER_BUFFER(N)                                              \
+#define COLLIDER_BUFFER(N) \
   std::invoke([]() {                                                    \
     auto v = std::vector<uint8_t>();                                    \
     v.insert(v.end(), col_test_##N, col_test_##N + col_test_##N##_len); \
-    return v;                                                           \
-  })
+    return v; })
 
 static std::vector<uint8_t> GetTestColliderMesh(int n)
 {
