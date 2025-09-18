@@ -17,6 +17,7 @@
 
 #include <dali-scene3d/public-api/loader/bvh-loader.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 
 #include <fstream>
 
@@ -52,7 +53,7 @@ std::string ReadBufferFromFile(const std::string& url)
 
 int UtcDaliLoadBvh(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   for(uint32_t tc = 0; tc < 2; ++tc)
   {
@@ -141,7 +142,7 @@ int UtcDaliLoadBvh(void)
 
 int UtcDaliLoadBvhFailed01(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   AnimationDefinition animDef = LoadBvh("/nothing.bvh", "testBvh", false);
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
@@ -150,7 +151,7 @@ int UtcDaliLoadBvhFailed01(void)
 
 int UtcDaliLoadBvhFailed02(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   AnimationDefinition animDef = LoadBvhFromBuffer(nullptr, 0, "testBvh", false);
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
@@ -159,7 +160,7 @@ int UtcDaliLoadBvhFailed02(void)
 
 int UtcDaliLoadBvhFailed03(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_infoline("Parse error for hierarchy1");
   uint32_t caseHierarchyCount = 8;

@@ -212,7 +212,7 @@ If you are adding test cases to existing files, then all you need to do is creat
 
     int UtcTestcase(void)
     {
-      TestApplication application;
+      ToolkitTestApplication application;
       ...
       END_TEST;
     }

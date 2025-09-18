@@ -109,7 +109,7 @@ void dali_npatch_utilities_cleanup(void)
 
 int UtcDaliNPatchUtilityGetRedOffsetAndMask(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_infoline("UtcDaliNPatchUtilityGetRedOffsetAndMask");
 
@@ -248,7 +248,7 @@ int UtcDaliNPatchUtilityGetRedOffsetAndMask(void)
 
 int UtcDaliNPatchUtilityParseBorders(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   tet_infoline("UtcDaliNPatchUtilityParseBorders");
 
   /* Stretch region left(2) top(2) right (2) bottom (2)
@@ -299,7 +299,7 @@ int UtcDaliNPatchUtilityParseBorders(void)
 
 int UtcDaliNPatchUtilityParseBordersN(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   tet_infoline("UtcDaliNPatchUtilityParseBordersN");
 
   for(const std::pair<uint32_t, uint32_t>& imageSizePair : std::initializer_list<std::pair<uint32_t, uint32_t>>({{1u, 1u}, {2u, 2u}, {0xFFFF, 0xFFFF}, {2u, 129u}}))

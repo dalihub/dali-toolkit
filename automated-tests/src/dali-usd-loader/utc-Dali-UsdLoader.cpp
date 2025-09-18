@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 
 using namespace Dali;
@@ -104,7 +105,7 @@ int UtcDaliUsdLoaderFailedToLoad(void)
 
 int UtcDaliUsdLoaderSuccess1(void)
 {
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Context ctx;
 
@@ -251,7 +252,7 @@ int UtcDaliUsdLoaderSuccess1(void)
 
 int UtcDaliUsdLoaderSuccess2(void)
 {
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Customization::Choices choices;
   for(auto modelName : {
@@ -400,7 +401,7 @@ int UtcDaliUsdLoaderSuccess2(void)
 
 int UtcDaliUsdLoaderAnimation01(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Context ctx;
 
@@ -515,7 +516,7 @@ int UtcDaliUsdLoaderAnimation01(void)
 
 int UtcDaliUsdLoaderAnimation02(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_infoline("Test USD with FPS is zero");
 
