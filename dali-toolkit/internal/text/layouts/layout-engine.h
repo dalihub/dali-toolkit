@@ -184,6 +184,13 @@ public:
    */
   float GetRelativeLineSize() const;
 
+  /**
+   * @brief Sets font pixel size to calcluate line height on design compatibility.
+   *
+   * @param[in] pixelSize The font pixel size.
+   */
+  void SetFontPixelSize(float pixelSize);
+
 private:
   // Undefined
   Engine(const Engine& handle);

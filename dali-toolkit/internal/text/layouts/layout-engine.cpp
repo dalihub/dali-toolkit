@@ -60,17 +60,24 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_LAYOUT");
 #endif
 
-const float              MAX_FLOAT          = std::numeric_limits<float>::max();
-const CharacterDirection LTR                = false;
-const CharacterDirection RTL                = !LTR;
-const float              LINE_SPACING       = 0.f;
-const float              MIN_LINE_SIZE      = 0.f;
-const Character          HYPHEN_UNICODE     = 0x002D;
-const float              RELATIVE_LINE_SIZE = 1.f;
+const float              MAX_FLOAT               = std::numeric_limits<float>::max();
+const CharacterDirection LTR                     = false;
+const CharacterDirection RTL                     = !LTR;
+const float              LINE_SPACING            = 0.f;
+const float              MIN_LINE_SIZE           = 0.f;
+const Character          HYPHEN_UNICODE          = 0x002D;
+const float              RELATIVE_LINE_SIZE      = 1.f;
+const float              RELATIVE_LINE_SIZE_AUTO = -1.f;
+const float              DEFAULT_FONT_PIXEL_SIZE = 10.f;
 
 inline bool isEmptyLineAtLast(const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line)
 {
   return ((*line).characterRun.numberOfCharacters == 0 && line + 1u == lines.End());
+}
+
+inline const float GetDefaultRelativeLineSize()
+{
+  return TextAbstraction::DesignCompatibilityEnabled() ? RELATIVE_LINE_SIZE_AUTO : RELATIVE_LINE_SIZE;
 }
 
 } //namespace
@@ -98,7 +105,7 @@ struct LineLayout
     characterIndexInSecondHalfLine{0u},
     numberOfGlyphsInSecondHalfLine{0u},
     numberOfCharactersInSecondHalfLine{0u},
-    relativeLineSize{1.0f}
+    relativeLineSize{GetDefaultRelativeLineSize()}
 
   {
   }
@@ -121,7 +128,7 @@ struct LineLayout
     characterIndexInSecondHalfLine     = 0u;
     numberOfGlyphsInSecondHalfLine     = 0u;
     numberOfCharactersInSecondHalfLine = 0u;
-    relativeLineSize                   = 1.0f;
+    relativeLineSize                   = GetDefaultRelativeLineSize();
   }
 
   GlyphIndex         glyphIndex;                ///< Index of the first glyph to be laid-out.
@@ -169,7 +176,8 @@ struct Engine::Impl
     mCursorWidth{0.f},
     mDefaultLineSpacing{LINE_SPACING},
     mDefaultLineSize{MIN_LINE_SIZE},
-    mRelativeLineSize{RELATIVE_LINE_SIZE}
+    mRelativeLineSize{GetDefaultRelativeLineSize()},
+    mPixelSize{DEFAULT_FONT_PIXEL_SIZE}
   {
   }
 
@@ -182,39 +190,75 @@ struct Engine::Impl
    */
   float GetLineSpacing(float textSize, float relativeLineSize)
   {
-    float lineSpacing;
-    float relTextSize;
-
-    // Sets the line size
-    lineSpacing = mDefaultLineSize - textSize;
-    lineSpacing = lineSpacing < 0.f ? 0.f : lineSpacing;
-
-    // Add the line spacing
-    lineSpacing += mDefaultLineSpacing;
-
-    //subtract line spcaing if relativeLineSize < 1 & larger than min height
-    relTextSize = textSize * relativeLineSize;
-    if(relTextSize > mDefaultLineSize)
+    if(TextAbstraction::DesignCompatibilityEnabled())
     {
-      if(relativeLineSize < 1)
+      // For readability and maintainability, completely separate the code.
+      float lineSpacing;
+      float relTextSize;
+
+      lineSpacing = mDefaultLineSize - textSize;
+      lineSpacing = lineSpacing < 0.f ? 0.f : lineSpacing;
+
+      lineSpacing += mDefaultLineSpacing;
+
+      // If relativeLineSize is less than 0, it will attempt to set LineHeight to NaturalSize.
+      // Or, if there is a minLineSize set, it will attempt to apply minLineSize.
+      relTextSize = relativeLineSize < 0 ? textSize : std::floor(mPixelSize * relativeLineSize);
+      if(relTextSize >= mDefaultLineSize)
       {
-        //subtract the difference (always will be positive)
-        lineSpacing -= (textSize - relTextSize);
-      }
-      else
-      {
-        //reverse the addition in the top.
-        if(mDefaultLineSize > textSize)
+        if(relTextSize <= textSize)
         {
-          lineSpacing -= mDefaultLineSize - textSize;
+          lineSpacing -= textSize - relTextSize;
         }
+        else
+        {
+          if(mDefaultLineSize > textSize)
+          {
+            lineSpacing -= mDefaultLineSize - textSize;
+          }
 
-        //add difference instead
-        lineSpacing += relTextSize - textSize;
+          lineSpacing += relTextSize - textSize;
+        }
       }
-    }
 
-    return lineSpacing;
+      return lineSpacing;
+    }
+    else
+    {
+      float lineSpacing;
+      float relTextSize;
+
+      // Sets the line size
+      lineSpacing = mDefaultLineSize - textSize;
+      lineSpacing = lineSpacing < 0.f ? 0.f : lineSpacing;
+
+      // Add the line spacing
+      lineSpacing += mDefaultLineSpacing;
+
+      //subtract line spcaing if relativeLineSize < 1 & larger than min height
+      relTextSize = textSize * relativeLineSize;
+      if(relTextSize > mDefaultLineSize)
+      {
+        if(relativeLineSize < 1)
+        {
+          //subtract the difference (always will be positive)
+          lineSpacing -= (textSize - relTextSize);
+        }
+        else
+        {
+          //reverse the addition in the top.
+          if(mDefaultLineSize > textSize)
+          {
+            lineSpacing -= mDefaultLineSize - textSize;
+          }
+
+          //add difference instead
+          lineSpacing += relTextSize - textSize;
+        }
+      }
+
+      return lineSpacing;
+    }
   }
 
   /**
@@ -2287,6 +2331,7 @@ struct Engine::Impl
 
   IntrusivePtr<Metrics> mMetrics;
   float                 mRelativeLineSize;
+  float                 mPixelSize;
 };
 
 Engine::Engine()
@@ -2390,6 +2435,11 @@ void Engine::SetRelativeLineSize(float relativeLineSize)
 float Engine::GetRelativeLineSize() const
 {
   return mImpl->mRelativeLineSize;
+}
+
+void Engine::SetFontPixelSize(float pixelSize)
+{
+  mImpl->mPixelSize = pixelSize;
 }
 
 } // namespace Layout

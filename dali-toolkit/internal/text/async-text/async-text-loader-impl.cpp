@@ -54,6 +54,24 @@ float ConvertToEven(float value)
   return static_cast<float>(intValue + (intValue & 1));
 }
 
+float GetDpi(TextAbstraction::FontClient& fontClient)
+{
+  static uint32_t horizontalDpi = 0u;
+  static uint32_t verticalDpi   = 0u;
+
+  if(DALI_UNLIKELY(horizontalDpi == 0u))
+  {
+    fontClient.GetDpi(horizontalDpi, verticalDpi);
+  }
+  return static_cast<float>(horizontalDpi);
+}
+
+float ConvertPointToPixel(float point, TextAbstraction::FontClient& fontClient)
+{
+  // Pixel size = Point size * DPI / 72.f
+  return point * GetDpi(fontClient) / 72.0f;
+}
+
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
@@ -724,6 +742,9 @@ Size AsyncTextLoader::Layout(AsyncTextParameters& parameters, bool& updated)
   mLayoutEngine.SetDefaultLineSize(parameters.minLineSize);
   mLayoutEngine.SetDefaultLineSpacing(parameters.lineSpacing);
   mLayoutEngine.SetRelativeLineSize(parameters.relativeLineSize);
+
+  float fontPointSize = (parameters.isTextFitEnabled || parameters.isTextFitArrayEnabled) ? parameters.fontSize : parameters.fontSize * parameters.fontSizeScale;
+  mLayoutEngine.SetFontPixelSize(ConvertPointToPixel(fontPointSize, mModule.GetFontClient()));
 
   // Set vertical line alignment.
   mTextModel->mVerticalLineAlignment = parameters.verticalLineAlignment;
