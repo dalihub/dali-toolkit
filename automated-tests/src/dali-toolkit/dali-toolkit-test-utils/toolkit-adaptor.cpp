@@ -410,7 +410,7 @@ void Adaptor::NotifySceneCreated()
 {
 }
 
-void Adaptor::NotifyLanguageChanged()
+void Adaptor::NotifyLanguageChanged(const std::string& language)
 {
 }
 
