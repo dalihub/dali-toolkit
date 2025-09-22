@@ -345,7 +345,7 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
 {
   auto bridge  = Accessibility::Bridge::GetCurrentBridge();
   auto control = Toolkit::Control::DownCast(actor);
-  if(DALI_LIKELY(control))
+  if(DALI_LIKELY(control && bridge))
   {
     if(state == Accessibility::State::SHOWING)
     {
@@ -364,7 +364,7 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
     }
   }
 
-  if(bridge->IsUp())
+  if(bridge && bridge->IsUp())
   {
     auto accessible = dynamic_cast<Accessibility::ActorAccessible*>(Accessibility::Accessible::Get(actor));
     if(DALI_LIKELY(accessible))

@@ -1789,7 +1789,8 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfo
 
 bool Control::Impl::IsAccessibleCreated() const
 {
-  return !!Accessibility::Bridge::GetCurrentBridge()->GetAccessible(mControlImpl.Self());
+  auto bridge = Accessibility::Bridge::GetCurrentBridge();
+  return DALI_LIKELY(bridge) ? !!bridge->GetAccessible(mControlImpl.Self()) : false;
 }
 
 void Control::Impl::EnableCreateAccessible(bool enable)
