@@ -346,11 +346,6 @@ private: // From Control
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
-   * @copydoc Control::OnTap()
-   */
-  void OnTap(const TapGesture& tap) override;
-
-  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize() override;
@@ -503,6 +498,14 @@ private:
    */
   void OnVariationPropertyNotify(PropertyNotification& source);
 
+  /**
+   * @brief Callback when TextLabel is intercept touched
+   *
+   * @param[in] actor TextLabel touched
+   * @param[in] touch Touch information
+   */
+  bool OnInterceptTouched(Actor actor, const TouchEvent& touch);
+
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
@@ -524,6 +527,8 @@ private: // Data
   std::string mLocale;
   Vector2     mSize;
 
+  Vector2  mTouchPosition;                ///< The initial touch down position.
+
   int  mRenderingBackend;
   int  mAsyncLineCount;
   bool mTextUpdateNeeded : 1;
@@ -535,6 +540,8 @@ private: // Data
   bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
   bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
   bool mManualRendered : 1;
+  bool mIsIntercepted : 1;       // whether the touch event is intercepted or not.
+  bool mIsHasAnchors : 1;        // whether the text has anchors or not.
 
 protected:
   /**
