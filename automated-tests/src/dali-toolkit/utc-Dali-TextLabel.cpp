@@ -3429,6 +3429,61 @@ int UtcDaliToolkitTextLabelRelativeLineHeight(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelRelativeLineHeight2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelRelativeLineHeight2");
+
+  Dali::TextAbstraction::EnableDesignCompatibility();
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 10);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello\nWorld");
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 2.0f);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize = label.GetNaturalSize();
+
+  DALI_TEST_EQUALS(40.f, naturalSize.y, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 0.0f);
+  application.SendNotification();
+  application.Render();
+
+  naturalSize = label.GetNaturalSize();
+
+  TextLabel singleLabel = TextLabel::New();
+  singleLabel.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  singleLabel.SetProperty(TextLabel::Property::PIXEL_SIZE, 10);
+  singleLabel.SetProperty(TextLabel::Property::TEXT, "Hello World");
+
+  Vector3 refNaturalSize = singleLabel.GetNaturalSize();
+
+  DALI_TEST_EQUALS(refNaturalSize.y, naturalSize.y, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 5.0f);
+  label.SetProperty(DevelTextLabel::Property::MIN_LINE_SIZE, 40.0f);
+  application.SendNotification();
+  application.Render();
+
+  naturalSize = label.GetNaturalSize();
+
+  DALI_TEST_EQUALS(100.f, naturalSize.y, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliTextLabelCharacterSpacing(void)
 {
   ToolkitTestApplication application;

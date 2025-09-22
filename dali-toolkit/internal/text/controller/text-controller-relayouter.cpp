@@ -48,6 +48,25 @@ float ConvertToEven(float value)
   return static_cast<float>(intValue + (intValue & 1));
 }
 
+float GetDpi()
+{
+  static uint32_t horizontalDpi = 0u;
+  static uint32_t verticalDpi   = 0u;
+
+  if(DALI_UNLIKELY(horizontalDpi == 0u))
+  {
+    Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+    fontClient.GetDpi(horizontalDpi, verticalDpi);
+  }
+  return static_cast<float>(horizontalDpi);
+}
+
+float ConvertPointToPixel(float point)
+{
+  // Pixel size = Point size * DPI / 72.f
+  return point * GetDpi() / 72.0f;
+}
+
 } // namespace
 
 namespace Dali
@@ -849,6 +868,9 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     layoutParameters.numberOfGlyphs         = numberOfGlyphs;
     layoutParameters.startLineIndex         = textUpdateInfo.mStartLineIndex;
     layoutParameters.estimatedNumberOfLines = textUpdateInfo.mEstimatedNumberOfLines;
+
+    float fontPointSize = (impl.mTextFitEnabled || impl.mTextFitArrayEnabled) ? (impl.mFontDefaults ? impl.mFontDefaults->mFitPointSize : 0.f) : (impl.mFontDefaults ? impl.mFontDefaults->mDefaultPointSize : 0.f) * impl.GetFontSizeScale();
+    impl.mLayoutEngine.SetFontPixelSize(ConvertPointToPixel(fontPointSize));
 
     // Update the ellipsis
     bool elideTextEnabled = impl.mModel->mElideEnabled;
