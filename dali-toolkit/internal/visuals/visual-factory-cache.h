@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -217,6 +218,17 @@ public:
     GEOMETRY_TYPE_MAX
   };
 
+  enum CachedGridGemetryType
+  {
+    NORMALIZED_GRID,
+    NPATCH_GRID,
+    NPATCH_GRID_BORDER_ONLY,
+    CACHED_GRID_GEOMETRY_TYPE_MAX
+  };
+
+  using ExternalShaderId                                   = uint32_t;
+  const static ExternalShaderId INVALID_EXTERNAL_SHADER_ID = static_cast<ExternalShaderId>(-1);
+
 public:
   /**
    * @brief Constructor
@@ -258,6 +270,10 @@ public:
    */
   Shader GenerateAndSaveShader(ShaderType type, std::string_view vertexShader, std::string_view fragmentShader);
 
+  Shader GetExternalShader(ExternalShaderId id);
+
+  ExternalShaderId RegisterExternalShader(Shader externalShader);
+
   /*
    * Greate the quad geometry.
    * Quad geometry is shared by multiple kind of Renderer, so implement it in the factory-cache.
@@ -267,9 +283,34 @@ public:
   /**
    * Create the grid geometry.
    * @param[in] gridSize The size of the grid.
+   * @param[in] normalized Make the attribute value normalize as [-0.5f ~ 0.5f]. If false,
+   *                       attribute value has [0 ~ gridSize) integer values (Usually be used for NPatch images)
    * @return The created grid geometry.
    */
-  static Geometry CreateGridGeometry(Uint16Pair gridSize);
+  static Geometry CreateGridGeometry(Uint16Pair gridSize, bool normalized);
+
+  /**
+   * @brief Creates a geometry with the border only for the grid size to be used by this visuals' shaders
+   * e.g. a 5x4 grid would create a geometry that would look like:
+   *
+   *   ---------------------
+   *   |  /|  /|  /|  /|  /|
+   *   |/  |/  |/  |/  |/  |
+   *   ---------------------
+   *   |  /|           |  /|
+   *   |/  |           |/  |
+   *   -----           -----
+   *   |  /|           |  /|
+   *   |/  |           |/  |
+   *   ---------------------
+   *   |  /|  /|  /|  /|  /|
+   *   |/  |/  |/  |/  |/  |
+   *   ---------------------
+   *
+   * @param[in] gridSize The size of the grid.
+   * @return The created grid geometry border only.
+   */
+  static Geometry CreateBorderGeometry(Uint16Pair gridSize);
 
   /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
@@ -434,6 +475,9 @@ private:
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX];
   Shader   mShader[SHADER_TYPE_MAX];
+
+  std::vector<Shader>            mExternalShaders;
+  std::map<Uint16Pair, Geometry> mCachedGridGeometry[CACHED_GRID_GEOMETRY_TYPE_MAX];
 
   bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 

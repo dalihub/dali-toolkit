@@ -23,17 +23,20 @@
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/shader-integ.h>
 #include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
@@ -46,6 +49,8 @@ namespace
 {
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
+constexpr uint16_t GRID_GEOMETRY_CACHE_THRESHOLD = 5u; /// Let we allow only [1~5]x[1~5] grid geometry per each type.
+
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV = "DALI_LOAD_IMAGE_YUV_PLANES";
@@ -55,6 +60,82 @@ bool NeedToLoadYuvPlanes()
   auto loadYuvPlanesString = Dali::EnvironmentVariable::GetEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV);
   bool loadYuvPlanes       = loadYuvPlanesString ? std::atoi(loadYuvPlanesString) : false;
   return loadYuvPlanes;
+}
+
+Dali::Geometry CreateGridGeometry(Dali::Uint16Pair gridSize, bool normalized)
+{
+  if(!normalized)
+  {
+    // TODO : Remove npatch helper geometry generation in future!
+    return NPatchHelper::CreateGridGeometry(gridSize);
+  }
+
+  uint32_t gridWidth  = static_cast<uint32_t>(gridSize.GetWidth());
+  uint32_t gridHeight = static_cast<uint32_t>(gridSize.GetHeight());
+
+  // Create vertices
+  Vector<Vector2> vertices;
+  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
+
+  for(uint32_t y = 0; y < gridHeight + 1; ++y)
+  {
+    for(uint32_t x = 0; x < gridWidth + 1; ++x)
+    {
+      vertices.PushBack(Vector2((float)x / gridWidth - 0.5f, (float)y / gridHeight - 0.5f));
+    }
+  }
+
+  // Create indices
+  Vector<uint16_t> indices;
+  indices.Reserve((gridWidth + 2) * gridHeight * 2 - 2);
+
+  for(uint32_t row = 0u; row < gridHeight; ++row)
+  {
+    uint32_t rowStartIndex     = row * (gridWidth + 1u);
+    uint32_t nextRowStartIndex = rowStartIndex + gridWidth + 1u;
+
+    if(row != 0u) // degenerate index on non-first row
+    {
+      indices.PushBack(rowStartIndex);
+    }
+
+    for(uint32_t column = 0u; column < gridWidth + 1u; column++) // main strip
+    {
+      indices.PushBack(rowStartIndex + column);
+      indices.PushBack(nextRowStartIndex + column);
+    }
+
+    if(row != gridHeight - 1u) // degenerate index on non-last row
+    {
+      indices.PushBack(nextRowStartIndex + gridWidth);
+    }
+  }
+
+  Property::Map vertexFormat;
+  vertexFormat["aPosition"] = Property::VECTOR2;
+  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
+  if(vertices.Size() > 0)
+  {
+    vertexBuffer.SetData(&vertices[0], vertices.Size());
+  }
+
+  // Create the geometry object
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer(vertexBuffer);
+  if(indices.Size() > 0)
+  {
+    geometry.SetIndexBuffer(&indices[0], indices.Size());
+  }
+
+  geometry.SetType(Geometry::TRIANGLE_STRIP);
+
+  return geometry;
+}
+
+Dali::Geometry CreateBorderGeometry(Uint16Pair gridSize)
+{
+  // TODO : Remove npatch helper geometry generation in future!
+  return NPatchHelper::CreateBorderGeometry(gridSize);
 }
 
 } // namespace
@@ -105,6 +186,28 @@ Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_vi
   mShader[type] = Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
 
   return mShader[type];
+}
+
+Shader VisualFactoryCache::GetExternalShader(VisualFactoryCache::ExternalShaderId externalShaderId)
+{
+  Shader shader;
+  if(DALI_LIKELY(externalShaderId != INVALID_EXTERNAL_SHADER_ID))
+  {
+    DALI_ASSERT_DEBUG(externalShaderId < mExternalShaders.size() && "external shader id is out of bound!");
+    shader = mExternalShaders[externalShaderId];
+  }
+  return shader;
+}
+
+VisualFactoryCache::ExternalShaderId VisualFactoryCache::RegisterExternalShader(Shader externalShader)
+{
+  ExternalShaderId externalShaderId = INVALID_EXTERNAL_SHADER_ID;
+  if(DALI_LIKELY(externalShader))
+  {
+    externalShaderId = mExternalShaders.size();
+    mExternalShaders.emplace_back(externalShader);
+  }
+  return externalShaderId;
 }
 
 Geometry VisualFactoryCache::CreateQuadGeometry()
@@ -195,72 +298,68 @@ void VisualFactoryCache::FinalizeVectorAnimationManager()
   }
 }
 
-Geometry VisualFactoryCache::CreateGridGeometry(Uint16Pair gridSize)
+Geometry VisualFactoryCache::CreateGridGeometry(Uint16Pair gridSize, bool normalized)
 {
-  uint16_t gridWidth  = gridSize.GetWidth();
-  uint16_t gridHeight = gridSize.GetHeight();
-
-  // Create vertices
-  Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
-
-  for(int y = 0; y < gridHeight + 1; ++y)
+  if(Dali::Adaptor::IsAvailable())
   {
-    for(int x = 0; x < gridWidth + 1; ++x)
+    auto factory = Dali::Toolkit::VisualFactory::Get();
+    if(factory)
     {
-      vertices.PushBack(Vector2((float)x / gridWidth - 0.5f, (float)y / gridHeight - 0.5f));
+      if(gridSize.GetWidth() == 1 && gridSize.GetHeight() == 1 && normalized)
+      {
+        // Let we use default quad geometry if possible.
+        return factory.GetDefaultQuadGeometry();
+      }
+      if(gridSize.GetWidth() <= GRID_GEOMETRY_CACHE_THRESHOLD && gridSize.GetHeight() <= GRID_GEOMETRY_CACHE_THRESHOLD)
+      {
+        auto& visualFactoryCache = GetImplementation(factory).GetFactoryCache();
+
+        const auto gridType = normalized ? VisualFactoryCache::NORMALIZED_GRID : VisualFactoryCache::NPATCH_GRID;
+        auto&      cacheMap = visualFactoryCache.mCachedGridGeometry[gridType];
+
+        auto iter = cacheMap.lower_bound(gridSize);
+        if(iter != cacheMap.end() && iter->first == gridSize)
+        {
+          return iter->second;
+        }
+        // Create and cache new geometry.
+        Geometry geometry = Dali::Toolkit::Internal::CreateGridGeometry(gridSize, normalized);
+        cacheMap.insert(iter, {gridSize, geometry});
+        return geometry;
+      }
     }
   }
+  return Dali::Toolkit::Internal::CreateGridGeometry(gridSize, normalized);
+}
 
-  // Create indices
-  Vector<unsigned short> indices;
-  indices.Reserve((gridWidth + 2) * gridHeight * 2 - 2);
-
-  for(unsigned int row = 0u; row < gridHeight; ++row)
+Geometry VisualFactoryCache::CreateBorderGeometry(Uint16Pair gridSize)
+{
+  if(Dali::Adaptor::IsAvailable())
   {
-    unsigned int rowStartIndex     = row * (gridWidth + 1u);
-    unsigned int nextRowStartIndex = rowStartIndex + gridWidth + 1u;
-
-    if(row != 0u) // degenerate index on non-first row
+    auto factory = Dali::Toolkit::VisualFactory::Get();
+    if(factory)
     {
-      indices.PushBack(rowStartIndex);
-    }
+      if(gridSize.GetWidth() <= GRID_GEOMETRY_CACHE_THRESHOLD && gridSize.GetHeight() <= GRID_GEOMETRY_CACHE_THRESHOLD)
+      {
+        auto& visualFactoryCache = GetImplementation(factory).GetFactoryCache();
 
-    for(unsigned int column = 0u; column < gridWidth + 1u; column++) // main strip
-    {
-      indices.PushBack(rowStartIndex + column);
-      indices.PushBack(nextRowStartIndex + column);
-    }
+        const auto gridType = VisualFactoryCache::NPATCH_GRID_BORDER_ONLY;
+        auto&      cacheMap = visualFactoryCache.mCachedGridGeometry[gridType];
 
-    if(row != gridHeight - 1u) // degenerate index on non-last row
-    {
-      indices.PushBack(nextRowStartIndex + gridWidth);
+        auto iter = cacheMap.lower_bound(gridSize);
+        if(iter != cacheMap.end() && iter->first == gridSize)
+        {
+          return iter->second;
+        }
+
+        // Create and cache new geometry.
+        Geometry geometry = Dali::Toolkit::Internal::CreateBorderGeometry(gridSize);
+        cacheMap.insert(iter, {gridSize, geometry});
+        return geometry;
+      }
     }
   }
-
-  Property::Map vertexFormat;
-  vertexFormat["aPosition"] = Property::VECTOR2;
-  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
-  if(vertices.Size() > 0)
-  {
-    vertexBuffer.SetData(&vertices[0], vertices.Size());
-  }
-
-  Property::Map indexFormat;
-  indexFormat["indices"]         = Property::INTEGER;
-  VertexBuffer indexVertexBuffer = VertexBuffer::New(indexFormat);
-
-  // Create the geometry object
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer(vertexBuffer);
-  if(indices.Size() > 0)
-  {
-    geometry.SetIndexBuffer(&indices[0], indices.Size());
-  }
-
-  geometry.SetType(Geometry::TRIANGLE_STRIP);
-
-  return geometry;
+  return Dali::Toolkit::Internal::CreateBorderGeometry(gridSize);
 }
 
 Texture VisualFactoryCache::GetBrokenVisualImage(uint32_t brokenIndex)
@@ -325,14 +424,14 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
       geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
       if(!geometry)
       {
-        geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3, 3));
+        geometry = VisualFactoryCache::CreateGridGeometry(Uint16Pair(3, 3), false);
         SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
       }
     }
     else if(data->GetStretchPixelsX().Size() > 0 || data->GetStretchPixelsY().Size() > 0)
     {
       Uint16Pair gridSize(2 * data->GetStretchPixelsX().Size() + 1, 2 * data->GetStretchPixelsY().Size() + 1);
-      geometry = NPatchHelper::CreateGridGeometry(gridSize);
+      geometry = VisualFactoryCache::CreateGridGeometry(gridSize, false);
     }
   }
   else
@@ -341,7 +440,7 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
     geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
     if(!geometry)
     {
-      geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3, 3));
+      geometry = VisualFactoryCache::CreateGridGeometry(Uint16Pair(3, 3), false);
       SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
     }
   }

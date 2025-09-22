@@ -150,7 +150,7 @@ Geometry CreateGeometry(VisualFactoryCache& factoryCache, ImageDimensions gridSi
   }
   else
   {
-    geometry = VisualFactoryCache::CreateGridGeometry(gridSize);
+    geometry = VisualFactoryCache::CreateGridGeometry(gridSize, true);
   }
 
   return geometry;
