@@ -1224,14 +1224,25 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
       {
+        bool    radiusUpdated = false;
         Vector4 radius;
         if(value.Get(radius))
         {
-          if(DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData) != radius)
+          radiusUpdated = true;
+        }
+        else
+        {
+          float radiusFloat = 0.0f;
+          if(value.Get(radiusFloat))
           {
-            DecorationData::SetCornerRadius(controlImpl.mImpl->mDecorationData, radius);
-            controlImpl.mImpl->UpdateCornerRadius();
+            radius        = Vector4(radiusFloat, radiusFloat, radiusFloat, radiusFloat);
+            radiusUpdated = true;
           }
+        }
+        if(radiusUpdated && DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData) != radius)
+        {
+          DecorationData::SetCornerRadius(controlImpl.mImpl->mDecorationData, radius);
+          controlImpl.mImpl->UpdateCornerRadius();
         }
         break;
       }
@@ -1252,14 +1263,25 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
       case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
       {
+        bool    squarenessUpdated = false;
         Vector4 squareness;
         if(value.Get(squareness))
         {
-          if(DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData) != squareness)
+          squarenessUpdated = true;
+        }
+        else
+        {
+          float squarenessFloat = 0.0f;
+          if(value.Get(squarenessFloat))
           {
-            DecorationData::SetCornerSquareness(controlImpl.mImpl->mDecorationData, squareness);
-            controlImpl.mImpl->UpdateCornerRadius();
+            squareness        = Vector4(squarenessFloat, squarenessFloat, squarenessFloat, squarenessFloat);
+            squarenessUpdated = true;
           }
+        }
+        if(squarenessUpdated && DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData) != squareness)
+        {
+          DecorationData::SetCornerSquareness(controlImpl.mImpl->mDecorationData, squareness);
+          controlImpl.mImpl->UpdateCornerRadius();
         }
         break;
       }

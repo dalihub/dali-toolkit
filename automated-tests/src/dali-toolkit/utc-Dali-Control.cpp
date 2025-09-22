@@ -1853,9 +1853,9 @@ int UtcDaliControlBorderline(void)
   tet_printf("Set corner radius. Check BORDERLINE visual has corner radius value now.\n");
   Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
   Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
-  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius.x);
   control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::Type::RELATIVE);
-  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness);
+  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness.x);
 
   value = control.GetProperty(DevelControl::Property::BORDERLINE);
   DALI_TEST_CHECK(value.GetMap());

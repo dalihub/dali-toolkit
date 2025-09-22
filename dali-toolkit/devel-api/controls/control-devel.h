@@ -284,9 +284,10 @@ enum
 
   /**
    * @brief The radius for the rounded corners of the control.
-   * @details Name "viewCornerRadius", type Property::VECTOR4
+   * @details Name "viewCornerRadius", type Property::VECTOR4 or Property::FLOAT
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
+   * @note Only Property::Vector4 can be animated.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
    * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
@@ -303,9 +304,10 @@ enum
 
   /**
    * @brief The squareness for the rounded corners of the control.
-   * @details Name "viewCornerSquareness", type Property::VECTOR4
+   * @details Name "viewCornerSquareness", type Property::VECTOR4 or Property::FLOAT
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
+   * @note Only Property::Vector4 can be animated.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_SQUARENESS
    * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
