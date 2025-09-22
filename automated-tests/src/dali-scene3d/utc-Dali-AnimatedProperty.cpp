@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include "dali-scene3d/public-api/loader/animated-property.h"
 
 using namespace Dali;
@@ -26,8 +27,8 @@ using namespace Dali::Scene3D::Loader;
 
 int UtcDaliAnimatedPropertyGetPropertyType(void)
 {
-  TestApplication app;
-  auto            actor = Actor::New();
+  ToolkitTestApplication app;
+  auto                   actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
   AnimatedProperty animProp{

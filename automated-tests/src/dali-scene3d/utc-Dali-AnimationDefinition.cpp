@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include "dali-scene3d/public-api/loader/animation-definition.h"
 
 using namespace Dali;
@@ -26,8 +27,8 @@ using namespace Dali::Scene3D::Loader;
 
 int UtcDaliAnimationDefinitionStopForModification(void)
 {
-  TestApplication app;
-  auto            anim = Animation::New(15.f);
+  ToolkitTestApplication app;
+  auto                   anim = Animation::New(15.f);
   anim.Play();
 
   auto oldEndAction = AnimationDefinition::StopForModification(anim);
@@ -40,8 +41,8 @@ int UtcDaliAnimationDefinitionStopForModification(void)
 
 int UtcDaliAnimationDefinitionReAnimate(void)
 {
-  TestApplication app;
-  auto            actor = Actor::New();
+  ToolkitTestApplication app;
+  auto                   actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
   auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)
@@ -81,8 +82,8 @@ int UtcDaliAnimationDefinitionReAnimate(void)
 
 int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
 {
-  TestApplication app;
-  auto            actor = Actor::New();
+  ToolkitTestApplication app;
+  auto                   actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
   auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)

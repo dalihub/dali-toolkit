@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include "dali-scene3d/public-api/loader/parse-renderer-state.h"
 #include "dali-scene3d/public-api/loader/renderer-state.h"
 #include "dali-scene3d/public-api/loader/utils.h"
@@ -56,12 +57,12 @@ int UtcDaliRendererStateFromBlendFactors(void)
 
 int UtcDaliRendererStateApply(void)
 {
-  TestApplication app;
-  auto            vsh      = "void main() { gl_Position = vec4(0.); }";
-  auto            fsh      = "void main() { gl_FragColor = vec4(1.); }";
-  Geometry        geom     = Geometry::New();
-  Shader          shader   = Shader::New(vsh, fsh);
-  Renderer        renderer = Renderer::New(geom, shader);
+  ToolkitTestApplication app;
+  auto                   vsh      = "void main() { gl_Position = vec4(0.); }";
+  auto                   fsh      = "void main() { gl_FragColor = vec4(1.); }";
+  Geometry               geom     = Geometry::New();
+  Shader                 shader   = Shader::New(vsh, fsh);
+  Renderer               renderer = Renderer::New(geom, shader);
 
   HELP_TEST_RENDERER_STATE(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF, rs::DEPTH_TEST, DepthTestMode::ON, renderer);
 

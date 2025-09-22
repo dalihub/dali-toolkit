@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 
 using namespace Dali;
@@ -150,7 +151,7 @@ int UtcDaliGlbLoaderSuccess1(void)
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(5u, ctx.scene.GetNodeCount());
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Customization::Choices choices;
   for(auto iRoot : ctx.scene.GetRoots())

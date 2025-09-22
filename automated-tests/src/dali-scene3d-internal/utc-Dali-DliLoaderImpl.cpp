@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 
 using namespace Dali;
@@ -182,8 +183,8 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 
 int UtcDaliDliLoaderLoadSceneExercise(void)
 {
-  TestApplication app;
-  Context         ctx;
+  ToolkitTestApplication app;
+  Context                ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
   DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
@@ -337,7 +338,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -401,7 +402,7 @@ int UtcDaliDliLoaderLoadSceneArc(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -452,7 +453,7 @@ int UtcDaliDliLoaderLoadSceneShaderUniforms(void)
 
   auto raw = resources.mShaders[0].first.LoadRaw(ctx.pathProvider(ResourceType::Shader));
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   auto shader = resources.mShaders[0].first.Load(std::move(raw));
   DALI_TEST_EQUAL(shader.GetProperty(shader.GetPropertyIndex("uBool")).Get<float>(), 1.0f);
@@ -500,8 +501,8 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
-  Actor           actor = scene.CreateNodes(0, choices, nodeParams);
+  ToolkitTestApplication app;
+  Actor                  actor = scene.CreateNodes(0, choices, nodeParams);
 
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeFactor")).Get<float>(), 9000.1f);
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeVector")).Get<Vector2>(), Vector2(-.25f, 17.f));
@@ -544,7 +545,7 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root    = scene.CreateNodes(0, choices, nodeParams);
   Actor alice   = root.FindChildByName("Alice");
@@ -681,7 +682,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);

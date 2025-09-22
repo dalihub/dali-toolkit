@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/ktx-loader.h"
 
@@ -135,8 +136,8 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
   auto pixelData = PixelData::New(pixelBuffer, pixelBufferSize, 1, 1, Pixel::Format::RGB888, PixelData::DELETE_ARRAY);
   environmentMapData.mPixelData[0].push_back(pixelData);
 
-  TestApplication app;
-  auto            texture = environmentMapData.GetTexture();
+  ToolkitTestApplication app;
+  auto                   texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(1u, texture.GetWidth());
@@ -151,8 +152,8 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture2(void)
   auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
-  TestApplication app;
-  auto            texture = environmentMapData.GetTexture();
+  ToolkitTestApplication app;
+  auto                   texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
@@ -167,8 +168,8 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture3(void)
   auto               path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
-  TestApplication app;
-  auto            texture = environmentMapData.GetTexture();
+  ToolkitTestApplication app;
+  auto                   texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
