@@ -92,6 +92,8 @@ public: // Implementation of AsyncTask
 public:
   const Scene3D::Loader::AnimationDefinition& GetAnimationDefinition() const;
 
+  LoadMethod GetLoadMethod() const;
+
 private:
   // Undefined
   MotionDataLoadTask(const MotionDataLoadTask& task) = delete;

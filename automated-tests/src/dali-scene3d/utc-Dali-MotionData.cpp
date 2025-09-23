@@ -28,6 +28,7 @@
 
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-index.h>
+#include <dali-scene3d/public-api/model-motion/motion-index/motion-property-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
 
 using namespace Dali;
@@ -313,6 +314,25 @@ int UtcDaliMotionDataLoadBvhAndFacialAsync(void)
 
     // Check MotionData load successfully.
     DALI_TEST_GREATER(motionData.GetMotionCount(), 0u, TEST_LOCATION);
+
+    // Check MotionIndex type specialized
+    for(uint32_t i = 0u; i < motionData.GetMotionCount(); ++i)
+    {
+      if(tc & 1)
+      {
+        // Facial motion
+        DALI_TEST_CHECK(BlendShapeIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionTransformIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionPropertyIndex::DownCast(motionData.GetIndex(i)));
+      }
+      else
+      {
+        // bvh motion
+        DALI_TEST_CHECK(MotionTransformIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!BlendShapeIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionPropertyIndex::DownCast(motionData.GetIndex(i)));
+      }
+    }
   }
 
   END_TEST;
@@ -360,6 +380,25 @@ int UtcDaliMotionDataLoadBvhAndFacialSync(void)
 
     // Check MotionData load successfully.
     DALI_TEST_GREATER(motionData.GetMotionCount(), 0u, TEST_LOCATION);
+
+    // Check MotionIndex type specialized
+    for(uint32_t i = 0u; i < motionData.GetMotionCount(); ++i)
+    {
+      if(tc & 1)
+      {
+        // Facial motion
+        DALI_TEST_CHECK(BlendShapeIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionTransformIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionPropertyIndex::DownCast(motionData.GetIndex(i)));
+      }
+      else
+      {
+        // bvh motion
+        DALI_TEST_CHECK(MotionTransformIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!BlendShapeIndex::DownCast(motionData.GetIndex(i)));
+        DALI_TEST_CHECK(!MotionPropertyIndex::DownCast(motionData.GetIndex(i)));
+      }
+    }
   }
 
   END_TEST;
