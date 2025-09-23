@@ -2899,11 +2899,11 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children ( stencil ).
-  DALI_TEST_EQUALS(field.GetChildCount(), 1u, TEST_LOCATION);
+  // Check there are the expected number of children (active layer, stencil).
+  DALI_TEST_EQUALS(field.GetChildCount(), 2u, TEST_LOCATION);
 
-  Actor stencil = field.GetChildAt(0u);
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  Actor stencil = field.GetChildAt(1u);
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // cursor layer
 
   // Create a tap event to touch the text field.
   TestGenerateTap(application, 150.0f, 25.0f, 300);
@@ -2912,9 +2912,9 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = field.GetChildAt(2u);
-  DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  Actor layer = stencil.GetChildAt(0u); // cursor layer
+  DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // cursor layer
 
   // Now the text field has the focus, so it can handle the key events.
   application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -4231,15 +4231,16 @@ int UtcDaliTextFieldSelectWholeText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(1u, textField.GetChildCount(), TEST_LOCATION);
+  // active layer, stencil
+  DALI_TEST_EQUALS(2u, textField.GetChildCount(), TEST_LOCATION);
 
   DevelTextField::SelectWholeText(textField);
 
   application.SendNotification();
   application.Render();
 
-  // Nothing should have been selected. The number of children is still 1
-  DALI_TEST_EQUALS(1u, textField.GetChildCount(), TEST_LOCATION);
+  // Nothing should have been selected. The number of children is still 2
+  DALI_TEST_EQUALS(2u, textField.GetChildCount(), TEST_LOCATION);
 
   textField.SetProperty(TextField::Property::TEXT, "Hello world");
 

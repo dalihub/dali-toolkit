@@ -2334,10 +2334,10 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Check there are the expected number of children (the stencil).
-  DALI_TEST_EQUALS(editor.GetChildCount(), 1u, TEST_LOCATION);
+  // Check there are the expected number of children (active layer, stencil).
+  DALI_TEST_EQUALS(editor.GetChildCount(), 2u, TEST_LOCATION);
 
-  Actor stencil = editor.GetChildAt(0u);
+  Actor stencil = editor.GetChildAt(1u);
 
   // Create a tap event to touch the text editor.
   TestGenerateTap(application, 150.0f, 25.0f, 100);
@@ -2346,9 +2346,9 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = editor.GetChildAt(2u);
+  Actor layer = stencil.GetChildAt(0u); // cursor layer
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // cursor layer
 
   // Now the text editor has the focus, so it can handle the key events.
   application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3902,15 +3902,16 @@ int UtcDaliTextEditorSelectWholeText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(1u, textEditor.GetChildCount(), TEST_LOCATION);
+  // active layer, stencil
+  DALI_TEST_EQUALS(2u, textEditor.GetChildCount(), TEST_LOCATION);
 
   DevelTextEditor::SelectWholeText(textEditor);
 
   application.SendNotification();
   application.Render();
 
-  // Nothing should have been selected. The number of children is still 1
-  DALI_TEST_EQUALS(1u, textEditor.GetChildCount(), TEST_LOCATION);
+  // Nothing should have been selected. The number of children is still 2
+  DALI_TEST_EQUALS(2u, textEditor.GetChildCount(), TEST_LOCATION);
 
   textEditor.SetProperty(TextEditor::Property::TEXT, "Hello world");
 
