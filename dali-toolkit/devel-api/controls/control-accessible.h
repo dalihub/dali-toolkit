@@ -250,6 +250,11 @@ public:
   std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
 
   /**
+   * @copydoc Dali::Accessibility::Accessible::GetStringProperty()
+   */
+  std::string GetStringProperty(std::string propertyName) const override;
+
+  /**
    * @copydoc Dali::Accessibility::Component::IsScrollable()
    */
   bool IsScrollable() const override;
