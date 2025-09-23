@@ -543,7 +543,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         yPosition = -halfHeight + minY;
       } // !preferBelow
-    }   // ( primaryHandle.active || secondaryHandle.active )
+    } // ( primaryHandle.active || secondaryHandle.active )
     else if(grabHandle.active)
     {
       if(preferBelow)

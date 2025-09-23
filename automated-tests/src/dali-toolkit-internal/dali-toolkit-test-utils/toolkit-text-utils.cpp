@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
-#include <limits>
 #include <cstring> ///< for memcpy
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 #include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
@@ -33,7 +34,6 @@
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
-#include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 
 namespace Dali
 {
@@ -148,7 +148,7 @@ void CreateTextModel(const std::string&                text,
 
   //Inset
   textModel->mRemoveFrontInset = true;
-  textModel->mRemoveBackInset = true;
+  textModel->mRemoveBackInset  = true;
 
   // 1) Convert to utf32
   Vector<Character>& utf32Characters = logicalModel->mText;

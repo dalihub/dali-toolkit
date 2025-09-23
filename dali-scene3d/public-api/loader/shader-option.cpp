@@ -127,7 +127,7 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
 void ShaderOption::AddMacroDefinition(std::string macro, std::string definition)
 {
   auto iter = std::find_if(mMacros.begin(), mMacros.end(), [macro](ShaderOption::MacroDefinition& md)
-                           { return md.macro == macro; });
+  { return md.macro == macro; });
   if(iter != mMacros.end())
   {
     iter->definition = definition;

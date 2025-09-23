@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SPANNABLE_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,10 +57,10 @@ public:
 
   // Removed constructors and assignment operators
 public:
-  Spannable(const Spannable&) = delete;            ///< Deleted copy constructor
-  Spannable(Spannable&&)      = delete;            ///< Deleted move constructor
+  Spannable(const Spannable&)            = delete; ///< Deleted copy constructor
+  Spannable(Spannable&&)                 = delete; ///< Deleted move constructor
   Spannable& operator=(const Spannable&) = delete; ///< Deleted copy assignment operator
-  Spannable& operator=(Spannable&&) = delete;      ///< Deleted move assignment operator
+  Spannable& operator=(Spannable&&)      = delete; ///< Deleted move assignment operator
 
 public: //Methods
   /**

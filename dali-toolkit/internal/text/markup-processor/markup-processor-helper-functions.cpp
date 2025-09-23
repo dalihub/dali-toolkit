@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,15 +91,13 @@ bool TokenComparison(const std::string& string1, const char* const stringBuffer2
 void SkipWhiteSpace(const char*&      stringBuffer,
                     const char* const stringEndBuffer)
 {
-  for(; (WHITE_SPACE >= *stringBuffer) && (stringBuffer < stringEndBuffer); ++stringBuffer)
-    ;
+  for(; (WHITE_SPACE >= *stringBuffer) && (stringBuffer < stringEndBuffer); ++stringBuffer);
 }
 
 void JumpToWhiteSpace(const char*&      stringBuffer,
                       const char* const stringEndBuffer)
 {
-  for(; (WHITE_SPACE != *stringBuffer) && (stringBuffer < stringEndBuffer); ++stringBuffer)
-    ;
+  for(; (WHITE_SPACE != *stringBuffer) && (stringBuffer < stringEndBuffer); ++stringBuffer);
 }
 
 unsigned int StringToUint(const char* const uintStr)

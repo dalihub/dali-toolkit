@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-constraints.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-constraints.h>
 
 namespace Dali
 {
@@ -522,10 +522,10 @@ public:
   void RemoveScrollingDirection(Radian angle);
 
   /**
-    * Finds the closest Actor to the current center of the ScrollView.
-    *
-    * @return A handle to the actor if found, or an empty handle if not.
-    */
+   * Finds the closest Actor to the current center of the ScrollView.
+   *
+   * @return A handle to the actor if found, or an empty handle if not.
+   */
   Actor FindClosestActor();
 
   /**
@@ -541,7 +541,7 @@ public:
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollToSnapPoint
-  */
+   */
   bool ScrollToSnapPoint();
 
   /**

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_RANGE_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,10 +87,10 @@ public: //Methods
   u_int32_t GetNumberOfIndices() const;
 
 public:
-  Range(const Range&) = delete;            ///< Deleted copy constructor
-  Range(Range&&)      = delete;            ///< Deleted move constructor
+  Range(const Range&)            = delete; ///< Deleted copy constructor
+  Range(Range&&)                 = delete; ///< Deleted move constructor
   Range& operator=(const Range&) = delete; ///< Deleted copy assignment operator
-  Range& operator=(Range&&) = delete;      ///< Deleted move assignment operator
+  Range& operator=(Range&&)      = delete; ///< Deleted move assignment operator
 
 private:
   // Data

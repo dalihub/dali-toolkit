@@ -42,4 +42,4 @@ void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry)
   DALI_TEST_EQUALS((float)rectGeometry.height, (float)expectedRectGeometry.height, TEST_LOCATION);
 }
 
-}
+} //namespace TestTextGeometryUtils

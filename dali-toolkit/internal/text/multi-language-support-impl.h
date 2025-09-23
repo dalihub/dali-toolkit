@@ -217,7 +217,7 @@ private:
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
 
   std::string mLocale;
-  bool        mIsICUEnabled                  : 1;
+  bool        mIsICUEnabled : 1;
   bool        mIsICULineBreakNeededForLocale : 1;
 
   //Methods
@@ -248,7 +248,6 @@ private:
    * @return If true, icu-based line breaks are required or possible.
    */
   bool IsICULineBreakNeededForLocale();
-
 };
 
 } // namespace Internal

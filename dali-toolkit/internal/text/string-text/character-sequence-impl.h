@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_CHARACTER_SEQUENCE_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,10 +59,10 @@ public:
 
   // Removed constructors and assignment operators
 public:
-  CharacterSequence(const CharacterSequence&) = delete;            ///< Deleted copy constructor
-  CharacterSequence(CharacterSequence&&)      = delete;            ///< Deleted move constructor
+  CharacterSequence(const CharacterSequence&)            = delete; ///< Deleted copy constructor
+  CharacterSequence(CharacterSequence&&)                 = delete; ///< Deleted move constructor
   CharacterSequence& operator=(const CharacterSequence&) = delete; ///< Deleted copy assignment operator
-  CharacterSequence& operator=(CharacterSequence&&) = delete;      ///< Deleted move assignment operator
+  CharacterSequence& operator=(CharacterSequence&&)      = delete; ///< Deleted move assignment operator
 
 public: //Methods
   /**

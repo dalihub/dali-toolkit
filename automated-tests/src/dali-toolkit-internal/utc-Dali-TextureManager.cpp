@@ -1939,20 +1939,20 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   observer1.mData = &data1;
   observer1.ConnectFunction(
     [](void* data)
-    {
-      DALI_TEST_CHECK(data);
-      CustomData1 data1 = *(CustomData1*)data;
+  {
+    DALI_TEST_CHECK(data);
+    CustomData1 data1 = *(CustomData1*)data;
 
-      DALI_TEST_CHECK(data1.textureManagerPtr);
-      DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
-      DALI_TEST_CHECK(data1.removeTextureObserver);
+    DALI_TEST_CHECK(data1.textureManagerPtr);
+    DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
+    DALI_TEST_CHECK(data1.removeTextureObserver);
 
-      // Remove textureId3.
-      data1.textureManagerPtr->RequestRemove(data1.removeTextureId, data1.removeTextureObserver);
+    // Remove textureId3.
+    data1.textureManagerPtr->RequestRemove(data1.removeTextureId, data1.removeTextureObserver);
 
-      // Destroy observer3
-      delete data1.removeTextureObserver;
-    });
+    // Destroy observer3
+    delete data1.removeTextureObserver;
+  });
 
   // Connect observer2 custom function
   struct CustomData2
@@ -1971,28 +1971,28 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   observer2.mData = &data2;
   observer2.ConnectFunction(
     [](void* data)
-    {
-      DALI_TEST_CHECK(data);
-      CustomData2 data2 = *(CustomData2*)data;
+  {
+    DALI_TEST_CHECK(data);
+    CustomData2 data2 = *(CustomData2*)data;
 
-      DALI_TEST_CHECK(data2.textureManagerPtr);
-      DALI_TEST_CHECK(!data2.addTextureUrl.empty());
-      DALI_TEST_CHECK(data2.addTextureIdPtr);
-      DALI_TEST_CHECK(data2.addTextureObserver);
+    DALI_TEST_CHECK(data2.textureManagerPtr);
+    DALI_TEST_CHECK(!data2.addTextureUrl.empty());
+    DALI_TEST_CHECK(data2.addTextureIdPtr);
+    DALI_TEST_CHECK(data2.addTextureObserver);
 
-      auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-      // Load textureId4
-      (*data2.addTextureIdPtr) = data2.textureManagerPtr->RequestLoad(
-        data2.addTextureUrl,
-        ImageDimensions(),
-        FittingMode::SCALE_TO_FILL,
-        SamplingMode::BOX_THEN_LINEAR,
-        data2.addTextureObserver,
-        true,
-        TextureManager::ReloadPolicy::CACHED,
-        preMultiply);
-    });
+    // Load textureId4
+    (*data2.addTextureIdPtr) = data2.textureManagerPtr->RequestLoad(
+      data2.addTextureUrl,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      data2.addTextureObserver,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
+  });
 
   // Connect observer3 custom function
   struct CustomData3
@@ -2011,17 +2011,17 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   observer3->mData = &data3;
   observer3->ConnectFunction(
     [](void* data)
-    {
-      DALI_TEST_CHECK(data);
-      CustomData3 data3 = *(CustomData3*)data;
+  {
+    DALI_TEST_CHECK(data);
+    CustomData3 data3 = *(CustomData3*)data;
 
-      DALI_TEST_CHECK(data3.self);
-      DALI_TEST_CHECK(data3.observerLoadedPtr);
-      DALI_TEST_CHECK(data3.observerCalleddPtr);
+    DALI_TEST_CHECK(data3.self);
+    DALI_TEST_CHECK(data3.observerLoadedPtr);
+    DALI_TEST_CHECK(data3.observerCalleddPtr);
 
-      *data3.observerLoadedPtr  = data3.self->mLoaded;
-      *data3.observerCalleddPtr = data3.self->mObserverCalled;
-    });
+    *data3.observerLoadedPtr  = data3.self->mLoaded;
+    *data3.observerCalleddPtr = data3.self->mObserverCalled;
+  });
 
   tet_printf("Id info - mask : {%d}, 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(maskInfo[0]->mAlphaMaskId), static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
 
@@ -2192,59 +2192,59 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   observer1.mData = &data1;
   observer1.ConnectFunction(
     [&](void* data)
+  {
+    DALI_TEST_CHECK(data);
+    CustomData1 data1 = *(CustomData1*)data;
+
+    DALI_TEST_CHECK(data1.textureManagerPtr);
+    DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
+    DALI_TEST_CHECK(data1.removeTextureObserver);
+    DALI_TEST_CHECK(*data1.removeTextureObserver);
+    DALI_TEST_CHECK(!data1.resendFilename.empty());
+    DALI_TEST_CHECK(data1.resendTextureId != TextureManager::INVALID_TEXTURE_ID);
+    DALI_TEST_CHECK(data1.resendTextureObserver);
+    DALI_TEST_CHECK(!data1.newlyFilename.empty());
+    DALI_TEST_CHECK(data1.newlyTextureIdPtr);
+    DALI_TEST_CHECK(*data1.newlyTextureIdPtr == TextureManager::INVALID_TEXTURE_ID);
+
+    // Remove textureId2.
+    data1.textureManagerPtr->RequestRemove(data1.removeTextureId, *data1.removeTextureObserver);
+
+    auto removedObserver = *data1.removeTextureObserver;
+
+    // Destroy observer2.
+    delete removedObserver;
+
+    // Create new observer. Make we use same pointer if we can.
+    uint32_t maxTryCount = 100u;
+    uint32_t tryCount    = 0u;
+
+    while(tryCount < maxTryCount)
     {
-      DALI_TEST_CHECK(data);
-      CustomData1 data1 = *(CustomData1*)data;
+      *data1.removeTextureObserver = new TestObserverWithCustomFunction();
+      if(removedObserver == *data1.removeTextureObserver) break;
+      ++tryCount;
+      delete *data1.removeTextureObserver;
+    }
 
-      DALI_TEST_CHECK(data1.textureManagerPtr);
-      DALI_TEST_CHECK(data1.removeTextureId != TextureManager::INVALID_TEXTURE_ID);
-      DALI_TEST_CHECK(data1.removeTextureObserver);
-      DALI_TEST_CHECK(*data1.removeTextureObserver);
-      DALI_TEST_CHECK(!data1.resendFilename.empty());
-      DALI_TEST_CHECK(data1.resendTextureId != TextureManager::INVALID_TEXTURE_ID);
-      DALI_TEST_CHECK(data1.resendTextureObserver);
-      DALI_TEST_CHECK(!data1.newlyFilename.empty());
-      DALI_TEST_CHECK(data1.newlyTextureIdPtr);
-      DALI_TEST_CHECK(*data1.newlyTextureIdPtr == TextureManager::INVALID_TEXTURE_ID);
+    tet_printf("TryCount[%u] / Old observer2 : %p, newly observer2 : %p\n", tryCount, removedObserver, *data1.removeTextureObserver);
 
-      // Remove textureId2.
-      data1.textureManagerPtr->RequestRemove(data1.removeTextureId, *data1.removeTextureObserver);
+    if(tryCount == maxTryCount)
+    {
+      forciblyExit = true;
+      tet_printf("Unlucky case. I think we cannot test this UTC for now. Just force-exit as success.");
+      return;
+    }
 
-      auto removedObserver = *data1.removeTextureObserver;
+    // Connect new observer2 custom function
+    newData2.textureManagerPtr = &textureManager;
+    newData2.self              = (*data1.removeTextureObserver);
+    newData2.observerLoadedPtr = &newObserver2Loaded;
+    newData2.observerCalledPtr = &newObserver2Called;
 
-      // Destroy observer2.
-      delete removedObserver;
-
-      // Create new observer. Make we use same pointer if we can.
-      uint32_t maxTryCount = 100u;
-      uint32_t tryCount    = 0u;
-
-      while(tryCount < maxTryCount)
-      {
-        *data1.removeTextureObserver = new TestObserverWithCustomFunction();
-        if(removedObserver == *data1.removeTextureObserver) break;
-        ++tryCount;
-        delete *data1.removeTextureObserver;
-      }
-
-      tet_printf("TryCount[%u] / Old observer2 : %p, newly observer2 : %p\n", tryCount, removedObserver, *data1.removeTextureObserver);
-
-      if(tryCount == maxTryCount)
-      {
-        forciblyExit = true;
-        tet_printf("Unlucky case. I think we cannot test this UTC for now. Just force-exit as success.");
-        return;
-      }
-
-      // Connect new observer2 custom function
-      newData2.textureManagerPtr = &textureManager;
-      newData2.self              = (*data1.removeTextureObserver);
-      newData2.observerLoadedPtr = &newObserver2Loaded;
-      newData2.observerCalledPtr = &newObserver2Called;
-
-      (*data1.removeTextureObserver)->mData = &newData2;
-      (*data1.removeTextureObserver)->ConnectFunction([](void* data)
-                                                      {
+    (*data1.removeTextureObserver)->mData = &newData2;
+    (*data1.removeTextureObserver)->ConnectFunction([](void* data)
+    {
         DALI_TEST_CHECK(data);
         CustomData2 data2 = *(CustomData2*)data;
 
@@ -2257,40 +2257,40 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
         *data2.observerLoadedPtr = data2.self->mLoaded;
         *data2.observerCalledPtr = data2.self->mObserverCalled; });
 
-      // Dummy reference value
-      auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    // Dummy reference value
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-      // Resend textureId3
-      data1.textureManagerPtr->RequestRemove(data1.resendTextureId, data1.resendTextureObserver);
+    // Resend textureId3
+    data1.textureManagerPtr->RequestRemove(data1.resendTextureId, data1.resendTextureObserver);
 
-      TextureManager::TextureId tempId;
-      tempId = data1.textureManagerPtr->RequestLoad(
-        data1.resendFilename,
-        ImageDimensions(),
-        FittingMode::SCALE_TO_FILL,
-        SamplingMode::BOX_THEN_LINEAR,
-        data1.resendTextureObserver,
-        true,
-        TextureManager::ReloadPolicy::CACHED,
-        preMultiply);
+    TextureManager::TextureId tempId;
+    tempId = data1.textureManagerPtr->RequestLoad(
+      data1.resendFilename,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      data1.resendTextureObserver,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
-      DALI_TEST_CHECK(tempId == data1.resendTextureId);
+    DALI_TEST_CHECK(tempId == data1.resendTextureId);
 
-      // Request new task
+    // Request new task
 
-      tempId = data1.textureManagerPtr->RequestLoad(
-        data1.newlyFilename,
-        ImageDimensions(),
-        FittingMode::SCALE_TO_FILL,
-        SamplingMode::BOX_THEN_LINEAR,
-        *data1.removeTextureObserver,
-        true,
-        TextureManager::ReloadPolicy::CACHED,
-        preMultiply);
+    tempId = data1.textureManagerPtr->RequestLoad(
+      data1.newlyFilename,
+      ImageDimensions(),
+      FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR,
+      *data1.removeTextureObserver,
+      true,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
-      DALI_TEST_CHECK(tempId != TextureManager::INVALID_TEXTURE_ID);
-      *data1.newlyTextureIdPtr = tempId;
-    });
+    DALI_TEST_CHECK(tempId != TextureManager::INVALID_TEXTURE_ID);
+    *data1.newlyTextureIdPtr = tempId;
+  });
 
   // Connect observer2 custom function
   CustomData2 data2;
@@ -2302,19 +2302,19 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   observer2->mData = &data2;
   observer2->ConnectFunction(
     [](void* data)
-    {
-      DALI_TEST_CHECK(data);
-      CustomData2 data2 = *(CustomData2*)data;
+  {
+    DALI_TEST_CHECK(data);
+    CustomData2 data2 = *(CustomData2*)data;
 
-      tet_printf("Old created observer running. Something error occured!\n");
+    tet_printf("Old created observer running. Something error occured!\n");
 
-      DALI_TEST_CHECK(data2.self);
-      DALI_TEST_CHECK(data2.observerLoadedPtr);
-      DALI_TEST_CHECK(data2.observerCalledPtr);
+    DALI_TEST_CHECK(data2.self);
+    DALI_TEST_CHECK(data2.observerLoadedPtr);
+    DALI_TEST_CHECK(data2.observerCalledPtr);
 
-      *data2.observerLoadedPtr = data2.self->mLoaded;
-      *data2.observerCalledPtr = data2.self->mObserverCalled;
-    });
+    *data2.observerLoadedPtr = data2.self->mLoaded;
+    *data2.observerCalledPtr = data2.self->mObserverCalled;
+  });
 
   tet_printf("Id info - 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
 

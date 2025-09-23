@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_EFFECTS_VIEW_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 {
 class EffectsView;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * EffectsView: Applies an effect to a tree of actors
@@ -170,21 +170,21 @@ public:
   void SetRefreshOnDemand(bool onDemand);
 
   /**
-    * Set the pixel format for the output
-    * @param[in] pixelFormat The pixel format for the output
-    */
+   * Set the pixel format for the output
+   * @param[in] pixelFormat The pixel format for the output
+   */
   void SetPixelFormat(Pixel::Format pixelFormat);
 
   /**
-    * Set background color for the view. The background will be filled with this color.
-    * @param[in] color The background color.
-    */
+   * Set background color for the view. The background will be filled with this color.
+   * @param[in] color The background color.
+   */
   void SetBackgroundColor(const Vector4& color);
 
   /**
-    * Get the background color.
-    * @return The background color.
-    */
+   * Get the background color.
+   * @return The background color.
+   */
   Vector4 GetBackgroundColor() const;
 
 public: // Not intended for application developers

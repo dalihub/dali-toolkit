@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,12 +80,14 @@ struct Joint
 
 void trim(std::string& s)
 {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-            return !std::isspace(ch);
-          }));
-  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-            return !std::isspace(ch);
-          }).base(),
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch)
+  {
+    return !std::isspace(ch);
+  }));
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch)
+  {
+    return !std::isspace(ch);
+  }).base(),
           s.end());
 }
 

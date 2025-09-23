@@ -259,7 +259,8 @@ void AnimatedGradientVisual::SetupGradientAnimationData(const Property::Map& pro
     Property::Map* map_value   = value->GetMap();
     if(map_value)
     {
-      auto getValueFromMap = [&map_value](const Property::Index& index, const std::string& name, Property::Value& res) -> void {
+      auto getValueFromMap = [&map_value](const Property::Index& index, const std::string& name, Property::Value& res) -> void
+      {
         Property::Value* sub_value = map_value->Find(index, name);
         if(sub_value)
         {

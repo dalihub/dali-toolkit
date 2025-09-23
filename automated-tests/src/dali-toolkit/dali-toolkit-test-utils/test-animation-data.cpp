@@ -31,15 +31,15 @@ TestAnimationData::~TestAnimationData()
 }
 
 TestAnimationData::AnimationDataElement::AnimationDataElement()
-: alphaFunction( AlphaFunction::DEFAULT ),
-  timePeriodDelay( 0.0f ),
-  timePeriodDuration( 1.0f )
+: alphaFunction(AlphaFunction::DEFAULT),
+  timePeriodDelay(0.0f),
+  timePeriodDuration(1.0f)
 {
 }
 
-void TestAnimationData::Add( AnimationDataElement* animationDataElement )
+void TestAnimationData::Add(AnimationDataElement* animationDataElement)
 {
-  mAnimationDataList.PushBack( animationDataElement );
+  mAnimationDataList.PushBack(animationDataElement);
 }
 
 std::size_t TestAnimationData::Size() const
@@ -50,141 +50,140 @@ std::size_t TestAnimationData::Size() const
 void TestAnimationData::Clear()
 {
   AnimationDataList::Iterator end = mAnimationDataList.End();
-  for( AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter )
+  for(AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter)
   {
-    delete ( *iter );
+    delete(*iter);
   }
   mAnimationDataList.Clear();
 }
 
-
-void NewAnimator( const Property::Map& map, TestAnimationData::AnimationDataElement& element )
+void NewAnimator(const Property::Map& map, TestAnimationData::AnimationDataElement& element)
 {
   // Now set the properties, or create children
-  for( unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i )
+  for(unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i)
   {
-    const StringValuePair& pair( map.GetPair( i ) );
-    const std::string& key( pair.first );
-    const Property::Value& value( pair.second );
+    const StringValuePair& pair(map.GetPair(i));
+    const std::string&     key(pair.first);
+    const Property::Value& value(pair.second);
 
-    if( key == "actor" || key == "target" )
+    if(key == "actor" || key == "target")
     {
-      element.target = value.Get< std::string >();
+      element.target = value.Get<std::string>();
     }
-    else if( key == "property" )
+    else if(key == "property")
     {
-      element.property = value.Get< std::string >();
+      element.property = value.Get<std::string>();
     }
-    else if( key == "value" )
+    else if(key == "value")
     {
       element.value = value;
     }
-    else if( key == "alphaFunction" )
+    else if(key == "alphaFunction")
     {
-      std::string alphaFunctionValue = value.Get< std::string >();
+      std::string alphaFunctionValue = value.Get<std::string>();
 
-      if( alphaFunctionValue == "LINEAR" )
+      if(alphaFunctionValue == "LINEAR")
       {
         element.alphaFunction = AlphaFunction::LINEAR;
       }
-      else if( alphaFunctionValue == "REVERSE" )
+      else if(alphaFunctionValue == "REVERSE")
       {
         element.alphaFunction = AlphaFunction::REVERSE;
       }
-      else if( alphaFunctionValue == "EASE_IN_SQUARE" )
+      else if(alphaFunctionValue == "EASE_IN_SQUARE")
       {
         element.alphaFunction = AlphaFunction::EASE_IN_SQUARE;
       }
-      else if( alphaFunctionValue == "EASE_OUT_SQUARE" )
+      else if(alphaFunctionValue == "EASE_OUT_SQUARE")
       {
         element.alphaFunction = AlphaFunction::EASE_OUT_SQUARE;
       }
-      else if( alphaFunctionValue == "EASE_IN" )
+      else if(alphaFunctionValue == "EASE_IN")
       {
         element.alphaFunction = AlphaFunction::EASE_IN;
       }
-      else if( alphaFunctionValue == "EASE_OUT" )
+      else if(alphaFunctionValue == "EASE_OUT")
       {
         element.alphaFunction = AlphaFunction::EASE_OUT;
       }
-      else if( alphaFunctionValue == "EASE_IN_OUT" )
+      else if(alphaFunctionValue == "EASE_IN_OUT")
       {
         element.alphaFunction = AlphaFunction::EASE_IN_OUT;
       }
-      else if( alphaFunctionValue == "EASE_IN_SINE" )
+      else if(alphaFunctionValue == "EASE_IN_SINE")
       {
         element.alphaFunction = AlphaFunction::EASE_IN_SINE;
       }
-      else if( alphaFunctionValue == "EASE_OUT_SINE" )
+      else if(alphaFunctionValue == "EASE_OUT_SINE")
       {
         element.alphaFunction = AlphaFunction::EASE_OUT_SINE;
       }
-      else if( alphaFunctionValue == "EASE_IN_OUT_SINE" )
+      else if(alphaFunctionValue == "EASE_IN_OUT_SINE")
       {
         element.alphaFunction = AlphaFunction::EASE_IN_OUT_SINE;
       }
-      else if( alphaFunctionValue == "BOUNCE" )
+      else if(alphaFunctionValue == "BOUNCE")
       {
         element.alphaFunction = AlphaFunction::BOUNCE;
       }
-      else if( alphaFunctionValue == "SIN" )
+      else if(alphaFunctionValue == "SIN")
       {
         element.alphaFunction = AlphaFunction::SIN;
       }
-      else if( alphaFunctionValue == "EASE_OUT_BACK" )
+      else if(alphaFunctionValue == "EASE_OUT_BACK")
       {
         element.alphaFunction = AlphaFunction::EASE_OUT_BACK;
       }
     }
-    else if( key == "timePeriod" )
+    else if(key == "timePeriod")
     {
-      Property::Map timeMap = value.Get< Property::Map >();
-      for( unsigned int i = 0; i < timeMap.Count(); ++i )
+      Property::Map timeMap = value.Get<Property::Map>();
+      for(unsigned int i = 0; i < timeMap.Count(); ++i)
       {
-        const StringValuePair& pair( timeMap.GetPair( i ) );
-        if( pair.first == "delay" )
+        const StringValuePair& pair(timeMap.GetPair(i));
+        if(pair.first == "delay")
         {
-          element.timePeriodDelay = pair.second.Get< float >();
+          element.timePeriodDelay = pair.second.Get<float>();
         }
-        else if( pair.first == "duration" )
+        else if(pair.first == "duration")
         {
-          element.timePeriodDuration = pair.second.Get< float >();
+          element.timePeriodDuration = pair.second.Get<float>();
         }
       }
     }
-    else if( key == "animator" )
+    else if(key == "animator")
     {
-      if( value.GetType() == Property::MAP )
+      if(value.GetType() == Property::MAP)
       {
-        const Property::Map* map = value.GetMap();
+        const Property::Map* map    = value.GetMap();
         const Property::Map& mapref = *map;
-        NewAnimator( mapref, element ); // Merge the map into element
+        NewAnimator(mapref, element); // Merge the map into element
       }
     }
   }
 }
 
-void NewAnimation( const Property::Map& map, TestAnimationData& outputAnimationData )
+void NewAnimation(const Property::Map& map, TestAnimationData& outputAnimationData)
 {
   TestAnimationData::AnimationDataElement* element = new TestAnimationData::AnimationDataElement();
-  NewAnimator( map, *element );
+  NewAnimator(map, *element);
 
-  outputAnimationData.Add( element );
+  outputAnimationData.Add(element);
 }
 
-void NewAnimation( const Property::Array& array, TestAnimationData& outputAnimationData )
+void NewAnimation(const Property::Array& array, TestAnimationData& outputAnimationData)
 {
-  for(unsigned int i=0; i<array.Size(); ++i )
+  for(unsigned int i = 0; i < array.Size(); ++i)
   {
     TestAnimationData::AnimationDataElement* element = new TestAnimationData::AnimationDataElement();
-    const Property::Value& value = array.GetElementAt(i);
-    if( value.GetType() == Property::MAP )
+    const Property::Value&                   value   = array.GetElementAt(i);
+    if(value.GetType() == Property::MAP)
     {
       const Property::Map* map = value.GetMap();
-      NewAnimator( *map, *element );
-      outputAnimationData.Add( element );
+      NewAnimator(*map, *element);
+      outputAnimationData.Add(element);
     }
   }
 }
 
-} // Test
+} //namespace Test

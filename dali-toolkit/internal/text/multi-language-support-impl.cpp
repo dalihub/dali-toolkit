@@ -59,19 +59,19 @@ namespace Internal
 namespace
 {
 void CheckFontSupportsCharacter(
-  bool& isValidFont,
-  bool& isCommonScript,
-  const Character& character,
-  ValidateFontsPerScript**& validFontsPerScriptCacheBuffer,
-  const Script& script,
-  FontId& fontId,
-  TextAbstraction::FontClient& fontClient,
-  const bool isValidCachedDefaultFont,
-  const FontId& cachedDefaultFontId,
+  bool&                                   isValidFont,
+  bool&                                   isCommonScript,
+  const Character&                        character,
+  ValidateFontsPerScript**&               validFontsPerScriptCacheBuffer,
+  const Script&                           script,
+  FontId&                                 fontId,
+  TextAbstraction::FontClient&            fontClient,
+  const bool                              isValidCachedDefaultFont,
+  const FontId&                           cachedDefaultFontId,
   const TextAbstraction::FontDescription& currentFontDescription,
   const TextAbstraction::PointSize26Dot6& currentFontPointSize,
-  DefaultFonts**& defaultFontPerScriptCacheBuffer,
-  bool findFallbackFont)
+  DefaultFonts**&                         defaultFontPerScriptCacheBuffer,
+  bool                                    findFallbackFont)
 {
   // Need to check if the given font supports the current character.
   if(!isValidFont && !findFallbackFont) // (1)
@@ -185,8 +185,8 @@ void CheckFontSupportsCharacter(
           }
         }
       } // !isValidFont (3)
-    }   // !isValidFont (2)
-  }     // !isValidFont (1)
+    } // !isValidFont (2)
+  } // !isValidFont (1)
   else if(!isValidFont && findFallbackFont)
   {
     // Find a fallback-font.
@@ -512,7 +512,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     {
       // Check if whether is right to left markup and Keeps true if the previous value was true.
       currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
-      hasRTLMarker = hasRTLMarker || TextAbstraction::IsRightToLeftMark(character);
+      hasRTLMarker                   = hasRTLMarker || TextAbstraction::IsRightToLeftMark(character);
 
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
@@ -733,9 +733,9 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  FontId                  currentFontId       = 0u;
-  FontId                  previousFontId      = 0u;
-  TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
+  FontId                  currentFontId  = 0u;
+  FontId                  previousFontId = 0u;
+  TextAbstraction::Script previousScript = TextAbstraction::UNKNOWN;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters - 1u;
   for(Length index = startIndex; index <= lastCharacter; ++index)
@@ -769,7 +769,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     if(currentFontDescription.weight == TextAbstraction::FontWeight::BOLD)
     {
       TextAbstraction::FontDescription currentFontDescriptionWithoutBold = TextAbstraction::FontDescription(currentFontDescription);
-      currentFontDescriptionWithoutBold.weight = TextAbstraction::FontWeight::NORMAL;
+      currentFontDescriptionWithoutBold.weight                           = TextAbstraction::FontWeight::NORMAL;
 
       FontId fontIdWithoutBold = fontClient.GetFontId(currentFontDescriptionWithoutBold, currentFontPointSize);
       if(fontId != fontIdWithoutBold)
@@ -856,7 +856,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       if(index + 1 <= lastCharacter)
       {
         const Character nextCharacter = *(textBuffer + index + 1);
-        findFallbackFont = (!TextAbstraction::IsEmojiPresentationSelector(nextCharacter) && !TextAbstraction::IsTextPresentationSelector(nextCharacter) &&
+        findFallbackFont              = (!TextAbstraction::IsEmojiPresentationSelector(nextCharacter) && !TextAbstraction::IsTextPresentationSelector(nextCharacter) &&
                             !TextAbstraction::IsZeroWidthJoiner(nextCharacter) && !TextAbstraction::IsEmojiModifier(nextCharacter));
       }
       else if(index == lastCharacter)

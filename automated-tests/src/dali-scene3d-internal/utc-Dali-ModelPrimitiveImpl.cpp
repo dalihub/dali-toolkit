@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ int UtcDaliModelPrimitiveImplSetData(void)
   DALI_TEST_CHECK(!modelPrimitive.GetGeometry());
   DALI_TEST_CHECK(!modelPrimitive.GetMaterial());
 
-  Dali::Geometry geometry = Dali::Geometry::New();
+  Dali::Geometry          geometry = Dali::Geometry::New();
   Dali::Scene3D::Material material = Dali::Scene3D::Material::New();
 
   modelPrimitive.SetGeometry(geometry);
@@ -75,7 +75,7 @@ int UtcDaliModelPrimitiveMaterialDepthIndex(void)
 
   DALI_TEST_CHECK(!modelPrimitive.GetMaterial());
 
-  Dali::Geometry geometry = Dali::Geometry::New();
+  Dali::Geometry          geometry = Dali::Geometry::New();
   Dali::Scene3D::Material material = Dali::Scene3D::Material::New();
 
   modelPrimitive.SetGeometry(geometry);

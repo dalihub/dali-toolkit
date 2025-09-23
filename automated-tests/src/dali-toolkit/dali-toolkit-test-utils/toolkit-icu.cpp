@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/text-abstraction/icu.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/public-api/dali-adaptor-common.h>
@@ -22,7 +23,6 @@
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-application.h>
 #include <toolkit-icu.h>
-#include <dali-toolkit-test-suite-utils.h>
 
 namespace Dali
 {
@@ -34,51 +34,50 @@ namespace
 {
 Dali::Vector<Dali::TextAbstraction::Internal::ICU*> gICUs;
 uint32_t                                            gInitializedCount = 0u;
-}
+} //namespace
 
-class ICU: public Dali::BaseObject
+class ICU : public Dali::BaseObject
 {
 public:
-
-ICU()
-: mInitialized(false)
-{
-}
-
-~ICU()
-{
-}
-
-void Initialize()
-{
-  // Try once.
-  mInitialized = true;
-  tet_printf("ICU::Initialize:%d\n", mInitialized);
-}
-
-void UpdateLineBreakInfoByLocale(const std::string& text,
-                                 Length             numberOfCharacters,
-                                 const char*        locale,
-                                 LineBreakInfo*     breakInfo)
-{
-  tet_printf("ICU::UpdateLineBreakInfoByLocale\n");
-  if(!mInitialized)
+  ICU()
+  : mInitialized(false)
   {
-    Initialize();
   }
-}
 
-// Test method
-void ResetInitialize()
-{
-  mInitialized = false;
-}
+  ~ICU()
+  {
+  }
 
-// Test method
-bool IsInitialized()
-{
-  return mInitialized;
-}
+  void Initialize()
+  {
+    // Try once.
+    mInitialized = true;
+    tet_printf("ICU::Initialize:%d\n", mInitialized);
+  }
+
+  void UpdateLineBreakInfoByLocale(const std::string& text,
+                                   Length             numberOfCharacters,
+                                   const char*        locale,
+                                   LineBreakInfo*     breakInfo)
+  {
+    tet_printf("ICU::UpdateLineBreakInfoByLocale\n");
+    if(!mInitialized)
+    {
+      Initialize();
+    }
+  }
+
+  // Test method
+  void ResetInitialize()
+  {
+    mInitialized = false;
+  }
+
+  // Test method
+  bool IsInitialized()
+  {
+    return mInitialized;
+  }
 
 private:
   bool mInitialized : 1; ///< Whether Initialize() has been called, prevents dlopen from being attempted again.
@@ -133,7 +132,7 @@ void ICU::UpdateLineBreakInfoByLocale(const std::string& text,
 }
 
 } // namespace TextAbstraction
-} // namespace Dali;
+} //namespace Dali
 
 namespace Test
 {

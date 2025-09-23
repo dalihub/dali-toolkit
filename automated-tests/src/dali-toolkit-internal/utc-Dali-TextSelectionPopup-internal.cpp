@@ -50,7 +50,7 @@ void dali_textselectionpopupinternal_cleanup(void)
 int UtcDaliToolkitTextSelectionPopupIconPropertiesN(void)
 {
   ToolkitTestApplication application;
-  TextSelectionPopup popup = TextSelectionPopup::New(nullptr);
+  TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
 
   Toolkit::Internal::TextSelectionPopup& popupImpl = GetImpl(popup);
   DALI_TEST_EQUALS(std::string(), popupImpl.GetButtonImage(Toolkit::TextSelectionPopup::NONE), TEST_LOCATION);

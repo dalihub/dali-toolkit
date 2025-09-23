@@ -167,7 +167,7 @@ public:
   /**
    * @brief Increase the external resource reference count.
    * Only have effort if ProtocolType is TEXTURE or BUFFER.
-   * 
+   *
    * @post DecreaseExternalResourceReference Should be called when the resource is no longer needed.
    *
    * @param[in] textureManager The texture manager who owns the external texture.

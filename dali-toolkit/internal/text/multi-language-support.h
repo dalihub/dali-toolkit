@@ -38,7 +38,7 @@ namespace Internal DALI_INTERNAL
 {
 class MultilanguageSupport;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @brief Sets the character's scripts to the model and validates the fonts set by the user or assigns default ones.
@@ -173,10 +173,10 @@ public:
 
 public:
   // Default copy and move operator
-  MultilanguageSupport(const MultilanguageSupport& rhs) = default;
-  MultilanguageSupport(MultilanguageSupport&& rhs)      = default;
+  MultilanguageSupport(const MultilanguageSupport& rhs)            = default;
+  MultilanguageSupport(MultilanguageSupport&& rhs)                 = default;
   MultilanguageSupport& operator=(const MultilanguageSupport& rhs) = default;
-  MultilanguageSupport& operator=(MultilanguageSupport&& rhs) = default;
+  MultilanguageSupport& operator=(MultilanguageSupport&& rhs)      = default;
 };
 
 } // namespace Text

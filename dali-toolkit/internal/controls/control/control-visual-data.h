@@ -42,8 +42,8 @@ class Base;
 }
 
 /**
-  * @brief Struct used to store Visual within the control, index is a unique key for each visual.
-  */
+ * @brief Struct used to store Visual within the control, index is a unique key for each visual.
+ */
 struct RegisteredVisual
 {
   Property::Index       index;
@@ -113,7 +113,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableCornerPropertiesOverridden()
    */
-  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable);
+  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualResourceStatus()

@@ -4393,7 +4393,8 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask01(void)
 
   ToolkitTestApplication application;
 
-  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const std::string& url, const std::string& mask, const char* location) {
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const std::string& url, const std::string& mask, const char* location)
+  {
     gResourceReadySignalCounter = 0;
 
     Property::Map map;
@@ -4452,7 +4453,8 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
 
   gResourceReadySignalCounter = 0;
 
-  auto TestBrokenMaskResourceReadyUrl = [&application](const std::string& url, const char* location) {
+  auto TestBrokenMaskResourceReadyUrl = [&application](const std::string& url, const char* location)
+  {
     Property::Map map;
     map[Toolkit::ImageVisual::Property::URL] = url;
     // Use invalid mask url
@@ -4492,7 +4494,8 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 {
   tet_infoline("Test signal handler various case.");
 
-  auto TestResourceReadyUrl = [](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location) {
+  auto TestResourceReadyUrl = [](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location)
+  {
     ToolkitTestApplication application;
 
     gResourceReadySignalCounter = 0;
@@ -4524,7 +4527,8 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
     imageView.Unparent();
   };
 
-  auto TestAuxiliaryResourceReadyUrl = [](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location) {
+  auto TestAuxiliaryResourceReadyUrl = [](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location)
+  {
     ToolkitTestApplication application;
 
     gResourceReadySignalCounter = 0;
@@ -5398,7 +5402,8 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
   textureCallStack.Enable(true);
   textureCallStack.EnableLogging(true);
 
-  auto TestNPatch = [&](int index, const std::string& nPatchImageUrl, const char* location) {
+  auto TestNPatch = [&](int index, const std::string& nPatchImageUrl, const char* location)
+  {
     if(imageView[index])
     {
       imageView[index].Unparent();
@@ -5500,7 +5505,8 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   textureCallStack.Enable(true);
   textureCallStack.EnableLogging(true);
 
-  auto TestBorderImage = [&](int index, const std::string& normalImageUrl, const Rect<int> border, const char* location) {
+  auto TestBorderImage = [&](int index, const std::string& normalImageUrl, const Rect<int> border, const char* location)
+  {
     Property::Map map;
     map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
     map[Toolkit::ImageVisual::Property::URL]    = normalImageUrl;

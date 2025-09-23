@@ -176,7 +176,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+  {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
@@ -220,7 +220,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
     }
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
-                                          {
+    {
       mEndTimeNanoSceonds = GetNanoseconds();
       oss << std::fixed << std::setprecision(3);
       oss << "[";
@@ -249,7 +249,7 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mImageUrl.GetUrl().c_str(), mTotalFrame, mFrameRate, this);
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
-                                        {
+  {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
@@ -615,7 +615,7 @@ bool VectorAnimationTask::Rasterize()
   uint64_t mEndTimeNanoSceonds   = 0;
 #endif
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
-                                          {
+  {
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[s:" << mWidth << "x" << mHeight << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
@@ -737,7 +737,7 @@ bool VectorAnimationTask::Rasterize()
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
-                                        {
+  {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";

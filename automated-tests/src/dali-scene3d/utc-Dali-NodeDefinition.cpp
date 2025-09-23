@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
-#include <toolkit-test-application.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/node-definition.h"
 #include "dali-scene3d/public-api/loader/view-projection.h"
@@ -70,7 +70,7 @@ int UtcDaliConstraintDefinitionsCompare(void)
 
 int UtcDaliBlendshapeShaderConfigurationRequestsCompare(void)
 {
-  TestApplication                      app;
+  ToolkitTestApplication               app;
   BlendshapeShaderConfigurationRequest bsscr1{"", 0, Shader(nullptr)};
 
   BlendshapeShaderConfigurationRequest bsscr2{"", 0, Shader::New("void main(){ gl_Position = vec4(0.); }", "void main(){ gl_FragColor = vec4(1.); }")};
@@ -98,8 +98,8 @@ int UtcDaliNodeDefinitionExtrasCompare(void)
 
 int UtcDaliNodeDefinitionProperties(void)
 {
-  TestApplication testApp;
-  NodeDefinition  nodeDef{
+  ToolkitTestApplication testApp;
+  NodeDefinition         nodeDef{
     "testRootNode",
     INVALID_INDEX,
     Vector3{-100.f, 100.f, -500.f},
@@ -207,8 +207,8 @@ int UtcDaliNodeDefinitionRenderableReflectResources(void)
 
 int UtcDaliNodeDefinitionRenderable(void)
 {
-  TestApplication testApp;
-  NodeDefinition  nodeDef;
+  ToolkitTestApplication testApp;
+  NodeDefinition         nodeDef;
 
   std::unique_ptr<NodeDefinition::Renderable> renderable = std::unique_ptr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
   nodeDef.mRenderables.push_back(std::move(renderable));

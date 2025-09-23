@@ -64,7 +64,7 @@ struct Base::Impl
   struct CustomShader
   {
     CustomShader(const Property::Map& map);
-    void SetPropertyMap(const Property::Map& map);
+    void          SetPropertyMap(const Property::Map& map);
     Property::Map CreatePropertyMap() const;
 
     std::string               mVertexShader;
@@ -177,7 +177,7 @@ struct Base::Impl
     else
     {
       Property::Array shaderArray;
-      for(auto && customShader : mCustomShaders)
+      for(auto&& customShader : mCustomShaders)
       {
         shaderArray.PushBack(customShader->CreatePropertyMap());
       }

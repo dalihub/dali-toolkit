@@ -28,8 +28,8 @@ using namespace Toolkit;
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME = "selection-popup-border.9.png";
-const char* TEST_FONT_FAMILY = "BreezeSans";
-}
+const char* TEST_FONT_FAMILY     = "BreezeSans";
+} //namespace
 
 void dali_textselectionpopup_startup(void)
 {
@@ -308,8 +308,8 @@ int UtcDaliToolkitTextSelectionPopupFloatProperties(void)
   ToolkitTestApplication application;
   TextSelectionPopup     popup = TextSelectionPopup::New(nullptr);
 
-  const float popupFadeInDuration = 5.0f;
-  const float popupFadeOutDuration = 10.0f;
+  const float popupFadeInDuration      = 5.0f;
+  const float popupFadeOutDuration     = 10.0f;
   const float popupPressedCornerRadius = 15.0f;
   popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_IN_DURATION, popupFadeInDuration);
   popup.SetProperty(TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION, popupFadeOutDuration);

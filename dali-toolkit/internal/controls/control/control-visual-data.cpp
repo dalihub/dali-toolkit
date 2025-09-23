@@ -325,6 +325,18 @@ void Control::Impl::VisualData::ClearScene(Actor parent)
   {
     (*replacedIter)->pending = false;
   }
+
+  for(auto registeredVisual : mVisuals)
+  {
+    if(!registeredVisual->overrideCornerProperties)
+    {
+      continue;
+    }
+    for(auto iterator = registeredVisual->animationConstraint.begin(); iterator != registeredVisual->animationConstraint.end(); iterator++)
+    {
+      iterator->second.SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
+    }
+  }
 }
 
 // Called by a Visual when it's resource is ready
@@ -706,7 +718,7 @@ void Control::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual:
   }
 }
 
-void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable)
+void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", &visual, enable ? "T" : "F");
 
@@ -736,6 +748,29 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
       if(cornerRadius != Vector4::ZERO)
       {
         visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+      }
+    }
+
+    if(cornerRadiusConstraint)
+    {
+      if(enable)
+      {
+        if((*iter)->animationConstraint.count(Dali::Toolkit::DevelControl::Property::CORNER_RADIUS) == 0)
+        {
+          (*iter)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS] = cornerRadiusConstraint;
+          cornerRadiusConstraint.SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
+        }
+        cornerRadiusConstraint.Apply();
+      }
+      else
+      {
+        if((*iter)->animationConstraint.count(Dali::Toolkit::DevelControl::Property::CORNER_RADIUS) != 0)
+        {
+          (*iter)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS] = cornerRadiusConstraint;
+          cornerRadiusConstraint.SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
+        }
+        cornerRadiusConstraint.Remove();
+        (*iter)->animationConstraint.erase(Dali::Toolkit::DevelControl::Property::CORNER_RADIUS);
       }
     }
   }
@@ -999,16 +1034,18 @@ void Control::Impl::VisualData::BindAnimatablePropertyFromControlToVisual(Proper
   // Add constraint that constrains visual's index from control's index
   for(auto registeredVisual : mVisuals)
   {
-    if(registeredVisual->overrideCornerProperties && registeredVisual->animationConstraint.count(index) == 0)
+    if(registeredVisual->overrideCornerProperties)
     {
-      Toolkit::Visual::Base& visualToAnimate = registeredVisual->visual;
-
-      Property   property   = visualToAnimate.GetPropertyObject(visualIndex);
-      Constraint constraint = Constraint::New<Vector4>(property.object, property.propertyIndex, EqualToConstraint());
-      constraint.AddSource(Source(handle, index));
-      constraint.Apply();
-
-      registeredVisual->animationConstraint[index] = constraint;
+      if(registeredVisual->animationConstraint.count(index) == 0)
+      {
+        Toolkit::Visual::Base& visualToAnimate = registeredVisual->visual;
+        Property               property        = visualToAnimate.GetPropertyObject(visualIndex);
+        Constraint             constraint      = Constraint::New<Vector4>(property.object, property.propertyIndex, EqualToConstraint());
+        constraint.AddSource(Source(handle, index));
+        registeredVisual->animationConstraint[index] = constraint;
+        registeredVisual->animationConstraint[index].Apply();
+      }
+      registeredVisual->animationConstraint[index].SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ALWAYS);
     }
   }
 }
@@ -1019,8 +1056,7 @@ void Control::Impl::VisualData::UnbindAnimatablePropertyFromControlToVisual(Prop
   {
     if(registeredVisual->overrideCornerProperties && registeredVisual->animationConstraint.count(index) > 0)
     {
-      registeredVisual->animationConstraint[index].Remove();
-      registeredVisual->animationConstraint.erase(index);
+      registeredVisual->animationConstraint[index].SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
     }
   }
 }
@@ -1134,7 +1170,7 @@ void Control::Impl::VisualData::ApplyFittingMode(const Vector2& size)
           {
             auto availableVisualSize = finalSize;
             finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+                                                              (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
             auto originalOffset = finalOffset;
 

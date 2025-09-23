@@ -521,10 +521,10 @@ private: // Implementation
   void OnLocaleChanged(std::string locale);
 
   /**
-  * @brief Add a layer for active or cursor.
-  * @param[in] layer The actor in which to store the layer.
-  * @param[in] actor The new layer to add.
-  */
+   * @brief Add a layer for active or cursor.
+   * @param[in] layer The actor in which to store the layer.
+   * @param[in] actor The new layer to add.
+   */
   void AddLayer(Actor& layer, Actor& actor);
 
   /**
@@ -580,7 +580,7 @@ private: // Data
   Toolkit::DevelTextField::SelectionStartedSignalType      mSelectionStartedSignal;
 
   // for Font Variations
-  std::map<Dali::Property::Index, std::string> mVariationIndexMap;  // Stores [CustomPropertyIndex, tag].
+  std::map<Dali::Property::Index, std::string> mVariationIndexMap; // Stores [CustomPropertyIndex, tag].
 
   InputMethodContext               mInputMethodContext;
   Text::ControllerPtr              mController;

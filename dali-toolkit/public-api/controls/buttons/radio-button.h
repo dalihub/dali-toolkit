@@ -32,7 +32,7 @@ namespace Internal DALI_INTERNAL
 // Forward declarations
 
 class RadioButton;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_buttons
  * @{

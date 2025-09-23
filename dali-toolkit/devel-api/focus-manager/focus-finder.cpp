@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,7 +357,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
     const auto childCount = actor.GetChildCount();
     for(auto i = childCount; i > 0u; --i)
     {
-      Dali::Actor child = actor.GetChildAt(i-1);
+      Dali::Actor child = actor.GetChildAt(i - 1);
       if(child && child != focusedActor && IsFocusable(child))
       {
         Rect<float> candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
@@ -392,17 +392,16 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
   }
 
   Rect<float> focusedRect;
-  if (!focusedActor)
+  if(!focusedActor)
   {
     // If there is no currently focused actor, it is searched based on the upper left corner of the current window.
     Rect<float> rootRect = DevelActor::CalculateCurrentScreenExtents(rootActor);
-    focusedRect = Rect<float>(rootRect.x, rootRect.y, 0.f, 0.f);
+    focusedRect          = Rect<float>(rootRect.x, rootRect.y, 0.f, 0.f);
   }
   else
   {
     focusedRect = DevelActor::CalculateCurrentScreenExtents(focusedActor);
   }
-
 
   // initialize the best candidate to something impossible
   // (so the first plausible actor will become the best choice)

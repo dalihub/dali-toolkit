@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,11 +216,11 @@ enum
   INPUT_FILTER,
 
   /**
-  * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
-  * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
-  * @note Default is EllipsisPosition::END.
-  * @see DevelText::EllipsisPosition
-  */
+   * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
+   * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
+   * @note Default is EllipsisPosition::END.
+   * @see DevelText::EllipsisPosition
+   */
   ELLIPSIS_POSITION,
 
   /**
@@ -236,12 +236,12 @@ enum
   INPUT_STRIKETHROUGH,
 
   /**
-  * @brief The spaces between characters in Pixels.
-  * @details Name "characterSpacing", type Property::FLOAT.
-  * @note
-  *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
-  *   The default value is 0.f which does nothing.
-  */
+   * @brief The spaces between characters in Pixels.
+   * @details Name "characterSpacing", type Property::FLOAT.
+   * @note
+   *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *   The default value is 0.f which does nothing.
+   */
   CHARACTER_SPACING,
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -862,7 +862,8 @@ int UtcDaliPhysics3DAdaptorQueue(void)
   }
 
   tet_infoline("Test that Queue works without accessor");
-  adaptor.Queue([body]() {
+  adaptor.Queue([body]()
+  {
     body->getWorldTransform().setOrigin(btVector3(100.0f, 20.0f, 20.0f));
   });
   adaptor.CreateSyncPoint();
@@ -905,7 +906,8 @@ int UtcDaliPhysics3DAdaptorCreateSyncPoint(void)
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
     tet_infoline("Test that Queue works with accessor");
-    adaptor.Queue([body]() {
+    adaptor.Queue([body]()
+    {
       body->getWorldTransform().setOrigin(btVector3(100.0f, 20.0f, 20.0f));
     });
   }

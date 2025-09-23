@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_RELAYOUTER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,16 +124,16 @@ struct Controller::Relayouter
   static void CalculateVerticalOffset(Controller::Impl& impl, const Size& controlSize);
 
   /**
-  * @brief Calculates the layout size of control according to @p requestedControllerSize and @p requestedOperationsMask
-  *
-  * GetNaturalSize() and GetHeightForWidth() calls this method.
-  *
-  * @param[in] controller The controller to calcualte size on it.
-  * @param[in] requestedControllerSize The requested size of controller to calcualte layout size on it.
-  * @param[in] requestedOperationsMask The requested operations-mask to calcualte layout size according to it.
-  *
-  * @return The calculated layout-size.
-  */
+   * @brief Calculates the layout size of control according to @p requestedControllerSize and @p requestedOperationsMask
+   *
+   * GetNaturalSize() and GetHeightForWidth() calls this method.
+   *
+   * @param[in] controller The controller to calcualte size on it.
+   * @param[in] requestedControllerSize The requested size of controller to calcualte layout size on it.
+   * @param[in] requestedOperationsMask The requested operations-mask to calcualte layout size according to it.
+   *
+   * @return The calculated layout-size.
+   */
   static Size CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask);
 
 private:

@@ -33,11 +33,10 @@ namespace VirtualKeyboard
 Dali::VirtualKeyboard::StatusSignalType gKeyboardStatusSignal;
 }
 
-} // Adaptor
-} // Internal
+} //namespace Adaptor
+} //namespace Internal
 
-
-bool IsKey( const Dali::KeyEvent& keyEvent, Dali::KEY daliKey)
+bool IsKey(const Dali::KeyEvent& keyEvent, Dali::KEY daliKey)
 {
   return true;
 }
@@ -45,7 +44,7 @@ bool IsKey( const Dali::KeyEvent& keyEvent, Dali::KEY daliKey)
 namespace VirtualKeyboard
 {
 
-void ApplySettings( Dali::Property::Map const& )
+void ApplySettings(Dali::Property::Map const&)
 {
 }
 
@@ -63,5 +62,5 @@ StatusSignalType& StatusChangedSignal()
   return Internal::Adaptor::VirtualKeyboard::gKeyboardStatusSignal;
 }
 
-} // VirtualKeyboard
-} // Dali
+} //namespace VirtualKeyboard
+} //namespace Dali

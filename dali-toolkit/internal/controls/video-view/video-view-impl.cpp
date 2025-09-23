@@ -681,11 +681,6 @@ void VideoView::SetWindowSurfaceTarget()
     mTextureVisual.Reset();
   }
 
-  // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
-  mVideoPlayer.SetRenderingTarget(Dali::Adaptor::Get().GetNativeWindowHandle(self));
-
-  ApplyBackupProperties();
-
   if(!mOverlayVisual)
   {
     Property::Map properties;
@@ -721,7 +716,12 @@ void VideoView::SetWindowSurfaceTarget()
       // Sync corner values to Control
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayVisual, true);
     }
+
+    // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
+    mVideoPlayer.SetRenderingTarget(Dali::Adaptor::Get().GetNativeWindowHandle(self));
   }
+
+  ApplyBackupProperties();
 
   if(!mOverlayTextureVisual)
   {
@@ -818,10 +818,10 @@ void VideoView::SetNativeImageTarget()
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
-  }
 
-  // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
-  mVideoPlayer.SetRenderingTarget(nativeImageSourcePtr);
+    // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
+    mVideoPlayer.SetRenderingTarget(nativeImageSourcePtr);
+  }
 
   ApplyBackupProperties();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/environment-definition.h"
 
@@ -128,10 +129,9 @@ int UtcDaliEnvironmentDefinitionLoadDefault(void)
 {
   EnvironmentDefinition envDef{};
   auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
-  ;
 
-  TestApplication app;
-  auto            textures = envDef.Load(std::move(rawData));
+  ToolkitTestApplication app;
+  auto                   textures = envDef.Load(std::move(rawData));
 
   CheckTextureDefault(textures.mSpecular);
   CheckTextureDefault(textures.mDiffuse);
@@ -143,10 +143,9 @@ int UtcDaliEnvironmentDefinitionLoadDiffuse(void)
 {
   EnvironmentDefinition envDef{"forest_irradiance.ktx"};
   auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
-  ;
 
-  TestApplication app;
-  auto            textures = envDef.Load(std::move(rawData));
+  ToolkitTestApplication app;
+  auto                   textures = envDef.Load(std::move(rawData));
 
   CheckTextureNotDefault(textures.mDiffuse);
   CheckTextureDefault(textures.mSpecular);
@@ -158,10 +157,9 @@ int UtcDaliEnvironmentDefinitionLoadSpecular(void)
 {
   EnvironmentDefinition envDef{"", "forest_radiance.ktx"};
   auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
-  ;
 
-  TestApplication app;
-  auto            textures = envDef.Load(std::move(rawData));
+  ToolkitTestApplication app;
+  auto                   textures = envDef.Load(std::move(rawData));
 
   CheckTextureDefault(textures.mDiffuse);
   CheckTextureNotDefault(textures.mSpecular);
@@ -173,10 +171,9 @@ int UtcDaliEnvironmentDefinitionLoadBoth(void)
 {
   EnvironmentDefinition envDef{"forest_irradiance.ktx", "forest_radiance.ktx"};
   auto                  rawData = envDef.LoadRaw(TEST_RESOURCE_DIR "/");
-  ;
 
-  TestApplication app;
-  auto            textures = envDef.Load(std::move(rawData));
+  ToolkitTestApplication app;
+  auto                   textures = envDef.Load(std::move(rawData));
 
   CheckTextureNotDefault(textures.mDiffuse);
   CheckTextureNotDefault(textures.mSpecular);

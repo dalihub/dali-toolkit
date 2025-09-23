@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -436,7 +436,7 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
   // Searching for the correct line.
   while(high - low > 1)
   {
-    guess = (high + low) / 2;
+    guess                             = (high + low) / 2;
     Vector<LineRun>::ConstIterator it = lines.Begin() + guess;
 
     lineTop = GetLineTop(lines, *it);
@@ -464,8 +464,8 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
 
   if(isLastLine)
   {
-    const LineRun& line = *(visualModel->mLines.Begin() + lineIndex);
-    float lineHeight = GetLineHeight(line, isLastLine);
+    const LineRun& line       = *(visualModel->mLines.Begin() + lineIndex);
+    float          lineHeight = GetLineHeight(line, isLastLine);
 
     // If the visualY is placed after the last line.
     if(visualY > lineTop + lineHeight)
@@ -474,7 +474,7 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
     }
   }
 
- // Start searching for the visualX
+  // Start searching for the visualX
   const LineRun& line = *(visualModel->mLines.Begin() + lineIndex);
 
   visualX -= line.alignmentOffset;
@@ -487,13 +487,13 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
 
   CharacterIndex characterIndexAtPosition = -1;
   CharacterIndex characterIndex           = startCharacter;
-  float characterPosition;
-  float rightMostCharacterPosition;
+  float          characterPosition;
+  float          rightMostCharacterPosition;
 
   for(; characterIndex != endCharacter; characterIndex++)
   {
-    characterPosition = positionsBuffer[characterIndex].x;
-    rightMostCharacterPosition = positionsBuffer[characterIndex+1].x;
+    characterPosition          = positionsBuffer[characterIndex].x;
+    rightMostCharacterPosition = positionsBuffer[characterIndex + 1].x;
 
     if(visualX < rightMostCharacterPosition && visualX >= characterPosition)
     {

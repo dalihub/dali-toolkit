@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_EMITTER_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_EMITTER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ public:
   uint32_t                  mEmissionRatePerSecond{1u};
   std::atomic<uint32_t>     mEmissionCountOnStart{0u};
   std::atomic<uint32_t>     mActiveParticlesLimit{0u}; ///< 0 - unlimited
-  std::atomic<uint8_t >     mSystemStarted{0u};        ///< 0 - not started, 1 - started
+  std::atomic<uint8_t>      mSystemStarted{0u};        ///< 0 - not started, 1 - started
   std::chrono::milliseconds mCurrentMilliseconds{0};
   std::chrono::milliseconds mLastUpdateMs{0};
 

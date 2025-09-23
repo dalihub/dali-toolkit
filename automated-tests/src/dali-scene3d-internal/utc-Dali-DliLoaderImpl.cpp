@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/loader/resource-bundle.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 
 using namespace Dali;
@@ -182,8 +183,8 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 
 int UtcDaliDliLoaderLoadSceneExercise(void)
 {
-  TestApplication app;
-  Context ctx;
+  ToolkitTestApplication app;
+  Context                ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
   DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
@@ -253,44 +254,44 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   uint32_t                 metadataCount = 0;
   ctx.input.mPreNodeCategoryProcessors.push_back({"metadata",
                                                   [&](const Property::Array& array, StringCallback)
-                                                  {
-                                                    std::string key, value;
-                                                    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-                                                    {
-                                                      auto& data = array.GetElementAt(i0);
-                                                      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  {
+    std::string key, value;
+    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+    {
+      auto& data = array.GetElementAt(i0);
+      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-                                                      auto map   = data.GetMap();
-                                                      auto key   = map->Find("key");
-                                                      auto value = map->Find("value");
-                                                      DALI_TEST_EQUAL(key->GetType(), Property::STRING);
-                                                      DALI_TEST_EQUAL(value->GetType(), Property::STRING);
-                                                      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
+      auto map   = data.GetMap();
+      auto key   = map->Find("key");
+      auto value = map->Find("value");
+      DALI_TEST_EQUAL(key->GetType(), Property::STRING);
+      DALI_TEST_EQUAL(value->GetType(), Property::STRING);
+      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
 
-                                                      ++metadataCount;
-                                                    }
-                                                  }});
+      ++metadataCount;
+    }
+  }});
 
   std::vector<std::string> behaviors;
   uint32_t                 behaviorCount = 0;
   ctx.input.mPostNodeCategoryProcessors.push_back({"behaviors",
                                                    [&](const Property::Array& array, StringCallback)
-                                                   {
-                                                     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
-                                                     {
-                                                       auto& data = array.GetElementAt(i0);
-                                                       DALI_TEST_EQUAL(data.GetType(), Property::MAP);
+  {
+    for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
+    {
+      auto& data = array.GetElementAt(i0);
+      DALI_TEST_EQUAL(data.GetType(), Property::MAP);
 
-                                                       auto map   = data.GetMap();
-                                                       auto event = map->Find("event");
-                                                       auto url   = map->Find("url");
-                                                       DALI_TEST_EQUAL(event->GetType(), Property::STRING);
-                                                       DALI_TEST_EQUAL(url->GetType(), Property::STRING);
-                                                       behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
+      auto map   = data.GetMap();
+      auto event = map->Find("event");
+      auto url   = map->Find("url");
+      DALI_TEST_EQUAL(event->GetType(), Property::STRING);
+      DALI_TEST_EQUAL(url->GetType(), Property::STRING);
+      behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
 
-                                                       ++behaviorCount;
-                                                     }
-                                                   }});
+      ++behaviorCount;
+    }
+  }});
 
   size_t numNodes                  = 0;
   ctx.input.mNodePropertyProcessor = [&](const NodeDefinition&, const Property::Map&, StringCallback)
@@ -337,7 +338,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -401,7 +402,7 @@ int UtcDaliDliLoaderLoadSceneArc(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -452,7 +453,7 @@ int UtcDaliDliLoaderLoadSceneShaderUniforms(void)
 
   auto raw = resources.mShaders[0].first.LoadRaw(ctx.pathProvider(ResourceType::Shader));
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   auto shader = resources.mShaders[0].first.Load(std::move(raw));
   DALI_TEST_EQUAL(shader.GetProperty(shader.GetPropertyIndex("uBool")).Get<float>(), 1.0f);
@@ -500,8 +501,8 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
-  Actor           actor = scene.CreateNodes(0, choices, nodeParams);
+  ToolkitTestApplication app;
+  Actor                  actor = scene.CreateNodes(0, choices, nodeParams);
 
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeFactor")).Get<float>(), 9000.1f);
   DALI_TEST_EQUAL(actor.GetProperty(actor.GetPropertyIndex("fudgeVector")).Get<Vector2>(), Vector2(-.25f, 17.f));
@@ -544,7 +545,7 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root    = scene.CreateNodes(0, choices, nodeParams);
   Actor alice   = root.FindChildByName("Alice");
@@ -681,7 +682,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);

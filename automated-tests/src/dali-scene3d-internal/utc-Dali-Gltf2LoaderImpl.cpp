@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 
 using namespace Dali;
@@ -55,7 +56,8 @@ namespace
 {
 struct Context
 {
-  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type) {
+  ResourceBundle::PathProvider pathProvider = [](ResourceType::Value type)
+  {
     return TEST_RESOURCE_DIR "/";
   };
 
@@ -199,7 +201,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   // Default envmap is used
   DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.size());
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Customization::Choices choices;
   for(auto iRoot : ctx.scene.GetRoots())
@@ -503,7 +505,7 @@ int UtcDaliGltfLoaderSuccess2(void)
   DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
   DALI_TEST_EQUAL(1u, ctx.scene.GetNodeCount());
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Customization::Choices choices;
   for(auto iRoot : ctx.scene.GetRoots())
@@ -522,10 +524,11 @@ int UtcDaliGltfLoaderSuccess2(void)
 
 int UtcDaliGltfLoaderSuccessShort(void)
 {
-  TestApplication app;
+  ToolkitTestApplication app;
 
   const std::string resourcePath = TEST_RESOURCE_DIR "/";
-  auto              pathProvider = [resourcePath](ResourceType::Value) {
+  auto              pathProvider = [resourcePath](ResourceType::Value)
+  {
     return resourcePath;
   };
 
@@ -663,7 +666,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -698,8 +701,8 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
 int UtcDaliGltfLoaderAnimationLoadingTest(void)
 {
-  TestApplication app;
-  Context         ctx;
+  ToolkitTestApplication app;
+  Context                ctx;
 
   auto& resources = ctx.resources;
 
@@ -773,7 +776,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -824,7 +827,7 @@ int UtcDaliGltfLoaderUint8Indices(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -883,7 +886,7 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
 
   Customization::Choices choices;
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Actor root = Actor::New();
   SetActorCentered(root);
@@ -969,7 +972,7 @@ int UtcDaliGltfLoaderTextureTransform(void)
   DALI_TEST_EQUAL(1u, scene.GetRoots().size());
   DALI_TEST_EQUAL(1u, scene.GetNodeCount());
 
-  TestApplication app;
+  ToolkitTestApplication app;
 
   Customization::Choices choices;
   for(auto iRoot : scene.GetRoots())

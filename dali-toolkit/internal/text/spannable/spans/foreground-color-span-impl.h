@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FOREGROUND_COLOR_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ public:
    */
   ForegroundColorSpan();
 
-  ForegroundColorSpan(const ForegroundColorSpan&) = delete;            ///< Deleted copy constructor
-  ForegroundColorSpan(ForegroundColorSpan&&)      = delete;            ///< Deleted move constructor
+  ForegroundColorSpan(const ForegroundColorSpan&)            = delete; ///< Deleted copy constructor
+  ForegroundColorSpan(ForegroundColorSpan&&)                 = delete; ///< Deleted move constructor
   ForegroundColorSpan& operator=(const ForegroundColorSpan&) = delete; ///< Deleted copy assignment operator
-  ForegroundColorSpan& operator=(ForegroundColorSpan&&) = delete;      ///< Deleted move assignment operator
+  ForegroundColorSpan& operator=(ForegroundColorSpan&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief Destructor
@@ -87,8 +87,8 @@ public: //Methods. Not intended for application developers
 
 public: //Methods for internal only
         /**
-   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-   */
+         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+         */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
 
 private:

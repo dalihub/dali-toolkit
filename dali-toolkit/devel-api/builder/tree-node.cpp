@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,10 @@ namespace Dali
  */
 bool CaseInsensitiveStringCompare(std::string_view a, std::string_view b)
 {
-  return (a.length() == b.length()) && std::equal(a.begin(), a.end(), b.begin(), [](auto x, auto y) {
-           return std::tolower(x) == std::tolower(y);
-         });
+  return (a.length() == b.length()) && std::equal(a.begin(), a.end(), b.begin(), [](auto x, auto y)
+  {
+    return std::tolower(x) == std::tolower(y);
+  });
 }
 
 namespace Toolkit

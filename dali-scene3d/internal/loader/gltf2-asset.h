@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_GLTF2_ASSET_H_
 #define DALI_SCENE3D_LOADER_GLTF2_ASSET_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@
 
 #define ENUM_STRING_MAPPING(t, x) \
   {                               \
-#x, t::x                      \
-  }
+    #x, t::x}
 
 #define ENUM_TYPE_FROM_STRING(structName, table)                             \
   structName::Type structName::FromString(const char* s, size_t len)         \
@@ -687,7 +686,7 @@ struct Document
   Document(Document&&)      = default;
 
   Document& operator=(const Document&) = delete;
-  Document& operator=(Document&&) = default;
+  Document& operator=(Document&&)      = default;
 };
 
 /**
@@ -699,7 +698,7 @@ struct RefReader
 {
   static T* sObject;
 
-  template<typename U, std::vector<U> T::*V>
+  template<typename U, std::vector<U> T::* V>
   static Ref<U> Read(const json_value_s& j)
   {
     uint32_t index = json::Read::Number<uint32_t>(j);

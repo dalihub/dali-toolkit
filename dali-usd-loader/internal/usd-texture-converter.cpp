@@ -1,20 +1,20 @@
 
 /*
-* Copyright (c) 2025 Samsung Electronics Co., Ltd.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // FILE HEADER
 #include <dali-usd-loader/internal/usd-texture-converter.h>
@@ -56,9 +56,12 @@ bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, co
 
   // Map for handling various shaders
   std::unordered_map<std::string, std::function<void(const UsdShadeShader&)>> shaderProcessors = {
-    {"UsdPrimvarReader_float2", [&](const UsdShadeShader& d) { ProcessUvChannel(d); }},
-    {"UsdTransform2d", [&](const UsdShadeShader& d) { transformOffsetAuthored = Process2DTransform(d, uvTransformOffset, uvTransformRotation, uvTransformScale); }},
-    {"UsdUVTexture", [&](const UsdShadeShader& d) { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, imageMetaDataMap, semantic); }}};
+    {"UsdPrimvarReader_float2", [&](const UsdShadeShader& d)
+  { ProcessUvChannel(d); }},
+    {"UsdTransform2d", [&](const UsdShadeShader& d)
+  { transformOffsetAuthored = Process2DTransform(d, uvTransformOffset, uvTransformRotation, uvTransformScale); }},
+    {"UsdUVTexture", [&](const UsdShadeShader& d)
+  { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, imageMetaDataMap, semantic); }}};
 
   // Iterate over shader dependencies and process the shader IDs
   for(const auto& d : deps)
@@ -100,9 +103,12 @@ bool UsdTextureConverter::Process2DTransform(const UsdShadeShader& shader, GfVec
 {
   // Map for processing different 2D transform attributes (translation, scale, rotation)
   std::unordered_map<std::string, std::function<void(const UsdShadeInput&)>> transformProcessors = {
-    {"translation", [&](const UsdShadeInput& input) { ProcessTransformTranslation(input, uvTransformOffset); }},
-    {"scale", [&](const UsdShadeInput& input) { ProcessTransformScale(input, uvTransformScale); }},
-    {"rotation", [&](const UsdShadeInput& input) { ProcessTransformRotation(input, uvTransformRotation); }}};
+    {"translation", [&](const UsdShadeInput& input)
+  { ProcessTransformTranslation(input, uvTransformOffset); }},
+    {"scale", [&](const UsdShadeInput& input)
+  { ProcessTransformScale(input, uvTransformScale); }},
+    {"rotation", [&](const UsdShadeInput& input)
+  { ProcessTransformRotation(input, uvTransformRotation); }}};
 
   bool transformOffsetAuthored = false;
 
@@ -151,13 +157,20 @@ bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTe
 
   // Map for processing texture attributes (file, wrapS, wrapT, scale, bias, etc.)
   std::unordered_map<std::string, std::function<void(const UsdShadeInput&)>> textureProcessors = {
-    {"file", [&](const UsdShadeInput& input) { ProcessTextureFile(input, imagePath, imageBuffer); }},
-    {"wrapS", [&](const UsdShadeInput& input) { ProcessTextureWrap(input); }},
-    {"wrapT", [&](const UsdShadeInput& input) { ProcessTextureWrap(input); }},
-    {"scale", [&](const UsdShadeInput& input) { ProcessTextureScale(input); }},
-    {"bias", [&](const UsdShadeInput& input) { ProcessTextureBias(input); }},
-    {"st", [&](const UsdShadeInput& input) { ProcessTextureST(input); }},
-    {"fallback", [&](const UsdShadeInput& input) { ProcessTextureFallback(input); }}};
+    {"file", [&](const UsdShadeInput& input)
+  { ProcessTextureFile(input, imagePath, imageBuffer); }},
+    {"wrapS", [&](const UsdShadeInput& input)
+  { ProcessTextureWrap(input); }},
+    {"wrapT", [&](const UsdShadeInput& input)
+  { ProcessTextureWrap(input); }},
+    {"scale", [&](const UsdShadeInput& input)
+  { ProcessTextureScale(input); }},
+    {"bias", [&](const UsdShadeInput& input)
+  { ProcessTextureBias(input); }},
+    {"st", [&](const UsdShadeInput& input)
+  { ProcessTextureST(input); }},
+    {"fallback", [&](const UsdShadeInput& input)
+  { ProcessTextureFallback(input); }}};
 
   // Process each input in the USD UV texture shader
   std::vector<UsdShadeInput> inputs = usdUvTexture.GetInputs();

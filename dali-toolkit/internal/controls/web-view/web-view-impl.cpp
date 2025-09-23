@@ -121,10 +121,10 @@ Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
 {
   bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
   Vector3 actorSize               = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
-                                                                               : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 screenPosition    = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
-                                                                                    : Dali::DevelActor::CalculateScreenPosition(self);
+                                                                                             : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2 screenPosition          = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
+                                                                                             : Dali::DevelActor::CalculateScreenPosition(self);
 
   Dali::Rect<int32_t> displayArea;
   displayArea.x      = screenPosition.x - anchorPointOffSet.x;
@@ -1611,7 +1611,10 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
 
     // DoGetChildren is called at most once per every OnChildrenChanged.
     // We have only one OnChildrenChanged in this case, so EmbedSocket will be called only once.
-    Accessibility::Bridge::GetCurrentBridge()->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());
+    if(auto bridge = Accessibility::Bridge::GetCurrentBridge())
+    {
+      bridge->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());
+    }
     children.push_back(&mRemoteChild);
   }
 }

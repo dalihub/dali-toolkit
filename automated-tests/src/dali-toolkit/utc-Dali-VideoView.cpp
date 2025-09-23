@@ -1186,10 +1186,10 @@ int UtcDaliVideoViewCleanupInterpolationAnimationOnIntervalChange_P(void)
   application.SendNotification();
   application.Render(16);
 
-  Renderer renderer = videoView.GetRendererAt(1);
-  Shader   shader   = renderer.GetShader();
+  Renderer        renderer                 = videoView.GetRendererAt(1);
+  Shader          shader                   = renderer.GetShader();
   Property::Index interpolationFactorIndex = shader.GetPropertyIndex("uInterpolationFactor");
-  float currentValue = shader.GetCurrentProperty<float>(interpolationFactorIndex);
+  float           currentValue             = shader.GetCurrentProperty<float>(interpolationFactorIndex);
   tet_printf("Value after first frame: %f\n", currentValue);
   // The new logic sets uInterpolationFactor to 1.0f immediately for the first frame.
   DALI_TEST_EQUALS(currentValue, 1.0f, TEST_LOCATION);

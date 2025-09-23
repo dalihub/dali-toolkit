@@ -255,6 +255,12 @@ int UtcDaliCanvasViewChangeSizeP(void)
   pv.Get(v3);
   DALI_TEST_EQUALS(v3, Vector3(300, 300, 0), TEST_LOCATION);
 
+  // Unparent for line coverage
+  application.GetScene().Remove(canvasView);
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -400,6 +406,12 @@ int UtcDaliCanvasViewSetSizeAndAddDrawable(void)
   shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
+
+  application.SendNotification();
+  application.Render();
+
+  // Unparent for line coverage
+  application.GetScene().Remove(canvasView);
 
   application.SendNotification();
   application.Render();

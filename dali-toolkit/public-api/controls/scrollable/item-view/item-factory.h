@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_FACTORY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public:
    * @param[in] itemId The ID of the released item
    * @param[in] actor The actor that represents the released item
    */
-  virtual void ItemReleased(unsigned int itemId, Actor actor){};
+  virtual void ItemReleased(unsigned int itemId, Actor actor) {};
 
   /**
    * @brief Retrieves the extension for this control.

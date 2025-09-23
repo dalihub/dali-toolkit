@@ -483,7 +483,7 @@ private:
   Texture mPreviousFrameTexture; ///< Texture for mNativeImageSourcePrevious
   Texture mCurrentFrameTexture;  ///< Texture for mNativeImageSourceCurrent
 
-  float mInterpolationInterval;    ///< Target duration for interpolation in seconds
+  float mInterpolationInterval; ///< Target duration for interpolation in seconds
 
   Property::Index mInterpolationFactorPropertyIndex; ///< Uniform index for uInterpolationFactor in shader
   Dali::Animation mInterpolationAnimation;           ///< Animation to drive the interpolation factor

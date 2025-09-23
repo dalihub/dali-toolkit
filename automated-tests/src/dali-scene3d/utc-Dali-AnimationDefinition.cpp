@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include "dali-scene3d/public-api/loader/animation-definition.h"
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include "dali-scene3d/public-api/loader/animation-definition.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
 
 int UtcDaliAnimationDefinitionStopForModification(void)
 {
-  TestApplication app;
-  auto anim = Animation::New(15.f);
+  ToolkitTestApplication app;
+  auto                   anim = Animation::New(15.f);
   anim.Play();
 
   auto oldEndAction = AnimationDefinition::StopForModification(anim);
@@ -40,16 +41,17 @@ int UtcDaliAnimationDefinitionStopForModification(void)
 
 int UtcDaliAnimationDefinitionReAnimate(void)
 {
-  TestApplication app;
-  auto actor = Actor::New();
+  ToolkitTestApplication app;
+  auto                   actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
-  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)
+  {
     return actor.FindChildByName(property.mNodeName);
   };
 
   uint32_t animatedPropertyIndex = 0;
-  for (bool b: { false, true })
+  for(bool b : {false, true})
   {
     AnimationDefinition animDef;
     animDef.SetName("WalkRight");
@@ -57,18 +59,16 @@ int UtcDaliAnimationDefinitionReAnimate(void)
     animDef.SetLoopCount(2);
     animDef.SetEndAction(Animation::BAKE_FINAL);
     animDef.SetSpeedFactor(.7f);
-    animDef.SetProperty(animatedPropertyIndex++,std::move(AnimatedProperty{
-     INVALID_INDEX,
-     "ChristopherPlummer",
-     "position",
-     KeyFrames(),
-     std::unique_ptr<AnimatedProperty::Value>{ new AnimatedProperty::Value{
-       Property::Value{ Vector3::XAXIS * 100.f },
-       b
-     } },
-     AlphaFunction::EASE_OUT,
-     TimePeriod(animDef.GetDuration())
-    }));
+    animDef.SetProperty(animatedPropertyIndex++, std::move(AnimatedProperty{
+                                                   INVALID_INDEX,
+                                                   "ChristopherPlummer",
+                                                   "position",
+                                                   KeyFrames(),
+                                                   std::unique_ptr<AnimatedProperty::Value>{new AnimatedProperty::Value{
+                                                     Property::Value{Vector3::XAXIS * 100.f},
+                                                     b}},
+                                                   AlphaFunction::EASE_OUT,
+                                                   TimePeriod(animDef.GetDuration())}));
 
     auto anim = animDef.ReAnimate(getActor);
     DALI_TEST_EQUAL(anim.GetDuration(), animDef.GetDuration());
@@ -82,11 +82,12 @@ int UtcDaliAnimationDefinitionReAnimate(void)
 
 int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
 {
-  TestApplication app;
-  auto actor = Actor::New();
+  ToolkitTestApplication app;
+  auto                   actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "ChristopherPlummer");
 
-  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+  auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)
+  {
     return actor.FindChildByName(property.mNodeName);
   };
 
@@ -94,7 +95,7 @@ int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
   kf.Add(0.f, Vector3::ZERO);
   kf.Add(1.f, Vector3::XAXIS * 100.f);
 
-  uint32_t animatedPropertyIndex = 0;
+  uint32_t            animatedPropertyIndex = 0;
   AnimationDefinition animDef;
   animDef.SetName("WalkRight");
   animDef.SetDuration(10.f);
@@ -102,14 +103,13 @@ int UtcDaliAnimationDefinitionReAnimateKeyFrames(void)
   animDef.SetEndAction(Animation::BAKE_FINAL);
   animDef.SetSpeedFactor(.7f);
   animDef.SetProperty(animatedPropertyIndex++, std::move(AnimatedProperty{
-   INVALID_INDEX,
-   "ChristopherPlummer",
-   "position",
-   kf,
-   nullptr,
-   AlphaFunction::EASE_OUT,
-   TimePeriod(animDef.GetDuration())
-  }));
+                                                 INVALID_INDEX,
+                                                 "ChristopherPlummer",
+                                                 "position",
+                                                 kf,
+                                                 nullptr,
+                                                 AlphaFunction::EASE_OUT,
+                                                 TimePeriod(animDef.GetDuration())}));
 
   auto anim = animDef.ReAnimate(getActor);
   DALI_TEST_EQUAL(anim.GetDuration(), animDef.GetDuration());

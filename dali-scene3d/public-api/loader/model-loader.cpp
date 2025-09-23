@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,8 @@ void ModelLoader::CreateModelLoader()
       }
 
       // Store the handle in the shared_ptr (passing the handle and the custom deleter)
-      gUsdLoaderHandle = std::shared_ptr<void*>(new void*(handle), [](void* ptr) {
+      gUsdLoaderHandle = std::shared_ptr<void*>(new void*(handle), [](void* ptr)
+      {
         if(ptr)
         {
           DlcloseDeleter(*(static_cast<void**>(ptr))); // Call custom deleter

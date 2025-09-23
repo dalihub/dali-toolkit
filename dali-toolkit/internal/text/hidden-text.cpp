@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 using namespace Dali::Toolkit;
 
-const int      DEFAULT_SHOW_DURATION = 1000;
+const int DEFAULT_SHOW_DURATION = 1000;
 
 namespace Dali
 {
@@ -148,7 +148,6 @@ void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& 
       break;
     }
   }
-
 
   if(mHideMode == Toolkit::HiddenInput::Mode::SHOW_LAST_CHARACTER)
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,15 +40,15 @@ ItalicSpan::~ItalicSpan()
 
 Dali::Toolkit::Text::ItalicSpan ItalicSpan::New()
 {
-  ItalicSpanPtr object = new ItalicSpan();
+  ItalicSpanPtr                   object = new ItalicSpan();
   Dali::Toolkit::Text::ItalicSpan handle = Dali::Toolkit::Text::ItalicSpan(object.Get());
   return handle;
 }
 void ItalicSpan::CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const
 {
   FontDescriptionRun fontRun;
-  fontRun.slant        = TextAbstraction::FontSlant::ITALIC;
-  fontRun.slantDefined = true;
+  fontRun.slant                           = TextAbstraction::FontSlant::ITALIC;
+  fontRun.slantDefined                    = true;
   fontRun.characterRun.characterIndex     = range.GetStartIndex();
   fontRun.characterRun.numberOfCharacters = range.GetNumberOfIndices();
   logicalModel->mFontDescriptionRuns.PushBack(fontRun);

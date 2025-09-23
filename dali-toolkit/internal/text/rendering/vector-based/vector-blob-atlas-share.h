@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_BLOB_ATLAS_SHARE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,10 +72,10 @@ public:
 
 public:
   // Default copy and move operator
-  VectorBlobAtlasShare(const VectorBlobAtlasShare& rhs) = default;
-  VectorBlobAtlasShare(VectorBlobAtlasShare&& rhs)      = default;
+  VectorBlobAtlasShare(const VectorBlobAtlasShare& rhs)            = default;
+  VectorBlobAtlasShare(VectorBlobAtlasShare&& rhs)                 = default;
   VectorBlobAtlasShare& operator=(const VectorBlobAtlasShare& rhs) = default;
-  VectorBlobAtlasShare& operator=(VectorBlobAtlasShare&& rhs) = default;
+  VectorBlobAtlasShare& operator=(VectorBlobAtlasShare&& rhs)      = default;
 
 private:
   class Impl;

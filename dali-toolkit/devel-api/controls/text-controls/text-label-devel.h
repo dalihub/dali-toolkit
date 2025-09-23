@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ namespace Render
  */
 enum Mode
 {
-  SYNC = 0,     ///< default, synchronous text loading.
-  ASYNC_AUTO,   ///< automatically requests an asynchronous text load in OnRelayout.
-  ASYNC_MANUAL  ///< users should manually request rendering using the async text method.
+  SYNC = 0,    ///< default, synchronous text loading.
+  ASYNC_AUTO,  ///< automatically requests an asynchronous text load in OnRelayout.
+  ASYNC_MANUAL ///< users should manually request rendering using the async text method.
 };
 
 } // namespace Render
@@ -74,91 +74,91 @@ enum Type
   LINE_WRAP_MODE         = Dali::Toolkit::TextLabel::Property::LINE_WRAP_MODE,
 
   /**
-     * @brief The direction of the layout.
-     * @details Name "textDirection", type [Type](@ref Dali::Toolkit::DevelText::TextDirection::Type) (Property::INTEGER), Read/Write
-     * @note The text direction can be changed only by replacing the text itself.
-     * @see TextDirection::Type for supported values.
-     */
+   * @brief The direction of the layout.
+   * @details Name "textDirection", type [Type](@ref Dali::Toolkit::DevelText::TextDirection::Type) (Property::INTEGER), Read/Write
+   * @note The text direction can be changed only by replacing the text itself.
+   * @see TextDirection::Type for supported values.
+   */
   TEXT_DIRECTION,
 
   /**
-     * @brief Alignment of text within area of single line
-     * @details Name "verticalLineAlignment", type [Type](@ref Dali::Toolkit::DevelText::VerticalLineAlignment::Type) (Property::INTEGER), Read/Write
-     * @note The default value is TOP
-     * @see VerticalLineAlignment::Type for supported values
-     */
+   * @brief Alignment of text within area of single line
+   * @details Name "verticalLineAlignment", type [Type](@ref Dali::Toolkit::DevelText::VerticalLineAlignment::Type) (Property::INTEGER), Read/Write
+   * @note The default value is TOP
+   * @see VerticalLineAlignment::Type for supported values
+   */
   VERTICAL_LINE_ALIGNMENT,
 
   /**
-     * @brief The default text background parameters.
-     * @details Name "textBackground", type Property::MAP.
-     * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
-     *
-     * The background map contains the following keys:
-     *
-     * | %Property Name       | Type     | Required | Description                                                                                                        |
-     * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
-     * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
-     * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
-     */
+   * @brief The default text background parameters.
+   * @details Name "textBackground", type Property::MAP.
+   * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
+   *
+   * The background map contains the following keys:
+   *
+   * | %Property Name       | Type     | Required | Description                                                                                                        |
+   * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+   * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
+   * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
+   */
   BACKGROUND,
 
   /**
-     * @brief Ignore spaces after text.
-     * @details Name "ignoreSpacesAfterText", type (Property::BOLEAN), Read/Write
-     * @note The default value is true
-     */
+   * @brief Ignore spaces after text.
+   * @details Name "ignoreSpacesAfterText", type (Property::BOLEAN), Read/Write
+   * @note The default value is true
+   */
   IGNORE_SPACES_AFTER_TEXT,
 
   /**
-     * @brief Modifies the default text alignment to match the direction of the system language.
-     * @details Name "matchSystemLanguageDirection", type (Property::BOLEAN), Read/Write
-     * @note The default value is true
-     *
-     * If MATCH_SYSTEM_LANGUAGE_DIRECTION property set true, the default text alignment to match the direction of the system language.
-     *
-     * ex) Current system language direction LTR.
-     *     TextLabel::New("Hello world \n  ﻡﺮﺤﺑﺍ. ");
-     *     TextLabel::Property::HORIZONTAL_ALIGNMENT, "END"
-     *
-     * | TextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION                 |
-     * |-----------------------------------------------------------------------
-     * |               false               |          true (default)          |
-     * |-----------------------------------|----------------------------------|
-     * |                     Hello world   |                  Hello world     |
-     * |   ﻡﺮﺤﺑﺍ.                     |                          ﻡﺮﺤﺑﺍ.      |
-     *
-     */
+   * @brief Modifies the default text alignment to match the direction of the system language.
+   * @details Name "matchSystemLanguageDirection", type (Property::BOLEAN), Read/Write
+   * @note The default value is true
+   *
+   * If MATCH_SYSTEM_LANGUAGE_DIRECTION property set true, the default text alignment to match the direction of the system language.
+   *
+   * ex) Current system language direction LTR.
+   *     TextLabel::New("Hello world \n  ﻡﺮﺤﺑﺍ. ");
+   *     TextLabel::Property::HORIZONTAL_ALIGNMENT, "END"
+   *
+   * | TextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION                 |
+   * |-----------------------------------------------------------------------
+   * |               false               |          true (default)          |
+   * |-----------------------------------|----------------------------------|
+   * |                     Hello world   |                  Hello world     |
+   * |   ﻡﺮﺤﺑﺍ.                     |                          ﻡﺮﺤﺑﺍ.      |
+   *
+   */
   MATCH_SYSTEM_LANGUAGE_DIRECTION,
 
   /**
-     * @brief The text fit parameters.
-     * @details Name "textFit", type Property::MAP.
-     * @note The default value is false
-     *
-     * The textFit map contains the following keys:
-     *
-     * | %Property Name       | Type     | Required | Description                                                                                                        |
-     * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
-     * | enable               | BOOLEAN  | No       | True to enable the text fit or false to disable (the default value is false)                                     |
-     * | minSize              | FLOAT    | No       | Minimum Size for text fit (the default value is 10.f)                                                     |
-     * | maxSize              | FLOAT    | No       | Maximum Size for text fit (the default value is 100.f)                                                     |
-     * | stepSize             | FLOAT    | No       | Step Size for font increase (the default value is 1.f)                                                     |
-     * | fontSizeType         | STRING   | No       | The size type of font, You can choose between "pointSize" or "pixelSize". (the default value is "pointSize")                                                     |
-     */
+   * @brief The text fit parameters.
+   * @details Name "textFit", type Property::MAP.
+   * @note The default value is false
+   *
+   * The textFit map contains the following keys:
+   *
+   * | %Property Name       | Type     | Required | Description                                                                                                        |
+   * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+   * | enable               | BOOLEAN  | No       | True to enable the text fit or false to disable (the default value is false)                                     |
+   * | minSize              | FLOAT    | No       | Minimum Size for text fit (the default value is 10.f)                                                     |
+   * | maxSize              | FLOAT    | No       | Maximum Size for text fit (the default value is 100.f)                                                     |
+   * | stepSize             | FLOAT    | No       | Step Size for font increase (the default value is 1.f)                                                     |
+   * | fontSizeType         | STRING   | No       | The size type of font, You can choose between "pointSize" or "pixelSize". (the default value is "pointSize")                                                     |
+   */
   TEXT_FIT,
 
   /**
-     * @brief Sets the height of the line in points.
-     * @details Name "lineSize", type Property::FLOAT.
-     * @note If the font size is larger than the line size, it works with the font size.
-     */
+   * @brief Sets the height of the line in points.
+   * @details Name "lineSize", type Property::FLOAT.
+   * @note If the font size is larger than the line size, it works with the font size.
+   */
   MIN_LINE_SIZE,
 
   /**
-     * @brief The type of rendering e.g. bitmap-based.
-     * @details Name "renderingBackend", type Property::INT.
-     */
+   * @brief The type of rendering e.g. bitmap-based.
+   * @details Name "renderingBackend", type Property::INT.
+   */
   RENDERING_BACKEND,
 
   /**
@@ -182,11 +182,11 @@ enum Type
   ENABLE_FONT_SIZE_SCALE,
 
   /**
-  * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
-  * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
-  * @note Default is EllipsisPosition::END.
-  * @see DevelText::EllipsisPosition
-  */
+   * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
+   * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
+   * @note Default is EllipsisPosition::END.
+   * @see DevelText::EllipsisPosition
+   */
   ELLIPSIS_POSITION,
 
   /**
@@ -205,12 +205,12 @@ enum Type
   STRIKETHROUGH,
 
   /**
-  * @brief The spaces between characters in Pixels.
-  * @details Name "characterSpacing", type Property::FLOAT.
-  * @note
-  *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
-  *   The default value is 0.f which does nothing.
-  */
+   * @brief The spaces between characters in Pixels.
+   * @details Name "characterSpacing", type Property::FLOAT.
+   * @note
+   *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *   The default value is 0.f which does nothing.
+   */
   CHARACTER_SPACING,
 
   /**
@@ -331,7 +331,10 @@ enum Type
 struct FitOption
 {
   FitOption(float pointSize = 0.0f, float minLineSize = 0.0f)
-  : mPointSize(pointSize), mMinLineSize(minLineSize) {}
+  : mPointSize(pointSize),
+    mMinLineSize(minLineSize)
+  {
+  }
 
   float GetPointSize() const
   {

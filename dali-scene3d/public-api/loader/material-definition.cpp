@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,13 +91,15 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   Dali::PixelData pixelData;
   if(!textureDefinition.mTextureBuffer.empty())
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
+    { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
     Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
     if(pixelBuffer)
     {
       pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
+    {
       oss << "[";
       if(pixelData)
       {
@@ -116,13 +118,15 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
       Dali::Toolkit::DecodeBase64FromString(data, buffer);
       uint32_t bufferSize = buffer.size();
 
-      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[embedded s:" << bufferSize << "]"; });
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
+      { oss << "[embedded s:" << bufferSize << "]"; });
       Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
       if(pixelBuffer)
       {
         pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
       }
-      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
+      {
         oss << "[";
         if(pixelData)
         {
@@ -271,7 +275,8 @@ MaterialDefinition::LoadRaw(const std::string& imagesPath)
 
   // Load textures
   auto iTexture   = mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags) {
+  auto checkStage = [&](uint32_t flags)
+  {
     return iTexture != mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
   };
 
@@ -520,7 +525,8 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
 bool MaterialDefinition::CheckTextures(uint32_t flags) const
 {
-  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts) { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
+  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts)
+  { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
 }
 
 } // namespace Loader

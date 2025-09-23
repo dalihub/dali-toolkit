@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_SETTINGS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,14 +101,14 @@ public:
    * @param[in] enabled if true, to enable the cache builder
    *       otherwise to disable
    */
-  void EnableCacheBuilder( bool enabled );
+  void EnableCacheBuilder(bool enabled);
 
   /**
    * @brief Used/Unused uses scrollbar thumb focus notifications. The default is used.
    *
    * @param[in] used True if uses scrollbar thumb focus notifications, false otherwise
    */
-  void UseScrollbarThumbFocusNotifications ( bool used );
+  void UseScrollbarThumbFocusNotifications(bool used);
 
   /**
    * @brief Enable/disables do not track executing.
@@ -116,7 +116,7 @@ public:
    * @param[in] enabled if true, to enable do not track
    *        otherwise to disable
    */
-  void EnableDoNotTrack( bool enabled );
+  void EnableDoNotTrack(bool enabled);
 
   /**
    * @brief Allow/Disallow file access from external url
@@ -147,12 +147,12 @@ public:
    */
   bool IsAutoFittingEnabled() const;
 
-   /**
+  /**
    * @brief Enables/disables auto fitting executing. The default is enabled.
    *
    * @param[in] enabled True if auto fitting executing is enabled, false otherwise
    */
-  void EnableAutoFitting( bool enabled );
+  void EnableAutoFitting(bool enabled);
 
   /**
    * @brief Returns whether plugins can be executable. The default is true.
@@ -161,12 +161,12 @@ public:
    */
   bool ArePluginsEnabled() const;
 
-   /**
+  /**
    * @brief Enables/disables Plugins executing. The default is enabled.
    *
    * @param[in] enabled True if Plugins executing is enabled, false otherwise
    */
-  void EnablePlugins( bool enabled );
+  void EnablePlugins(bool enabled);
 
   /**
    * @brief Returns whether private browsing can be executable. The default is true.
@@ -180,7 +180,7 @@ public:
    *
    * @param[in] enabled True if private browsing executing is enabled, false otherwise
    */
-  void EnablePrivateBrowsing( bool enabled );
+  void EnablePrivateBrowsing(bool enabled);
 
   /**
    * @brief Returns whether link magnifier can be executable. The default is true.
@@ -194,7 +194,7 @@ public:
    *
    * @param[in] enabled True if link magnifier executing is enabled, false otherwise
    */
-  void EnableLinkMagnifier( bool enabled );
+  void EnableLinkMagnifier(bool enabled);
 
   /**
    * @brief Returns whether uses keypad without user action can be executable. The default is true.
@@ -208,7 +208,7 @@ public:
    *
    * @param[in] used True if keypad without user action executing is used, false otherwise
    */
-  void UseKeypadWithoutUserAction( bool used );
+  void UseKeypadWithoutUserAction(bool used);
 
   /**
    * @brief Returns whether autofill password form can be executable. The default is true.
@@ -222,7 +222,7 @@ public:
    *
    * @param[in] enabled True if autofill password form executing is enabled, false otherwise
    */
-  void EnableAutofillPasswordForm( bool enabled );
+  void EnableAutofillPasswordForm(bool enabled);
 
   /**
    * @brief Returns whether form candidate data can be executable. The default is true.
@@ -236,7 +236,7 @@ public:
    *
    * @param[in] enabled True if form candidate data executing is enabled, false otherwise
    */
-  void EnableFormCandidateData( bool enabled );
+  void EnableFormCandidateData(bool enabled);
 
   /**
    * @brief Returns whether text selection can be executable. The default is true.
@@ -250,7 +250,7 @@ public:
    *
    * @param[in] enabled True if text selection executing is enabled, false otherwise
    */
-  void EnableTextSelection( bool enabled );
+  void EnableTextSelection(bool enabled);
 
   /**
    * @brief Returns whether text autosizing can be executable. The default is true.
@@ -264,7 +264,7 @@ public:
    *
    * @param[in] enabled True if text autosizing executing is enabled, false otherwise
    */
-  void EnableTextAutosizing( bool enabled );
+  void EnableTextAutosizing(bool enabled);
 
   /**
    * @brief Returns whether arrow scroll can be executable. The default is true.
@@ -278,7 +278,7 @@ public:
    *
    * @param[in] enabled True if arrow scroll executing is enabled, false otherwise
    */
-  void EnableArrowScroll( bool enabled );
+  void EnableArrowScroll(bool enabled);
 
   /**
    * @brief Returns whether clipboard can be executable. The default is true.
@@ -292,7 +292,7 @@ public:
    *
    * @param[in] enabled True if clipboard is enabled, false otherwise
    */
-  void EnableClipboard( bool enabled );
+  void EnableClipboard(bool enabled);
 
   /**
    * @brief Returns whether ime panel can be executable. The default is true.
@@ -306,7 +306,7 @@ public:
    *
    * @param[in] enabled True if ime panel executing is enabled, false otherwise
    */
-  void EnableImePanel( bool enabled );
+  void EnableImePanel(bool enabled);
 
   /**
    * @brief Allow if the scripts can open new windows.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTION_HANDLE_CONTROLLER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 
 namespace Dali
 {

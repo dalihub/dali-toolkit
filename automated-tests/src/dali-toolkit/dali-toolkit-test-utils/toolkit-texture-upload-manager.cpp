@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,7 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
         info.srcExtent2D  = {pixelData.GetWidth(), pixelData.GetHeight()};
         info.srcOffset    = 0;
         info.srcSize      = Dali::Integration::GetPixelDataBuffer(pixelData).bufferSize;
-        info.srcStride    = bytesPerPixel ? (pixelData.GetStrideBytes() / bytesPerPixel) : 0u;  ///< Note : Graphics stride use pixel scale!
+        info.srcStride    = bytesPerPixel ? (pixelData.GetStrideBytes() / bytesPerPixel) : 0u; ///< Note : Graphics stride use pixel scale!
         info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelFormat);
 
         Graphics::TextureUpdateSourceInfo updateSourceInfo{};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,9 +115,9 @@ const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE          = "enableFontSiz
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR               = "grabHandleColor";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
-const char* const PROPERTY_NAME_REMOVE_FRONT_INSET    = "removeFrontInset";
-const char* const PROPERTY_NAME_REMOVE_BACK_INSET     = "removeBackInset";
-const char* const PROPERTY_NAME_FONT_VARIATIONS       = "fontVariations";
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET  = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS    = "fontVariations";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -1097,10 +1097,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map embossMapSet;
   Property::Map embossMapGet;
 
-  embossMapSet["enable"] = true;
-  embossMapSet["direction"] = Vector2(-1.0f, -1.0f);
-  embossMapSet["strength"] = 5.f;
-  embossMapSet["lightColor"] = Color::WHITE;
+  embossMapSet["enable"]      = true;
+  embossMapSet["direction"]   = Vector2(-1.0f, -1.0f);
+  embossMapSet["strength"]    = 5.f;
+  embossMapSet["lightColor"]  = Color::WHITE;
   embossMapSet["shadowColor"] = Color::BLACK;
   field.SetProperty(TextField::Property::EMBOSS, embossMapSet);
 
@@ -1119,9 +1119,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
-  outlineMapSet["color"] = Color::RED;
-  outlineMapSet["width"] = 2.0f;
-  outlineMapSet["offset"] = Vector2(0.0f, 0.0f);
+  outlineMapSet["color"]      = Color::RED;
+  outlineMapSet["width"]      = 2.0f;
+  outlineMapSet["offset"]     = Vector2(0.0f, 0.0f);
   outlineMapSet["blurRadius"] = 0.0f;
 
   field.SetProperty(TextField::Property::OUTLINE, outlineMapSet);
@@ -1316,9 +1316,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map invalidFontVariationsMapSet;
   Property::Map invalidFontVariationsMapGet;
 
-  invalidFontVariationsMapSet.Insert("abcde", 0.f);    // invalid because key length is not 4.
-  invalidFontVariationsMapSet.Insert("abc", 0.f);     // invalid because key length is not 4.
-  invalidFontVariationsMapSet.Insert("abcd", "str");  // invalid because value is not float.
+  invalidFontVariationsMapSet.Insert("abcde", 0.f);  // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abc", 0.f);    // invalid because key length is not 4.
+  invalidFontVariationsMapSet.Insert("abcd", "str"); // invalid because value is not float.
   field.SetProperty(DevelTextField::Property::FONT_VARIATIONS, invalidFontVariationsMapSet);
 
   invalidFontVariationsMapGet = field.GetProperty<Property::Map>(DevelTextField::Property::FONT_VARIATIONS);
@@ -6293,16 +6293,16 @@ int utcDaliTextFieldFontVariationsRegister(void)
   application.Render();
 
   // Invalid key check
-  std::string INVALID_KEY = "invalid";
-  auto invalidFontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, INVALID_KEY.data());
+  std::string INVALID_KEY                = "invalid";
+  auto        invalidFontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, INVALID_KEY.data());
   DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
 
   application.GetScene().Add(field);
   application.SendNotification();
   application.Render();
 
-  std::string WGHT_KEY = "wght";
-  const float WGHT_VALUE = 100.f;
+  std::string WGHT_KEY       = "wght";
+  const float WGHT_VALUE     = 100.f;
   const float WGHT_VALUE_END = 900.f;
 
   // Check with no previous variations.
@@ -6364,8 +6364,8 @@ int utcDaliTextFieldLocaleChangedCoverage(void)
   application.SendNotification();
   application.Render();
 
-  Adaptor &adaptor = application.GetAdaptor();
-  std::string locale = "en_US";
+  Adaptor&    adaptor = application.GetAdaptor();
+  std::string locale  = "en_US";
   adaptor.LocaleChangedSignal().Emit(locale);
 
   application.SendNotification();

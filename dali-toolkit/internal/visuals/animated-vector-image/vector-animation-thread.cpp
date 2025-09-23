@@ -191,7 +191,7 @@ void VectorAnimationThread::RemoveEventTriggerCallbacks(CallbackBase* callback)
   if(DALI_LIKELY(!mDestroyThread))
   {
     auto iter = std::remove_if(mTriggerEventCallbacks.begin(), mTriggerEventCallbacks.end(), [&callback](std::pair<CallbackBase*, uint32_t>& item)
-                               { return item.first == callback; });
+    { return item.first == callback; });
     mTriggerEventCallbacks.erase(iter, mTriggerEventCallbacks.end());
   }
 }
@@ -250,15 +250,15 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
   if(DALI_LIKELY(!mDestroyThread))
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
-                                            { oss << "[" << mAnimationTasks.size() << "," << useCurrentTime << "]"; });
+    { oss << "[" << mAnimationTasks.size() << "," << useCurrentTime << "]"; });
 
     // Find if the task is already in the list except loading task
     auto iter = std::find_if(mAnimationTasks.begin(), mAnimationTasks.end(), [task, useCurrentTime](VectorAnimationTaskPtr& element)
-                             {
-                               return (element == task) &&
-                                      (!useCurrentTime ||            // If we don't need to use current time (i.e. CompletedTasks)
-                                       !element->IsLoadRequested()); // Or we need to use current time And loading completed.
-                             });
+    {
+      return (element == task) &&
+             (!useCurrentTime ||            // If we don't need to use current time (i.e. CompletedTasks)
+              !element->IsLoadRequested()); // Or we need to use current time And loading completed.
+    });
 
     if(iter == mAnimationTasks.end())
     {
@@ -283,7 +283,7 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
       }
 
       DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
-                                            { oss << "[" << mAnimationTasks.size() << "]"; });
+      { oss << "[" << mAnimationTasks.size() << "]"; });
 
       return true;
     }
@@ -298,7 +298,7 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
   // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
   // Since we should make ensure that all working tasks are completed before destroying the thread.
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
-                                          { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]"; });
+  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]"; });
   bool needRasterize = false;
 
   for(auto&& taskPair : completedTasksQueue)
@@ -342,7 +342,7 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
-                                        { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
+  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
 }
 
 /// VectorAnimationThread called
@@ -391,7 +391,7 @@ void VectorAnimationThread::Rasterize()
       if(mAnimationTasks.size() > 0u)
       {
         DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
-                                                { oss << "[" << mAnimationTasks.size() << "]"; });
+        { oss << "[" << mAnimationTasks.size() << "]"; });
 
         // pop out the next task from the queue
         for(auto it = mAnimationTasks.begin(); it != mAnimationTasks.end();)
@@ -425,7 +425,7 @@ void VectorAnimationThread::Rasterize()
           }
         }
         DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
-                                              { oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]"; });
+        { oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]"; });
       }
     }
   }
@@ -563,7 +563,7 @@ void VectorAnimationThread::SleepThread::Run()
       if(DALI_LIKELY(!mDestroyThread))
       {
         DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD", [&](std::ostringstream& oss)
-                                                {
+        {
           oss << "[";
           if(needToSleep)
           {

@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_CACHE_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,9 +143,9 @@ public:
 
 public:
   // Default copy and move operator
-  ModelCacheManager(const ModelCacheManager& rhs) = default;
-  ModelCacheManager(ModelCacheManager&& rhs)      = default;
-  ModelCacheManager& operator=(const ModelCacheManager& rhs) = default;
+  ModelCacheManager(const ModelCacheManager& rhs)                = default;
+  ModelCacheManager(ModelCacheManager&& rhs)                     = default;
+  ModelCacheManager& operator=(const ModelCacheManager& rhs)     = default;
   ModelCacheManager& operator=(ModelCacheManager&& rhs) noexcept = default;
 
 private:

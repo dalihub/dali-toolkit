@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_MESH_FACTORY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,15 +31,15 @@ namespace AtlasMeshFactory
 typedef uint32_t SizeType;
 
 /**
-   * @brief Create a Quad that describes an area in an atlas and a position.
-   *
-   * @param[in]  width Width of area in pixels.
-   * @param[in]  height Height of area in pixels.
-   * @param[in]  block Block position in atlas.
-   * @param[in]  atlasSize Atlas and block dimensions.
-   * @param[in]  position Position to place area in space.
-   * @param[out] mesh Mesh object to hold created quad.
-   */
+ * @brief Create a Quad that describes an area in an atlas and a position.
+ *
+ * @param[in]  width Width of area in pixels.
+ * @param[in]  height Height of area in pixels.
+ * @param[in]  block Block position in atlas.
+ * @param[in]  atlasSize Atlas and block dimensions.
+ * @param[in]  position Position to place area in space.
+ * @param[out] mesh Mesh object to hold created quad.
+ */
 void CreateQuad(SizeType                                width,
                 SizeType                                height,
                 SizeType                                block,
@@ -48,11 +48,11 @@ void CreateQuad(SizeType                                width,
                 Toolkit::AtlasManager::Mesh2D&          mesh);
 
 /**
-   * @brief Append one mesh to another.
-   *
-   * @param[in,out] first Mesh to append to.
-   * @param[in]     second Mesh to append.
-   */
+ * @brief Append one mesh to another.
+ *
+ * @param[in,out] first Mesh to append to.
+ * @param[in]     second Mesh to append.
+ */
 void AppendMesh(Toolkit::AtlasManager::Mesh2D&       first,
                 const Toolkit::AtlasManager::Mesh2D& second);
 

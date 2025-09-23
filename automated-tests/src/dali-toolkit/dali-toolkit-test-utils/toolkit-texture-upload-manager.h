@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOLKIT_TEXTURE_UPLOAD_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Dali
 namespace Graphics DALI_INTERNAL
 {
 class Controller;
-} // namespace DALI_INTERNAL
+} //namespace Graphics DALI_INTERNAL
 } // namespace Dali
 
 namespace Test

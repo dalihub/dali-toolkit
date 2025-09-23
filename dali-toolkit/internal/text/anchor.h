@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ANCHOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ struct Anchor
 
   Vector4 markupClickedColor; ///< The markup color of the anchor when clicked. if there is no markup attribute, the default color stored in the controller is used.
 
-  bool     isClicked               = false; ///< Whether the anchor is clicked or not.
-  bool     isMarkupColorSet        = false; ///< Whether the markup color has been set or not.
-  bool     isMarkupClickedColorSet = false; ///< Whether the markup clicked color has been set or not.
+  bool isClicked               = false; ///< Whether the anchor is clicked or not.
+  bool isMarkupColorSet        = false; ///< Whether the markup color has been set or not.
+  bool isMarkupClickedColorSet = false; ///< Whether the markup clicked color has been set or not.
 };
 
 } // namespace Text

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,10 +197,10 @@ private: // From Control
   void OnSizeSet(const Vector3& size) override;
 
   /**
-  * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
-  * @param[in] actor The actor whose layoutDirection is changed.
-  * @param[in] type  The layoutDirection.
-  */
+   * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+   * @param[in] actor The actor whose layoutDirection is changed.
+   * @param[in] type  The layoutDirection.
+   */
   void OnLayoutDirectionChanged(Dali::Actor actor, Dali::LayoutDirection::Type type);
 
 private: // Implementation

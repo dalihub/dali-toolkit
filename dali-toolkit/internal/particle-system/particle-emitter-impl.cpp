@@ -349,7 +349,7 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
 
     updateTasks.emplace_back(GetImplementation(modifier), mParticleList, index, count);
     tasks.emplace_back([&task = updateTasks.back()](uint32_t n)
-                       { task.Update(); });
+    { task.Update(); });
   }
 
   auto future = threadPool.SubmitTasks(tasks, 0);
@@ -455,7 +455,7 @@ Dali::ThreadPool& GetThreadPool()
   if(!gThreadPool)
   {
     std::call_once(onceFlag, [&threadPool = gThreadPool]
-                   { threadPool = std::make_unique<Dali::ThreadPool>();
+    { threadPool = std::make_unique<Dali::ThreadPool>();
                      threadPool->Initialize(4u); });
   }
 

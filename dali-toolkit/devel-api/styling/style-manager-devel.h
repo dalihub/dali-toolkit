@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_STYLE_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,22 +48,22 @@ using BrokenImageChangedSignalType = Signal<void(StyleManager)>;
  * @pre The Builder has been initialized.
  * @param[in] styleManager The instance of StyleManager
  * @return A property map to the currently defined configurations
-**/
+ **/
 DALI_TOOLKIT_API const Property::Map& GetConfigurations(StyleManager styleManager);
 
 /**
-   * @brief Sets an image to be used when a visual has failed to correctly render
-   * @param[in] styleManager The instance of StyleManager
-   * @param[in] brokenImageType The type of broken image
-   * @param[in] brokenImageUrl The broken image url
-   */
+ * @brief Sets an image to be used when a visual has failed to correctly render
+ * @param[in] styleManager The instance of StyleManager
+ * @param[in] brokenImageType The type of broken image
+ * @param[in] brokenImageUrl The broken image url
+ */
 DALI_TOOLKIT_API void SetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl);
 
 /**
-   * @brief Gets an image to be used when a visual has failed to correctly render
-   * @param[in] styleManager The instance of StyleManager
-   * @param[in] brokenImageType BrokenImage type
-   */
+ * @brief Gets an image to be used when a visual has failed to correctly render
+ * @param[in] styleManager The instance of StyleManager
+ * @param[in] brokenImageType BrokenImage type
+ */
 DALI_TOOLKIT_API std::string GetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType);
 
 /**

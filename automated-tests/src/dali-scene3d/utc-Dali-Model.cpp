@@ -75,7 +75,7 @@ const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercis
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2024 Wave Coorporation
+ * Copyright (c) 2025 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1314,7 +1314,8 @@ int UtcDaliModelCameraGenerate02(void)
   CameraActor appliedCamera;
   DALI_TEST_EQUALS(model.ApplyCamera(0u, appliedCamera), false, TEST_LOCATION); // Cannot apply into empty camera.
 
-  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location) {
+  auto CompareCameraProperties = [](CameraActor lhs, CameraActor rhs, const char* location)
+  {
     DALI_TEST_EQUALS(lhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), rhs.GetProperty<int>(Dali::CameraActor::Property::PROJECTION_MODE), TEST_LOCATION);
     DALI_TEST_EQUALS(lhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), rhs.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), TEST_LOCATION);
 

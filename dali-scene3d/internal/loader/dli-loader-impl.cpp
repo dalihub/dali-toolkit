@@ -502,7 +502,8 @@ void DliLoaderImpl::Impl::ParseScene(LoadParams& params)
 
 void DliLoaderImpl::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
+  {
     auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
     if(!tn)
     {
@@ -585,7 +586,8 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
         uint32_t                   jointCount = 0;
         std::function<void(Index)> visitFn;
         auto&                      ibms = mInverseBindMatrices;
-        visitFn                         = [&](Index id) {
+        visitFn                         = [&](Index id)
+        {
           auto node = scene.GetNode(id);
           jointCount += ibms.find(id) != ibms.end();
 
@@ -604,7 +606,8 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
 
         skeleton.mJoints.reserve(jointCount);
 
-        visitFn = [&](Index id) {
+        visitFn = [&](Index id)
+        {
           auto iFind = ibms.find(id);
           if(iFind != ibms.end() && skeleton.mJoints.size() < Skinning::MAX_JOINTS)
           {
@@ -667,7 +670,8 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
     auto&            node = (*i0).second;
     ShaderDefinition shaderDef;
     ReadStringVector(node.GetChild("defines"), shaderDef.mDefines);
-    auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](std::string& item) { return (item == "SSS"); });
+    auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](std::string& item)
+    { return (item == "SSS"); });
     if(sssIter != shaderDef.mDefines.end())
     {
       shaderDef.mDefines.erase(sssIter);
@@ -1111,7 +1115,8 @@ void DliLoaderImpl::Impl::ParseNodes(const TreeNode* const nodes, Index index, L
 
     virtual unsigned int Resolve(Index iDli) override
     {
-      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli) { return idx.iDli < iDli; });
+      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli)
+      { return idx.iDli < iDli; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }
@@ -1461,7 +1466,8 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     ReadString(tnAnim.GetChild(NAME), animationName);
     animDef.SetName(animationName);
 
-    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1) { return ad0.GetName() < ad1.GetName(); });
+    auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1)
+              { return ad0.GetName() < ad1.GetName(); });
     const bool overwrite = iFind != definitions.end() && iFind->GetName() == animDef.GetName();
     if(overwrite)
     {
@@ -1731,7 +1737,8 @@ void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimat
       continue;
     }
 
-    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name) { return group.mName < name; });
+    auto iFind = std::lower_bound(animGroups.begin(), animGroups.end(), groupName, [](const AnimationGroupDefinition& group, const std::string& name)
+    { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == groupName)
     {
       mOnError(FormatString("Animation group with name '%s' already exists; new entries will be merged.", groupName.c_str()));

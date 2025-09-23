@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_EFFECT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace Internal DALI_INTERNAL
 {
 class ScrollViewEffect;
 class ScrollViewWobbleEffect;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_scroll_view
  * @{

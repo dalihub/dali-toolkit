@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  *
  */
 
-
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/text/spans/character-spacing-span.h>
@@ -25,25 +24,25 @@ using namespace Toolkit;
 
 int UtcDaliToolkitCharacterSpacingSpanNew(void)
 {
-    ToolkitTestApplication application;
-    tet_infoline("UtcDaliToolkitCharacterSpacingSpanNew");
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitCharacterSpacingSpanNew");
 
-    auto charSpacingSpan = Text::CharacterSpacingSpan::New(5.6f);
-    DALI_TEST_CHECK(charSpacingSpan);
+  auto charSpacingSpan = Text::CharacterSpacingSpan::New(5.6f);
+  DALI_TEST_CHECK(charSpacingSpan);
 
-    END_TEST;
+  END_TEST;
 }
 
 int UtcDaliToolkitGetCharacterSpacingSpan(void)
 {
-    ToolkitTestApplication application;
-    tet_infoline("UtcDaliToolkitCharacterSpacingSpanNew");
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitCharacterSpacingSpanNew");
 
-    auto charSpacingSpan = Text::CharacterSpacingSpan::New(9.1f);
-    DALI_TEST_CHECK(charSpacingSpan);
-    DALI_TEST_EQUALS(9.1f, charSpacingSpan.GetCharacterSpacing(), TEST_LOCATION);
+  auto charSpacingSpan = Text::CharacterSpacingSpan::New(9.1f);
+  DALI_TEST_CHECK(charSpacingSpan);
+  DALI_TEST_EQUALS(9.1f, charSpacingSpan.GetCharacterSpacing(), TEST_LOCATION);
 
-    END_TEST;
+  END_TEST;
 }
 
 int UtcDaliToolkitCharacterSpacingSpanDownCast(void)

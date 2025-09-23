@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,13 +306,13 @@ bool FindSelectionIndicesTest(const FindSelectionIndicesData& data)
     CharacterIndex endIndex       = 0;
     CharacterIndex noTextHitIndex = 0;
     const bool     found          = FindSelectionIndices(visualModel,
-                                            logicalModel,
-                                            metrics,
-                                            data.visualX[index],
-                                            data.visualY[index],
-                                            startIndex,
-                                            endIndex,
-                                            noTextHitIndex);
+                                                         logicalModel,
+                                                         metrics,
+                                                         data.visualX[index],
+                                                         data.visualY[index],
+                                                         startIndex,
+                                                         endIndex,
+                                                         noTextHitIndex);
 
     if(found != data.found[index])
     {

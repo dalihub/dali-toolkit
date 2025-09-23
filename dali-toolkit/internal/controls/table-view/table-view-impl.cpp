@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1292,17 +1292,17 @@ Property::Value TableView::GetColumnWidthsPropertyValue()
 void TableView::GetMapPropertyValue(const RowColumnArray& data, Property::Map& map)
 {
   const char* fixedPolicy    = Scripting::GetEnumerationName<Toolkit::TableView::LayoutPolicy>(Toolkit::TableView::FIXED,
-                                                                                            LAYOUT_POLICY_STRING_TABLE,
-                                                                                            LAYOUT_POLICY_STRING_TABLE_COUNT);
+                                                                                               LAYOUT_POLICY_STRING_TABLE,
+                                                                                               LAYOUT_POLICY_STRING_TABLE_COUNT);
   const char* relativePolicy = Scripting::GetEnumerationName<Toolkit::TableView::LayoutPolicy>(Toolkit::TableView::RELATIVE,
                                                                                                LAYOUT_POLICY_STRING_TABLE,
                                                                                                LAYOUT_POLICY_STRING_TABLE_COUNT);
   const char* fillPolicy     = Scripting::GetEnumerationName<Toolkit::TableView::LayoutPolicy>(Toolkit::TableView::FILL,
-                                                                                           LAYOUT_POLICY_STRING_TABLE,
-                                                                                           LAYOUT_POLICY_STRING_TABLE_COUNT);
+                                                                                               LAYOUT_POLICY_STRING_TABLE,
+                                                                                               LAYOUT_POLICY_STRING_TABLE_COUNT);
   const char* fitPolicy      = Scripting::GetEnumerationName<Toolkit::TableView::LayoutPolicy>(Toolkit::TableView::FIT,
-                                                                                          LAYOUT_POLICY_STRING_TABLE,
-                                                                                          LAYOUT_POLICY_STRING_TABLE_COUNT);
+                                                                                               LAYOUT_POLICY_STRING_TABLE,
+                                                                                               LAYOUT_POLICY_STRING_TABLE_COUNT);
 
   const RowColumnArray::SizeType count = data.Size();
   for(RowColumnArray::SizeType i = 0; i < count; i++)

@@ -41,28 +41,27 @@ namespace Internal DALI_INTERNAL
 {
 class AsyncTextLoader;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 namespace Async
 {
-  enum RequestType
-  {
-    RENDER_FIXED_SIZE,
-    RENDER_FIXED_WIDTH,
-    RENDER_FIXED_HEIGHT,
-    RENDER_CONSTRAINT,
-    COMPUTE_NATURAL_SIZE,
-    COMPUTE_HEIGHT_FOR_WIDTH,
-  };
-  const char* const RequestTypeName[] =
+enum RequestType
+{
+  RENDER_FIXED_SIZE,
+  RENDER_FIXED_WIDTH,
+  RENDER_FIXED_HEIGHT,
+  RENDER_CONSTRAINT,
+  COMPUTE_NATURAL_SIZE,
+  COMPUTE_HEIGHT_FOR_WIDTH,
+};
+const char* const RequestTypeName[] =
   {
     "RENDER_FIXED_SIZE",
     "RENDER_FIXED_WIDTH",
     "RENDER_FIXED_HEIGHT",
     "RENDER_CONSTRAINT",
     "COMPUTE_NATURAL_SIZE",
-    "COMPUTE_HEIGHT_FOR_WIDTH"
-  };
+    "COMPUTE_HEIGHT_FOR_WIDTH"};
 } // namespace Async
 
 struct AsyncTextParameters
@@ -150,7 +149,7 @@ struct AsyncTextParameters
   std::string text;       ///< The text to be rendered encoded in utf8.
   std::string fontFamily; ///< The font's family.
 
-  Vector4 textColor;                 ///< The default text's color. Default is white.
+  Vector4 textColor; ///< The default text's color. Default is white.
   Vector4 underlineColor;
   Vector4 strikethroughColor;
   Vector4 shadowColor;
@@ -160,24 +159,24 @@ struct AsyncTextParameters
   Vector2 shadowOffset;
   Vector2 outlineOffset;
 
-  Extents padding;       ///< The padding of the boundaries where the text is going to be laid-out.
+  Extents padding; ///< The padding of the boundaries where the text is going to be laid-out.
 
-  Property::Map variationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
+  Property::Map                          variationsMap; ///< The map for variable fonts. it might be replaced by variable map run.
   std::vector<DevelTextLabel::FitOption> textFitArray;
 
   Vector2 embossDirection;
-  float embossStrength;
+  float   embossStrength;
   Vector4 embossLightColor;
   Vector4 embossShadowColor;
 
-  float fontSize;             ///< The font's size (in points).
-  float minLineSize;          ///< The line's minimum size (in pixels).
-  float lineSpacing;          ///< The default extra space between lines in points. (in pixels).
-  float relativeLineSize;     ///< The relative height of the line (a factor that will be multiplied by text height).
-  float characterSpacing;     ///< The space between characters.
-  float fontSizeScale;        ///< The font's size scale.
-  float textWidth;            ///< The width in pixels of the boundaries where the text is going to be laid-out.
-  float textHeight;           ///< The height in pixels of the boundaries where the text is going to be laid-out.
+  float fontSize;         ///< The font's size (in points).
+  float minLineSize;      ///< The line's minimum size (in pixels).
+  float lineSpacing;      ///< The default extra space between lines in points. (in pixels).
+  float relativeLineSize; ///< The relative height of the line (a factor that will be multiplied by text height).
+  float characterSpacing; ///< The space between characters.
+  float fontSizeScale;    ///< The font's size scale.
+  float textWidth;        ///< The width in pixels of the boundaries where the text is going to be laid-out.
+  float textHeight;       ///< The height in pixels of the boundaries where the text is going to be laid-out.
   float underlineHeight;
   float dashedUnderlineWidth;
   float dashedUnderlineGap;
@@ -188,18 +187,18 @@ struct AsyncTextParameters
   float textFitMaxSize;
   float textFitStepSize;
   float autoScrollLoopDelay;
-  float renderScale;          ///< The render scale.
-  float renderScaleWidth;     ///< The requested original textWidth when using render scale.
-  float renderScaleHeight;    ///< The requested original textHeight when using render scale.
+  float renderScale;       ///< The render scale.
+  float renderScaleWidth;  ///< The requested original textWidth when using render scale.
+  float renderScaleHeight; ///< The requested original textHeight when using render scale.
 
-  int maxTextureSize;      ///< The maximum size of texture.
-  int autoScrollSpeed;     ///< auto scroll properties.
+  int maxTextureSize;  ///< The maximum size of texture.
+  int autoScrollSpeed; ///< auto scroll properties.
   int autoScrollLoopCount;
   int autoScrollGap;
 
   uint16_t outlineWidth; ///< The width of the outline, if it is greater than 1, it is enabled.
 
-  Async::RequestType requestType;
+  Async::RequestType                     requestType;
   Text::HorizontalAlignment::Type        horizontalAlignment;   ///< The horizontal alignment: one of {BEGIN, CENTER, END}.
   Text::VerticalAlignment::Type          verticalAlignment;     ///< The vertical alignment: one of {TOP, CENTER, BOTTOM}.
   Text::LineWrap::Mode                   lineWrapMode;          ///< The line wrap mode: one of {WORD, CHARACTER, HYPHENATION, MIXED}.
@@ -214,21 +213,21 @@ struct AsyncTextParameters
   FontWidth                              fontWidth;             ///< The font's width.
   FontSlant                              fontSlant;             ///< The font's slant.
 
-  bool manualRender                   : 1; ///< Whether the manual rendered or not.
-  bool isMultiLine                    : 1; ///< Whether the multi-line layout is enabled.
-  bool ellipsis                       : 1; ///< Whether the ellipsis layout option is enabled.
-  bool enableMarkup                   : 1; ///< Whether the mark-up processor is enabled.
-  bool removeFrontInset               : 1; ///< Whether to ignore xBearing of the first glyph. Default is true.
-  bool removeBackInset                : 1; ///< Whether to ignore advance of the last glyph. Default is true.
-  bool isUnderlineEnabled             : 1; ///< Underline enabeld flag.
-  bool isStrikethroughEnabled         : 1; ///< Strikethrough enabeld flag.
-  bool isTextFitEnabled               : 1; ///< TextFit enabeld flag.
-  bool isTextFitArrayEnabled          : 1; ///< TextFitArray enabeld flag.
-  bool isAutoScrollEnabled            : 1; ///< Auto scroll enabeld flag.
+  bool manualRender : 1;                   ///< Whether the manual rendered or not.
+  bool isMultiLine : 1;                    ///< Whether the multi-line layout is enabled.
+  bool ellipsis : 1;                       ///< Whether the ellipsis layout option is enabled.
+  bool enableMarkup : 1;                   ///< Whether the mark-up processor is enabled.
+  bool removeFrontInset : 1;               ///< Whether to ignore xBearing of the first glyph. Default is true.
+  bool removeBackInset : 1;                ///< Whether to ignore advance of the last glyph. Default is true.
+  bool isUnderlineEnabled : 1;             ///< Underline enabeld flag.
+  bool isStrikethroughEnabled : 1;         ///< Strikethrough enabeld flag.
+  bool isTextFitEnabled : 1;               ///< TextFit enabeld flag.
+  bool isTextFitArrayEnabled : 1;          ///< TextFitArray enabeld flag.
+  bool isAutoScrollEnabled : 1;            ///< Auto scroll enabeld flag.
   bool isAutoScrollMaxTextureExceeded : 1; ///< Whether the auto scroll texture size exceeds the maximum texture width.
-  bool cutout                         : 1; ///< Cutout enabled flag.
-  bool backgroundWithCutoutEnabled    : 1; ///< Background with cutout enabled flag.
-  bool embossEnabled                  : 1; ///< Emboss enabled flag.
+  bool cutout : 1;                         ///< Cutout enabled flag.
+  bool backgroundWithCutoutEnabled : 1;    ///< Background with cutout enabled flag.
+  bool embossEnabled : 1;                  ///< Emboss enabled flag.
 };
 
 struct AsyncTextRenderInfo
@@ -271,13 +270,13 @@ struct AsyncTextRenderInfo
   int                lineCount;
   float              autoScrollWrapGap;
   bool               hasMultipleTextColors : 1;
-  bool               containsColorGlyph    : 1;
-  bool               styleEnabled          : 1;
-  bool               isOverlayStyle        : 1;
-  bool               isTextDirectionRTL    : 1;
-  bool               isCutout              : 1;
-  bool               manualRendered        : 1;
-  bool               embossEnabled         : 1;
+  bool               containsColorGlyph : 1;
+  bool               styleEnabled : 1;
+  bool               isOverlayStyle : 1;
+  bool               isTextDirectionRTL : 1;
+  bool               isCutout : 1;
+  bool               manualRendered : 1;
+  bool               embossEnabled : 1;
 };
 
 /**
@@ -445,10 +444,10 @@ public:
 
 public:
   // Default copy and move operator
-  AsyncTextLoader(const AsyncTextLoader& rhs) = default;
-  AsyncTextLoader(AsyncTextLoader&& rhs)      = default;
+  AsyncTextLoader(const AsyncTextLoader& rhs)            = default;
+  AsyncTextLoader(AsyncTextLoader&& rhs)                 = default;
   AsyncTextLoader& operator=(const AsyncTextLoader& rhs) = default;
-  AsyncTextLoader& operator=(AsyncTextLoader&& rhs) = default;
+  AsyncTextLoader& operator=(AsyncTextLoader&& rhs)      = default;
 };
 
 } // namespace Text

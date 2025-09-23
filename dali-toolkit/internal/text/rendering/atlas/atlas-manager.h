@@ -30,7 +30,7 @@ namespace Internal DALI_INTERNAL
 {
 class AtlasManager;
 
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 class AtlasManager : public BaseHandle
 {
@@ -271,10 +271,10 @@ public:
 
 public:
   // Default copy and move operator
-  AtlasManager(const AtlasManager& rhs) = default;
-  AtlasManager(AtlasManager&& rhs)      = default;
+  AtlasManager(const AtlasManager& rhs)            = default;
+  AtlasManager(AtlasManager&& rhs)                 = default;
   AtlasManager& operator=(const AtlasManager& rhs) = default;
-  AtlasManager& operator=(AtlasManager&& rhs) = default;
+  AtlasManager& operator=(AtlasManager&& rhs)      = default;
 
 private:
   explicit DALI_INTERNAL AtlasManager(Internal::AtlasManager* impl);

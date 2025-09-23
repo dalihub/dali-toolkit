@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_BASE_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,10 @@ using BaseSpanConstPtr = const BaseSpan*;
 class BaseSpan : public BaseObject
 {
 public:
-  BaseSpan(const BaseSpan&) = delete;            ///< Deleted copy constructor
-  BaseSpan(BaseSpan&&)      = delete;            ///< Deleted move constructor
+  BaseSpan(const BaseSpan&)            = delete; ///< Deleted copy constructor
+  BaseSpan(BaseSpan&&)                 = delete; ///< Deleted move constructor
   BaseSpan& operator=(const BaseSpan&) = delete; ///< Deleted copy assignment operator
-  BaseSpan& operator=(BaseSpan&&) = delete;      ///< Deleted move assignment operator
+  BaseSpan& operator=(BaseSpan&&)      = delete; ///< Deleted move assignment operator
 
 protected:
   /**

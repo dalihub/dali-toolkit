@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/environment-map-loader.h"
 
@@ -181,8 +182,8 @@ int UtcDaliEnvironmentMapLoaderEnvironmentMapDataCreateTexture01(void)
   auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
-  TestApplication app;
-  auto            texture = environmentMapData.GetTexture();
+  ToolkitTestApplication app;
+  auto                   texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(64u, texture.GetWidth());
@@ -197,8 +198,8 @@ int UtcDaliEnvironmentMapLoaderEnvironmentMapDataCreateTexture02(void)
   auto               path = TEST_RESOURCE_DIR "/forest_diffuse_cubemap.png";
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
-  TestApplication app;
-  auto            texture = environmentMapData.GetTexture();
+  ToolkitTestApplication app;
+  auto                   texture = environmentMapData.GetTexture();
 
   DALI_TEST_CHECK(texture);
   DALI_TEST_EQUAL(512u, texture.GetWidth());

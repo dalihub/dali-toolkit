@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,8 +95,8 @@ bool IsNewKeycapSequence(const Character* const   textBuffer,
           currentCharacterScript = TextAbstraction::EMOJI_COLOR;
         }
       } // if(!isNewKeycapSequence && currentCharacterIndex + 2 <= lastCharacterIndex)
-    }   // if(IsStartForKeycapSequence(currentCharacter))
-  }     // if(currentCharacterIndex < lastCharacterIndex)
+    } // if(IsStartForKeycapSequence(currentCharacter))
+  } // if(currentCharacterIndex < lastCharacterIndex)
 
   return isNewKeycapSequence;
 }
@@ -143,7 +143,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
           isNewVariationSelectorSequence = true;
         }
       } // if(!isNewVariationSelectorSequence && currentCharacterIndex + 1 <= lastCharacterIndex)
-    }   // if(TextAbstraction::IsEmojiVariationSequences(currentCharacter))
+    } // if(TextAbstraction::IsEmojiVariationSequences(currentCharacter))
     else if(!TextAbstraction::IsEmojiPresentationSelector(currentCharacter) &&
             !TextAbstraction::IsTextPresentationSelector(currentCharacter) &&
             !TextAbstraction::IsZeroWidthJoiner(currentCharacter) &&
@@ -159,7 +159,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
         }
       }
     }
-  }     // if(currentCharacterIndex < lastCharacterIndex)
+  } // if(currentCharacterIndex < lastCharacterIndex)
 
   return isNewVariationSelectorSequence;
 }

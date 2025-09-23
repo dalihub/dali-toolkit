@@ -5239,7 +5239,7 @@ int UtcDaliColorVisualMultipleCustomShader(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  Property::Array shaderArray;
+  Property::Array   shaderArray;
   Property::Map     shaderA;
   const std::string vertexShaderA                                   = "FoobarA";
   const std::string fragmentShaderA                                 = "FoobarA";

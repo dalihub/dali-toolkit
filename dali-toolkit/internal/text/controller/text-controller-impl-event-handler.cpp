@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,8 +383,8 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       const LineRun& currline = *(visualModel->mLines.Begin() + lineIndex);
 
       // Get last line index
-      const size_t    lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
-      const bool      isLastLine    = (lineIndex + 1u == lastLineIndex);
+      const size_t lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
+      const bool   isLastLine    = (lineIndex + 1u == lastLineIndex);
 
       // Get the next hit 'y' point.
       const float hitPointY = cursorInfo.lineOffset + GetLineHeight(currline, false) + 0.5f * GetLineHeight(nextline, isLastLine);
@@ -894,12 +894,12 @@ void ControllerImplEventHandler::OnHandleReleased(Controller::Impl& impl, const 
 
     bool matchedCharacter = false;
     handlePosition        = Text::GetClosestCursorIndex(model->mVisualModel,
-                                                 model->mLogicalModel,
-                                                 impl.mMetrics,
-                                                 xPosition,
-                                                 yPosition,
-                                                 CharacterHitTest::SCROLL,
-                                                 matchedCharacter);
+                                                        model->mLogicalModel,
+                                                        impl.mMetrics,
+                                                        xPosition,
+                                                        yPosition,
+                                                        CharacterHitTest::SCROLL,
+                                                        matchedCharacter);
   }
 
   EventData& eventData = *impl.mEventData;
@@ -1030,12 +1030,12 @@ void ControllerImplEventHandler::OnHandleScrolling(Controller::Impl& impl, const
     // The grab handle's position is in decorator's coords. Need to transforms to text's coords.
     bool                 matchedCharacter = false;
     const CharacterIndex handlePosition   = Text::GetClosestCursorIndex(visualModel,
-                                                                      impl.mModel->mLogicalModel,
-                                                                      impl.mMetrics,
-                                                                      position.x - scrollPosition.x,
-                                                                      position.y - scrollPosition.y,
-                                                                      CharacterHitTest::SCROLL,
-                                                                      matchedCharacter);
+                                                                        impl.mModel->mLogicalModel,
+                                                                        impl.mMetrics,
+                                                                        position.x - scrollPosition.x,
+                                                                        position.y - scrollPosition.y,
+                                                                        CharacterHitTest::SCROLL,
+                                                                        matchedCharacter);
 
     if(eventData.mPrimaryCursorPosition != handlePosition)
     {
@@ -1074,12 +1074,12 @@ void ControllerImplEventHandler::OnHandleScrolling(Controller::Impl& impl, const
     // The selection handle's position is in decorator's coords. Need to transform to text's coords.
     bool                 matchedCharacter = false;
     const CharacterIndex handlePosition   = Text::GetClosestCursorIndex(visualModel,
-                                                                      impl.mModel->mLogicalModel,
-                                                                      impl.mMetrics,
-                                                                      position.x - scrollPosition.x,
-                                                                      position.y - scrollPosition.y,
-                                                                      CharacterHitTest::SCROLL,
-                                                                      matchedCharacter);
+                                                                        impl.mModel->mLogicalModel,
+                                                                        impl.mMetrics,
+                                                                        position.x - scrollPosition.x,
+                                                                        position.y - scrollPosition.y,
+                                                                        CharacterHitTest::SCROLL,
+                                                                        matchedCharacter);
     uint32_t             oldStart         = eventData.mLeftSelectionPosition;
     uint32_t             oldEnd           = eventData.mRightSelectionPosition;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ bool InputFilter::Contains(Toolkit::InputFilter::Property::Type type, std::strin
 
 bool InputFilter::Filter(Toolkit::InputFilter::Property::Type type, std::string& text)
 {
-  std::regex pattern;
+  std::regex  pattern;
   std::string result;
 
   if(type == Toolkit::InputFilter::Property::ACCEPTED)
@@ -108,7 +108,8 @@ bool InputFilter::Filter(Toolkit::InputFilter::Property::Type type, std::string&
     auto start = std::sregex_iterator(text.begin(), text.end(), pattern);
     auto end   = std::sregex_iterator();
 
-    while (start != end) {
+    while(start != end)
+    {
       result += start->str();
       ++start;
     }

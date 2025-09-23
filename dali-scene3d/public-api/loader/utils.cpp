@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include <dali-scene3d/public-api/loader/utils.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <stdarg.h>
 #include <cstring>
 #include <fstream>

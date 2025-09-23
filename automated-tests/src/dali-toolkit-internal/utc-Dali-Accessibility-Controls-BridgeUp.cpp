@@ -40,7 +40,8 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-const auto flushCoalescableMessage = [](Dali::ToolkitTestApplication& application) {
+const auto flushCoalescableMessage = [](Dali::ToolkitTestApplication& application)
+{
   Dali::Timer timer = Timer::New(0);
   for(int i = 0; i < 11; ++i)
   {
@@ -128,7 +129,8 @@ int UtcDaliControlAccessibilityName(void)
   DALI_TEST_EQUALS("Accessibility_Name", q->GetName(), TEST_LOCATION);
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>(), "Accessibility_Name", TEST_LOCATION);
 
-  auto nameChangeCallback = [](std::string& accessibilityName) { accessibilityName = "Accessibility_Name_With_Callback"; };
+  auto nameChangeCallback = [](std::string& accessibilityName)
+  { accessibilityName = "Accessibility_Name_With_Callback"; };
 
   DevelControl::AccessibilityGetNameSignal(control).Connect(nameChangeCallback);
 
@@ -175,7 +177,8 @@ int UtcDaliControlAccessibilityDescription(void)
   auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<std::string>();
   DALI_TEST_EQUALS("Accessibility_Description", property, TEST_LOCATION);
 
-  auto descriptionChangeCallback = [](std::string& accessibilityDescription) { accessibilityDescription = "Accessibility_Description_With_Callback"; };
+  auto descriptionChangeCallback = [](std::string& accessibilityDescription)
+  { accessibilityDescription = "Accessibility_Description_With_Callback"; };
 
   DevelControl::AccessibilityGetDescriptionSignal(control).Connect(descriptionChangeCallback);
 
@@ -950,7 +953,8 @@ int UtcDaliControlDoGesture(void)
   DALI_TEST_CHECK(!accessible->DoGesture(gesture_one));
   DALI_TEST_CHECK(!TestDoGesture(accessible->GetAddress(), Dali::Accessibility::Gesture::ONE_FINGER_FLICK_LEFT, 600, 100, 500, 500, Dali::Accessibility::GestureState::BEGIN, 1000));
 
-  DevelControl::AccessibilityDoGestureSignal(control).Connect([](std::pair<Dali::Accessibility::GestureInfo, bool>& gesture) {
+  DevelControl::AccessibilityDoGestureSignal(control).Connect([](std::pair<Dali::Accessibility::GestureInfo, bool>& gesture)
+  {
     if(gesture.first.type == Dali::Accessibility::Gesture::ONE_FINGER_FLICK_LEFT)
       gesture.second = true;
     else
@@ -1404,12 +1408,14 @@ int UtcDaliAccessibilityDoAction(void)
   thread_local std::vector<ActionType> actions_done;
   thread_local std::vector<bool>       legacy_actions_done(5, false);
 
-  const auto reset_results = [&]() {
+  const auto reset_results = [&]()
+  {
     actions_done.clear();
     std::fill(legacy_actions_done.begin(), legacy_actions_done.end(), false);
   };
 
-  const auto check_actions_done = [&](std::vector<ActionType> actions_sent) {
+  const auto check_actions_done = [&](std::vector<ActionType> actions_sent)
+  {
     for(ActionType action : actions_sent)
     {
       auto it = std::find(actions_done.begin(), actions_done.end(), action);
@@ -1417,9 +1423,11 @@ int UtcDaliAccessibilityDoAction(void)
     }
   };
 
-  const auto check_all_actions_done_and_reset = [&]() {
+  const auto check_all_actions_done_and_reset = [&]()
+  {
     check_actions_done({ActionType::ACTIVATE, ActionType::ESCAPE, ActionType::INCREMENT, ActionType::DECREMENT});
-    DALI_TEST_CHECK(std::all_of(legacy_actions_done.begin(), legacy_actions_done.end(), [](bool x) { return x == true; }));
+    DALI_TEST_CHECK(std::all_of(legacy_actions_done.begin(), legacy_actions_done.end(), [](bool x)
+    { return x == true; }));
     reset_results();
   };
 
@@ -1437,23 +1445,29 @@ int UtcDaliAccessibilityDoAction(void)
   DALI_TEST_CHECK(!b->DoAction(actions[2])); // increment
   DALI_TEST_CHECK(!b->DoAction(actions[3])); // decrement
 
-  DevelControl::AccessibilityActionSignal(control).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+  DevelControl::AccessibilityActionSignal(control).Connect([](const Dali::Accessibility::ActionInfo& action_info)
+  {
     actions_done.push_back(action_info.type);
     return true;
   });
-  DevelControl::AccessibilityReadingSkippedSignal(control).Connect([]() {
+  DevelControl::AccessibilityReadingSkippedSignal(control).Connect([]()
+  {
     legacy_actions_done[0] = true;
   });
-  DevelControl::AccessibilityReadingCancelledSignal(control).Connect([]() {
+  DevelControl::AccessibilityReadingCancelledSignal(control).Connect([]()
+  {
     legacy_actions_done[1] = true;
   });
-  DevelControl::AccessibilityReadingStoppedSignal(control).Connect([]() {
+  DevelControl::AccessibilityReadingStoppedSignal(control).Connect([]()
+  {
     legacy_actions_done[2] = true;
   });
-  DevelControl::AccessibilityReadingPausedSignal(control).Connect([]() {
+  DevelControl::AccessibilityReadingPausedSignal(control).Connect([]()
+  {
     legacy_actions_done[3] = true;
   });
-  DevelControl::AccessibilityReadingResumedSignal(control).Connect([]() {
+  DevelControl::AccessibilityReadingResumedSignal(control).Connect([]()
+  {
     legacy_actions_done[4] = true;
   });
 
@@ -1508,7 +1522,8 @@ int UtcDaliAccessibilityActivateFallbackToLegacy(void)
   auto a       = Dali::Accessibility::Accessible::Get(control);
   auto b       = dynamic_cast<Dali::Accessibility::Action*>(a);
 
-  DevelControl::AccessibilityActivateSignal(control).Connect([]() {
+  DevelControl::AccessibilityActivateSignal(control).Connect([]()
+  {
     legacy_activate_done = true;
   });
 
@@ -1605,7 +1620,8 @@ int UtcDaliAccessibilityScrollToChildCustomScrollable(void)
   ToolkitTestApplication application;
 
   thread_local Dali::Accessibility::ActionInfo action_done;
-  const auto                                   check_scroll_to_child_action_done_and_reset = [&](Actor child) {
+  const auto                                   check_scroll_to_child_action_done_and_reset = [&](Actor child)
+  {
     DALI_TEST_CHECK(action_done.type == Dali::Accessibility::ActionType::SCROLL_TO_CHILD);
     DALI_TEST_CHECK(action_done.target == child);
     action_done = Dali::Accessibility::ActionInfo{};
@@ -1617,7 +1633,8 @@ int UtcDaliAccessibilityScrollToChildCustomScrollable(void)
   // set control as scrollable
   scrollable.SetProperty(DevelControl::Property::ACCESSIBILITY_SCROLLABLE, true);
 
-  DevelControl::AccessibilityActionSignal(scrollable).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+  DevelControl::AccessibilityActionSignal(scrollable).Connect([](const Dali::Accessibility::ActionInfo& action_info)
+  {
     action_done = action_info;
     return true;
   });
@@ -1698,7 +1715,8 @@ int UtcDaliAccessibilityScrollToChild(void)
   // ScrollToChild fails if no ActionSignal is connected
   DALI_TEST_CHECK(!accessibleParent->ScrollToChild(child));
 
-  DevelControl::AccessibilityActionSignal(parent).Connect([](const Dali::Accessibility::ActionInfo& action_info) {
+  DevelControl::AccessibilityActionSignal(parent).Connect([](const Dali::Accessibility::ActionInfo& action_info)
+  {
     return true;
   });
 
@@ -1816,11 +1834,13 @@ int UtcDaliAccessibilityCheckHighlight(void)
   thread_local bool buttonAHighlighted = false;
   thread_local bool buttonBHighlighted = false;
 
-  DevelControl::AccessibilityHighlightedSignal(buttonA).Connect([](bool highlighted) {
+  DevelControl::AccessibilityHighlightedSignal(buttonA).Connect([](bool highlighted)
+  {
     buttonAHighlighted = highlighted;
   });
 
-  DevelControl::AccessibilityHighlightedSignal(buttonB).Connect([](bool highlighted) {
+  DevelControl::AccessibilityHighlightedSignal(buttonB).Connect([](bool highlighted)
+  {
     buttonBHighlighted = highlighted;
   });
 

@@ -34,7 +34,7 @@
 using namespace Dali::Toolkit;
 using namespace Dali::Toolkit::DevelControl;
 
-constexpr const char* OVERLAY_NAME = "HighlightOverlay";
+constexpr const char* OVERLAY_NAME   = "HighlightOverlay";
 constexpr const char* HIGHLIGHT_NAME = "HighlightIndicator";
 
 void utc_dali_accessibility_scene_startup(void)
@@ -51,13 +51,13 @@ int UtcDaliSceneViewAccessibleMarkSceneAccessible(void)
 {
   ToolkitTestApplication application;
 
-  auto controlA       = Control::New();
+  auto controlA      = Control::New();
   auto controlParent = Control::New();
   controlParent.Add(controlA);
   application.GetScene().Add(controlParent);
 
-  auto controlB         = Control::New();
-  auto sceneParent      = Scene3D::SceneView::New();
+  auto controlB    = Control::New();
+  auto sceneParent = Scene3D::SceneView::New();
   sceneParent.Add(controlB);
   application.GetScene().Add(sceneParent);
 
@@ -74,8 +74,8 @@ int UtcDaliSceneViewAccessibilityRole(void)
 {
   ToolkitTestApplication application;
 
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
+  auto model     = Scene3D::Model::New();
+  auto sceneView = Scene3D::SceneView::New();
   sceneView.Add(model);
   application.GetScene().Add(sceneView);
 
@@ -103,14 +103,14 @@ int UtcDaliSceneViewAccessibilityRole(void)
 int UtcDaliSceneViewUpdateOverlay(void)
 {
   ToolkitTestApplication application;
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto highlight     = Toolkit::ImageView::New(focusBorderImagePath);
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
-  auto container     = Control::New();
+  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          model     = Scene3D::Model::New();
+  auto                          sceneView = Scene3D::SceneView::New();
+  auto                          container = Control::New();
 
   model.Add(highlight);
   sceneView.Add(model);
@@ -136,14 +136,14 @@ int UtcDaliSceneViewUpdateOverlay(void)
 int UtcDaliSceneViewSetCustomHighlght01(void)
 {
   ToolkitTestApplication application;
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto highlight     = Toolkit::ImageView::New(focusBorderImagePath);
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
-  auto container     = Control::New();
+  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          model     = Scene3D::Model::New();
+  auto                          sceneView = Scene3D::SceneView::New();
+  auto                          container = Control::New();
 
   model.Add(highlight);
   sceneView.Add(model);
@@ -160,7 +160,7 @@ int UtcDaliSceneViewSetCustomHighlght01(void)
   application.SendNotification();
   application.Render(1);
 
-  auto overlay = container.FindChildByName(OVERLAY_NAME);
+  auto overlay   = container.FindChildByName(OVERLAY_NAME);
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_EQUALS(indicator.GetProperty<Vector2>(Actor::Property::SIZE), Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(indicator.GetProperty<Vector2>(Actor::Property::POSITION), Vector2(10.0f, 10.0f), 0.001f, TEST_LOCATION);
@@ -170,14 +170,14 @@ int UtcDaliSceneViewSetCustomHighlght01(void)
 int UtcDaliSceneViewSetCustomHighlght02(void)
 {
   ToolkitTestApplication application;
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto highlight     = Toolkit::ImageView::New(focusBorderImagePath);
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
-  auto container     = Control::New();
+  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          model     = Scene3D::Model::New();
+  auto                          sceneView = Scene3D::SceneView::New();
+  auto                          container = Control::New();
   model.Add(highlight);
   sceneView.Add(model);
   container.Add(sceneView);
@@ -201,7 +201,7 @@ int UtcDaliSceneViewSetCustomHighlght02(void)
   application.SendNotification();
   application.Render(1);
 
-  auto overlay = container.FindChildByName(OVERLAY_NAME);
+  auto overlay   = container.FindChildByName(OVERLAY_NAME);
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
 
   DALI_TEST_CHECK(overlay);
@@ -212,14 +212,14 @@ int UtcDaliSceneViewSetCustomHighlght02(void)
 int UtcDaliSceneViewHideOverlay(void)
 {
   ToolkitTestApplication application;
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto highlight     = Toolkit::ImageView::New(focusBorderImagePath);
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
-  auto container     = Control::New();
+  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          model     = Scene3D::Model::New();
+  auto                          sceneView = Scene3D::SceneView::New();
+  auto                          container = Control::New();
 
   model.Add(highlight);
   sceneView.Add(model);
@@ -229,7 +229,7 @@ int UtcDaliSceneViewHideOverlay(void)
   application.SendNotification();
   application.Render(1);
 
-  auto overlay = container.FindChildByName(OVERLAY_NAME);
+  auto overlay   = container.FindChildByName(OVERLAY_NAME);
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_EQUALS(indicator.GetProperty<bool>(Actor::Property::VISIBLE), true, TEST_LOCATION);
   mHighlightOverlay.HideOverlay();
@@ -243,14 +243,14 @@ int UtcDaliSceneViewHideOverlay(void)
 int UtcDaliSceneViewRemoveHighlight(void)
 {
   ToolkitTestApplication application;
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto highlight     = Toolkit::ImageView::New(focusBorderImagePath);
-  auto model         = Scene3D::Model::New();
-  auto sceneView     = Scene3D::SceneView::New();
-  auto container     = Control::New();
+  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          model     = Scene3D::Model::New();
+  auto                          sceneView = Scene3D::SceneView::New();
+  auto                          container = Control::New();
 
   model.Add(highlight);
   sceneView.Add(model);
@@ -260,7 +260,7 @@ int UtcDaliSceneViewRemoveHighlight(void)
   application.SendNotification();
   application.Render(1);
 
-  auto overlay = container.FindChildByName(OVERLAY_NAME);
+  auto overlay   = container.FindChildByName(OVERLAY_NAME);
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_CHECK(overlay);
 

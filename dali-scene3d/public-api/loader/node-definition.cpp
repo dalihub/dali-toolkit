@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -370,7 +370,8 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty("uEmissiveTextureTransform", Matrix3::IDENTITY);
 
   auto iTexture   = matDef.mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags) {
+  auto checkStage = [&](uint32_t flags)
+  {
     return iTexture != matDef.mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
   };
 

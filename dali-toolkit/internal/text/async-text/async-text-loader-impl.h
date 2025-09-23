@@ -92,7 +92,6 @@ public:
    */
   bool IsModuleClearNeeded();
 
-
   // Worker thread
   /**
    * @copydoc Dali::AsyncTextLoader::SetupRenderScale()
@@ -207,20 +206,20 @@ private:
    */
   Text::AsyncTextModule mModule;
 
-  Text::ModelPtr        mTextModel;
-  MetricsPtr            mMetrics;
-  Text::Layout::Engine  mLayoutEngine;
-  Text::TypesetterPtr   mTypesetter;
-  std::string           mLocale;
+  Text::ModelPtr       mTextModel;
+  MetricsPtr           mMetrics;
+  Text::Layout::Engine mLayoutEngine;
+  Text::TypesetterPtr  mTypesetter;
+  std::string          mLocale;
 
-  Length                mNumberOfCharacters;
-  bool                  mFitActualEllipsis  : 1; // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
-  bool                  mIsTextDirectionRTL : 1; // The direction of the first line after layout completion.
-  bool                  mIsTextMirrored     : 1;
-  bool                  mModuleClearNeeded  : 1;
-  bool                  mLocaleUpdateNeeded : 1;
+  Length mNumberOfCharacters;
+  bool   mFitActualEllipsis : 1;  // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
+  bool   mIsTextDirectionRTL : 1; // The direction of the first line after layout completion.
+  bool   mIsTextMirrored : 1;
+  bool   mModuleClearNeeded : 1;
+  bool   mLocaleUpdateNeeded : 1;
 
-  Mutex                 mMutex;
+  Mutex mMutex;
 }; // class AsyncTextLoader
 
 inline bool compareByPointSize(DevelTextLabel::FitOption& lhs, DevelTextLabel::FitOption& rhs)

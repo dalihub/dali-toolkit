@@ -79,12 +79,12 @@ bool CanvasRendererRasterizingTask::Rasterize()
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_RASTERIZE_TASK", [&](std::ostringstream& oss)
-                                          { mStartTimeNanoSceonds = GetNanoseconds(); });
+  { mStartTimeNanoSceonds = GetNanoseconds(); });
 
   bool rasterized = DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.Rasterize();
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_RASTERIZE_TASK", [&](std::ostringstream& oss)
-                                        {
+  {
     mEndTimeNanoSceonds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";

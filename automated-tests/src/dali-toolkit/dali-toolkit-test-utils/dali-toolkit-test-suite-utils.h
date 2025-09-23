@@ -18,18 +18,18 @@
  *
  */
 
-#include <iostream>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <iostream>
 
 // Put any toolkit specific operators for DALI_TEST_CHECK template here, before dali-test-suite-utils.h.
 
-std::ostream& operator<<( std::ostream& ostream, Dali::Toolkit::Visual::ResourceStatus status );
+std::ostream& operator<<(std::ostream& ostream, Dali::Toolkit::Visual::ResourceStatus status);
 
 // INTERNAL INCLUDES
 
 #include <dali-test-suite-utils.h>
-#include "toolkit-test-application.h"
 #include "toolkit-application.h"
 #include "toolkit-input-method-context.h"
+#include "toolkit-test-application.h"
 
 #endif // DALI_TOOLKIT_TEST_SUITE_UTILS_H

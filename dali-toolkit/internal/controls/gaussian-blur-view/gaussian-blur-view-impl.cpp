@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,9 +101,9 @@ const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 constexpr uint32_t MAXIMUM_SAMPLES_SIZE = 335u;
 
 /**
-  * @brief Calculates gaussian weight
-  * @param[in] localOffset Input to the function
-  */
+ * @brief Calculates gaussian weight
+ * @param[in] localOffset Input to the function
+ */
 inline float CalculateGaussianWeight(float localOffset, float sigma)
 {
   return (1.0f / sqrt(2.0f * Dali::Math::PI * sigma)) * exp(-(localOffset / sigma * localOffset / sigma) * 0.5f);

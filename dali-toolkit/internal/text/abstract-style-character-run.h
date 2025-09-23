@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ABSTRACT_STYLE_CHARACTER_RUN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,21 +80,21 @@ public:
   //Methods
 
   /**
-  * @brief Retrive the first index in run.
-  * @return the end character index in run.
-  */
+   * @brief Retrive the first index in run.
+   * @return the end character index in run.
+   */
   CharacterIndex GetStartCharacterIndex() const;
 
   /**
-  * @brief Retrive the number of characters in the run.
-  * @return the the number of characters in run.
-  */
+   * @brief Retrive the number of characters in the run.
+   * @return the the number of characters in run.
+   */
   Length GetNumberOfCharacters() const;
 
   /**
-  * @brief Calculate the end index in run.
-  * @return the end character index in run.
-  */
+   * @brief Calculate the end index in run.
+   * @return the end character index in run.
+   */
   CharacterIndex GetEndCharacterIndex() const;
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public:
   ~BulletPhysicsAdaptor() override;
 
   // Remove copy constructor and copy assignment
-  BulletPhysicsAdaptor(const PhysicsAdaptor& handle) = delete;
+  BulletPhysicsAdaptor(const PhysicsAdaptor& handle)            = delete;
   BulletPhysicsAdaptor& operator=(const PhysicsAdaptor& handle) = delete;
 
   static PhysicsAdaptorPtr New(const Dali::Matrix& transform, Uint16Pair size);

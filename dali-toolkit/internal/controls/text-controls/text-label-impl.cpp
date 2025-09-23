@@ -319,12 +319,13 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
 
         if(impl.mController->HasAnchors())
         {
-          // Forward input events to controller
-          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = true;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
-          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = false;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
 
         break;
@@ -388,12 +389,13 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
 
         if(impl.mController->HasAnchors())
         {
-          // Forward input events to controller
-          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = true;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
-          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+          impl.mIsHasAnchors = false;
+          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
         break;
       }
@@ -1227,6 +1229,34 @@ DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
   return new TextLabelAccessible(Self());
 }
 
+bool TextLabel::OnInterceptTouched(Actor actor, const TouchEvent& touch)
+{
+  if (touch.GetState(0) == PointState::STARTED)
+  {
+    mIsIntercepted = true;
+    mTouchPosition = touch.GetScreenPosition(0);
+  }
+  else if (touch.GetState(0) == PointState::FINISHED)
+  {
+    if (mIsIntercepted && mIsHasAnchors)
+    {
+      const Vector2& screen(touch.GetScreenPosition(0));
+      Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
+                                    std::abs(mTouchPosition.y - screen.y));
+      if(distanceDelta.x < 20 &&
+        distanceDelta.y < 20)
+      {
+        Extents padding;
+        padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+        const Vector2& localPoint = touch.GetLocalPosition(0);
+        mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
+      }
+    }
+    mIsIntercepted = false;
+  }
+  return false;
+}
+
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::OnStyleChange\n");
@@ -1257,17 +1287,6 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
 
   // Up call to Control
   Control::OnStyleChange(styleManager, change);
-}
-
-void TextLabel::OnTap(const TapGesture& gesture)
-{
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::OnTap %p\n", mController.Get());
-
-  // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  Extents padding;
-  padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  const Vector2& localPoint = gesture.GetLocalPoint();
-  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 }
 
 void TextLabel::AnchorClicked(const std::string& href)
@@ -1500,7 +1519,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       return;
     }
 
-    DALI_LOG_RELEASE_INFO("Request render, size : %f, %f [%p]\n", contentSize.width, contentSize.height, static_cast<void *>(mController.Get()));
+    DALI_LOG_RELEASE_INFO("Request render, size : %f, %f [%p]\n", contentSize.width, contentSize.height, static_cast<void*>(mController.Get()));
     AsyncTextParameters parameters = GetAsyncTextParameters(Async::RENDER_FIXED_SIZE, contentSize, padding, layoutDirection);
     TextVisual::UpdateAsyncRenderer(mVisual, parameters);
     mTextUpdateNeeded    = false;
@@ -1542,7 +1561,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if((Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType)) || mTextUpdateNeeded)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout IsAutoScrollEnabled[%s] [%p]\n", (mController->IsAutoScrollEnabled()) ? "true" : "false", static_cast<void *>(mController.Get()));
+    DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout IsAutoScrollEnabled[%s] [%p]\n", (mController->IsAutoScrollEnabled()) ? "true" : "false", static_cast<void*>(mController.Get()));
 
     // Update the visual
     TextVisual::EnableRendererUpdate(mVisual);
@@ -1744,12 +1763,12 @@ void TextLabel::SetUpAutoScrolling()
 
   PixelData data    = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
   Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                                 data.GetPixelFormat(),
-                                 data.GetWidth(),
-                                 data.GetHeight());
+                                   data.GetPixelFormat(),
+                                   data.GetWidth(),
+                                   data.GetHeight());
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data,"TextLabel");
+  texture.Upload(data, "TextLabel");
 #else
   texture.Upload(data);
 #endif
@@ -1779,7 +1798,7 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data,"TextLabel");
+  texture.Upload(data, "TextLabel");
 #else
   texture.Upload(data);
 #endif
@@ -1824,14 +1843,14 @@ void TextLabel::AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo)
   {
     case Async::COMPUTE_NATURAL_SIZE:
     {
-      DALI_LOG_RELEASE_INFO("Natural size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
+      DALI_LOG_RELEASE_INFO("Natural size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void*>(mController.Get()));
       mAsyncLineCount = renderInfo.lineCount;
       EmitAsyncNaturalSizeComputedSignal(renderInfo.renderedSize.width, renderInfo.renderedSize.height);
       break;
     }
     case Async::COMPUTE_HEIGHT_FOR_WIDTH:
     {
-      DALI_LOG_RELEASE_INFO("Height for width : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
+      DALI_LOG_RELEASE_INFO("Height for width : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void*>(mController.Get()));
       mAsyncLineCount = renderInfo.lineCount;
       EmitAsyncHeightForWidthComputedSignal(renderInfo.renderedSize.width, renderInfo.renderedSize.height);
       break;
@@ -1847,7 +1866,7 @@ void TextLabel::AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo)
 void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
 {
   // Pure Virtual from AsyncTextInterface
-  DALI_LOG_RELEASE_INFO("Rendered size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void *>(mController.Get()));
+  DALI_LOG_RELEASE_INFO("Rendered size : %f, %f, line count : %d [%p]\n", renderInfo.renderedSize.width, renderInfo.renderedSize.height, renderInfo.lineCount, static_cast<void*>(mController.Get()));
 
   // To avoid flickering issues, enable/disable the background visual when async load is completed.
   EnableControlBackground(!mController->IsTextCutout());
@@ -1929,6 +1948,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mLocale(std::string()),
   mSize(),
+  mTouchPosition(),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mAsyncLineCount(0),
   mTextUpdateNeeded(false),
@@ -1938,7 +1958,9 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mIsSizeChanged(false),
   mIsManualRender(false),
   mIsManualRendered(false),
-  mManualRendered(false)
+  mManualRendered(false),
+  mIsIntercepted(false),
+  mIsHasAnchors(false)
 {
   mLocale = TextAbstraction::GetLocaleFull();
 }
@@ -2073,7 +2095,7 @@ void TextLabel::RequestAsyncHeightForWidth(float width)
 
 void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 {
-  DALI_LOG_RELEASE_INFO("Request size : %f, %f [%p]\n", width, height, static_cast<void *>(mController.Get()));
+  DALI_LOG_RELEASE_INFO("Request size : %f, %f [%p]\n", width, height, static_cast<void*>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2105,7 +2127,7 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 
 void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstraint)
 {
-  DALI_LOG_RELEASE_INFO("Request width : %f, height constraint : %f [%p]\n", width, heightConstraint, static_cast<void *>(mController.Get()));
+  DALI_LOG_RELEASE_INFO("Request width : %f, height constraint : %f [%p]\n", width, heightConstraint, static_cast<void*>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2137,7 +2159,7 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
 
 void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float height)
 {
-  DALI_LOG_RELEASE_INFO("Request width constraint : %f, height : %f [%p]\n", widthConstraint, height, static_cast<void *>(mController.Get()));
+  DALI_LOG_RELEASE_INFO("Request width constraint : %f, height : %f [%p]\n", widthConstraint, height, static_cast<void*>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2169,7 +2191,7 @@ void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float h
 
 void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float heightConstraint)
 {
-  DALI_LOG_RELEASE_INFO("Request constraint : %f, %f [%p]\n", widthConstraint, heightConstraint, static_cast<void *>(mController.Get()));
+  DALI_LOG_RELEASE_INFO("Request constraint : %f, %f [%p]\n", widthConstraint, heightConstraint, static_cast<void*>(mController.Get()));
 
   if(mController->GetRenderMode() == DevelTextLabel::Render::SYNC)
   {
@@ -2255,7 +2277,7 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
 
 void TextLabel::SetMaskEffect(Toolkit::Control control)
 {
-  Actor self = Self();
+  Actor            self        = Self();
   Toolkit::Control selfControl = Toolkit::Control::DownCast(self);
 
   // Add control to this component

@@ -1,7 +1,7 @@
 
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
-#include <dali-toolkit/devel-api/text/text-utils-devel.h>
 #include <dali-toolkit/devel-api/text/text-geometry-devel.h>
+#include <dali-toolkit/devel-api/text/text-utils-devel.h>
 #include "test-text-geometry-utils.h"
 
 using namespace Dali;
@@ -371,12 +371,12 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleLabel(void)
 
   Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
 
-  std::cout << " characterGeometry "<< characterGeometry <<std::endl;
+  std::cout << " characterGeometry " << characterGeometry << std::endl;
 
   Rect<> expectedCharacterGeometry = {13.0f, 16.0f, 19.0f, 16.0f};
-  std::cout<< " expectedCharacterGeometry " << characterGeometry <<std::endl;
+  std::cout << " expectedCharacterGeometry " << characterGeometry << std::endl;
 
-  std:: cout << "if" << (characterGeometry == expectedCharacterGeometry) <<std::endl;
+  std::cout << "if" << (characterGeometry == expectedCharacterGeometry) << std::endl;
   TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry);
 
   END_TEST;

@@ -33,10 +33,9 @@ namespace Adaptor
  * Implementation of the Clipboard
  */
 
-class Clipboard :  public Dali::BaseObject
+class Clipboard : public Dali::BaseObject
 {
 public:
-
   /**
    * @copydoc Dali::ClipboardEventNotifier::Get()
    */
@@ -77,7 +76,7 @@ public:
   /**
    * @copydoc Dali::Clipboard::GetData()
    */
-  uint32_t GetData(const std::string &mimeType);
+  uint32_t GetData(const std::string& mimeType);
 
   /**
    * @copydoc Dali::Clipboard::NumberOfClipboardItems()
@@ -95,13 +94,13 @@ public:
   void HideClipboard();
 
   /**
-  * @copydoc Dali::Clipboard::IsVisible()
-  */
+   * @copydoc Dali::Clipboard::IsVisible()
+   */
   bool IsVisible() const;
 
 private:
-  Clipboard( const Clipboard& );
-  Clipboard& operator=( Clipboard& );
+  Clipboard(const Clipboard&);
+  Clipboard& operator=(Clipboard&);
 
   static Dali::Clipboard mToolkitClipboard;
 
@@ -115,14 +114,12 @@ private:
   Dali::Clipboard::DataReceivedSignalType mDataReceivedSignal;
 }; // class clipboard
 
-
 Dali::Clipboard Dali::Internal::Adaptor::Clipboard::mToolkitClipboard;
-
 
 Clipboard::Clipboard()
 {
   mVisible = false;
-  mCount = 0u;
+  mCount   = 0u;
 }
 
 Clipboard::~Clipboard()
@@ -178,7 +175,7 @@ bool Clipboard::SetData(const Dali::Clipboard::ClipData& clipData)
   return true;
 }
 
-uint32_t Clipboard::GetData(const std::string &mimeType)
+uint32_t Clipboard::GetData(const std::string& mimeType)
 {
   if(!mMimeType.compare(mimeType.c_str()))
   {
@@ -213,23 +210,21 @@ bool Clipboard::IsVisible() const
 
 } // namespace Internal
 
-
 inline static Internal::Adaptor::Clipboard& GetImplementation(Dali::Clipboard& clipboard)
 {
   // Bypass any passed in clipboard handle - it probably won't be initialized
   Dali::Clipboard theClipboard = Dali::Clipboard::Get();
-  BaseObject& object = theClipboard.GetBaseObject();
+  BaseObject&     object       = theClipboard.GetBaseObject();
   return static_cast<Internal::Adaptor::Clipboard&>(object);
 }
 
-inline static const  Internal::Adaptor::Clipboard& GetImplementation(const Dali::Clipboard& clipboard)
+inline static const Internal::Adaptor::Clipboard& GetImplementation(const Dali::Clipboard& clipboard)
 {
   // Bypass any passed in clipboard handle - it probably won't be initialized
-  Dali::Clipboard theClipboard = Dali::Clipboard::Get();
-  const BaseObject& object = theClipboard.GetBaseObject();
+  Dali::Clipboard   theClipboard = Dali::Clipboard::Get();
+  const BaseObject& object       = theClipboard.GetBaseObject();
   return static_cast<const Internal::Adaptor::Clipboard&>(object);
 }
-
 
 Clipboard::Clipboard()
 {
@@ -237,8 +232,8 @@ Clipboard::Clipboard()
 Clipboard::~Clipboard()
 {
 }
-Clipboard::Clipboard(Internal::Adaptor::Clipboard *impl)
-  : BaseHandle(impl)
+Clipboard::Clipboard(Internal::Adaptor::Clipboard* impl)
+: BaseHandle(impl)
 {
 }
 

@@ -194,7 +194,8 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
         if(sparseIndices)
         {
           // convert 8-bit indices into 32-bit
-          std::transform(indicesBuffer.begin(), indicesBuffer.end(), sparseIndices->begin(), [](const uint8_t& value) { return uint32_t(value); });
+          std::transform(indicesBuffer.begin(), indicesBuffer.end(), sparseIndices->begin(), [](const uint8_t& value)
+          { return uint32_t(value); });
         }
         break;
       }
@@ -208,9 +209,9 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
                          reinterpret_cast<uint16_t*>(indicesBuffer.data()) + accessor.mSparse->mCount,
                          sparseIndices->begin(),
                          [](const uint16_t& value)
-                         {
-                           return uint32_t(value);
-                         });
+          {
+            return uint32_t(value);
+          });
         }
         break;
       }
@@ -1378,11 +1379,11 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
   ClampFn clampFn = min.empty() ? (max.empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::min(max[i], value); })
+  { value = std::min(max[i], value); })
                                 : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::max(min[i], value); }
+  { value = std::max(min[i], value); }
                                                : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
-                                                                      { value = std::min(std::max(min[i], value), max[i]); }));
+  { value = std::min(std::max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {

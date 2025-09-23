@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MATERIAL_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/material-modify-observer.h>
+#include <dali-scene3d/public-api/common/scene-depth-index-ranges.h>
 #include <dali-scene3d/public-api/loader/material-definition.h>
 #include <dali-scene3d/public-api/loader/shader-definition.h>
 #include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/model-components/material.h>
-#include <dali-scene3d/public-api/common/scene-depth-index-ranges.h>
 
 namespace Dali
 {
@@ -287,10 +287,10 @@ private:
 
 private:
   // Delete copy & move operator
-  Material(const Material&) = delete;
-  Material(Material&&)      = delete;
+  Material(const Material&)                = delete;
+  Material(Material&&)                     = delete;
   Material& operator=(const Material& rhs) = delete;
-  Material& operator=(Material&& rhs) = delete;
+  Material& operator=(Material&& rhs)      = delete;
 
 private:
   ObserverContainer mObservers{}; ///< List of observers who need to be notified after some properties are changed.

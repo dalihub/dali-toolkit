@@ -808,7 +808,7 @@ void TextureManager::Remove(const TextureManager::TextureId textureId)
 void TextureManager::ProcessRemoveQueue()
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mRemoveQueue.Count() << ", " << mRemoveExternalQueue.size() << "]"; });
+  { oss << "[" << mRemoveQueue.Count() << ", " << mRemoveExternalQueue.size() << "]"; });
 
   // Note that RemoveQueue is not be changed during Remove().
   for(auto&& textureId : mRemoveQueue)

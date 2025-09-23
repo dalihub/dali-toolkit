@@ -45,7 +45,7 @@ void utc_dali_accessibility_highlight_overlay_cleanup(void)
 
 int UtcDaliAccessibilityHighlihtOverlayCheckMode(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication        application;
   AccessibilityHighlightOverlay mHighlightOverlay;
 
   auto mode = mHighlightOverlay.GetOverlayMode();

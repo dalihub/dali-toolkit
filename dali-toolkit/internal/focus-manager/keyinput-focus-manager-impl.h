@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYINPUT_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,11 +110,11 @@ private:
   void OnFocusControlSceneDisconnection(Dali::Actor control);
 
   /**
-    *  Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
+   *  Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
    * @param[in]  control  The control got KeyEvent.
    * @param[in]  event    The KeyEvent.
    * @return True if KeyEvent is consumed.
-    */
+   */
   bool EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event);
 
   /**
@@ -135,7 +135,7 @@ private:
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
   Toolkit::Control mCurrentFocusControl; ///< The current focused control
-  uint32_t mCurrentWindowId; ///< The native window id of current focused control
+  uint32_t         mCurrentWindowId;     ///< The native window id of current focused control
 };
 
 } // namespace Internal

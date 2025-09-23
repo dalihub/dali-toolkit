@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  *
  */
 
-#include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/loader/facial-animation-loader.h>
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/animation/key-frames-devel.h>
 
 #include <fstream>
 
@@ -54,7 +55,7 @@ std::string ReadBufferFromFile(const std::string& url)
 
 int UtcDaliLoadFacialAnimation(void)
 {
-  TestApplication app;
+  ToolkitTestApplication app;
 
   for(uint32_t tc = 0; tc < 2; ++tc)
   {
@@ -125,7 +126,8 @@ int UtcDaliLoadFacialAnimation(void)
       actor.RegisterProperty(weightName, 0.0f);
     }
 
-    auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property) {
+    auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)
+    {
       return actor.FindChildByName(property.mNodeName);
     };
 
@@ -141,7 +143,7 @@ int UtcDaliLoadFacialAnimation(void)
 
 int UtcDaliLoadFacialAnimationFailed01(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   AnimationDefinition animDef = LoadFacialAnimation("/nothing.json");
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
@@ -150,7 +152,7 @@ int UtcDaliLoadFacialAnimationFailed01(void)
 
 int UtcDaliLoadFacialAnimationFailed02(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   AnimationDefinition animDef = LoadFacialAnimationFromBuffer(nullptr, 0);
   DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
@@ -159,7 +161,7 @@ int UtcDaliLoadFacialAnimationFailed02(void)
 
 int UtcDaliLoadFacialAnimationFailed03(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_infoline("Parse error for invalid json");
   uint32_t caseCount = 6;
@@ -176,10 +178,10 @@ int UtcDaliLoadFacialAnimationFailed03(void)
 
 int UtcDaliLoadFacialAnimationLoadFirstFrameData(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_infoline("parse json which don't define times zero");
-  std::string rawData = R"(
+  std::string         rawData = R"(
   {
     "name": "Facial_Blendshape_Animation",
     "version": "1.2.3",
@@ -222,8 +224,8 @@ int UtcDaliLoadFacialAnimationLoadFirstFrameData(void)
   DALI_TEST_EQUAL(keyFrames.GetType(), Property::Type::FLOAT);
   DALI_TEST_EQUALS(Dali::DevelKeyFrames::GetKeyFrameCount(keyFrames), 3, TEST_LOCATION);
 
-  float progress = -1.0f;
-  Property::Value value = Property::Value(10.0f);
+  float           progress = -1.0f;
+  Property::Value value    = Property::Value(10.0f);
   Dali::DevelKeyFrames::GetKeyFrame(keyFrames, 0u, progress, value);
   DALI_TEST_EQUALS(progress, 0.0f, TEST_LOCATION);
 

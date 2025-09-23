@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,12 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/images/pixel-data.h>
-#include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -383,7 +383,6 @@ static void OnDeviceConnectionChanged(int32_t)
 static void OnDeviceListGetCallback(Dali::WebEngineDeviceListGet*, int32_t)
 {
 }
-
 
 } // namespace
 
@@ -1544,12 +1543,10 @@ int UtcDaliWebViewMethodsForCoverage(void)
 
   view.LoadHtmlString("<body>Hello World!</body>");
   view.AddJavaScriptMessageHandler("jsObject",
-                                   [](const std::string& arg) {
-                                   });
+                                   [](const std::string& arg) {});
 
   view.AddJavaScriptEntireMessageHandler("jsObject2",
-                                   [](const std::string& arg, const std::string& arg2) {
-                                   });
+                                         [](const std::string& arg, const std::string& arg2) {});
 
   view.SetTtsFocus(true);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,10 +298,10 @@ void ImageAtlas::UploadToAtlas(uint32_t id, PixelData pixelData)
         if(pixelData.GetWidth() < packRect.width || pixelData.GetHeight() < packRect.height)
         {
           DALI_LOG_ERROR("Can not upscale the image from actual loaded size [ %d, %d ] to specified size [ %d, %d ]\n",
-                        pixelData.GetWidth(),
-                        pixelData.GetHeight(),
-                        packRect.width,
-                        packRect.height);
+                         pixelData.GetWidth(),
+                         pixelData.GetHeight(),
+                         packRect.width,
+                         packRect.height);
         }
 
         mAtlas.Upload(pixelData, 0u, 0u, packRect.x, packRect.y, packRect.width, packRect.height);

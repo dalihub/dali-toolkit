@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -333,7 +333,7 @@ private:
    */
   bool EmitCustomWheelSignals(Actor actor, const WheelEvent& event);
 
-   /**
+  /**
    * Clear the focus actor
    * @param[in] actor Actor to be cleared of focus
    */
@@ -401,7 +401,6 @@ private:
   bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
 
   uint32_t mCurrentWindowId; ///< The current native window id
-
 };
 
 } // namespace Internal

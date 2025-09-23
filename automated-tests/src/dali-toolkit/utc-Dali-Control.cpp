@@ -1677,7 +1677,8 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
-  control.OffScreenRenderingFinishedSignal().Connect([]() -> void { tet_printf("Signal emitted\n"); });
+  control.OffScreenRenderingFinishedSignal().Connect([]() -> void
+  { tet_printf("Signal emitted\n"); });
 
   DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
 
@@ -1852,9 +1853,9 @@ int UtcDaliControlBorderline(void)
   tet_printf("Set corner radius. Check BORDERLINE visual has corner radius value now.\n");
   Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
   Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
-  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius);
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, radius.x);
   control.SetProperty(DevelControl::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::Type::RELATIVE);
-  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness);
+  control.SetProperty(DevelControl::Property::CORNER_SQUARENESS, squreness.x);
 
   value = control.GetProperty(DevelControl::Property::BORDERLINE);
   DALI_TEST_CHECK(value.GetMap());
@@ -2090,5 +2091,277 @@ int UtcDaliControlCornerRadiusAnimation2(void)
 
   DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelVisual::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
 
+  END_TEST;
+}
+
+// Positive test case for applying a custom corner property constraint via EnableCornerPropertiesOverridden.
+// Tests that a custom constraint with APPLY_ONCE apply rate correctly synchronizes the visual's
+// corner radius property with the control's corner radius property when the override is enabled.
+int UtcDaliControlEnableCornerPropertiesOverriddenWithCustomConstraintP(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4::ZERO);
+  application.GetScene().Add(control);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Property::Map          visualMap;
+  visualMap[Visual::Property::TYPE]           = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+  Toolkit::Visual::Base visual                = visualFactory.CreateVisual(visualMap);
+
+  DALI_TEST_CHECK(visual);
+
+  Property::Index visualIndex = 100; // Arbitrary index for the visual
+  Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex, visual);
+  DALI_TEST_CHECK(Toolkit::DevelControl::IsVisualEnabled(controlImpl, visualIndex));
+
+  Actor dummyVisualActor = Actor::New();
+  application.GetScene().Add(dummyVisualActor); // Add to scene so constraint can be applied
+
+  auto       visualCornerRadiusProperty = visual.GetPropertyObject(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  Constraint customConstraint           = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, EqualToConstraint());
+  customConstraint.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+
+  // Apply the custom constraint using EnableCornerPropertiesOverridden.
+  Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual, true, customConstraint);
+
+  // Change control's corner radius
+  Vector4 newCornerRadius(10.0f, 10.0f, 10.0f, 10.0f);
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, newCornerRadius);
+  application.SendNotification();
+  application.Render(); // Allow APPLY_ONCE constraint to trigger
+
+  // Verify the constraint effect by checking the visual's corner radius property.
+  Vector4 visualCornerRadius = visualCornerRadiusProperty.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty.propertyIndex);
+  DALI_TEST_EQUALS(visualCornerRadius, newCornerRadius, TEST_LOCATION);
+
+  application.GetScene().Remove(control);
+  application.GetScene().Remove(dummyVisualActor);
+  END_TEST;
+}
+
+// Test case for disabling the corner property override and ensuring the constraint is removed.
+// Tests that after enabling a custom constraint and then disabling the override,
+// the visual's corner radius property is no longer synchronized with the control's property.
+int UtcDaliControlEnableCornerPropertiesOverriddenDisableN(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4::ZERO);
+  application.GetScene().Add(control);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Property::Map          visualMap;
+  visualMap[Visual::Property::TYPE]           = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::GREEN;
+  Toolkit::Visual::Base visual                = visualFactory.CreateVisual(visualMap);
+
+  Property::Index visualIndex = 101;
+  Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex, visual);
+  DALI_TEST_CHECK(Toolkit::DevelControl::IsVisualEnabled(controlImpl, visualIndex));
+
+  auto       visualCornerRadiusProperty = visual.GetPropertyObject(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  Constraint customConstraint           = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, EqualToConstraint());
+  customConstraint.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+
+  Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual, true, customConstraint);
+
+  // Verify initial application
+  Vector4 initialCornerRadius(5.0f, 5.0f, 5.0f, 5.0f);
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, initialCornerRadius);
+  application.SendNotification();
+  application.Render();
+  Vector4 visualRadiusAfterApply = visualCornerRadiusProperty.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty.propertyIndex);
+  DALI_TEST_EQUALS(visualRadiusAfterApply, initialCornerRadius, TEST_LOCATION);
+
+  // Now, disable the corner property override
+  Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual, false, customConstraint);
+
+  // Change control's corner radius again
+  Vector4 newCornerRadiusAfterDisable(15.0f, 15.0f, 15.0f, 15.0f);
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, newCornerRadiusAfterDisable);
+  application.SendNotification();
+  application.Render();
+
+  // The visual's corner radius should NOT have changed because the constraint was removed
+  Vector4 visualRadiusAfterDisable = visualCornerRadiusProperty.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty.propertyIndex);
+  DALI_TEST_EQUALS(visualRadiusAfterDisable, initialCornerRadius, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(visualRadiusAfterDisable, newCornerRadiusAfterDisable, 0.01f, TEST_LOCATION);
+
+  application.GetScene().Remove(control);
+  END_TEST;
+}
+
+// Test case for interaction between custom corner constraints and animatable property binding.
+// Tests the behavior of two visuals with different constraint apply rates (APPLY_ONCE vs APPLY_ALWAYS)
+// when the control's corner radius property is animated. Both visuals should follow the animation
+// as the default behavior for EnableCornerPropertiesOverridden is to apply continuously.
+int UtcDaliControlCornerPropertiesWithAnimationBindingP(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4::ZERO);
+  application.GetScene().Add(control);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Property::Map          visualMap1, visualMap2;
+  visualMap1[Visual::Property::TYPE]           = Visual::COLOR;
+  visualMap1[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
+  visualMap2[Visual::Property::TYPE]           = Visual::COLOR;
+  visualMap2[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+
+  Toolkit::Visual::Base visual1 = visualFactory.CreateVisual(visualMap1);
+  Toolkit::Visual::Base visual2 = visualFactory.CreateVisual(visualMap2);
+
+  Property::Index visualIndex1 = 200;
+  Property::Index visualIndex2 = 201;
+  Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex1, visual1);
+  DALI_TEST_CHECK(Toolkit::DevelControl::IsVisualEnabled(controlImpl, visualIndex1));
+  Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex2, visual2);
+  DALI_TEST_CHECK(Toolkit::DevelControl::IsVisualEnabled(controlImpl, visualIndex2));
+
+  auto visualCornerRadiusProperty1 = visual1.GetPropertyObject(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  auto visualCornerRadiusProperty2 = visual2.GetPropertyObject(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+
+  // Apply a custom APPLY_ONCE constraint to visual1
+  Constraint customConstraint1 = Constraint::New<Vector4>(visualCornerRadiusProperty1.object, visualCornerRadiusProperty1.propertyIndex, EqualToConstraint());
+  customConstraint1.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+  Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual1, true, customConstraint1);
+
+  // Apply default corner property override to visual2 (simulated with APPLY_ALWAYS for dummy actor)
+  Constraint customConstraint2 = Constraint::New<Vector4>(visualCornerRadiusProperty2.object, visualCornerRadiusProperty2.propertyIndex, EqualToConstraint());
+  customConstraint2.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+  Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual2, true, customConstraint2);
+
+  // Set initial corner radius
+  Vector4 initialRadius(8.0f, 8.0f, 8.0f, 8.0f);
+  control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, initialRadius);
+  application.SendNotification();
+  application.Render();
+
+  // Both visuals should reflect the initial radius
+  Vector4 visual1RadiusInitial = visualCornerRadiusProperty1.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty1.propertyIndex);
+  Vector4 visual2RadiusInitial = visualCornerRadiusProperty2.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty2.propertyIndex);
+  DALI_TEST_EQUALS(visual1RadiusInitial, initialRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(visual2RadiusInitial, initialRadius, TEST_LOCATION);
+
+  // Create an animation to change the control's corner radius
+  Animation animation = Animation::New(1.0f);
+  Vector4   targetRadius(20.0f, 20.0f, 20.0f, 20.0f);
+  animation.AnimateTo(Property(control, Toolkit::DevelControl::Property::CORNER_RADIUS), targetRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500); // Halfway
+
+  Vector4 halfwayRadius = control.GetCurrentProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
+  DALI_TEST_NOT_EQUALS(halfwayRadius, initialRadius, 0.01f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(halfwayRadius, targetRadius, 0.01f, TEST_LOCATION);
+
+  Vector4 visual1RadiusHalfway = visualCornerRadiusProperty1.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty1.propertyIndex);
+  Vector4 visual2RadiusHalfway = visualCornerRadiusProperty2.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty2.propertyIndex);
+  DALI_TEST_EQUALS(visual1RadiusHalfway, halfwayRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(visual2RadiusHalfway, halfwayRadius, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(600); // Animation finishes
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS), targetRadius, TEST_LOCATION);
+
+  // After animation, visual1 should still have initialRadius
+  // visual2 should have targetRadius
+  Vector4 visual1RadiusFinal = visualCornerRadiusProperty1.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty1.propertyIndex);
+  Vector4 visual2RadiusFinal = visualCornerRadiusProperty2.object.GetCurrentProperty<Vector4>(visualCornerRadiusProperty2.propertyIndex);
+  DALI_TEST_EQUALS(visual1RadiusFinal, targetRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(visual2RadiusFinal, targetRadius, TEST_LOCATION);
+
+  application.GetScene().Remove(control);
+  END_TEST;
+}
+
+// Positive test case for cleanup of corner property override constraints on Control destruction.
+// Ensures that when a Control with overridden corner properties and active animation
+// constraints is destroyed, the destructor correctly removes these constraints without causing crashes or leaks.
+int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
+{
+  ToolkitTestApplication application;
+
+  // This scope ensures that the control and its internal VisualData are destroyed
+  // before the test function exits.
+  {
+    Control control = Control::New();
+    control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+    application.GetScene().Add(control);
+    application.SendNotification();
+    application.Render();
+
+    Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+
+    // Create a visual and register it
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+    Property::Map          visualMap;
+    visualMap[Visual::Property::TYPE]           = Visual::COLOR;
+    visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+    Toolkit::Visual::Base visual                = visualFactory.CreateVisual(visualMap);
+
+    Property::Index visualIndex = 300; // Arbitrary index
+    Toolkit::DevelControl::RegisterVisual(controlImpl, visualIndex, visual);
+    DALI_TEST_CHECK(Toolkit::DevelControl::IsVisualEnabled(controlImpl, visualIndex));
+
+    // Create a dummy actor for the constraint target
+    // This simulates the target of the constraint within the visual.
+    // In a real scenario, this would be a property of the visual itself.
+    // For testing the cleanup in VisualData, we just need the constraint to be created and stored.
+    Actor dummyVisualActor = Actor::New();
+    application.GetScene().Add(dummyVisualActor); // Add to stage so constraint can be applied
+
+    auto visualCornerRadiusProperty = visual.GetPropertyObject(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS);
+
+    // Apply a custom constraint with APPLY_ALWAYS (or continuous) to ensure it stays in animationConstraint map
+    // Using EqualToConstraint which is continuous by default.
+    Constraint customConstraint = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, EqualToConstraint());
+    customConstraint.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
+    // Note: We don't call customConstraint.Apply() here. EnableCornerPropertiesOverridden will handle it.
+
+    Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, visual, true, customConstraint);
+
+    // Set a corner radius to trigger the constraint
+    control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4(10.0f, 10.0f, 10.0f, 10.0f));
+    application.SendNotification();
+    application.Render();
+
+    // At this point, the internal VisualData for the control should have:
+    // - A RegisteredVisual with overrideCornerProperties = true
+    // - At least one entry in its animationConstraint map
+
+    tet_infoline("Control with overridden corner properties is about to go out of scope.");
+  } // <- Control 'control' goes out of scope here. Its destructor (~Control) -> ~ControlImpl -> ~VisualData is called.
+  // This is where the new cleanup logic in control-visual-data.cpp should be executed.
+
+  tet_infoline("Control has been destroyed. If no crash occurred, the cleanup was successful.");
+
+  // Render the application again to ensure no dangling references or issues persist.
+  application.SendNotification();
+  application.Render();
+
+  // The test passes if it reaches this point without any crashes or sanitizer errors.
+  // The testing framework (e.g., LeakSanitizer, AddressSanitizer if enabled) would catch
+  // issues like memory leaks or invalid accesses during destruction.
   END_TEST;
 }

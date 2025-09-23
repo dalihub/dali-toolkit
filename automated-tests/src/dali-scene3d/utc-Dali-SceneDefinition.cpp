@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-test-suite-utils.h>
 #include "dali-scene3d/public-api/loader/scene-definition.h"
 #include "dali-scene3d/public-api/loader/utils.h"
-#include <dali-test-suite-utils.h>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -30,29 +30,29 @@ int UtcDaliSceneDefinitionAddNode(void)
   SceneDefinition sceneDef;
 
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 0u);
-  auto node = new NodeDefinition();
+  auto node   = new NodeDefinition();
   node->mName = "First";
 
-  auto result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ node });
+  auto result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{node});
   DALI_TEST_EQUAL(result, node);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 1u);
   DALI_TEST_EQUAL(sceneDef.GetNode(0), node);
   DALI_TEST_EQUAL(sceneDef.FindNode(node->mName), node);
 
-  auto node2 = new NodeDefinition();
+  auto node2   = new NodeDefinition();
   node2->mName = node->mName;
-  result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ node2 });
+  result       = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{node2});
   DALI_TEST_EQUAL(result, node2);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 2u);
   DALI_TEST_EQUAL(sceneDef.GetNode(1), node2);
 
-  auto child = new NodeDefinition();
-  child->mName = "Second";
+  auto child        = new NodeDefinition();
+  child->mName      = "Second";
   child->mParentIdx = 0;
 
   DALI_TEST_CHECK(node->mChildren.empty()); // these are hooked up by AddNode, base on parent idx.
 
-  result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ child });
+  result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{child});
   DALI_TEST_EQUAL(result, child);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 3u);
   DALI_TEST_EQUAL(sceneDef.GetNode(2), child);
@@ -86,16 +86,16 @@ struct TestContext
 
   TestContext()
   : sceneDef{},
-    root{ new NodeDefinition{ "Root" }},
-    childA{ new NodeDefinition{ "A" }},
-    childB{ new NodeDefinition{ "B" }}
+    root{new NodeDefinition{"Root"}},
+    childA{new NodeDefinition{"A"}},
+    childB{new NodeDefinition{"B"}}
   {
     childA->mParentIdx = 0;
     childB->mParentIdx = 0;
 
-    root = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ root });
-    childA = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ childA });
-    childB = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{ childB });
+    root   = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{root});
+    childA = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{childA});
+    childB = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{childB});
   }
 };
 
@@ -110,7 +110,7 @@ struct NodeVisitor : NodeDefinition::IVisitor
 {
   struct Visit
   {
-    Event event;
+    Event           event;
     NodeDefinition* node;
 
     bool operator==(const Visit& other) const
@@ -121,12 +121,12 @@ struct NodeVisitor : NodeDefinition::IVisitor
 
   void Start(NodeDefinition& n) override
   {
-    visits.push_back({ START, &n });
+    visits.push_back({START, &n});
   }
 
   void Finish(NodeDefinition& n) override
   {
-    visits.push_back({ FINISH, &n });
+    visits.push_back({FINISH, &n});
   }
 
   std::vector<Visit> visits;
@@ -136,7 +136,7 @@ struct ConstNodeVisitor : NodeDefinition::IConstVisitor
 {
   struct Visit
   {
-    Event  event;
+    Event                 event;
     const NodeDefinition* node;
 
     bool operator==(const Visit& other) const
@@ -147,18 +147,18 @@ struct ConstNodeVisitor : NodeDefinition::IConstVisitor
 
   void Start(const NodeDefinition& n) override
   {
-    visits.push_back({ START, &n });
+    visits.push_back({START, &n});
   }
 
   void Finish(const NodeDefinition& n) override
   {
-    visits.push_back({ FINISH, &n });
+    visits.push_back({FINISH, &n});
   }
 
   std::vector<Visit> visits;
 };
 
-}
+} //namespace
 
 int UtcDaliSceneDefinitionAddRemoveRootNode(void)
 {
@@ -183,13 +183,13 @@ int UtcDaliSceneDefinitionVisit(void)
   NodeVisitor visitor;
   ctx.sceneDef.Visit(0, Customization::Choices{}, visitor);
 
-  const NodeVisitor::Visit expected[] {
-    { START, ctx.root },
-    { START, ctx.childA },
-    { FINISH, ctx.childA },
-    { START, ctx.childB },
-    { FINISH, ctx.childB },
-    { FINISH, ctx.root },
+  const NodeVisitor::Visit expected[]{
+    {START, ctx.root},
+    {START, ctx.childA},
+    {FINISH, ctx.childA},
+    {START, ctx.childB},
+    {FINISH, ctx.childB},
+    {FINISH, ctx.root},
   };
   DALI_TEST_CHECK(std::equal(visitor.visits.begin(), visitor.visits.end(), expected));
 
@@ -203,13 +203,13 @@ int UtcDaliSceneDefinitionConstVisit(void)
   ConstNodeVisitor visitor;
   ctx.sceneDef.Visit(0, Customization::Choices{}, visitor);
 
-  const ConstNodeVisitor::Visit expected[] {
-    { START, ctx.root },
-    { START, ctx.childA },
-    { FINISH, ctx.childA },
-    { START, ctx.childB },
-    { FINISH, ctx.childB },
-    { FINISH, ctx.root },
+  const ConstNodeVisitor::Visit expected[]{
+    {START, ctx.root},
+    {START, ctx.childA},
+    {FINISH, ctx.childA},
+    {START, ctx.childB},
+    {FINISH, ctx.childB},
+    {FINISH, ctx.root},
   };
   DALI_TEST_CHECK(std::equal(visitor.visits.begin(), visitor.visits.end(), expected));
 
@@ -220,17 +220,17 @@ int UtcDaliSceneDefinitionVisitCustomized(void)
 {
   TestContext ctx;
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{ "A/B" });
+  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
 
-  const NodeVisitor::Visit expected[] {
-    { START, ctx.root },
-    { START, ctx.childB },
-    { FINISH, ctx.childB },
-    { FINISH, ctx.root },
+  const NodeVisitor::Visit expected[]{
+    {START, ctx.root},
+    {START, ctx.childB},
+    {FINISH, ctx.childB},
+    {FINISH, ctx.root},
   };
 
   Customization::Choices choices;
-  for (auto i : { 1, 2 })
+  for(auto i : {1, 2})
   {
     choices.Set("A/B", i);
 
@@ -247,17 +247,17 @@ int UtcDaliSceneDefinitionConstVisitCustomized(void)
 {
   TestContext ctx;
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{ "A/B" });
+  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
 
-  const ConstNodeVisitor::Visit expected[] {
-    { START, ctx.root },
-    { START, ctx.childB },
-    { FINISH, ctx.childB },
-    { FINISH, ctx.root },
+  const ConstNodeVisitor::Visit expected[]{
+    {START, ctx.root},
+    {START, ctx.childB},
+    {FINISH, ctx.childB},
+    {FINISH, ctx.root},
   };
 
   Customization::Choices choices;
-  for (auto i : { 1, 2 })
+  for(auto i : {1, 2})
   {
     choices.Set("A/B", i);
 
@@ -276,12 +276,12 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
 
   ctx.sceneDef.AddRootNode(0); // GetCustomizationOptions requires this.
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{ "A/B" });
-  ctx.childA->mCustomization.reset(new NodeDefinition::CustomizationDefinition{ "hello" });
-  ctx.childB->mCustomization.reset(new NodeDefinition::CustomizationDefinition{ "goodbye" });
+  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
+  ctx.childA->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"hello"});
+  ctx.childB->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"goodbye"});
 
   Customization::Choices choices;
-  Customization::Map options;
+  Customization::Map     options;
   ctx.sceneDef.GetCustomizationOptions(choices, options, &choices);
 
   DALI_TEST_EQUAL(choices.Size(), 2u);
@@ -289,16 +289,16 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
 
   struct TestOption
   {
-    std::string name;
-    Customization customization;
+    std::string               name;
+    Customization             customization;
     Customization::OptionType choice;
   };
 
-  std::vector<TestOption> testOptions {
-    { "A/B", { 2, { "Root" } }, 0 },
-    { "hello", { 0, { "A" } }, 0 },
+  std::vector<TestOption> testOptions{
+    {"A/B", {2, {"Root"}}, 0},
+    {"hello", {0, {"A"}}, 0},
   };
-  for (auto& testOption: testOptions)
+  for(auto& testOption : testOptions)
   {
     auto iFind = choices.Get(testOption.name);
     DALI_TEST_EQUAL(iFind, testOption.choice);
@@ -308,15 +308,15 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
     DALI_TEST_EQUAL(iFindOption->numOptions, testOption.customization.numOptions);
     DALI_TEST_EQUAL(iFindOption->nodes.size(), testOption.customization.nodes.size());
     DALI_TEST_CHECK(std::equal(iFindOption->nodes.begin(), iFindOption->nodes.end(),
-      testOption.customization.nodes.begin()));
+                               testOption.customization.nodes.begin()));
   }
 
   choices.Clear();
   choices.Set("A/B", 1);
   *options.Get("A/B") = {};
 
-  testOptions[0].choice = 1;
-  testOptions[1].name = "goodbye";
+  testOptions[0].choice                 = 1;
+  testOptions[1].name                   = "goodbye";
   testOptions[1].customization.nodes[0] = "B";
 
   ctx.sceneDef.GetCustomizationOptions(choices, options, &choices);
@@ -324,7 +324,7 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
   DALI_TEST_EQUAL(choices.Size(), 2u);
   DALI_TEST_EQUAL(options.Size(), 3u);
 
-  for (auto& testOption: testOptions)
+  for(auto& testOption : testOptions)
   {
     auto iFind = choices.Get(testOption.name);
     DALI_TEST_EQUAL(iFind, testOption.choice);
@@ -334,7 +334,7 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
     DALI_TEST_EQUAL(iFindOption->numOptions, testOption.customization.numOptions);
     DALI_TEST_EQUAL(iFindOption->nodes.size(), testOption.customization.nodes.size());
     DALI_TEST_CHECK(std::equal(iFindOption->nodes.begin(), iFindOption->nodes.end(),
-      testOption.customization.nodes.begin()));
+                               testOption.customization.nodes.begin()));
   }
 
   END_TEST;
@@ -345,7 +345,7 @@ int UtcDaliSceneDefinitionFindNode(void)
   TestContext ctx;
 
   Index result = INVALID_INDEX;
-  for (auto n: { ctx.root, ctx.childA, ctx.childB })
+  for(auto n : {ctx.root, ctx.childA, ctx.childB})
   {
     ctx.sceneDef.FindNode(n->mName, &result);
     DALI_TEST_CHECK(result != INVALID_INDEX);
@@ -360,7 +360,7 @@ int UtcDaliSceneDefinitionConstFindNode(void)
   TestContext ctx;
 
   Index result = INVALID_INDEX;
-  for (auto n: { ctx.root, ctx.childA, ctx.childB })
+  for(auto n : {ctx.root, ctx.childA, ctx.childB})
   {
     const_cast<const TestContext&>(ctx).sceneDef.FindNode(n->mName, &result);
     DALI_TEST_CHECK(result != INVALID_INDEX);
@@ -375,7 +375,7 @@ int UtcDaliSceneDefinitionFindNodeIndex(void)
   TestContext ctx;
 
   Index result = INVALID_INDEX;
-  for (auto n: { ctx.root, ctx.childA, ctx.childB })
+  for(auto n : {ctx.root, ctx.childA, ctx.childB})
   {
     result = ctx.sceneDef.FindNodeIndex(*n);
     DALI_TEST_CHECK(result != INVALID_INDEX);
@@ -390,11 +390,13 @@ int UtcDaliSceneDefinitionFindNodes(void)
   TestContext ctx;
 
   std::vector<NodeDefinition*> nodes;
-  auto nodeConsumer = [&nodes](NodeDefinition& nd) {
+  auto                         nodeConsumer = [&nodes](NodeDefinition& nd)
+  {
     nodes.push_back(&nd);
   };
 
-  auto nodePredicate = [](const NodeDefinition& nd) {
+  auto nodePredicate = [](const NodeDefinition& nd)
+  {
     return nd.mName.length() == 1;
   };
 
@@ -462,4 +464,3 @@ int UtcDaliSceneDefinitionReparentNode(void)
 
   END_TEST;
 }
-

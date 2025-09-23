@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,18 +143,18 @@ public:
   bool IsMarkupUnderlineSet() const;
 
   /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
+   */
   const GlyphInfo* GetHyphens() const override;
 
   /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
+   */
   const Length* GetHyphenIndices() const override;
 
   /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
+   */
   Length GetHyphensCount() const override;
 
   /**
@@ -205,8 +205,8 @@ public:
   uint16_t GetOutlineWidth() const override;
 
   /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetEllipsisPosition()
-  */
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetEllipsisPosition()
+   */
   DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
 
   /**

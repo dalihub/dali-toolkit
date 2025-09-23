@@ -29,7 +29,7 @@ namespace Dali::Scene3D
  */
 enum ConstraintTagRanges
 {
-  SCENE3D_CONSTRAINT_TAG_START = Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_MAX + 1u + (Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION)*2,
+  SCENE3D_CONSTRAINT_TAG_START = Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_MAX + 1u + (Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION) * 2,
   SCENE3D_CONSTRAINT_TAG_END   = SCENE3D_CONSTRAINT_TAG_START + Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION,
 };
 } // namespace Dali::Scene3D

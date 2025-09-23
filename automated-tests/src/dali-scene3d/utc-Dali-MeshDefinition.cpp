@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ int UtcDaliMeshDefinitionInvalidUrl(void)
   MeshDefinition meshDefinition;
   meshDefinition.mUri = "invalid-uri/";
   BufferDefinition::Vector buffers;
-  MeshDefinition::RawData rawData = meshDefinition.LoadRaw("invalidModelPath", buffers);
+  MeshDefinition::RawData  rawData = meshDefinition.LoadRaw("invalidModelPath", buffers);
   DALI_TEST_EQUALS(rawData.mIndices.size(), 0u, TEST_LOCATION);
   END_TEST;
 }

@@ -125,6 +125,11 @@ const Scene3D::Loader::AnimationDefinition& MotionDataLoadTask::GetAnimationDefi
   return mAnimationDefinition;
 }
 
+MotionDataLoadTask::LoadMethod MotionDataLoadTask::GetLoadMethod() const
+{
+  return mLoadMethod;
+}
+
 } // namespace Internal
 
 } // namespace Scene3D

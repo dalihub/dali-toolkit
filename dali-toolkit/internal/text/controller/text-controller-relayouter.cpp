@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include <dali-toolkit/internal/text/controller/text-controller-relayouter.h>
 
 // EXTERNAL INCLUDES
-#include <cmath>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/math-utils.h>
+#include <cmath>
 #include <limits>
 
 // INTERNAL INCLUDES
@@ -46,6 +46,25 @@ float ConvertToEven(float value)
 {
   int intValue(static_cast<int>(value));
   return static_cast<float>(intValue + (intValue & 1));
+}
+
+float GetDpi()
+{
+  static uint32_t horizontalDpi = 0u;
+  static uint32_t verticalDpi   = 0u;
+
+  if(DALI_UNLIKELY(horizontalDpi == 0u))
+  {
+    Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+    fontClient.GetDpi(horizontalDpi, verticalDpi);
+  }
+  return static_cast<float>(horizontalDpi);
+}
+
+float ConvertPointToPixel(float point)
+{
+  // Pixel size = Point size * DPI / 72.f
+  return point * GetDpi() / 72.0f;
 }
 
 } // namespace
@@ -262,8 +281,8 @@ void Controller::Relayouter::FitArrayPointSizeforLayout(Controller& controller, 
   if(NO_OPERATION != (UPDATE_LAYOUT_SIZE & operations) || impl.mTextFitContentSize != layoutSize)
   {
     DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_FIT_ARRAY_LAYOUT", "[%p]", static_cast<void*>(&controller));
-    std::vector<Toolkit::DevelTextLabel::FitOption> fitOptions = impl.mTextFitArray;
-    int numberOfFitOptions = static_cast<int>(fitOptions.size());
+    std::vector<Toolkit::DevelTextLabel::FitOption> fitOptions         = impl.mTextFitArray;
+    int                                             numberOfFitOptions = static_cast<int>(fitOptions.size());
     if(numberOfFitOptions == 0)
     {
       DALI_LOG_ERROR("fitOptions is empty\n");
@@ -295,35 +314,35 @@ void Controller::Relayouter::FitArrayPointSizeforLayout(Controller& controller, 
 
     // Set the first FitOption(Minimum PointSize) to the best value.
     // If the search does not find an optimal value, the minimum PointSize will be used to text fit.
-    Toolkit::DevelTextLabel::FitOption firstOption = fitOptions.front();
-    bool  bestSizeUpdatedLatest = false;
-    float bestPointSize         = firstOption.GetPointSize();
-    float bestMinLineSize       = firstOption.GetMinLineSize();
+    Toolkit::DevelTextLabel::FitOption firstOption           = fitOptions.front();
+    bool                               bestSizeUpdatedLatest = false;
+    float                              bestPointSize         = firstOption.GetPointSize();
+    float                              bestMinLineSize       = firstOption.GetMinLineSize();
 
     if(binarySearch)
     {
-      int left = 0u;
+      int left  = 0u;
       int right = numberOfFitOptions - 1;
 
-      while (left <= right)
+      while(left <= right)
       {
-        int mid = left + (right - left) / 2;
-        Toolkit::DevelTextLabel::FitOption option = fitOptions[mid];
-        float testPointSize   = option.GetPointSize();
-        float testMinLineSize = option.GetMinLineSize();
+        int                                mid             = left + (right - left) / 2;
+        Toolkit::DevelTextLabel::FitOption option          = fitOptions[mid];
+        float                              testPointSize   = option.GetPointSize();
+        float                              testMinLineSize = option.GetMinLineSize();
         impl.SetDefaultLineSize(testMinLineSize);
 
         if(CheckForTextFit(controller, testPointSize, layoutSize))
         {
           bestSizeUpdatedLatest = true;
-          bestPointSize   = testPointSize;
-          bestMinLineSize = testMinLineSize;
-          left = mid + 1;
+          bestPointSize         = testPointSize;
+          bestMinLineSize       = testMinLineSize;
+          left                  = mid + 1;
         }
         else
         {
           bestSizeUpdatedLatest = false;
-          right = mid - 1;
+          right                 = mid - 1;
         }
       }
     }
@@ -332,16 +351,16 @@ void Controller::Relayouter::FitArrayPointSizeforLayout(Controller& controller, 
       // If binary search is not possible, search sequentially starting from the largest PointSize.
       for(auto it = fitOptions.rbegin(); it != fitOptions.rend(); ++it)
       {
-        Toolkit::DevelTextLabel::FitOption option = *it;
-        float testPointSize   = option.GetPointSize();
-        float testMinLineSize = option.GetMinLineSize();
+        Toolkit::DevelTextLabel::FitOption option          = *it;
+        float                              testPointSize   = option.GetPointSize();
+        float                              testMinLineSize = option.GetMinLineSize();
         impl.SetDefaultLineSize(testMinLineSize);
 
         if(CheckForTextFit(controller, testPointSize, layoutSize))
         {
           bestSizeUpdatedLatest = true;
-          bestPointSize   = testPointSize;
-          bestMinLineSize = testMinLineSize;
+          bestPointSize         = testPointSize;
+          bestMinLineSize       = testMinLineSize;
           break;
         }
         else
@@ -387,7 +406,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     impl.SetDefaultLineSize(impl.mTextFitLineSize);
 
     model->mElideEnabled = false;
-    float bestPointSize = minPointSize;
+    float bestPointSize  = minPointSize;
 
     // check zero value
     if(pointInterval < 1.f)
@@ -447,8 +466,8 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     else
     {
       // assume textSize = a * pointSize + b, finding a and b.
-      Size              textSize;
-      TextUpdateInfo&   textUpdateInfo  = impl.mTextUpdateInfo;
+      Size                 textSize;
+      TextUpdateInfo&      textUpdateInfo     = impl.mTextUpdateInfo;
       const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
                                                                             GET_SCRIPTS |
                                                                             VALIDATE_FONTS |
@@ -462,23 +481,22 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
       float tmpPointSize[2] = {minPointSize, maxPointSize};
 
       // Calculate a and b by creating simultaneous equations with two calculations.
-      for(int i=0;i<2;i++)
+      for(int i = 0; i < 2; i++)
       {
         impl.mFontDefaults->mFitPointSize = tmpPointSize[i];
-        impl.mFontDefaults->sizeDefined = true;
+        impl.mFontDefaults->sizeDefined   = true;
         impl.ClearFontData();
 
         textUpdateInfo.mParagraphCharacterIndex     = 0u;
         textUpdateInfo.mRequestedNumberOfCharacters = impl.mModel->mLogicalModel->mText.Count();
 
-
         // Make sure the model is up-to-date before layouting
         impl.UpdateModel(onlyOnceOperations);
 
         DoRelayout(impl,
-                  Size(layoutSize.width, MAX_FLOAT),
-                  static_cast<OperationsMask>(onlyOnceOperations | LAYOUT),
-                  textSize);
+                   Size(layoutSize.width, MAX_FLOAT),
+                   static_cast<OperationsMask>(onlyOnceOperations | LAYOUT),
+                   textSize);
 
         // Clear the update info. This info will be set the next time the text is updated.
         textUpdateInfo.Clear();
@@ -490,11 +508,11 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
 
       float aBasedX = (resultBasedX[1] - resultBasedX[0]) / (tmpPointSize[1] - tmpPointSize[0]);
       float bBasedX = resultBasedX[1] - aBasedX * tmpPointSize[1];
-      aBasedX = std::max(aBasedX, Dali::Math::MACHINE_EPSILON_1000);
+      aBasedX       = std::max(aBasedX, Dali::Math::MACHINE_EPSILON_1000);
 
       float aBasedY = (resultBasedY[1] - resultBasedY[0]) / (tmpPointSize[1] - tmpPointSize[0]);
       float bBasedY = resultBasedY[1] - aBasedY * tmpPointSize[1];
-      aBasedY = std::max(aBasedY, Dali::Math::MACHINE_EPSILON_1000);
+      aBasedY       = std::max(aBasedY, Dali::Math::MACHINE_EPSILON_1000);
 
       float bestPointSizeBasedX = (layoutSize.x - bBasedX) / aBasedX;
       float bestPointSizeBasedY = (layoutSize.y - bBasedY) / aBasedY;
@@ -651,10 +669,10 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   {
     // Update Text layout for applying elided
     operationsPending                  = static_cast<OperationsMask>(operationsPending |
-                                                    ALIGN |
-                                                    LAYOUT |
-                                                    UPDATE_LAYOUT_SIZE |
-                                                    REORDER);
+                                                                     ALIGN |
+                                                                     LAYOUT |
+                                                                     UPDATE_LAYOUT_SIZE |
+                                                                     REORDER);
     textUpdateInfo.mFullRelayoutNeeded = true;
     textUpdateInfo.mCharacterIndex     = 0u;
   }
@@ -669,13 +687,13 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
     // Apply modifications to the model
     // Shape the text again is needed because characters like '()[]{}' have to be mirrored and the glyphs generated again.
     operationsPending     = static_cast<OperationsMask>(operationsPending |
-                                                    GET_GLYPH_METRICS |
-                                                    SHAPE_TEXT |
-                                                    UPDATE_DIRECTION |
-                                                    ALIGN |
-                                                    LAYOUT |
-                                                    BIDI_INFO |
-                                                    REORDER);
+                                                        GET_GLYPH_METRICS |
+                                                        SHAPE_TEXT |
+                                                        UPDATE_DIRECTION |
+                                                        ALIGN |
+                                                        LAYOUT |
+                                                        BIDI_INFO |
+                                                        REORDER);
     impl.mLayoutDirection = layoutDirection;
   }
 
@@ -851,6 +869,9 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
     layoutParameters.startLineIndex         = textUpdateInfo.mStartLineIndex;
     layoutParameters.estimatedNumberOfLines = textUpdateInfo.mEstimatedNumberOfLines;
 
+    float fontPointSize = (impl.mTextFitEnabled || impl.mTextFitArrayEnabled) ? (impl.mFontDefaults ? impl.mFontDefaults->mFitPointSize : 0.f) : (impl.mFontDefaults ? impl.mFontDefaults->mDefaultPointSize : 0.f) * impl.GetFontSizeScale();
+    impl.mLayoutEngine.SetFontPixelSize(ConvertPointToPixel(fontPointSize));
+
     // Update the ellipsis
     bool elideTextEnabled = impl.mModel->mElideEnabled;
     auto ellipsisPosition = impl.mModel->mEllipsisPosition;
@@ -893,7 +914,7 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
                                                 ellipsisPosition);
 
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
-    layoutTooSmall = !viewUpdated;
+    layoutTooSmall            = !viewUpdated;
 
     viewUpdated = viewUpdated || (newLayoutSize != layoutSize);
 
@@ -1001,16 +1022,16 @@ void Controller::Relayouter::DoRelayoutHorizontalAlignment(Controller::Impl&    
       Text::HorizontalAlignment::Type decidedHorizontalAlignment     = impl.mModel->mHorizontalAlignment;
 
       /*
-         * Shortcuts to explain indexes cases:
-         *
-         * AS: Alignment Start Index
-         * AE: Alignment End Index
-         * PS: Paragraph Start Index
-         * PE: Paragraph End Index
-         * B: BoundedParagraph Alignment
-         * M: Model Alignment
-         *
-         */
+       * Shortcuts to explain indexes cases:
+       *
+       * AS: Alignment Start Index
+       * AE: Alignment End Index
+       * PS: Paragraph Start Index
+       * PE: Paragraph End Index
+       * B: BoundedParagraph Alignment
+       * M: Model Alignment
+       *
+       */
 
       if(alignIndex < characterStartIndexBP && characterStartIndexBP <= alignEndIndex) /// AS.MMMMMM.PS--------AE
       {

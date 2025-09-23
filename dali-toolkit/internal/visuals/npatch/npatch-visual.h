@@ -180,37 +180,6 @@ private:
   Geometry GetNinePatchGeometry(VisualFactoryCache::GeometryType subType);
 
   /**
-   * @brief Creates a geometry for the grid size to be used by this visuals' shaders
-   *
-   * @param[in] gridSize The grid size of the solid geometry to create
-   * @return Returns the created geometry for the grid size
-   */
-  Geometry CreateGridGeometry(Uint16Pair gridSize);
-
-  /**
-   * @brief Creates a geometry with the border only for the grid size to be used by this visuals' shaders
-   * e.g. a 5x4 grid would create a geometry that would look like:
-   *
-   *   ---------------------
-   *   |  /|  /|  /|  /|  /|
-   *   |/  |/  |/  |/  |/  |
-   *   ---------------------
-   *   |  /|           |  /|
-   *   |/  |           |/  |
-   *   -----           -----
-   *   |  /|           |  /|
-   *   |/  |           |/  |
-   *   ---------------------
-   *   |  /|  /|  /|  /|  /|
-   *   |/  |/  |/  |/  |/  |
-   *   ---------------------
-   *
-   * @param[in] gridSize The grid size of the solid geometry to create
-   * @return Returns the created geometry for the grid size
-   */
-  Geometry CreateBorderGeometry(Uint16Pair gridSize);
-
-  /**
    * @brief Creates a renderer by using loaded resource.
    */
   void SetResource();

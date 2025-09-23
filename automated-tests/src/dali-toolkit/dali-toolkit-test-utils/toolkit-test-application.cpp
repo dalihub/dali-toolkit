@@ -58,6 +58,12 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
 
 ToolkitTestApplication::~ToolkitTestApplication()
 {
+  auto bridge = Dali::Accessibility::Bridge::GetCurrentBridge();
+  if(bridge)
+  {
+    bridge->Terminate();
+  }
+
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   lifecycleController.TerminateSignal().Emit();
 

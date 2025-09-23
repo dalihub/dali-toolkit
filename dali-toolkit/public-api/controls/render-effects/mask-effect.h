@@ -45,7 +45,6 @@ class MaskEffectImpl;
 class DALI_TOOLKIT_API MaskEffect : public RenderEffect
 {
 public:
-
   /**
    * @brief Enumeration for selecting how the mask source interprets pixel data.
    * @SINCE_2_4.15

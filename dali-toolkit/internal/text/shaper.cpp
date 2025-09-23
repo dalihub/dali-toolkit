@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/shaper.h>
 
 // EXTERNAL INCLUDES
-#include <chrono>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <chrono>
 
 namespace Dali
 {
@@ -281,9 +281,9 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
     if(logEnabled)
     {
       timeStamps[timeStampIndex++] = GetMilliSeconds();
-      sumPre   += timeStamps[1] - timeStamps[0];
+      sumPre += timeStamps[1] - timeStamps[0];
       sumShape += timeStamps[2] - timeStamps[1];
-      sumPost  += timeStamps[3] - timeStamps[2];
+      sumPost += timeStamps[3] - timeStamps[2];
     }
 #endif
   }

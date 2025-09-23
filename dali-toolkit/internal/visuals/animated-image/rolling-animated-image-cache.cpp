@@ -217,16 +217,16 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
 
   TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
   TextureSet                textureSet    = mTextureManager.LoadAnimatedImageTexture(mImageUrl,
-                                                                   mAnimatedImageLoading,
-                                                                   frameIndex,
-                                                                   loadTextureId,
-                                                                   mMaskingData,
-                                                                   mDesiredSize,
-                                                                   mFittingMode,
-                                                                   mSamplingMode,
-                                                                   synchronousLoading,
-                                                                   this,
-                                                                   preMultiplyOnLoading);
+                                                                                     mAnimatedImageLoading,
+                                                                                     frameIndex,
+                                                                                     loadTextureId,
+                                                                                     mMaskingData,
+                                                                                     mDesiredSize,
+                                                                                     mFittingMode,
+                                                                                     mSamplingMode,
+                                                                                     synchronousLoading,
+                                                                                     this,
+                                                                                     preMultiplyOnLoading);
   if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();

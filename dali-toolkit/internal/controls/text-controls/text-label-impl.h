@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,7 +276,7 @@ public:
    * @param[in] widthConstraint The maximum available width of text to render.
    * @param[in] height  The height of text to render.
    */
-   void RequestAsyncRenderWithFixedHeight(float widthConstraint, float height);
+  void RequestAsyncRenderWithFixedHeight(float widthConstraint, float height);
 
   /**
    * @brief Requests asynchronous rendering with the maximum available width using the given widthConstraint.
@@ -346,11 +346,6 @@ private: // From Control
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
-   * @copydoc Control::OnTap()
-   */
-  void OnTap(const TapGesture& tap) override;
-
-  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize() override;
@@ -395,7 +390,6 @@ public: // From AnchorControlInterface
   void AnchorClicked(const std::string& href) override;
 
 private: // from AsyncTextInterface
-
   /**
    * @copydoc Text::AsyncTextInterface::AsyncSetupAutoScroll()
    */
@@ -415,7 +409,6 @@ private: // from AsyncTextInterface
    * @copydoc Text::AsyncTextInterface::AsyncSizeComputed()
    */
   void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo);
-
 
 private: // Implementation
   /**
@@ -505,6 +498,14 @@ private:
    */
   void OnVariationPropertyNotify(PropertyNotification& source);
 
+  /**
+   * @brief Callback when TextLabel is intercept touched
+   *
+   * @param[in] actor TextLabel touched
+   * @param[in] touch Touch information
+   */
+  bool OnInterceptTouched(Actor actor, const TouchEvent& touch);
+
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
@@ -514,29 +515,33 @@ private: // Data
   std::vector<Toolkit::TextAnchor> mAnchorActors;
 
   // Signals
-  Toolkit::DevelTextLabel::AnchorClickedSignalType  mAnchorClickedSignal;
-  Toolkit::DevelTextLabel::TextFitChangedSignalType mTextFitChangedSignal;
-  Toolkit::DevelTextLabel::AsyncTextRenderedSignalType mAsyncTextRenderedSignal;
-  Toolkit::DevelTextLabel::AsyncNaturalSizeComputedSignalType mAsyncNaturalSizeComputedSignal;
+  Toolkit::DevelTextLabel::AnchorClickedSignalType               mAnchorClickedSignal;
+  Toolkit::DevelTextLabel::TextFitChangedSignalType              mTextFitChangedSignal;
+  Toolkit::DevelTextLabel::AsyncTextRenderedSignalType           mAsyncTextRenderedSignal;
+  Toolkit::DevelTextLabel::AsyncNaturalSizeComputedSignalType    mAsyncNaturalSizeComputedSignal;
   Toolkit::DevelTextLabel::AsyncHeightForWidthComputedSignalType mAsyncHeightForWidthComputedSignal;
 
   // for Font Variations
-  std::map<Dali::Property::Index, std::string> mVariationIndexMap;  // Stores [CustomPropertyIndex, tag].
+  std::map<Dali::Property::Index, std::string> mVariationIndexMap; // Stores [CustomPropertyIndex, tag].
 
   std::string mLocale;
   Vector2     mSize;
 
+  Vector2  mTouchPosition;                ///< The initial touch down position.
+
   int  mRenderingBackend;
   int  mAsyncLineCount;
-  bool mTextUpdateNeeded         : 1;
-  bool mLastAutoScrollEnabled    : 1;
+  bool mTextUpdateNeeded : 1;
+  bool mLastAutoScrollEnabled : 1;
   bool mControlBackgroundEnabled : 1;
 
   bool mIsAsyncRenderNeeded : 1; // true if a render request is required in ASYNC_AUTO mode, otherwise false.
-  bool mIsSizeChanged       : 1; // whether the size has been changed or not.
-  bool mIsManualRender      : 1; // whether an async manual render has been requested, returns false when completed.
-  bool mIsManualRendered    : 1; // whether an async manual render has been completed, returns false on the next relayout.
-  bool mManualRendered      : 1;
+  bool mIsSizeChanged : 1;       // whether the size has been changed or not.
+  bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
+  bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
+  bool mManualRendered : 1;
+  bool mIsIntercepted : 1;       // whether the touch event is intercepted or not.
+  bool mIsHasAnchors : 1;        // whether the text has anchors or not.
 
 protected:
   /**

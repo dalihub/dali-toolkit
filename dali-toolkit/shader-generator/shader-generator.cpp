@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,23 +93,24 @@ string GetShaderVariableName(const string& filename)
   for_each(
     shaderVariableName.begin(),
     shaderVariableName.end(),
-    [](char& character) {
-      switch(character)
+    [](char& character)
+  {
+    switch(character)
+    {
+      case '-':
+      case '.':
       {
-        case '-':
-        case '.':
-        {
-          character = '_';
-          break;
-        }
-
-        default:
-        {
-          character = ::toupper(character);
-          break;
-        }
+        character = '_';
+        break;
       }
-    });
+
+      default:
+      {
+        character = ::toupper(character);
+        break;
+      }
+    }
+  });
   return shaderVariableName;
 }
 
@@ -287,7 +288,7 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
   cout << "====================================================================" << endl;
 
   BuiltInFilesGenerator generator(outDir);
-  bool shaderGenerated = false;
+  bool                  shaderGenerated = false;
 
   for(auto& file : fs::directory_iterator(inDir))
   {

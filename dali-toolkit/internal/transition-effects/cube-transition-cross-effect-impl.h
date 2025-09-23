@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_CROSS_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,42 +44,42 @@ public:
 
 protected:
   /**
-    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnInitialize
-    */
+   * @copydoc Toolkit::Internal::CubeTransitionEffect::OnInitialize
+   */
   void OnInitialize() override;
 
   /**
-    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStartTransition
-    */
+   * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStartTransition
+   */
   void OnStartTransition(Vector2 panPosition, Vector2 panDisplacement) override;
 
 private:
   /**
-    * @brief Construct a new CubeTransitionCrossEffect object
-    *
-    * @param[in] numRows How many rows of cubes
-    * @param[in] numColumns How many columns of cubes
-    */
+   * @brief Construct a new CubeTransitionCrossEffect object
+   *
+   * @param[in] numRows How many rows of cubes
+   * @param[in] numColumns How many columns of cubes
+   */
   CubeTransitionCrossEffect(unsigned int numRows, unsigned int numColumns);
 
   /**
-    * @brief Set up animation to an Actor
-    * This will also displace the cubes in the z direction by mCubeDisplacement and spread them apart on the xy plane
-    * given by the closeness of displacementCentre to the XY plane at 0.
-    *
-    * @param[in] actorIndex The index of the cube in the cube array
-    * @param[in] angle The angle of the rotation animation
-    * @param[in] the centre to "explode" the tiles outwards from
-    */
+   * @brief Set up animation to an Actor
+   * This will also displace the cubes in the z direction by mCubeDisplacement and spread them apart on the xy plane
+   * given by the closeness of displacementCentre to the XY plane at 0.
+   *
+   * @param[in] actorIndex The index of the cube in the cube array
+   * @param[in] angle The angle of the rotation animation
+   * @param[in] the centre to "explode" the tiles outwards from
+   */
   void SetupAnimation(unsigned int actorIndex, unsigned int x, unsigned int y, float angle, const Vector3 axis, const Vector3& displacementCentre);
 
 private:
   /**
-    * The factor that determines how spread apart from each other the cubes will go
-    * when they are displaced during the transition animation.
-    * The larger the value the more the spread apart the cubes will be.
-    * it should be in the range (0.0, +infinity)
-    */
+   * The factor that determines how spread apart from each other the cubes will go
+   * when they are displaced during the transition animation.
+   * The larger the value the more the spread apart the cubes will be.
+   * it should be in the range (0.0, +infinity)
+   */
   float mDisplacementSpreadFactor;
 
 }; //class CubeTransitionCrossEffect

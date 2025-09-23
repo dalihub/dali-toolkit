@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,17 +264,17 @@ enum Type
   INPUT_FILTER,
 
   /**
-  * @brief Whether we should show the ellipsis if required.
-  * @details Name "ellipsis", type Property::BOOLEAN.
-  */
+   * @brief Whether we should show the ellipsis if required.
+   * @details Name "ellipsis", type Property::BOOLEAN.
+   */
   ELLIPSIS,
 
   /**
-  * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
-  * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
-  * @note Default is EllipsisPosition::END.
-  * @see DevelText::EllipsisPosition
-  */
+   * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
+   * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
+   * @note Default is EllipsisPosition::END.
+   * @see DevelText::EllipsisPosition
+   */
   ELLIPSIS_POSITION,
 
   /**
@@ -297,12 +297,12 @@ enum Type
   INPUT_STRIKETHROUGH,
 
   /**
-  * @brief The spaces between characters in Pixels.
-  * @details Name "characterSpacing", type Property::FLOAT.
-  * @note
-  *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
-  *   The default value is 0.f which does nothing.
-  */
+   * @brief The spaces between characters in Pixels.
+   * @details Name "characterSpacing", type Property::FLOAT.
+   * @note
+   *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *   The default value is 0.f which does nothing.
+   */
   CHARACTER_SPACING,
 
   /**
@@ -359,7 +359,7 @@ DALI_TOOLKIT_API InputMethodContext GetInputMethodContext(TextEditor textEditor)
 
 /**
  * @brief Max Characters Exceed signal type.
-  */
+ */
 using MaxLengthReachedSignalType = Signal<void(TextEditor)>;
 
 /**
@@ -635,7 +635,6 @@ DALI_TOOLKIT_API bool IsRemoveBackInset(TextEditor textEditor);
  * @return The index of the registered variation property. Property::INVALID_INDEX if failed.
  */
 DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextEditor textEditor, std::string tag);
-
 
 } // namespace DevelTextEditor
 

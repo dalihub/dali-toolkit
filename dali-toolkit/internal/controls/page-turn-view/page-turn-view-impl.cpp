@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
 
 using namespace Dali;
 
-namespace //Unnamed namespace
+namespace // Unnamed namespace
 {
 // properties set on shader, these properties have the constant value in regardless of the page status
 const char* const PROPERTY_SPINE_SHADOW("uSpineShadowParameter"); // uniform for both spine and turn effect
@@ -45,7 +45,7 @@ const char* const PROPERTY_SPINE_SHADOW("uSpineShadowParameter"); // uniform for
 // properties set on actor, the value of these properties varies depending on the page status
 //    properties used in turn effect
 const char* const PROPERTY_TURN_DIRECTION("uIsTurningBack");       // uniform
-const char* const PROPERTY_COMMON_PARAMETERS("uCommonParameters"); //uniform
+const char* const PROPERTY_COMMON_PARAMETERS("uCommonParameters"); // uniform
 
 const char* const PROPERTY_PAN_DISPLACEMENT("panDisplacement"); // property used to constrain the uniforms
 const char* const PROPERTY_PAN_CENTER("panCenter");             // property used to constrain the uniforms
@@ -217,7 +217,7 @@ struct ShadowBlurStrengthConstraint
   float mThres;
 };
 
-} //unnamed namespace
+} // unnamed namespace
 
 namespace Dali
 {
@@ -381,7 +381,7 @@ void PageTurnView::OnInitialize()
   // create the grid geometry for pages
   uint16_t width  = static_cast<uint16_t>(mPageSize.width / DEFAULT_GRID_DENSITY + 0.5f);
   uint16_t height = static_cast<uint16_t>(mPageSize.height / DEFAULT_GRID_DENSITY + 0.5f);
-  mGeometry       = VisualFactoryCache::CreateGridGeometry(Uint16Pair(width, height));
+  mGeometry       = VisualFactoryCache::CreateGridGeometry(Uint16Pair(width, height), true);
 
   mPages.reserve(NUMBER_OF_CACHED_PAGES);
   for(int i = 0; i < NUMBER_OF_CACHED_PAGES; i++)

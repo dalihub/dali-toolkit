@@ -34,7 +34,7 @@ namespace Internal DALI_INTERNAL
 {
 class Control;
 class RenderEffectImpl;
-} // namespace DALI_INTERNAL
+} //namespace Internal DALI_INTERNAL
 
 /**
  * @brief

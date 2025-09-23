@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-property-index.h>
+#include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
 
 namespace Dali
 {
@@ -192,7 +194,50 @@ void MotionData::OnLoadCompleted(MotionDataLoadTaskPtr task)
       // TODO : Currently, we only support KeyFrames without alpha function and time period now.
       if(animatedProperty.mKeyFrames)
       {
-        Add(Scene3D::MotionPropertyIndex::New(animatedProperty.mNodeName, animatedProperty.mPropertyName), Scene3D::MotionValue::New(animatedProperty.mKeyFrames));
+        bool specialized = false;
+        if(mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::BVH_FILE || mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::BVH_BUFFER)
+        {
+          if(!animatedProperty.mPropertyName.empty())
+          {
+            // Heuristic checkup : Get only first character.
+            if(animatedProperty.mPropertyName[0] == 'p')
+            {
+              Add(Scene3D::MotionTransformIndex::New(animatedProperty.mNodeName, Scene3D::MotionTransformIndex::TransformType::POSITION), Scene3D::MotionValue::New(animatedProperty.mKeyFrames));
+              specialized = true;
+            }
+            else if(animatedProperty.mPropertyName[0] == 'o')
+            {
+              Add(Scene3D::MotionTransformIndex::New(animatedProperty.mNodeName, Scene3D::MotionTransformIndex::TransformType::ORIENTATION), Scene3D::MotionValue::New(animatedProperty.mKeyFrames));
+              specialized = true;
+            }
+          }
+        }
+        else if(mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::FACIAL_FILE || mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::FACIAL_BUFFER)
+        {
+          int indexKey = Property::INVALID_INDEX;
+          // Get indexKey from animatedProperty.mPropertyName (format: "WEIGHTS_UNIFORM[index]")
+          // Heuristic checkup : Get only braket value..
+          size_t openBracket  = animatedProperty.mPropertyName.find('[');
+          size_t closeBracket = animatedProperty.mPropertyName.find(']');
+          if(openBracket != std::string::npos && closeBracket != std::string::npos && closeBracket > openBracket + 1)
+          {
+            try
+            {
+              indexKey = std::stoi(animatedProperty.mPropertyName.substr(openBracket + 1, closeBracket - openBracket - 1));
+            }
+            catch(...)
+            {
+              indexKey = Property::INVALID_INDEX;
+            }
+          }
+          if(indexKey != Property::INVALID_INDEX)
+          {
+            Add(Scene3D::BlendShapeIndex::New(animatedProperty.mNodeName, indexKey), Scene3D::MotionValue::New(animatedProperty.mKeyFrames));
+            specialized = true;
+          }
+        }
+
+        DALI_ASSERT_ALWAYS(specialized && "MotionData not supported format!");
       }
     }
 

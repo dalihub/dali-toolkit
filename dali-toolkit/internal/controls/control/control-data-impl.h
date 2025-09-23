@@ -180,8 +180,9 @@ public:
    * @brief Enables or disables overriding the given visual's corner properties to its control's
    * @param[in] visual A registered visual
    * @param[in] enable flat to set enabled or disabled.
+   * @param[in] cornerRadiusConstraint Optional constraint to link the control's corner properties to the visual's.
    */
-  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable);
+  void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint = Dali::Constraint());
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::EnableVisual()

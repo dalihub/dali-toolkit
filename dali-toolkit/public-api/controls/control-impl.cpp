@@ -96,7 +96,7 @@ void RegisterControlAccessibleGetter()
   {
     onceFlag = true;
     Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool>
-                                                                {
+    {
       auto control = Toolkit::Control::DownCast(actor);
       if(!control)
       {

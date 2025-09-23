@@ -664,7 +664,7 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
                                  data.GetWidth(),
                                  data.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data,"TextVisual");
+  texture.Upload(data, "TextVisual");
 #else
   texture.Upload(data);
 #endif
@@ -840,8 +840,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       // This affects font rendering quality.
       // It need to be integerized.
       visualTransformOffset.x = roundf(parameters.padding.start + alignmentOffset.x);
-      visualTransformOffset.y = isRenderScale ? roundf((layoutSize.y + parameters.padding.top + alignmentOffset.y) * 2.0f) * 0.5f - layoutSize.y :
-                                                roundf(parameters.padding.top + alignmentOffset.y);
+      visualTransformOffset.y = isRenderScale ? roundf((layoutSize.y + parameters.padding.top + alignmentOffset.y) * 2.0f) * 0.5f - layoutSize.y : roundf(parameters.padding.top + alignmentOffset.y);
     }
 
     SetRequireRender(renderInfo.isCutout);
@@ -988,12 +987,12 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
         if(renderInfo.embossEnabled)
         {
-          float sizeX = std::max(layoutSize.x, Math::MACHINE_EPSILON_100);
-          float sizeY = std::max(std::min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
-          const Vector2& embossSize = Vector2(1.0f / sizeX, 1.0f / sizeY);
-          const Vector2& embossDirection = parameters.embossDirection;
-          const float embossStrength = parameters.embossStrength;
-          const Vector4& embossLightColor = parameters.embossLightColor;
+          float          sizeX             = std::max(layoutSize.x, Math::MACHINE_EPSILON_100);
+          float          sizeY             = std::max(std::min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
+          const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
+          const Vector2& embossDirection   = parameters.embossDirection;
+          const float    embossStrength    = parameters.embossStrength;
+          const Vector4& embossLightColor  = parameters.embossLightColor;
           const Vector4& embossShadowColor = parameters.embossShadowColor;
 
           renderer.RegisterProperty("uEmbossSize", embossSize);
@@ -1310,12 +1309,12 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
       if(embossEnabled)
       {
-        float sizeX = std::max(size.x, Math::MACHINE_EPSILON_100);
-        float sizeY = std::max(std::min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
-        const Vector2& embossSize = Vector2(1.0f / sizeX, 1.0f / sizeY);
-        const Vector2& embossDirection = mController->GetEmbossDirection();
-        const float embossStrength = mController->GetEmbossStrength();
-        const Vector4& embossLightColor = mController->GetEmbossLightColor();
+        float          sizeX             = std::max(size.x, Math::MACHINE_EPSILON_100);
+        float          sizeY             = std::max(std::min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
+        const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
+        const Vector2& embossDirection   = mController->GetEmbossDirection();
+        const float    embossStrength    = mController->GetEmbossStrength();
+        const Vector4& embossLightColor  = mController->GetEmbossLightColor();
         const Vector4& embossShadowColor = mController->GetEmbossShadowColor();
 
         renderer.RegisterProperty("uEmbossSize", embossSize);

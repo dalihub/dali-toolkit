@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <toolkit-event-thread-callback.h>
-#include <dali-toolkit-test-suite-utils.h>
-#include <string_view>
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
+#include <string_view>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Internal;

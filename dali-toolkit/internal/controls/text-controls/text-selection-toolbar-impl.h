@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,8 +105,8 @@ private: // From Control
   void OnInitialize() override;
 
   /**
-  * @copydoc Control::OnRelayout()
-  */
+   * @copydoc Control::OnRelayout()
+   */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**

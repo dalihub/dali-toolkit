@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/devel-api/controls/accessibility-highlight-overlay.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali::Toolkit::DevelControl
 {
@@ -255,20 +255,20 @@ public:
   bool IsScrollable() const override;
 
   /**
-  * @brief Function to set a custom highlight overlay
-  *
-  * This function sets a custom highlight overlay at the specified position and size.
-  *
-  * @param position A Vector2 representing the position of the overlay
-  * @param size A Vector2 representing the size of the overlay
-  */
+   * @brief Function to set a custom highlight overlay
+   *
+   * This function sets a custom highlight overlay at the specified position and size.
+   *
+   * @param position A Vector2 representing the position of the overlay
+   * @param size A Vector2 representing the size of the overlay
+   */
   void SetCustomHighlightOverlay(Vector2 position, Vector2 size);
 
   /**
-  * @brief Function to reset the custom highlight overlay
-  *
-  * This function resets the custom highlight overlay.
-  */
+   * @brief Function to reset the custom highlight overlay
+   *
+   * This function resets the custom highlight overlay.
+   */
   void ResetCustomHighlightOverlay();
 
   /**

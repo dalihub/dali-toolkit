@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,13 +137,13 @@ public:
   Vector2 GetAtlasSize(uint32_t atlasId);
 
   /**
-    * @brief Set the atlas size and block size for subsequent Atlas generation
-    *
-    * @param[in] width width of atlas in pixels
-    * @param[in] height height of atlas in pixels
-    * @param[in] blockWidth width of a block in pixels
-    * @param[in] blockHeight height of a block in pixels
-    */
+   * @brief Set the atlas size and block size for subsequent Atlas generation
+   *
+   * @param[in] width width of atlas in pixels
+   * @param[in] height height of atlas in pixels
+   * @param[in] blockWidth width of a block in pixels
+   * @param[in] blockHeight height of a block in pixels
+   */
   void SetNewAtlasSize(uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight);
 
   /**
@@ -183,10 +183,10 @@ public:
 
 public:
   // Default copy and move operator
-  AtlasGlyphManager(const AtlasGlyphManager& rhs) = default;
-  AtlasGlyphManager(AtlasGlyphManager&& rhs)      = default;
+  AtlasGlyphManager(const AtlasGlyphManager& rhs)            = default;
+  AtlasGlyphManager(AtlasGlyphManager&& rhs)                 = default;
   AtlasGlyphManager& operator=(const AtlasGlyphManager& rhs) = default;
-  AtlasGlyphManager& operator=(AtlasGlyphManager&& rhs) = default;
+  AtlasGlyphManager& operator=(AtlasGlyphManager&& rhs)      = default;
 
 private:
   explicit DALI_INTERNAL AtlasGlyphManager(Internal::AtlasGlyphManager* impl);

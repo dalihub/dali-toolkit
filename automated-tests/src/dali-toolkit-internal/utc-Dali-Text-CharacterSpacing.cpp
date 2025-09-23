@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,12 +188,12 @@ bool LayoutTextTest(const LayoutTextData& data)
   bool       isAutoScrollMaxTextureExceeded = false;
   bool       isHiddenInputEnabled           = false;
   const bool updated                        = engine.LayoutText(layoutParameters,
-                                         layoutSize,
-                                         data.ellipsis,
-                                         isAutoScroll,
-                                         isAutoScrollMaxTextureExceeded,
-                                         isHiddenInputEnabled,
-                                         DevelText::EllipsisPosition::END);
+                                                                layoutSize,
+                                                                data.ellipsis,
+                                                                isAutoScroll,
+                                                                isAutoScrollMaxTextureExceeded,
+                                                                isHiddenInputEnabled,
+                                                                DevelText::EllipsisPosition::END);
 
   // 4) Compare the results.
 
@@ -363,9 +363,8 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea1(void)
 
   //******* characterSpacing = 0.0f *******//
   float positions[] =
-   {
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f
-   };
+    {
+      0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f};
   Size layoutSize(79.f, 20.f);
   //************************************//
 
@@ -440,9 +439,8 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea2(void)
 
   //******* characterSpacing = 2.0f *******//
   float positions[] =
-   {
-     0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f
-   };
+    {
+      0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f};
   Size layoutSize(99.f, 20.f);
   //************************************//
 
@@ -517,9 +515,8 @@ int UtcDaliTextCharacterSpacingSingleLineTextArea3(void)
 
   //******* characterSpacing = 4.0f *******//
   float positions[] =
-   {
-     0.f, -12.f, 14.f, -9.f, 27.f, -13.f, 35.f, -13.f, 42.f, -9.f, 55.f, -0.f, 63.f, -9.f, 79.f, -9.f, 93.f, -9.f, 103.f, -13.f, 110.f, -13.f
-   };
+    {
+      0.f, -12.f, 14.f, -9.f, 27.f, -13.f, 35.f, -13.f, 42.f, -9.f, 55.f, -0.f, 63.f, -9.f, 79.f, -9.f, 93.f, -9.f, 103.f, -13.f, 110.f, -13.f};
   Size layoutSize(119.f, 20.f);
   //************************************//
 
@@ -607,8 +604,7 @@ int UtcDaliTextCharacterSpacingMultilineText1(void)
   Size  layoutSize(96.f, 97.f);
   float positions[] =
     {
-      0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f, 0.f, -13.f, 9.f, -9.f, 18.f, -9.f, 31.f, -9.f, 40.f, -2.f, 44.f, -12.f, 0.f, -12.f, 8.f, -9.f, 18.f, -9.f, 27.f, -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f, 0.f, -12.f, 11.f, -12.f, 14.f, -12.f, 25.f, -9.f, 36.f, -9.f, 41.f, -9.f, 52.f, -9.f, 61.f, -11.f, 67.f, -0.f, 0.f, -12.f, 4.f, -12.f, 8.f, -9.f, 17.f, -9.f, 27.f, -9.f, 35.f, -0.f, 40.f, -9.f, 50.f, -12.f, 56.f, -0.f, 61.f, -11.f, 67.f, -9.f, 77.f, -9.f, 86.f, -11.f, 93.f, -2.f
-    };
+      0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f, 0.f, -13.f, 9.f, -9.f, 18.f, -9.f, 31.f, -9.f, 40.f, -2.f, 44.f, -12.f, 0.f, -12.f, 8.f, -9.f, 18.f, -9.f, 27.f, -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f, 0.f, -12.f, 11.f, -12.f, 14.f, -12.f, 25.f, -9.f, 36.f, -9.f, 41.f, -9.f, 52.f, -9.f, 61.f, -11.f, 67.f, -0.f, 0.f, -12.f, 4.f, -12.f, 8.f, -9.f, 17.f, -9.f, 27.f, -9.f, 35.f, -0.f, 40.f, -9.f, 50.f, -12.f, 56.f, -0.f, 61.f, -11.f, 67.f, -9.f, 77.f, -9.f, 86.f, -11.f, 93.f, -2.f};
   struct LineRun line0 =
     {
       {0u, 12u},
@@ -746,8 +742,7 @@ int UtcDaliTextCharacterSpacingMultilineText2(void)
   Size  layoutSize(99.f, 116.f);
   float positions[] =
     {
-      0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f, 101.f, -0.f, 0.f, -13.f, 11.f, -9.f, 22.f, -9.f, 37.f, -9.f, 48.f, -2.f, 54.f, -12.f, 0.f, -12.f, 10.f, -9.f, 22.f, -9.f, 33.f, -9.f, 46.f, -9.f, 57.f, -11.f, 65.f, -0.f, 0.f, -12.f, 13.f, -12.f, 18.f, -12.f, 31.f, -9.f, 44.f, -9.f, 51.f, -9.f, 64.f, -9.f, 75.f, -11.f, 83.f, -0.f, 0.f, -12.f, 6.f, -12.f, 12.f, -9.f, 23.f, -9.f, 35.f, -9.f, 45.f, -0.f, 52.f, -9.f, 64.f, -12.f, 72.f, -0.f, 0.f, -11.f, 8.f, -9.f, 20.f, -9.f, 31.f, -11.f, 40.f, -2.f
-    };
+      0.f, -12.f, 12.f, -9.f, 23.f, -13.f, 29.f, -13.f, 34.f, -9.f, 45.f, -0.f, 51.f, -9.f, 65.f, -9.f, 77.f, -9.f, 85.f, -13.f, 90.f, -13.f, 101.f, -0.f, 0.f, -13.f, 11.f, -9.f, 22.f, -9.f, 37.f, -9.f, 48.f, -2.f, 54.f, -12.f, 0.f, -12.f, 10.f, -9.f, 22.f, -9.f, 33.f, -9.f, 46.f, -9.f, 57.f, -11.f, 65.f, -0.f, 0.f, -12.f, 13.f, -12.f, 18.f, -12.f, 31.f, -9.f, 44.f, -9.f, 51.f, -9.f, 64.f, -9.f, 75.f, -11.f, 83.f, -0.f, 0.f, -12.f, 6.f, -12.f, 12.f, -9.f, 23.f, -9.f, 35.f, -9.f, 45.f, -0.f, 52.f, -9.f, 64.f, -12.f, 72.f, -0.f, 0.f, -11.f, 8.f, -9.f, 20.f, -9.f, 31.f, -11.f, 40.f, -2.f};
   struct LineRun line0 =
     {
       {0u, 12u},

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,40 +125,45 @@ const std::map<std::string_view, Property::Value (*)(const TreeNode*)>& GetTypeI
 {
   static const std::map<std::string_view, Property::Value (*)(const TreeNode*)> kTypeIds{
     // NONE
-    {"boolean", [](const TreeNode* tn) {
-       return ReadPrimitiveHelper<bool>(tn, ReadBool);
-     }},
-    {"float", [](const TreeNode* tn) {
-       return ReadPrimitiveHelper<float>(tn, ReadFloat);
-     }},
-    {"integer", [](const TreeNode* tn) {
-       return ReadPrimitiveHelper<int>(tn, ReadInt);
-     }},
+    {"boolean", [](const TreeNode* tn)
+  {
+    return ReadPrimitiveHelper<bool>(tn, ReadBool);
+  }},
+    {"float", [](const TreeNode* tn)
+  {
+    return ReadPrimitiveHelper<float>(tn, ReadFloat);
+  }},
+    {"integer", [](const TreeNode* tn)
+  {
+    return ReadPrimitiveHelper<int>(tn, ReadInt);
+  }},
     {"vector2", ReadVectorHelper<Vector2>},
     {"vector3", ReadVectorHelper<Vector3>},
     {"vector4", ReadVectorHelper<Vector4>},
     {"matrix3", ReadVectorHelper<Matrix3>},
     {"matrix", ReadVectorHelper<Matrix>},
-    {"rectangle", [](const TreeNode* tn) {
-       Rect<int> value;
-       if(ReadQuadHelper<int>(tn, {&value.x, &value.y, &value.width, &value.height}))
-       {
-         return Property::Value(value);
-       }
-       return Property::Value();
-     }},
+    {"rectangle", [](const TreeNode* tn)
+  {
+    Rect<int> value;
+    if(ReadQuadHelper<int>(tn, {&value.x, &value.y, &value.width, &value.height}))
+    {
+      return Property::Value(value);
+    }
+    return Property::Value();
+  }},
     {"rotation", ReadRotationHelper},
     // STRING - not particularly animatable
     // ARRAY - not particularly animatable
     // MAP - not particularly animatable
-    {"extents", [](const TreeNode* tn) {
-       Extents value;
-       if(ReadQuadHelper<uint16_t>(tn, {&value.start, &value.end, &value.top, &value.bottom}))
-       {
-         return Property::Value(value);
-       }
-       return Property::Value();
-     }},
+    {"extents", [](const TreeNode* tn)
+  {
+    Extents value;
+    if(ReadQuadHelper<uint16_t>(tn, {&value.start, &value.end, &value.top, &value.bottom}))
+    {
+      return Property::Value(value);
+    }
+    return Property::Value();
+  }},
   };
   return kTypeIds;
 }

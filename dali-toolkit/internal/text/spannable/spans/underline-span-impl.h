@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_UNDERLINE_SPAN_IMPL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,10 +87,10 @@ public:
    */
   UnderlineSpan();
 
-  UnderlineSpan(const UnderlineSpan&) = delete;            ///< Deleted copy constructor
-  UnderlineSpan(UnderlineSpan&&)      = delete;            ///< Deleted move constructor
+  UnderlineSpan(const UnderlineSpan&)            = delete; ///< Deleted copy constructor
+  UnderlineSpan(UnderlineSpan&&)                 = delete; ///< Deleted move constructor
   UnderlineSpan& operator=(const UnderlineSpan&) = delete; ///< Deleted copy assignment operator
-  UnderlineSpan& operator=(UnderlineSpan&&) = delete;      ///< Deleted move assignment operator
+  UnderlineSpan& operator=(UnderlineSpan&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief Destructor
@@ -180,16 +180,16 @@ public: //Methods. Not intended for application developers
   void SetDashGap(const float& dashGap);
 
   /**
-    * @brief Set the dash-width of underline.
-    *
-    * @param[in] dashWidth The dash-width of line.
-    */
+   * @brief Set the dash-width of underline.
+   *
+   * @param[in] dashWidth The dash-width of line.
+   */
   void SetDashWidth(const float& dashWidth);
 
 public: //Methods for internal only
         /**
-   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-   */
+         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+         */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
 
 private:

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_THREAD_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ protected:
   void Run() override;
 
 private:
-  GlViewRenderThread(const GlViewRenderThread& obj) = delete;
+  GlViewRenderThread(const GlViewRenderThread& obj)           = delete;
   GlViewRenderThread operator=(const GlViewRenderThread& obj) = delete;
 
   /**

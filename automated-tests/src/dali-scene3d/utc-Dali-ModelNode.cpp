@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,7 +272,7 @@ int UtcDaliModelNodeFindChildModelNodeByName(void)
 
   ToolkitTestApplication application;
 
-  Scene3D::ModelNode modelNode = Scene3D::ModelNode::New();
+  Scene3D::ModelNode modelNode  = Scene3D::ModelNode::New();
   Scene3D::ModelNode modelNode1 = Scene3D::ModelNode::New();
   Scene3D::ModelNode modelNode2 = Scene3D::ModelNode::New();
 
@@ -308,7 +308,7 @@ int UtcDaliModelNodeCustomNode1(void)
   modelNode.AddModelPrimitive(modelPrimitive);
 
   DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);
-  
+
   modelPrimitive.SetGeometry(geometry);
 
   DALI_TEST_EQUALS(modelNode.GetRendererCount(), 0, TEST_LOCATION);

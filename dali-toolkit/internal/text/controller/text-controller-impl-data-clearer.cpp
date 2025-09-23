@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Contr
 void ControllerImplDataClearer::ClearCharacterModelData(Controller::Impl& impl, CharacterIndex startIndex, CharacterIndex endIndex, Controller::OperationsMask operations)
 {
   const CharacterIndex endIndexPlusOne = endIndex + 1u;
-  ModelPtr& model = impl.mModel;
+  ModelPtr&            model           = impl.mModel;
 
   if(Controller::NO_OPERATION != (Controller::GET_LINE_BREAKS & operations))
   {
@@ -108,7 +108,7 @@ void ControllerImplDataClearer::ClearCharacterModelData(Controller::Impl& impl, 
     LineBreakInfo* lineBreakInfoBuffer = model->mLogicalModel->mLineBreakInfo.Begin();
 
     model->mLogicalModel->mLineBreakInfo.Erase(lineBreakInfoBuffer + startIndex,
-                                                     lineBreakInfoBuffer + endIndexPlusOne);
+                                               lineBreakInfoBuffer + endIndexPlusOne);
 
     // Clear the paragraphs.
     ClearCharacterRuns(startIndex,
@@ -209,7 +209,6 @@ void ControllerImplDataClearer::ClearGlyphModelData(Controller::Impl& impl, Char
   ModelPtr&            model                     = impl.mModel;
   TextUpdateInfo&      textUpdateInfo            = impl.mTextUpdateInfo;
 
-
   // Convert the character index to glyph index before deleting the character to glyph and the glyphs per character buffers.
   GlyphIndex* charactersToGlyphBuffer  = model->mVisualModel->mCharactersToGlyph.Begin();
   Length*     glyphsPerCharacterBuffer = model->mVisualModel->mGlyphsPerCharacter.Begin();
@@ -307,7 +306,7 @@ void ControllerImplDataClearer::ClearGlyphModelData(Controller::Impl& impl, Char
     {
       ColorIndex* colorIndexBuffer = model->mVisualModel->mColorIndices.Begin();
       model->mVisualModel->mColorIndices.Erase(colorIndexBuffer + textUpdateInfo.mStartGlyphIndex,
-                                                colorIndexBuffer + endGlyphIndexPlusOne);
+                                               colorIndexBuffer + endGlyphIndexPlusOne);
     }
 
     if(0u != model->mVisualModel->mBackgroundColorIndices.Count())

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 
 namespace Dali::Toolkit::Physics
 {
-PhysicsActor::PhysicsActor()                            = default;
-PhysicsActor::~PhysicsActor()                           = default;
-PhysicsActor::PhysicsActor(const PhysicsActor& handle)  = default;
-PhysicsActor::PhysicsActor(PhysicsActor&& rhs) noexcept = default;
-PhysicsActor& PhysicsActor::operator=(const PhysicsActor& handle) = default;
+PhysicsActor::PhysicsActor()                                          = default;
+PhysicsActor::~PhysicsActor()                                         = default;
+PhysicsActor::PhysicsActor(const PhysicsActor& handle)                = default;
+PhysicsActor::PhysicsActor(PhysicsActor&& rhs) noexcept               = default;
+PhysicsActor& PhysicsActor::operator=(const PhysicsActor& handle)     = default;
 PhysicsActor& PhysicsActor::operator=(PhysicsActor&& handle) noexcept = default;
 
 PhysicsActor PhysicsActor::New(Dali::Actor actor, Dali::Any body, PhysicsAdaptor adaptor)

@@ -182,9 +182,9 @@ struct DBusWrapper
   };
   struct PropertyInfo
   {
-    CallId                                                                                               setterId, getterId;
-    std::string                                                                                          memberName, typeSignature;
-    std::function<std::string(const DBusWrapper::MessagePtr&src, const DBusWrapper::MessageIterPtr&dst)> getCallback, setCallback;
+    CallId                                                                                                 setterId, getterId;
+    std::string                                                                                            memberName, typeSignature;
+    std::function<std::string(const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& dst)> getCallback, setCallback;
   };
   struct SignalId
   {
@@ -2743,7 +2743,8 @@ void asyncCall(CallId callId, const ConnectionState& connectionState, bool prope
   }
 
   detail::packValues(callId, msg, args...);
-  auto pending = DBUS_W->eldbus_proxy_send_impl(proxy, msg, [callback, callId, proxy](const DBusWrapper::MessagePtr& reply) {
+  auto pending = DBUS_W->eldbus_proxy_send_impl(proxy, msg, [callback, callId, proxy](const DBusWrapper::MessagePtr& reply)
+  {
     DBUS_DEBUG("call %d: calling done", callId.id);
     if(!reply)
     {
@@ -2966,7 +2967,7 @@ public:
   DBusClient(const DBusClient&) = delete;
   DBusClient(DBusClient&&)      = default;
 
-  DBusClient& operator=(DBusClient&&) = default;
+  DBusClient& operator=(DBusClient&&)      = default;
   DBusClient& operator=(const DBusClient&) = delete;
 
   /**
@@ -3079,7 +3080,8 @@ public:
     {
       detail::CallId callId;
       detail::displayDebugCallInfoProperty(callId, "Get", info, connectionInfo->interfaceName, propName);
-      auto cc = [callback](VariantRetType reply) {
+      auto cc = [callback](VariantRetType reply)
+      {
         if(reply)
           callback(std::move(std::get<0>(reply.getValues()).value));
         else
@@ -3158,7 +3160,8 @@ public:
     detail::displayDebugCallInfoSignal(callId, propertyName, info, connectionInfo->interfaceName);
     DBUS_DEBUG("call %d: adding property", callId.id);
     auto& cI = this->connectionInfo;
-    DBUS_W->add_property_changed_event_listener_impl(connectionState->proxy, cI->interfaceName, propertyName, [callback](const _Eina_Value* newValue) {
+    DBUS_W->add_property_changed_event_listener_impl(connectionState->proxy, cI->interfaceName, propertyName, [callback](const _Eina_Value* newValue)
+    {
       V val = 0;
       if(!getFromEinaValue(newValue, &val))
       {
@@ -3184,7 +3187,8 @@ public:
   {
     detail::CallId callId;
     detail::displayDebugCallInfoSignal(callId, signalName, info, connectionInfo->interfaceName);
-    DBUS_W->eldbus_proxy_signal_handler_add_impl(connectionState->proxy, signalName, [callId, callback, signalName](const DBusWrapper::MessagePtr& msg) -> void {
+    DBUS_W->eldbus_proxy_signal_handler_add_impl(connectionState->proxy, signalName, [callId, callback, signalName](const DBusWrapper::MessagePtr& msg) -> void
+    {
       std::string errname, aux;
       if(DBUS_W->eldbus_message_error_get_impl(msg, errname, aux))
       {
@@ -3305,7 +3309,8 @@ public:
       detail::CallId getterId;
       z.getterId = getterId;
       DBUS_DEBUG("call %d: property %s (get) type %s", getterId.id, memberName.c_str(), detail::signature<T>::name().c_str());
-      z.getCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& dst) -> std::string {
+      z.getCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& dst) -> std::string
+      {
         try
         {
           auto v = detail::apply(getter, std::tuple<>{});
@@ -3333,7 +3338,8 @@ public:
       detail::CallId setterId;
       z.setterId = setterId;
       DBUS_DEBUG("call %d: property %s (set) type %s", setterId.id, memberName.c_str(), detail::signature<T>::name().c_str());
-      z.setCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& src_iter) -> std::string {
+      z.setCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& src_iter) -> std::string
+      {
         std::tuple<T> value;
         auto          src_signature = DBUS_W->eldbus_message_iter_signature_get_impl(src_iter);
         if(detail::signature<T>::get(src_iter, std::get<0>(value)))
@@ -3397,7 +3403,8 @@ private:
                                                                                        typename detail::dbus_interface_traits<T>::SyncCB callback)
   {
     using VEArgs = typename detail::dbus_interface_traits<T>::VEArgs;
-    return [=](const DBusWrapper::MessagePtr& msg) -> DBusWrapper::MessagePtr {
+    return [=](const DBusWrapper::MessagePtr& msg) -> DBusWrapper::MessagePtr
+    {
       DBUS_DEBUG("call %d: entering", callId.id);
       DBusWrapper::MessagePtr ret  = {};
       auto                    args = detail::unpackValues<VEArgs>(callId, msg);
@@ -3480,7 +3487,7 @@ public:
   DBusServer(const DBusServer&) = delete;
   DBusServer(DBusServer&&)      = default;
 
-  DBusServer& operator=(DBusServer&&) = default;
+  DBusServer& operator=(DBusServer&&)      = default;
   DBusServer& operator=(const DBusServer&) = delete;
 
   /**
@@ -3589,8 +3596,8 @@ public:
     }
     CurrentObjectSetter(const CurrentObjectSetter&) = delete;
     CurrentObjectSetter(CurrentObjectSetter&&)      = delete;
-    void operator=(const CurrentObjectSetter&) = delete;
-    void operator=(CurrentObjectSetter&&) = delete;
+    void operator=(const CurrentObjectSetter&)      = delete;
+    void operator=(CurrentObjectSetter&&)           = delete;
   };
   /// \endcond
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -303,12 +303,16 @@ const XHTMLEntityLookup XHTMLEntityLookupTable[] =
 
 const XHTMLEntityLookup XHTMLEntityLegacyLookupTable[] =
 {
-  {"&Aelig;\0"   ,"\xc3\x86\0"     }
+  {"&Aelig;\0"   ,"\xc3\x86\0"     },
+  {"&Eth;\0"     ,"\xc3\x90\0"     },
+  {"&Thorn;\0"   ,"\xc3\x9e\0"     },
+  {"&larr;\0"    ,"\xe2\x87\x90\0" },
+  {"&rarr;\0"    ,"\xe2\x87\x92\0" }
 };
 // clang-format on
 
-const std::size_t XHTMLENTITY_LOOKUP_COUNT = (sizeof(XHTMLEntityLookupTable)) / (sizeof(XHTMLEntityLookup));
-const std::size_t XHTMLENTITY_LEGACY_LOOPKUP_COUNT =  (sizeof(XHTMLEntityLegacyLookupTable)) / (sizeof(XHTMLEntityLookup));
+const std::size_t XHTMLENTITY_LOOKUP_COUNT         = (sizeof(XHTMLEntityLookupTable)) / (sizeof(XHTMLEntityLookup));
+const std::size_t XHTMLENTITY_LEGACY_LOOPKUP_COUNT = (sizeof(XHTMLEntityLegacyLookupTable)) / (sizeof(XHTMLEntityLookup));
 
 } // unnamed namespace
 

@@ -19,6 +19,7 @@
 #include "canvas-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -29,10 +30,13 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 namespace Dali
 {
@@ -42,6 +46,8 @@ namespace Internal
 {
 namespace
 {
+static constexpr std::string_view CANVAS_VISUAL_INDEX_PROPERTY_NAME("canvasVisualIndexProperty");
+
 BaseHandle Create()
 {
   return BaseHandle();
@@ -62,8 +68,8 @@ CanvasView::CanvasView(const Vector2& viewBox)
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mCanvasRenderer(CanvasRenderer::New(viewBox)),
   mTexture(),
-  mTextureSet(),
   mSize(viewBox),
+  mCanvasVisualIndex(Property::INVALID_INDEX),
   mIsSynchronous(true),
   mManualRasterization(false),
   mProcessorRegistered(false),
@@ -137,6 +143,22 @@ void CanvasView::OnSizeSet(const Vector3& targetSize)
   }
   mSize.width  = targetSize.width;
   mSize.height = targetSize.height;
+}
+
+void CanvasView::OnSceneConnection(int depth)
+{
+  Dali::Window window = DevelWindow::Get(Self());
+  if(DALI_LIKELY(window))
+  {
+    mPlacementWindow = window;
+  }
+  Control::OnSceneConnection(depth);
+}
+
+void CanvasView::OnSceneDisconnection()
+{
+  mPlacementWindow.Reset();
+  Control::OnSceneDisconnection();
 }
 
 void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
@@ -214,8 +236,8 @@ Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index prop
 void CanvasView::Process(bool postProcessor)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_PROCESS", [&](std::ostringstream& oss)
-                                          { oss << "[s:" << mIsSynchronous << ", l:" << mLastCommitRasterized << ", "
-                                                << "m:" << mManualRasterization << ", s:" << mSize.width << "x" << mSize.height << "]"; });
+  { oss << "[s:" << mIsSynchronous << ", l:" << mLastCommitRasterized << ", "
+        << "m:" << mManualRasterization << ", s:" << mSize.width << "x" << mSize.height << "]"; });
 
   bool rasterizeRequired = false;
 
@@ -252,7 +274,7 @@ void CanvasView::Process(bool postProcessor)
 void CanvasView::AddRasterizationTask(bool forceProcess)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_ADD_RASTERIZE", [&](std::ostringstream& oss)
-                                          { oss << "[f:" << forceProcess << "]"; });
+  { oss << "[f:" << forceProcess << "]"; });
   if(DALI_LIKELY(mCanvasRenderer) && (mCanvasRenderer.Commit() || forceProcess))
   {
     mLastCommitRasterized = false;
@@ -289,21 +311,32 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
     Texture rasterizedTexture = task->GetRasterizedTexture();
     if(rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
     {
-      if(!mTextureSet)
+      if(mTexture != rasterizedTexture)
       {
-        std::string fragmentShader = SHADER_CANVAS_VIEW_FRAG.data();
-        DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader, 1);
+        mTexture = rasterizedTexture;
 
-        mTextureSet       = TextureSet::New();
-        Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-        Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader, Shader::Hint::NONE, "CANVAS_VIEW");
-        Renderer renderer = Renderer::New(geometry, shader);
+        Toolkit::ImageUrl     imageUrl = Toolkit::ImageUrl::New(rasterizedTexture, true);
+        Toolkit::Visual::Base visual   = Toolkit::VisualFactory::Get().CreateVisual(imageUrl.GetUrl(), ImageDimensions());
+        if(visual)
+        {
+          if(mCanvasVisualIndex == Property::INVALID_INDEX)
+          {
+            mCanvasVisualIndex = Self().RegisterProperty(CANVAS_VISUAL_INDEX_PROPERTY_NAME, Property::Value(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
+          }
+          DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
-        renderer.SetTextures(mTextureSet);
-        renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-        Self().AddRenderer(renderer);
+          Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+          controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
+        }
       }
-      mTextureSet.SetTexture(0, rasterizedTexture);
+      else
+      {
+        Dali::Window window = mPlacementWindow.GetHandle();
+        if(DALI_LIKELY(window))
+        {
+          window.KeepRendering(0.0f); // Trigger event processing, and keep rendering.
+        }
+      }
     }
   }
 

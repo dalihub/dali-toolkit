@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
 // INTERNAL INCLUDES
@@ -283,9 +284,10 @@ enum
 
   /**
    * @brief The radius for the rounded corners of the control.
-   * @details Name "viewCornerRadius", type Property::VECTOR4
+   * @details Name "viewCornerRadius", type Property::VECTOR4 or Property::FLOAT
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
+   * @note Only Property::Vector4 can be animated.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_RADIUS
    * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
@@ -302,9 +304,10 @@ enum
 
   /**
    * @brief The squareness for the rounded corners of the control.
-   * @details Name "viewCornerSquareness", type Property::VECTOR4
+   * @details Name "viewCornerSquareness", type Property::VECTOR4 or Property::FLOAT
    * @note By default, it is Vector::ZERO.
    * @note Applies to specific visuals inside the control.
+   * @note Only Property::Vector4 can be animated.
    * @see Dali::Toolkit::DevelVisual::Property::Type::CORNER_SQUARENESS
    * @note It will not create UniformMap internally. So this property don't be used at Render phase.
    */
@@ -492,14 +495,29 @@ DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualInd
 DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
 
 /**
- * @brief Takes corner properties of control and overrides them to registered visual.
- * @note This function is to support derived control classes that cannot use Control::Impl::EnableCornerPropertiesOverridden directly.
+ * @brief Takes corner properties of a control and applies them to a registered visual, overriding the visual's own corner properties.
  *
- * @param[in] control The control.
- * @param[in] visual A registered visual.
- * @param[in] enable Whether to override corner properties of control to visual.
+ * This function is essential for visuals like shadows and borderlines that need to match the control's corner radius.
+ * It allows the visual to inherit the control's corner properties (e.g., CORNER_RADIUS, CORNER_RADIUS_POLICY)
+ * through an optional constraint. This ensures visual consistency, especially when the control's corners are rounded.
+ *
+ * This API should be used for each registered visual (e.g., SHADOW, INNER_SHADOW, BORDERLINE) that needs to
+ * reflect the control's corner properties. For instance, when adding a shadow visual, this function should be called
+ * with the shadow visual and an appropriate corner constraint to ensure the shadow's corners align with the control's corners.
+ *
+ * @note This function is provided for derived control classes that cannot access Control::Impl::EnableCornerPropertiesOverridden directly.
+ * @note If @p enable is true, the @p cornerConstraint is applied to link the control's corner properties to the visual's corner radius property.
+ *       If @p enable is false, any previously applied constraint is removed, and the visual will use its own corner properties.
+ *
+ * @param[in] control The control whose corner properties are to be used.
+ * @param[in] visual The registered visual (e.g., shadow, borderline) that will receive the corner properties.
+ * @param[in] enable True to apply the corner property override, false to disable it.
+ * @param[in] cornerRadiusConstraint An optional Dali::Constraint that defines how the control's
+ *                            corner properties (e.g., Toolkit::DevelControl::Property::CORNER_RADIUS)
+ *                            are mapped to the visual's corner radius property.
+ *                            If empty, a default equality constraint might be used if applicable.
  */
-DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable);
+DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint = Dali::Constraint());
 
 /**
  * @brief Set input method context.

@@ -121,9 +121,9 @@ void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali
   controlDataImpl.DoActionExtension(visualIndex, actionId, attributes);
 }
 
-void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable)
+void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
-  Internal::Control::Impl::Get(control).EnableCornerPropertiesOverridden(visual, enable);
+  Internal::Control::Impl::Get(control).EnableCornerPropertiesOverridden(visual, enable, cornerRadiusConstraint);
 }
 
 void SetInputMethodContext(Internal::Control& control, InputMethodContext& inputMethodContext)
@@ -345,7 +345,7 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
 {
   auto bridge  = Accessibility::Bridge::GetCurrentBridge();
   auto control = Toolkit::Control::DownCast(actor);
-  if(DALI_LIKELY(control))
+  if(DALI_LIKELY(control && bridge))
   {
     if(state == Accessibility::State::SHOWING)
     {
@@ -364,7 +364,7 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
     }
   }
 
-  if(bridge->IsUp())
+  if(bridge && bridge->IsUp())
   {
     auto accessible = dynamic_cast<Accessibility::ActorAccessible*>(Accessibility::Accessible::Get(actor));
     if(DALI_LIKELY(accessible))

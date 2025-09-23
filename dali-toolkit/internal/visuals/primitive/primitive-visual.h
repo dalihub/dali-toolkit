@@ -179,8 +179,8 @@ private:
   void InitializeRenderer();
 
   /**
-     * @brief Create a shader for the object to use.
-     */
+   * @brief Create a shader for the object to use.
+   */
   void CreateShader();
 
   /**

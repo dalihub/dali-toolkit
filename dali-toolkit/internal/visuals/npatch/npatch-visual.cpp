@@ -379,7 +379,7 @@ void NPatchVisual::OnInitialize()
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  //Register transform properties
+  // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
@@ -417,12 +417,12 @@ Geometry NPatchVisual::CreateGeometry()
       Uint16Pair gridSize(2 * data->GetStretchPixelsX().Size() + 1, 2 * data->GetStretchPixelsY().Size() + 1);
       if(!data->GetRenderingMap())
       {
-        geometry = !mBorderOnly ? NPatchHelper::CreateGridGeometry(gridSize) : NPatchHelper::CreateBorderGeometry(gridSize);
+        geometry = !mBorderOnly ? VisualFactoryCache::CreateGridGeometry(gridSize, false) : VisualFactoryCache::CreateBorderGeometry(gridSize);
       }
       else
       {
         uint32_t elementCount[2];
-        geometry = !mBorderOnly ? RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), gridSize, elementCount) : NPatchHelper::CreateBorderGeometry(gridSize);
+        geometry = !mBorderOnly ? RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), gridSize, elementCount) : VisualFactoryCache::CreateBorderGeometry(gridSize);
         if(mImpl->mRenderer)
         {
           RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
@@ -449,8 +449,8 @@ Shader NPatchVisual::CreateShader()
 
   auto fragmentShader = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
                                                                                            : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                                                                       : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto shaderType     = mAuxiliaryResourceStatus == Toolkit::Visual::ResourceStatus::READY ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                                                                           : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))
@@ -584,11 +584,11 @@ Geometry NPatchVisual::GetNinePatchGeometry(VisualFactoryCache::GeometryType sub
   {
     if(DALI_LIKELY(VisualFactoryCache::NINE_PATCH_GEOMETRY == subType))
     {
-      geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3, 3));
+      geometry = VisualFactoryCache::CreateGridGeometry(Uint16Pair(3, 3), false);
     }
     else if(VisualFactoryCache::NINE_PATCH_BORDER_GEOMETRY == subType)
     {
-      geometry = NPatchHelper::CreateBorderGeometry(Uint16Pair(3, 3));
+      geometry = VisualFactoryCache::CreateBorderGeometry(Uint16Pair(3, 3));
     }
     mFactoryCache.SaveGeometry(subType, geometry);
   }

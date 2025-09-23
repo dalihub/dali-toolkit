@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/camera-parameters.h"
@@ -47,8 +48,8 @@ int UtcDaliCameraParameters(void)
   DALI_TEST_EQUAL(orientation, Quaternion::IDENTITY); // 2 180 degrees rotations along y
   DALI_TEST_EQUAL(position, Vector3::ZAXIS * -100.f);
 
-  TestApplication app;
-  CameraActor     camera = CameraActor::New();
+  ToolkitTestApplication app;
+  CameraActor            camera = CameraActor::New();
   for(auto i : {false, true})
   {
     camParams.isPerspective = i;

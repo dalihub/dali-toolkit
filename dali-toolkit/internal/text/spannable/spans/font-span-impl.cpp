@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ const float PIXEL_FORMAT_64_FACTOR = 64.f; ///< 64.f is used to convert from poi
 
 struct FontSpan::Impl
 {
-  std::string mFamilyName; ///< The font's family name.
+  std::string                             mFamilyName; ///< The font's family name.
   Dali::TextAbstraction::FontWeight::Type mWeight;     ///< The font's weight.
   Dali::TextAbstraction::FontWidth::Type  mWidth;      ///< The font's width.
   Dali::TextAbstraction::FontSlant::Type  mSlant;      ///< The font's slant.
-  float       mSize;       ///< The font's size.
+  float                                   mSize;       ///< The font's size.
 
   bool mFamilyNameDefined : 1; ///< Whether the font's family is defined.
   bool mWeightDefined : 1;     ///< Whether the font's weight is defined.

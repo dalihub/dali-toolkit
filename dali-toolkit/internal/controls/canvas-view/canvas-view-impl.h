@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CANVAS_VIEW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/canvas-view/canvas-view.h>
@@ -112,6 +114,17 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Toolkit::Control::OnSceneConnection()
+   */
+  void OnSceneConnection(int depth) override;
+
+  /**
+   * @copydoc Toolkit::Control::OnSceneDisconnection()
+   */
+  void OnSceneDisconnection() override;
+
+public:
+  /**
    * @brief This is the viewbox of the Canvas.
    * @param[in] viewBox The size of viewbox.
    * @return Returns True when it's successful. False otherwise.
@@ -182,19 +195,21 @@ public:
   void ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task);
 
 private:
-  CanvasView(const CanvasView&) = delete;
+  CanvasView(const CanvasView&)            = delete;
   CanvasView& operator=(const CanvasView&) = delete;
 
 private:
   CanvasRenderer                   mCanvasRenderer;
   Dali::Texture                    mTexture;
-  TextureSet                       mTextureSet;
   Vector2                          mSize;
   CanvasRendererRasterizingTaskPtr mRasterizingTask;
-  bool                             mIsSynchronous : 1;
-  bool                             mManualRasterization : 1;
-  bool                             mProcessorRegistered : 1;
-  bool                             mLastCommitRasterized : 1;
+  WeakHandle<Window>               mPlacementWindow;
+  Property::Index                  mCanvasVisualIndex;
+
+  bool mIsSynchronous : 1;
+  bool mManualRasterization : 1;
+  bool mProcessorRegistered : 1;
+  bool mLastCommitRasterized : 1;
 };
 
 } // namespace Internal
