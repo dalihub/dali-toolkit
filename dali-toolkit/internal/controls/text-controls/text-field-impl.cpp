@@ -915,7 +915,7 @@ void TextField::SetEditable(bool editable)
 void TextField::TextInserted(unsigned int position, unsigned int length, const std::string& content)
 {
   auto accessible = GetAccessibleObject();
-  if(DALI_LIKELY(accessible))
+  if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
   {
     accessible->EmitTextInserted(position, length, content);
   }
