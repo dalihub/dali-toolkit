@@ -30,6 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/property-bridge/property-bridge.h>
 #include <dali-toolkit/internal/controls/control/control-accessibility-data.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -698,6 +699,11 @@ std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
   return DevelControl::GetAccessibilityRelations(control);
+}
+
+std::string ControlAccessible::GetStringProperty(std::string propertyName) const
+{
+  return Dali::Toolkit::PropertyBridge::Get().GetStringProperty(Self(), propertyName);
 }
 
 bool ControlAccessible::IsScrollable() const
