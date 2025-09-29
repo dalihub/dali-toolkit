@@ -659,7 +659,7 @@ int UtcDaliTextViewModelElideText02(void)
   float positions03[] = {78.0f, 72.0f, 66.0f, 62.0f, 57.0f, 50.0f, 45.0f, 41.0f, 39.0f, 33.0f, 29.0f, 15.0f, 3.0f};
 
   Size  textSize04(80.f, 10.f);
-  float positions04[] = {1.f};
+  float positions04[] = {1.0f, 8.0f, 18.0f, 23.0f, 32.0f, 44.0f, 49.0f, 53.0f, 62.0f};
 
   struct ElideData data[] =
     {
@@ -691,7 +691,7 @@ int UtcDaliTextViewModelElideText02(void)
        "<font family='TizenSans'>Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.</font>",
        textSize04,
        1u,
-       1u,
+       9u,
        positions04}};
   const unsigned int numberOfTests = 5u;
 

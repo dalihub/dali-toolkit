@@ -449,37 +449,6 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
             startIndexOfEllipsis = (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) - ((ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) > 0u ? 1u : 0u);
           }
 
-          // When the hight is not enough then show one glyph and that should be the first laid out glyph.
-          if((1u == numberOfLines) &&
-             (ellipsisLine->ascender - ellipsisLine->descender > controlSize.height))
-          {
-            // Replace the first glyph with ellipsis glyph
-            auto indexOfFirstGlyph = (ellipsisPosition == DevelText::EllipsisPosition::START) ? startIndexOfEllipsis : 0u;
-
-            // Regardless where the location of ellipsis,in-case the hight of line is greater than control's height
-            // then replace the first glyph with ellipsis glyph.
-
-            // Get the first glyph which is going to be replaced and the ellipsis glyph.
-            GlyphInfo&       glyphToRemove = *(elidedGlyphsBuffer + indexOfFirstGlyph);
-            const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(glyphToRemove.fontId));
-
-            // Change the 'x' and 'y' position of the ellipsis glyph.
-            Vector2& position = *(elidedPositionsBuffer + indexOfFirstGlyph);
-
-            position.x = ellipsisGlyph.xBearing;
-            position.y = -ellipsisLine->ascender + controlSize.height - ellipsisGlyph.yBearing;
-
-            // Replace the glyph by the ellipsis glyph and resize the buffers.
-            glyphToRemove = ellipsisGlyph;
-
-            mElidedGlyphs.Resize(1u);
-            mElidedLayout.Resize(1u);
-
-            mEndIndexOfElidedGlyphs = mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = indexOfFirstGlyph;
-
-            return;
-          }
-
           // firstPenX, penY and firstPenSet are used to position the ellipsis glyph if needed.
           float firstPenX   = 0.f; // Used if rtl text is elided.
           float penY        = 0.f;
