@@ -375,6 +375,16 @@ private: // From Control
    */
   void OnSceneDisconnection() override;
 
+  /**
+   * @copydoc Control::OnAnimateAnimatableProperty()
+   */
+  void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state) override;
+
+  /**
+   * @copydoc Control::OnConstraintAnimatableProperty()
+   */
+  void OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied) override;
+
   // From ControlInterface
 
   /**
@@ -535,10 +545,11 @@ private: // Data
   std::string mLocale;
   Vector2     mSize;
 
-  Vector2  mTouchPosition;                ///< The initial touch down position.
+  Vector2 mTouchPosition; ///< The initial touch down position.
 
   int  mRenderingBackend;
   int  mAsyncLineCount;
+  int  mTextColorAnimatedCount;
   bool mTextUpdateNeeded : 1;
   bool mLastAutoScrollEnabled : 1;
   bool mControlBackgroundEnabled : 1;
@@ -548,8 +559,8 @@ private: // Data
   bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
   bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
   bool mManualRendered : 1;
-  bool mIsIntercepted : 1;       // whether the touch event is intercepted or not.
-  bool mIsHasAnchors : 1;        // whether the text has anchors or not.
+  bool mIsIntercepted : 1; // whether the touch event is intercepted or not.
+  bool mIsHasAnchors : 1;  // whether the text has anchors or not.
 
 protected:
   /**
