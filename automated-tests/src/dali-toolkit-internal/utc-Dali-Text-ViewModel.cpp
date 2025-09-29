@@ -54,7 +54,7 @@ const Vector2 LOREM_SCROLL_POSITION(0.f, -265.f);
 const Length  LOREM_NUMBER_OF_LINES             = 35u;
 const Length  LOREM_NUMBER_OF_LINES_ELIDED      = 21u;
 const Length  LOREM_NUMBER_OF_GLYPHS            = 632u;
-const Length  LOREM_NUMBER_OF_GLYPHS_ELIDED     = 392u;
+const Length  LOREM_NUMBER_OF_GLYPHS_ELIDED     = 395u;
 const Length  LOREM_NUMBER_OF_CHARACTERS        = 633u;
 const Length  LOREM_NUMBER_OF_CHARACTERS_ELIDED = 633u;
 
@@ -653,10 +653,10 @@ int UtcDaliTextViewModelElideText02(void)
   float positions01[] = {0.0f, 8.0f, 16.0f, 26.0f, 34.0f, 42.0f, 46.0f, 55.0f, 64.0f};
 
   Size  textSize02(80.f, 100.f);
-  float positions02[] = {69.0f, 63.0f, 59.0f, 51.0f, 47.0f, 43.0f, 34.0f, 26.0f, 11.0f};
+  float positions02[] = {69.0f, 63.0f, 59.0f, 51.0f, 47.0f, 43.0f, 34.0f, 26.0f, 17.0f, 2.0f};
 
   Size  textSize03(80.f, 100.f);
-  float positions03[] = {78.0f, 72.0f, 66.0f, 62.0f, 57.0f, 50.0f, 45.0f, 41.0f, 39.0f, 33.0f, 29.0f, 15.0f, 3.0f};
+  float positions03[] = {78.0f, 72.0f, 66.0f, 62.0f, 57.0f, 50.0f, 45.0f, 41.0f, 39.0f, 33.0f, 29.0f, 23.0f, 9.0f};
 
   Size  textSize04(80.f, 10.f);
   float positions04[] = {1.0f, 8.0f, 18.0f, 23.0f, 32.0f, 44.0f, 49.0f, 53.0f, 62.0f};
@@ -679,13 +679,13 @@ int UtcDaliTextViewModelElideText02(void)
        "<font family='TizenSansHebrew'>צעד על לשון המלצת לאחרונה, אם לכאן שנורו סרבול מדע, קרן דת שפות להפוך.</font>",
        textSize02,
        5u,
-       44u,
+       45u,
        positions02},
       {"Arabic script",
        "<font family='TizenSansArabic'>عل النفط ديسمبر الإمداد بال, بين وترك شعار هو. لمّ من المبرمة النفط بالسيطرة, أم يتم تحرّك وبغطاء, عدم في لإعادة وإقامة رجوعهم.</font>",
        textSize03,
        5u,
-       65u,
+       66u,
        positions03},
       {"Small control size, no line fits.",
        "<font family='TizenSans'>Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.</font>",
