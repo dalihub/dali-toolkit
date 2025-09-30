@@ -228,6 +228,7 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
     GlyphInfo glyphInfo;
     glyphInfo.isItalicRequired = isItalicRequired;
     glyphInfo.isBoldRequired   = isBoldRequired;
+    glyphInfo.isShaped         = true;
 
     tmpGlyphs.Resize(numberOfGlyphs, glyphInfo);
     tmpGlyphToCharacterMap.Resize(numberOfGlyphs);

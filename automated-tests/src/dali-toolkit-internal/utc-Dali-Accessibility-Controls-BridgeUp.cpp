@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
+#include <dali-toolkit/devel-api/property-bridge/property-bridge.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
@@ -2470,6 +2471,49 @@ int UtcDaliAccessibleDumpTree(void)
   }
 
   Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibleGetStringProperty(void)
+{
+  ToolkitTestApplication application;
+
+  const char* propertyName   = "NAME";
+  const char* expectedResult = "TEST_ACCESSIBILITY_NAME";
+
+  auto control = Control::New();
+  DALI_TEST_CHECK(control);
+
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, expectedResult);
+
+  // Register accessibility string getter
+  StringGetterDelegate getter = [](void* refObject, const char* propertyName, std::string* out) -> void
+  {
+    if(!out || !refObject || !propertyName)
+    {
+      if(out) *out = std::string();
+      return;
+    }
+
+    auto control = Dali::Toolkit::Control::DownCast(Actor::DownCast(BaseHandle(static_cast<Dali::BaseObject *>(refObject))));
+
+    if(std::string(propertyName) == "NAME")
+    {
+      *out = control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>();
+    }
+    else
+    {
+      *out = std::string();
+    }
+  };
+  PropertyBridgeRegisterStringGetter(getter);
+
+  auto accessible = Dali::Accessibility::Accessible::Get(control);
+
+  std::string result = accessible->GetStringProperty(propertyName);
+
+  DALI_TEST_EQUALS(result, std::string(expectedResult), TEST_LOCATION);
 
   END_TEST;
 }
