@@ -636,10 +636,6 @@ void TextEditor::OnInitialize()
   mStencil.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   self.Add(mStencil);
-  if(mCursorLayer)
-  {
-    mStencil.Add(mCursorLayer);
-  }
 
   // Accessibility
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);

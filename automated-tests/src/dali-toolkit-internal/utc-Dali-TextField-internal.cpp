@@ -76,9 +76,9 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   application.SendNotification();
   application.Render();
 
-  // The offscreen root actor should have two children: the renderable, cursor layer
-  Actor stencil = textField.GetChildAt(1u);
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 2u, TEST_LOCATION);
+  // The offscreen root actor should have one child: the renderable.
+  Actor stencil = textField.GetChildAt(0u);
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION);
 
   // The renderable actor should have two children: the text and the background.
   Actor renderableActor = stencil.GetChildAt(0u);

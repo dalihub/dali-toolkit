@@ -246,8 +246,6 @@ struct Decorator::Impl : public ConnectionTracker
     mQuadVertexFormat["aPosition"] = Property::VECTOR2;
     mHighlightShader               = Shader::New(SHADER_TEXT_DECORATOR_SHADER_VERT, SHADER_TEXT_DECORATOR_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_DECORATOR");
     SetupGestures();
-    CreateLayer(mActiveLayer, DecorationType::ACTIVE_LAYER);
-    CreateLayer(mCursorLayer, DecorationType::CURSOR_LAYER);
   }
 
   /**
@@ -258,8 +256,9 @@ struct Decorator::Impl : public ConnectionTracker
   {
     mControlSize = size;
 
-    mActiveLayer.RaiseToTop();
-    mCursorLayer.RaiseToTop();
+    // TODO - Remove this if nothing is active
+    CreateLayer(mActiveLayer, DecorationType::ACTIVE_LAYER);
+    CreateLayer(mCursorLayer, DecorationType::CURSOR_LAYER);
 
     // Show or hide the cursors
     CreateCursors();

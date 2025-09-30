@@ -1129,10 +1129,6 @@ void TextField::EnableClipping()
     mStencil.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     Self().Add(mStencil);
-    if(mCursorLayer)
-    {
-      mStencil.Add(mCursorLayer);
-    }
   }
 }
 
