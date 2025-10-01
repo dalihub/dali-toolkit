@@ -1355,7 +1355,7 @@ struct Engine::Impl
                     DevelText::EllipsisPosition::Type ellipsisPosition,
                     bool                              enforceEllipsisInSingleLine)
   {
-    const bool ellipsis    = enforceEllipsisInSingleLine || (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded : ((penY - layout.descender > layoutParameters.boundingBox.height) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
+    const bool ellipsis    = enforceEllipsisInSingleLine || (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded : (((mLayout == MULTI_LINE_BOX) && !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) && (penY - layout.descender > layoutParameters.boundingBox.height)) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
     const bool isMultiline = !enforceEllipsisInSingleLine && (mLayout == MULTI_LINE_BOX);
     if(ellipsis && (ellipsisPosition == DevelText::EllipsisPosition::END || !isMultiline))
     {
