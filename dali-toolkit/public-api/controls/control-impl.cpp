@@ -716,11 +716,23 @@ void Control::OnAnimateAnimatableProperty(Animation& animation, Property::Index 
 {
   if(state == Animation::State::PLAYING)
   {
-    mImpl->CreateAnimationConstraints(animation, index);
+    mImpl->CreateAnimationConstraints(animation.GetBaseObject(), index);
   }
   else if(state == Animation::State::STOPPED)
   {
-    mImpl->ClearAnimationConstraints(animation, index);
+    mImpl->ClearAnimationConstraints(animation.GetBaseObject(), index);
+  }
+}
+
+void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+{
+  if(applied)
+  {
+    mImpl->CreateAnimationConstraints(constraint.GetBaseObject(), index);
+  }
+  else
+  {
+    mImpl->ClearAnimationConstraints(constraint.GetBaseObject(), index);
   }
 }
 

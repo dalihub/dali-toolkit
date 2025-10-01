@@ -423,15 +423,17 @@ public:
 
   /**
    * @brief Create constraints to animate animatable properties.
+   * @param[in] animationObject BaseObject of Animation or Constraint
    * @param[in] index The animatable property
    */
-  void CreateAnimationConstraints(Dali::Animation& animation, Property::Index index);
+  void CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
 
   /**
    * @brief Clear animatable constraints
+   * @param[in] animationObject BaseObject of Animation or Constraint
    * @param[in] index The animatable property
    */
-  void ClearAnimationConstraints(Dali::Animation& animation, Property::Index index);
+  void ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
 
   /**
    * @brief Update visual properties.
@@ -554,8 +556,8 @@ public:
   Constraint      mInnerShadowCornerRadiusConstraint; ///< InnerShadow's CornerRadius constriant
 
   // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
-  using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<Dali::RefObject*, uint32_t>>;
-  PropertyOnAnimationContainer mPropertyOnAnimation; ///< Properties that are currently on animation
+  using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;
+  PropertyOnAnimationContainer mPropertyOnAnimation; ///< Properties that are currently on animation or constraint applied
 
   // Off screen rendering context
   std::unique_ptr<OffScreenRenderingImpl>                mOffScreenRenderingImpl;
