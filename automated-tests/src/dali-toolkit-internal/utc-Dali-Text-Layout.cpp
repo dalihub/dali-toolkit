@@ -3633,7 +3633,7 @@ int UtcDaliTextLayoutEllipsis05(void)
       0.f,
       0.f,
       false,
-      true};
+      false};
   Vector<LineRun> lines;
   lines.PushBack(line01);
 
@@ -3642,7 +3642,7 @@ int UtcDaliTextLayoutEllipsis05(void)
       0.f, -12.f};
 
   Size textArea(100.f, 19.f);
-  Size layoutSize(100.f, 20.f);
+  Size layoutSize(79.f, 20.f);
 
   LayoutTextData data =
     {

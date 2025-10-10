@@ -449,6 +449,18 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
             startIndexOfEllipsis = (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) - ((ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) > 0u ? 1u : 0u);
           }
 
+          Length EllidedLineIndex = 0u;
+          Length numberOfActualLaidOutGlyphsCount = 0u;
+          for(Length lineIndex = 0u; lineIndex < numberOfLines; lineIndex++)
+          {
+            numberOfActualLaidOutGlyphsCount += lines[lineIndex].glyphRun.numberOfGlyphs + lines[lineIndex].glyphRunSecondHalf.numberOfGlyphs;
+            if(startIndexOfEllipsis < numberOfActualLaidOutGlyphsCount)
+            {
+              EllidedLineIndex = lineIndex;
+              break;
+            }
+          }
+
           // firstPenX, penY and firstPenSet are used to position the ellipsis glyph if needed.
           float firstPenX   = 0.f; // Used if rtl text is elided.
           float penY        = 0.f;
@@ -463,9 +475,8 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           float actualAdvance = 0.f;
           for(Length i = 0; i < ellipsisLine->glyphRun.numberOfGlyphs; i++)
           {
-            const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + i);
+            const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + lines[EllidedLineIndex].glyphRun.glyphIndex + i);
             float            currentAdvance = currentGlyph.advance;
-
             actualAdvance += currentAdvance;
           }
 
