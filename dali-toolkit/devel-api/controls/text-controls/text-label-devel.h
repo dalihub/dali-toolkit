@@ -536,6 +536,13 @@ DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextLabel t
 DALI_TOOLKIT_API void SetMaskEffect(TextLabel textLabel, Toolkit::Control control);
 
 /**
+ * @brief Remove the applied mask effect of the label.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ */
+DALI_TOOLKIT_API void RemoveMaskEffect(TextLabel textLabel);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal
