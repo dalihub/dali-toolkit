@@ -145,6 +145,11 @@ void SetMaskEffect(TextLabel textLabel, Toolkit::Control control)
   GetImpl(textLabel).SetMaskEffect(control);
 }
 
+void RemoveMaskEffect(TextLabel textLabel)
+{
+  GetImpl(textLabel).RemoveMaskEffect();
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

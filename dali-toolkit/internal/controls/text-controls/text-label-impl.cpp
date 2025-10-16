@@ -2282,10 +2282,24 @@ void TextLabel::SetMaskEffect(Toolkit::Control control)
 
   // Add control to this component
   self.Add(control);
+  mMaskControl = control;
 
   MaskEffect maskEffect = MaskEffect::New(control);
   GetImplementation(maskEffect).SetReverseMaskDirection(true);
   selfControl.SetRenderEffect(maskEffect);
+}
+
+void TextLabel::RemoveMaskEffect()
+{
+  Actor            self        = Self();
+  Toolkit::Control selfControl = Toolkit::Control::DownCast(self);
+
+  Toolkit::Control control = mMaskControl.GetHandle();
+  if(control)
+  {
+    selfControl.Remove(control);
+  }
+  selfControl.ClearRenderEffect();
 }
 
 std::string TextLabel::TextLabelAccessible::GetNameRaw() const

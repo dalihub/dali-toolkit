@@ -3771,6 +3771,10 @@ int utcDaliTextLabelSetMaskEffect(void)
   DevelTextLabel::SetMaskEffect(label, maskControl);
   DALI_TEST_CHECK(maskControl.GetParent() == label);
 
+  // Remove Mask Effect
+  DevelTextLabel::RemoveMaskEffect(label);
+  DALI_TEST_CHECK(maskControl.GetParent() == nullptr);
+
   END_TEST;
 }
 
