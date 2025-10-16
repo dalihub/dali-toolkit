@@ -399,6 +399,12 @@ protected: // From CustomActorImpl
   void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state) override;
 
   /**
+   * @copydoc CustomActorImpl::OnConstraintAnimatableProperty()
+   * @note If overridden, then an up-call to Control::OnConstraintAnimatableProperty MUST be made at the end.
+   */
+  void OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied) override;
+
+  /**
    * @copydoc CustomActorImpl::GetOffScreenRenderTasks()
    */
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
