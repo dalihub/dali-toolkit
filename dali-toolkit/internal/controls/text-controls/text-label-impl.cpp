@@ -2277,6 +2277,8 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
 
 void TextLabel::SetMaskEffect(Toolkit::Control control)
 {
+  RemoveMaskEffect();
+
   Actor            self        = Self();
   Toolkit::Control selfControl = Toolkit::Control::DownCast(self);
 
@@ -2297,7 +2299,7 @@ void TextLabel::RemoveMaskEffect()
   Toolkit::Control control = mMaskControl.GetHandle();
   if(control)
   {
-    selfControl.Remove(control);
+    self.Remove(control);
   }
   selfControl.ClearRenderEffect();
 }
