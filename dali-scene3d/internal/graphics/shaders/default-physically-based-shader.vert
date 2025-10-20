@@ -8,7 +8,19 @@ precision highp float;
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/glTF-WebGL-PBR/shaders/pbr-vert.glsl
 // Commit dc84b5e374fb3d23153d2248a338ef88173f9eb6
 
-#define MORPH defined(MORPH_POSITION) || defined(MORPH_NORMAL) || defined(MORPH_TANGENT)
+// Do not define MORPH unless at least one of the morph shader constants is on. (The "#ifdef CONSTANT" gets replaced by "#if 1" in dali-scene3d if CONSTANT is needed by the model)
+#ifdef MORPH_POSITION
+#define MORPH 1
+#endif
+#ifdef MORPH_NORMAL
+#define MORPH 1
+#endif
+#ifdef MORPH_TANGENT
+#define MORPH 1
+#endif
+#ifdef MORPH_VERSION_2_0
+#define MORPH 1
+#endif
 
 // These lines in the shader may be replaced with actual definitions by the model loader,
 // if they are needed. Note, some shader compilers have problems with spurious ";", so
@@ -110,7 +122,7 @@ void main()
 
 #ifdef MORPH_POSITION
     // Calculate the index to retrieve the geometry from the texture.
-    vertexId = gl_VertexID + blendShapeBufferOffset;
+    vertexId = VERTEX_INDEX + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
 
@@ -133,7 +145,7 @@ void main()
 
 #ifdef MORPH_NORMAL
     // Calculate the index to retrieve the normal from the texture.
-    vertexId = gl_VertexID + blendShapeBufferOffset;
+    vertexId = VERTEX_INDEX + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
 
@@ -150,7 +162,7 @@ void main()
 
 #ifdef MORPH_TANGENT
     // Calculate the index to retrieve the tangent from the texture.
-    vertexId = gl_VertexID + blendShapeBufferOffset;
+    vertexId = VERTEX_INDEX + blendShapeBufferOffset;
     x = vertexId % width;
     y = vertexId / width;
 
