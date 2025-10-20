@@ -87,7 +87,8 @@ const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg"
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 const char* TEST_WEBP_FILE_NAME                  = TEST_RESOURCE_DIR "/dali-logo.webp";
 
-const char* TEST_OVERWRITABLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/overwritable-image.jpg";
+const char* TEST_OVERWRITABLE_IMAGE_FILE_NAME_01 = TEST_RESOURCE_DIR "/overwritable-image-01.jpg";
+const char* TEST_OVERWRITABLE_IMAGE_FILE_NAME_02 = TEST_RESOURCE_DIR "/overwritable-image-02.jpg";
 
 void TestUrl(ImageView imageView, const std::string url)
 {
@@ -98,9 +99,9 @@ void TestUrl(ImageView imageView, const std::string url)
   DALI_TEST_EQUALS(urlActual, url, TEST_LOCATION);
 }
 
-void OverwriteImage(const char* sourceFilename)
+void OverwriteImage(const char* overwritableFilename, const char* sourceFilename)
 {
-  FILE* fpOut = fopen(TEST_OVERWRITABLE_IMAGE_FILE_NAME, "wb");
+  FILE* fpOut = fopen(overwritableFilename, "wb");
   DALI_TEST_CHECK(fpOut);
   if(fpOut)
   {
@@ -6046,9 +6047,9 @@ int UtcDaliImageViewImageLoadFailureAndReload01(void)
   gResourceReadySignalFired = false;
 
   // Make overwritable image invalid first.
-  OverwriteImage("");
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_01, "");
 
-  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME);
+  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME_01);
   imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
 
@@ -6066,7 +6067,7 @@ int UtcDaliImageViewImageLoadFailureAndReload01(void)
   gResourceReadySignalFired = false;
 
   // Make overwritable image valid now.
-  OverwriteImage(gImage_34_RGBA);
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_01, gImage_34_RGBA);
 
   // Reload the image
   Property::Map attributes;
@@ -6082,7 +6083,7 @@ int UtcDaliImageViewImageLoadFailureAndReload01(void)
   DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
 
   // Make overwritable image invalid end of test (for clean).
-  OverwriteImage("");
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_01, "");
 
   gResourceReadySignalFired = false;
 
@@ -6103,9 +6104,9 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
   gResourceReadySignalFired = false;
 
   // Make overwritable image invalid first.
-  OverwriteImage("");
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_02, "");
 
-  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME);
+  ImageView imageView = ImageView::New(TEST_OVERWRITABLE_IMAGE_FILE_NAME_02);
   imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
 
@@ -6129,7 +6130,7 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
   gResourceReadySignalFired = false;
 
   // Make overwritable image valid now.
-  OverwriteImage(gImage_34_RGBA);
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_02, gImage_34_RGBA);
 
   // Reload the image
   Property::Map attributes;
@@ -6150,7 +6151,7 @@ int UtcDaliImageViewImageLoadFailureAndReload02(void)
   DALI_TEST_CHECK(brokenShader != imageView.GetRendererAt(0u).GetShader());
 
   // Make overwritable image invalid end of test (for clean).
-  OverwriteImage("");
+  OverwriteImage(TEST_OVERWRITABLE_IMAGE_FILE_NAME_02, "");
 
   gResourceReadySignalFired = false;
 
