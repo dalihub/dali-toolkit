@@ -179,6 +179,7 @@ void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec
 
 #ifdef IS_REQUIRED_BORDERLINE
 #ifdef IS_REQUIRED_BLUR
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
 // TODO : Current logic is only for PoC! We should make clean up!
 lowp vec4 convertBorderlineColorWithBlur(lowp vec4 textureColor,highp float currentBorderlineWidth, highp float blurRadius)
 {
@@ -222,6 +223,111 @@ lowp vec4 convertBorderlineColorWithBlur(lowp vec4 textureColor,highp float curr
   highp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
   return vec4(finalMultipliedRGB, finalAlpha);
 }
+#else
+// Not squircle case.
+lowp vec4 convertBorderlineColorWithBlur(lowp vec4 textureColor,highp float currentBorderlineWidth, highp float blurRadius)
+{
+  // TODO : Need to consider squareness.
+
+  blurRadius = max(blurRadius, 0.0) + vAliasMargin;
+
+  highp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  highp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineColorAlpha;
+
+  // Use the advanced calculateBlurOpacity() logic for more precise control
+  highp vec2 v = gDiff;
+
+  // Warning : This logic exist only for the inner-shader case, which is borderlineOffset = -1.0.
+  // This code will match the radius of inside of borderline is same as normal case.
+  //
+  // And also, need to reduce the visual defect near the outline
+  // If inside of borderline is totally inside of circle, make cy as zero.
+  // (Mean, baseline is parallel with axis.)
+  // Use heuristic factor 1.5 to ensure this parallel occured only for big enough radius cases.
+  highp float insettedBorderlineWidth = currentBorderlineWidth * (1.0 - clamp(borderlineOffset, -1.0, 1.0)) * 0.5;
+  highp float cy = max(0.0, insettedBorderlineWidth + blurRadius * 1.5 - gRadius);
+  highp float cr = cy + max(0.0, gRadius - insettedBorderlineWidth);
+
+#ifdef IS_REQUIRED_ROUNDED_CORNER
+  // This routine make perfect circle. If corner radius is not exist, we don't consider prefect circle.
+  // cy + gRadius <= min(vRectSize.x, vRectSize.y) + currentBorderlineWidth - insettedBorderlineWidth;
+  cy = min(cy, min(vRectSize.x, vRectSize.y) + currentBorderlineWidth - insettedBorderlineWidth - gRadius);
+#endif
+  v = vec2(min(v.x, v.y), max(v.x, v.y));
+  v = v + cy;
+
+  highp float potential = 0.0;
+  highp float alias = min(gRadius, vAliasMargin);
+  // Calculate potential ranges for both inner and outer boundaries
+  highp float innerPotentialMin = cy + gRadius - currentBorderlineWidth - blurRadius - alias;
+  highp float innerPotentialMax = cy + gRadius - currentBorderlineWidth + blurRadius + alias;
+  highp float outerPotentialMin = cy + gRadius - blurRadius - alias;
+  highp float outerPotentialMax = cy + gRadius + blurRadius + alias;
+
+  // move center of circles for reduce defact
+  highp float cyDiff = min(cy, 0.2 * blurRadius);
+  cy -= cyDiff;
+  cr += cyDiff;
+
+  highp float diffFromBaseline = cy * v.y - (cy + cr) * v.x;
+
+  if(diffFromBaseline > 0.0)
+  {
+    potential = v.y;
+    highp float heuristicBaselineScale = max(vAliasMargin , cr * (cr + cy));
+    highp float potentialDiff = min(alias, diffFromBaseline / heuristicBaselineScale);
+    innerPotentialMin += potentialDiff;
+    innerPotentialMax -= potentialDiff;
+    outerPotentialMin += potentialDiff;
+    outerPotentialMax -= potentialDiff;
+  }
+  else
+  {
+#ifdef IS_REQUIRED_ROUNDED_CORNER
+    highp float A = (cr * cr - 2.0 * cy * cy);
+    highp float B = cy * (v.x + v.y);
+    highp float V = dot(v,v);
+    highp float D = B * B + A * V;
+    potential = V * (cr + cy) / (sqrt(D) + B);
+#else
+    highp float x = 0.5 * (1.0 - length(v) / (v.x + v.y));
+    potential = -1.0557281 * (v.x + v.y) + 2.236068 * length(v) + 10.0 * (v.x + v.y) * (0.35777088 - 0.14310 * x) * x * x;
+#endif
+  }
+
+  // Calculate opacities using smoothstep
+  highp float innerOpacity = smoothstep(innerPotentialMin, innerPotentialMax, potential);
+  highp float outerOpacity = 1.0 - smoothstep(outerPotentialMin, outerPotentialMax, potential);
+
+  highp float borderlineOpacity = 0.0;
+  highp float textureOpacity = 0.0;
+
+  // borderlineOpacity should be 0~1 whenever potential over insideThreshold
+  // and 1~0 whenever potential outsideThreshold.
+  // To combine this 2 information, we can use smoothstep and multiply function.
+  borderlineOpacity = innerOpacity * outerOpacity;
+
+  highp float textureOutlineThreshold = -gCenterPosition + cy;
+  textureOpacity = 1.0 - smoothstep(textureOutlineThreshold - blurRadius, textureOutlineThreshold + blurRadius, potential);
+
+  // NOTE : color-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineOpacity;
+  borderlineColorAlpha *= borderlineOpacity;
+  textureColor *= textureOpacity;
+
+  // Manual blend operation with premultiplied colors.
+  // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
+  // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
+  // If premultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+  // Else, return vec4((rgb*alpha) / alpha, alpha)
+
+  highp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+  highp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+  return vec4(finalMultipliedRGB, finalAlpha);
+}
+#endif
 #else
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
@@ -312,7 +418,7 @@ mediump float calculateCornerOpacity()
 
 #ifdef IS_REQUIRED_BLUR
 #if defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_BORDERLINE)
-// Legacy code for low version glsl
+// Legacy code for low version glsl. Should not come here for borderline case!
 mediump float calculateBlurOpacity()
 {
   highp float potential = gPotential;
@@ -331,10 +437,11 @@ mediump float calculateBlurOpacity()
   // Don't use borderline!
   highp vec2 v = gDiff;
   highp float cy = gRadius + blurRadius;
-  highp float cr = gRadius + blurRadius;
+  highp float cr = cy;
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   // This routine make perfect circle. If corner radius is not exist, we don't consider prefect circle.
+  // cy + gRadius <= min(vRectSize.x, vRectSize.y);
   cy = min(cy, min(vRectSize.x, vRectSize.y) - gRadius);
 #endif
   v = vec2(min(v.x, v.y), max(v.x, v.y));
