@@ -324,6 +324,11 @@ public:
    */
   void SetMaskEffect(Toolkit::Control control);
 
+  /**
+   * @brief Remove the applied mask effect of the label.
+   */
+  void RemoveMaskEffect();
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -523,6 +528,9 @@ private: // Data
 
   // for Font Variations
   std::map<Dali::Property::Index, std::string> mVariationIndexMap; // Stores [CustomPropertyIndex, tag].
+
+  // for masking
+  WeakHandle<Toolkit::Control> mMaskControl;
 
   std::string mLocale;
   Vector2     mSize;

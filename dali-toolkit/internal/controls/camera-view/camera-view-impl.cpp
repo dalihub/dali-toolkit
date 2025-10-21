@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
@@ -121,9 +122,7 @@ void CameraView::SetWindowSurfaceTarget()
   mScaleUpdateNotification.NotifySignal().Connect(this, &CameraView::UpdateDisplayArea);
 
   // For underlay rendering mode, camera display area have to be transparent.
-  Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader   shader   = Shader::New(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, Shader::Hint::NONE, "CAMERA_VIEW_OVERLAY");
-  mOverlayRenderer  = Renderer::New(geometry, shader);
+  mOverlayRenderer = CreateRenderer(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW_OVERLAY", Uint16Pair(1, 1));
   mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
 
   Self().AddRenderer(mOverlayRenderer);

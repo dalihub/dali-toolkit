@@ -2189,7 +2189,7 @@ void Control::Impl::UpdateBorderline()
   SetBorderline(map, false);
 }
 
-void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Property::Index index)
+void Control::Impl::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2202,7 +2202,7 @@ void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Prope
 
       // Get or create counter
       auto& animationCounter   = mPropertyOnAnimation[index];
-      auto* animationObjectPtr = animation.GetObjectPtr();
+      auto* animationObjectPtr = &static_cast<const Dali::RefObject&>(animationObject);
 
       auto iter = animationCounter.find(animationObjectPtr);
       if(iter == animationCounter.end())
@@ -2217,7 +2217,7 @@ void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Prope
   }
 }
 
-void Control::Impl::ClearAnimationConstraints(Dali::Animation& animation, Property::Index index)
+void Control::Impl::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2225,7 +2225,7 @@ void Control::Impl::ClearAnimationConstraints(Dali::Animation& animation, Proper
     if(indexIter != mPropertyOnAnimation.end())
     {
       auto& animationCounter   = indexIter->second;
-      auto* animationObjectPtr = animation.GetObjectPtr();
+      auto* animationObjectPtr = &static_cast<const Dali::RefObject&>(animationObject);
       auto  iter               = animationCounter.find(animationObjectPtr);
       if(DALI_LIKELY(iter != animationCounter.end()))
       {
