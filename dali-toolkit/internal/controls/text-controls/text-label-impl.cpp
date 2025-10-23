@@ -1187,6 +1187,7 @@ void TextLabel::OnInitialize()
 
   TextVisual::SetAsyncTextInterface(mVisual, this);
   TextVisual::SetAnimatableTextColorProperty(mVisual, Toolkit::TextLabel::Property::TEXT_COLOR);
+  TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   self.SetProperty(Toolkit::TextLabel::Property::PIXEL_SNAP_FACTOR, 0.0f);
 
   mController = TextVisual::GetController(mVisual);
@@ -1231,20 +1232,20 @@ DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
 
 bool TextLabel::OnInterceptTouched(Actor actor, const TouchEvent& touch)
 {
-  if (touch.GetState(0) == PointState::STARTED)
+  if(touch.GetState(0) == PointState::STARTED)
   {
     mIsIntercepted = true;
     mTouchPosition = touch.GetScreenPosition(0);
   }
-  else if (touch.GetState(0) == PointState::FINISHED)
+  else if(touch.GetState(0) == PointState::FINISHED)
   {
-    if (mIsIntercepted && mIsHasAnchors)
+    if(mIsIntercepted && mIsHasAnchors)
     {
       const Vector2& screen(touch.GetScreenPosition(0));
       Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
-                                    std::abs(mTouchPosition.y - screen.y));
+                                   std::abs(mTouchPosition.y - screen.y));
       if(distanceDelta.x < 20 &&
-        distanceDelta.y < 20)
+         distanceDelta.y < 20)
       {
         Extents padding;
         padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
@@ -1359,6 +1360,12 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
         mController->SetDefaultColor(textColor);
         mTextUpdateNeeded    = true;
         mIsAsyncRenderNeeded = mIsAsyncRenderNeeded ? true : (mController->IsUnderlineEnabled() || mController->IsStrikethroughEnabled());
+
+        // Trigger constraint always.
+        if(DALI_LIKELY(mVisual))
+        {
+          TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount, true);
+        }
       }
       break;
     }
@@ -1456,6 +1463,48 @@ void TextLabel::OnSceneDisconnection()
     }
   }
   Control::OnSceneDisconnection();
+}
+
+void TextLabel::OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Animation::State state)
+{
+  if(DALI_LIKELY(mVisual) && index == Toolkit::TextLabel::Property::TEXT_COLOR)
+  {
+    if(state == Animation::State::PLAYING)
+    {
+      ++mTextColorAnimatedCount;
+    }
+    else if(state == Animation::State::STOPPED)
+    {
+      if(mTextColorAnimatedCount)
+      {
+        --mTextColorAnimatedCount;
+      }
+    }
+
+    TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
+  }
+  Control::OnAnimateAnimatableProperty(animation, index, state);
+}
+
+void TextLabel::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+{
+  if(DALI_LIKELY(mVisual) && index == Toolkit::TextLabel::Property::TEXT_COLOR)
+  {
+    if(applied)
+    {
+      ++mTextColorAnimatedCount;
+    }
+    else
+    {
+      if(mTextColorAnimatedCount)
+      {
+        --mTextColorAnimatedCount;
+      }
+    }
+
+    TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
+  }
+  Control::OnConstraintAnimatableProperty(constraint, index, applied);
 }
 
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -1951,6 +2000,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mTouchPosition(),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mAsyncLineCount(0),
+  mTextColorAnimatedCount(0),
   mTextUpdateNeeded(false),
   mLastAutoScrollEnabled(false),
   mControlBackgroundEnabled(true),

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,6 +167,17 @@ public:
     GetVisualObject(visual).SetAsyncTextInterface(asyncTextInterface);
   };
 
+  /**
+   * @brief Set the visual constraints need to be applied always or not.
+   * @param[in] visual The text visual.
+   * @param[in] applyAlways True if constraint need to be applied always. False if we need once only.
+   * @param[in] notifyToConstraint True if we need to notify changeness to constraints.
+   */
+  static void SetConstraintApplyAlways(Toolkit::Visual::Base visual, bool applyAlways, bool notifyToConstraint = false)
+  {
+    GetVisualObject(visual).SetConstraintApplyAlways(applyAlways, notifyToConstraint);
+  };
+
 public: // from Visual::Base
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
@@ -297,6 +308,13 @@ private:
   void SetAsyncTextInterface(Text::AsyncTextInterface* asyncTextInterface);
 
   /**
+   * @brief Set the visual constraints need to be applied always or not.
+   * @param[in] applyAlways True if constraint need to be applied always. False if we need once only.
+   * @param[in] notifyToConstraint True if we need to notify changeness to constraints.
+   */
+  void SetConstraintApplyAlways(bool applyAlways, bool notifyToConstraint);
+
+  /**
    * @brief Removes the text's renderer.
    */
   void RemoveRenderer(Actor& actor, bool removeDefaultRenderer);
@@ -380,7 +398,8 @@ private:
   void LoadComplete(bool success, const TextInformation& textInformation) override;
 
 private:
-  typedef std::vector<Renderer> RendererContainer;
+  typedef std::vector<Renderer>   RendererContainer;
+  typedef std::vector<Constraint> ConstraintContainer;
 
 private:
   Text::ControllerPtr       mController;         ///< The text's controller.
@@ -390,16 +409,19 @@ private:
   TextVisualShaderFactory&                mTextVisualShaderFactory; ///< The shader factory for text visual.
   TextVisualShaderFeature::FeatureBuilder mTextShaderFeatureCache;  ///< The cached shader feature for text visual.
 
-  WeakHandle<Actor> mControl;                          ///< The control where the renderer is added.
-  Constraint        mColorConstraint{};                ///< Color constraint
-  Constraint        mOpacityConstraint{};              ///< Opacity constraint
-  Property::Index   mHasMultipleTextColorsIndex;       ///< The index of uHasMultipleTextColors proeprty.
-  Property::Index   mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
-  Property::Index   mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
-  Property::Index   mTextRequireRenderPropertyIndex;   ///< The index of requireRender property.
-  bool              mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
-  bool              mTextRequireRender : 1;            ///< The flag to indicate whether the text needs to be rendered.
-  RendererContainer mRendererList;
+  WeakHandle<Actor>   mControl;                          ///< The control where the renderer is added.
+  Constraint          mColorConstraint{};                ///< Color constraint
+  Constraint          mOpacityConstraint{};              ///< Opacity constraint
+  Property::Index     mHasMultipleTextColorsIndex;       ///< The index of uHasMultipleTextColors proeprty.
+  Property::Index     mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
+  Property::Index     mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
+  Property::Index     mTextRequireRenderPropertyIndex;   ///< The index of requireRender property.
+  bool                mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
+  bool                mTextRequireRender : 1;            ///< The flag to indicate whether the text needs to be rendered.
+  bool                mIsConstraintAppliedAlways : 1;    ///< Whether the constraint need to be applied always.
+  RendererContainer   mRendererList;
+  ConstraintContainer mColorConstraintList;
+  ConstraintContainer mOpacityConstraintList;
 
   uint32_t mTextLoadingTaskId;               ///< The currently requested text loading(render) task Id.
   uint32_t mNaturalSizeTaskId;               ///< The currently requested natural size task Id.

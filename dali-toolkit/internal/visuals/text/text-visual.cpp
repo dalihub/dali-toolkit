@@ -23,6 +23,7 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
@@ -41,6 +42,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
@@ -56,6 +58,9 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 DALI_INIT_TRACE_FILTER(gTraceFilter2, DALI_TRACE_TEXT_ASYNC, false);
 
 const int CUSTOM_PROPERTY_COUNT(3); // uTextColorAnimatable, uHasMultipleTextColors, requireRender
+
+static constexpr uint32_t TEXT_VISUAL_COLOR_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 21);
+static constexpr uint32_t TEXT_VISUAL_OPACITY_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 22);
 
 const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
   {
@@ -283,6 +288,7 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory
   mTextRequireRenderPropertyIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false),
   mTextRequireRender(false),
+  mIsConstraintAppliedAlways(false),
   mTextLoadingTaskId(0u),
   mNaturalSizeTaskId(0u),
   mHeightForWidthTaskId(0u),
@@ -362,8 +368,12 @@ void TextVisual::DoSetOnScene(Actor& actor)
       {
         mColorConstraint = Constraint::New<Vector4>(mImpl->mRenderer, mTextColorAnimatableIndex, TextColorConstraint);
         mColorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+        Dali::Integration::ConstraintSetInternalTag(mColorConstraint, TEXT_VISUAL_COLOR_CONSTRAINT_TAG);
+        mColorConstraint.Apply();
       }
-      mColorConstraint.Apply();
+      mColorConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+
+      mColorConstraintList.push_back(mColorConstraint);
     }
 
     // Make zero if the alpha value of text color is zero to skip rendering text
@@ -373,8 +383,12 @@ void TextVisual::DoSetOnScene(Actor& actor)
       mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
       mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
       mOpacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
+      Dali::Integration::ConstraintSetInternalTag(mOpacityConstraint, TEXT_VISUAL_OPACITY_CONSTRAINT_TAG);
+      mOpacityConstraint.Apply();
     }
-    mOpacityConstraint.Apply();
+    mOpacityConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+
+    mOpacityConstraintList.push_back(mOpacityConstraint);
   }
 
   // Renderer needs textures and to be added to control
@@ -397,6 +411,18 @@ void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
   }
   // Clear the renderer list
   mRendererList.clear();
+
+  // Clear constraint, and keep default renderer's constraint only.
+  if(mColorConstraint)
+  {
+    mColorConstraintList.clear();
+    mColorConstraintList.push_back(mColorConstraint);
+  }
+  if(mOpacityConstraint)
+  {
+    mOpacityConstraintList.clear();
+    mOpacityConstraintList.push_back(mOpacityConstraint);
+  }
 }
 
 void TextVisual::DoSetOffScene(Actor& actor)
@@ -406,13 +432,24 @@ void TextVisual::DoSetOffScene(Actor& actor)
     Text::AsyncTextManager::Get().RequestCancel(mTextLoadingTaskId);
     mIsTextLoadingTaskRunning = false;
   }
-  if(mColorConstraint)
+
+  if(mIsConstraintAppliedAlways)
   {
-    mColorConstraint.Remove();
-  }
-  if(mOpacityConstraint)
-  {
-    mOpacityConstraint.Remove();
+    // Change the constraint as APPLY_ONCE if apply rate was always.
+    for(auto& constraint : mColorConstraintList)
+    {
+      if(constraint)
+      {
+        constraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
+      }
+    }
+    for(auto& constraint : mOpacityConstraintList)
+    {
+      if(constraint)
+      {
+        constraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
+      }
+    }
   }
 
   RemoveRenderer(actor, true);
@@ -1015,7 +1052,11 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
             {
               Constraint colorConstraint = Constraint::New<Vector4>(renderer, index, TextColorConstraint);
               colorConstraint.AddSource(Source(control, mAnimatableTextColorPropertyIndex));
+              colorConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+              Dali::Integration::ConstraintSetInternalTag(colorConstraint, TEXT_VISUAL_COLOR_CONSTRAINT_TAG);
               colorConstraint.Apply();
+
+              mColorConstraintList.push_back(colorConstraint);
             }
 
             // Make zero if the alpha value of text color is zero to skip rendering text
@@ -1023,7 +1064,11 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
             Constraint opacityConstraint = Constraint::New<float>(renderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
             opacityConstraint.AddSource(Source(control, mAnimatableTextColorPropertyIndex));
             opacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
+            opacityConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+            Dali::Integration::ConstraintSetInternalTag(opacityConstraint, TEXT_VISUAL_OPACITY_CONSTRAINT_TAG);
             opacityConstraint.Apply();
+
+            mOpacityConstraintList.push_back(opacityConstraint);
           }
         }
       }
@@ -1064,6 +1109,33 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 void TextVisual::SetAsyncTextInterface(Text::AsyncTextInterface* asyncTextInterface)
 {
   mAsyncTextInterface = asyncTextInterface;
+}
+
+void TextVisual::SetConstraintApplyAlways(bool applyAlways, bool notifyToConstraint)
+{
+  if(mIsConstraintAppliedAlways != applyAlways || notifyToConstraint)
+  {
+    mIsConstraintAppliedAlways = applyAlways;
+
+    // Change apply rate only if it is scene on.
+    if(mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX && mControl.GetHandle())
+    {
+      for(auto& constraint : mColorConstraintList)
+      {
+        if(constraint)
+        {
+          constraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+        }
+      }
+      for(auto& constraint : mOpacityConstraintList)
+      {
+        if(constraint)
+        {
+          constraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+        }
+      }
+    }
+  }
 }
 
 void TextVisual::RequestAsyncSizeComputation(Text::AsyncTextParameters& parameters)
@@ -1337,7 +1409,11 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
           {
             Constraint colorConstraint = Constraint::New<Vector4>(renderer, index, TextColorConstraint);
             colorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+            colorConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+            Dali::Integration::ConstraintSetInternalTag(colorConstraint, TEXT_VISUAL_COLOR_CONSTRAINT_TAG);
             colorConstraint.Apply();
+
+            mColorConstraintList.push_back(colorConstraint);
           }
 
           // Make zero if the alpha value of text color is zero to skip rendering text
@@ -1345,7 +1421,11 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
           Constraint opacityConstraint = Constraint::New<float>(renderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
           opacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
           opacityConstraint.AddSource(Source(mImpl->mRenderer, mTextRequireRenderPropertyIndex));
+          opacityConstraint.SetApplyRate(mIsConstraintAppliedAlways ? Dali::Constraint::APPLY_ALWAYS : Dali::Constraint::APPLY_ONCE);
+          Dali::Integration::ConstraintSetInternalTag(opacityConstraint, TEXT_VISUAL_OPACITY_CONSTRAINT_TAG);
           opacityConstraint.Apply();
+
+          mOpacityConstraintList.push_back(opacityConstraint);
         }
       }
     }
@@ -1445,6 +1525,18 @@ void TextVisual::SetRequireRender(bool requireRender)
     if(mImpl->mRenderer)
     {
       mImpl->mRenderer.SetProperty(mTextRequireRenderPropertyIndex, mTextRequireRender);
+    }
+
+    // Notify once to opacity constraints
+    if(!mIsConstraintAppliedAlways && mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX && mControl.GetHandle())
+    {
+      for(auto& constraint : mOpacityConstraintList)
+      {
+        if(constraint)
+        {
+          constraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
+        }
+      }
     }
   }
 }
