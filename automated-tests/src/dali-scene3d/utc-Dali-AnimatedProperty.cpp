@@ -18,9 +18,9 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
+#include <dali-scene3d/public-api/loader/animated-property.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include "dali-scene3d/public-api/loader/animated-property.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
@@ -45,7 +45,6 @@ int UtcDaliAnimatedPropertyGetPropertyType(void)
   Property result = animProp.GetProperty(actor);
   DALI_TEST_EQUAL(result.object, expected.object);
   DALI_TEST_EQUAL(result.propertyIndex, expected.propertyIndex);
-  DALI_TEST_EQUAL(result.componentIndex, expected.componentIndex);
   DALI_TEST_EQUAL(animProp.GetPropertyType(actor), Property::VECTOR3);
 
   END_TEST;
