@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FEEDBACK_STYLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <map>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/internal/feedback/feedback-ids.h>
 
 namespace Dali
@@ -140,7 +141,8 @@ private:
   void PlayFile(FeedbackType type, const std::string& file);
 
 private:
-  Dali::FeedbackPlayer mFeedback;
+  Dali::FeedbackPlayer       mFeedback;
+  Dali::Toolkit::JsonParser  mJsonParser;
 
   std::map<const std::string, FeedbackPattern>   mFeedbackPatternLut; ///< Used to convert feedback pattern strings into enumerated values
   std::map<const std::string, FeedbackStyleInfo> mStyleInfoLut;       ///< Converts key strings into style information
