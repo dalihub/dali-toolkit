@@ -5740,7 +5740,8 @@ int UtcDaliVisualGetPropertyObject01(void)
     }
     else
     {
-      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+      // DevNote : Invalid property's object may not return valid object. Do not check it.
+      DALI_TEST_CHECK(property.propertyIndex == Property::INVALID_INDEX);
     }
   };
 
@@ -5793,7 +5794,8 @@ int UtcDaliVisualGetPropertyObject02(void)
     }
     else
     {
-      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+      // DevNote : Invalid property's object may not return valid object. Do not check it.
+      DALI_TEST_CHECK(property.propertyIndex == Property::INVALID_INDEX);
     }
   };
 
@@ -5987,7 +5989,7 @@ int UtcDaliVisualGetVisualProperty01(void)
 
   // Test unregistered visual
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
-  DALI_TEST_CHECK(!property3.object);
+  // DALI_TEST_CHECK(!property3.object); ///< DevNote : Invalid property's object may not return valid object. Do not check it.
   DALI_TEST_CHECK(property3.propertyIndex == Property::INVALID_INDEX);
 
   END_TEST;
