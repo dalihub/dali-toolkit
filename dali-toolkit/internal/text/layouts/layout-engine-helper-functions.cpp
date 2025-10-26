@@ -111,7 +111,8 @@ void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
     penX += calculatedAdvance;
 
     ++characterLogicalIndex;
-    characterVisualIndex = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
+    characterVisualIndex = bidiLine.characterRun.characterIndex +
+                           (bidiLine.visualToLogicalMap ? *(bidiLine.visualToLogicalMap + characterLogicalIndex) : 0u);
   }
 }
 
@@ -139,7 +140,8 @@ void TraversesCharactersForGlyphPositionsRTL(const VisualModelPtr&  visualModel,
       ++characterLogicalIndex)
   {
     // Convert the character in the logical order into the character in the visual order.
-    const CharacterIndex characterVisualIndex = bidiLineCharacterRun.characterIndex + *(bidiLineVisualToLogicalMap + characterLogicalIndex);
+    const CharacterIndex characterVisualIndex = bidiLineCharacterRun.characterIndex +
+                                                (bidiLineVisualToLogicalMap ? *(bidiLineVisualToLogicalMap + characterLogicalIndex) : 0u);
 
     // Get the number of glyphs of the character.
     const Length numberOfGlyphs = *(glyphsPerCharacterBuffer + characterVisualIndex);
