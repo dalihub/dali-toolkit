@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/internal/feedback/feedback-ids.h>
 
 namespace // unnamed namespace
@@ -95,8 +96,7 @@ struct FeedbackStyleInfo
 
 FeedbackStyle::FeedbackStyle()
 {
-  mFeedback   = Dali::FeedbackPlayer::Get();
-  mJsonParser = Toolkit::JsonParser::New();
+  mFeedback = Dali::FeedbackPlayer::Get();
 
   const std::string styleDirPath         = AssetManager::GetDaliStylePath();
   const std::string defaultThemeFilePath = styleDirPath + DEFAULT_FEEDBACK_THEME_FILE_NAME;
@@ -238,18 +238,19 @@ bool FeedbackStyle::LoadTheme(const std::string& data)
 
 void FeedbackStyle::LoadFromString(const std::string& data)
 {
+  Toolkit::JsonParser      parser = Toolkit::JsonParser::New();
   const Toolkit::TreeNode* root   = NULL;
 
-  if(!mJsonParser.Parse(data))
+  if(!parser.Parse(data))
   {
-    DALI_LOG_ERROR("JSON Parse Error:'%s'\n", mJsonParser.GetErrorDescription().c_str());
+    DALI_LOG_ERROR("JSON Parse Error:'%s'\n", parser.GetErrorDescription().c_str());
     DALI_LOG_ERROR("JSON Parse Line :'%d (%d)'\n",
-                   mJsonParser.GetErrorLineNumber(),
-                   mJsonParser.GetErrorColumn());
+                   parser.GetErrorLineNumber(),
+                   parser.GetErrorColumn());
   }
   else
   {
-    root = mJsonParser.GetRoot();
+    root = parser.GetRoot();
   }
 
   if(root)
