@@ -1960,7 +1960,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
   END_TEST;
 }
 
-int UtcDaliToolkitTextLabelColorComponents(void)
+int UtcDaliToolkitTextLabelColorComponents01(void)
 {
   ToolkitTestApplication application;
 
@@ -2023,6 +2023,199 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   label.SetProperty(TextLabel::Property::TEXT_COLOR, Color::RED);
 
   drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // Should be rendered again
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelColorComponents02(void)
+{
+  ToolkitTestApplication application;
+
+  TextLabel label = TextLabel::New();
+
+  // Test a transparent text with animation. - Rendering should be skipped.
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world");
+  label.SetProperty(TextLabel::Property::TEXT_COLOR, Color::BLUE);
+
+  application.GetScene().Add(label);
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // Should be rendered
+
+  Animation animation = Animation::New(1.0f);
+  KeyFrames keyFrame  = KeyFrames::New();
+  keyFrame.Add(0.0f, Color::TRANSPARENT);
+  keyFrame.Add(0.99f, Color::TRANSPARENT);
+  keyFrame.Add(1.0f, Color::RED);
+  animation.AnimateBetween(Property(label, TextLabel::Property::TEXT_COLOR), keyFrame);
+  animation.Play();
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(10);
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(10);
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped too
+
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, true);
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(10);
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // When cutout is enabled, should not be skipped
+
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, false);
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(10);
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(1000); ///< Animation finished
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // Should be rendered again
+
+  // For line coverage
+  application.SendNotification();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelColorComponents03(void)
+{
+  ToolkitTestApplication application;
+
+  // Test a tiling transparent text with animation. - Rendering should be skipped.
+  DevelText::BitmapFontDescription fontDescription;
+  fontDescription.name = "Digits";
+  fontDescription.glyphs.push_back({TEST_RESOURCE_DIR "/fonts/bitmap/u0030.png", ":", 200.f, 0.f});
+
+  TextAbstraction::BitmapFont bitmapFont;
+  DevelText::CreateBitmapFont(fontDescription, bitmapFont);
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.GetFontId(bitmapFont);
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Digits");
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, ":This is a long sample text made to allow max texture size to be exceeded.");
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 200.f);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  Property::Map underlineMapSet;
+  underlineMapSet.Clear();
+  underlineMapSet.Insert("enable", true);
+  underlineMapSet.Insert("color", Color::RED);
+  underlineMapSet.Insert("height", 1);
+  label.SetProperty(TextLabel::Property::UNDERLINE, underlineMapSet);
+  label.SetProperty(Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE);
+
+  Property::Map strikethroughMapSet;
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert("enable", true);
+  strikethroughMapSet.Insert("color", Color::RED);
+  strikethroughMapSet.Insert("height", 2.0f);
+  label.SetProperty(DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet);
+  label.SetProperty(Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE);
+
+  application.GetScene().Add(label);
+
+  application.SendNotification();
+  application.Render();
+
+  const int maxTextureSize = Dali::GetMaxTextureSize();
+  // Whether the rendered text is greater than maxTextureSize
+  DALI_TEST_CHECK(label.GetCurrentProperty<Vector3>(Actor::Property::SIZE).height > maxTextureSize);
+
+  // Check if the number of renderers is greater than 1.
+  DALI_TEST_CHECK(label.GetRendererCount() > 1u);
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // Should be rendered
+
+  Property::Index customIndex = label.RegisterProperty("customProperty", Color::TRANSPARENT);
+
+  Constraint constraint = Constraint::New<Vector4>(label, TextLabel::Property::TEXT_COLOR, Dali::EqualToConstraint());
+  constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
+  constraint.AddSource(LocalSource(customIndex));
+  constraint.Apply();
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped too
+
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, true);
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION); // When cutout is enabled, should not be skipped
+
+  // For line coverage
+  label.Unparent();
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
+
+  application.GetScene().Add(label);
+  label.SetProperty(DevelTextLabel::Property::CUTOUT, false);
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION); // Rendering should be skipped
+
+  drawTrace.Reset();
+
+  constraint.Remove();
 
   application.SendNotification();
   application.Render();

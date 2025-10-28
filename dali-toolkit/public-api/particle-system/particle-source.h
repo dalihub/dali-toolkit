@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_SOURCE_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_SOURCE_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,13 @@ public:
    * @brief Called when source is added to the emitter
    */
   virtual void Init() = 0;
+
+  /**
+   * @brief Virtual destructor
+   *
+   * It ensures derived class destructors are called.
+   */
+  virtual ~ParticleSourceInterface() = default;
 };
 
 /**

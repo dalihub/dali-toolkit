@@ -84,8 +84,8 @@ void Adaptor::Stop()
   if(mTestApplication)
   {
     Integration::Core& core = mTestApplication->GetCore();
-    tet_printf("Adaptor::UnregisterProcessors\n");
-    core.UnregisterProcessors();
+    tet_printf("Adaptor::SceneDestroyed\n");
+    core.SceneDestroyed();
   }
 
   mStopped = true;

@@ -364,11 +364,13 @@ struct Engine::Impl
     // This is to initialize the first visual index.
     if(bidirectionalLineInfo.characterRunForSecondHalfLine.numberOfCharacters > 0u)
     {
-      characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex + *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex);
+      characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex +
+                             (bidirectionalLineInfo.visualToLogicalMapSecondHalf ? *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
     }
     else
     {
-      characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex + *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex);
+      characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex +
+                             (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
     }
 
     bool extendedToSecondHalf = false; // Whether the logical index is extended to second half
@@ -388,7 +390,8 @@ struct Engine::Impl
           whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
-          characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex + *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex);
+          characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex +
+                                 (bidirectionalLineInfo.visualToLogicalMapSecondHalf ? *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
         }
       }
 
@@ -399,7 +402,8 @@ struct Engine::Impl
       {
         extendedToSecondHalf  = true; // Whether the logical index is extended to second half
         characterLogicalIndex = 0u;
-        characterVisualIndex  = bidirectionalLineInfo.characterRun.characterIndex + *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex);
+        characterVisualIndex  = bidirectionalLineInfo.characterRun.characterIndex +
+                                (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
 
         // Keep adding the WhiteSpaces to the whiteSpaceLengthEndOfLine
         while(TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex)))
@@ -411,7 +415,8 @@ struct Engine::Impl
           whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
-          characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex + *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex);
+          characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex +
+                                 (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
         }
       }
     }
@@ -444,7 +449,8 @@ struct Engine::Impl
       for(; characterLogicalIndex < bidirectionalLineInfo.characterRunForSecondHalfLine.numberOfCharacters;)
       {
         // Convert the character in the logical order into the character in the visual order.
-        const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex + *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex);
+        const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex +
+                                                    (bidirectionalLineInfo.visualToLogicalMapSecondHalf ? *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
         const bool           isWhiteSpace         = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
 
         const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
@@ -516,7 +522,8 @@ struct Engine::Impl
     for(; characterLogicalIndex < bidirectionalLineInfo.characterRun.numberOfCharacters;)
     {
       // Convert the character in the logical order into the character in the visual order.
-      const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex + *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex);
+      const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex +
+                                                  (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
       const bool           isWhiteSpace         = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
 
       const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
@@ -1227,7 +1234,8 @@ struct Engine::Impl
     const GlyphIndex* const         charactersToGlyphsBuffer = layoutParameters.textModel->mVisualModel->mCharactersToGlyph.Begin();
 
     CharacterIndex characterLogicalIndex = 0u;
-    CharacterIndex characterVisualIndex  = bidiLine.characterRunForSecondHalfLine.characterIndex + *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex);
+    CharacterIndex characterVisualIndex  = bidiLine.characterRunForSecondHalfLine.characterIndex +
+                                           (bidiLine.visualToLogicalMapSecondHalf ? *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
     bool           extendedToSecondHalf  = false; // Whether the logical index is extended to second half
 
     float penX = 0.f;
@@ -1248,7 +1256,8 @@ struct Engine::Impl
     {
       extendedToSecondHalf  = true;
       characterLogicalIndex = 0u;
-      characterVisualIndex  = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
+      characterVisualIndex  = bidiLine.characterRun.characterIndex +
+                              (bidiLine.visualToLogicalMap ? *(bidiLine.visualToLogicalMap + characterLogicalIndex) : 0u);
 
       CalculateGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
                                  layoutParameters.textModel->mLogicalModel,
@@ -1355,7 +1364,13 @@ struct Engine::Impl
                     DevelText::EllipsisPosition::Type ellipsisPosition,
                     bool                              enforceEllipsisInSingleLine)
   {
-    const bool ellipsis    = enforceEllipsisInSingleLine || (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded : (((mLayout == MULTI_LINE_BOX) && !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) && (penY - layout.descender > layoutParameters.boundingBox.height)) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
+     const bool ellipsis    = enforceEllipsisInSingleLine ||
+                             (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded :
+                             (((mLayout == MULTI_LINE_BOX) &&
+                             !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) &&
+                             (penY - layout.descender + std::max(0.f, GetLineSpacing(layout.ascender - layout.descender, mRelativeLineSize)) > layoutParameters.boundingBox.height)) ||
+                             ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
+
     const bool isMultiline = !enforceEllipsisInSingleLine && (mLayout == MULTI_LINE_BOX);
     if(ellipsis && (ellipsisPosition == DevelText::EllipsisPosition::END || !isMultiline))
     {
