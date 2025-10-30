@@ -736,17 +736,17 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
     if(enable)
     {
       DecorationData* decorationData = mOuter.mControlImpl.mImpl->mDecorationData;
-      Vector4         cornerRadius   = DecorationData::GetCornerRadius(decorationData);
-
-      Property::Map map;
-      map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
-      map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(decorationData);
-      map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(decorationData);
+      const Vector4   cornerRadius   = DecorationData::GetCornerRadius(decorationData);
 
       // TODO This condition is to cover utc failtures. Remove this after updating them.
       // e.g Setting control's corner radius and then setting background visual: Changing visual's corner radius crashes utc.
       if(cornerRadius != Vector4::ZERO)
       {
+        Property::Map map;
+        map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+        map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, DecorationData::GetCornerRadiusPolicy(decorationData));
+        map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, DecorationData::GetCornerSquareness(decorationData));
+
         visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
       }
     }
@@ -931,7 +931,7 @@ DevelControl::VisualEventSignalType& Control::Impl::VisualData::VisualEventSigna
   return mVisualEventSignal;
 }
 
-void Control::Impl::VisualData::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes)
+void Control::Impl::VisualData::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visualIndex, mVisuals, iter))
@@ -940,7 +940,7 @@ void Control::Impl::VisualData::DoAction(Dali::Property::Index visualIndex, Dali
   }
 }
 
-void Control::Impl::VisualData::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
+void Control::Impl::VisualData::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visualIndex, mVisuals, iter))
