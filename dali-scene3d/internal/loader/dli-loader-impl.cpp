@@ -1643,7 +1643,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
 
             binAniFile.read(reinterpret_cast<char*>(&dummyAlphaFunction), sizeof(unsigned char));
 
-            animProp.mKeyFrames.Add(progress, propValue, AlphaFunction::LINEAR);
+            animProp.mKeyFrames.Add(progress, propValue);
           }
         }
         else if(const TreeNode* tnKeyFrames = tnProperty.GetChild("keyFrames"))
@@ -1672,14 +1672,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
               propValue = Property::Value(Quaternion(v.w, v.x, v.y, v.z));
             }
 
-            AlphaFunction kfAlphaFunction(AlphaFunction::DEFAULT);
-            std::string   alphaFuncStr;
-            if(ReadString(kfKeyChild.second.GetChild("alphaFunction"), alphaFuncStr))
-            {
-              kfAlphaFunction = GetAlphaFunction(alphaFuncStr);
-            }
-
-            animProp.mKeyFrames.Add(progress, propValue, kfAlphaFunction);
+            animProp.mKeyFrames.Add(progress, propValue);
           }
         }
         else
