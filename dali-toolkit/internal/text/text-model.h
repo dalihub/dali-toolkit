@@ -431,6 +431,7 @@ public:
    */
   Vector2                                mScrollPosition;            ///< The text is offset by this position when scrolling.
   Vector2                                mScrollPositionLast;        ///< The last offset value of mScrollPosition
+  Vector2                                mLayoutAlignmentOffset;     ///< The offset of the layout based on the controller due to alignment.
   HorizontalAlignment::Type              mHorizontalAlignment;       ///< The layout's horizontal alignment.
   VerticalAlignment::Type                mVerticalAlignment;         ///< The layout's vertical alignment.
   DevelText::VerticalLineAlignment::Type mVerticalLineAlignment;     ///< The layout's vertical line alignment.
@@ -442,7 +443,6 @@ public:
   bool                                   mRemoveBackInset : 1;       ///< Whether to ignore advance of the last glyph. Default is true.
   DevelText::MatchLayoutDirection        mMatchLayoutDirection;      ///< Whether to match text alignment with layout direction or not.
   DevelText::EllipsisPosition::Type      mEllipsisPosition;          ///< Where is the location the text elide
-  Vector2                                mVisualTransformOffset;     ///< The offset of the layout based on the controller due to alignment.
 };
 
 } // namespace Text
