@@ -1739,8 +1739,10 @@ Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
   auto actor = Toolkit::TextAnchor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  auto rect = Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
-  actor.SetProperty(Actor::Property::POSITION, Vector2(rect.x, rect.y));
+
+  auto    rect   = Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
+  Vector2 offset = mModel->mLayoutOffsetWithPadding;
+  actor.SetProperty(Actor::Property::POSITION, Vector2(rect.x + offset.x, rect.y + offset.y));
   actor.SetProperty(Actor::Property::SIZE, Vector2(rect.width, rect.height));
 
   std::string anchorText;

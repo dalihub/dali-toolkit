@@ -802,6 +802,8 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   {
     DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::OnRelayout %p Displaying new contents\n", mController.Get());
 
+    mController->SetLayoutOffsetWithPadding(Vector2(padding.start, padding.top));
+
     if(mDecorator &&
        (Text::Controller::NONE_UPDATED != (Text::Controller::DECORATOR_UPDATED & updateTextType)))
     {

@@ -392,6 +392,7 @@ Model::Model()
   mScrollPosition(),
   mScrollPositionLast(),
   mLayoutAlignmentOffset(),
+  mLayoutOffsetWithPadding(),
   mHorizontalAlignment(Text::HorizontalAlignment::BEGIN),
   mVerticalAlignment(Text::VerticalAlignment::TOP),
   mVerticalLineAlignment(DevelText::VerticalLineAlignment::TOP),
