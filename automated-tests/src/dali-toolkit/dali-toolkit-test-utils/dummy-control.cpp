@@ -164,7 +164,7 @@ Animation DummyControlImpl::CreateTransition(const Toolkit::TransitionData& tran
   return DevelControl::CreateTransition(*this, transition);
 }
 
-void DummyControlImpl::DoAction(Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes)
+void DummyControlImpl::DoAction(Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value& attributes)
 {
   DummyControl control(*this);
   DevelControl::DoAction(control, index, action, attributes);

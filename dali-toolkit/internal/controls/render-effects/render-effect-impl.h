@@ -67,7 +67,7 @@ public:
    * @brief Set shader constants of target renderer. Without an explicit call, it will pull off BACKGROUND property of the owner control.
    * @param[in] map may include corner radius, corner radius policy, and squareness
    */
-  void SetCornerConstants(Property::Map map);
+  void SetCornerConstants(const Property::Map& map);
 
   /**
    * @brief Retrieves OffScreenRenderableType of this RenderEffect.

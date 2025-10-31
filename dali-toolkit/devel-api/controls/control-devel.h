@@ -480,7 +480,7 @@ DALI_TOOLKIT_API Dali::Animation CreateTransition(Internal::Control&            
  * @param[in] actionId The action to perform.  See Visual to find supported actions.
  * @param[in] attributes Optional attributes for the action.
  */
-DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
+DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes);
 
 /**
  * @brief Perform an action on a visual registered to this control.
@@ -492,7 +492,7 @@ DALI_TOOLKIT_API void DoAction(Control& control, Dali::Property::Index visualInd
  * @param[in] actionId The action to perform.  See Visual to find supported actions.
  * @param[in] attributes Optional attributes for the action.
  */
-DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
+DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes);
 
 /**
  * @brief Takes corner properties of a control and applies them to a registered visual, overriding the visual's own corner properties.
