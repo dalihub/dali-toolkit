@@ -1673,6 +1673,11 @@ void Controller::SetLayoutAlignmentOffset(Vector2 offset)
   mImpl->mModel->mLayoutAlignmentOffset = offset;
 }
 
+void Controller::SetLayoutOffsetWithPadding(Vector2 offset)
+{
+  mImpl->mModel->mLayoutOffsetWithPadding = offset;
+}
+
 void Controller::SetBackgroundWithCutoutEnabled(bool cutout)
 {
   mImpl->mModel->mVisualModel->SetBackgroundWithCutoutEnabled(cutout);

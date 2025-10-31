@@ -1764,6 +1764,13 @@ public: // Default style & Input style
    */
   void SetLayoutAlignmentOffset(Vector2 offset);
 
+   /**
+    * @brief Sets the layout alignment offset with padding.
+    *
+    * @param[in] offset The offset.
+    */
+   void SetLayoutOffsetWithPadding(Vector2 offset);
+
   /**
    * @brief Sets whether background color with cutout is enabled.
    *
