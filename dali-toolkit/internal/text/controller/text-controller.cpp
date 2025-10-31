@@ -1668,9 +1668,9 @@ const float Controller::GetCharacterSpacing() const
   return mImpl->mModel->mVisualModel->GetCharacterSpacing();
 }
 
-void Controller::SetVisualTransformOffset(Vector2 offset)
+void Controller::SetLayoutAlignmentOffset(Vector2 offset)
 {
-  mImpl->mModel->mVisualTransformOffset = offset;
+  mImpl->mModel->mLayoutAlignmentOffset = offset;
 }
 
 void Controller::SetBackgroundWithCutoutEnabled(bool cutout)
