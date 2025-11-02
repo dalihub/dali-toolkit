@@ -29,6 +29,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
@@ -46,6 +48,36 @@ const int CUSTOM_PROPERTY_COUNT(1); // atlas
 constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
+
+// load policies
+DALI_ENUM_TO_STRING_TABLE_BEGIN(LOAD_POLICY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::LoadPolicy, IMMEDIATE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::LoadPolicy, ATTACHED)
+DALI_ENUM_TO_STRING_TABLE_END(LOAD_POLICY)
+
+// release policies
+DALI_ENUM_TO_STRING_TABLE_BEGIN(RELEASE_POLICY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, DETACHED)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, DESTROYED)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, NEVER)
+DALI_ENUM_TO_STRING_TABLE_END(RELEASE_POLICY)
+
+struct NameIndexMatch
+{
+  const char* const name;
+  Property::Index   index;
+};
+
+const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
+  {
+    {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
+    {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
+    {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
+    {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
+    {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
+    {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
+};
+const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
 
 } // namespace
 
@@ -78,6 +110,8 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mPlacementActor(),
   mRasterizedSize(-Vector2::ONE), ///< Let we don't use zero since visual size could be zero after trasnform
   mDesiredSize(size),
+  mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
+  mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mLoadCompleted(false),
   mRasterizeCompleted(false),
   mLoadFailed(false),
@@ -91,12 +125,12 @@ SvgVisual::~SvgVisual()
 {
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    if(mSvgLoadId != SvgLoader::INVALID_SVG_LOAD_ID)
+    if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER && mSvgLoadId != SvgLoader::INVALID_SVG_LOAD_ID)
     {
       mSvgLoader.RequestLoadRemove(mSvgLoadId, this);
       mSvgLoadId = SvgLoader::INVALID_SVG_LOAD_ID;
     }
-    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
+    if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER && mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
     {
       // We don't need to remove task synchronously.
       mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
@@ -123,13 +157,16 @@ void SvgVisual::OnInitialize()
     mImpl->mRenderer.RegisterVisualTransformUniform();
   }
 
-  Vector2 dpi     = Stage::GetCurrent().GetDpi();
-  float   meanDpi = (dpi.height + dpi.width) * 0.5f;
+  if(mSvgLoadId == SvgLoader::INVALID_SVG_LOAD_ID)
+  {
+    const Vector2 dpi     = Stage::GetCurrent().GetDpi();
+    const float   meanDpi = (dpi.height + dpi.width) * 0.5f;
 
-  const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
+    const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
 
-  // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
-  mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
+    // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
+    mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
+  }
 }
 
 void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -142,22 +179,32 @@ void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
     {
       DoSetProperty(keyValue.first.indexKey, keyValue.second);
     }
-    else if(keyValue.first == IMAGE_ATLASING)
+    else
     {
-      DoSetProperty(Toolkit::ImageVisual::Property::ATLASING, keyValue.second);
+      for(int i = 0; i < NAME_INDEX_MATCH_TABLE_SIZE; ++i)
+      {
+        if(keyValue.first == NAME_INDEX_MATCH_TABLE[i].name)
+        {
+          DoSetProperty(NAME_INDEX_MATCH_TABLE[i].index, keyValue.second);
+          break;
+        }
+      }
     }
-    else if(keyValue.first == SYNCHRONOUS_LOADING)
-    {
-      DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
-    }
-    else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-    {
-      DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-    }
-    else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-    {
-      DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
-    }
+  }
+
+  // Load image immediately if LOAD_POLICY requires it
+  if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
+  {
+    const Vector2 dpi     = Stage::GetCurrent().GetDpi();
+    const float   meanDpi = (dpi.height + dpi.width) * 0.5f;
+
+    const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
+
+    // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
+    mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
+
+    // DevNote : Let we don't change mRasterizedSize since visual size could be changed after trasnform
+    AddRasterizationTask(Vector2(mDesiredSize.GetWidth(), mDesiredSize.GetHeight()));
   }
 }
 
@@ -212,6 +259,24 @@ void SvgVisual::DoSetProperty(Property::Index index, const Property::Value& valu
       }
       break;
     }
+    case Toolkit::ImageVisual::Property::RELEASE_POLICY:
+    {
+      int releasePolicy = static_cast<int>(mReleasePolicy);
+      if(DALI_LIKELY(Scripting::GetEnumerationProperty(value, RELEASE_POLICY_TABLE, RELEASE_POLICY_TABLE_COUNT, releasePolicy)))
+      {
+        mReleasePolicy = Toolkit::ImageVisual::ReleasePolicy::Type(releasePolicy);
+      }
+      break;
+    }
+    case Toolkit::ImageVisual::Property::LOAD_POLICY:
+    {
+      int loadPolicy = static_cast<int>(mLoadPolicy);
+      if(DALI_LIKELY(Scripting::GetEnumerationProperty(value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy)))
+      {
+        mLoadPolicy = Toolkit::ImageVisual::LoadPolicy::Type(loadPolicy);
+      }
+      break;
+    }
   }
 }
 
@@ -250,7 +315,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 void SvgVisual::DoSetOffScene(Actor& actor)
 {
   // Remove rasterizing task
-  if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
+  if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED && mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
     // We don't need to remove task synchronously.
     mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
@@ -302,9 +367,12 @@ void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
     map.Insert(Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing);
   }
+
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
+  map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
 }
 
 void SvgVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -354,24 +422,21 @@ void SvgVisual::EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus
 
 void SvgVisual::AddRasterizationTask(const Vector2& size)
 {
-  if(mImpl->mRenderer)
+  // Remove previous task
+  if(mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
-    // Remove previous task
-    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
-    {
-      mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
-      mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
-    }
-
-    uint32_t width  = static_cast<uint32_t>(roundf(size.width));
-    uint32_t height = static_cast<uint32_t>(roundf(size.height));
-
-    const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
-    const bool attemtAtlasing       = AttemptAtlasing();
-
-    mRasterizeCompleted = false;
-    mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemtAtlasing, this, synchronousRasterize);
+    mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
+    mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
   }
+
+  uint32_t width  = static_cast<uint32_t>(roundf(size.width));
+  uint32_t height = static_cast<uint32_t>(roundf(size.height));
+
+  const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
+  const bool attemptAtlasing      = AttemptAtlasing();
+
+  mRasterizeCompleted = false;
+  mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemptAtlasing, this, synchronousRasterize);
 }
 
 /// Called when SvgLoader::Load is completed.
@@ -400,12 +465,10 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
   }
   else if(!mLoadFailed)
   {
-    SvgVisualPtr self = this; // Keep reference until this API finished
-
     mLoadFailed = true;
 
     // Remove rasterizing task if we requested before.
-    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_LOAD_ID)
+    if(mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
     {
       mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
       mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
@@ -484,8 +547,6 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
   }
   else if(!mLoadFailed)
   {
-    SvgVisualPtr self = this; // Keep reference until this API finished
-
     mLoadFailed = true;
 
     if(IsOnScene())

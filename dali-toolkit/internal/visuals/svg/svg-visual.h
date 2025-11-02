@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
@@ -211,6 +212,9 @@ private:
   WeakHandle<Actor>     mPlacementActor;
   Vector2               mRasterizedSize;
   Dali::ImageDimensions mDesiredSize{};
+
+  Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
+  Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
 
   bool mLoadCompleted : 1;
   bool mRasterizeCompleted : 1;

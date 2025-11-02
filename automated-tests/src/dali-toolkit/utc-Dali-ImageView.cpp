@@ -1808,7 +1808,7 @@ int UtcDaliImageViewPaddingProperty02(void)
   ImageView     imageView = ImageView::New();
   Property::Map imagePropertyMap;
   imagePropertyMap[Toolkit::Visual::Property::TYPE]            = Toolkit::Visual::IMAGE;
-  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_RESOURCE_DIR "/Kid1.svg";
+  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_SVG_FILE_NAME;
   imagePropertyMap[ImageVisual::Property::DESIRED_WIDTH]       = 128;
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
@@ -1849,7 +1849,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   ImageView     imageView = ImageView::New();
   Property::Map imagePropertyMap;
   imagePropertyMap[Toolkit::Visual::Property::TYPE]            = Toolkit::Visual::IMAGE;
-  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_RESOURCE_DIR "/Kid1.svg";
+  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_SVG_FILE_NAME;
   imagePropertyMap[ImageVisual::Property::DESIRED_WIDTH]       = 128;
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
@@ -1897,7 +1897,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   ImageView     imageView = ImageView::New();
   Property::Map imagePropertyMap;
   imagePropertyMap[Toolkit::Visual::Property::TYPE]            = Toolkit::Visual::IMAGE;
-  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_RESOURCE_DIR "/Kid1.svg";
+  imagePropertyMap[Toolkit::ImageVisual::Property::URL]        = TEST_SVG_FILE_NAME;
   imagePropertyMap[ImageVisual::Property::DESIRED_WIDTH]       = 128;
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FILL;
@@ -1945,7 +1945,7 @@ int UtcDaliImageViewTransformTest01(void)
   ImageView     imageView = ImageView::New();
   Property::Map imagePropertyMap;
   imagePropertyMap.Add(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE)
-    .Add(Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/Kid1.svg")
+    .Add(Toolkit::ImageVisual::Property::URL, TEST_SVG_FILE_NAME)
     .Add(ImageVisual::Property::DESIRED_WIDTH, 120)
     .Add(ImageVisual::Property::DESIRED_HEIGHT, 120)
     .Add(DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FILL)
