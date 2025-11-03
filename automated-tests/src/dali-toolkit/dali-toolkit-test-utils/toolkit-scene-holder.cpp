@@ -85,7 +85,17 @@ SceneHolder::~SceneHolder()
 {
   if(Dali::Adaptor::IsAvailable())
   {
+    if(mScene)
+    {
+      // The scene graph object should be removed first.
+      mScene.RemoveSceneObject();
+    }
     AdaptorImpl::GetImpl(AdaptorImpl::Get()).RemoveWindow(this);
+    if(mScene)
+    {
+      // We should remove the surface from the Core last
+      mScene.Discard();
+    }
   }
 }
 

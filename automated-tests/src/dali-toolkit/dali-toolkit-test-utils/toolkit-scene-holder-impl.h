@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCENE_HOLDER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ public:
   Dali::Integration::Scene mScene{nullptr}; ///< The Scene
   std::string              mName;           ///< The name of the SceneHolder
 
-  TestRenderSurface* mRenderSurface;
+  std::unique_ptr<TestRenderSurface> mRenderSurface;
 };
 
 } // namespace Adaptor
