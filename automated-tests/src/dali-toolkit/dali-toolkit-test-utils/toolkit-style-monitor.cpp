@@ -93,6 +93,9 @@ public: // Creation & Destruction
   StyleMonitor();
   ~StyleMonitor();
 
+public: // API
+  bool EnsureFontClientCreated();
+
 public: // Style Information
   std::string        GetDefaultFontFamily() const;
   std::string        GetDefaultFontStyle() const;
@@ -135,6 +138,12 @@ StyleMonitor::StyleMonitor()
 
 StyleMonitor::~StyleMonitor()
 {
+}
+
+bool StyleMonitor::EnsureFontClientCreated()
+{
+  // Do nothing for UTC case. Just return true.
+  return true;
 }
 
 std::string StyleMonitor::GetDefaultFontFamily() const

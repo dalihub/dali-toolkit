@@ -146,8 +146,10 @@ CharacterIndex LogicalModel::GetLogicalCursorIndex(CharacterIndex visualCursorIn
     // both characters and the direction of the paragraph.
 
     const CharacterIndex previousVisualCursorIndex  = visualCursorIndex - 1u;
-    const CharacterIndex previousLogicalCursorIndex = *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
-    const CharacterIndex currentLogicalCursorIndex  = *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
+    const CharacterIndex previousLogicalCursorIndex = bidirectionalLineInfo->characterRun.characterIndex +
+                                                      (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
+    const CharacterIndex currentLogicalCursorIndex  = bidirectionalLineInfo->characterRun.characterIndex +
+                                                      (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
 
     const CharacterDirection previousCharacterDirection = *(modelCharacterDirections + previousLogicalCursorIndex);
     const CharacterDirection currentCharacterDirection  = *(modelCharacterDirections + currentLogicalCursorIndex);
@@ -199,7 +201,8 @@ CharacterIndex LogicalModel::GetLogicalCharacterIndex(CharacterIndex visualChara
   // The bidirectional line info.
   const BidirectionalLineInfoRun* const bidirectionalLineInfo = mBidirectionalLineInfo.Begin() + mBidirectionalLineIndex;
 
-  return *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCharacterIndex - bidirectionalLineInfo->characterRun.characterIndex)) + bidirectionalLineInfo->characterRun.characterIndex;
+  return bidirectionalLineInfo->characterRun.characterIndex +
+         (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCharacterIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
 }
 
 bool LogicalModel::FetchBidirectionalLineInfo(CharacterIndex characterIndex)

@@ -544,7 +544,7 @@ char* JsonParserState::EncodeString()
   VectorCharIter first        = mIter;
   VectorCharIter last         = mIter;
 
-  while(*mIter)
+  while(DALI_LIKELY(!AtEnd()) && *mIter)
   {
     if(static_cast<unsigned char>(*mIter) < '\x20')
     {
@@ -671,6 +671,12 @@ char* JsonParserState::EncodeString()
 
   } // while(*mIter)
 
+  if(DALI_UNLIKELY(last == mEnd || *last))
+  {
+    static_cast<void>(Error("Strings is not null-terminated!"));
+    return nullptr;
+  }
+
   mNumberOfParsedChars += last - first;
   mNumberOfParsedChars += 1; // null terminator
 
@@ -741,7 +747,7 @@ bool JsonParserState::HandleKeyState(char*& name)
   {
     return false;
   }
-  if(':' != Char())
+  if(DALI_UNLIKELY(AtEnd()) || ':' != Char())
   {
     return Error("Expected ':'");
   }
@@ -868,7 +874,7 @@ bool JsonParserState::ParseJson(VectorChar& source)
     return false;
   }
 
-  while(mIter != mEnd)
+  while(!AtEnd())
   {
     lastCharacter = currentChar;
     currentChar   = Char();

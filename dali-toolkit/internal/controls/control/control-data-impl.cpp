@@ -790,7 +790,7 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
   }
 }
 
-void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes)
+void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -798,7 +798,7 @@ void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::
   }
 }
 
-void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes)
+void Control::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2150,9 +2150,9 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
 void Control::Impl::UpdateCornerRadius()
 {
   Property::Map map;
-  map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = DecorationData::GetCornerRadius(mDecorationData);
-  map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = DecorationData::GetCornerRadiusPolicy(mDecorationData);
-  map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = DecorationData::GetCornerSquareness(mDecorationData);
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, DecorationData::GetCornerRadius(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, DecorationData::GetCornerRadiusPolicy(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, DecorationData::GetCornerSquareness(mDecorationData));
 
   if(DALI_LIKELY(mVisualData))
   {
@@ -2180,16 +2180,16 @@ void Control::Impl::UpdateCornerRadius()
 void Control::Impl::UpdateBorderline()
 {
   Property::Map map;
-  map[Toolkit::Visual::Property::TYPE]                   = Toolkit::Visual::Type::COLOR;
-  map[Toolkit::ColorVisual::Property::MIX_COLOR]         = Color::TRANSPARENT;
-  map[Toolkit::DevelVisual::Property::BORDERLINE_WIDTH]  = DecorationData::GetBorderlineWidth(mDecorationData);
-  map[Toolkit::DevelVisual::Property::BORDERLINE_COLOR]  = DecorationData::GetBorderlineColor(mDecorationData);
-  map[Toolkit::DevelVisual::Property::BORDERLINE_OFFSET] = DecorationData::GetBorderlineOffset(mDecorationData);
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::Type::COLOR);
+  map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT);
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, DecorationData::GetBorderlineWidth(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, DecorationData::GetBorderlineColor(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, DecorationData::GetBorderlineOffset(mDecorationData));
 
   SetBorderline(map, false);
 }
 
-void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Property::Index index)
+void Control::Impl::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2202,7 +2202,7 @@ void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Prope
 
       // Get or create counter
       auto& animationCounter   = mPropertyOnAnimation[index];
-      auto* animationObjectPtr = animation.GetObjectPtr();
+      auto* animationObjectPtr = &static_cast<const Dali::RefObject&>(animationObject);
 
       auto iter = animationCounter.find(animationObjectPtr);
       if(iter == animationCounter.end())
@@ -2217,7 +2217,7 @@ void Control::Impl::CreateAnimationConstraints(Dali::Animation& animation, Prope
   }
 }
 
-void Control::Impl::ClearAnimationConstraints(Dali::Animation& animation, Property::Index index)
+void Control::Impl::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2225,7 +2225,7 @@ void Control::Impl::ClearAnimationConstraints(Dali::Animation& animation, Proper
     if(indexIter != mPropertyOnAnimation.end())
     {
       auto& animationCounter   = indexIter->second;
-      auto* animationObjectPtr = animation.GetObjectPtr();
+      auto* animationObjectPtr = &static_cast<const Dali::RefObject&>(animationObject);
       auto  iter               = animationCounter.find(animationObjectPtr);
       if(DALI_LIKELY(iter != animationCounter.end()))
       {

@@ -308,7 +308,7 @@ public:
    * @brief Sets the time interval for frame interpolation.
    *
    * The interpolation factor will progress from 0.0 to 1.0 over this duration.
-   * This interval is applied after the next call to SetNativeImageSourceForCurrentFrame.
+   * This interval is applied after the next call to SetVideoFrameBuffer.
    *
    * @param[in] intervalSeconds The duration in seconds for interpolation.
    */
@@ -322,15 +322,24 @@ public:
   float GetFrameInterpolationInterval() const;
 
   /**
-   * @brief Sets the NativeImageSource for the current video frame.
+   * @brief Enables or disables offscreen frame rendering for video interpolation.
    *
-   * This method updates the texture used for the current frame and resets the interpolation timer.
-   * The VideoView will then start interpolating between the previous frame and this new frame
-   * over the interval set by SetFrameInterpolationInterval.
+   * When enabled, the video player will use offscreen rendering for frame interpolation,
+   * which can improve visual quality for certain video content.
    *
-   * @param[in] nativeImageSource A handle to the NativeImageSource containing the current video frame (tbm_surface).
+   * @param[in] useOffScreenFrame true to enable offscreen frame rendering, false to disable
    */
-  void SetNativeImageSourceForCurrentFrame(NativeImageSourcePtr nativeImageSource);
+  void EnableOffscreenFrameRendering(bool useOffScreenFrame);
+
+  /**
+   * @brief Sets the video frame buffer for rendering.
+   *
+   * This method sets the native image source that will be used as the frame buffer
+   * for video rendering. The frame buffer contains the surface data for video playback.
+   *
+   * @param[in] source The native image source for video frame buffer
+   */
+  void SetVideoFrameBuffer(Dali::NativeImageSourcePtr source);
 
 private: // From Control
   /**
@@ -423,6 +432,8 @@ private:
    */
   void CreateOverlayTextureVisual();
 
+  void ResetOverlayTextureVisual();
+
   /*
    * @brief resize/move animation finished callback function
    *
@@ -459,6 +470,7 @@ private:
   std::string       mUrl;
   Dali::DisplayArea mDisplayArea;
 
+  bool                        mIsUsingOverlayTexture{false};
   Property::Index             mOverlayTextureVisualIndex{Property::INVALID_INDEX};
   Dali::Toolkit::Visual::Base mOverlayVisual;
   Dali::Toolkit::Visual::Base mOverlayTextureVisual;
@@ -484,9 +496,6 @@ private:
   Texture mCurrentFrameTexture;  ///< Texture for mNativeImageSourceCurrent
 
   float mInterpolationInterval; ///< Target duration for interpolation in seconds
-
-  Property::Index mInterpolationFactorPropertyIndex; ///< Uniform index for uInterpolationFactor in shader
-  Dali::Animation mInterpolationAnimation;           ///< Animation to drive the interpolation factor
 };
 
 } // namespace Internal

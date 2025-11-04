@@ -104,8 +104,7 @@ VideoView::VideoView(Dali::VideoSyncMode syncMode)
   mSyncMode(syncMode),
   mSiblingOrder(0),
   // For frame interpolation
-  mInterpolationInterval(0.0f),
-  mInterpolationFactorPropertyIndex(Property::INVALID_INDEX)
+  mInterpolationInterval(0.0f)
 {
 }
 
@@ -224,18 +223,42 @@ void VideoView::Play()
 {
   mVideoPlayer.Play();
   mIsPlay = true;
+
+  if(mOverlayTextureVisual)
+  {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
+    Renderer                renderer   = visualImpl.GetRenderer();
+
+    renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
+  }
 }
 
 void VideoView::Pause()
 {
   mVideoPlayer.Pause();
   mIsPlay = false;
+
+  if(mOverlayTextureVisual)
+  {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
+    Renderer                renderer   = visualImpl.GetRenderer();
+
+    renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
+  }
 }
 
 void VideoView::Stop()
 {
   mVideoPlayer.Stop();
   mIsPlay = false;
+
+  if(mOverlayTextureVisual)
+  {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
+    Renderer                renderer   = visualImpl.GetRenderer();
+
+    renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
+  }
 }
 
 void VideoView::Forward(int millisecond)
@@ -723,7 +746,7 @@ void VideoView::SetWindowSurfaceTarget()
 
   ApplyBackupProperties();
 
-  if(!mOverlayTextureVisual)
+  if(!mOverlayTextureVisual && mIsUsingOverlayTexture)
   {
     CreateOverlayTextureVisual();
   }
@@ -769,27 +792,7 @@ void VideoView::SetNativeImageTarget()
     mOverlayVisual.Reset();
   }
 
-  if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
-  {
-    Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
-
-    if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)
-    {
-      Toolkit::VisualFactory::Get().DiscardVisual(mOverlayTextureVisual);
-    }
-    mOverlayTextureVisual.Reset();
-  }
-
-  // Reset frame interpolation related members as they are not used in native image target mode
-  mPreviousFrameTexture.Reset();
-  mCurrentFrameTexture.Reset();
-  mInterpolationInterval            = 0.0f;
-  mInterpolationFactorPropertyIndex = Property::INVALID_INDEX;
-  if(mInterpolationAnimation)
-  {
-    mInterpolationAnimation.Stop();
-    mInterpolationAnimation.Clear();
-  }
+  ResetOverlayTextureVisual();
 
   self.RemovePropertyNotification(mPositionUpdateNotification);
   self.RemovePropertyNotification(mSizeUpdateNotification);
@@ -1082,12 +1085,16 @@ void VideoView::CreateOverlayTextureVisual()
     Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
     Renderer                renderer   = visualImpl.GetRenderer();
 
+    if(mIsPlay)
+    {
+      renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
+    }
+
     // Set default(prevent trash values)
     Shader shader = renderer.GetShader();
     shader.RegisterProperty("cornerRadius", Vector4::ZERO);
     shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
     shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
-    mInterpolationFactorPropertyIndex = shader.RegisterProperty("uInterpolationFactor", 0.0f);
 
     auto                     self = Self();
     Dali::Toolkit::VideoView handle(Dali::Toolkit::VideoView::DownCast(self));
@@ -1106,6 +1113,26 @@ void VideoView::CreateOverlayTextureVisual()
     // Sync corner values to Control
     Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayTextureVisual, true);
   }
+}
+
+void VideoView::ResetOverlayTextureVisual()
+{
+  if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
+  {
+    Toolkit::Control control     = Toolkit::Control(GetOwner());
+    Control&         controlImpl = GetImplementation(control);
+    Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
+
+    if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)
+    {
+      Toolkit::VisualFactory::Get().DiscardVisual(mOverlayTextureVisual);
+    }
+    mOverlayTextureVisual.Reset();
+  }
+
+  // Reset frame interpolation related members as they are not used in native image target mode
+  mPreviousFrameTexture.Reset();
+  mCurrentFrameTexture.Reset();
 }
 
 bool VideoView::IsVideoView(Actor actor) const
@@ -1152,8 +1179,9 @@ bool VideoView::IsLetterBoxEnabled() const
 
 void VideoView::SetFrameInterpolationInterval(float intervalSeconds)
 {
-  mInterpolationInterval = intervalSeconds;
-  // If not interpolating, just update the interval. It will be used on the next SetNativeImageSourceForCurrentFrame.
+  mInterpolationInterval = std::max(0.0f, intervalSeconds);
+  mVideoPlayer.SetFrameInterpolationInterval(intervalSeconds);
+  // If not interpolating, just update the interval. It will be used on the next SetVideoFrameBuffer.
 }
 
 float VideoView::GetFrameInterpolationInterval() const
@@ -1161,61 +1189,32 @@ float VideoView::GetFrameInterpolationInterval() const
   return mInterpolationInterval;
 }
 
-void VideoView::SetNativeImageSourceForCurrentFrame(NativeImageSourcePtr nativeImageSource)
+void VideoView::EnableOffscreenFrameRendering(bool useOffScreenFrame)
 {
-  if(!nativeImageSource)
+  mIsUsingOverlayTexture = useOffScreenFrame;
+  if(!mOverlayTextureVisual && useOffScreenFrame)
   {
-    return;
-  }
+    NativeImageSourcePtr previousNativeImageSource = Dali::NativeImageSource::New(0, 0, NativeImageSource::ColorDepth::COLOR_DEPTH_DEFAULT);
+    mPreviousFrameTexture                          = Dali::Texture::New(*previousNativeImageSource);
 
-  mPreviousFrameTexture = mCurrentFrameTexture;
-  mCurrentFrameTexture  = Texture::New(*nativeImageSource);
+    NativeImageSourcePtr currentNativeImageSource = Dali::NativeImageSource::New(0, 0, NativeImageSource::ColorDepth::COLOR_DEPTH_DEFAULT);
+    mCurrentFrameTexture                          = Dali::Texture::New(*currentNativeImageSource);
 
-  if(!Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
-  {
-    mPreviousFrameTexture = mCurrentFrameTexture;
-    return;
-  }
-
-  if(!mOverlayTextureVisual)
-  {
-    mPreviousFrameTexture = (mPreviousFrameTexture) ? mPreviousFrameTexture : mCurrentFrameTexture;
     CreateOverlayTextureVisual();
+
+    mVideoPlayer.EnableOffscreenFrameRendering(useOffScreenFrame, previousNativeImageSource, currentNativeImageSource);
   }
 
-  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayTextureVisual);
-  Renderer                renderer   = visualImpl.GetRenderer();
-
-  TextureSet textures = renderer.GetTextures();
-  textures.SetTexture(0u, mPreviousFrameTexture);
-  textures.SetTexture(1u, mCurrentFrameTexture);
-
-  if(mInterpolationAnimation && mInterpolationAnimation.GetState() == Dali::Animation::State::PLAYING)
+  if(mOverlayTextureVisual && !useOffScreenFrame)
   {
-    mInterpolationAnimation.Stop();
-    mInterpolationAnimation.Clear();
+    ResetOverlayTextureVisual();
+    mVideoPlayer.EnableOffscreenFrameRendering(useOffScreenFrame, nullptr, nullptr);
   }
+}
 
-  mInterpolationAnimation.Reset();
-
-  Shader shader = renderer.GetShader();
-  if(mCurrentFrameTexture != mPreviousFrameTexture && mInterpolationInterval > 0.0f)
-  {
-    // Use KeyFrames to ensure the animation always starts from 0.0f
-    KeyFrames interpolationKeyFrames = KeyFrames::New();
-    interpolationKeyFrames.Add(0.0f, 0.0f); // At time 0.0s, value is 0.0f
-    interpolationKeyFrames.Add(1.0f, 1.0f); // At time 1.0f, value is 1.0f
-
-    // Set default(prevent trash values)
-    mInterpolationAnimation = Animation::New(mInterpolationInterval);
-    mInterpolationAnimation.AnimateBetween(Dali::Property(shader, mInterpolationFactorPropertyIndex), interpolationKeyFrames, AlphaFunction::LINEAR);
-    mInterpolationAnimation.Play();
-  }
-  else
-  {
-    // Show current texture
-    shader.SetProperty(mInterpolationFactorPropertyIndex, 1.0f);
-  }
+void VideoView::SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+{
+  mVideoPlayer.SetVideoFrameBuffer(source);
 }
 
 } // namespace Internal

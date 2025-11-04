@@ -159,8 +159,8 @@ void Control::SetBackgroundColor(const Vector4& color)
   mImpl->mBackgroundColor = color;
 
   Property::Map map;
-  map[Toolkit::Visual::Property::TYPE]           = Toolkit::Visual::COLOR;
-  map[Toolkit::ColorVisual::Property::MIX_COLOR] = color;
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, color);
 
   Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
   if(visualImplPtr && visualImplPtr->GetType() == Toolkit::Visual::COLOR)
@@ -716,11 +716,23 @@ void Control::OnAnimateAnimatableProperty(Animation& animation, Property::Index 
 {
   if(state == Animation::State::PLAYING)
   {
-    mImpl->CreateAnimationConstraints(animation, index);
+    mImpl->CreateAnimationConstraints(animation.GetBaseObject(), index);
   }
   else if(state == Animation::State::STOPPED)
   {
-    mImpl->ClearAnimationConstraints(animation, index);
+    mImpl->ClearAnimationConstraints(animation.GetBaseObject(), index);
+  }
+}
+
+void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+{
+  if(applied)
+  {
+    mImpl->CreateAnimationConstraints(constraint.GetBaseObject(), index);
+  }
+  else
+  {
+    mImpl->ClearAnimationConstraints(constraint.GetBaseObject(), index);
   }
 }
 

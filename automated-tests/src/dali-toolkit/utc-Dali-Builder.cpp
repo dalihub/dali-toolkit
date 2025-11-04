@@ -1111,7 +1111,7 @@ int UtcDaliBuilderCustomShaderP(void)
   END_TEST;
 }
 
-int UtcDaliBuilderLoadFromStringN(void)
+int UtcDaliBuilderLoadFromStringN01(void)
 {
   ToolkitTestApplication application;
 
@@ -1130,6 +1130,66 @@ int UtcDaliBuilderLoadFromStringN(void)
     "}]"
     "}]"
     "}");
+  Builder builder = Builder::New();
+
+  bool assert1 = false;
+
+  try
+  {
+    builder.LoadFromString(json);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_EQUALS(e.condition, "!\"Cannot parse JSON\"", TEST_LOCATION);
+    assert1 = true;
+  }
+
+  DALI_TEST_CHECK(assert1);
+
+  END_TEST;
+}
+
+int UtcDaliBuilderLoadFromStringN02(void)
+{
+  ToolkitTestApplication application;
+
+  // Not finished quote case.
+  std::string json(
+    "{"
+    "\"stage\":"
+    "[{"
+    "\"type");
+  Builder builder = Builder::New();
+
+  bool assert1 = false;
+
+  try
+  {
+    builder.LoadFromString(json);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_EQUALS(e.condition, "!\"Cannot parse JSON\"", TEST_LOCATION);
+    assert1 = true;
+  }
+
+  DALI_TEST_CHECK(assert1);
+
+  END_TEST;
+}
+
+int UtcDaliBuilderLoadFromStringN03(void)
+{
+  ToolkitTestApplication application;
+
+  // No value for key case.
+  std::string json(
+    "{"
+    "\"stage\":"
+    "[{"
+    "\"type\"}]}");
   Builder builder = Builder::New();
 
   bool assert1 = false;

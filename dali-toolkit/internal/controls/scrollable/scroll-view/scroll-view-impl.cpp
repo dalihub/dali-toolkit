@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1704,7 +1704,7 @@ void ScrollView::AnimateInternalXTo(float position, float duration, AlphaFunctio
     mInternalXAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalXAnimation[0x%X]", this, mInternalXAnimation.GetObjectPtr());
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
-    mInternalXAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 0), position, alpha, TimePeriod(duration));
+    mInternalXAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X), position, alpha, TimePeriod(duration));
     mInternalXAnimation.Play();
 
     // erase current state flags
@@ -1725,7 +1725,7 @@ void ScrollView::AnimateInternalYTo(float position, float duration, AlphaFunctio
     mInternalYAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalYAnimation[0x%X]", this, mInternalYAnimation.GetObjectPtr());
     mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
-    mInternalYAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 1), position, alpha, TimePeriod(duration));
+    mInternalYAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y), position, alpha, TimePeriod(duration));
     mInternalYAnimation.Play();
 
     // erase current state flags
@@ -1835,7 +1835,7 @@ void ScrollView::SnapInternalXTo(float position)
 
     mInternalXAnimation = Animation::New(duration);
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnSnapInternalPositionFinished);
-    mInternalXAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 0), position);
+    mInternalXAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X), position);
     mInternalXAnimation.Play();
 
     // add internal animation state flag
@@ -1861,7 +1861,7 @@ void ScrollView::SnapInternalYTo(float position)
 
     mInternalYAnimation = Animation::New(duration);
     mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnSnapInternalPositionFinished);
-    mInternalYAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 1), position);
+    mInternalYAnimation.AnimateTo(Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y), position);
     mInternalYAnimation.Play();
 
     // add internal animation state flag

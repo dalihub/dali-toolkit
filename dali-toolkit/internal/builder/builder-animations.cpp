@@ -278,13 +278,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
             throw;
           }
 
-          AlphaFunction kfAlphaFunction(AlphaFunction::DEFAULT);
-          if(OptionalString alphaFuncStr = constant.IsString(IsChild(pKeyChild.second, "alphaFunction")))
-          {
-            kfAlphaFunction = GetAlphaFunction(*alphaFuncStr);
-          }
-
-          keyframes.Add(*kfProgress, propValue, kfAlphaFunction);
+          keyframes.Add(*kfProgress, propValue);
         }
 
         if(timeChild)

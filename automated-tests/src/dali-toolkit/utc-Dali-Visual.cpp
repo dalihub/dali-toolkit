@@ -4107,7 +4107,7 @@ int UtcDaliSvgVisualCustomShader(void)
   END_TEST;
 }
 
-int UtcDaliVisualRoundedCorner(void)
+int UtcDaliVisualRoundedCornerImageVisual(void)
 {
   tet_infoline("UtcDaliVisualRoundedCorner");
 
@@ -4157,7 +4157,23 @@ int UtcDaliVisualRoundedCorner(void)
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerColorVisual1(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 1
   {
@@ -4197,7 +4213,23 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerColorVisual2(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 2
   {
@@ -4236,7 +4268,23 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
     // Default corner squareness is Vector4::ZERO.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerColorVisual3(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 3 - invalid value
   {
@@ -4276,7 +4324,23 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     // Default corner squareness is Vector4::ZERO.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerGradientVisual(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // gradient visual
   {
@@ -4330,7 +4394,23 @@ int UtcDaliVisualRoundedCorner(void)
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerAnimatedImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // animated image visual
   {
@@ -4372,7 +4452,23 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", cornerRadius), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerVectorImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // vector image visual
   {
@@ -4413,7 +4509,23 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE), true, TEST_LOCATION);
     // Default corner squareness is Vector4::ZERO.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCornerAnimatedVectorImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualRoundedCorner");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // animated vector image visual
   {
@@ -4457,12 +4569,14 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
 
   END_TEST;
 }
 
-int UtcDaliVisualBorderline(void)
+int UtcDaliVisualBorderlineImageVisual(void)
 {
   tet_infoline("UtcDaliVisualBorderline");
 
@@ -4524,7 +4638,26 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineColorVisual1(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 1
   {
@@ -4570,7 +4703,26 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineColorVisual2(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 2, default color, default offset
   {
@@ -4608,7 +4760,26 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderline(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // color visual 3, offset not [-1.0 ~ 1.0], but uniform value is same anyway
   {
@@ -4649,7 +4820,26 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     // NOTE : borderlineOffset will clamp in fragment shader. not visual itself
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineGradientVisual(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // gradient visual
   {
@@ -4710,7 +4900,26 @@ int UtcDaliVisualBorderline(void)
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4(cornerSquareness, cornerSquareness, cornerSquareness, cornerSquareness)), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineAnimatedImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // animated image visual
   {
@@ -4752,7 +4961,26 @@ int UtcDaliVisualBorderline(void)
     // Default borderline color is BLACK.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", Color::BLACK), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineVectorImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // vector image visual
   {
@@ -4801,7 +5029,26 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", 0.0f), true, TEST_LOCATION);
     // Default corner squareness is Vector4::ZERO.
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", Vector4::ZERO), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineAnimatedVectorImageVisual(void)
+{
+  tet_infoline("UtcDaliVisualBorderline");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("cornerRadius", Property::Type::VECTOR4),
+      UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+      UniformData("borderlineWidth", Property::Type::FLOAT),
+      UniformData("borderlineColor", Property::Type::VECTOR4),
+      UniformData("borderlineOffset", Property::Type::FLOAT),
+      UniformData("cornerSquareness", Property::Type::VECTOR4),
+    };
 
   // animated vector image visual
   {
@@ -4853,6 +5100,8 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", borderlineColor), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", borderlineOffset), true, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerSquareness", cornerSquareness), true, TEST_LOCATION);
+
+    dummy.Unparent();
   }
 
   END_TEST;
@@ -5491,7 +5740,8 @@ int UtcDaliVisualGetPropertyObject01(void)
     }
     else
     {
-      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+      // DevNote : Invalid property's object may not return valid object. Do not check it.
+      DALI_TEST_CHECK(property.propertyIndex == Property::INVALID_INDEX);
     }
   };
 
@@ -5544,7 +5794,8 @@ int UtcDaliVisualGetPropertyObject02(void)
     }
     else
     {
-      DALI_TEST_CHECK(!property.object && property.propertyIndex == Property::INVALID_INDEX);
+      // DevNote : Invalid property's object may not return valid object. Do not check it.
+      DALI_TEST_CHECK(property.propertyIndex == Property::INVALID_INDEX);
     }
   };
 
@@ -5738,7 +5989,7 @@ int UtcDaliVisualGetVisualProperty01(void)
 
   // Test unregistered visual
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
-  DALI_TEST_CHECK(!property3.object);
+  // DALI_TEST_CHECK(!property3.object); ///< DevNote : Invalid property's object may not return valid object. Do not check it.
   DALI_TEST_CHECK(property3.propertyIndex == Property::INVALID_INDEX);
 
   END_TEST;

@@ -178,3 +178,344 @@ int UtcDaliSvgVisualSvgCacheFileAndRasterizedTexture(void)
 
   END_TEST;
 }
+
+int UtcDaliSvgVisualLoadPolicyImmediate(void)
+{
+  tet_infoline("Test load and rasterize request immediate");
+
+  ToolkitTestApplication application;
+
+  TraceCallStack& textureTrace = application.GetGlAbstraction().GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_WIDTH, 20);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_HEIGHT, 30);
+  propertyMap.Insert("loadPolicy", ImageVisual::LoadPolicy::IMMEDIATE);
+
+  Visual::Base visual1 = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual1);
+
+  // Wait for loading and rasterizing
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  Visual::Base visual2 = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME).Add(ImageVisual::Property::DESIRED_WIDTH, 20).Add(ImageVisual::Property::DESIRED_HEIGHT, 30));
+  DALI_TEST_CHECK(visual2);
+
+  DummyControl      control1   = DummyControl::New();
+  DummyControlImpl& dummyImpl1 = static_cast<DummyControlImpl&>(control1.GetImplementation());
+  dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual1);
+
+  DummyControl      control2   = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(control2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+
+  // Check we don't request load.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
+
+  // Check we don't rasterize again.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check we upload only 1 textures.
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  TraceCallStack::NamedParams params;
+  params["width"] << 20;
+  params["height"] << 30;
+  DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSvgVisualReleasePolicy01(void)
+{
+  tet_infoline("Test release policy destroyed");
+
+  ToolkitTestApplication application;
+
+  TraceCallStack& textureTrace = application.GetGlAbstraction().GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED);
+
+  Visual::Base visual1 = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual1);
+
+  Visual::Base visual2 = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+  DALI_TEST_CHECK(visual2);
+
+  DummyControl      control1   = DummyControl::New();
+  DummyControlImpl& dummyImpl1 = static_cast<DummyControlImpl&>(control1.GetImplementation());
+  dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual1);
+
+  DummyControl      control2   = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(control2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+
+  // Check we request load only 1 time.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Vector2 size(100.0f, 100.0f);
+  control1.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control1);
+  control2.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control2);
+
+  visual1.SetTransformAndSize(Property::Map(), size);
+  visual2.SetTransformAndSize(Property::Map(), size);
+
+  // Check we request rasterize 1 time.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check we upload only 1 textures.
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  TraceCallStack::NamedParams params;
+  params["width"] << 100;
+  params["height"] << 100;
+  DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  // Detach visual1 and visual2.
+  control1.Unparent();
+  control2.Unparent();
+
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Check whether svg cached
+  {
+    Visual::Base dummyVisual = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+    DALI_TEST_CHECK(dummyVisual);
+
+    DummyControl      dummyControl     = DummyControl::New();
+    DummyControlImpl& dummyControlImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+    dummyControlImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, dummyVisual);
+
+    dummyControl.SetProperty(Actor::Property::SIZE, size);
+    application.GetScene().Add(dummyControl);
+
+    dummyVisual.SetTransformAndSize(Property::Map(), size);
+
+    // Check we don't request load and rasterize.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+    dummyControl.Unparent();
+    dummyControl.Reset();
+    dummyVisual.Reset();
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+  }
+
+  // Destroy visual1 and visual2.
+  control1.Reset();
+  control2.Reset();
+  visual1.Reset();
+  visual2.Reset();
+
+  // Ensure to remove cache.
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Check whether svg cache removed.
+  {
+    Visual::Base dummyVisual = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+    DALI_TEST_CHECK(dummyVisual);
+
+    DummyControl      dummyControl     = DummyControl::New();
+    DummyControlImpl& dummyControlImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+    dummyControlImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, dummyVisual);
+
+    dummyControl.SetProperty(Actor::Property::SIZE, size);
+    application.GetScene().Add(dummyControl);
+
+    dummyVisual.SetTransformAndSize(Property::Map(), size);
+
+    // Check we request load and rasterize.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+    dummyControl.Unparent();
+    dummyControl.Reset();
+    dummyVisual.Reset();
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSvgVisualReleasePolicy02(void)
+{
+  tet_infoline("Test release policy never");
+
+  ToolkitTestApplication application;
+
+  TraceCallStack& textureTrace = application.GetGlAbstraction().GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER);
+
+  Visual::Base visual1 = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual1);
+
+  Visual::Base visual2 = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+  DALI_TEST_CHECK(visual2);
+
+  DummyControl      control1   = DummyControl::New();
+  DummyControlImpl& dummyImpl1 = static_cast<DummyControlImpl&>(control1.GetImplementation());
+  dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual1);
+
+  DummyControl      control2   = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(control2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+
+  application.SendNotification();
+
+  // Check we request load only 1 time.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+
+  Vector2 size(100.0f, 100.0f);
+  control1.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control1);
+  control2.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control2);
+
+  visual1.SetTransformAndSize(Property::Map(), size);
+  visual2.SetTransformAndSize(Property::Map(), size);
+
+  // Check we request rasterize 1 time.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check we upload only 1 textures.
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  TraceCallStack::NamedParams params;
+  params["width"] << 100;
+  params["height"] << 100;
+  DALI_TEST_EQUALS(textureTrace.FindMethodAndParams("TexImage2D", params), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  // Detach visual1 and visual2.
+  control1.Unparent();
+  control2.Unparent();
+
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Check whether svg cached
+  {
+    Visual::Base dummyVisual = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+    DALI_TEST_CHECK(dummyVisual);
+
+    DummyControl      dummyControl     = DummyControl::New();
+    DummyControlImpl& dummyControlImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+    dummyControlImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, dummyVisual);
+
+    dummyControl.SetProperty(Actor::Property::SIZE, size);
+    application.GetScene().Add(dummyControl);
+
+    dummyVisual.SetTransformAndSize(Property::Map(), size);
+
+    // Check we don't request load and rasterize.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+    dummyControl.Unparent();
+    dummyControl.Reset();
+    dummyVisual.Reset();
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+  }
+
+  // Destroy visual1 and visual2.
+  control1.Reset();
+  control2.Reset();
+  visual1.Reset();
+  visual2.Reset();
+
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Check whether svg cached
+  {
+    Visual::Base dummyVisual = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_FILE_NAME));
+    DALI_TEST_CHECK(dummyVisual);
+
+    DummyControl      dummyControl     = DummyControl::New();
+    DummyControlImpl& dummyControlImpl = static_cast<DummyControlImpl&>(dummyControl.GetImplementation());
+    dummyControlImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, dummyVisual);
+
+    dummyControl.SetProperty(Actor::Property::SIZE, size);
+    application.GetScene().Add(dummyControl);
+
+    dummyVisual.SetTransformAndSize(Property::Map(), size);
+
+    // Check we don't request load and rasterize.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+    dummyControl.Unparent();
+    dummyControl.Reset();
+    dummyVisual.Reset();
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
