@@ -396,6 +396,15 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
                                                       CharacterHitTest::TAP,
                                                       matchedCharacter);
 
+  std::string href;
+  if(AnchorClickEvent(controller, cursorPosition, href))
+  {
+    controller.mImpl->mAnchorControlInterface->EmitAnchorClickedSignal(href);
+  }
+}
+
+bool Controller::EventHandler::AnchorClickEvent(Controller& controller, uint32_t cursorPosition, std::string& href)
+{
   for(auto& anchor : controller.mImpl->mModel->mLogicalModel->mAnchors)
   {
     // Anchor clicked if the calculated cursor position is within the range of anchor.
@@ -426,13 +435,12 @@ void Controller::EventHandler::AnchorEvent(Controller& controller, float x, floa
             controller.mImpl->RequestRelayout();
           }
         }
-
-        std::string href = anchor.href == nullptr ? "" : anchor.href;
-        controller.mImpl->mAnchorControlInterface->AnchorClicked(href);
-        break;
+        href = anchor.href == nullptr ? "" : anchor.href;
+        return true;
       }
     }
   }
+  return false;
 }
 
 void Controller::EventHandler::TapEvent(Controller& controller, unsigned int tapCount, float x, float y)

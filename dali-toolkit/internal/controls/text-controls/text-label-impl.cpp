@@ -1290,7 +1290,12 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
   Control::OnStyleChange(styleManager, change);
 }
 
-void TextLabel::AnchorClicked(const std::string& href)
+bool TextLabel::AnchorClicked(uint32_t cursorPosition, std::string& href)
+{
+  return mController->AnchorClickEvent(cursorPosition, href);
+}
+
+void TextLabel::EmitAnchorClickedSignal(const std::string& href)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
@@ -1664,7 +1669,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       SetUpAutoScrolling();
     }
 
-    if(Dali::Accessibility::IsUp())
+    if(Dali::Accessibility::IsUp() && (mAnchorActors.empty() || mTextUpdateNeeded || sizeChanged))
     {
       CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
     }

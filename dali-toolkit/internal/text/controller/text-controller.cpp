@@ -1792,6 +1792,11 @@ bool Controller::KeyEvent(const Dali::KeyEvent& keyEvent)
   return EventHandler::KeyEvent(*this, keyEvent);
 }
 
+bool Controller::AnchorClickEvent(uint32_t cursorPosition, std::string& href)
+{
+  return EventHandler::AnchorClickEvent(*this, cursorPosition, href);
+}
+
 void Controller::AnchorEvent(float x, float y)
 {
   EventHandler::AnchorEvent(*this, x, y);
