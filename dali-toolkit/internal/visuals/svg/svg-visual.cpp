@@ -425,7 +425,7 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
   // Remove previous task
   if(mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
-    mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, true);
+    mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
   }
 
