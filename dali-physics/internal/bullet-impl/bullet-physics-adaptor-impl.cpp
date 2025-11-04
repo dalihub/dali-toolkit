@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ Layer BulletPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   Constraint positionConstraint = Constraint::New<Vector3>(debugLayer, Actor::Property::POSITION, EqualToConstraint());
   positionConstraint.AddSource(Source(mRootActor, Actor::Property::POSITION));
   positionConstraint.Apply();
-  Constraint sizeConstraint = Constraint::New<Vector2>(debugLayer, Actor::Property::SIZE, EqualToConstraint());
+  Constraint sizeConstraint = Constraint::New<Vector3>(debugLayer, Actor::Property::SIZE, EqualToConstraint());
   sizeConstraint.AddSource(Source(mRootActor, Actor::Property::SIZE));
   sizeConstraint.Apply();
 
@@ -92,7 +92,7 @@ Layer BulletPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   mDebugActor[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
   mDebugActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
-  Constraint sizeConstraint2 = Constraint::New<Vector2>(mDebugActor, Actor::Property::SIZE, EqualToConstraint());
+  Constraint sizeConstraint2 = Constraint::New<Vector3>(mDebugActor, Actor::Property::SIZE, EqualToConstraint());
   sizeConstraint2.AddSource(ParentSource(Actor::Property::SIZE));
   sizeConstraint2.Apply();
 

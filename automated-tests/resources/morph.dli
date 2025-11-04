@@ -268,13 +268,18 @@
         }, {
             "node" : "head",
             "property" : "uBlendShapeWeight[2]",
-            "value" : 0.0,
+            "keyFrames" : [ {
+                "progress" : 0.0,
+                "value" : 1.0
+            }, {
+                "progress" : 1.0,
+                "value" : 0.0
+            } ],
             "alphaFunction" : "DEFAULT",
             "timePeriod" : {
                 "delay" : 0.5,
                 "duration" : 0.5
-            },
-            "relative" : false
+            }
         } ]
     } ]
 }

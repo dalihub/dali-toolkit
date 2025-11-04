@@ -213,9 +213,9 @@ void RenderEffectImpl::Activate()
       Vector4 cornerSquareness   = ownerControl.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
 
       Property::Map map;
-      map[Toolkit::DevelVisual::Property::CORNER_RADIUS]        = cornerRadius;
-      map[Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY] = static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy);
-      map[Toolkit::DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
+      map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+      map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, static_cast<Toolkit::Visual::Transform::Policy::Type>(cornerRadiusPolicy));
+      map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, cornerSquareness);
 
       SetCornerConstants(map);
     }
@@ -341,7 +341,7 @@ void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool vis
   }
 }
 
-void RenderEffectImpl::SetCornerConstants(Property::Map map)
+void RenderEffectImpl::SetCornerConstants(const Property::Map& map)
 {
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Set corner radius constants to shader\n", this);
 

@@ -217,12 +217,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::DoAction()
    */
-  void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
+  void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::DoActionExtension()
    */
-  void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
+  void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
    * @brief Function used to set control properties.

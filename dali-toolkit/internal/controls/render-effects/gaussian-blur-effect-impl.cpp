@@ -234,14 +234,9 @@ void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Alph
   fromValue = std::clamp(fromValue, 0.0f, 1.0f);
   toValue   = std::clamp(toValue, 0.0f, 1.0f);
 
-  if(fromValue > toValue)
-  {
-    DALI_LOG_ERROR("Removing blur may require blur downscale factor updates for visual quality.\n");
-  }
-
   KeyFrames keyFrames = KeyFrames::New();
-  keyFrames.Add(0.0f, fromValue, AlphaFunction::BuiltinFunction::LINEAR);
-  keyFrames.Add(1.0f, toValue, AlphaFunction::BuiltinFunction::LINEAR);
+  keyFrames.Add(0.0f, fromValue);
+  keyFrames.Add(1.0f, toValue);
 
   Property::Index horizontalAnimationIndex = mHorizontalBlurActor.GetPropertyIndex(UNIFORM_BLUR_STRENGTH_NAME.data());
   animation.AnimateBetween(Property(mHorizontalBlurActor, horizontalAnimationIndex), keyFrames, alphaFunction, timePeriod);
@@ -266,8 +261,8 @@ void GaussianBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, Alpha
   toValue   = std::clamp(toValue, 0.0f, 1.0f);
 
   KeyFrames keyFrames = KeyFrames::New();
-  keyFrames.Add(0.0f, fromValue, AlphaFunction::BuiltinFunction::LINEAR);
-  keyFrames.Add(1.0f, toValue, AlphaFunction::BuiltinFunction::LINEAR);
+  keyFrames.Add(0.0f, fromValue);
+  keyFrames.Add(1.0f, toValue);
 
   Property::Index horizontalAnimationIndex = mHorizontalBlurActor.GetPropertyIndex(UNIFORM_BLUR_OPACITY_NAME.data());
   animation.AnimateBetween(Property(mHorizontalBlurActor, horizontalAnimationIndex), keyFrames, alphaFunction, timePeriod);

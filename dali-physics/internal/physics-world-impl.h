@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_INTERNAL_PHYSICS_WORLD_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ protected:
   std::mutex                            mMutex;
   std::queue<std::function<void(void)>> commandQueue;
   Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
-  Dali::CallbackBase*                   mUpdateCallback{nullptr};
+  std::unique_ptr<Dali::CallbackBase>   mUpdateCallback{nullptr};
   std::unique_ptr<FrameCallback>        mFrameCallback;
   Dali::Actor                           mRootActor;
 

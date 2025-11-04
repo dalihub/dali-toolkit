@@ -69,6 +69,17 @@ Adaptor::~Adaptor()
 {
   gAdaptor = nullptr;
 
+  for(auto& callback : mReturnCallbacks)
+  {
+    delete callback;
+  }
+  mReturnCallbacks.Clear();
+  for(auto& callback : mCallbacks)
+  {
+    delete callback;
+  }
+  mCallbacks.Clear();
+
   // Ensure all threads and not-excuted tasks are destroyed.
   // TODO : we'd better make some singletone service for toolkit UTC in future.
   Test::AsyncTaskManager::DestroyAsyncTaskManager();
@@ -109,17 +120,34 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
       mCallbacks.PushBack(callback);
     }
   }
+  else
+  {
+    // Delete callback
+    delete callback;
+  }
   return ToolkitApplication::ADD_IDLE_SUCCESS;
 }
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
-  mCallbacks.Erase(std::remove_if(mCallbacks.Begin(), mCallbacks.End(), [&callback](CallbackBase* current)
-  { return callback == current; }),
-                   mCallbacks.End());
-  mReturnCallbacks.Erase(std::remove_if(mReturnCallbacks.Begin(), mReturnCallbacks.End(), [&callback](CallbackBase* current)
-  { return callback == current; }),
-                         mReturnCallbacks.End());
+  for(auto iter = mCallbacks.Begin(); iter != mCallbacks.End(); ++iter)
+  {
+    if(*iter == callback)
+    {
+      delete *iter;
+      mCallbacks.Erase(iter);
+      return;
+    }
+  }
+  for(auto iter = mReturnCallbacks.Begin(); iter != mReturnCallbacks.End(); ++iter)
+  {
+    if(*iter == callback)
+    {
+      delete *iter;
+      mReturnCallbacks.Erase(iter);
+      return;
+    }
+  }
 }
 
 void Adaptor::RunIdles()
@@ -132,10 +160,15 @@ void Adaptor::RunIdles()
     {
       reusedCallbacks.PushBack(callback);
     }
+    else
+    {
+      delete callback;
+    }
   }
   for(auto& callback : mCallbacks)
   {
     CallbackBase::Execute(*callback);
+    delete callback;
   }
 
   mCallbacks.Clear();

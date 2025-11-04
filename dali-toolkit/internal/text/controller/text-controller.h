@@ -1756,11 +1756,20 @@ public: // Default style & Input style
   const float GetCharacterSpacing() const;
 
   /**
-   * @brief Sets the visual transform offset.
+   * @brief Sets the layout alignment offset.
+   *
+   * @note This does not include padding. If the layout alignment offset includes padding, it is a visual transform offset.
    *
    * @param[in] offset The offset.
    */
-  void SetVisualTransformOffset(Vector2 offset);
+  void SetLayoutAlignmentOffset(Vector2 offset);
+
+   /**
+    * @brief Sets the layout alignment offset with padding.
+    *
+    * @param[in] offset The offset.
+    */
+   void SetLayoutOffsetWithPadding(Vector2 offset);
 
   /**
    * @brief Sets whether background color with cutout is enabled.

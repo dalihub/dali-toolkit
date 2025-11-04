@@ -220,12 +220,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::DoAction()
    */
-  void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
+  void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::DoActionExtension()
    */
-  void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, Dali::Any attributes);
+  void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::VisualEventSignal()

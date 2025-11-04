@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <ctime>
+#include <memory>
 #include <vector>
 
 namespace
@@ -40,14 +41,14 @@ namespace Dali
 {
 struct EventThreadCallback::Impl
 {
-  CallbackBase* callback;
-  sem_t         mySemaphore;
+  std::unique_ptr<CallbackBase> callback;
+  sem_t                         mySemaphore;
 };
 
 EventThreadCallback::EventThreadCallback(CallbackBase* callback)
 : mImpl(new Impl())
 {
-  mImpl->callback = callback;
+  mImpl->callback.reset(callback);
   sem_init(&(mImpl->mySemaphore), 0, 0);
 
   gEventThreadCallbacks.push_back(this);
@@ -88,7 +89,7 @@ bool EventThreadCallback::WaitingForTrigger()
 
 CallbackBase* EventThreadCallback::GetCallback()
 {
-  return mImpl->callback;
+  return mImpl->callback.get();
 }
 
 } // namespace Dali

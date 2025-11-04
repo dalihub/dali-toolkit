@@ -159,8 +159,8 @@ void Control::SetBackgroundColor(const Vector4& color)
   mImpl->mBackgroundColor = color;
 
   Property::Map map;
-  map[Toolkit::Visual::Property::TYPE]           = Toolkit::Visual::COLOR;
-  map[Toolkit::ColorVisual::Property::MIX_COLOR] = color;
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, color);
 
   Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
   if(visualImplPtr && visualImplPtr->GetType() == Toolkit::Visual::COLOR)
