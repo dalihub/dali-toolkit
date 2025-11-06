@@ -160,6 +160,23 @@ public:
       CLOCKWISE,         ///< Move keyboard focus towards the clockwise direction @SINCE_2_1.14
       COUNTER_CLOCKWISE, ///< Move keyboard focus towards the counter clockwise direction @SINCE_2_1.14
     };
+
+    /**
+     * @brief Keyboard focus device.
+     * @SINCE_2_5.5
+     */
+    enum Device
+    {
+      UNKNOWN,     ///< Unknown device. @SINCE_2_5.5
+      KEYBOARD,    ///< A regular keyboard, numberpad or attached buttons. @SINCE_2_5.5
+      MOUSE,       ///< A mouse, trackball or touchpad relative motion device. @SINCE_2_5.5
+      TOUCH,       ///< A touchscreen with fingers or stylus. @SINCE_2_5.5
+      PEN,         ///< A special pen device. @SINCE_2_5.5
+      POINTER,     ///< A pointing device based on laser, infrared or similar technology. @SINCE_2_5.5
+      GAMEPAD,     ///< A gamepad controller or joystick. @SINCE_2_5.5
+      WHEEL,       ///< A mouse device. @SINCE_2_5.5
+      PROGRAMMATIC ///< Set to API call, not device. @SINCE_2_5.5
+    };
   };
 
   // Typedefs
