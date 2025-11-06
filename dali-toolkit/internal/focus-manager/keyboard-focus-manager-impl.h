@@ -22,10 +22,12 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
 namespace Dali
@@ -47,6 +49,12 @@ class KeyboardFocusManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
   typedef Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface CustomAlgorithmInterface;
+
+  struct FocusChangeContext
+  {
+    Toolkit::Control::KeyboardFocus::Device device      = Toolkit::Control::KeyboardFocus::Device::UNKNOWN;
+    std::string                             deviceName;
+  };
 
   enum FocusIndicatorState
   {
@@ -91,6 +99,11 @@ public:
    * @copydoc Toolkit::KeyboardFocusManager::MoveFocus
    */
   bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const std::string& deviceName = "");
+
+  /**
+   * @brief Move the focus with device information
+   */
+  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const FocusChangeContext& context);
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::ClearFocus
@@ -172,6 +185,11 @@ public:
    */
   void ResetFocusFinderRootActor();
 
+  /**
+   * Returns the last focus change context (device and optional device name).
+   */
+  const FocusChangeContext& FocusChangedContext() const;
+
 public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
@@ -241,27 +259,30 @@ private:
   /**
    * Move the focus to the specified actor and send notification for the focus change.
    * @param actor The actor to be queried
+   * @param context The context that caused the focus change (device, name)
    * @return Whether the focus is successful or not
    */
-  bool DoSetCurrentFocusActor(Actor actor);
+  bool DoSetCurrentFocusActor(Actor actor, const FocusChangeContext& context);
 
   /**
    * Move the focus to the next actor towards the specified direction within the layout control
    * @param control The layout control to move the focus in
    * @param actor The current focused actor
    * @param direction The direction of focus movement
+   * @param context The context that caused the focus change (device, name)
    * @return Whether the focus is successful or not
    */
-  bool DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocus::Direction direction);
+  bool DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocus::Direction direction, const FocusChangeContext& context);
 
   /**
    * Move the focus to the first focusable actor in the next focus group in the forward
    * or backward direction. The "Tab" key changes the focus group in the forward direction
    * and the "Shift-Tab" key changes it in the backward direction.
    * @param forward Whether the direction of focus group change is forward or backward
+   * @param context The context that caused the focus change (device, name)
    * @return Whether the focus group change is successful or not
    */
-  bool DoMoveFocusToNextFocusGroup(bool forward);
+  bool DoMoveFocusToNextFocusGroup(bool forward, const FocusChangeContext& context);
 
   /**
    * Enter has been pressed on the actor. If the actor is control, call the OnKeybaordEnter virtual function.
@@ -324,6 +345,13 @@ private:
    * Get the focus Actor from current window
    */
   Actor GetFocusActorFromCurrentWindow();
+
+  /**
+   * Convert Device::Class to KeyboardFocus::Device
+   * @param deviceClass The device class from the touch event
+   * @return The corresponding KeyboardFocus::Device
+   */
+  Toolkit::Control::KeyboardFocus::Device ConvertDeviceClassToKeyboardFocusDevice(Device::Class::Type deviceClass) const;
 
   /**
    * Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
@@ -401,6 +429,8 @@ private:
   bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
 
   uint32_t mCurrentWindowId; ///< The current native window id
+
+  FocusChangeContext mLastFocusChangeContext; ///< The last focus change context (device & name)
 };
 
 } // namespace Internal
