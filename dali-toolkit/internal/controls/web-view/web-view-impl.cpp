@@ -991,6 +991,14 @@ void WebView::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWe
   }
 }
 
+void WebView::RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterFileChooserRequestedCallback(std::move(callback));
+  }
+}
+
 void WebView::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
 {
   if(mWebEngine)

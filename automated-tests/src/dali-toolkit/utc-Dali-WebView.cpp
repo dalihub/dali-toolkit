@@ -33,6 +33,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-file-chooser-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-hit-test.h>
@@ -111,6 +112,8 @@ static int                                                                gFulls
 static int                                                                gTextFoundCallbackCalled                = 0;
 static int                                                                gWebAuthDisplayQRCalled                 = 0;
 static int                                                                gWebAuthDisplayResponseCalled           = 0;
+static int                                                                gFileChooserRequestCalled               = 0;
+static std::unique_ptr<Dali::WebEngineFileChooserRequest>                 gFileChooserRequestInstance             = nullptr;
 static int                                                                gUserMediaPermissionRequestCalled       = 0;
 
 struct CallbackFunctor
@@ -367,6 +370,12 @@ static void OnWebAuthDisplayQR(const std::string&)
 static void OnWebAuthResponse()
 {
   gWebAuthDisplayResponseCalled++;
+}
+
+static void OnFileChooserRequested(std::unique_ptr<Dali::WebEngineFileChooserRequest> request)
+{
+  gFileChooserRequestCalled++;
+  gFileChooserRequestInstance = std::move(request);
 }
 
 static void OnUserMediaPermissionRequest(Dali::WebEngineUserMediaPermissionRequest*, const std::string&)
@@ -2662,6 +2671,34 @@ int UtcDaliWebViewRegisterWebAuthResponseCallback(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gWebAuthDisplayResponseCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterFileChooserRequestedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterFileChooserRequestedCallback(&OnFileChooserRequested);
+  DALI_TEST_EQUALS(gFileChooserRequestCalled, 0, TEST_LOCATION);
+  DALI_TEST_CHECK(gFileChooserRequestInstance == nullptr);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gFileChooserRequestCalled, 1, TEST_LOCATION);
+  DALI_TEST_CHECK(gFileChooserRequestInstance != nullptr);
+  DALI_TEST_CHECK(!gFileChooserRequestInstance->MultipleFilesAllowed());
+  std::vector<std::string> mimetypes = gFileChooserRequestInstance->AcceptedMimetypes();
+  DALI_TEST_CHECK(mimetypes.size() == 2);
+  DALI_TEST_CHECK(!gFileChooserRequestInstance->Cancel());
+  std::vector<std::string> files;
+  DALI_TEST_CHECK(!gFileChooserRequestInstance->ChooseFiles(files));
+  std::string file;
+  DALI_TEST_CHECK(!gFileChooserRequestInstance->ChooseFile(file));
+
+  gFileChooserRequestInstance = nullptr;
   END_TEST;
 }
 
