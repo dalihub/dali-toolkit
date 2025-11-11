@@ -2205,6 +2205,14 @@ public: // Text-input Event Queuing.
   bool KeyEvent(const Dali::KeyEvent& event);
 
   /**
+   * @brief Called from AnchorEvent or TextAnchor's OnAccessibilityActivated.
+   * @param[in] cursorPosition Checks if an anchor exists at the given cursor position.
+   * @param[out] href If an anchor exists at the given cursor position, the href is written.
+   * @return True if an anchor exists at the given cursor position, false otherwise.
+   */
+  bool AnchorClickEvent(uint32_t cursorPosition, std::string& href);
+
+  /**
    * @brief Called by anchor when a tap gesture occurs.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.

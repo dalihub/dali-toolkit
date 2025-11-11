@@ -53,6 +53,10 @@ struct Controller::EventHandler
   /// @param[in] controller A reference to the controller class
   static void AnchorEvent(Controller& controller, float x, float y);
 
+  /// @copydoc Text::Controller::AnchorClickEvent
+  /// @param[in] controller A reference to the controller class
+  static bool AnchorClickEvent(Controller& controller, uint32_t cursorPosition, std::string& href);
+
   /// @copydoc Text::Controller::TapEvent
   /// @param[in] controller A reference to the controller class
   static void TapEvent(Controller& controller, unsigned int tapCount, float x, float y);

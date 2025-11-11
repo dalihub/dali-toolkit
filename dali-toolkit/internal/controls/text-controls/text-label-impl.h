@@ -402,7 +402,12 @@ public: // From AnchorControlInterface
   /**
    * @copydoc Text::AnchorControlInterface::AnchorClicked()
    */
-  void AnchorClicked(const std::string& href) override;
+  bool AnchorClicked(uint32_t cursorPosition, std::string& href) override;
+
+  /**
+   * @copydoc Text::AnchorControlInterface::EmitAnchorClickedSignal()
+   */
+  void EmitAnchorClickedSignal(const std::string& href) override;
 
 private: // from AsyncTextInterface
   /**

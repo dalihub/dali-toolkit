@@ -972,7 +972,12 @@ void TextField::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   mInputStyleChangedSignal.Emit(handle, ConvertInputStyle(inputStyleMask));
 }
 
-void TextField::AnchorClicked(const std::string& href)
+bool TextField::AnchorClicked(uint32_t cursorPosition, std::string& href)
+{
+  return mController->AnchorClickEvent(cursorPosition, href);
+}
+
+void TextField::EmitAnchorClickedSignal(const std::string& href)
 {
   Dali::Toolkit::TextField handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());

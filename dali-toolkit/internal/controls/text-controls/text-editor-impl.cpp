@@ -1049,7 +1049,12 @@ void TextEditor::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   mInputStyleChangedSignal.Emit(handle, ConvertInputStyle(inputStyleMask));
 }
 
-void TextEditor::AnchorClicked(const std::string& href)
+bool TextEditor::AnchorClicked(uint32_t cursorPosition, std::string& href)
+{
+  return mController->AnchorClickEvent(cursorPosition, href);
+}
+
+void TextEditor::EmitAnchorClickedSignal(const std::string& href)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
