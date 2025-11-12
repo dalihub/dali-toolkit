@@ -108,13 +108,13 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mDefaultWidth(0),
   mDefaultHeight(0),
   mPlacementActor(),
-  mRasterizedSize(-Vector2::ONE), ///< Let we don't use zero since visual size could be zero after trasnform
   mDesiredSize(size),
   mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mLoadCompleted(false),
   mRasterizeCompleted(false),
   mLoadFailed(false),
+  mRasterizeForcibly(true),
   mAttemptAtlasing(false)
 {
   // the rasterized image is with pre-multiplied alpha format
@@ -203,8 +203,7 @@ void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
     // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
     mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
 
-    // DevNote : Let we don't change mRasterizedSize since visual size could be changed after trasnform
-    AddRasterizationTask(Vector2(mDesiredSize.GetWidth(), mDesiredSize.GetHeight()));
+    AddRasterizationTask(mDesiredSize);
   }
 }
 
@@ -304,6 +303,11 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   }
   else
   {
+    if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+    {
+      // Use desired size. Need to request rasterize forcibly.
+      AddRasterizationTask(mDesiredSize);
+    }
     if(mImpl->mEventObserver)
     {
       // SVG visual needs it's size set before it can be rasterized hence request relayout once on stage
@@ -320,13 +324,13 @@ void SvgVisual::DoSetOffScene(Actor& actor)
     // We don't need to remove task synchronously.
     mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
+
+    // Reset the visual size so that when adding the actor back to stage the SVG rasterization is forced
+    mRasterizeForcibly = true;
   }
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
-
-  // Reset the visual size so that when adding the actor back to stage the SVG rasterization is forced
-  mRasterizedSize = -Vector2::ONE; ///< Let we don't use zero since visual size could be zero after trasnform
 }
 
 void SvgVisual::GetNaturalSize(Vector2& naturalSize)
@@ -420,8 +424,19 @@ void SvgVisual::EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus
   ResourceReady(resourceStatus);
 }
 
-void SvgVisual::AddRasterizationTask(const Vector2& size)
+void SvgVisual::AddRasterizationTask(const Dali::ImageDimensions& size)
 {
+  if(!mRasterizeForcibly && size == mLastRequiredSize)
+  {
+    // No size change. Skip rasterization.
+    return;
+  }
+
+  // Reset the flag
+  mRasterizeForcibly = false;
+
+  mLastRequiredSize = size;
+
   // Remove previous task
   if(mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
@@ -429,14 +444,11 @@ void SvgVisual::AddRasterizationTask(const Vector2& size)
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
   }
 
-  uint32_t width  = static_cast<uint32_t>(roundf(size.width));
-  uint32_t height = static_cast<uint32_t>(roundf(size.height));
-
   const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
   const bool attemptAtlasing      = AttemptAtlasing();
 
   mRasterizeCompleted = false;
-  mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, width, height, attemptAtlasing, this, synchronousRasterize);
+  mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, size.GetWidth(), size.GetHeight(), attemptAtlasing, this, synchronousRasterize);
 }
 
 /// Called when SvgLoader::Load is completed.
@@ -565,27 +577,22 @@ void SvgVisual::OnSetTransform()
 
   if(IsOnScene() && !mLoadFailed)
   {
-    Vector2 size;
+    Dali::ImageDimensions size;
     if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
     {
       // Use desired size
-      size = Vector2(mDesiredSize.GetWidth(), mDesiredSize.GetHeight());
+      size = mDesiredSize;
     }
     else
     {
       // Use visual size
-      size = mImpl->GetTransformVisualSize(mImpl->mControlSize);
+      Vector2 visualSize = mImpl->GetTransformVisualSize(mImpl->mControlSize);
+
+      // roundf and change as integer scale.
+      size = Dali::ImageDimensions(static_cast<uint32_t>(roundf(visualSize.x)), static_cast<uint32_t>(roundf(visualSize.y)));
     }
 
-    // roundf and change as integer scale.
-    size.width  = static_cast<uint32_t>(roundf(size.width));
-    size.height = static_cast<uint32_t>(roundf(size.height));
-
-    if(size != mRasterizedSize)
-    {
-      mRasterizedSize = size;
-      AddRasterizationTask(size);
-    }
+    AddRasterizationTask(size);
   }
 }
 
