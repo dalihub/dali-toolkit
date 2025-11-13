@@ -324,10 +324,10 @@ void SvgVisual::DoSetOffScene(Actor& actor)
     // We don't need to remove task synchronously.
     mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
-
-    // Reset the visual size so that when adding the actor back to stage the SVG rasterization is forced
-    mRasterizeForcibly = true;
   }
+
+  // When adding the actor back to stage the SVG rasterization should be forced again. (To emit ResourceReady signal at SceneOn).
+  mRasterizeForcibly = true;
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
