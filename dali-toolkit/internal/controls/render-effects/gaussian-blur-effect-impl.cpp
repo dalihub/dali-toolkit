@@ -355,23 +355,20 @@ void GaussianBlurEffectImpl::OnActivate()
 
   // Reset shader constants
   auto& blurShader = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
-  {
-    Renderer renderer = mHorizontalBlurActor.GetRendererAt(0u);
-    renderer.SetShader(blurShader);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
-  }
-  {
-    Renderer renderer = mVerticalBlurActor.GetRendererAt(0u);
-    renderer.SetShader(blurShader);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
-  }
+  Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
+  horizontalBlurRenderer.SetShader(blurShader);
+  horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+
+  Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
+  verticalBlurRenderer.SetShader(blurShader);
+  verticalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   // Inject blurred output to control
-  Renderer renderer = GetTargetRenderer();
-  renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::FOREGROUND_EFFECT);
-  ownerControl.AddCacheRenderer(renderer);
+  Renderer targetRenderer = GetTargetRenderer();
+  targetRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::FOREGROUND_EFFECT);
+  ownerControl.AddCacheRenderer(targetRenderer);
   ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
-  SetRendererTexture(renderer, mBlurredOutputFrameBuffer);
+  SetRendererTexture(targetRenderer, mBlurredOutputFrameBuffer);
 
   ownerControl.Add(mInternalRoot);
 
@@ -390,8 +387,8 @@ void GaussianBlurEffectImpl::OnDeactivate()
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    Renderer renderer = GetTargetRenderer();
-    ownerControl.RemoveCacheRenderer(renderer);
+    Renderer targetRenderer = GetTargetRenderer();
+    ownerControl.RemoveCacheRenderer(targetRenderer);
     ownerControl.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   }
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[GaussianBlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
@@ -444,16 +441,13 @@ void GaussianBlurEffectImpl::OnRefresh()
     mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
   }
 
-  {
-    Renderer renderer = mHorizontalBlurActor.GetRendererAt(0);
-    SetRendererTexture(renderer, mInputFrameBuffer);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
-  }
-  {
-    Renderer renderer = mVerticalBlurActor.GetRendererAt(0);
-    SetRendererTexture(renderer, mTemporaryFrameBuffer);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
-  }
+  Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
+  SetRendererTexture(horizontalBlurRenderer, mInputFrameBuffer);
+  horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+
+  Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
+  SetRendererTexture(verticalBlurRenderer, mTemporaryFrameBuffer);
+  verticalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
 }
@@ -571,6 +565,9 @@ void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 
   DestroyFrameBuffers();
   DestroyRenderTasks();
+
+  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
+  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
   mInternalRoot.Unparent();
 }
 
