@@ -1442,7 +1442,8 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
     }
     animationDefinition.ReserveSize(numberOfProperties);
 
-    Index propertyIndex = 0u;
+    Index propertyIndex     = 0u;
+    float animationDuration = 0.0f;
     for(const auto& channel : animation.mChannels)
     {
       Index nodeIndex = context.mNodeIndices.GetRuntimeId(channel.mTarget.mNode.GetIndex());
@@ -1478,10 +1479,10 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         }
       }
 
-      animationDefinition.SetDuration(std::max(duration, animationDefinition.GetDuration()));
-
+      animationDuration = std::max(animationDuration, duration);
       ++propertyIndex;
     }
+    animationDefinition.SetDuration(animationDuration);
 
     output.mAnimationDefinitions.push_back(std::move(animationDefinition));
   }
