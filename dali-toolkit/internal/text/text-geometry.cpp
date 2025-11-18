@@ -120,8 +120,13 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   GlyphIndex   glyphEnd       = *(charactersToGlyphBuffer + endIndex) + ((numberOfGlyphs > 0) ? numberOfGlyphs - 1u : 0u);
   LineIndex    lineIndex      = visualModel->GetLineOfCharacter(startIndex);
   Length       numberOfLines  = visualModel->GetTotalNumberOfLines();
-  bool         isLastLine     = lineIndex + 1 == numberOfLines;
 
+  if(lineIndex >= numberOfLines)
+  {
+    lineIndex = numberOfLines - 1;
+  }
+
+  bool      isLastLine     = lineIndex + 1 == numberOfLines;
   LineIndex firstLineIndex = lineIndex;
   Size      textInLineSize;
   Vector2   textInLinePosition;
