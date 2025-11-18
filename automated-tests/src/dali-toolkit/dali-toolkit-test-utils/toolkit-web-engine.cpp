@@ -25,6 +25,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-file-chooser-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-frame.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-hit-test.h>
@@ -1542,6 +1543,9 @@ public:
   void RegisterWebAuthResponseCallback(WebEngineWebAuthResponseCallback callback) override
   {
   }
+  void RegisterFileChooserRequestedCallback(WebEngineFileChooserRequestedCallback callback) override
+  {
+  }
   void RegisterUserMediaPermissionRequestCallback(WebEngineUserMediaPermissionRequestCallback callback) override
   {
   }
@@ -1648,6 +1652,52 @@ public:
 
 private:
   Dali::Property::Map mockHeadersMap;
+};
+
+class MockUserMediaPermissionRequest : public Dali::WebEngineUserMediaPermissionRequest
+{
+public:
+  MockUserMediaPermissionRequest()
+  {
+  }
+  void Set(bool allowed) const override
+  {
+  }
+  bool Suspend() const override
+  {
+    return true;
+  }
+};
+
+class MockFileChooserRequestRequest : public Dali::WebEngineFileChooserRequest
+{
+public:
+  MockFileChooserRequestRequest()
+  {
+  }
+  bool MultipleFilesAllowed() const override
+  {
+    return false;
+  }
+  std::vector<std::string> AcceptedMimetypes() const override
+  {
+    std::vector<std::string> mimetypes;
+    mimetypes.push_back(std::string("image/png"));
+    mimetypes.push_back(std::string("image/jpeg"));
+    return mimetypes;
+  }
+  bool Cancel() override
+  {
+    return false;
+  }
+  bool ChooseFiles(const std::vector<std::string> files) override
+  {
+    return false;
+  }
+  bool ChooseFile(const std::string file) override
+  {
+    return false;
+  }
 };
 
 class WebEngine : public Dali::BaseObject
@@ -2079,6 +2129,11 @@ public:
     mWebAuthResponseCallback = callback;
   }
 
+  void RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback)
+  {
+    mFileChooserRequestedCallback = callback;
+  }
+
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
   {
     mUserMediaPermissionRequestCallback = callback;
@@ -2162,22 +2217,8 @@ public:
   bool                                                               mWebAuthenticationCancel;
   Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback           mWebAuthDisplayQRCallback;
   Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback            mWebAuthResponseCallback;
+  Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback       mFileChooserRequestedCallback;
   Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback mUserMediaPermissionRequestCallback;
-};
-
-class MockUserMediaPermissionRequest : public Dali::WebEngineUserMediaPermissionRequest
-{
-public:
-  MockUserMediaPermissionRequest()
-  {
-  }
-  void Set(bool allowed) const override
-  {
-  }
-  bool Suspend() const override
-  {
-    return true;
-  }
 };
 
 namespace
@@ -2315,6 +2356,11 @@ bool OnLoadUrl()
     if(gInstance->mWebAuthResponseCallback)
     {
       gInstance->mWebAuthResponseCallback();
+    }
+    if(gInstance->mFileChooserRequestedCallback)
+    {
+      std::unique_ptr<Dali::WebEngineFileChooserRequest> request(new MockFileChooserRequestRequest());
+      gInstance->mFileChooserRequestedCallback(std::move(request));
     }
     if(gInstance->mUserMediaPermissionRequestCallback)
     {
@@ -3121,6 +3167,11 @@ void WebEngine::RegisterWebAuthDisplayQRCallback(Dali::WebEnginePlugin::WebEngin
 void WebEngine::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterWebAuthResponseCallback(callback);
+}
+
+void WebEngine::RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterFileChooserRequestedCallback(callback);
 }
 
 void WebEngine::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)

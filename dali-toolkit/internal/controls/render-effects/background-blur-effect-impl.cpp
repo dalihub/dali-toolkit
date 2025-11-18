@@ -357,17 +357,14 @@ void BackgroundBlurEffectImpl::OnActivate()
   CreateRenderTasks(GetSceneHolder(), ownerControl);
 
   // Reset shader constants
-  auto& blurShader = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
-  {
-    Renderer renderer = mHorizontalBlurActor.GetRendererAt(0u);
-    renderer.SetShader(blurShader);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
-  }
-  {
-    Renderer renderer = mVerticalBlurActor.GetRendererAt(0u);
-    renderer.SetShader(blurShader);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
-  }
+  auto&    blurShader         = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
+  Renderer horizontalRenderer = mHorizontalBlurActor.GetRendererAt(0u);
+  horizontalRenderer.SetShader(blurShader);
+  horizontalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+
+  Renderer verticalRenderer = mVerticalBlurActor.GetRendererAt(0u);
+  verticalRenderer.SetShader(blurShader);
+  verticalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   // Inject blurred output to control
   Renderer renderer = GetTargetRenderer();
@@ -445,16 +442,13 @@ void BackgroundBlurEffectImpl::OnRefresh()
     mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
   }
 
-  {
-    Renderer renderer = mHorizontalBlurActor.GetRendererAt(0);
-    SetRendererTexture(renderer, mInputBackgroundFrameBuffer);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
-  }
-  {
-    Renderer renderer = mVerticalBlurActor.GetRendererAt(0);
-    SetRendererTexture(renderer, mTemporaryFrameBuffer);
-    renderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
-  }
+  Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
+  SetRendererTexture(horizontalBlurRenderer, mInputBackgroundFrameBuffer);
+  horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+
+  Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
+  SetRendererTexture(verticalBlurRenderer, mTemporaryFrameBuffer);
+  verticalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
 }
@@ -571,6 +565,9 @@ void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 
   DestroyFrameBuffers();
   DestroyRenderTasks();
+
+  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
+  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
   mInternalRoot.Unparent();
 }
 

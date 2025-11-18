@@ -170,7 +170,7 @@ private:
    *
    * @param[in] size The target size of the SVG rasterization.
    */
-  void AddRasterizationTask(const Vector2& size);
+  void AddRasterizationTask(const ImageDimensions& size);
 
   /**
    * Helper method to set individual values by index key.
@@ -210,8 +210,8 @@ private:
   uint32_t              mDefaultWidth;
   uint32_t              mDefaultHeight;
   WeakHandle<Actor>     mPlacementActor;
-  Vector2               mRasterizedSize;
   Dali::ImageDimensions mDesiredSize{};
+  Dali::ImageDimensions mLastRequiredSize{};
 
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
@@ -219,6 +219,7 @@ private:
   bool mLoadCompleted : 1;
   bool mRasterizeCompleted : 1;
   bool mLoadFailed : 1;
+  bool mRasterizeForcibly : 1;
   bool mAttemptAtlasing : 1; ///< If true will attempt atlasing, otherwise create unique texture
 };
 

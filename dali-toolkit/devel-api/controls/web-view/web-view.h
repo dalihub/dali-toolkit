@@ -855,6 +855,13 @@ public:
   void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
 
   /**
+   * @brief Register FileChooserRequest callback.
+   *
+   * @param[in] callback The callback function called when file chooser is requested.
+   */
+  void RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback);
+
+  /**
    * @brief Register UserMediaPermissionRequest callback.
    *
    * @param[in] callback The callback to be called for handling user media permission.

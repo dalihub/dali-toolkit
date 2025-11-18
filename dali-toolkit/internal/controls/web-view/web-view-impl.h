@@ -483,6 +483,11 @@ public:
   void RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterFileChooserRequestCallback()
+   */
+  void RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterUserMediaPermissionRequestCallback()
    */
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback);
