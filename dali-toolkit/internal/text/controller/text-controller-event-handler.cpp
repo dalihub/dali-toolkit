@@ -702,6 +702,7 @@ void Controller::EventHandler::TextReplacedEvent(Controller& controller)
 {
   // The natural size needs to be re-calculated.
   controller.mImpl->mRecalculateNaturalSize = true;
+  controller.mImpl->mRecalculateLayoutSize  = true;
 
   // The text direction needs to be updated.
   controller.mImpl->mUpdateTextDirection = true;
@@ -723,6 +724,7 @@ void Controller::EventHandler::TextInsertedEvent(Controller& controller)
 
   // The natural size needs to be re-calculated.
   controller.mImpl->mRecalculateNaturalSize = true;
+  controller.mImpl->mRecalculateLayoutSize  = true;
 
   // The text direction needs to be updated.
   controller.mImpl->mUpdateTextDirection = true;
@@ -746,6 +748,7 @@ void Controller::EventHandler::TextDeletedEvent(Controller& controller)
 
   // The natural size needs to be re-calculated.
   controller.mImpl->mRecalculateNaturalSize = true;
+  controller.mImpl->mRecalculateLayoutSize  = true;
 
   // The text direction needs to be updated.
   controller.mImpl->mUpdateTextDirection = true;

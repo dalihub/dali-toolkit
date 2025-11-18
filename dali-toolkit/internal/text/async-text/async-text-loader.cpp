@@ -92,6 +92,11 @@ Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
   return GetImplementation(*this).ComputeNaturalSize(parameters);
 }
 
+float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, float width, bool layoutOnly)
+{
+  return GetImplementation(*this).ComputeHeightForWidth(parameters, width, layoutOnly);
+}
+
 AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)
 {
   return GetImplementation(*this).RenderText(parameters, useCachedNaturalSize, naturalSize);

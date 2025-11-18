@@ -1788,6 +1788,220 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll02(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelAsyncRenderAutoScroll03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncRenderAutoScroll03");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(0u, 0u);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float labelWidth  = 300.0f;
+  float labelHeight = 300.0f;
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus");
+  label.SetProperty(Actor::Property::SIZE, Vector2(labelWidth, labelHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 20);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER");
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+
+  // Auto scroll
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+
+  application.GetScene().Add(label);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  gAsyncTextRenderedCalled = false;
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_CHECK(label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+
+  // stop IMMEDIATE.
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+
+  // restart.
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_CHECK(label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+
+  // stop FINISH_LOOP.
+  // Rendering should not be requested at this time, because the scroll does not end immediately,
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP);
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  // The finish loop has not ended yet.
+  DALI_TEST_CHECK(label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+
+  // stop IMMEDIATE.
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+
+  // Request render automatically.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_AUTO_SCROLL));
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelAsyncRenderAutoScroll04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncRenderAutoScroll04");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(0u, 0u);
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  float labelWidth  = 100.0f;
+  float labelHeight = 100.0f;
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_MANUAL);
+  label.SetProperty(Actor::Property::SIZE, Vector2(labelWidth, labelHeight));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 50);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
+  label.SetProperty(TextLabel::Property::TEXT, text);
+
+  // Auto scroll
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+
+  application.GetScene().Add(label);
+
+  // Connect to the async text rendered signal.
+  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
+
+  bool asyncTextRendered = false;
+  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Request render auto scroll.
+  DevelTextLabel::RequestAsyncRenderWithConstraint(label, labelWidth, 99999);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  float expectedWidth  = labelWidth;
+  float expectedHeight = label.GetHeightForWidth(labelWidth);
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // stop IMMEDIATE.
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+
+  // Request render auto scroll.
+  DevelTextLabel::RequestAsyncRenderWithFixedSize(label, labelWidth, labelHeight);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
+
+  expectedWidth  = labelWidth;
+  expectedHeight = labelHeight;
+
+  DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::MANUAL_RENDERED), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextLabelAsyncRenderCutout(void)
 {
   ToolkitTestApplication application;
@@ -3037,6 +3251,81 @@ int UtcDaliToolkitTextLabelAsyncTextEllipsisMode(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
 
+  // Auto scroll does not work because the multi line is true.
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  // Set long text to scroll.
+  label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
+  label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelAsyncTextEllipsisMode02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncTextEllipsisMode02");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
+  // Set short text.
+  TextLabel label = TextLabel::New("H");
+  DALI_TEST_CHECK(label);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
+
+  // Set ellipsis mode to auto scroll, but auto scroll does not work because the text is short.
+  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_MODE, Toolkit::DevelText::Ellipsize::AUTO_SCROLL);
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
   // Set long text to scroll.
   label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
   label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
@@ -3186,6 +3475,22 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   DALI_TEST_CHECK(asyncTextRendered);
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  asyncTextRendered        = false;
+  gAsyncTextRenderedCalled = false;
+  gAsyncTextRenderedWidth  = 0.0f;
+  gAsyncTextRenderedHeight = 0.0f;
+
+  // Request render.
+  DevelTextLabel::RequestAsyncRenderWithConstraint(label, std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAsyncTextRenderedCalled);
+  DALI_TEST_CHECK(asyncTextRendered);
 
   expectedWidth  = 500.0f;
   expectedHeight = 50.0f;

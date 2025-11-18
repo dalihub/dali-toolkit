@@ -922,6 +922,11 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   Size layoutSize = mTextModel->mVisualModel->GetLayoutSize();
   layoutSize.x    = parameters.textWidth;
 
+  if(parameters.isAutoScrollEnabled && parameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)
+  {
+    layoutSize.y = parameters.textHeight;
+  }
+
   if(shadowOffset.y > Math::MACHINE_EPSILON_1)
   {
     layoutSize.y += shadowOffset.y;
@@ -1016,7 +1021,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
   if(parameters.isAutoScrollEnabled)
   {
     // This will be uploaded in async text interface's setup auto scroll.
-    renderInfo.autoScrollPixelData = mTypesetter->Render(layoutSize, textDirection, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
+    renderInfo.autoScrollPixelData = mTypesetter->Render(layoutSize, textDirection, Text::Typesetter::RENDER_TEXT_AND_STYLES, parameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL, Pixel::RGBA8888, Size(parameters.originWidth, parameters.originHeight));
   }
 
   renderInfo.hasMultipleTextColors = hasMultipleTextColors;
@@ -1106,12 +1111,23 @@ float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, fl
     DALI_LOG_RELEASE_INFO("ComputeHeightForWidth, width:%f, layoutOnly:%d\n", width, layoutOnly);
   }
 #endif
+  return ComputeLayoutSize(parameters, width, MAX_FLOAT, layoutOnly).height;
+}
+
+Size AsyncTextLoader::ComputeLayoutSize(AsyncTextParameters& parameters, float width, float height, bool layoutOnly)
+{
+#ifdef TRACE_ENABLED
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+  {
+    DALI_LOG_RELEASE_INFO("ComputeLayoutSize, width:%f, height:%f, layoutOnly:%d\n", width, height, layoutOnly);
+  }
+#endif
 
   float actualWidth  = parameters.textWidth;
   float actualHeight = parameters.textHeight;
 
   parameters.textWidth  = width;
-  parameters.textHeight = MAX_FLOAT;
+  parameters.textHeight = height;
 
   if(!layoutOnly)
   {
@@ -1127,7 +1143,7 @@ float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, fl
   parameters.textHeight                  = actualHeight;
   mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
 
-  return layoutSize.height;
+  return layoutSize;
 }
 
 Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize)
@@ -1140,6 +1156,7 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
     parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
     parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
     parameters.minLineSize       = parameters.minLineSize * parameters.renderScale;
+    parameters.autoScrollGap     = parameters.autoScrollGap * parameters.renderScale;
     cachedNaturalSize            = false;
     return Size::ZERO;
   }
@@ -1156,9 +1173,32 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
   bool widthEllipsized  = parameters.textWidth < originalNaturalSize.width ? true : false;
   bool heightEllipsized = parameters.textHeight < originalNaturalSize.height ? true : false;
 
-  // Store the computed natural size to avoid redundant calculations.
-  Size naturalSize  = ComputeNaturalSize(parameters);
-  cachedNaturalSize = true;
+  Size naturalSize = Size::ZERO;
+  if(parameters.requestType == Async::RENDER_FIXED_HEIGHT || parameters.requestType == Async::RENDER_CONSTRAINT)
+  {
+    naturalSize       = ComputeNaturalSize(parameters);
+    cachedNaturalSize = true;
+    if(parameters.textWidth > naturalSize.width)
+    {
+      parameters.textWidth = naturalSize.width;
+    }
+  }
+
+  if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
+  {
+    bool  layoutOnly = cachedNaturalSize;
+    float height     = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
+    if(parameters.textHeight > height)
+    {
+      parameters.textHeight = height;
+    }
+  }
+
+  if(!cachedNaturalSize)
+  {
+    naturalSize  = ComputeNaturalSize(parameters);
+    cachedNaturalSize = true;
+  }
 
   // Update the scaled size.
   parameters.renderScaleWidth  = parameters.textWidth;
@@ -1166,6 +1206,7 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
   parameters.textWidth         = ConvertToEven(ceil(parameters.textWidth * parameters.renderScale));
   parameters.textHeight        = ConvertToEven(ceil(parameters.textHeight * parameters.renderScale));
   parameters.minLineSize       = parameters.minLineSize * parameters.renderScale;
+  parameters.autoScrollGap     = parameters.autoScrollGap * parameters.renderScale;
 
   // The texture in RenderScale needs to be resized because it exceeds the control size.
   if(!widthEllipsized && naturalSize.width > parameters.textWidth)
@@ -1283,76 +1324,141 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_RENDER_AUTO_SCROLL");
 
-  Size controlSize(parameters.textWidth, parameters.textHeight);
-
-  // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
-  Size textNaturalSize;
-  if(useCachedNaturalSize)
-  {
-    textNaturalSize = naturalSize;
-  }
-  else
-  {
-    textNaturalSize = ComputeNaturalSize(parameters);
-    textNaturalSize.width += (parameters.padding.start + parameters.padding.end);
-    textNaturalSize.height += (parameters.padding.top + parameters.padding.bottom);
-  }
-
-  if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
-  {
-    // The real height calculated during layout should be set.
-    parameters.textHeight                  = textNaturalSize.height - (parameters.padding.top + parameters.padding.bottom);
-    controlSize.height                     = parameters.textHeight;
-    mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
-  }
-
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("natural size : %f, %f, control size : %f, %f\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
-  }
-#endif
-
-  // Calculate the actual gap before scrolling wraps.
-  int     textPadding = std::max(controlSize.x - textNaturalSize.x, 0.0f);
-  float   wrapGap     = std::max(parameters.autoScrollGap, textPadding);
-  Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture.
-
-  // Calculate a size of texture for text scrolling
-  Size      verifiedSize   = textureSize;
+  Size      controlSize(parameters.textWidth, parameters.textHeight);
+  Size      verifiedSize;
+  float     wrapGap        = 0.0f;
+  bool      isHorizontal   = parameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL;
   const int maxTextureSize = parameters.maxTextureSize;
 
-  // If the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis.
-  if(verifiedSize.width > maxTextureSize)
+  if(isHorizontal)
   {
-    verifiedSize.width = maxTextureSize;
-    if(textNaturalSize.width > maxTextureSize)
+    // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
+    Size textNaturalSize = useCachedNaturalSize ? naturalSize : ComputeNaturalSize(parameters);
+
+    if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
     {
-      float actualWidth  = parameters.textWidth;
-      float actualHeight = parameters.textHeight;
-
-      parameters.textWidth                      = verifiedSize.width;
-      parameters.textHeight                     = textNaturalSize.height;
-      parameters.isAutoScrollMaxTextureExceeded = true;
-
-      bool layoutUpdated = false;
-
-      // Re-layout is required to apply ellipsis.
-      Layout(parameters, layoutUpdated);
-
-      parameters.textWidth  = actualWidth;
-      parameters.textHeight = actualHeight;
+      // The real height calculated during layout should be set.
+      parameters.textHeight                  = textNaturalSize.height;
+      controlSize.height                     = parameters.textHeight;
+      mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
     }
-    wrapGap = std::max(maxTextureSize - textNaturalSize.width, 0.0f);
+
+  #ifdef TRACE_ENABLED
+    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    {
+      DALI_LOG_RELEASE_INFO("natural size : %f, %f, control size : %f, %f\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
+    }
+  #endif
+
+    // Calculate the actual gap before scrolling wraps.
+    int     textPadding = std::max(controlSize.x - textNaturalSize.x, 0.0f);
+    wrapGap             = std::max(parameters.autoScrollGap, textPadding);
+    Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture.
+
+    // Calculate a size of texture for text scrolling
+    verifiedSize = textureSize;
+
+    // If the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis.
+    if(verifiedSize.width > maxTextureSize)
+    {
+      verifiedSize.width = maxTextureSize;
+      if(textNaturalSize.width > maxTextureSize)
+      {
+        float actualWidth  = parameters.textWidth;
+        float actualHeight = parameters.textHeight;
+
+        parameters.textWidth                      = verifiedSize.width - static_cast<float>(parameters.autoScrollGap);
+        parameters.textHeight                     = textNaturalSize.height;
+        parameters.isAutoScrollMaxTextureExceeded = true;
+
+        bool layoutUpdated = false;
+
+        // Re-layout is required to apply ellipsis.
+        Layout(parameters, layoutUpdated);
+
+        parameters.textWidth  = actualWidth;
+        parameters.textHeight = actualHeight;
+      }
+      wrapGap = std::max(maxTextureSize - textNaturalSize.width, static_cast<float>(parameters.autoScrollGap));
+    }
+  }
+  else // AutoScroll::VERTICAL
+  {
+    bool  layoutOnly      = useCachedNaturalSize;
+    bool  useCachedHeight = false;
+    float textHeight      = 0.0f;
+    if(parameters.requestType == Async::RENDER_FIXED_WIDTH || parameters.requestType == Async::RENDER_CONSTRAINT)
+    {
+      // The real height calculated during layout should be set.
+      textHeight      = ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
+      useCachedHeight = true;
+      layoutOnly      = true;
+
+      if(parameters.textHeight > textHeight)
+      {
+        parameters.textHeight                  = textHeight;
+        controlSize.height                     = parameters.textHeight;
+        mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
+      }
+    }
+
+    Size originSize                = Size::ZERO;
+    bool needLayoutSizeCalculation = parameters.verticalAlignment != VerticalAlignment::TOP ? true : false;
+    if(needLayoutSizeCalculation)
+    {
+      parameters.isAutoScrollEnabled = false;
+      originSize = ComputeLayoutSize(parameters, parameters.textWidth, parameters.textHeight, layoutOnly);
+      parameters.isAutoScrollEnabled = true;
+      parameters.originWidth         = originSize.width;
+      parameters.originHeight        = originSize.height;
+      layoutOnly                     = true;
+    }
+
+    textHeight = useCachedHeight ? textHeight : ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
+
+    // Calculate the actual gap before scrolling wraps.
+    int     textPadding = std::max(controlSize.y - textHeight, 0.0f);
+    wrapGap             = std::max(parameters.autoScrollGap, textPadding);
+    Vector2 textureSize(controlSize.width, textHeight + wrapGap); // Add the gap as a part of the texture
+
+    // Calculate a size of texture for text scrolling
+    verifiedSize = textureSize;
+
+    // If the texture size height exceed maxTextureSize, modify the visual model size and enabled the ellipsis.
+    if(verifiedSize.height > maxTextureSize)
+    {
+      verifiedSize.height = maxTextureSize;
+      if(textHeight > maxTextureSize)
+      {
+        float actualWidth  = parameters.textWidth;
+        float actualHeight = parameters.textHeight;
+
+        parameters.textWidth           = verifiedSize.width;
+        parameters.textHeight          = verifiedSize.height;
+        parameters.isAutoScrollEnabled = false;
+
+        bool layoutUpdated = false;
+
+        // Re-layout is required to apply ellipsis.
+        Layout(parameters, layoutUpdated);
+
+        parameters.textWidth           = actualWidth;
+        parameters.textHeight          = actualHeight;
+        parameters.isAutoScrollEnabled = true;
+      }
+      wrapGap = std::max(maxTextureSize - textHeight, 0.0f);
+    }
   }
 
-  uint32_t actualWidth = parameters.textWidth;
-  parameters.textWidth = verifiedSize.width;
+  uint32_t actualWidth  = parameters.textWidth;
+  uint32_t actualHeight = parameters.textHeight;
+  parameters.textWidth  = verifiedSize.width;
+  parameters.textHeight = verifiedSize.height;
 
   AsyncTextRenderInfo renderInfo = Render(parameters);
 
-  // Restore actual size.
-  parameters.textWidth = actualWidth;
+  parameters.textWidth  = actualWidth;
+  parameters.textHeight = actualHeight;
 
   // Store the control size and calculated wrap gap in render info.
   bool  isRenderScale          = parameters.renderScale > 1.0f ? true : false;

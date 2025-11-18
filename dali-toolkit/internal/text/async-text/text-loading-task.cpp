@@ -133,36 +133,56 @@ void TextLoadingTask::Load()
         naturalSize = mLoader.SetupRenderScale(mParameters, cachedNaturalSize);
       }
 
-      if(mParameters.ellipsis && !mParameters.isMultiLine && mParameters.ellipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
+      if(mParameters.ellipsis && mParameters.ellipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
       {
-        if(!cachedNaturalSize)
+        if(mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
         {
-          naturalSize       = mLoader.ComputeNaturalSize(mParameters);
-          cachedNaturalSize = true;
-        }
-        if(mParameters.textWidth < naturalSize.width)
-        {
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          if(mParameters.isMultiLine)
           {
-            DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
+            DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll horizontal on a non SINGLE_LINE_BOX, request ignored\n");
+            mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
           }
-#endif
-          mParameters.isAutoScrollEnabled = true;
-          mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
-        }
-        else
-        {
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+          else
           {
-            DALI_LOG_RELEASE_INFO("RenderText, Ellipsize::AUTO_SCROLL\n");
+            if(!cachedNaturalSize)
+            {
+              naturalSize       = mLoader.ComputeNaturalSize(mParameters);
+              cachedNaturalSize = true;
+            }
+            if(mParameters.textWidth < naturalSize.width)
+            {
+    #ifdef TRACE_ENABLED
+              if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+              {
+                DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
+              }
+    #endif
+              mParameters.isAutoScrollEnabled = true;
+              mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
+            }
+            else
+            {
+              mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
+            }
           }
-#endif
-          mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
+        }
+        else // AutoScroll::VERTICAL
+        {
+          const float textHeight = mLoader.ComputeHeightForWidth(mParameters, mParameters.textWidth, cachedNaturalSize);
+          if(mParameters.textHeight < textHeight)
+          {
+            mParameters.isAutoScrollEnabled = true;
+            mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, true, naturalSize);
+          }
+          else
+          {
+            mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
+          }
         }
       }
-      else if(mParameters.isAutoScrollEnabled && !mParameters.isMultiLine)
+      else if(mParameters.isAutoScrollEnabled &&
+             ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
+             (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
       {
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())

@@ -462,8 +462,15 @@ private:
 
   /**
    * @brief Set up Autoscrolling
+   * @param[in] contentSize The size of the text content requested by relayout excluding padding.
+   * @param[in] originSize The size of the laid-out text to calculate the offset of the text before auto scroll operation.
    */
-  void SetUpAutoScrolling();
+  void SetUpAutoScrolling(const Size& contentSize, const Size& originSize);
+
+  /**
+   * @brief Called when the auto scroll state needs to be updated due to changes in direction or multiline.
+   */
+  void UpdateAutoScrollState();
 
   /**
    * Creates a text-scroller if one has not been created.

@@ -571,6 +571,7 @@ void Controller::PlaceholderHandler::ShowPlaceholderText(Controller::Impl& impl)
 
     // The natural size needs to be re-calculated.
     impl.mRecalculateNaturalSize = true;
+    impl.mRecalculateLayoutSize  = true;
 
     // The text direction needs to be updated.
     impl.mUpdateTextDirection = true;

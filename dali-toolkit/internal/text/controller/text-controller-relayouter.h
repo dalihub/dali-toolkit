@@ -41,9 +41,10 @@ struct Controller::Relayouter
    * @brief Called by the Controller to retrieve the natural size.
    *
    * @param[in] controller A reference to the controller class
+   * @param[in] convertToEven Whether to force the calculation result to be even. Defaults to true for compatibility.
    * @return
    */
-  static Vector3 GetNaturalSize(Controller& controller);
+  static Vector3 GetNaturalSize(Controller& controller, bool convertToEven = true);
 
   /**
    * @brief Called by the Controller to check if the text fits.
@@ -79,6 +80,17 @@ struct Controller::Relayouter
    * @return
    */
   static float GetHeightForWidth(Controller& controller, float width);
+
+  /**
+   * @brief Called by the Controller to get the layout size for a particular width and height.
+   *
+   * @param[in] controller A reference to the controller class.
+   * @param[in] width The width.
+   * @param[in] height The height.
+   * @param[in] forceUpdate Forces updates to recalculate layout, alignment etc.
+   * @return Size of the laid-out text.
+   */
+  static Vector2 CalculateLayoutSize(Controller& controller, float width, float height, bool forceUpdate = false);
 
   /**
    * @brief Called by the Controller to do the relayout itself.

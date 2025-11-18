@@ -186,7 +186,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   return calculatedLayoutSize;
 }
 
-Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
+Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller, bool convertToEven)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n");
   DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_GET_NATURAL_SIZE", "[%p]", static_cast<void*>(&controller));
@@ -225,8 +225,11 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSizeVec3.x, naturalSizeVec3.y, naturalSizeVec3.z);
   }
 
-  naturalSizeVec3.x = ConvertToEven(naturalSizeVec3.x);
-  naturalSizeVec3.y = ConvertToEven(naturalSizeVec3.y);
+  if(convertToEven)
+  {
+    naturalSizeVec3.x = ConvertToEven(naturalSizeVec3.x);
+    naturalSizeVec3.y = ConvertToEven(naturalSizeVec3.y);
+  }
 
   return naturalSizeVec3;
 }
@@ -571,7 +574,7 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
      textUpdateInfo.mClearAll)
   {
     // Layout the text for the new width.
-    OperationsMask requestedOperationsMask        = static_cast<OperationsMask>(LAYOUT);
+    OperationsMask requestedOperationsMask        = static_cast<OperationsMask>(LAYOUT | ALIGN);
     Size           sizeRequestedWidthAndMaxHeight = Size(width, MAX_FLOAT);
 
     layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask);
@@ -589,6 +592,42 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
   }
 
   return layoutSize.height;
+}
+
+Vector2 Controller::Relayouter::CalculateLayoutSize(Controller& controller, float width, float height, bool forceUpdate)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::CalculateLayoutSize %p width %f height %f\n", &controller, width, height);
+  DALI_TRACE_SCOPE_WITH_FORMAT(gTraceFilter, "DALI_TEXT_CALCULATE_LAYOUT_SIZE", "[%p]", static_cast<void*>(&controller));
+  Vector2 layoutSize;
+
+  // Make sure the model is up-to-date before layouting
+  EventHandler::ProcessModifyEvents(controller);
+
+  Controller::Impl& impl        = *controller.mImpl;
+  ModelPtr&         model       = impl.mModel;
+  VisualModelPtr&   visualModel = model->mVisualModel;
+
+  if(impl.mRecalculateLayoutSize || forceUpdate)
+  {
+    // Layout the text for the new width.
+    OperationsMask requestedOperationsMask      = static_cast<OperationsMask>(LAYOUT | ALIGN);
+    Size           sizeFixedWidthAndFixedHeight = Size(width, height);
+
+    layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeFixedWidthAndFixedHeight, requestedOperationsMask);
+
+    // Stores the layout size to avoid recalculate it again
+    visualModel->SetCachedLayoutSize(layoutSize);
+
+    impl.mRecalculateLayoutSize = forceUpdate;
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::CalculateLayoutSize calculated %f,%f\n", layoutSize.x, layoutSize.y);
+  }
+  else
+  {
+    layoutSize = visualModel->GetCachedLayoutSize();
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::CalculateLayoutSize cached %f,%f\n", layoutSize.x, layoutSize.y);
+  }
+
+  return layoutSize;
 }
 
 Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controller, const Size& size, Dali::LayoutDirection::Type layoutDirection)
