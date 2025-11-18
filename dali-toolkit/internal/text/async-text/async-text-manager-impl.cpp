@@ -73,6 +73,7 @@ AsyncTextManager::AsyncTextManager()
       mAvailableLoaders.push_back(loader);
     }
 
+    TextAbstraction::FontClient::Get().CustomFontAddedSignal().Connect(this, &AsyncTextManager::OnCustomFontAdded);
     Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &AsyncTextManager::OnLocaleChanged);
   }
 }
@@ -115,6 +116,18 @@ Text::AsyncTextManager AsyncTextManager::Get()
   }
 
   return asyncTextManagerHandle;
+}
+
+void AsyncTextManager::OnCustomFontAdded(const std::string& path)
+{
+  for(auto& loader : mAvailableLoaders)
+  {
+    loader.RequestAddCustomFont(path);
+  }
+  for(auto& loader : mRunningLoaders)
+  {
+    loader.RequestAddCustomFont(path);
+  }
 }
 
 void AsyncTextManager::OnLocaleChanged(std::string locale)

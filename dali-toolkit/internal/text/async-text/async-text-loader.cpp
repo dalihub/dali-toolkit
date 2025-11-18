@@ -65,6 +65,11 @@ void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathLi
   GetImplementation(*this).SetCustomFontDirectories(customFontDirectories);
 }
 
+void AsyncTextLoader::RequestAddCustomFont(const std::string& path)
+{
+  GetImplementation(*this).RequestAddCustomFont(path);
+}
+
 void AsyncTextLoader::SetModuleClearNeeded(bool clear)
 {
   GetImplementation(*this).SetModuleClearNeeded(clear);
