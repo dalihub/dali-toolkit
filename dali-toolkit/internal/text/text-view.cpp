@@ -28,9 +28,27 @@
 
 namespace Dali::Toolkit::Text
 {
-
 namespace
 {
+// Safely shift a glyph buffer in-place using memmove,
+// clamping the copy length to the valid [0, bufferSize) range.
+template<typename T>
+void GlyphMemmove(T* buffer, Length bufferSize, Length dstIndex, Length srcIndex, Length count)
+{
+  if(!buffer || bufferSize == 0u || count == 0u || dstIndex >= bufferSize || srcIndex >= bufferSize)
+  {
+    return;
+  }
+
+  const Length maxByDst  = bufferSize - dstIndex;
+  const Length maxBySrc  = bufferSize - srcIndex;
+  Length       safeCount = std::min(count, std::min(maxByDst, maxBySrc));
+
+  if(safeCount > 0u)
+  {
+    memmove(buffer + dstIndex, buffer + srcIndex, safeCount * sizeof(T));
+  }
+}
 
 /// If ellipsis is enabled, calculate the number of laid out glyphs.
 /// Otherwise use the given number of glyphs.
@@ -333,23 +351,25 @@ void RemoveAllGlyphsAfterEllipsisGlyph(
       {
         Length numberOfSecondHalfGlyphs = numberOfLaidOutGlyphs - firstMiddleIndexOfElidedGlyphs;
 
-        //Copy elided glyphs after the ellipsis glyph.
-        memcpy(glyphs + firstMiddleIndexOfElidedGlyphs, glyphs + secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
-        memcpy(glyphPositions + firstMiddleIndexOfElidedGlyphs, glyphPositions + secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+        // Copy elided glyphs after the ellipsis glyph.
+        GlyphMemmove(glyphs, numberOfGlyphs, firstMiddleIndexOfElidedGlyphs, secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
+        GlyphMemmove(glyphPositions, numberOfGlyphs, firstMiddleIndexOfElidedGlyphs, secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
       }
       else
       {
         Length numberOfSecondHalfGlyphs = numberOfLaidOutGlyphs - firstMiddleIndexOfElidedGlyphs + 1u;
 
-        // Make sure that out-of-boundary does not occur.
+        // Make sure that out-of-boundary does not occur for the source range.
         if(secondMiddleIndexOfElidedGlyphs + numberOfSecondHalfGlyphs > numberOfGlyphs)
         {
           numberOfSecondHalfGlyphs = numberOfGlyphs - secondMiddleIndexOfElidedGlyphs;
         }
 
-        //Copy elided glyphs after the ellipsis glyph.
-        memcpy(glyphs + firstMiddleIndexOfElidedGlyphs + 1u, glyphs + secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
-        memcpy(glyphPositions + firstMiddleIndexOfElidedGlyphs + 1u, glyphPositions + secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+        const Length dstIndex = firstMiddleIndexOfElidedGlyphs + 1u;
+
+        // Copy elided glyphs after the ellipsis glyph.
+        GlyphMemmove(glyphs, numberOfGlyphs, dstIndex, secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
+        GlyphMemmove(glyphPositions, numberOfGlyphs, dstIndex, secondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
       }
       break;
     }
@@ -357,9 +377,14 @@ void RemoveAllGlyphsAfterEllipsisGlyph(
     case DevelText::EllipsisPosition::START:
     {
       numberOfLaidOutGlyphs = numberOfActualLaidOutGlyphs - numberOfRemovedGlyphs;
-      //Copy elided glyphs after the ellipsis glyph.
-      memcpy(glyphs, glyphs + startIndexOfEllipsis + numberOfRemovedGlyphs, numberOfLaidOutGlyphs * sizeof(GlyphInfo));
-      memcpy(glyphPositions, glyphPositions + startIndexOfEllipsis + numberOfRemovedGlyphs, numberOfLaidOutGlyphs * sizeof(Vector2));
+
+      const Length dstIndex = 0u;
+      const Length srcIndex = startIndexOfEllipsis + numberOfRemovedGlyphs;
+
+      // Copy elided glyphs after the ellipsis glyph.
+      GlyphMemmove(glyphs, numberOfGlyphs, dstIndex, srcIndex, numberOfLaidOutGlyphs);
+      GlyphMemmove(glyphPositions, numberOfGlyphs, dstIndex, srcIndex, numberOfLaidOutGlyphs);
+
       visualModel->SetStartIndexOfElidedGlyphs(indexOfEllipsis);
       break;
     }
