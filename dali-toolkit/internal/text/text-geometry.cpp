@@ -121,7 +121,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   LineIndex    lineIndex      = visualModel->GetLineOfCharacter(startIndex);
   Length       numberOfLines  = visualModel->GetTotalNumberOfLines();
 
-  if(lineIndex >= numberOfLines)
+  if(lineIndex >= numberOfLines && numberOfLines > 0)
   {
     lineIndex = numberOfLines - 1;
   }
