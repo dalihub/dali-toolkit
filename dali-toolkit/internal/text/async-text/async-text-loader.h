@@ -355,6 +355,13 @@ public:
   void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
 
   /**
+   * @brief Request adds a custom font directory.
+   *
+   * @param[in] path The path of the custom font directory.
+   */
+  void RequestAddCustomFont(const std::string& path);
+
+  /**
    * @brief Sets a flag indicating that module's cache clearing is needed.
    *
    * When the async text loader is available, clear is processed on the main thread.

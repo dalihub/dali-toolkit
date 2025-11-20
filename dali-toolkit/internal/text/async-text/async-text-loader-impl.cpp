@@ -86,6 +86,7 @@ AsyncTextLoader::AsyncTextLoader()
   mTextModel(),
   mMetrics(),
   mLocale(),
+  mCustomFonts(),
   mNumberOfCharacters(0u),
   mFitActualEllipsis(true),
   mIsTextDirectionRTL(false),
@@ -141,6 +142,12 @@ void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathLi
   }
 }
 
+void AsyncTextLoader::RequestAddCustomFont(const std::string& path)
+{
+  Dali::Mutex::ScopedLock lock(mMutex);
+  mCustomFonts.push_back(path);
+}
+
 void AsyncTextLoader::SetModuleClearNeeded(bool clear)
 {
   Dali::Mutex::ScopedLock lock(mMutex);
@@ -156,6 +163,17 @@ bool AsyncTextLoader::IsModuleClearNeeded()
 void AsyncTextLoader::Initialize()
 {
   mModule.GetFontClient().InitDefaultFontDescription();
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+    if(!mCustomFonts.empty())
+    {
+      for(const auto& font : mCustomFonts)
+      {
+        mModule.GetFontClient().AddCustomFontDirectory(font);
+      }
+      mCustomFonts.clear();
+    }
+  }
 
   ClearTextModelData();
 

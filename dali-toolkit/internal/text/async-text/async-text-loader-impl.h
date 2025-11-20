@@ -83,6 +83,11 @@ public:
   void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
 
   /**
+   * @copydoc Dali::AsyncTextLoader::RequestAddCustomFont()
+   */
+  void RequestAddCustomFont(const std::string& path);
+
+  /**
    * @copydoc Dali::AsyncTextLoader::SetModuleClearNeeded()
    */
   void SetModuleClearNeeded(bool clear);
@@ -217,6 +222,8 @@ private:
   Text::Layout::Engine mLayoutEngine;
   Text::TypesetterPtr  mTypesetter;
   std::string          mLocale;
+
+  TextAbstraction::FontPathList mCustomFonts;
 
   Length mNumberOfCharacters;
   bool   mFitActualEllipsis : 1;  // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
