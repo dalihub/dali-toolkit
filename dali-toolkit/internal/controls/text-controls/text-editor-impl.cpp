@@ -774,7 +774,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mStencil)
   {
     mStencil.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
-    ResizeActor(mStencil, contentSize);
+    ResizeActor(mStencil, Vector2(contentSize.x + padding.end, contentSize.y));
   }
   if(mActiveLayer)
   {
