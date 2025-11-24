@@ -309,7 +309,7 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes");
 
-  char utf8_06[] = {-2, -1}; // Invalid string
+  char utf8_06[] = {-2, -1, '\0'}; // Invalid string
 
   unsigned int utf32_01[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};                         // Hello World
   unsigned int utf32_02[] = {0xA, 0x20, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xA, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};         // Hello World + CR and CR+LF
