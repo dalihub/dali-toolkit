@@ -127,6 +127,8 @@ int UtcDaliPanelOnSceneOffScene(void)
 
   DALI_TEST_EQUALS(previousTaskCount, application.GetWindow().GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -193,6 +195,8 @@ int UtcDaliPanelSetPanelResolution02(void)
 
   DALI_TEST_EQUALS(500, texture.GetWidth(), TEST_LOCATION);
   DALI_TEST_EQUALS(300, texture.GetHeight(), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -405,6 +409,8 @@ int UtcDaliPanelIBLWithSceneView(void)
 
   // Reset
   sceneView.SetImageBasedLightSource("", "");
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -619,6 +625,8 @@ int UtcDaliPanelSetGetProperty(void)
   DALI_TEST_EQUALS(backPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), false, TEST_LOCATION);
   DALI_TEST_EQUALS(doubleSidedPlaneNode.GetProperty<bool>(Dali::Actor::Property::VISIBLE), true, TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -708,6 +716,8 @@ int UtcDaliPanelSetGetContent(void)
   panel.ClearPanel();
   DALI_TEST_CHECK(!secondControl.GetParent());
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -735,6 +745,8 @@ int UtcDaliPanelSetGetShadow(void)
 
   panel.ReceiveShadow(false);
   DALI_TEST_EQUALS(panel.IsShadowReceiving(), false, TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -811,6 +823,8 @@ int UtcDaliPanelRenderTaskOrdering(void)
   DALI_TEST_EQUALS(INT32_MIN, blurSourceRenderTask.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN + 1, blurHorizontalRenderTask.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN + 2, blurVerticalRenderTask.GetOrderIndex(), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
