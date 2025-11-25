@@ -533,6 +533,9 @@ int UtcDaliTextLabelElideTextLocation(void)
   Size  textSize38(145.0f, 30.0f);
   float positions38[] = {138.0f, 70.0f, 79.0f, 84.0f, 92.0f, 97.0f, 107.0f, 116.0f, 122.0f, 132.0f, 64.0f, 50.0f, 45.0f, 40.0f, 35.0f, 26.0f, 21.0f, 11.0f};
 
+  Size  textSize39(5.0f, 30.0f);
+  float positions39[] = {20.0f};
+
   struct ElideData data[] =
     {
       {"void text",
@@ -1000,8 +1003,18 @@ int UtcDaliTextLabelElideTextLocation(void)
        18u,
        positions38},
 
+      {"EllipsisPosition: TextLabel: Corner case MIDDLE",
+       "سیٹنگیں Projector سیٹنگیں",
+       false,
+       DevelText::LineWrap::WORD,
+       DevelText::EllipsisPosition::MIDDLE,
+       false,
+       textSize39,
+       1u,
+       1u,
+       positions39},
     };
-  const unsigned int numberOfTests = 41u;
+  const unsigned int numberOfTests = 42u;
 
   for(unsigned int index = 0u; index < numberOfTests; ++index)
   {
@@ -1063,6 +1076,9 @@ int UtcDaliTextFieldlElideTextLocation(void)
 
   Size  textSize14(145.0f, 30.0f);
   float positions14[] = {88.0f, 103.0f, 108.0f, 118.0f, 127.0f, 133.0f, 143.0f, 75.0f, 61.0f, 56.0f, 51.0f, 46.0f, 37.0f, 32.0f, 22.0f};
+
+  Size  textSize15(5.0f, 30.0f);
+  float positions15[] = {16.0f};
 
   struct ElideData data[] =
     {
@@ -1253,9 +1269,19 @@ int UtcDaliTextFieldlElideTextLocation(void)
        15,
        positions14},
 
+      {"EllipsisPosition: TextField: Corner case MIDDLE",
+       "سیٹنگیں Projector سیٹنگیں",
+       false,
+       DevelText::LineWrap::WORD,
+       DevelText::EllipsisPosition::MIDDLE,
+       false,
+       textSize15,
+       1u,
+       1u,
+       positions15},
     };
 
-  const unsigned int numberOfTests = 17u;
+  const unsigned int numberOfTests = 18u;
 
   for(unsigned int index = 0u; index < numberOfTests; ++index)
   {

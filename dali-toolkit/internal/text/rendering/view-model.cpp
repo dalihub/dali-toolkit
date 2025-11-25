@@ -31,6 +31,29 @@ namespace Toolkit
 {
 namespace Text
 {
+namespace
+{
+// Safely shift a glyph buffer in-place using memmove,
+// clamping the copy length to the valid [0, bufferSize) range.
+template<typename T>
+void GlyphMemmove(T* buffer, Length bufferSize, Length dstIndex, Length srcIndex, Length count)
+{
+  if(!buffer || bufferSize == 0u || count == 0u || dstIndex >= bufferSize || srcIndex >= bufferSize)
+  {
+    return;
+  }
+
+  const Length maxByDst  = bufferSize - dstIndex;
+  const Length maxBySrc  = bufferSize - srcIndex;
+  Length       safeCount = std::min(count, std::min(maxByDst, maxBySrc));
+
+  if(safeCount > 0u)
+  {
+    memmove(buffer + dstIndex, buffer + srcIndex, safeCount * sizeof(T));
+  }
+}
+} // unnamed namespace
+
 ViewModel::ViewModel(const ModelInterface* const model)
 : mModel(model),
   mElidedGlyphs(),
@@ -616,12 +639,12 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
             {
               if(!isTailMode && indexOfEllipsis < numberOfGlyphs - 1u)
               {
-                // Tail Mode: remove glyphs from startIndexOfEllipsis then decrement indexOfEllipsis, until arrive to index zero.
+                // Not Tail Mode: remove glyphs from startIndexOfEllipsis then increase indexOfEllipsis, until arrive to last index (numberOfGlyphs - 1u).
                 ++indexOfEllipsis;
               }
               else if(isTailMode && indexOfEllipsis > 0u)
               {
-                // Not Tail Mode: remove glyphs from startIndexOfEllipsis then increase indexOfEllipsis, until arrive to last index (numberOfGlyphs - 1u).
+                // Tail Mode: remove glyphs from startIndexOfEllipsis then decrement indexOfEllipsis, until arrive to index zero.
                 --indexOfEllipsis;
               }
               else
@@ -641,8 +664,8 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           if(ellipsisPosition == DevelText::EllipsisPosition::START)
           {
             // 'Shifts' glyphs after ellipsis glyph and 'Removes' before ellipsis glyph
-            memcpy(elidedGlyphsBuffer, elidedGlyphsBuffer + indexOfEllipsis, numberOfElidedGlyphs * sizeof(GlyphInfo));
-            memcpy(elidedPositionsBuffer, elidedPositionsBuffer + indexOfEllipsis, numberOfElidedGlyphs * sizeof(Vector2));
+            GlyphMemmove(elidedGlyphsBuffer, numberOfGlyphs, 0u, indexOfEllipsis, numberOfElidedGlyphs);
+            GlyphMemmove(elidedPositionsBuffer, numberOfGlyphs, 0u, indexOfEllipsis, numberOfElidedGlyphs);
 
             mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = indexOfEllipsis;
           }
@@ -674,17 +697,25 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
             {
               Length numberOfSecondHalfGlyphs = numberOfElidedGlyphs - mFirstMiddleIndexOfElidedGlyphs;
 
-              //Copy elided glyphs after the ellipsis glyph.
-              memcpy(elidedGlyphsBuffer + mFirstMiddleIndexOfElidedGlyphs, elidedGlyphsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
-              memcpy(elidedPositionsBuffer + mFirstMiddleIndexOfElidedGlyphs, elidedPositionsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+              // Copy elided glyphs after the ellipsis glyph.
+              GlyphMemmove(elidedGlyphsBuffer, numberOfGlyphs, mFirstMiddleIndexOfElidedGlyphs, mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
+              GlyphMemmove(elidedPositionsBuffer, numberOfGlyphs, mFirstMiddleIndexOfElidedGlyphs, mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
             }
             else
             {
               Length numberOfSecondHalfGlyphs = numberOfElidedGlyphs - mFirstMiddleIndexOfElidedGlyphs + 1u;
 
-              //Copy elided glyphs after the ellipsis glyph.
-              memcpy(elidedGlyphsBuffer + mFirstMiddleIndexOfElidedGlyphs + 1u, elidedGlyphsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
-              memcpy(elidedPositionsBuffer + mFirstMiddleIndexOfElidedGlyphs + 1u, elidedPositionsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+              // Make sure that out-of-boundary does not occur for the source range.
+              if(mSecondMiddleIndexOfElidedGlyphs + numberOfSecondHalfGlyphs > numberOfGlyphs)
+              {
+                numberOfSecondHalfGlyphs = numberOfGlyphs - mSecondMiddleIndexOfElidedGlyphs;
+              }
+
+              const Length dstIndex = mFirstMiddleIndexOfElidedGlyphs + 1u;
+
+              // Copy elided glyphs after the ellipsis glyph.
+              GlyphMemmove(elidedGlyphsBuffer, numberOfGlyphs, dstIndex, mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
+              GlyphMemmove(elidedPositionsBuffer, numberOfGlyphs, dstIndex, mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs);
             }
           }
           else // DevelText::EllipsisPosition::END
