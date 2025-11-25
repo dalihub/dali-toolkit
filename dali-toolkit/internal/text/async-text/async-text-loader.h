@@ -92,6 +92,8 @@ struct AsyncTextParameters
     fontSizeScale{1.f},
     textWidth{0.f},
     textHeight{0.f},
+    originWidth{0.f},
+    originHeight{0.f},
     underlineHeight{0.f},
     dashedUnderlineWidth{2.f},
     dashedUnderlineGap{1.f},
@@ -120,6 +122,7 @@ struct AsyncTextParameters
     layoutDirectionPolicy{DevelText::MatchLayoutDirection::INHERIT},
     ellipsisPosition{DevelText::EllipsisPosition::END},
     ellipsisMode{DevelText::Ellipsize::TRUNCATE},
+    autoScrollDirection{DevelText::AutoScroll::HORIZONTAL},
     autoScrollStopMode{TextLabel::AutoScrollStopMode::FINISH_LOOP},
     fontWeight{FontWeight::NONE},
     fontWidth{FontWidth::NONE},
@@ -177,6 +180,8 @@ struct AsyncTextParameters
   float fontSizeScale;    ///< The font's size scale.
   float textWidth;        ///< The width in pixels of the boundaries where the text is going to be laid-out.
   float textHeight;       ///< The height in pixels of the boundaries where the text is going to be laid-out.
+  float originWidth;
+  float originHeight;
   float underlineHeight;
   float dashedUnderlineWidth;
   float dashedUnderlineGap;
@@ -208,6 +213,7 @@ struct AsyncTextParameters
   DevelText::MatchLayoutDirection        layoutDirectionPolicy; ///< The policy used to set the text layout direction : one of {INHERIT, LOCALE, CONTENTS}.
   DevelText::EllipsisPosition::Type      ellipsisPosition;      ///< The position of the ellipsis glyph: one of {END, START, MIDDLE}.
   DevelText::Ellipsize::Mode             ellipsisMode;          ///< The mode of the ellipsis: one of {TRUNCATE, AUTO_SCROLL}.
+  DevelText::AutoScroll::Direction       autoScrollDirection;   ///< The direction of the auto scroll {HORIZONTAL, VERTICAL}.
   TextLabel::AutoScrollStopMode::Type    autoScrollStopMode;    ///< The auto scroll stop mode: one of {FINISH_LOOP, IMMEDIATE}.
   FontWeight                             fontWeight;            ///< The font's weight.
   FontWidth                              fontWidth;             ///< The font's width.
@@ -349,6 +355,13 @@ public:
   void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
 
   /**
+   * @brief Request adds a custom font directory.
+   *
+   * @param[in] path The path of the custom font directory.
+   */
+  void RequestAddCustomFont(const std::string& path);
+
+  /**
    * @brief Sets a flag indicating that module's cache clearing is needed.
    *
    * When the async text loader is available, clear is processed on the main thread.
@@ -390,6 +403,17 @@ public:
    * @return The natural size of text.
    */
   Size ComputeNaturalSize(AsyncTextParameters& parameters);
+
+  /**
+   * @brief Compute height for width of text.
+   *
+   * @param[in] parameters All options required to compute height of text.
+   * @param[in] width The width of text to compute.
+   * @param[in] layoutOnly If there is no need to Initialize/Update, only the Layout is performed.
+   *
+   * @return The height for width of text.
+   */
+  float ComputeHeightForWidth(AsyncTextParameters& parameters, float width, bool layoutOnly);
 
   /**
    * @brief Renders text into a pixel buffer.

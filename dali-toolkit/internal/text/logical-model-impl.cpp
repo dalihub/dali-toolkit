@@ -683,6 +683,7 @@ LogicalModel::~LogicalModel()
   }
   ClearFontDescriptionRuns();
   ClearEmbeddedImages();
+  ClearAnchors();
 }
 
 LogicalModel::LogicalModel()

@@ -218,6 +218,20 @@ public:
   const Vector2& GetLayoutSize() const;
 
   /**
+   * @brief Sets the text's cached layout size.
+   *
+   * @param[in] size The text's size.
+   */
+  void SetCachedLayoutSize(const Vector2& size);
+
+  /**
+   * @brief Retrieves the text's cached layout size.
+   *
+   * @return The text's size.
+   */
+  const Vector2& GetCachedLayoutSize() const;
+
+  /**
    * @brief Sets the size of height for width.
    *
    * @param[in] size The text's height for width size.
@@ -846,9 +860,10 @@ public:
   Vector4                          mEmbossShadowColor;         ///< Shadow color of emboss.
 
 private:
-  Size mNaturalSize;    ///< Size of the text with no line wrapping.
-  Size mLayoutSize;     ///< Size of the laid-out text considering the layout properties set.
-  Size mHeightForWidth; ///< Size of the text last calculated using GetHeightForWidth.
+  Size mNaturalSize;      ///< Size of the text with no line wrapping.
+  Size mLayoutSize;       ///< Size of the laid-out text considering the layout properties set.
+  Size mCachedLayoutSize; ///< Size of the cached laid-out text for controller's get layout size.
+  Size mHeightForWidth;   ///< Size of the text last calculated using GetHeightForWidth.
 
   // Caches to increase performance in some consecutive operations.
   LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.

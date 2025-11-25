@@ -116,10 +116,11 @@ public:
    * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
    * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
    * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   * @param[in] originSize The origin size for calculating vertical alignment. (default) If zero, the control and renderer sizes are used.
    *
    * @return A pixel data with the text rendered.
    */
-  PixelData Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888);
+  PixelData Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888, const Vector2& originSize = Size::ZERO);
 
   /**
    * @brief After the Render, use the pixel information of the given cutoutBuffer to make the part where the pixel is drawn transparent.
@@ -131,10 +132,11 @@ public:
    * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
    * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
    * @param[in] originAlpha The original alpha of text.
+   * @param[in] originSize The origin size for calculating vertical alignment. (default) If zero, the control and renderer sizes are used.
    *
    * @return A pixel data with the text rendered.
    */
-  PixelData RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer cutoutBuffer, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888, float originAlpha = 1.f);
+  PixelData RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer cutoutBuffer, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888, float originAlpha = 1.f, const Vector2& originSize = Size::ZERO);
 
   /**
    * @brief Renders the text, return as Devel::PixelBuffer.
@@ -147,10 +149,11 @@ public:
    * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
    * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
    * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   * @param[in] originSize The origin size for calculating vertical alignment. (default) If zero, the control and renderer sizes are used.
    *
    * @return A pixel data with the text rendered.
    */
-  Devel::PixelBuffer RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888);
+  Devel::PixelBuffer RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888, const Vector2& originSize = Size::ZERO);
 
   /**
    * @brief Create & draw the image buffer of single background color.

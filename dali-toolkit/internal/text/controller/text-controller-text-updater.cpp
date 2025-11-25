@@ -145,6 +145,8 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
 
     // The natural size needs to be re-calculated.
     impl.mRecalculateNaturalSize = true;
+    impl.mRecalculateLayoutSize  = true;
+    impl.mModel->mVisualModel->SetHeightForWidth(Size::ZERO);
 
     // The text direction needs to be updated.
     impl.mUpdateTextDirection = true;
@@ -751,6 +753,7 @@ void Controller::TextUpdater::ResetText(Controller& controller)
 
   // The natural size needs to be re-calculated.
   impl.mRecalculateNaturalSize = true;
+  impl.mRecalculateLayoutSize  = true;
 
   // The text direction needs to be updated.
   impl.mUpdateTextDirection = true;

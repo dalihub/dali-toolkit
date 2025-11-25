@@ -324,6 +324,15 @@ enum Type
    * CONTENTS : The text layout direction is determined by the text itself.
    */
   LAYOUT_DIRECTION_POLICY,
+
+  /**
+   * @brief AutoScrollDirection value.
+   * @details Name "autoScrollDirection", type Property::INTERGER.
+   * @note
+   * HORIZONTAL : Horizontal scrolling of text, only valid when single-line.
+   * VERTICAL   : Vertical scrolling of text, only valid when multi-line.
+   */
+  AUTO_SCROLL_DIRECTION,
 };
 
 } // namespace Property

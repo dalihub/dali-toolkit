@@ -83,6 +83,11 @@ public:
   void SetCustomFontDirectories(const TextAbstraction::FontPathList& customFontDirectories);
 
   /**
+   * @copydoc Dali::AsyncTextLoader::RequestAddCustomFont()
+   */
+  void RequestAddCustomFont(const std::string& path);
+
+  /**
    * @copydoc Dali::AsyncTextLoader::SetModuleClearNeeded()
    */
   void SetModuleClearNeeded(bool clear);
@@ -102,6 +107,11 @@ public:
    * @copydoc Dali::AsyncTextLoader::ComputeNaturalSize()
    */
   Size ComputeNaturalSize(AsyncTextParameters& parameters);
+
+  /**
+   * @brief Dali::AsyncTextLoader::ComputeHeightForWidth()
+   */
+  float ComputeHeightForWidth(AsyncTextParameters& parameters, float width, bool layoutOnly);
 
   /**
    * @copydoc Dali::AsyncTextLoader::RenderText()
@@ -167,15 +177,16 @@ private:
   AsyncTextRenderInfo Render(AsyncTextParameters& parameters);
 
   /**
-   * @brief Compute height for width of text.
+   * @brief Compute layout size of text.
    *
    * @param[in] parameters All options required to compute height of text.
    * @param[in] width The width of text to compute.
+   * @param[in] height The height of text to compute.
    * @param[in] layoutOnly If there is no need to Initialize/Update, only the Layout is performed.
    *
-   * @return The height for width of text.
+   * @return The size of laid-out text.
    */
-  float ComputeHeightForWidth(AsyncTextParameters& parameters, float width, bool layoutOnly);
+  Size ComputeLayoutSize(AsyncTextParameters& parameters, float width, float height, bool layoutOnly);
 
   /**
    * @brief Check if the text fits.
@@ -211,6 +222,8 @@ private:
   Text::Layout::Engine mLayoutEngine;
   Text::TypesetterPtr  mTypesetter;
   std::string          mLocale;
+
+  TextAbstraction::FontPathList mCustomFonts;
 
   Length mNumberOfCharacters;
   bool   mFitActualEllipsis : 1;  // Used to store actual ellipses during TextFit calculations. Do not use it in other sections.
