@@ -340,6 +340,16 @@ const Vector2& VisualModel::GetLayoutSize() const
   return mLayoutSize;
 }
 
+void VisualModel::SetCachedLayoutSize(const Vector2& size)
+{
+  mCachedLayoutSize = size;
+}
+
+const Vector2& VisualModel::GetCachedLayoutSize() const
+{
+  return mCachedLayoutSize;
+}
+
 void VisualModel::SetHeightForWidth(const Vector2& size)
 {
   mHeightForWidth = size;
@@ -783,6 +793,7 @@ VisualModel::VisualModel()
   mEmbossStrength(0.0f),
   mNaturalSize(),
   mLayoutSize(),
+  mCachedLayoutSize(),
   mHeightForWidth(0.0f, 0.0f),
   mCachedLineIndex(0u),
   mEllipsisPosition(DevelText::EllipsisPosition::END),

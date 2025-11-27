@@ -62,6 +62,12 @@ public:
   static Text::AsyncTextManager Get();
 
   /**
+   * @brief Callback function for when the custom font is added.
+   * @param[in] path Added custom font directory.
+   */
+  void OnCustomFontAdded(const std::string& path);
+
+  /**
    * @brief Callback function for when the locale is changed.
    * @param[in] locale The new system locale.
    */

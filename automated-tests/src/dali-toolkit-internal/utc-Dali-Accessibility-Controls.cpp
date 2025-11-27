@@ -712,7 +712,40 @@ int UtcDaliAccessibilityTextAnchor(void)
   // making hyperlink invalid
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
-  DALI_TEST_CHECK(!action->DoAction("activate"));
+  // activate should be valid even if the hyperlink is invalid.
+  DALI_TEST_CHECK(action->DoAction("activate"));
+
+  auto textField = TextField::New();
+  DALI_TEST_CHECK(textField);
+
+  textField.Add(textanchor);
+  accessible = Dali::Accessibility::Accessible::Get(textanchor);
+  DALI_TEST_CHECK(accessible);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(accessible);
+  DALI_TEST_CHECK(hyperlink);
+  textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "https://www.tizen.org");
+  DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
+  action = dynamic_cast<Dali::Accessibility::Action*>(accessible);
+  DALI_TEST_CHECK(action->DoAction("activate"));
+  textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
+  DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
+  DALI_TEST_CHECK(action->DoAction("activate"));
+
+  auto textEditor = TextEditor::New();
+  DALI_TEST_CHECK(textEditor);
+
+  textEditor.Add(textanchor);
+  accessible = Dali::Accessibility::Accessible::Get(textanchor);
+  DALI_TEST_CHECK(accessible);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(accessible);
+  DALI_TEST_CHECK(hyperlink);
+  textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "https://www.tizen.org");
+  DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
+  action = dynamic_cast<Dali::Accessibility::Action*>(accessible);
+  DALI_TEST_CHECK(action->DoAction("activate"));
+  textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
+  DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
+  DALI_TEST_CHECK(action->DoAction("activate"));
 
   Dali::Accessibility::TestEnableSC(false);
 

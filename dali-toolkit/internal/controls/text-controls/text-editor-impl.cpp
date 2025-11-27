@@ -774,7 +774,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mStencil)
   {
     mStencil.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
-    ResizeActor(mStencil, contentSize);
+    ResizeActor(mStencil, Vector2(contentSize.x + padding.end, contentSize.y));
   }
   if(mActiveLayer)
   {
@@ -1049,7 +1049,12 @@ void TextEditor::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   mInputStyleChangedSignal.Emit(handle, ConvertInputStyle(inputStyleMask));
 }
 
-void TextEditor::AnchorClicked(const std::string& href)
+bool TextEditor::AnchorClicked(uint32_t cursorPosition, std::string& href)
+{
+  return mController->AnchorClickEvent(cursorPosition, href);
+}
+
+void TextEditor::EmitAnchorClickedSignal(const std::string& href)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());

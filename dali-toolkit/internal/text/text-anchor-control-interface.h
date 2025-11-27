@@ -36,9 +36,17 @@ public:
   virtual ~AnchorControlInterface() = default;
 
   /**
-   * @brief Called to signal that anchor has been clicked.
+   * @brief Called to notify that an anchor has been clicked.
+   * @param[in] cursorPosition Checks if an anchor exists at the given cursor position.
+   * @param[out] href If an anchor exists at the given cursor position, the href is written.
+   * @return True if an anchor exists at the given cursor position, false otherwise.
    */
-  virtual void AnchorClicked(const std::string& href) = 0;
+  virtual bool AnchorClicked(uint32_t cursorPosition, std::string& href) = 0;
+
+  /**
+   * @brief Called to emit an anchor clicked signal.
+   */
+  virtual void EmitAnchorClickedSignal(const std::string& href) = 0;
 };
 
 } // namespace Text

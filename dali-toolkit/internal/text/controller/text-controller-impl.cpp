@@ -1624,6 +1624,7 @@ void Controller::Impl::RelayoutAllCharacters()
 
   // Need to recalculate natural size
   mRecalculateNaturalSize = true;
+  mRecalculateLayoutSize  = true;
 
   //remove selection
   if((mEventData != nullptr) && (mEventData->mState == EventData::SELECTING))
@@ -1918,19 +1919,16 @@ void Controller::Impl::CopyCharacterSpacingFromLogicalToVisualModels()
   mModel->mLogicalModel->mCharacterSpacingRunsUpdated = false;
 }
 
-void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout)
+void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout, DevelText::AutoScroll::Direction direction)
 {
-  if(mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
+  if((mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX && direction == DevelText::AutoScroll::HORIZONTAL) ||
+     (mLayoutEngine.GetLayout() == Layout::Engine::MULTI_LINE_BOX && direction == DevelText::AutoScroll::VERTICAL))
   {
-    mOperationsPending = static_cast<OperationsMask>(mOperationsPending |
-                                                     LAYOUT |
-                                                     ALIGN |
-                                                     UPDATE_LAYOUT_SIZE |
-                                                     REORDER);
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | LAYOUT | ALIGN | UPDATE_LAYOUT_SIZE | REORDER);
 
     if(enable)
     {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n");
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled\n");
       mOperationsPending = static_cast<OperationsMask>(mOperationsPending | UPDATE_DIRECTION);
     }
     else
@@ -1946,7 +1944,7 @@ void Controller::Impl::SetAutoScrollEnabled(bool enable, bool requestRelayout)
   }
   else
   {
-    DALI_LOG_DEBUG_INFO("Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n");
+    DALI_LOG_DEBUG_INFO("Attempted AutoScrolling, request ignored\n");
     mIsAutoScrollEnabled = false;
   }
 }
@@ -1986,6 +1984,7 @@ void Controller::Impl::SetMultiLineEnabled(bool enable)
 
     // Need to recalculate natural size
     mRecalculateNaturalSize = true;
+    mRecalculateLayoutSize  = true;
 
     RequestRelayout();
   }
@@ -2082,6 +2081,7 @@ void Controller::Impl::ClearFontData()
   mTextUpdateInfo.mClearAll           = true;
   mTextUpdateInfo.mFullRelayoutNeeded = true;
   mRecalculateNaturalSize             = true;
+  mRecalculateLayoutSize              = true;
 
   mOperationsPending = static_cast<OperationsMask>(mOperationsPending |
                                                    VALIDATE_FONTS |

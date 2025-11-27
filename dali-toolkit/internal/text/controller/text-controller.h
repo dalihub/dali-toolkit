@@ -262,8 +262,9 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the auto scrolling
    * @param[in] requestRelayout Whether to request the relayout
+   * @param[in] direction Direction of the auto scroll.
    */
-  void SetAutoScrollEnabled(bool enable, bool requestRelayout = true);
+  void SetAutoScrollEnabled(bool enable, bool requestRelayout = true, DevelText::AutoScroll::Direction direction = DevelText::AutoScroll::HORIZONTAL);
 
   /**
    * @brief Whether the auto scrolling texture exceed max texture.
@@ -287,7 +288,7 @@ public: // Configure the text controller.
    * @brief Get direction of the text from the first line of text,
    * @return bool rtl (right to left) is true
    */
-  CharacterDirection GetAutoScrollDirection() const;
+  CharacterDirection GetAutoScrollTextDirection() const;
 
   /**
    * @brief Get the alignment offset of the first line of text.
@@ -1824,12 +1825,22 @@ public: // Queries & retrieves.
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize(bool convertToEven = true);
 
   /**
    * @copydoc Control::GetHeightForWidth()
    */
   float GetHeightForWidth(float width);
+
+  /**
+   * @brief Called by the Controller to get the layout size for a particular width and height.
+   *
+   * @param[in] width The width.
+   * @param[in] height The height.
+   * @param[in] forceUpdate Forces updates to recalculate layout, alignment etc.
+   * @return Size of the laid-out text.
+   */
+  Vector2 CalculateLayoutSize(float width, float height, bool forceUpdate = false);
 
   /**
    * @brief Calculates the point size for text for given layout()
@@ -2203,6 +2214,14 @@ public: // Text-input Event Queuing.
    * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   bool KeyEvent(const Dali::KeyEvent& event);
+
+  /**
+   * @brief Called from AnchorEvent or TextAnchor's OnAccessibilityActivated.
+   * @param[in] cursorPosition Checks if an anchor exists at the given cursor position.
+   * @param[out] href If an anchor exists at the given cursor position, the href is written.
+   * @return True if an anchor exists at the given cursor position, false otherwise.
+   */
+  bool AnchorClickEvent(uint32_t cursorPosition, std::string& href);
 
   /**
    * @brief Called by anchor when a tap gesture occurs.

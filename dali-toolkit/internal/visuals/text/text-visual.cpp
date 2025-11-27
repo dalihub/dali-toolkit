@@ -846,20 +846,29 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       parameters.textHeight = parameters.renderScaleHeight;
     }
 
-    // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
-    Vector2 alignmentOffset;
-    alignmentOffset.x = 0.0f;
-    alignmentOffset.y = (parameters.textHeight - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[parameters.verticalAlignment];
-
     // Size of the text control including padding.
     Vector2 textControlSize(parameters.textWidth + (parameters.padding.start + parameters.padding.end), parameters.textHeight + (parameters.padding.top + parameters.padding.bottom));
 
+    bool isVerticalScroll = false;
     if(parameters.isAutoScrollEnabled)
     {
       // In case of auto scroll, the layout width (renderInfo's width) is the natural size of the text.
       // Since the layout size is the size of the visual transform, it should be reset to the text area excluding padding.
-      layoutSize.width = parameters.textWidth;
+      if(parameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
+      {
+        layoutSize.width = parameters.textWidth;
+      }
+      else
+      {
+        layoutSize.height = parameters.textHeight;
+        isVerticalScroll  = true;
+      }
     }
+
+    // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
+    Vector2 alignmentOffset;
+    alignmentOffset.x = 0.0f;
+    alignmentOffset.y = isVerticalScroll ? 0.0f : (parameters.textHeight - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[parameters.verticalAlignment];
 
     Vector2 visualTransformOffset;
     if(renderInfo.isCutout)
@@ -903,7 +912,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
     const int maxTextureSize = Dali::GetMaxTextureSize();
 
     // No tiling required. Use the default renderer.
-    if(renderInfo.size.height < static_cast<float>(maxTextureSize))
+    if(renderInfo.size.height <= static_cast<float>(maxTextureSize))
     {
       // Filter mode needs to be set to linear to produce better quality while scaling.
       Sampler sampler = Sampler::New();

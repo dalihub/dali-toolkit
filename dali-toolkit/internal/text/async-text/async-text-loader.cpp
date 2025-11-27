@@ -65,6 +65,11 @@ void AsyncTextLoader::SetCustomFontDirectories(const TextAbstraction::FontPathLi
   GetImplementation(*this).SetCustomFontDirectories(customFontDirectories);
 }
 
+void AsyncTextLoader::RequestAddCustomFont(const std::string& path)
+{
+  GetImplementation(*this).RequestAddCustomFont(path);
+}
+
 void AsyncTextLoader::SetModuleClearNeeded(bool clear)
 {
   GetImplementation(*this).SetModuleClearNeeded(clear);
@@ -90,6 +95,11 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
 Size AsyncTextLoader::ComputeNaturalSize(AsyncTextParameters& parameters)
 {
   return GetImplementation(*this).ComputeNaturalSize(parameters);
+}
+
+float AsyncTextLoader::ComputeHeightForWidth(AsyncTextParameters& parameters, float width, bool layoutOnly)
+{
+  return GetImplementation(*this).ComputeHeightForWidth(parameters, width, layoutOnly);
 }
 
 AsyncTextRenderInfo AsyncTextLoader::RenderText(AsyncTextParameters& parameters, bool useCachedNaturalSize, const Size& naturalSize)

@@ -176,10 +176,10 @@ bool Controller::HasAnchors() const
   return (mImpl->mMarkupProcessorEnabled && mImpl->mModel->mLogicalModel->mAnchors.Count() && mImpl->IsShowingRealText());
 }
 
-void Controller::SetAutoScrollEnabled(bool enable, bool requestRelayout)
+void Controller::SetAutoScrollEnabled(bool enable, bool requestRelayout, DevelText::AutoScroll::Direction direction)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable) ? "true" : "false", (mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX) ? "true" : "false", this);
-  mImpl->SetAutoScrollEnabled(enable, requestRelayout);
+  mImpl->SetAutoScrollEnabled(enable, requestRelayout, direction);
 }
 
 void Controller::SetAutoScrollMaxTextureExceeded(bool exceed)
@@ -193,7 +193,7 @@ bool Controller::IsAutoScrollEnabled() const
   return mImpl->mIsAutoScrollEnabled;
 }
 
-CharacterDirection Controller::GetAutoScrollDirection() const
+CharacterDirection Controller::GetAutoScrollTextDirection() const
 {
   return mImpl->mIsTextDirectionRTL;
 }
@@ -1508,9 +1508,9 @@ View& Controller::GetView()
   return mImpl->mView;
 }
 
-Vector3 Controller::GetNaturalSize()
+Vector3 Controller::GetNaturalSize(bool convertToEven)
 {
-  return Relayouter::GetNaturalSize(*this);
+  return Relayouter::GetNaturalSize(*this, convertToEven);
 }
 
 bool Controller::CheckForTextFit(float pointSize, Size& layoutSize)
@@ -1531,6 +1531,11 @@ void Controller::FitArrayPointSizeforLayout(Size layoutSize)
 float Controller::GetHeightForWidth(float width)
 {
   return Relayouter::GetHeightForWidth(*this, width);
+}
+
+Vector2 Controller::CalculateLayoutSize(float width, float height, bool forceUpdate)
+{
+  return Relayouter::CalculateLayoutSize(*this, width, height, forceUpdate);
 }
 
 int Controller::GetLineCount(float width)
@@ -1790,6 +1795,11 @@ void Controller::KeyboardFocusLostEvent()
 bool Controller::KeyEvent(const Dali::KeyEvent& keyEvent)
 {
   return EventHandler::KeyEvent(*this, keyEvent);
+}
+
+bool Controller::AnchorClickEvent(uint32_t cursorPosition, std::string& href)
+{
+  return EventHandler::AnchorClickEvent(*this, cursorPosition, href);
 }
 
 void Controller::AnchorEvent(float x, float y)

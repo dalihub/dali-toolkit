@@ -161,6 +161,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontVariations",
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderScale",                  FLOAT,   RENDER_SCALE                   )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "needRequestAsyncRender",       BOOLEAN, NEED_REQUEST_ASYNC_RENDER      )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "layoutDirectionPolicy",        INTEGER, LAYOUT_DIRECTION_POLICY        )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "autoScrollDirection",          INTEGER, AUTO_SCROLL_DIRECTION          )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",       Color::BLACK,     TEXT_COLOR       )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",    TEXT_COLOR_RED,   TEXT_COLOR,     0)
@@ -360,6 +361,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       {
         impl.mController->SetMultiLineEnabled(value.Get<bool>());
         impl.mIsAsyncRenderNeeded = true;
+        impl.UpdateAutoScrollState();
         break;
       }
       case Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT:
@@ -423,7 +425,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
             // If request is enable (true) then start autoscroll as not already running
             else
             {
-              impl.mController->SetAutoScrollEnabled(enableAutoScroll);
+              impl.mController->SetAutoScrollEnabled(enableAutoScroll, true, impl.GetTextScroller()->GetDirection());
             }
             impl.mIsAsyncRenderNeeded = true;
           }
@@ -461,6 +463,14 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::TextLabel::Property::AUTO_SCROLL_GAP:
       {
         impl.GetTextScroller()->SetGap(value.Get<float>());
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_DIRECTION:
+      {
+        DevelText::AutoScroll::Direction direction = static_cast<DevelText::AutoScroll::Direction>(value.Get<int>());
+        impl.GetTextScroller()->SetDirection(direction);
+        impl.UpdateAutoScrollState();
+        impl.mTextUpdateNeeded = true;
         break;
       }
       case Toolkit::TextLabel::Property::LINE_SPACING:
@@ -889,6 +899,14 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_DIRECTION:
+      {
+        if(impl.mTextScroller)
+        {
+          value = impl.mTextScroller->GetDirection();
+        }
+        break;
+      }
       case Toolkit::TextLabel::Property::LINE_SPACING:
       {
         value = impl.mController->GetDefaultLineSpacing();
@@ -1290,7 +1308,12 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
   Control::OnStyleChange(styleManager, change);
 }
 
-void TextLabel::AnchorClicked(const std::string& href)
+bool TextLabel::AnchorClicked(uint32_t cursorPosition, std::string& href)
+{
+  return mController->AnchorClickEvent(cursorPosition, href);
+}
+
+void TextLabel::EmitAnchorClickedSignal(const std::string& href)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
@@ -1436,7 +1459,7 @@ void TextLabel::OnSceneConnection(int depth)
 
   if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
   {
-    mController->SetAutoScrollEnabled(true);
+    mController->SetAutoScrollEnabled(true, true, GetTextScroller()->GetDirection());
   }
   Control::OnSceneConnection(depth);
 }
@@ -1587,22 +1610,47 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     mController->SetTextFitContentSize(contentSize);
   }
 
+  DevelText::AutoScroll::Direction autoScrollDirection = mTextScroller ? mTextScroller->GetDirection() : DevelText::AutoScroll::HORIZONTAL;
+
   if(mController->IsTextElideEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
   {
-    if(mController->IsMultiLineEnabled())
+    bool enableAutoScroll = false;
+    if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
     {
-      DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+      if(mController->IsMultiLineEnabled())
+      {
+        DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+        enableAutoScroll = false;
+      }
+      else
+      {
+        const Size naturalSize = mController->GetNaturalSize(false).GetVectorXY();
+        enableAutoScroll       = contentSize.width < naturalSize.width ? true : false;
+      }
     }
     else
     {
-      const Size naturalSize       = GetNaturalSize().GetVectorXY();
-      bool       autoScrollEnabled = contentSize.width < naturalSize.width ? true : false;
-      bool       requestRelayout   = false;
+      const float textHeight = mController->GetHeightForWidth(contentSize.width);
+      enableAutoScroll       = contentSize.height < textHeight ? true : false;
+    }
 
-      if(autoScrollEnabled != mController->IsAutoScrollEnabled())
-      {
-        mController->SetAutoScrollEnabled(autoScrollEnabled, requestRelayout);
-      }
+    if(enableAutoScroll != mController->IsAutoScrollEnabled())
+    {
+      mController->SetAutoScrollEnabled(enableAutoScroll, false, autoScrollDirection);
+    }
+  }
+
+  Size originSize       = Size::ZERO;
+  bool isVerticalScroll = false;
+  if(mController->IsAutoScrollEnabled())
+  {
+    isVerticalScroll               = autoScrollDirection == DevelText::AutoScroll::VERTICAL ? true : false;
+    bool needLayoutSizeCalculation = (isVerticalScroll && mController->GetVerticalAlignment() != Text::VerticalAlignment::TOP) ? true : false;
+    if(needLayoutSizeCalculation)
+    {
+      mController->SetAutoScrollEnabled(false, false, DevelText::AutoScroll::VERTICAL);
+      originSize = mController->CalculateLayoutSize(contentSize.x, contentSize.y);
+      mController->SetAutoScrollEnabled(true, false, DevelText::AutoScroll::VERTICAL);
     }
   }
 
@@ -1632,7 +1680,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
     Vector2 alignmentOffset;
     alignmentOffset.x = 0.0f;
-    alignmentOffset.y = (contentSize.y - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[mController->GetVerticalAlignment()];
+    alignmentOffset.y = isVerticalScroll ? 0.0f : (contentSize.y - layoutSize.y) * VERTICAL_ALIGNMENT_TABLE[mController->GetVerticalAlignment()];
 
     const int maxTextureSize = Dali::GetMaxTextureSize();
     if(layoutSize.width > maxTextureSize)
@@ -1650,8 +1698,10 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     mController->SetLayoutAlignmentOffset(alignmentOffset);
     mController->SetLayoutOffsetWithPadding(visualTransformOffset);
 
+    Vector2 visualTransformSize = isVerticalScroll ? contentSize : layoutSize;
+
     Property::Map visualTransform;
-    visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, layoutSize)
+    visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, visualTransformSize)
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
@@ -1661,10 +1711,10 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     if(mController->IsAutoScrollEnabled())
     {
-      SetUpAutoScrolling();
+      SetUpAutoScrolling(contentSize, originSize);
     }
 
-    if(Dali::Accessibility::IsUp())
+    if(Dali::Accessibility::IsUp() && (mAnchorActors.empty() || mTextUpdateNeeded || sizeChanged))
     {
       CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
     }
@@ -1754,6 +1804,7 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
     parameters.autoScrollLoopCount = GetTextScroller()->GetLoopCount();
     parameters.autoScrollLoopDelay = GetTextScroller()->GetLoopDelay();
     parameters.autoScrollGap       = GetTextScroller()->GetGap();
+    parameters.autoScrollDirection = GetTextScroller()->GetDirection();
   }
   parameters.cutout                      = mController->IsTextCutout();
   parameters.backgroundWithCutoutEnabled = mController->IsBackgroundWithCutoutEnabled();
@@ -1771,13 +1822,25 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   return parameters;
 }
 
-void TextLabel::SetUpAutoScrolling()
+void TextLabel::UpdateAutoScrollState()
 {
-  const Size&                    controlSize     = mController->GetView().GetControlSize();
-  const Size                     textNaturalSize = GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
-  const Text::CharacterDirection direction       = mController->GetAutoScrollDirection();
+  if(mController->IsAutoScrollEnabled())
+  {
+    const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = GetTextScroller()->GetStopMode();
+    mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+    mTextScroller->StopScrolling();
+    mTextScroller->SetStopMode(stopMode);
+    mController->SetAutoScrollEnabled(true, true, mTextScroller->GetDirection());
+  }
+}
 
-  DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling textNaturalSize[%f,%f] controlSize[%f,%f]\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
+void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSize)
+{
+  const Text::CharacterDirection direction = mController->GetAutoScrollTextDirection();
+
+  float wrapGap        = 0.0f;
+  Size  verifiedSize   = Size::ZERO;
+  bool  actualellipsis = mController->IsTextElideEnabled();
 
   if(!mTextScroller)
   {
@@ -1786,36 +1849,72 @@ void TextLabel::SetUpAutoScrolling()
     mTextScroller = Text::TextScroller::New(*this);
   }
 
-  // Calculate the actual gap before scrolling wraps.
-  int     textPadding = std::max(controlSize.x - textNaturalSize.x, 0.0f);
-  float   wrapGap     = std::max(mTextScroller->GetGap(), textPadding);
-  Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture
+  bool        isHorizontal   = mTextScroller->GetDirection() == DevelText::AutoScroll::HORIZONTAL;
+  const Size& controlSize    = isHorizontal ? mController->GetView().GetControlSize() : contentSize;
+  const int   maxTextureSize = Dali::GetMaxTextureSize();
 
-  // Create a texture of the text for scrolling
-  Size      verifiedSize   = textureSize;
-  const int maxTextureSize = Dali::GetMaxTextureSize();
-
-  //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
-  bool actualellipsis = mController->IsTextElideEnabled();
-  if(verifiedSize.width > maxTextureSize)
+  if(isHorizontal)
   {
-    verifiedSize.width = maxTextureSize;
-    if(textNaturalSize.width > maxTextureSize)
+    const Size textNaturalSize = mController->GetNaturalSize().GetVectorXY(); // As relayout of text may not be done at this point natural size is used to get size. Single line scrolling only.
+
+    DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling textNaturalSize[%f,%f] controlSize[%f,%f]\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
+
+    // Calculate the actual gap before scrolling wraps.
+    int textPadding     = std::max(controlSize.x - textNaturalSize.x, 0.0f);
+    wrapGap             = std::max(mTextScroller->GetGap(), textPadding);
+    Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture
+
+    // Create a texture of the text for scrolling
+    verifiedSize = textureSize;
+
+    //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
+    if(verifiedSize.width > maxTextureSize)
     {
-      mController->SetTextElideEnabled(true);
-      mController->SetAutoScrollMaxTextureExceeded(true);
+      verifiedSize.width = maxTextureSize;
+      if(textNaturalSize.width > maxTextureSize)
+      {
+        mController->SetTextElideEnabled(true);
+        mController->SetAutoScrollMaxTextureExceeded(true);
+      }
+      float gap = static_cast<float>(mTextScroller->GetGap());
+      mController->CalculateLayoutSize(verifiedSize.width - gap, controlSize.height, true);
+      wrapGap = std::max(maxTextureSize - textNaturalSize.width, gap);
     }
-    GetHeightForWidth(maxTextureSize);
-    wrapGap = std::max(maxTextureSize - textNaturalSize.width, 0.0f);
+  }
+  else // AutoScroll::VERTICAL
+  {
+    const float textHeight = mController->GetHeightForWidth(controlSize.width);
+
+    // Calculate the actual gap before scrolling wraps.
+    int textPadding = std::max(controlSize.height - textHeight, 0.0f);
+    wrapGap         = std::max(mTextScroller->GetGap(), textPadding);
+    Vector2 textureSize(controlSize.width, textHeight + wrapGap); // Add the gap as a part of the texture
+
+    // Create a texture of the text for scrolling
+    verifiedSize = textureSize;
+
+    // if the texture size height exceed maxTextureSize, modify the visual model size and enabled the ellipsis
+    if(verifiedSize.height > maxTextureSize)
+    {
+      verifiedSize.height = maxTextureSize;
+      if(textHeight > maxTextureSize)
+      {
+        mController->SetAutoScrollEnabled(false, false, DevelText::AutoScroll::VERTICAL);
+        mController->SetTextElideEnabled(true);
+      }
+
+      mController->CalculateLayoutSize(controlSize.width, maxTextureSize, true);
+      wrapGap = std::max(maxTextureSize - textHeight, 0.0f);
+      if(!mController->IsAutoScrollEnabled())
+      {
+        mController->SetAutoScrollEnabled(true, false, DevelText::AutoScroll::VERTICAL);
+      }
+    }
   }
 
   Text::TypesetterPtr typesetter = Text::Typesetter::New(mController->GetTextModel());
-
-  PixelData data    = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888); // ignore the horizontal alignment
-  Texture   texture = Texture::New(Dali::TextureType::TEXTURE_2D,
-                                   data.GetPixelFormat(),
-                                   data.GetWidth(),
-                                   data.GetHeight());
+  PixelData           data       = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, isHorizontal, Pixel::RGBA8888, originSize);
+  Texture             texture    = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   texture.Upload(data, "TextLabel");
@@ -1829,12 +1928,20 @@ void TextLabel::SetUpAutoScrolling()
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
-  sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT, Dali::WrapMode::DEFAULT); // Wrap the texture in the x direction
+
+  if(isHorizontal)
+  {
+    sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT, Dali::WrapMode::DEFAULT); // Wrap the texture in the x direction
+  }
+  else
+  {
+    sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT); // Wrap the texture in the y direction
+  }
   textureSet.SetSampler(0u, sampler);
 
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>(GetImplementation(mVisual)).GetRenderer();
-  mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment());
+  mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment(), mTextUpdateNeeded);
   mController->SetTextElideEnabled(actualellipsis);
   mController->SetAutoScrollMaxTextureExceeded(false);
 }
@@ -1859,12 +1966,21 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR);
-  sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT, Dali::WrapMode::DEFAULT); // Wrap the texture in the x direction
+
+  bool isHorizontal = mTextScroller->GetDirection() == DevelText::AutoScroll::HORIZONTAL;
+  if(isHorizontal)
+  {
+    sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT, Dali::WrapMode::DEFAULT); // Wrap the texture in the x direction
+  }
+  else
+  {
+    sampler.SetWrapMode(Dali::WrapMode::DEFAULT, Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT); // Wrap the texture in the y direction
+  }
   textureSet.SetSampler(0u, sampler);
 
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>(GetImplementation(mVisual)).GetRenderer();
-  mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, renderInfo.isTextDirectionRTL, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment());
+  mTextScroller->SetParameters(Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, renderInfo.isTextDirectionRTL, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment(), true);
 }
 
 void TextLabel::ScrollingFinished()
