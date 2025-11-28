@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_POPUP_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,7 +249,7 @@ protected:
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()
      */
-    std::string GetNameRaw() const override;
+    std::pair<std::string, bool> GetNameRaw() const override;
 
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
