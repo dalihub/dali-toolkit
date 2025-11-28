@@ -2111,11 +2111,15 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
         RegisteredVisualContainer& visuals = mVisualData->mVisuals;
         for(auto it = visuals.begin(); it != visuals.end(); it++)
         {
-          if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+          if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT || (*it)->visual.GetDepthIndex() > DepthIndex::DECORATION)
           {
-            Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
-            handle.RemoveCacheRenderer(renderer);
-            handle.AddRenderer(renderer);
+            auto& visualImpl = Toolkit::GetImplementation((*it)->visual);
+            if(visualImpl.IsOnScene())
+            {
+              Renderer renderer = visualImpl.GetRenderer();
+              handle.RemoveCacheRenderer(renderer);
+              handle.AddRenderer(renderer);
+            }
           }
         }
       }
@@ -2131,11 +2135,15 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
       RegisteredVisualContainer& visuals = mVisualData->mVisuals;
       for(auto it = visuals.begin(); it != visuals.end(); it++)
       {
-        if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT)
+        if((*it)->visual.GetDepthIndex() <= DepthIndex::BACKGROUND_EFFECT || (*it)->visual.GetDepthIndex() > DepthIndex::DECORATION)
         {
-          Renderer renderer = Toolkit::GetImplementation((*it)->visual).GetRenderer();
-          handle.RemoveRenderer(renderer);
-          handle.AddCacheRenderer(renderer);
+          auto& visualImpl = Toolkit::GetImplementation((*it)->visual);
+          if(visualImpl.IsOnScene())
+          {
+            Renderer renderer = visualImpl.GetRenderer();
+            handle.RemoveRenderer(renderer);
+            handle.AddCacheRenderer(renderer);
+          }
         }
       }
     }

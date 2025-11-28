@@ -144,6 +144,13 @@ public:
   void DoActionExtension(const Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
+   * @brief Gets the on scene state for this Visual
+   *
+   * @return Returns true if this Visual is on the scene, false if it is off the scene
+   */
+  bool IsOnScene() const;
+
+  /**
    * @brief Create a property map containing per-instance visual properties.
    *
    * This will enable creation of new visuals on control state change with
@@ -459,13 +466,6 @@ protected:
   }
 
 protected:
-  /**
-   * @brief Gets the on scene state for this Visual
-   *
-   * @return Returns true if this Visual is on the scene, false if it is off the scene
-   */
-  bool IsOnScene() const;
-
   /**
    * @brief Query whether the corners of the visual requires to be rounded.
    *
