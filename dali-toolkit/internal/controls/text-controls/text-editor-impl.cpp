@@ -1503,9 +1503,9 @@ TextEditor::~TextEditor()
   UnparentAndReset(mStencil);
 }
 
-std::string TextEditor::TextEditorAccessible::GetName() const
+std::pair<std::string, bool> TextEditor::TextEditorAccessible::GetNameRaw() const
 {
-  return GetWholeText();
+  return {GetWholeText(), true};
 }
 
 const std::vector<Toolkit::TextAnchor>& TextEditor::TextEditorAccessible::GetTextAnchors() const

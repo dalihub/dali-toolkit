@@ -254,9 +254,9 @@ std::string ControlAccessible::GetName() const
   {
     name = accessibilityData->mAccessibilityProps.name;
   }
-  else if(auto raw = GetNameRaw(); !raw.empty())
+  else if(auto raw = GetNameRaw(); !raw.first.empty() || raw.second)
   {
-    name = raw;
+    name = raw.first;
   }
   else
   {
@@ -266,9 +266,9 @@ std::string ControlAccessible::GetName() const
   return GetLocaleText(name);
 }
 
-std::string ControlAccessible::GetNameRaw() const
+std::pair<std::string, bool> ControlAccessible::GetNameRaw() const
 {
-  return {};
+  return {"", false};
 }
 
 std::string ControlAccessible::GetDescription() const

@@ -690,9 +690,9 @@ private: // Data
     using EditableTextControlAccessible::EditableTextControlAccessible;
 
     /**
-     * @copydoc Dali::Accessibility::Accessible::GetName()
+     * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()
      */
-    std::string GetName() const override;
+    std::pair<std::string, bool> GetNameRaw() const override;
 
   protected:
     /**
