@@ -146,8 +146,9 @@ public:
 
   /**
    * @brief Returns the actor's name in the absence of ACCESSIBILITY_NAME property
+   * @return A pair containing the name and a boolean indicating if empty names are allowed
    */
-  virtual std::string GetNameRaw() const;
+  virtual std::pair<std::string, bool> GetNameRaw() const;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetDescription()

@@ -586,7 +586,7 @@ protected:
     /**
      * @copydoc Dali::Accessibility::Text::GetNameRaw()
      */
-    std::string GetNameRaw() const override;
+    std::pair<std::string, bool> GetNameRaw() const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetNamePropertyIndex()
