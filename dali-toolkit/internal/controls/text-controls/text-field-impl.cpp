@@ -1332,7 +1332,14 @@ std::pair<std::string, bool> TextField::TextFieldAccessible::GetNameRaw() const
     return {"", true};
   }
 
-  return {GetWholeText(), true};
+  auto wholeText = GetWholeText();
+
+  if(!wholeText.empty())
+  {
+    return {wholeText, true};
+  }
+
+  return {GetCurrentPlaceholderText(), true};
 }
 
 const std::vector<Toolkit::TextAnchor>& TextField::TextFieldAccessible::GetTextAnchors() const

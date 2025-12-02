@@ -431,6 +431,20 @@ std::string TextControlAccessible::GetWholeText() const
   return text;
 }
 
+std::string TextControlAccessible::GetCurrentPlaceholderText() const
+{
+  auto focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+  bool hasFocus     = Self() == focusControl;
+
+  Toolkit::Text::Controller::PlaceholderType placeholderType = hasFocus ? Toolkit::Text::Controller::PLACEHOLDER_TYPE_ACTIVE : Toolkit::Text::Controller::PLACEHOLDER_TYPE_INACTIVE;
+
+  std::string placeholderText;
+
+  GetTextController()->GetPlaceholderText(placeholderType, placeholderText);
+
+  return placeholderText;
+}
+
 std::uint32_t TextControlAccessible::GetSubstituteCharacter() const
 {
   return Toolkit::Text::STAR;

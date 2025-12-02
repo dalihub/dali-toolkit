@@ -1505,7 +1505,14 @@ TextEditor::~TextEditor()
 
 std::pair<std::string, bool> TextEditor::TextEditorAccessible::GetNameRaw() const
 {
-  return {GetWholeText(), true};
+  auto wholeText = GetWholeText();
+
+  if(!wholeText.empty())
+  {
+    return {wholeText, true};
+  }
+
+  return {GetCurrentPlaceholderText(), true};
 }
 
 const std::vector<Toolkit::TextAnchor>& TextEditor::TextEditorAccessible::GetTextAnchors() const

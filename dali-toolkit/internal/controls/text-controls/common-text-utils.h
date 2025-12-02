@@ -170,6 +170,13 @@ protected:
   std::string GetWholeText() const;
 
   /**
+   * @brief Gets current placeholder text.
+   *
+   * @return The placeholder text
+   */
+  std::string GetCurrentPlaceholderText() const;
+
+  /**
    * @brief Gets text anchors.
    *
    * @return Text anchors
