@@ -1156,6 +1156,25 @@ int UtcDaliAccessibilityTextFieldGetNameRaw(void)
   textfield.SetProperty(Actor::Property::NAME, "test-actor-name");
   DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
 
+  // Test with PLACEHOLDER_TEXT property set - GetName should return placeholder string
+  textfield.SetProperty(Toolkit::TextField::Property::PLACEHOLDER_TEXT, "placeholder-content");
+  DALI_TEST_EQUALS(accessible->GetName(), "placeholder-content", TEST_LOCATION);
+
+  // Test with PLACEHOLDER_TEXT_FOCUSED property set - GetName should return placeholder string
+  textfield.SetProperty(Toolkit::TextField::Property::PLACEHOLDER_TEXT_FOCUSED, "placeholder-focused-content");
+  textfield.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(textfield);
+  Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(textfield);
+  DALI_TEST_EQUALS(accessible->GetName(), "placeholder-focused-content", TEST_LOCATION);
+  application.GetScene().Remove(textfield);
+
+  // Test with Placeholder property set - GetName should return placeholder string
+  DALI_TEST_EQUALS(accessible->GetName(), "placeholder-content", TEST_LOCATION);
+
+  // Test with Text property set - GetName should return whole text
+  textfield.SetProperty(Toolkit::TextField::Property::TEXT, "text-content");
+  DALI_TEST_EQUALS(accessible->GetName(), "text-content", TEST_LOCATION);
+
   // Test with AccessibilityName property set - this should override GetNameRaw
   textfield.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
   DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
@@ -1186,6 +1205,25 @@ int UtcDaliAccessibilityTextEditorGetNameRaw(void)
   // Set Actor name - GetName should still return empty string because GetNameRaw allows empty
   texteditor.SetProperty(Actor::Property::NAME, "test-actor-name");
   DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
+
+  // Test with PLACEHOLDER_TEXT property set - GetName should return placeholder string
+  Property::Map propertyMap;
+  propertyMap[Toolkit::Text::PlaceHolder::Property::TEXT] = "placeholder-content";
+  texteditor.SetProperty(TextEditor::Property::PLACEHOLDER, propertyMap);
+  DALI_TEST_EQUALS(accessible->GetName(), "placeholder-content", TEST_LOCATION);
+
+  // Test with PLACEHOLDER_TEXT_FOCUSED property set - GetName should return placeholder string
+  propertyMap[Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED] = "placeholder-focused-content";
+  texteditor.SetProperty(TextEditor::Property::PLACEHOLDER, propertyMap);
+  texteditor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(texteditor);
+  Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(texteditor);
+  DALI_TEST_EQUALS(accessible->GetName(), "placeholder-focused-content", TEST_LOCATION);
+  application.GetScene().Remove(texteditor);
+
+  // Test with Text property set - GetName should return whole text
+  texteditor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text-content");
+  DALI_TEST_EQUALS(accessible->GetName(), "text-content", TEST_LOCATION);
 
   // Test with AccessibilityName property set - this should override GetNameRaw
   texteditor.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
