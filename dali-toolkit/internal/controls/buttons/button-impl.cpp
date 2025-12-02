@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1308,7 +1308,7 @@ Padding Button::GetForegroundPadding()
   return mForegroundPadding;
 }
 
-std::string Button::ButtonAccessible::GetNameRaw() const
+std::pair<std::string, bool> Button::ButtonAccessible::GetNameRaw() const
 {
   std::string   labelText;
   auto          slf      = Toolkit::Button::DownCast(Self());
@@ -1320,7 +1320,7 @@ std::string Button::ButtonAccessible::GetNameRaw() const
     textPropertyPtr->Get(labelText);
   }
 
-  return labelText;
+  return {labelText, false};
 }
 
 Property::Index Button::ButtonAccessible::GetNamePropertyIndex()

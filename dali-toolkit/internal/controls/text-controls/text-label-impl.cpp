@@ -2471,9 +2471,9 @@ void TextLabel::RemoveMaskEffect()
   selfControl.ClearRenderEffect();
 }
 
-std::string TextLabel::TextLabelAccessible::GetNameRaw() const
+std::pair<std::string, bool> TextLabel::TextLabelAccessible::GetNameRaw() const
 {
-  return GetWholeText();
+  return {GetWholeText(), false};
 }
 
 Property::Index TextLabel::TextLabelAccessible::GetNamePropertyIndex()

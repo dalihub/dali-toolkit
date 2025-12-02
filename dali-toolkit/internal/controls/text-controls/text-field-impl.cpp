@@ -1325,14 +1325,14 @@ void TextField::OnVariationPropertyNotify(PropertyNotification& source)
   mController->SetVariationsMap(map);
 }
 
-std::string TextField::TextFieldAccessible::GetName() const
+std::pair<std::string, bool> TextField::TextFieldAccessible::GetNameRaw() const
 {
   if(IsHiddenInput())
   {
-    return {};
+    return {"", true};
   }
 
-  return GetWholeText();
+  return {GetWholeText(), true};
 }
 
 const std::vector<Toolkit::TextAnchor>& TextField::TextFieldAccessible::GetTextAnchors() const

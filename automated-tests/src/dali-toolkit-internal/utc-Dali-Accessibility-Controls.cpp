@@ -247,6 +247,33 @@ int UtcDaliAccessibilityPushButtonConstructor(void)
   END_TEST;
 }
 
+int UtcDaliAccessibilityPushButtonGetNameRaw(void)
+{
+  ToolkitTestApplication application;
+
+  auto pushbutton = PushButton::New();
+  DALI_TEST_CHECK(pushbutton);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(pushbutton));
+  DALI_TEST_CHECK(accessible);
+
+  // Test default GetNameRaw behavior - PushButton does NOT allow empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, false, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", false), GetName should fall back to Actor::Property::NAME
+  pushbutton.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "test-actor-name", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  pushbutton.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliAccessibilityPushButtonStates(void)
 {
   ToolkitTestApplication application;
@@ -351,6 +378,8 @@ int UtcDaliAccessibilityToggleButtonStates(void)
 }
 
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
+
 int UtcDaliAccessibilityTextSelectionPopupConstructor(void)
 {
   ToolkitTestApplication application;
@@ -361,6 +390,33 @@ int UtcDaliAccessibilityTextSelectionPopupConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(textselectionpopup);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::DIALOG, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityPopupGetNameRaw(void)
+{
+  ToolkitTestApplication application;
+
+  auto popup = Popup::New();
+  DALI_TEST_CHECK(popup);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(popup));
+  DALI_TEST_CHECK(accessible);
+
+  // Test default GetNameRaw behavior - Popup does NOT allow empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, false, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", false), GetName should fall back to Actor::Property::NAME
+  popup.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "test-actor-name", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  popup.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
 
   END_TEST;
 }
@@ -986,11 +1042,25 @@ int UtcDaliAccessibilityTextLabel(void)
   textlabel.SetProperty(Actor::Property::NAME, "test");
   DALI_TEST_EQUALS(textlabel.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION);
 
-  auto accessible = Dali::Accessibility::Accessible::Get(textlabel);
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(textlabel));
   DALI_TEST_CHECK(accessible);
 
+  // Test default GetNameRaw behavior - TextLabel does NOT allow empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, false, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", false), GetName should fall back to Actor::Property::NAME
   DALI_TEST_EQUALS(accessible->GetName(), "test", TEST_LOCATION);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::LABEL, TEST_LOCATION);
+
+  // Set Actor name - GetName should return Actor::Property::NAME
+  textlabel.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "test-actor-name", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  textlabel.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
 
@@ -1058,6 +1128,68 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(false);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityTextFieldGetNameRaw(void)
+{
+  ToolkitTestApplication application;
+
+  auto textfield = TextField::New();
+  DALI_TEST_CHECK(textfield);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(textfield));
+  DALI_TEST_CHECK(accessible);
+
+  // Test default GetNameRaw behavior - TextField allows empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, true, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", true), GetName should return empty string
+  // and NOT fall back to Actor::Property::NAME
+  DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
+
+  // Set Actor name - GetName should still return empty string because GetNameRaw allows empty
+  textfield.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  textfield.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityTextEditorGetNameRaw(void)
+{
+  ToolkitTestApplication application;
+
+  auto texteditor = TextEditor::New();
+  DALI_TEST_CHECK(texteditor);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(texteditor));
+  DALI_TEST_CHECK(accessible);
+
+  // Test default GetNameRaw behavior - TextEditor allows empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, true, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", true), GetName should return empty string
+  // and NOT fall back to Actor::Property::NAME
+  DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
+
+  // Set Actor name - GetName should still return empty string because GetNameRaw allows empty
+  texteditor.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  texteditor.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
 
   END_TEST;
 }
