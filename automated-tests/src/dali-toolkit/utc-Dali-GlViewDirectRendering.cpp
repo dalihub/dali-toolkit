@@ -20,6 +20,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <test-addon-manager.h>
+#include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
@@ -353,15 +354,29 @@ int UtcDaliGlViewDirectRenderingTerminate(void)
   tet_infoline("UtcDaliGlViewDirectRenderingTerminate");
   GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
 
-  try
-  {
-    view.Terminate();
-    DALI_TEST_CHECK(true);
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(false);
-  }
+  // Onscene
+  application.GetScene().Add(view);
+  view.RegisterGlCallbacks(nullptr, nullptr, Dali::MakeCallback(DirectRenderingCode::glTerminate));
+
+  application.SendNotification();
+  application.Render();
+
+  // Offscene
+  application.GetScene().Remove(view);
+
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+  view.Terminate();
+
+  // 2 frames would be rendered before Terminate is completed.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Make sure that Terminate is completed.
+  Test::WaitForEventThreadTrigger(1);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -437,15 +452,16 @@ int UtcDaliGlViewDirectRenderingOnScene(void)
   // DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION); ///< Don't know exact behavior after terminate
   DALI_TEST_GREATER(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
 
-  DirectRenderingCode::ClearFlags();
-
   // run 2 more frames, for line coverage.
   application.SendNotification();
   application.Render();
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(true);
+  // Make sure that Terminate is completed.
+  Test::WaitForEventThreadTrigger(1);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -654,16 +670,19 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene01(void)
 
   view.Terminate();
 
-  while(DirectRenderingCode::gDRFrameTerminatedCount < 1)
-  {
-    application.SendNotification();
-    application.Render();
-  }
   DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
   // DALI_TEST_GREATER(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION); ///< Don't know exact behavior after terminate
-  DALI_TEST_GREATER(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
 
-  DALI_TEST_CHECK(true);
+  // Make sure that Terminate is completed.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  Test::WaitForEventThreadTrigger(1);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
+
   END_TEST;
 }
 
