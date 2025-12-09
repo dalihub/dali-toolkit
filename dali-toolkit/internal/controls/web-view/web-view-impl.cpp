@@ -1067,7 +1067,7 @@ void WebView::OnFrameRendered()
   mLastRenderedNativeImageWidth  = nativeImageSourcePtr->GetWidth();
   mLastRenderedNativeImageHeight = nativeImageSourcePtr->GetHeight();
 
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr);
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr, true);
 
   newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
 
