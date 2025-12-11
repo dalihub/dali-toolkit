@@ -1327,19 +1327,17 @@ void TextField::OnVariationPropertyNotify(PropertyNotification& source)
 
 std::pair<std::string, bool> TextField::TextFieldAccessible::GetNameRaw() const
 {
+  if(GetTextController()->IsShowingPlaceholderText())
+  {
+    return {GetCurrentPlaceholderText(), true};
+  }
+
   if(IsHiddenInput())
   {
     return {"", true};
   }
 
-  auto wholeText = GetWholeText();
-
-  if(!wholeText.empty())
-  {
-    return {wholeText, true};
-  }
-
-  return {GetCurrentPlaceholderText(), true};
+  return {GetWholeText(), true};
 }
 
 const std::vector<Toolkit::TextAnchor>& TextField::TextFieldAccessible::GetTextAnchors() const

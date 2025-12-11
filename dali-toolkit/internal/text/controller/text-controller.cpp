@@ -404,6 +404,11 @@ Dali::LayoutDirection::Type Controller::GetLayoutDirection(Dali::Actor& actor) c
   return mImpl->GetLayoutDirection(actor);
 }
 
+bool Controller::IsShowingPlaceholderText() const
+{
+  return mImpl->IsShowingPlaceholderText();
+}
+
 bool Controller::IsShowingRealText() const
 {
   return mImpl->IsShowingRealText();
