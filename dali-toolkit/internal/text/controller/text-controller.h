@@ -2135,6 +2135,12 @@ public: // Queries & retrieves.
   void ResetFontAndStyleData();
 
   /**
+   * @brief Retrieves if showing placeholder text or not.
+   * @return The value of showing placeholder text.
+   */
+  bool IsShowingPlaceholderText() const;
+
+  /**
    * @brief Retrieves if showing real text or not.
    * @return The value of showing real text.
    */
