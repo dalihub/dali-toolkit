@@ -665,6 +665,7 @@ struct InputParameterForEachLine
   const GlyphIndex endIndexOfGlyphs;
   const GlyphIndex firstMiddleIndexOfElidedGlyphs;
   const GlyphIndex secondMiddleIndexOfElidedGlyphs;
+  const float      elidedOffset;
 
   const DevelText::VerticalLineAlignment::Type verticalLineAlignType;
   const DevelText::EllipsisPosition::Type      ellipsisPosition;
@@ -913,7 +914,14 @@ void CreateImageBufferForEachGlyph(TextAbstraction::FontClient fontClient, Glyph
 void CreateImageBufferForEachLine(TextAbstraction::FontClient fontClient, GlyphData& glyphData, Length& hyphenIndex, const LineRun& line, const bool isFirstLine, const InputParameterForEachLine& inputParamsForLine, const InputParameterForEachGlyph& inputParamsForGlyph)
 {
   // Sets the horizontal offset of the line.
-  glyphData.horizontalOffset = inputParamsForLine.ignoreHorizontalAlignment ? 0 : static_cast<int32_t>(line.alignmentOffset);
+  if(inputParamsForLine.ignoreHorizontalAlignment)
+  {
+    glyphData.horizontalOffset = 0;
+  }
+  else
+  {
+    glyphData.horizontalOffset = line.ellipsis ? static_cast<int32_t>(inputParamsForLine.elidedOffset) : static_cast<int32_t>(line.alignmentOffset);
+  }
   glyphData.horizontalOffset += inputParamsForLine.horizontalOffset;
 
   // Increases the vertical offset with the line's ascender.
@@ -1317,7 +1325,7 @@ Devel::PixelBuffer Typesetter::Impl::CreateImageBuffer(const uint32_t bufferWidt
                                                      viewModel.GetEndIndexOfElidedGlyphs(),
                                                      viewModel.GetFirstMiddleIndexOfElidedGlyphs(),
                                                      viewModel.GetSecondMiddleIndexOfElidedGlyphs(),
-
+                                                     viewModel.GetElidedOffset(),
                                                      viewModel.GetVerticalLineAlignment(),
                                                      viewModel.GetEllipsisPosition(),
 

@@ -386,6 +386,11 @@ const Vector2& Model::GetOffsetWithCutout() const
   return mVisualModel->GetOffsetWithCutout();
 }
 
+const Vector<CharacterDirection>& Model::GetCharacterDirections() const
+{
+  return mLogicalModel->mCharacterDirections;
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),
