@@ -404,6 +404,12 @@ public:
    */
   const Vector2& GetOffsetWithCutout() const override;
 
+  /**
+   * @copydoc ModelInterface::GetCharacterDirections()
+   */
+  const Vector<CharacterDirection>& GetCharacterDirections() const override;
+
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
