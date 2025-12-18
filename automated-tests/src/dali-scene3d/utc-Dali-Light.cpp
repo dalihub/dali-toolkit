@@ -258,6 +258,8 @@ int UtcDaliLightAdd01(void)
   // Light uniforms moved to UniformBlock. Skip these tests for now.
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -313,6 +315,8 @@ int UtcDaliLightAdd02(void)
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
   // Light uniforms moved to UniformBlock. Skip these tests for now.
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -379,6 +383,8 @@ int UtcDaliLightAdd03(void)
   DALI_TEST_EQUALS(0u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
   // Light uniforms moved to UniformBlock. Skip these tests for now.
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(countPropertyIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -447,6 +453,8 @@ int UtcDaliLightAdd04(void)
   // // After light1 is disable, shader uniforms of lights are reordered.
   // DALI_TEST_EQUALS(Vector3(1.0f, 0.0f, 0.0f), shader.GetCurrentProperty<Vector3>(colorPropertyIndex1), 0.01f, TEST_LOCATION);
   // DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, -1.0f), shader.GetCurrentProperty<Vector3>(directionPropertyIndex1), 0.01f, TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -557,6 +565,8 @@ int UtcDaliLightAdd05(void)
     }
   }
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -611,6 +621,8 @@ int UtcDaliLightModelAddAndRemove(void)
 
   DALI_TEST_EQUALS(1u, sceneView.GetActivatedLightCount(), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -660,6 +672,8 @@ int UtcDaliLightEnableShadowOnScene01(void)
 
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -716,6 +730,8 @@ int UtcDaliLightEnableShadowOnScene02(void)
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -761,6 +777,8 @@ int UtcDaliLightEnableShadowOnScene03(void)
   // auto shadowEnabledIndex = shader.GetPropertyIndex("uIsShadowEnabled");
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -819,6 +837,8 @@ int UtcDaliLightDisableShadow01(void)
 
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -906,6 +926,8 @@ int UtcDaliLightDisableShadow02(void)
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -969,6 +991,8 @@ int UtcDaliLightEnableShadowOfNotEnabledLight(void)
   // DALI_TEST_CHECK(shadowEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
+  sceneView.Unparent();
+
   END_TEST;
 }
 
@@ -1009,6 +1033,8 @@ int UtcDaliLightSetGetProperty(void)
   DALI_TEST_EQUALS(0.5f, light.GetShadowIntensity(), TEST_LOCATION);
   light.SetShadowIntensity(0.1f);
   DALI_TEST_EQUALS(0.1f, light.GetShadowIntensity(), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -1066,6 +1092,8 @@ int UtcDaliLightShadowSoftFiltering(void)
   // Shadow uniforms moved to UniformBlock. Skip these tests for now.
   // DALI_TEST_CHECK(shadowFilteringEnabledIndex != DALI_KEY_INVALID);
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowFilteringEnabledIndex), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
@@ -1127,6 +1155,8 @@ int UtcDaliLightShadowRenderTask(void)
   DALI_TEST_EQUALS(baseRenderTaskCount + 1u, taskList.GetTaskCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN, taskList.GetTask(baseRenderTaskCount - 1u).GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN + 1, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
+
+  sceneView.Unparent();
 
   END_TEST;
 }
