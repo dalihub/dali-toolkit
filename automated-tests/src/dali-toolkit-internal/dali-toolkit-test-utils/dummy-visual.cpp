@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,15 @@ DummyVisualPtr DummyVisual::New(const Property::Map& properties)
 {
   VisualFactoryCache* factoryCache = new VisualFactoryCache(false);
 
-  DummyVisualPtr dummyVisualPtr(new DummyVisual(*factoryCache));
+  DummyVisualPtr dummyVisualPtr(new DummyVisual(factoryCache));
   dummyVisualPtr->Initialize();
   return dummyVisualPtr;
 }
 
-DummyVisual::DummyVisual(VisualFactoryCache& factoryCache)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::Type::COLOR),
-  mActionCounter(0)
+DummyVisual::DummyVisual(VisualFactoryCache* factoryCache)
+: Visual::Base(*factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::Type::COLOR),
+  mActionCounter(0),
+  mVisualFactoryCache(factoryCache)
 {
 }
 
