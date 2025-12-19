@@ -3522,3 +3522,46 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelAsyncRenderAutoScrollTimingIssue(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAsyncRenderAutoScrollTimingIssue");
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Set the dpi of AsyncTextLoader and FontClient to be identical.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
+  label.SetProperty(TextLabel::Property::TEXT, "This is a very long text that should trigger auto scrolling when enabled");
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
+
+  try
+  {
+    // Enable auto scroll to trigger async render with auto scroll enabled
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
+    application.SendNotification();
+    // Immediately disable auto scroll to simulate the timing issue
+    label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
+    application.Render();
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
+
+  END_TEST;
+}

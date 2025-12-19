@@ -1949,6 +1949,21 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
 void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
 {
   // Pure Virtual from AsyncTextInterface
+
+  // Check current state to prevent starting scroll when ENABLE_AUTO_SCROLL was set to false.
+  if(!mController->IsAutoScrollEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::TRUNCATE)
+  {
+    if(!mIsAsyncRenderNeeded)
+    {
+      DALI_LOG_ERROR("AsyncSetupAutoScroll was called, but auto-scroll was disabled and no next render was requested.\n");
+    }
+    // Auto scroll has been disabled since the async render was requested.
+    // Do not start scrolling even though the render was completed with auto scroll enabled.
+    // This issue occurs when ScrollingFinished and TextScroller::StartScrolling are called in the same loop.
+    mIsAsyncRenderNeeded = true;
+    return;
+  }
+
   Size      verifiedSize = renderInfo.size;
   Size      controlSize  = renderInfo.controlSize;
   float     wrapGap      = renderInfo.autoScrollWrapGap;
