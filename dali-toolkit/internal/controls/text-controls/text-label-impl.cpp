@@ -1375,6 +1375,13 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       break;
     }
+    case Toolkit::Control::Property::PADDING:
+    {
+      // Unlike Size, Padding doesn't change unless the app intends to, so we don't check for actual changes.
+      // If Padding is set multiple times, causing async render computation overhead, need to check for changes in Padding.
+      mIsSizeChanged = true;
+      break;
+    }
     case Toolkit::TextLabel::Property::TEXT_COLOR:
     {
       const Vector4& textColor = propertyValue.Get<Vector4>();
@@ -1649,7 +1656,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(needLayoutSizeCalculation)
     {
       mController->SetAutoScrollEnabled(false, false, DevelText::AutoScroll::VERTICAL);
-      originSize = mController->CalculateLayoutSize(contentSize.x, contentSize.y);
+      originSize = mController->CalculateLayoutSize(contentSize.x, contentSize.y, true);
       mController->SetAutoScrollEnabled(true, false, DevelText::AutoScroll::VERTICAL);
     }
   }
