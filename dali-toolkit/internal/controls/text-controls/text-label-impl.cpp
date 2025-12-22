@@ -719,6 +719,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
             textScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
             textScroller->StopScrolling();
           }
+          impl.mLastEllipsisMode = ellipsisMode;
           impl.mIsAsyncRenderNeeded = true;
           impl.RequestTextRelayout();
         }
@@ -1226,6 +1227,7 @@ void TextLabel::OnInitialize()
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
 
+  self.InheritedVisibilityChangedSignal().Connect(this, &TextLabel::OnControlInheritedVisibilityChanged);
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
   if(Dali::Adaptor::IsAvailable())
@@ -1458,41 +1460,6 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       break;
     }
   }
-}
-
-void TextLabel::OnSceneConnection(int depth)
-{
-  mIsAsyncRenderNeeded = true;
-
-  if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
-  {
-    mController->SetAutoScrollEnabled(true, true, GetTextScroller()->GetDirection());
-  }
-  Control::OnSceneConnection(depth);
-}
-
-void TextLabel::OnSceneDisconnection()
-{
-  mIsSizeChanged    = false;
-  mIsManualRender   = false;
-  mIsManualRendered = false;
-
-  if(mTextScroller)
-  {
-    if(mLastAutoScrollEnabled && !mController->IsAutoScrollEnabled())
-    {
-      mLastAutoScrollEnabled = false;
-    }
-
-    if(mTextScroller->IsScrolling())
-    {
-      const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
-      mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
-      mTextScroller->StopScrolling();
-      mTextScroller->SetStopMode(stopMode);
-    }
-  }
-  Control::OnSceneDisconnection();
 }
 
 void TextLabel::OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Animation::State state)
@@ -1841,6 +1808,59 @@ void TextLabel::UpdateAutoScrollState()
   }
 }
 
+void TextLabel::SetAutoScrollVisible(bool visible)
+{
+  if(mTextScroller)
+  {
+    if(visible)
+    {
+      if(mLastEllipsisMode == DevelText::Ellipsize::AUTO_SCROLL)
+      {
+        mController->SetEllipsisMode(mLastEllipsisMode);
+        if(mTextScroller)
+        {
+          mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+          mTextScroller->StopScrolling();
+        }
+      }
+      else
+      {
+        if(mController->IsAutoScrollEnabled() || mLastAutoScrollEnabled)
+        {
+          mController->SetAutoScrollEnabled(true, true, GetTextScroller()->GetDirection());
+        }
+      }
+    }
+    else
+    {
+      if(mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
+      {
+        mLastEllipsisMode = DevelText::Ellipsize::AUTO_SCROLL;
+        mController->SetEllipsisMode(DevelText::Ellipsize::TRUNCATE);
+        if(mTextScroller)
+        {
+          mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+          mTextScroller->StopScrolling();
+        }
+      }
+      else
+      {
+        if(mLastAutoScrollEnabled && !mController->IsAutoScrollEnabled())
+        {
+          mLastAutoScrollEnabled = false;
+        }
+        if(mTextScroller->IsScrolling())
+        {
+          const Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = mTextScroller->GetStopMode();
+          mTextScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
+          mTextScroller->StopScrolling();
+          mTextScroller->SetStopMode(stopMode);
+        }
+      }
+    }
+  }
+}
+
 void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSize)
 {
   const Text::CharacterDirection direction = mController->GetAutoScrollTextDirection();
@@ -2083,6 +2103,21 @@ void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
   }
 }
 
+void TextLabel::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
+{
+  if(visible)
+  {
+    mIsAsyncRenderNeeded = true;
+  }
+  else
+  {
+    mIsSizeChanged    = false;
+    mIsManualRender   = false;
+    mIsManualRendered = false;
+  }
+  SetAutoScrollVisible(visible);
+}
+
 void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   mController->ChangedLayoutDirection();
@@ -2137,6 +2172,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mLocale(std::string()),
   mSize(),
   mTouchPosition(),
+  mLastEllipsisMode(DevelText::Ellipsize::TRUNCATE),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mAsyncLineCount(0),
   mTextColorAnimatedCount(0),
