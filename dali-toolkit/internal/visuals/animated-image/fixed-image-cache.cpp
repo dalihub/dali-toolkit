@@ -32,6 +32,26 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
+
+#define LOG_CACHE                                                                                                                                        \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                                                    \
+  {                                                                                                                                                      \
+    std::ostringstream oss;                                                                                                                              \
+    oss << "Size:" << mImageUrls.size() << " / Batch: " << mReadyFlags.size() << " [ ";                                                                  \
+    for(std::size_t _i = 0; _i < mImageUrls.size(); ++_i)                                                                                                \
+    {                                                                                                                                                    \
+      oss << _i << "={ #frm:" << " tex:" << mImageUrls[_i].mTextureId << " rdy:" << ((_i < mReadyFlags.size() && mReadyFlags[_i]) ? "T" : "F") << "}, "; \
+    }                                                                                                                                                    \
+    oss << " ]" << std::endl;                                                                                                                            \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                                                           \
+  }
+
+#else
+#define LOG_CACHE
+#endif
+
 constexpr bool     ENABLE_ORIENTATION_CORRECTION(true);
 constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
@@ -152,6 +172,8 @@ void FixedImageCache::LoadBatch()
     mImageUrls[frameIndex].mTextureId = loadTextureId;
     mRequestingLoad                   = false;
   }
+
+  LOG_CACHE;
 }
 
 TextureSet FixedImageCache::GetTextureSet(uint32_t frameIndex) const
@@ -188,6 +210,9 @@ void FixedImageCache::ClearCache()
 
 void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
+  LOG_CACHE;
+
   if(loadSuccess)
   {
     mLoadState                = TextureManager::LoadState::LOAD_FINISHED;
@@ -220,6 +245,8 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
     // preMultiplied should be false because broken image don't premultiply alpha on load
     mObserver.FrameReady(TextureSet(), 0, false);
   }
+
+  LOG_CACHE;
 }
 
 } //namespace Internal

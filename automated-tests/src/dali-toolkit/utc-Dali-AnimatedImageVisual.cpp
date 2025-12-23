@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,7 +163,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(DevelVisual::Property::BORDERLINE_COLOR, Color::RED)
       .Add(DevelVisual::Property::BORDERLINE_OFFSET, 0.3f)
       .Add(DevelVisual::Property::CORNER_SQUARENESS, 0.3f)
-      .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f));
+      .Add(DevelImageVisual::Property::FRAME_SPEED_FACTOR, 2.0f)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, true)
+      .Add(DevelImageVisual::Property::SYNCHRONOUS_SIZING, false));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap(resultMap);
@@ -245,6 +247,14 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 2.0f, TEST_LOCATION);
 
+  value = resultMap.Find(ImageVisual::Property::SYNCHRONOUS_LOADING, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  value = resultMap.Find(DevelImageVisual::Property::SYNCHRONOUS_SIZING, Property::BOOLEAN);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), false, TEST_LOCATION);
+
   // Natural size getted as desired size
   Vector2 naturalSize;
   animatedImageVisual.GetNaturalSize(naturalSize);
@@ -305,7 +315,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("borderlineColor", Vector4())
       .Add("borderlineOffset", -1.0f)
       .Add("cornerSquareness", Vector4(1.0f, 0.5f, 0.25f, 0.0f))
-      .Add("frameSpeedFactor", 0.5f));
+      .Add("frameSpeedFactor", 0.5f)
+      .Add("synchronousLoading", true)
+      .Add("synchronousSizing", true));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap(resultMap);
@@ -409,6 +421,20 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<float>(), 0.5f, TEST_LOCATION);
 
+  value = resultMap.Find(ImageVisual::Property::SYNCHRONOUS_LOADING, "synchronousLoading");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  value = resultMap.Find(DevelImageVisual::Property::SYNCHRONOUS_SIZING, "synchronousSizing");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  // Natural size getted as desired size, even if synchronousSizing is true
+  // (Since we never request image load before)
+  Vector2 naturalSize;
+  animatedImageVisual.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS(naturalSize, Vector2(154, 79), TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -437,7 +463,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
       .Add("maskContentScale", 1.6f)
       .Add("cropToMask", true)
       .Add(DevelImageVisual::Property::MASKING_TYPE, DevelImageVisual::MaskingType::MASKING_ON_RENDERING)
-      .Add("cornerRadius", 50.5f));
+      .Add("cornerRadius", 50.5f)
+      .Add("synchronousLoading", true)
+      .Add("synchronousSizing", true));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap(resultMap);
@@ -513,7 +541,16 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
 
-  // Natural size getted as masked image size
+  value = resultMap.Find(ImageVisual::Property::SYNCHRONOUS_LOADING, "synchronousLoading");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  value = resultMap.Find(DevelImageVisual::Property::SYNCHRONOUS_SIZING, "synchronousSizing");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+
+  // Natural size getted as masked image size, even if synchronousSizing is true
+  // (Since we never request image load before)
   Vector2 naturalSize;
   animatedImageVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS(naturalSize, Vector2(100, 100), TEST_LOCATION);
@@ -743,6 +780,80 @@ int UtcDaliAnimatedImageVisualImageLoadingFail03(void)
     application.SendNotification();
     application.Render(20);
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSetInvalidImageWithDisabledBroken(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request animated image visual with invalid images - should draw broken.png");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // Load invalid file
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, "InvalidImage.gif");
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+  textureTrace.Reset();
+
+  // Load invalid file with disabled broken
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, "InvalidImage.gif");
+  propertyMap.Insert(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, false);
+
+  visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  actor                        = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl2.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), false, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
 
   END_TEST;
 }
@@ -3195,6 +3306,282 @@ int UtcDaliAnimatedImageVisualUpdatePixelAreaByAction(void)
 
   // Check uniform value updated
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("pixelArea", targetPixelArea), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage01");
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+    VisualFactory factory = VisualFactory::Get();
+    DALI_TEST_CHECK(factory);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+
+    Vector2 size;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(20.f, 20.f)); // set size(1), no renderer yet
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+    application.GetScene().Add(actor);
+
+    // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(0), will return original image's size 50x50
+    DALI_TEST_EQUALS(size, Vector2(50.0f, 50.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(1)
+
+    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                   // get size(1)
+    DALI_TEST_EQUALS(size, Vector2(20.0f, 20.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(2)
+    application.Render();
+
+    // reload image
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(2)
+    DALI_TEST_EQUALS(size, Vector2(10.0f, 10.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage02");
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, TEST_WEBP_FILE_NAME); // static image
+    propertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+    VisualFactory factory = VisualFactory::Get();
+    DALI_TEST_CHECK(factory);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+
+    Vector2 size;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+    application.GetScene().Add(actor);
+
+    // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(0), will return original image's size 326x171
+    DALI_TEST_EQUALS(size, Vector2(326.0f, 171.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(1)
+
+    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                     // get size(1)
+    DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(2)
+    application.Render();
+
+    // reload image
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(2)
+    DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousSizingMultiImage01");
+
+  {
+    Property::Array urls;
+    CopyUrlsIntoArray(urls);
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, urls);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 12);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+    VisualFactory factory = VisualFactory::Get();
+    DALI_TEST_CHECK(factory);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+
+    Vector2 size;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+    application.GetScene().Add(actor);
+
+    // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(0), will return original image's size 210x210
+    DALI_TEST_EQUALS(size, Vector2(210.0f, 210.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(1)
+
+    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                     // get size(1)
+    DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(2)
+    application.Render();
+
+    // reload image
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(2)
+    DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualSynchronousSizingMultiImage02");
+
+  {
+    Property::Array urls;
+    CopyUrlsIntoArray(urls);
+
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
+    propertyMap.Insert(Toolkit::ImageVisual::Property::URL, urls);
+    propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 8);
+    propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, true);
+
+    VisualFactory factory = VisualFactory::Get();
+    DALI_TEST_CHECK(factory);
+
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+
+    Vector2 size;
+
+    TestGlAbstraction& gl           = application.GetGlAbstraction();
+    TraceCallStack&    textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
+
+    application.GetScene().Add(actor);
+
+    // load image as size 0x0 (Since we cannot ensure the size of actor yet)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(0), will return original image's size 210x210
+    DALI_TEST_EQUALS(size, Vector2(210.0f, 210.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(1)
+
+    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                     // get size(1)
+    DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // require to load size(2)
+    application.Render();
+
+    // reload image
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+
+    visual.GetNaturalSize(size); // get size(2)
+    DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  }
 
   END_TEST;
 }

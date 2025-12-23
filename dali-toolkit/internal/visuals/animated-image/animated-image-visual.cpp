@@ -118,6 +118,39 @@ constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
 
+struct NameIndexMatch
+{
+  const char* const name;
+  Property::Index   index;
+};
+
+const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
+  {
+    {IMAGE_FITTING_MODE, Toolkit::ImageVisual::Property::FITTING_MODE},
+    {IMAGE_SAMPLING_MODE, Toolkit::ImageVisual::Property::SAMPLING_MODE},
+    {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
+    {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
+    {PIXEL_AREA_UNIFORM_NAME, Toolkit::ImageVisual::Property::PIXEL_AREA},
+    {IMAGE_WRAP_MODE_U, Toolkit::ImageVisual::Property::WRAP_MODE_U},
+    {IMAGE_WRAP_MODE_V, Toolkit::ImageVisual::Property::WRAP_MODE_V},
+    {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
+    {BATCH_SIZE_NAME, Toolkit::ImageVisual::Property::BATCH_SIZE},
+    {CACHE_SIZE_NAME, Toolkit::ImageVisual::Property::CACHE_SIZE},
+    {FRAME_DELAY_NAME, Toolkit::ImageVisual::Property::FRAME_DELAY},
+    {ALPHA_MASK_URL, Toolkit::ImageVisual::Property::ALPHA_MASK_URL},
+    {MASK_CONTENT_SCALE_NAME, Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE},
+    {CROP_TO_MASK_NAME, Toolkit::ImageVisual::Property::CROP_TO_MASK},
+    {MASKING_TYPE_NAME, Toolkit::DevelImageVisual::Property::MASKING_TYPE},
+    {ENABLE_BROKEN_IMAGE, Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE},
+    {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
+    {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
+    {LOOP_COUNT_NAME, Toolkit::DevelImageVisual::Property::LOOP_COUNT},
+    {STOP_BEHAVIOR_NAME, Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR},
+    {FRAME_SPEED_FACTOR, Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR},
+    {SYNCHRONOUS_SIZING, Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING},
+};
+const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 #endif
@@ -273,6 +306,10 @@ void AnimatedImageVisual::CreateImageCache()
   {
     DALI_LOG_ERROR("mImageCache is null\n");
   }
+  else
+  {
+    mLastRequiredSize = mDesiredSize;
+  }
 }
 
 AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, ImageDimensions desiredSize)
@@ -308,7 +345,11 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mFittingMode(FittingMode::VISUAL_FITTING),
   mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
   mStartFirstFrame(false),
-  mIsJumpTo(false)
+  mIsJumpTo(false),
+  mEnableBrokenImage(true),
+  mRendererAdded(false),
+  mUseBrokenImageRenderer(false),
+  mUseSynchronousSizing(false)
 {
   EnablePreMultipliedAlpha(mFactoryCache.GetPreMultiplyOnLoad());
 }
@@ -349,7 +390,31 @@ AnimatedImageVisual::~AnimatedImageVisual()
 
 void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
-  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+  if(mUseSynchronousSizing && (mLastRequiredSize.GetWidth() > 0 && mLastRequiredSize.GetHeight() > 0))
+  {
+    if(mImpl->mRenderer)
+    {
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet && textureSet.GetTextureCount())
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          if(mImageSize != ImageDimensions(0, 0))
+          {
+            naturalSize.x = mImageSize.GetWidth();
+            naturalSize.y = mImageSize.GetHeight();
+            return;
+          }
+        }
+      }
+    }
+
+    naturalSize.x = mLastRequiredSize.GetWidth();
+    naturalSize.y = mLastRequiredSize.GetHeight();
+    return;
+  }
+  else if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
   {
     if(mImpl->mRenderer)
     {
@@ -482,17 +547,25 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
   map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
   map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+
+  Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, size.GetWidth());
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
+
   map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
+  map.Insert(Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING, mUseSynchronousSizing);
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE);
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
-  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+
+  Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, size.GetWidth());
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
 }
 
 void AnimatedImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
@@ -527,12 +600,14 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
   {
     case DevelAnimatedImageVisual::Action::PAUSE:
     {
+      DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "PAUSE\n");
       // Pause will be executed on next timer tick
       mActionStatus = DevelAnimatedImageVisual::Action::PAUSE;
       break;
     }
     case DevelAnimatedImageVisual::Action::PLAY:
     {
+      DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "PLAY\n");
       if(mFrameDelayTimer && IsOnScene() && mActionStatus != DevelAnimatedImageVisual::Action::PLAY)
       {
         mFrameDelayTimer.Start();
@@ -546,6 +621,7 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
       // Stop will be executed on next timer tick
       mActionStatus     = DevelAnimatedImageVisual::Action::STOP;
       mCurrentLoopIndex = FIRST_LOOP;
+      DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "STOP\n");
       if(IsOnScene())
       {
         DisplayNextFrame();
@@ -565,6 +641,7 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
         {
           mIsJumpTo            = true;
           mFrameIndexForJumpTo = frameNumber;
+          DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "JUMP_TO : %u\n", mFrameIndexForJumpTo);
           if(IsOnScene())
           {
             DisplayNextFrame();
@@ -588,88 +665,17 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
     }
     else
     {
-      if(keyValue.first == PIXEL_AREA_UNIFORM_NAME)
+      for(int i = 0; i < NAME_INDEX_MATCH_TABLE_SIZE; ++i)
       {
-        DoSetProperty(Toolkit::ImageVisual::Property::PIXEL_AREA, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_WRAP_MODE_U)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::WRAP_MODE_U, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_WRAP_MODE_V)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::WRAP_MODE_V, keyValue.second);
-      }
-      else if(keyValue.first == BATCH_SIZE_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::BATCH_SIZE, keyValue.second);
-      }
-      else if(keyValue.first == CACHE_SIZE_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::CACHE_SIZE, keyValue.second);
-      }
-      else if(keyValue.first == FRAME_DELAY_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::FRAME_DELAY, keyValue.second);
-      }
-      else if(keyValue.first == LOOP_COUNT_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::LOOP_COUNT, keyValue.second);
-      }
-      else if(keyValue.first == STOP_BEHAVIOR_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, keyValue.second);
-      }
-      else if(keyValue.first == ALPHA_MASK_URL)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, keyValue.second);
-      }
-      else if(keyValue.first == MASK_CONTENT_SCALE_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second);
-      }
-      else if(keyValue.first == CROP_TO_MASK_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
-      }
-      else if(keyValue.first == MASKING_TYPE_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::MASKING_TYPE, keyValue.second);
-      }
-      else if(keyValue.first == LOAD_POLICY_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::LOAD_POLICY, keyValue.second);
-      }
-      else if(keyValue.first == RELEASE_POLICY_NAME)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::RELEASE_POLICY, keyValue.second);
-      }
-      else if(keyValue.first == SYNCHRONOUS_LOADING)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_FITTING_MODE)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::FITTING_MODE, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_SAMPLING_MODE)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::SAMPLING_MODE, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
-      }
-      else if(keyValue.first == FRAME_SPEED_FACTOR)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, keyValue.second);
+        if(keyValue.first == NAME_INDEX_MATCH_TABLE[i].name)
+        {
+          DoSetProperty(NAME_INDEX_MATCH_TABLE[i].index, keyValue.second);
+          break;
+        }
       }
     }
   }
+
   // Load image immediately if LOAD_POLICY requires it
   if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
   {
@@ -897,6 +903,16 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       break;
     }
 
+    case Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE:
+    {
+      bool enableBrokenImage = true;
+      if(value.Get(enableBrokenImage))
+      {
+        mEnableBrokenImage = enableBrokenImage;
+      }
+      break;
+    }
+
     case Toolkit::ImageVisual::Property::RELEASE_POLICY:
     {
       int releasePolicy = 0;
@@ -972,6 +988,16 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       }
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::SYNCHRONOUS_SIZING:
+    {
+      bool useSynchronousSizing = false;
+      if(value.Get(useSynchronousSizing))
+      {
+        mUseSynchronousSizing = useSynchronousSizing;
+      }
+      break;
+    }
   }
 }
 
@@ -1009,6 +1035,8 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   }
 
   actor.RemoveRenderer(mImpl->mRenderer);
+  mRendererAdded = false;
+
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
   {
     if(DALI_LIKELY(mImageCache))
@@ -1034,6 +1062,40 @@ void AnimatedImageVisual::OnSetTransform()
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
   {
     mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  }
+
+  if(mUseSynchronousSizing)
+  {
+    // Get current visual size
+    Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
+    uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
+    uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
+    sizeWidth                        = std::min(sizeWidth, maximumNumber);
+    uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
+    sizeHeight                       = std::min(sizeHeight, maximumNumber);
+    Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
+
+    // Reload if visual size is updated
+    if(mLastRequiredSize != visualSize)
+    {
+      mLastRequiredSize = visualSize;
+
+      if(DALI_LIKELY(mImageCache))
+      {
+        DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "mLastRequiredSize : %hux%hu\n", mLastRequiredSize.GetWidth(), mLastRequiredSize.GetHeight());
+        mImageCache->SetDesiredSize(mLastRequiredSize);
+
+        // TODO : Is their more good way to request current frame again??
+        if(mStartFirstFrame)
+        {
+          PrepareTextureSet();
+        }
+        else
+        {
+          OnDoAction(DevelAnimatedImageVisual::Action::JUMP_TO, static_cast<int32_t>(mCurrentFrameIndex));
+        }
+      }
+    }
   }
 }
 
@@ -1149,16 +1211,20 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::StartFirstFrame()\n");
 
   mStartFirstFrame = false;
-  if(mImpl->mRenderer)
+  if(mImpl->mRenderer && DALI_LIKELY(textureSet))
   {
     mImpl->mRenderer.SetTextures(textureSet);
     CheckMaskTexture();
 
-    Actor actor = mPlacementActor.GetHandle();
-    if(actor)
+    if(!mRendererAdded)
     {
-      actor.AddRenderer(mImpl->mRenderer);
-      mPlacementActor.Reset();
+      Actor actor = mPlacementActor.GetHandle();
+      if(actor)
+      {
+        mRendererAdded = true;
+        actor.AddRenderer(mImpl->mRenderer);
+        mPlacementActor.Reset();
+      }
     }
   }
 
@@ -1224,6 +1290,8 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
       }
     }
   }
+
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "mImageSize : %hux%hu\n", mImageSize.GetWidth(), mImageSize.GetHeight());
 }
 
 void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, bool preMultiplied)
@@ -1247,7 +1315,7 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
   }
   else
   {
-    if(mImpl->mRenderer)
+    if(mImpl->mRenderer && DALI_LIKELY(textureSet))
     {
       if(mFrameDelayTimer && interval > 0u)
       {
@@ -1351,10 +1419,25 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
   }
 
   TextureSet textureSet;
-  if(DALI_LIKELY(mImpl->mRenderer))
+  if(mEnableBrokenImage)
   {
-    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-    textureSet = mImpl->mRenderer.GetTextures();
+    if(DALI_LIKELY(mImpl->mRenderer))
+    {
+      mUseBrokenImageRenderer = true;
+      mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
+      textureSet = mImpl->mRenderer.GetTextures();
+    }
+  }
+  else
+  {
+    if(mRendererAdded)
+    {
+      if(actor)
+      {
+        actor.RemoveRenderer(mImpl->mRenderer);
+        mRendererAdded = false;
+      }
+    }
   }
 
   if(mFrameDelayTimer)
