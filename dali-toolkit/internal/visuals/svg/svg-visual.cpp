@@ -281,9 +281,6 @@ void SvgVisual::DoSetProperty(Property::Index index, const Property::Value& valu
 
 void SvgVisual::DoSetOnScene(Actor& actor)
 {
-  TextureSet textureSet = TextureSet::New();
-  mImpl->mRenderer.SetTextures(textureSet);
-
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
@@ -303,15 +300,28 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   }
   else
   {
-    if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
-    {
-      // Use desired size. Need to request rasterize forcibly.
-      AddRasterizationTask(mDesiredSize);
-    }
     if(mImpl->mEventObserver)
     {
       // SVG visual needs it's size set before it can be rasterized hence request relayout once on stage
       mImpl->mEventObserver->RelayoutRequest(*this);
+    }
+
+    if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+    {
+      // Use desired size. Need to request rasterize forcibly.
+      AddRasterizationTask(mDesiredSize);
+
+      if(mRasterizeCompleted)
+      {
+        // The case when we got cached rasterized result. Since "IsOnScene()" still false,
+        // RasterizeComplete will not send resource ready signal. Need to emit this time.
+        EmitResourceReady(Toolkit::Visual::ResourceStatus::READY);
+      }
+      else if(DALI_UNLIKELY(mLoadFailed))
+      {
+        // If rasterize failed.
+        EmitResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+      }
     }
   }
 }
