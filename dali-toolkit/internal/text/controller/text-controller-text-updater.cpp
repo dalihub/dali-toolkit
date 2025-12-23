@@ -651,7 +651,6 @@ bool Controller::TextUpdater::RemoveText(
       {
         std::string utf8;
         Utf32ToUtf8(first, numberOfCharacters, utf8);
-        impl.mEditableControlInterface->TextDeleted(cursorIndex, numberOfCharacters, utf8);
         if (!isDeletingPreEdit)
         {
           impl.mEditableControlInterface->TextDeleted(cursorIndex, numberOfCharacters, utf8);
