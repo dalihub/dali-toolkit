@@ -59,6 +59,7 @@ ViewModel::ViewModel(const ModelInterface* const model)
   mElidedGlyphs(),
   mElidedLayout(),
   mIsTextElided(false),
+  mElidedOffset(0.0f),
   mStartIndexOfElidedGlyphs(0u),
   mEndIndexOfElidedGlyphs(0u),
   mFirstMiddleIndexOfElidedGlyphs(0u),
@@ -377,6 +378,22 @@ const Vector<CharacterIndex>& ViewModel::GetGlyphsToCharacters() const
   return mModel->GetGlyphsToCharacters();
 }
 
+const float ViewModel::GetElidedOffset() const
+{
+  return mElidedOffset;
+}
+
+const bool ViewModel::GetCharacterDirection(CharacterIndex logicalIndex) const
+{
+  auto   directions = mModel->GetCharacterDirections();
+  size_t length = directions.Count();
+  if(length == 0u || length <= logicalIndex)
+  {
+    return false;
+  }
+  return directions[logicalIndex];
+}
+
 void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
 {
   mIsTextElided             = false;
@@ -492,8 +509,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           float      removedGlypsWidth     = 0.f;
           Length     numberOfRemovedGlyphs = 0u;
           GlyphIndex indexOfEllipsis       = startIndexOfEllipsis;
-
-          float actualAdvance = 0.f;
+          float      actualAdvance         = 0.f;
           for(Length i = 0; i < ellipsisLine->glyphRun.numberOfGlyphs; i++)
           {
             const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + lines[EllidedLineIndex].glyphRun.glyphIndex + i);
@@ -531,7 +547,6 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                   // Avoids to exceed the bounding box when rtl text is elided.
                   firstPenX = -ellipsisGlyph.xBearing;
                 }
-
                 firstPenSet = true;
               }
 
@@ -544,13 +559,34 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
               actualAdvance -= glyphToRemove.advance;
               float calculatedWidth = actualAdvance + ellipsisGlyphWidth;
 
-              // Fot AutoScroll, there are cases where the layout is larger than the control.
+              // For AutoScroll, there are cases where the layout is larger than the control.
               // If the layout is larger than the max texture, it should be ellipsised.
               const float controlWidth = std::max(mModel->GetControlSize().width, mModel->GetLayoutSize().width);
 
+              bool isRTLLine = ellipsisLine->direction;
               // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
-              if((calculatedWidth < controlWidth) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
+              if((calculatedWidth <= controlWidth) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
               {
+                switch(mModel->GetHorizontalAlignment())
+                {
+                  case HorizontalAlignment::BEGIN:
+                  {
+                    mElidedOffset = isRTLLine ? ellipsisLine->alignmentOffset : 0.0f;
+                    break;
+                  }
+                  case HorizontalAlignment::CENTER:
+                  {
+                    mElidedOffset = isRTLLine ? controlWidth - ellipsisLine->width + ellipsisLine->alignmentOffset : controlWidth - calculatedWidth;
+                    mElidedOffset = std::floor(mElidedOffset * 0.5f);
+                    break;
+                  }
+                  case HorizontalAlignment::END:
+                  {
+                    mElidedOffset = isRTLLine ? controlWidth - ellipsisLine->width + ellipsisLine->alignmentOffset : controlWidth - calculatedWidth;
+                    break;
+                  }
+                }
+
                 GlyphInfo& glyphInfo = *(elidedGlyphsBuffer + indexOfEllipsis);
                 Vector2&   position  = *(elidedPositionsBuffer + indexOfEllipsis);
                 position.x -= glyphInfo.xBearing;
@@ -559,20 +595,21 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                 glyphInfo = ellipsisGlyph;
 
                 // Change the 'x' and 'y' position of the ellipsis glyph.
-                if(position.x > firstPenX)
+                if(position.x >= firstPenX)
                 {
                   if(isTailMode)
                   {
                     // To handle case of the mixed languages (LTR then RTL) with
                     // EllipsisPosition::END and the LayoutDirection::RIGHT_TO_LEFT
                     float nextXPositions = ellipsisLine->width;
+
                     if(indexOfEllipsis + 1u < numberOfGlyphs)
                     {
                       Vector2& positionOfNextGlyph = *(elidedPositionsBuffer + indexOfEllipsis + 1u);
                       nextXPositions               = positionOfNextGlyph.x;
                     }
 
-                    if(position.x > nextXPositions) // RTL language
+                    if(GetCharacterDirection(indexOfEllipsis)) // RTL character
                     {
                       if((indexOfEllipsis > 0u) && ((position.x - nextXPositions) > removedGlypsWidth))
                       {
@@ -610,13 +647,14 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                     // To handle case of the mixed languages (RTL then LTR) with
                     // EllipsisPosition::START and the LayoutDirection::RIGHT_TO_LEFT
                     float nextXPositions = ellipsisLine->width;
+
                     if(indexOfEllipsis + 1u < numberOfGlyphs)
                     {
                       Vector2& positionOfNextGlyph = *(elidedPositionsBuffer + indexOfEllipsis + 1u);
                       nextXPositions               = positionOfNextGlyph.x;
                     }
 
-                    if(position.x < nextXPositions) // LTR language
+                    if(!GetCharacterDirection(indexOfEllipsis)) // LTR Character
                     {
                       position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
 
@@ -628,10 +666,10 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                   }
                 }
 
-                position.x += ellipsisGlyph.xBearing;
-                position.y = penY - ellipsisGlyph.yBearing;
-
-                inserted = true;
+                position.x    += ellipsisGlyph.xBearing;
+                position.y    = penY - ellipsisGlyph.yBearing;
+                mElidedOffset = position.x + mElidedOffset < 0.0f ? -position.x : mElidedOffset;
+                inserted      = true;
               }
             }
 
@@ -817,6 +855,11 @@ const Vector4& ViewModel::GetBackgroundColorWithCutout() const
 const Vector2& ViewModel::GetOffsetWithCutout() const
 {
   return mModel->GetOffsetWithCutout();
+}
+
+const Vector<CharacterDirection>& ViewModel::GetCharacterDirections() const
+{
+  return mModel->GetCharacterDirections();
 }
 
 } // namespace Text

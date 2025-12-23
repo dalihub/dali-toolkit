@@ -681,6 +681,13 @@ LogicalModel::~LogicalModel()
   {
     ClearBidirectionalParagraphInfo(bidirectionalSupport);
   }
+
+  for(auto&& info : mBidirectionalLineInfo)
+  {
+    free(info.visualToLogicalMap);
+    free(info.visualToLogicalMapSecondHalf);
+  }
+
   ClearFontDescriptionRuns();
   ClearEmbeddedImages();
   ClearAnchors();

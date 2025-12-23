@@ -550,6 +550,14 @@ public:
    * @return The offset with cutout.
    */
   virtual const Vector2& GetOffsetWithCutout() const = 0;
+
+  /**
+   * @brief Retrieves the directions of the character.
+   *
+   * @return The character directions.
+   */
+  virtual const Vector<CharacterDirection>& GetCharacterDirections() const = 0;
+
 };
 
 } // namespace Text

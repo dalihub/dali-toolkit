@@ -308,6 +308,8 @@ int UtcDaliCanvasViewRasterizeTaskP(void)
   IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task);
 
+  delete dummyInternalCanvasView;
+
   END_TEST;
 }
 
@@ -333,6 +335,8 @@ int UtcDaliCanvasViewRasterizeTaskAddTaskP(void)
   asyncTaskManager.AddTask(task);
   asyncTaskManager.AddTask(task2);
 
+  delete dummyInternalCanvasView;
+
   END_TEST;
 }
 
@@ -355,6 +359,8 @@ int UtcDaliCanvasViewRasterizeTaskAddRemoveTaskP(void)
   asyncTaskManager.AddTask(task);
 
   asyncTaskManager.RemoveTask(task);
+
+  delete dummyInternalCanvasView;
 
   END_TEST;
 }

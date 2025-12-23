@@ -366,16 +366,6 @@ private: // From Control
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
-   * @copydoc Control::OnSceneConnection()
-   */
-  void OnSceneConnection(int depth) override;
-
-  /**
-   * @copydoc Control::OnSceneDisconnection()
-   */
-  void OnSceneDisconnection() override;
-
-  /**
    * @copydoc Control::OnAnimateAnimatableProperty()
    */
   void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state) override;
@@ -473,6 +463,12 @@ private:
   void UpdateAutoScrollState();
 
   /**
+   * @brief When the label's visibility changes, the auto scroll animation should also change.
+   * @param[in] visible True the last auto scroll state is restored. False the auto scroll is stopped.
+   */
+  void SetAutoScrollVisible(bool visible);
+
+  /**
    * Creates a text-scroller if one has not been created.
    * @return The text scroller.
    */
@@ -484,6 +480,11 @@ private:
     }
     return mTextScroller;
   }
+
+  /**
+   * @brief Callback when the visibility of the actor is changed.
+   */
+  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
 
   /**
    * @brief Callback function for when the layout is changed.
@@ -556,8 +557,9 @@ private: // Data
 
   std::string mLocale;
   Vector2     mSize;
+  Vector2     mTouchPosition; ///< The initial touch down position.
 
-  Vector2 mTouchPosition; ///< The initial touch down position.
+  Toolkit::DevelText::Ellipsize::Mode mLastEllipsisMode;
 
   int  mRenderingBackend;
   int  mAsyncLineCount;

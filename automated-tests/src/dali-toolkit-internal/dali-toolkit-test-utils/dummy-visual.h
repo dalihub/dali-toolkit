@@ -68,7 +68,7 @@ public:
   void ResetActionCounter();
 
 protected:
-  DummyVisual(VisualFactoryCache& factoryCache);
+  DummyVisual(VisualFactoryCache* factoryCache);
 
   void OnInitialize() override;
   void DoCreatePropertyMap(Property::Map& map) const override;
@@ -80,7 +80,8 @@ protected:
   void OnDoActionExtension(const Property::Index actionName, const Dali::Any& attributes) override;
 
 private:
-  unsigned int mActionCounter;
+  unsigned int                        mActionCounter;
+  std::unique_ptr<VisualFactoryCache> mVisualFactoryCache;
 };
 
 } // namespace Internal
