@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,6 +135,13 @@ public:
    * @param[in] interval time interval in millisecond to be used as default interval.
    */
   virtual void SetInterval(uint32_t interval);
+
+  /**
+   * @brief Update desired size.
+   *
+   * @param[in] desiredSize size of desired image to be requested.
+   */
+  virtual void SetDesiredSize(Dali::ImageDimensions desiredSize);
 
 private:
   void AllocateMaskData();
