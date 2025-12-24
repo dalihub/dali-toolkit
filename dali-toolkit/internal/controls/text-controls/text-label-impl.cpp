@@ -1391,7 +1391,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       {
         mController->SetDefaultColor(textColor);
         mTextUpdateNeeded    = true;
-        mIsAsyncRenderNeeded = mIsAsyncRenderNeeded ? true : (mController->IsUnderlineEnabled() || mController->IsStrikethroughEnabled());
+        mIsAsyncRenderNeeded = mIsAsyncRenderNeeded ? true : (mController->IsUnderlineEnabled() || mController->IsStrikethroughEnabled() || mController->IsAutoScrollEnabled());
 
         // Trigger constraint always.
         if(DALI_LIKELY(mVisual))
