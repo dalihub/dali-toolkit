@@ -99,7 +99,7 @@ ModelPrimitivePtr ModelPrimitive::New()
 }
 
 ModelPrimitive::ModelPrimitive()
-: mShaderManager(new Scene3D::Loader::ShaderManager())
+: mShaderManager()
 {
 }
 
@@ -222,7 +222,7 @@ void ModelPrimitive::UpdateShader(Scene3D::Loader::ShaderManagerPtr shaderManage
 {
   if(mShaderManager != shaderManager)
   {
-    mShaderManager = (shaderManager) ? shaderManager : new Scene3D::Loader::ShaderManager();
+    mShaderManager = shaderManager;
     if(mMaterial && GetImplementation(mMaterial).IsResourceReady())
     {
       ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag::SHADER, hash);
@@ -311,6 +311,11 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
       {
         shaderOption.AddOption(Scene3D::Loader::ShaderOption::Type::MORPH_VERSION_2_0);
       }
+    }
+
+    if(DALI_UNLIKELY(!mShaderManager))
+    {
+      mShaderManager = new Scene3D::Loader::ShaderManager();
     }
 
     Shader newShader = mShaderManager->ProduceShader(shaderOption);
