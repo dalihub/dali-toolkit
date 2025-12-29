@@ -302,6 +302,7 @@ void WebView::OnInitialize()
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
   self.InheritedVisibilityChangedSignal().Connect(this, &WebView::OnInheritedVisibilityChanged);
+  self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
