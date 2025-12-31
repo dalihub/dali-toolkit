@@ -2829,7 +2829,7 @@ int UtcDaliAnimatedImageVisualWrapMode(void)
 
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
 
-  // WITHOUT atlasing, the wrapping is handled by setting gl texture parameters
+  // the wrapping is handled by setting gl texture parameters
   std::stringstream out;
   out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_REPEAT;
   DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));

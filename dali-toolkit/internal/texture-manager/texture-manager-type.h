@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_TYPE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 

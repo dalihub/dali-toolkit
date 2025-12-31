@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/svg/svg-loader.h>
@@ -43,8 +42,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(1); // atlas
-
 constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
@@ -73,7 +70,6 @@ const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
     {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
     {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
     {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
-    {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
     {LOAD_POLICY_NAME, Toolkit::ImageVisual::Property::LOAD_POLICY},
     {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
 };
@@ -102,8 +98,6 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mSvgLoader(factoryCache.GetSvgLoader()),
   mSvgLoadId(SvgLoader::INVALID_SVG_LOAD_ID),
   mSvgRasterizeId(SvgLoader::INVALID_SVG_RASTERIZE_ID),
-  mAtlasRect(FULL_TEXTURE_RECT),
-  mAtlasRectIndex(Property::INVALID_INDEX),
   mImageUrl(imageUrl),
   mDefaultWidth(0),
   mDefaultHeight(0),
@@ -114,8 +108,7 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mLoadCompleted(false),
   mRasterizeCompleted(false),
   mLoadFailed(false),
-  mRasterizeForcibly(true),
-  mAttemptAtlasing(false)
+  mRasterizeForcibly(true)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -150,7 +143,6 @@ void SvgVisual::OnInitialize()
   Shader   shader   = GenerateShader();
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   mImpl->mRenderer  = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   if(IsUsingCustomShader())
   {
@@ -211,15 +203,6 @@ void SvgVisual::DoSetProperty(Property::Index index, const Property::Value& valu
 {
   switch(index)
   {
-    case Toolkit::ImageVisual::Property::ATLASING:
-    {
-      bool atlasing = false;
-      if(value.Get(atlasing))
-      {
-        mAttemptAtlasing = atlasing;
-      }
-      break;
-    }
     case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
     {
       bool sync = false;
@@ -379,7 +362,6 @@ void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
   if(mImageUrl.IsValid())
   {
     map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
-    map.Insert(Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing);
   }
 
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
@@ -401,11 +383,6 @@ void SvgVisual::EnablePreMultipliedAlpha(bool preMultiplied)
   {
     DALI_LOG_WARNING("Note : SvgVisual cannot disable PreMultipliedAlpha\n");
   }
-}
-
-bool SvgVisual::AttemptAtlasing() const
-{
-  return (!IsUsingCustomShader() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }
 
 void SvgVisual::EmitResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
@@ -455,10 +432,9 @@ void SvgVisual::AddRasterizationTask(const Dali::ImageDimensions& size)
   }
 
   const bool synchronousRasterize = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
-  const bool attemptAtlasing      = AttemptAtlasing();
 
   mRasterizeCompleted = false;
-  mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, size.GetWidth(), size.GetHeight(), attemptAtlasing, this, synchronousRasterize);
+  mSvgRasterizeId     = mSvgLoader.Rasterize(mSvgLoadId, size.GetWidth(), size.GetHeight(), this, synchronousRasterize);
 }
 
 /// Called when SvgLoader::Load is completed.
@@ -504,7 +480,7 @@ void SvgVisual::LoadComplete(int32_t loadId, Dali::VectorImageRenderer vectorIma
 }
 
 /// Called when SvgLoader::Rasterize is completed.
-void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect)
+void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet)
 {
   // rasterize id might not be updated if rasterize is cached.
   mSvgRasterizeId = rasterizeId;
@@ -515,41 +491,9 @@ void SvgVisual::RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureS
   {
     bool updateShader = false;
 
-    if(AttemptAtlasing() && atlasRect != FULL_TEXTURE_RECT)
-    {
-      mAtlasRect = atlasRect;
-      if(DALI_UNLIKELY(!(mImpl->mFlags & Impl::IS_ATLASING_APPLIED)))
-      {
-        updateShader = true;
-      }
-      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-    }
-    else
-    {
-      mAtlasRect = FULL_TEXTURE_RECT;
-      if(DALI_UNLIKELY(mImpl->mFlags & Impl::IS_ATLASING_APPLIED))
-      {
-        updateShader = true;
-      }
-      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-    }
-
     if(DALI_LIKELY(mImpl->mRenderer))
     {
       TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
-
-      if(mAtlasRectIndex == Property::INVALID_INDEX)
-      {
-        if(DALI_UNLIKELY(mAtlasRect != FULL_TEXTURE_RECT))
-        {
-          // Register atlas rect property only if it's not full texture rect.
-          mAtlasRectIndex = mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
-        }
-      }
-      else
-      {
-        mImpl->mRenderer.SetProperty(mAtlasRectIndex, mAtlasRect);
-      }
 
       if(textureSet != currentTextureSet)
       {
@@ -623,7 +567,6 @@ Shader SvgVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-        .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired()));
   }

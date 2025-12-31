@@ -27,7 +27,6 @@
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
@@ -558,14 +557,9 @@ int UtcTextureManagerExternalTexture(void)
     maskInfo->mContentScaleFactor = 1.0f;
     maskInfo->mPreappliedMasking  = false;
 
-    Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-    Dali::ImageDimensions         atlasRectSize(0, 0);
-    bool                          synchronousLoading(testSyncLoad);
-    bool                          atlasingStatus(false);
-    bool                          loadingStatus(false);
-    auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    ImageAtlasManagerPtr          atlasManager        = nullptr;
-    Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+    bool synchronousLoading(testSyncLoad);
+    bool loadingStatus(false);
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     std::string url(testExternalTexture ? externalImageUrl : TEST_IMAGE_FILE_NAME);
 
@@ -577,13 +571,8 @@ int UtcTextureManagerExternalTexture(void)
       maskInfo,
       synchronousLoading,
       textureId1,
-      atlasRect,
-      atlasRectSize,
-      atlasingStatus,
       loadingStatus,
       &observer1,
-      atlasUploadObserver,
-      atlasManager,
       true,
       TextureManager::ReloadPolicy::CACHED,
       preMultiply);
@@ -598,13 +587,8 @@ int UtcTextureManagerExternalTexture(void)
       maskInfo,
       synchronousLoading,
       textureId2,
-      atlasRect,
-      atlasRectSize,
-      atlasingStatus,
       loadingStatus,
       &observer2,
-      atlasUploadObserver,
-      atlasManager,
       true,
       TextureManager::ReloadPolicy::CACHED,
       preMultiply);
@@ -648,13 +632,8 @@ int UtcTextureManagerExternalTexture(void)
       maskInfo,
       synchronousLoading,
       textureId1,
-      atlasRect,
-      atlasRectSize,
-      atlasingStatus,
       loadingStatus,
       &observer1,
-      atlasUploadObserver,
-      atlasManager,
       true,
       TextureManager::ReloadPolicy::CACHED,
       preMultiply);
@@ -669,13 +648,8 @@ int UtcTextureManagerExternalTexture(void)
       maskInfo,
       synchronousLoading,
       textureId2,
-      atlasRect,
-      atlasRectSize,
-      atlasingStatus,
       loadingStatus,
       &observer2,
-      atlasUploadObserver,
-      atlasManager,
       true,
       TextureManager::ReloadPolicy::CACHED,
       preMultiply);
@@ -718,14 +692,9 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
   auto                               textureId2(TextureManager::INVALID_TEXTURE_ID);
   TextureManager::MaskingDataPointer maskInfo = nullptr;
 
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   uint32_t width(64);
   uint32_t height(64);
@@ -749,13 +718,8 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -785,13 +749,8 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
     maskInfo,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1010,15 +969,10 @@ int UtcTextureManagerUseInvalidMask(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto textureId(TextureManager::INVALID_TEXTURE_ID);
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textureManager.LoadTexture(
     filename,
@@ -1028,13 +982,8 @@ int UtcTextureManagerUseInvalidMask(void)
     maskInfo,
     synchronousLoading,
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1075,15 +1024,10 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedFirst(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto textureId(TextureManager::INVALID_TEXTURE_ID);
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textureManager.LoadTexture(
     filename,
@@ -1093,13 +1037,8 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedFirst(void)
     maskInfo,
     synchronousLoading,
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1140,15 +1079,10 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto textureId(TextureManager::INVALID_TEXTURE_ID);
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textureManager.LoadTexture(
     filename,
@@ -1158,13 +1092,8 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
     maskInfo,
     synchronousLoading,
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1220,15 +1149,10 @@ int UtcTextureManagerSynchronousLoadingFail(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  std::string                   filename("dummy");
-  auto                          textureId(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 0.f, 0.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  std::string filename("dummy");
+  auto        textureId(TextureManager::INVALID_TEXTURE_ID);
+  bool        loadingStatus(false);
+  auto        preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   // load image synchronously.
   TestObserver observer;
@@ -1240,13 +1164,8 @@ int UtcTextureManagerSynchronousLoadingFail(void)
     maskInfo,
     true, // synchronous loading.
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1275,13 +1194,8 @@ int UtcTextureManagerCachingSynchronousLoading(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  Vector4                       atlasRect(0.f, 0.f, 0.f, 0.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   // load image synchronously.
   TestObserver observer;
@@ -1294,13 +1208,8 @@ int UtcTextureManagerCachingSynchronousLoading(void)
     maskInfo,
     true, // synchronous loading.
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1324,13 +1233,8 @@ int UtcTextureManagerCachingSynchronousLoading(void)
     maskInfo,
     false, // asynchronous loading.
     asyncTextureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &asyncObserver,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1363,12 +1267,7 @@ int UtcTextureManagerAsyncSyncAsync(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  Vector4                       atlasRect(0.f, 0.f, 0.f, 0.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          atlasingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   // load image asynchronously.
   TestObserver asyncObserver1;
@@ -1382,13 +1281,8 @@ int UtcTextureManagerAsyncSyncAsync(void)
     maskInfo,
     false, // asynchronous loading.
     asyncTextureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     asyncLoadingStatus1,
     &asyncObserver1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1412,13 +1306,8 @@ int UtcTextureManagerAsyncSyncAsync(void)
     maskInfo,
     true, // synchronous loading.
     textureId,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     syncLoadingStatus,
     &syncObserver,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1447,13 +1336,8 @@ int UtcTextureManagerAsyncSyncAsync(void)
     maskInfo,
     false, // asynchronous loading.
     asyncTextureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     asyncLoadingStatus2,
     &asyncObserver2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1561,15 +1445,10 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
 
-  auto                          textureId1(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto textureId1(TextureManager::INVALID_TEXTURE_ID);
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textureManager.LoadTexture(
     filename,
@@ -1579,13 +1458,8 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1669,16 +1543,11 @@ int UtcTextureManagerMaskCacheTest(void)
   maskInfo2->mCropToMask         = true;
   maskInfo2->mContentScaleFactor = 1.0f;
 
-  auto                          textureId1(TextureManager::INVALID_TEXTURE_ID);
-  auto                          textureId2(TextureManager::INVALID_TEXTURE_ID);
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  auto textureId1(TextureManager::INVALID_TEXTURE_ID);
+  auto textureId2(TextureManager::INVALID_TEXTURE_ID);
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textureManager.LoadTexture(
     filename,
@@ -1688,13 +1557,8 @@ int UtcTextureManagerMaskCacheTest(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1719,13 +1583,8 @@ int UtcTextureManagerMaskCacheTest(void)
     maskInfo2,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1770,13 +1629,8 @@ int UtcTextureManagerMaskCacheTest(void)
       maskInfo,
       synchronousLoading,
       textureId1,
-      atlasRect,
-      atlasRectSize,
-      atlasingStatus,
       loadingStatus,
       &observer3,
-      atlasUploadObserver,
-      atlasManager,
       true,
       TextureManager::ReloadPolicy::CACHED,
       preMultiply);
@@ -1843,14 +1697,9 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     maskInfo[i]->mPreappliedMasking  = false; // To make GPU masking
     maskInfo[i]->mContentScaleFactor = 1.0f;
   }
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   // Request image 1, 2, 3 with GPU masking
   textureManager.LoadTexture(
@@ -1861,13 +1710,8 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     maskInfo[0],
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1880,13 +1724,8 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     maskInfo[1],
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -1899,13 +1738,8 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     maskInfo[2],
     synchronousLoading,
     textureId3,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     observer3,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2531,14 +2365,9 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   maskInfo->mContentScaleFactor = 1.0f;
   maskInfo->mPreappliedMasking  = false;
 
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   DALI_TEST_CHECK(pixelData);
 
@@ -2552,13 +2381,8 @@ int UtcTextureManagerMaskByExternalTexture01(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2571,13 +2395,8 @@ int UtcTextureManagerMaskByExternalTexture01(void)
     maskInfo,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2610,13 +2429,8 @@ int UtcTextureManagerMaskByExternalTexture01(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2629,13 +2443,8 @@ int UtcTextureManagerMaskByExternalTexture01(void)
     maskInfo,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2680,14 +2489,9 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   maskInfo->mContentScaleFactor = 1.0f;
   maskInfo->mPreappliedMasking  = false;
 
-  Vector4                       atlasRect(0.f, 0.f, 1.f, 1.f);
-  Dali::ImageDimensions         atlasRectSize(0, 0);
-  bool                          synchronousLoading(false);
-  bool                          atlasingStatus(false);
-  bool                          loadingStatus(false);
-  auto                          preMultiply         = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  ImageAtlasManagerPtr          atlasManager        = nullptr;
-  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+  bool synchronousLoading(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   DALI_TEST_CHECK(pixelData);
 
@@ -2701,13 +2505,8 @@ int UtcTextureManagerMaskByExternalTexture02(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2720,13 +2519,8 @@ int UtcTextureManagerMaskByExternalTexture02(void)
     maskInfo,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2755,13 +2549,8 @@ int UtcTextureManagerMaskByExternalTexture02(void)
     maskInfo,
     synchronousLoading,
     textureId1,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer1,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
@@ -2774,13 +2563,8 @@ int UtcTextureManagerMaskByExternalTexture02(void)
     maskInfo,
     synchronousLoading,
     textureId2,
-    atlasRect,
-    atlasRectSize,
-    atlasingStatus,
     loadingStatus,
     &observer2,
-    atlasUploadObserver,
-    atlasManager,
     true,
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);

@@ -1587,52 +1587,6 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliVisualFactoryGetSvgVisual: Request svg visual with enabled atlas");
-
-  VisualFactory factory = VisualFactory::Get();
-
-  Property::Map propertyMap;
-  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::SVG);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
-  propertyMap.Insert(ImageVisual::Property::ATLASING, true);
-
-  Visual::Base visual = factory.CreateVisual(propertyMap);
-  DALI_TEST_CHECK(visual);
-
-  TestGlAbstraction& gl           = application.GetGlAbstraction();
-  TraceCallStack&    textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  DummyControl      actor     = DummyControl::New(true);
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  application.GetScene().Add(actor);
-  visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
-
-  // Either application.SendNotification() or the trigger can now complete the task.
-  DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
-  application.SendNotification();
-  application.Render();
-
-  // Wait for loading & rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  // renderer is added to actor
-  DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
-
-  // waiting for the resource uploading
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
-
-  END_TEST;
-}
-
 namespace
 {
 // Creates a mesh visual from the given propertyMap and tries to load it on stage in the given application.
@@ -2929,15 +2883,7 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
 
   Property::Map imageShader4;
   imageShader4["shaderType"]   = "image";
-  imageShader4["shaderOption"] = Property::Map().Add("ATLAS_DEFAULT", true);
-
-  Property::Map imageShader5;
-  imageShader5["shaderType"]   = "image";
-  imageShader5["shaderOption"] = Property::Map().Add("ATLAS_CUSTOM", true);
-
-  Property::Map imageShader6;
-  imageShader6["shaderType"]   = "image";
-  imageShader6["shaderOption"] = Property::Map()
+  imageShader4["shaderOption"] = Property::Map()
                                    .Add("SQUIRCLE_CORNER", true)
                                    .Add("BORDERLINE", true)
                                    .Add("MASKING", true);
@@ -2997,9 +2943,6 @@ int UtcDaliVisualFactoryUsePreCompiledShader(void)
   factory.AddPrecompileShader(imageShader2);
   factory.AddPrecompileShader(imageShader3);
   factory.AddPrecompileShader(imageShader4);
-  factory.AddPrecompileShader(imageShader4); // use same shader, because check line coverage
-  factory.AddPrecompileShader(imageShader5);
-  factory.AddPrecompileShader(imageShader6);
   factory.AddPrecompileShader(textShader);
   factory.AddPrecompileShader(textShader); // use same shader, because check line coverage
   factory.AddPrecompileShader(textShader2);

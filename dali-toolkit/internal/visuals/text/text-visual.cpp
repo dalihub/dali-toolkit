@@ -38,7 +38,6 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -1022,8 +1021,6 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       }
     }
 
-    mImpl->mFlags &= ~Visual::Base::Impl::IS_ATLASING_APPLIED;
-
     const Vector4& defaultColor = parameters.textColor;
 
     for(RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
@@ -1382,8 +1379,6 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       verifiedHeight -= maxTextureSize;
     }
   }
-
-  mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
 

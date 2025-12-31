@@ -121,8 +121,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_MASKING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ATLAS_DEFAULT_WRAP)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ATLAS_CUSTOM_WRAP)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_YUV_TO_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_CORNER_YUV_TO_RGB)
@@ -147,8 +145,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_BORDERLINE_MASKING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ATLAS_DEFAULT_WRAP)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NATIVE_IMAGE_SHADER_ATLAS_CUSTOM_WRAP)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NINE_PATCH_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, NINE_PATCH_MASK_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_SINGLE_COLOR_TEXT)
@@ -242,7 +238,6 @@ const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME("cutoutCornerRadius");
 
 // Image visual
 const char* const IMAGE_URL_NAME("url");
-const char* const ATLAS_RECT_UNIFORM_NAME("uAtlasRect");
 const char* const PIXEL_AREA_UNIFORM_NAME("pixelArea");
 const char* const WRAP_MODE_UNIFORM_NAME("wrapMode");
 const char* const IMAGE_WRAP_MODE_U("wrapModeU");
@@ -266,7 +261,6 @@ const char* const CURRENT_FRAME_NUMBER_NAME("currentFrameNumber");
 const char* const TOTAL_FRAME_NUMBER_NAME("totalFrameNumber");
 const char* const STOP_BEHAVIOR_NAME("stopBehavior");
 const char* const LOOPING_MODE_NAME("loopingMode");
-const char* const IMAGE_ATLASING("atlasing");
 const char* const SYNCHRONOUS_LOADING("synchronousLoading");
 const char* const IMAGE_FITTING_MODE("fittingMode");
 const char* const IMAGE_SAMPLING_MODE("samplingMode");

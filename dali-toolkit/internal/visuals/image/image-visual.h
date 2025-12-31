@@ -27,7 +27,6 @@
 #include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/image-loader/fast-track-loading-task.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
@@ -111,7 +110,7 @@ typedef IntrusivePtr<ImageVisual> ImageVisualPtr;
  * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
  * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
  */
-class ImageVisual : public Visual::Base, public ConnectionTracker, public AtlasUploadObserver, public TextureUploadObserver
+class ImageVisual : public Visual::Base, public ConnectionTracker, public TextureUploadObserver
 {
 public:
   /**
@@ -249,14 +248,6 @@ protected:
 
 public:
   /**
-   * @copydoc AtlasUploadObserver::UploadCompleted
-   *
-   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
-   * This callback is the place to add the renderer as it would be called once the loading is finished.
-   */
-  void UploadCompleted() override;
-
-  /**
    * @copydoc TextureUploadObserver::LoadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
@@ -278,20 +269,12 @@ private:
   void AllocateMaskData();
 
   /**
-   * @brief Load the texture, will try to atlas unless unable or param set to false.
-   * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
-   * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
+   * @brief Load the texture.
    * @param[out] textures resulting texture set from the image loading.
    * @param[in] size if mUseSynchronousSizing is true this is the size of visual, else it is mDesiredSize
    * @param[in] forceReload flag determines if the texture should be reloaded from its source or use the cached texture.
    */
-  void LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload);
-
-  /**
-   * @brief Checks if atlasing should be attempted
-   * @return bool returns true if atlasing can be attempted.
-   */
-  bool AttemptAtlasing() const;
+  void LoadTexture(TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload);
 
   /**
    * @brief Initializes the Dali::Renderer from the image url
@@ -300,13 +283,10 @@ private:
 
   /**
    * Creates the texture set and adds the texture to it
-   * @param[out] textureRect The texture area of the texture in the atlas.
-   * @param[in] url The URL of the image resource to use.
    * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
-   * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
    * @return the texture set to use
    */
-  TextureSet CreateTextureSet(Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing);
+  TextureSet CreateTextureSet(bool synchronousLoading);
 
   /**
    * Set the value to the uTextureRect uniform
@@ -400,11 +380,8 @@ private:
   Dali::WrapMode::Type                            mWrapModeV : 3;
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
-  Vector4                                         mAtlasRect;
-  Dali::ImageDimensions                           mAtlasRectSize;
   TextureManager::LoadState                       mLoadState; ///< The texture loading state
 
-  bool mAttemptAtlasing : 1;        ///< If true will attempt atlasing, otherwise create unique texture
   bool mOrientationCorrection : 1;  ///< true if the image will have it's orientation corrected.
   bool mNeedYuvToRgb : 1;           ///< true if we need to convert yuv to rgb.
   bool mNeedUnifiedYuvAndRgb : 1;   ///< true if we need to support both yuv and rgb.

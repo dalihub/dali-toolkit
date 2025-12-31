@@ -36,14 +36,6 @@ UNIFORM_BLOCK FragBlock
   UNIFORM lowp float uYFlipMaskTexture;
 #endif
 
-#ifdef ATLAS_DEFAULT_WARP
-  UNIFORM highp vec4 uAtlasRect;
-
-#elif defined(ATLAS_CUSTOM_WARP)
-  // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
-  UNIFORM lowp vec2 wrapMode;
-#endif
-
   UNIFORM lowp vec4  uColor;
   UNIFORM lowp float premultipliedAlpha;
 
@@ -70,18 +62,6 @@ UNIFORM_BLOCK Borderline
   UNIFORM highp float borderlineWidth;
   UNIFORM highp float borderlineOffset;
 };
-#endif
-
-#ifdef ATLAS_CUSTOM_WARP
-highp float wrapCoordinate( highp vec2 range, highp float coordinate, lowp float wrap )
-{
-  highp float coord;
-  if( wrap > 1.5 ) /* REFLECT */
-    coord = 1.0 - abs(fract(coordinate*0.5)*2.0 - 1.0);
-  else /* warp is 0 or 1 */
-    coord = mix(coordinate, fract(coordinate), wrap);
-  return clamp(mix(range.x, range.y, coord), range.x, range.y);
-}
 #endif
 
 #if defined(IS_REQUIRED_DEBUG_VISUAL_SHADER) || defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE)
@@ -352,16 +332,6 @@ const bool IS_REQUIRED_ALPHA_MASKING_BOOL = true;
 #else
 const bool IS_REQUIRED_ALPHA_MASKING_BOOL = false;
 #endif
-#ifdef ATLAS_DEFAULT_WARP
-const bool ATLAS_DEFAULT_WARP_BOOL = true;
-#else
-const bool ATLAS_DEFAULT_WARP_BOOL = false;
-#endif
-#ifdef ATLAS_CUSTOM_WARP
-const bool ATLAS_CUSTOM_WARP_BOOL = true;
-#else
-const bool ATLAS_CUSTOM_WARP_BOOL = false;
-#endif
 
 // These lines in the shader may be replaced with actual definitions by the debug-image-visual-shader-script.json.
 // DEBUG_TRIGGER_CODE return bool type, and DEBUG_RATIO_CODE return float value which will be clamped between 0.0 and 1.0
@@ -442,19 +412,10 @@ mediump vec3 ApplyDebugMixColor(mediump vec4 originColor)
 
 void main()
 {
-#ifdef ATLAS_DEFAULT_WARP
-  highp vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );
-#elif defined(ATLAS_CUSTOM_WARP)
-  highp vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
-                                wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );
-#else
-  highp vec2 texCoord = vTexCoord;
-#endif
-
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
-  lowp vec4 textureColor = ConvertYuvToRgba(texCoord) * uColor;
+  lowp vec4 textureColor = ConvertYuvToRgba(vTexCoord) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * uColor;
+  lowp vec4 textureColor = TEXTURE( sTexture, vTexCoord ) * uColor;
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING

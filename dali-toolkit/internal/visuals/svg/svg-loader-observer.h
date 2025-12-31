@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,9 +84,8 @@ public:
    *
    * @param[in] rasterizeId Id of rasterize request.
    * @param[in] textureSet Rasterize texture set. It could be empty handle if rasterize failed.
-   * @param[in] atlasRect The atlas rect of the rasterized image.
    */
-  virtual void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) = 0;
+  virtual void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet) = 0;
 
 private:
   DestructionSignalType mLoadDestructionSignal;      ///< The destruction signal emitted when the observer is destroyed.

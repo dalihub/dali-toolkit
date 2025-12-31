@@ -27,7 +27,6 @@
 #include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
@@ -39,8 +38,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-class ImageAtlasManager;
-typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 class TextureAsyncLoadingHelper;
 
 /**
@@ -177,19 +174,9 @@ public:
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
    * @param[in, out] textureId        The textureId of the URL. It is also be used to check the previous textureId
    *                                  what requestor had. It will be used only ReloadPolicy::FORCED for now.
-   * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies,
-   *                                  this is the rectangle in normalized coordinates.
-   * @param[out] textureRectSize      The rectangle within the texture atlas that this URL occupies,
-   *                                  this is the same rectangle in pixels.
-   * @param[in,out] atlasingStatus    Set to true to attempt atlasing. If atlasing fails, the image will still
-   *                                  be loaded, and marked successful, but this will be set to false.
-   *                                  If atlasing succeeds, this will be set to true.
    * @param[out] loadingStatus        The loading status of the texture
    * @param[in] textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
-   * @param[in] atlasObserver         This is used if the texture is atlased, and will be called instead of
-   *                                  textureObserver.LoadCompleted
-   * @param[in] imageAtlasManager     The atlas manager to use for atlasing textures
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @param[in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
@@ -205,13 +192,8 @@ public:
     MaskingDataPointer&                maskInfo,
     const bool                         synchronousLoading,
     TextureManager::TextureId&         textureId,
-    Dali::Vector4&                     textureRect,
-    Dali::ImageDimensions&             textureRectSize,
-    bool&                              atlasingStatus,
     bool&                              loadingStatus,
     TextureUploadObserver*             textureObserver,
-    AtlasUploadObserver*               atlasObserver,
-    ImageAtlasManagerPtr               imageAtlasManager,
     const bool                         orientationCorrection,
     const TextureManager::ReloadPolicy reloadPolicy,
     TextureManager::MultiplyOnLoad&    preMultiplyOnLoad);

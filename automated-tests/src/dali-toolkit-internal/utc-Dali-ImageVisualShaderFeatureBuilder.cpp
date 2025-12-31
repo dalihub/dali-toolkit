@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty01(void)
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action on Visual directly");
   auto featureBuilder = Dali::Toolkit::Internal::ImageVisualShaderFeature::FeatureBuilder()
-                          .EnableTextureAtlas(Dali::Toolkit::Internal::ImageVisualShaderFeature::TextureAtlas::ENABLED)
                           .ApplyDefaultTextureWrapMode(true);
 
   std::string vertexPrefixList;
@@ -45,7 +44,6 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty01(void)
   featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
 
   DALI_TEST_EQUALS(vertexPrefixList, std::string(""), TEST_LOCATION);
-  DALI_TEST_EQUALS(fragmentPrefixList, std::string("#define ATLAS_DEFAULT_WARP\n"), TEST_LOCATION);
 
   featureBuilder = featureBuilder.ApplyDefaultTextureWrapMode(false);
 
@@ -55,7 +53,6 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty01(void)
   featureBuilder.GetFragmentShaderPrefixList(fragmentPrefixList);
 
   DALI_TEST_EQUALS(vertexPrefixList, std::string(""), TEST_LOCATION);
-  DALI_TEST_EQUALS(fragmentPrefixList, std::string("#define ATLAS_CUSTOM_WARP\n"), TEST_LOCATION);
   END_TEST;
 }
 

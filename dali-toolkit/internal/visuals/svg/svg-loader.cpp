@@ -20,7 +20,6 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h> ///< for EncodedImageBuffer
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-task.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -63,85 +62,46 @@ Debug::Filter* gSvgLoaderLogFilter = Debug::Filter::New(Debug::NoLogging, false,
 // clang-format on
 #endif
 
-constexpr Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-
 /**
  * @brief Helper function to set rasterize info from PixelData.
  *
- * @param[in] visualFactoryCache The visual factory cache. It will be used to get atlas manager faster.
  * @param[in] pixelData The rasterized pixel data.
  * @param[out] rasterizeInfo The rasterize info.
  */
-void SetTextureSetToRasterizeInfo(VisualFactoryCache* visualFactoryCache, const Dali::PixelData rasterizedPixelData, SvgLoader::SvgRasterizeInfo& rasterizeInfo)
+void SetTextureSetToRasterizeInfo(const Dali::PixelData rasterizedPixelData, SvgLoader::SvgRasterizeInfo& rasterizeInfo)
 {
-  rasterizeInfo.mAtlasAttempted = false;
-  if(rasterizeInfo.mAttemptAtlasing)
-  {
-    // Try to use atlas attempt
-    if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && visualFactoryCache))
-    {
-      auto atlasManager = visualFactoryCache->GetAtlasManager();
-      if(atlasManager)
-      {
-        Vector4 atlasRect;
-        auto    textureSet = atlasManager->Add(atlasRect, rasterizedPixelData);
-        if(textureSet) // atlasing
-        {
-          rasterizeInfo.mTextureSet     = textureSet;
-          rasterizeInfo.mAtlasRect      = atlasRect;
-          rasterizeInfo.mAtlasAttempted = true;
+  // Convert pixelData to texture.
+  Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
+  texture.Upload(rasterizedPixelData);
 
-          DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "  rasterizeId:%d atlasAttempted:%d atlasRect:(%f %f %f %f)\n", rasterizeInfo.mId, rasterizeInfo.mAtlasAttempted, rasterizeInfo.mAtlasRect.x, rasterizeInfo.mAtlasRect.y, rasterizeInfo.mAtlasRect.z, rasterizeInfo.mAtlasRect.w);
-        }
-      }
-    }
-  }
+  rasterizeInfo.mTextureSet = TextureSet::New();
+  rasterizeInfo.mTextureSet.SetTexture(0u, texture);
 
-  if(!rasterizeInfo.mAtlasAttempted)
-  {
-    // Atlas failed. Convert pixelData to texture.
-    Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-    texture.Upload(rasterizedPixelData);
-
-    rasterizeInfo.mTextureSet = TextureSet::New();
-    rasterizeInfo.mTextureSet.SetTexture(0u, texture);
-
-    rasterizeInfo.mAtlasRect = FULL_TEXTURE_RECT;
-
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "  rasterizeId:%d atlasAttempted:%d rasterizedPixelSize:(%ux%u)\n", rasterizeInfo.mId, rasterizeInfo.mAtlasAttempted, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-  }
+  DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "  rasterizeId:%d rasterizedPixelSize:(%ux%u)\n", rasterizeInfo.mId, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
 
   rasterizeInfo.mRasterizeState = SvgLoader::RasterizeState::UPLOADED;
 }
 
 /**
- * @brief Helper function to create a textureSet and atlasRect from rasterize info.
+ * @brief Helper function to create a textureSet from rasterize info.
  *
  * @param[in] rasterizeInfo The rasterize info.
- * @param[out] textureSet The textureSet.
- * @param[out] atlasRect The atlasRect.
+ * @return The textureSet.
  */
-void GetTextureSetFromRasterizeInfo(const SvgLoader::SvgRasterizeInfo& rasterizeInfo, Dali::TextureSet& textureSet, Vector4& atlasRect)
+Dali::TextureSet GetTextureSetFromRasterizeInfo(const SvgLoader::SvgRasterizeInfo& rasterizeInfo)
 {
-  if(!rasterizeInfo.mAtlasAttempted)
+  Dali::TextureSet textureSet;
+  if(DALI_LIKELY(rasterizeInfo.mTextureSet && rasterizeInfo.mTextureSet.GetTextureCount() > 0u))
   {
-    atlasRect = FULL_TEXTURE_RECT;
-    if(DALI_LIKELY(rasterizeInfo.mTextureSet && rasterizeInfo.mTextureSet.GetTextureCount() > 0u))
+    auto texture = rasterizeInfo.mTextureSet.GetTexture(0u);
+    if(DALI_LIKELY(texture))
     {
-      auto texture = rasterizeInfo.mTextureSet.GetTexture(0u);
-      if(DALI_LIKELY(texture))
-      {
-        // Always create new TextureSet here, so we don't share same TextureSets for multiple visuals.
-        textureSet = Dali::TextureSet::New();
-        textureSet.SetTexture(0u, texture);
-      }
+      // Always create new TextureSet here, so we don't share same TextureSets for multiple visuals.
+      textureSet = Dali::TextureSet::New();
+      textureSet.SetTexture(0u, texture);
     }
   }
-  else
-  {
-    textureSet = rasterizeInfo.mTextureSet;
-    atlasRect  = rasterizeInfo.mAtlasRect;
-  }
+  return textureSet;
 }
 
 } // Anonymous namespace
@@ -282,7 +242,7 @@ SvgLoader::SvgLoadId SvgLoader::Load(const VisualUrl& url, float dpi, SvgLoaderO
   return loadId;
 }
 
-SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing, SvgLoaderObserver* svgObserver, bool synchronousLoading)
+SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width, uint32_t height, SvgLoaderObserver* svgObserver, bool synchronousLoading)
 {
   if(loadId == SvgLoader::INVALID_SVG_LOAD_ID)
   {
@@ -290,7 +250,7 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
   }
 
   SvgRasterizeId rasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
-  auto           cacheIndex  = FindCacheIndexFromRasterizeCache(loadId, width, height, attemptAtlasing);
+  auto           cacheIndex  = FindCacheIndexFromRasterizeCache(loadId, width, height);
 
   // Newly append cache now.
   if(cacheIndex == SvgLoader::INVALID_SVG_CACHE_INDEX)
@@ -301,20 +261,20 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
       auto loadCacheIndex = GetCacheIndexFromLoadCacheById(loadId);
       DALI_ASSERT_ALWAYS(loadCacheIndex != SvgLoader::INVALID_SVG_CACHE_INDEX && "Invalid cache index");
       ++mLoadCache[loadCacheIndex].mReferenceCount;
-      DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u atlas=%d observer=%p ) Increase loadId loadState:%s, refCount=%d\n", loadId, width, height, attemptAtlasing, svgObserver, GET_LOAD_STATE_STRING(mLoadCache[loadCacheIndex].mLoadState), static_cast<int>(mLoadCache[loadCacheIndex].mReferenceCount));
+      DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) Increase loadId loadState:%s, refCount=%d\n", loadId, width, height, svgObserver, GET_LOAD_STATE_STRING(mLoadCache[loadCacheIndex].mLoadState), static_cast<int>(mLoadCache[loadCacheIndex].mReferenceCount));
     }
 
     rasterizeId = GenerateUniqueSvgRasterizeId();
     cacheIndex  = static_cast<SvgCacheIndex>(mRasterizeCache.size());
-    mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height, attemptAtlasing));
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u atlas=%d observer=%p ) New cached index:%d rasterizeId@%d\n", loadId, width, height, attemptAtlasing, svgObserver, cacheIndex, rasterizeId);
+    mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height));
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) New cached index:%d rasterizeId@%d\n", loadId, width, height, svgObserver, cacheIndex, rasterizeId);
   }
   else
   {
     DALI_ASSERT_ALWAYS(static_cast<size_t>(cacheIndex) < mRasterizeCache.size() && "Invalid cache index");
     rasterizeId = mRasterizeCache[cacheIndex].mId;
     ++mRasterizeCache[cacheIndex].mReferenceCount;
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u atlas=%d observer=%p ) Use cached index:%d rasterizeId@%d\n", loadId, width, height, attemptAtlasing, svgObserver, cacheIndex, rasterizeId);
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) Use cached index:%d rasterizeId@%d\n", loadId, width, height, svgObserver, cacheIndex, rasterizeId);
   }
 
   auto& rasterizeInfo = mRasterizeCache[cacheIndex];
@@ -345,12 +305,11 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
         if(svgObserver)
         {
           Dali::TextureSet textureSet;
-          Vector4          atlasRect = FULL_TEXTURE_RECT;
           if(rasterizeInfo.mRasterizeState == RasterizeState::UPLOADED)
           {
-            GetTextureSetFromRasterizeInfo(rasterizeInfo, textureSet, atlasRect);
+            textureSet = GetTextureSetFromRasterizeInfo(rasterizeInfo);
           }
-          svgObserver->RasterizeComplete(rasterizeId, textureSet, atlasRect);
+          svgObserver->RasterizeComplete(rasterizeId, textureSet);
         }
       }
       else
@@ -511,7 +470,7 @@ SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromLoadCache(const VisualUrl&
   return SvgLoader::INVALID_SVG_CACHE_INDEX;
 }
 
-SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromRasterizeCache(const SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing) const
+SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromRasterizeCache(const SvgLoadId loadId, uint32_t width, uint32_t height) const
 {
   const uint32_t size = static_cast<uint32_t>(mRasterizeCache.size());
 
@@ -523,13 +482,7 @@ SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromRasterizeCache(const SvgLo
        mRasterizeCache[i].mWidth == width &&
        mRasterizeCache[i].mHeight == height)
     {
-      // 1. If attemptAtlasing is true, then rasterizeInfo.mAttemptAtlasing should be true. The atlas rect result can be different.
-      // 2. If attemptAtlasing is false, then rasterizeInfo.mAtlasAttempted should be false. (We can use attempt failed result even if mAttemptAtlasing is true.)
-      if((attemptAtlasing && mRasterizeCache[i].mAttemptAtlasing) ||
-         (!attemptAtlasing && !mRasterizeCache[i].mAtlasAttempted))
-      {
-        return static_cast<SvgCacheIndex>(i);
-      }
+      return static_cast<SvgCacheIndex>(i);
     }
   }
   return SvgLoader::INVALID_SVG_CACHE_INDEX;
@@ -605,16 +558,6 @@ void SvgLoader::RemoveRasterize(SvgLoader::SvgRasterizeId rasterizeId)
       {
         // Cancel rasterize task immediatly!
         Dali::AsyncTaskManager::Get().RemoveTask(rasterizeInfo.mTask);
-      }
-
-      if(Dali::Adaptor::IsAvailable() && rasterizeInfo.mAtlasAttempted && mFactoryCache)
-      {
-        // Remove the atlas from the atlas manager.
-        auto atlasManager = mFactoryCache->GetAtlasManager();
-        if(atlasManager)
-        {
-          atlasManager->Remove(rasterizeInfo.mTextureSet, rasterizeInfo.mAtlasRect);
-        }
       }
 
       // Remove the rasterize info from the cache.
@@ -926,18 +869,17 @@ void SvgLoader::RasterizeSynchronously(SvgLoader::SvgRasterizeInfo& rasterizeInf
   }
   else if(rasterizeInfo.mRasterizeState != RasterizeState::UPLOADED) ///< Check it to avoid duplicate Upload call.
   {
-    SetTextureSetToRasterizeInfo(mFactoryCache, rasterizedPixelData, rasterizeInfo);
+    SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo);
   }
 
   if(svgObserver)
   {
     Dali::TextureSet textureSet;
-    Vector4          atlasRect = FULL_TEXTURE_RECT;
     if(rasterizeInfo.mRasterizeState == RasterizeState::UPLOADED)
     {
-      GetTextureSetFromRasterizeInfo(rasterizeInfo, textureSet, atlasRect);
+      textureSet = GetTextureSetFromRasterizeInfo(rasterizeInfo);
     }
-    svgObserver->RasterizeComplete(rasterizeInfo.mId, textureSet, atlasRect);
+    svgObserver->RasterizeComplete(rasterizeInfo.mId, textureSet);
   }
 }
 
@@ -1015,12 +957,11 @@ void SvgLoader::ProcessRasterizeQueue()
           svgObserver->RasterizeDestructionSignal().Disconnect(this, &SvgLoader::RasterizeObserverDestroyed);
 
           Dali::TextureSet textureSet;
-          Vector4          atlasRect = FULL_TEXTURE_RECT;
           if(rasterizeInfo.mRasterizeState == RasterizeState::UPLOADED)
           {
-            GetTextureSetFromRasterizeInfo(rasterizeInfo, textureSet, atlasRect);
+            textureSet = GetTextureSetFromRasterizeInfo(rasterizeInfo);
           }
-          svgObserver->RasterizeComplete(rasterizeId, textureSet, atlasRect);
+          svgObserver->RasterizeComplete(rasterizeId, textureSet);
         }
       }
       else if(rasterizeInfo.mRasterizeState == RasterizeState::RASTERIZING)
@@ -1066,7 +1007,7 @@ void SvgLoader::NotifyRasterizeObservers(SvgLoader::SvgRasterizeInfo& rasterizeI
     // invalidating the reference to the SvgRasterizeInfo struct.
     // Texture load requests for the same URL are deferred until the end of this
     // method.
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "SvgLoader::NotifyRasterizeObservers() observer:%p rasterizeId:%d loaderId:%d atlasAttempted:%d Size:%ux%u rasterizestate:%s\n", observer, rasterizeId, info->mLoadId, info->mAtlasAttempted, info->mWidth, info->mHeight, GET_RASTERIZE_STATE_STRING(info->mRasterizeState));
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "SvgLoader::NotifyRasterizeObservers() observer:%p rasterizeId:%d loaderId:%d Size:%ux%u rasterizestate:%s\n", observer, rasterizeId, info->mLoadId, info->mWidth, info->mHeight, GET_RASTERIZE_STATE_STRING(info->mRasterizeState));
 
     // It is possible for the observer to be deleted.
     // Disconnect and remove the observer first.
@@ -1076,13 +1017,12 @@ void SvgLoader::NotifyRasterizeObservers(SvgLoader::SvgRasterizeInfo& rasterizeI
     info->mObservers.Erase(info->mObservers.End() - 1u);
 
     Dali::TextureSet textureSet;
-    Vector4          atlasRect = FULL_TEXTURE_RECT;
     if(rasterizationSuccess)
     {
-      GetTextureSetFromRasterizeInfo(rasterizeInfo, textureSet, atlasRect);
+      textureSet = GetTextureSetFromRasterizeInfo(rasterizeInfo);
     }
 
-    observer->RasterizeComplete(rasterizeId, textureSet, atlasRect);
+    observer->RasterizeComplete(rasterizeId, textureSet);
 
     // Get the textureInfo from the container again as it may have been invalidated.
     auto cacheIndex = GetCacheIndexFromRasterizeCacheById(rasterizeId);
@@ -1153,7 +1093,7 @@ void SvgLoader::AsyncRasterizeComplete(SvgTaskPtr task)
 
     SvgRasterizeInfo& rasterizeInfo(mRasterizeCache[cacheIndex]);
 
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "  rasterizeId:%d loadId:%d attemptAtlasing:%d Size:%ux%u CacheIndex:%d RasterizeState: %s\n", rasterizeInfo.mId, rasterizeInfo.mLoadId, rasterizeInfo.mAttemptAtlasing, rasterizeInfo.mWidth, rasterizeInfo.mHeight, cacheIndex, GET_RASTERIZE_STATE_STRING(rasterizeInfo.mRasterizeState));
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::Concise, "  rasterizeId:%d loadId:%d Size:%ux%u CacheIndex:%d RasterizeState: %s\n", rasterizeInfo.mId, rasterizeInfo.mLoadId, rasterizeInfo.mWidth, rasterizeInfo.mHeight, cacheIndex, GET_RASTERIZE_STATE_STRING(rasterizeInfo.mRasterizeState));
 
     if(rasterizeInfo.mTask == task)
     {
@@ -1168,7 +1108,7 @@ void SvgLoader::AsyncRasterizeComplete(SvgTaskPtr task)
     }
     else if(rasterizeInfo.mRasterizeState != RasterizeState::UPLOADED) ///< Check it to avoid duplicate Upload call. (e.g. sync rasterize)
     {
-      SetTextureSetToRasterizeInfo(mFactoryCache, rasterizedPixelData, rasterizeInfo);
+      SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo);
     }
 
     // Note : rasterizeInfo can be invalidated after this call (as the mRasterizeCache may be modified)

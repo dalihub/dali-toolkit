@@ -29,7 +29,6 @@
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
@@ -104,17 +103,11 @@ void NPatchVisual::LoadImages()
       mPreMultipliedAlphaIndex = mImpl->mRenderer.RegisterProperty(Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, PREMULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled() ? 1.0f : 0.0f);
     }
 
-    TextureManager::MaskingDataPointer maskingDataPtr       = nullptr;
-    ImageAtlasManagerPtr               imageAtlasManagerPtr = nullptr;
-
-    bool atlasing      = false;
-    auto atlasRect     = Vector4::ZERO;
-    auto atlasRectSize = Dali::ImageDimensions();
-
-    bool loadingStatus = false;
+    TextureManager::MaskingDataPointer maskingDataPtr = nullptr;
+    bool                               loadingStatus  = false;
 
     // Load the auxiliary image
-    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, atlasRect, atlasRectSize, atlasing, loadingStatus, this, nullptr, imageAtlasManagerPtr, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
+    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, loadingStatus, this, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
 
     // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)

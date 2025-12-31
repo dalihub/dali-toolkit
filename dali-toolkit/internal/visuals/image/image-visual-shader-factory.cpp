@@ -91,7 +91,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
       mFragmentShaderNeedChange == ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE))
   {
     DALI_ASSERT_DEBUG((static_cast<int>(shaderType) >= static_cast<int>(VisualFactoryCache::IMAGE_SHADER)) &&
-                      (static_cast<int>(shaderType) <= static_cast<int>(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP)) &&
+                      (static_cast<int>(shaderType) <= static_cast<int>(VisualFactoryCache::NATIVE_IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING)) &&
                       "Do not support native image shader for given feature!!");
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
@@ -178,13 +178,13 @@ std::string_view ImageVisualShaderFactory::GetVertexShaderSource()
 
 std::string_view ImageVisualShaderFactory::GetFragmentShaderSource()
 {
-  // static string variable to cache complete fragment shader (no atlas)
-  static std::string gFragmentShaderNoAtlas;
-  if(gFragmentShaderNoAtlas.empty())
+  // static string variable to cache complete fragment shader
+  static std::string gFragmentShader;
+  if(gFragmentShader.empty())
   {
-    gFragmentShaderNoAtlas = SHADER_IMAGE_VISUAL_SHADER_FRAG.data();
+    gFragmentShader = SHADER_IMAGE_VISUAL_SHADER_FRAG.data();
   }
-  return gFragmentShaderNoAtlas;
+  return gFragmentShader;
 }
 
 bool ImageVisualShaderFactory::AddPrecompiledShader(PrecompileShaderOption& option)
@@ -247,18 +247,6 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
   {
     switch(option[i])
     {
-      case PrecompileShaderOption::Flag::ATLAS_DEFAULT:
-      {
-        builder.EnableTextureAtlas(true);
-        builder.ApplyDefaultTextureWrapMode(true);
-        break;
-      }
-      case PrecompileShaderOption::Flag::ATLAS_CUSTOM:
-      {
-        builder.EnableTextureAtlas(true);
-        builder.ApplyDefaultTextureWrapMode(false);
-        break;
-      }
       case PrecompileShaderOption::Flag::ROUNDED_CORNER:
       {
         builder.EnableRoundedCorner(true, false);

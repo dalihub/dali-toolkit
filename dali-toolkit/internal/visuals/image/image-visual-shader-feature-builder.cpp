@@ -71,20 +71,13 @@ constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(
 namespace ImageVisualShaderFeature
 {
 FeatureBuilder::FeatureBuilder()
-: mTextureAtlas(TextureAtlas::DISABLED),
-  mDefaultTextureWrapMode(DefaultTextureWrapMode::APPLY),
+: mDefaultTextureWrapMode(DefaultTextureWrapMode::APPLY),
   mRoundedCorner(RoundedCorner::DISABLED),
   mBorderline(Borderline::DISABLED),
   mAlphaMaskingOnRendering(AlphaMaskingOnRendering::DISABLED),
   mColorConversion(ColorConversion::DONT_NEED),
   mTexture()
 {
-}
-
-FeatureBuilder& FeatureBuilder::EnableTextureAtlas(bool enableTextureAtlas)
-{
-  mTextureAtlas = (enableTextureAtlas ? TextureAtlas::ENABLED : TextureAtlas::DISABLED);
-  return *this;
 }
 
 FeatureBuilder& FeatureBuilder::ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode)
@@ -125,53 +118,39 @@ FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb, bool enableU
 
 VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
 {
-  VisualFactoryCache::ShaderType shaderType = VisualFactoryCache::IMAGE_SHADER;
-  if(mTextureAtlas == TextureAtlas::ENABLED)
+  VisualFactoryCache::ShaderType shaderType     = VisualFactoryCache::IMAGE_SHADER;
+  uint32_t                       shaderTypeFlag = static_cast<uint32_t>(ImageVisualRequireFlag::DEFAULT);
+  if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
   {
-    if(mDefaultTextureWrapMode == DefaultTextureWrapMode::APPLY)
-    {
-      shaderType = VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP;
-    }
-    else
-    {
-      shaderType = VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP;
-    }
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::SQUIRCLE_CORNER);
   }
-  else
+  else if(mRoundedCorner == RoundedCorner::ROUNDED_CORNER)
   {
-    uint32_t shaderTypeFlag = static_cast<uint32_t>(ImageVisualRequireFlag::DEFAULT);
-    if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::SQUIRCLE_CORNER);
-    }
-    else if(mRoundedCorner == RoundedCorner::ROUNDED_CORNER)
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ROUNDED_CORNER);
-    }
-
-    if(mBorderline == Borderline::ENABLED)
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::BORDERLINE);
-    }
-
-    if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
-    }
-    else if(mColorConversion == ColorConversion::YUV_TO_RGB) // Not support gpu masking and color conversion at the same time now
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
-    }
-    else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
-    {
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
-      shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
-    }
-
-    DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid image shader type generated!");
-
-    shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ROUNDED_CORNER);
   }
+
+  if(mBorderline == Borderline::ENABLED)
+  {
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::BORDERLINE);
+  }
+
+  if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
+  {
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
+  }
+  else if(mColorConversion == ColorConversion::YUV_TO_RGB) // Not support gpu masking and color conversion at the same time now
+  {
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+  }
+  else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
+  {
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
+  }
+
+  DALI_ASSERT_DEBUG(shaderTypeFlag < SHADER_TYPE_TABLE_COUNT && "Invalid image shader type generated!");
+
+  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
 
   return shaderType;
 }
@@ -185,62 +164,45 @@ ChangeFragmentShader::Type FeatureBuilder::NeedToChangeFragmentShader() const
 
 void FeatureBuilder::GetVertexShaderPrefixList(std::string& vertexShaderPrefixList) const
 {
-  if(mTextureAtlas != TextureAtlas::ENABLED)
+  if(mRoundedCorner != RoundedCorner::DISABLED)
   {
-    if(mRoundedCorner != RoundedCorner::DISABLED)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
-    }
-    if(mBorderline == Borderline::ENABLED)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
-    }
-    if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
-    {
-      vertexShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
-    }
+    vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+  }
+  if(mBorderline == Borderline::ENABLED)
+  {
+    vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+  }
+  if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
+  {
+    vertexShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
   }
 }
 
 void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPrefixList) const
 {
-  if(mTextureAtlas == TextureAtlas::ENABLED)
+  if(mRoundedCorner != RoundedCorner::DISABLED)
   {
-    if(mDefaultTextureWrapMode == DefaultTextureWrapMode::APPLY)
+    fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
+    if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
     {
-      fragmentShaderPrefixList += "#define ATLAS_DEFAULT_WARP\n";
-    }
-    else
-    {
-      fragmentShaderPrefixList += "#define ATLAS_CUSTOM_WARP\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_SQUIRCLE_CORNER\n";
     }
   }
-  else
+  if(mBorderline == Borderline::ENABLED)
   {
-    if(mRoundedCorner != RoundedCorner::DISABLED)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER\n";
-      if(mRoundedCorner == RoundedCorner::SQUIRCLE_CORNER)
-      {
-        fragmentShaderPrefixList += "#define IS_REQUIRED_SQUIRCLE_CORNER\n";
-      }
-    }
-    if(mBorderline == Borderline::ENABLED)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
-    }
-    if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
-    }
-    else if(mColorConversion == ColorConversion::YUV_TO_RGB)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
-    }
-    else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
-    {
-      fragmentShaderPrefixList += "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n";
-    }
+    fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE\n";
+  }
+  if(mAlphaMaskingOnRendering == AlphaMaskingOnRendering::ENABLED)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING\n";
+  }
+  else if(mColorConversion == ColorConversion::YUV_TO_RGB)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
+  }
+  else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_UNIFIED_YUV_AND_RGB\n";
   }
 }
 

@@ -211,9 +211,6 @@ int UtcDaliImageVisualPropertyMap(void)
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -268,9 +265,6 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
 
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
@@ -327,9 +321,6 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -378,9 +369,6 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   // Make a new visual with the same image
   Visual::Base newVisual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(newVisual);
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
 
   DummyControl      newActor     = DummyControl::New();
   DummyControlImpl& newDummyImpl = static_cast<DummyControlImpl&>(newActor.GetImplementation());
@@ -1523,7 +1511,7 @@ int UtcDaliImageVisualTextureReuse2(void)
 int UtcDaliImageVisualCustomWrapModePixelArea(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("Request image visual with a Property::Map, test custom wrap mode and pixel area with atlasing");
+  tet_infoline("Request image visual with a Property::Map, test custom wrap mode and pixel area");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1537,7 +1525,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  // Test wrap mode with atlasing. Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
   const int     width  = 34;
   const int     height = 34;
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
@@ -1551,7 +1538,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   propertyMap.Insert(ImageVisual::Property::PIXEL_AREA, pixelArea);
   propertyMap.Insert(ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT);
   propertyMap.Insert(ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT);
-  propertyMap.Insert(ImageVisual::Property::ATLASING, true);
 
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -1577,13 +1563,12 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
 
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
 
-  // WITH atlasing, the wrapping is handled manually in shader, so the following gl function should not be called
   std::stringstream out;
   out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
-  DALI_TEST_CHECK(!texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
   out.str("");
   out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
-  DALI_TEST_CHECK(!texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
+  DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
 
   // test the uniforms which used to handle the wrap mode
   Renderer renderer = actor.GetRendererAt(0u);
@@ -1594,13 +1579,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   Vector4 pixelAreaUniform;
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("pixelArea", pixelAreaUniform));
   DALI_TEST_EQUALS(pixelArea, pixelAreaUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION);
-
-  Property::Value wrapModeValue = renderer.GetProperty(renderer.GetPropertyIndex("wrapMode"));
-  Vector2         wrapMode(WrapMode::MIRRORED_REPEAT - 1, WrapMode::REPEAT - 1);
-  DALI_TEST_EQUALS(wrapModeValue.Get<Vector2>(), wrapMode, TEST_LOCATION);
-  Vector2 wrapModeUniform;
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>("wrapMode", wrapModeUniform));
-  DALI_TEST_EQUALS(wrapMode, wrapModeUniform, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
   actor.Unparent();
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
@@ -1625,7 +1603,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea02(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  // Test wrap mode with atlasing. Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
   const int     width  = 34;
   const int     height = 34;
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
@@ -1694,10 +1671,10 @@ int UtcDaliImageVisualCustomWrapModePixelArea02(void)
   END_TEST;
 }
 
-int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
+int UtcDaliImageVisualCustomWrapMode(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("Request image visual with a Property::Map, test custom wrap mode and pixel area without atlasing");
+  tet_infoline("Request image visual with a Property::Map, test custom wrap mode and pixel area");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1710,7 +1687,6 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  // Test wrap mode without atlasing. Image with a size bigger than 512*512 will NOT be uploaded as a part of the atlas.
   const int     width  = 600;
   const int     height = 600;
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
@@ -1752,7 +1728,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
 
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
 
-  // WITHOUT atlasing, the wrapping is handled by setting gl texture parameters
+  // The wrapping is handled by setting gl texture parameters
   std::stringstream out;
   out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
   DALI_TEST_CHECK(texParameterTrace.FindMethodAndParams("TexParameteri", out.str()));
@@ -2449,9 +2425,6 @@ int UtcDaliImageVisualAlphaMask01(void)
   visual.CreatePropertyMap(testMap);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -2505,9 +2478,6 @@ int UtcDaliImageVisualAlphaMask02(void)
   visual.CreatePropertyMap(testMap);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
   DALI_TEST_EQUALS(*testMap.Find(DevelImageVisual::Property::MASKING_TYPE), Property::Value(DevelImageVisual::MaskingType::MASKING_ON_RENDERING), TEST_LOCATION);
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
 
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
@@ -2569,9 +2539,6 @@ int UtcDaliImageVisualAlphaMask03(void)
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -2629,9 +2596,6 @@ int UtcDaliImageVisualSynchronousLoadAlphaMask01(void)
   visual.CreatePropertyMap(testMap);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -2682,9 +2646,6 @@ int UtcDaliImageVisualSynchronousLoadAlphaMask02(void)
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
 
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
@@ -2743,9 +2704,6 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(MASK_IMAGE), TEST_LOCATION);
 
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -2798,9 +2756,6 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL), Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::MASK_CONTENT_SCALE), Property::Value(1.6f), TEST_LOCATION);
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::CROP_TO_MASK), Property::Value(true), TEST_LOCATION);
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
 
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();

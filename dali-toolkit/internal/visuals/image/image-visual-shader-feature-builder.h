@@ -35,18 +35,6 @@ namespace Internal
  */
 namespace ImageVisualShaderFeature
 {
-namespace TextureAtlas
-{
-/**
- * @brief Whether use texture with atlas, or not
- */
-enum Type
-{
-  DISABLED = 0, ///< Image visual doesn't use ATLAS
-  ENABLED       ///< Image visual uses ATLAS
-};
-} // namespace TextureAtlas
-
 namespace DefaultTextureWrapMode
 {
 /**
@@ -130,8 +118,6 @@ class FeatureBuilder
 public:
   FeatureBuilder();
 
-  FeatureBuilder& EnableTextureAtlas(bool enableTextureAtlas);
-
   FeatureBuilder& ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode);
 
   FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner, bool enableSquircleCorner = false);
@@ -156,7 +142,6 @@ public:
   bool IsEnabledAlphaMaskingOnRendering() const;
 
 private:
-  TextureAtlas::Type            mTextureAtlas : 2;            ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
   DefaultTextureWrapMode::Type  mDefaultTextureWrapMode : 2;  ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
   RoundedCorner::Type           mRoundedCorner : 2;           ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
   Borderline::Type              mBorderline : 2;              ///< Whether use borderline, or not. default as Borderline::DISABLED

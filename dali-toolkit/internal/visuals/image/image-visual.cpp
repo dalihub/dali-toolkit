@@ -35,7 +35,6 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -55,7 +54,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
+const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -126,7 +125,6 @@ const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
     {IMAGE_WRAP_MODE_U, Toolkit::ImageVisual::Property::WRAP_MODE_U},
     {IMAGE_WRAP_MODE_V, Toolkit::ImageVisual::Property::WRAP_MODE_V},
     {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
-    {IMAGE_ATLASING, Toolkit::ImageVisual::Property::ATLASING},
     {ALPHA_MASK_URL, Toolkit::ImageVisual::Property::ALPHA_MASK_URL},
     {MASK_CONTENT_SCALE_NAME, Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE},
     {CROP_TO_MASK_NAME, Toolkit::ImageVisual::Property::CROP_TO_MASK},
@@ -209,10 +207,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mWrapModeV(WrapMode::DEFAULT),
   mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
-  mAtlasRect(0.0f, 0.0f, 0.0f, 0.0f),
-  mAtlasRectSize(0, 0),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
-  mAttemptAtlasing(false),
   mOrientationCorrection(true),
   mNeedYuvToRgb(false),
   mNeedUnifiedYuvAndRgb(false),
@@ -274,8 +269,7 @@ void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
   // Load image immediately if LOAD_POLICY requires it
   if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
   {
-    auto attemptAtlasing = AttemptAtlasing();
-    LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mDesiredSize, TextureManager::ReloadPolicy::CACHED);
+    LoadTexture(mTextures, mDesiredSize, TextureManager::ReloadPolicy::CACHED);
   }
 }
 
@@ -381,16 +375,6 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
       int wrapMode = 0;
       Scripting::GetEnumerationProperty(value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode);
       mWrapModeV = Dali::WrapMode::Type(wrapMode);
-      break;
-    }
-
-    case Toolkit::ImageVisual::Property::ATLASING:
-    {
-      bool attemptAtlasing = false;
-      if(value.Get(attemptAtlasing))
-      {
-        mAttemptAtlasing = attemptAtlasing;
-      }
       break;
     }
 
@@ -591,13 +575,6 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
   }
   else if(mImpl->mRenderer) // Check if we have a loaded image
   {
-    if(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED)
-    {
-      naturalSize.x = mAtlasRectSize.GetWidth();
-      naturalSize.y = mAtlasRectSize.GetHeight();
-      return;
-    }
-
     auto textureSet = mImpl->mRenderer.GetTextures();
     if(textureSet && textureSet.GetTextureCount())
     {
@@ -696,22 +673,13 @@ void ImageVisual::OnInitialize()
   }
 }
 
-void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload)
+void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions& size, TextureManager::ReloadPolicy forceReload)
 {
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
   mLastRequiredSize = size;
 
-  ImageAtlasManagerPtr atlasManager        = nullptr;
-  AtlasUploadObserver* atlasUploadObserver = nullptr;
-  auto                 textureObserver     = this;
-
-  if(atlasing)
-  {
-    atlasManager        = mFactoryCache.GetAtlasManager();
-    atlasUploadObserver = this;
-  }
-
+  auto textureObserver   = this;
   auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !IsUsingCustomShader()
                              ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                              : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
@@ -753,7 +721,6 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
        (mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE) &&
        !synchronousLoading &&
        !mUseSynchronousSizing &&
-       !atlasing &&
        !IsUsingCustomShader() &&
        !(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()))
     {
@@ -769,7 +736,6 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
                           (!(mImageUrl.GetProtocolType() == VisualUrl::LOCAL || mImageUrl.GetProtocolType() == VisualUrl::REMOTE)) ? "/ url is not image" : "",
                           (synchronousLoading) ? "/ synchronousLoading" : "",
                           (mUseSynchronousSizing) ? "/ useSynchronousSizing " : "",
-                          (atlasing) ? "/ atlasing" : "",
                           (IsUsingCustomShader()) ? "/ use customs shader" : "",
                           (mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid()) ? "/ use masking url" : "");
     }
@@ -810,7 +776,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
   }
   else
   {
-    textures = textureManager.LoadTexture(mImageUrl, size, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
+    textures = textureManager.LoadTexture(mImageUrl, size, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, loadingStatus, textureObserver, mOrientationCorrection, forceReload, preMultiplyOnLoad);
   }
 
   if(textures)
@@ -825,7 +791,7 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     }
 
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
-    if(!atlasing && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
+    if(mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT)
     {
       Sampler sampler = Sampler::New();
       sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -837,26 +803,10 @@ void ImageVisual::LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& te
     // Synchronous loading is failed
     mLoadState = TextureManager::LoadState::LOAD_FAILED;
   }
-
-  if(atlasing) // Flag needs to be set before creating renderer
-  {
-    mImpl->mFlags |= Visual::Base::Impl::IS_ATLASING_APPLIED;
-  }
-  else
-  {
-    mImpl->mFlags &= ~Visual::Base::Impl::IS_ATLASING_APPLIED;
-  }
-}
-
-bool ImageVisual::AttemptAtlasing() const
-{
-  return (!IsUsingCustomShader() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()) && mAttemptAtlasing);
 }
 
 void ImageVisual::InitializeRenderer()
 {
-  auto attemptAtlasing = AttemptAtlasing();
-
   // Load Texture if mTextures is empty.
   // mTextures is already set, the mTexture can be used to create Renderer.
   // There are two cases mTextures is empty.
@@ -870,14 +820,12 @@ void ImageVisual::InitializeRenderer()
   {
     if(mTextureId == TextureManager::INVALID_TEXTURE_ID)
     {
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize, TextureManager::ReloadPolicy::CACHED);
+      LoadTexture(mTextures, mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize, TextureManager::ReloadPolicy::CACHED);
     }
     else
     {
       mTextures = mFactoryCache.GetTextureManager().GetTextureSet(mTextureId);
-      if(!(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED) &&
-         mTextures &&
-         (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
+      if(mTextures && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
       {
         Sampler sampler = Sampler::New();
         sampler.SetWrapMode(mWrapModeU, mWrapModeV);
@@ -924,20 +872,6 @@ void ImageVisual::InitializeRenderer()
 
     // We don't use broken image anymore.
     mUseBrokenImageRenderer = false;
-  }
-
-  if(attemptAtlasing) // the texture is packed inside atlas
-  {
-    mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
-
-    bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-
-    if(!defaultWrapMode) // custom wrap mode
-    {
-      Vector2 wrapMode(mWrapModeU - WrapMode::CLAMP_TO_EDGE, mWrapModeV - WrapMode::CLAMP_TO_EDGE);
-      wrapMode.Clamp(Vector2::ZERO, Vector2(2.f, 2.f));
-      mImpl->mRenderer.RegisterProperty(WRAP_MODE_UNIFORM_NAME, wrapMode);
-    }
   }
 }
 
@@ -1028,8 +962,6 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU);
   map.Insert(Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV);
 
-  map.Insert(Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing);
-
   if(mMaskingData != NULL)
   {
     map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
@@ -1085,8 +1017,6 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
   {
     case DevelImageVisual::Action::RELOAD:
     {
-      auto attemptAtlasing = AttemptAtlasing();
-
       // Reset resource ready status when we call reload.
       ResourceReady(Toolkit::Visual::ResourceStatus::PREPARING);
       mLoadState = TextureManager::LoadState::NOT_STARTED;
@@ -1096,7 +1026,7 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
       UpdateNativeTextureInfomation(Dali::TextureSet());
 
       Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::FORCED);
+      LoadTexture(mTextures, size, TextureManager::ReloadPolicy::FORCED);
       break;
     }
   }
@@ -1130,8 +1060,7 @@ void ImageVisual::OnSetTransform()
       mTextures.Reset();
       UpdateNativeTextureInfomation(Dali::TextureSet());
 
-      bool attemptAtlasing = AttemptAtlasing();
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
+      LoadTexture(mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
     }
   }
 }
@@ -1143,26 +1072,6 @@ void ImageVisual::UpdateShader()
     Shader shader = GenerateShader();
     mImpl->mRenderer.SetShader(shader);
   }
-}
-
-// From existing atlas manager
-void ImageVisual::UploadCompleted()
-{
-  // Texture has been uploaded. If weak handle is holding a placement actor,
-  // it is the time to add the renderer to actor.
-  Actor actor = mPlacementActor.GetHandle();
-  if(actor)
-  {
-    mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
-    actor.AddRenderer(mImpl->mRenderer);
-    mRendererAdded = true;
-    // reset the weak handle so that the renderer only get added to actor once
-    mPlacementActor.Reset();
-  }
-
-  // Image loaded
-  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
-  mLoadState = TextureManager::LoadState::LOAD_FINISHED;
 }
 
 // From FastTrackLoadingTask
@@ -1325,21 +1234,6 @@ void ImageVisual::RemoveTexture()
   else
   {
     ResetFastTrackLoadingTask();
-
-    Vector4         atlasRect(0.f, 0.f, 1.f, 1.f);
-    Property::Index index = mImpl->mRenderer.GetPropertyIndex(ATLAS_RECT_UNIFORM_NAME);
-    if(index != Property::INVALID_INDEX)
-    {
-      Property::Value atlasRectValue = mImpl->mRenderer.GetProperty(index);
-      atlasRectValue.Get(atlasRect);
-    }
-
-    TextureSet textureSet = mImpl->mRenderer.GetTextures();
-
-    if(index != Property::INVALID_INDEX)
-    {
-      mFactoryCache.GetAtlasManager()->Remove(textureSet, atlasRect);
-    }
   }
 }
 
@@ -1411,7 +1305,6 @@ Shader ImageVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-        .EnableTextureAtlas(mImpl->mFlags & Visual::Base::Impl::IS_ATLASING_APPLIED && !useNativeImage)
         .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
@@ -1531,7 +1424,7 @@ void ImageVisual::CheckMaskTexture()
 
 void ImageVisual::ResetRenderer()
 {
-  RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+  RemoveTexture();
   mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
   TextureSet textureSet = TextureSet::New();

@@ -40,13 +40,10 @@ namespace Toolkit
 {
 namespace Internal
 {
-class ImageAtlasManager;
 class NPatchLoader;
 class SvgLoader;
 class TextureManager;
 class VectorAnimationManager;
-
-typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 
 /**
  * Caches shaders and geometries. Owned by VisualFactory.
@@ -133,8 +130,6 @@ public:
     IMAGE_SHADER_BORDERLINE_MASKING,
     IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
     IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING,
-    IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
-    IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     IMAGE_SHADER_YUV_TO_RGB,
     IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
     IMAGE_SHADER_SQUIRCLE_CORNER_YUV_TO_RGB,
@@ -159,8 +154,6 @@ public:
     NATIVE_IMAGE_SHADER_BORDERLINE_MASKING,
     NATIVE_IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
     NATIVE_IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING,
-    NATIVE_IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
-    NATIVE_IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
     NINE_PATCH_MASK_SHADER,
     TEXT_SHADER_SINGLE_COLOR_TEXT,
@@ -347,12 +340,6 @@ public:
 
 public:
   /**
-   * Get the image atlas manager.
-   * @return A pointer to the atlas manager
-   */
-  ImageAtlasManagerPtr GetAtlasManager();
-
-  /**
    * Get the texture manager
    * @return A reference to the texture manager
    */
@@ -481,10 +468,9 @@ private:
 
   bool mLoadYuvPlanes; ///< A global flag to specify if the image should be loaded as yuv planes
 
-  ImageAtlasManagerPtr mAtlasManager;
-  TextureManager       mTextureManager;
-  NPatchLoader         mNPatchLoader;
-  SvgLoader            mSvgLoader;
+  TextureManager mTextureManager;
+  NPatchLoader   mNPatchLoader;
+  SvgLoader      mSvgLoader;
 
   Dali::UniformBlock mDefaultUniformBlock;
 
