@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -719,7 +719,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
             textScroller->SetStopMode(Toolkit::TextLabel::AutoScrollStopMode::IMMEDIATE);
             textScroller->StopScrolling();
           }
-          impl.mLastEllipsisMode = ellipsisMode;
+          impl.mLastEllipsisMode    = ellipsisMode;
           impl.mIsAsyncRenderNeeded = true;
           impl.RequestTextRelayout();
         }
@@ -2108,6 +2108,12 @@ void TextLabel::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
   if(visible)
   {
     mIsAsyncRenderNeeded = true;
+
+    if(mController->GetRenderMode() == DevelTextLabel::Render::ASYNC_AUTO ||
+       mController->GetRenderMode() == DevelTextLabel::Render::ASYNC_MANUAL)
+    {
+      RequestTextRelayout();
+    }
   }
   else
   {
