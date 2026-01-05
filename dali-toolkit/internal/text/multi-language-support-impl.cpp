@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -851,7 +851,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     }
 
     bool findFallbackFont = false;
-    if(TextAbstraction::IsEmojiVariationSequences(character) && !TextAbstraction::IsASCIIDigits(character))
+    if(TextAbstraction::IsEmojiVariationSequences(character) && !TextAbstraction::IsASCIIDigits(character) && !TextAbstraction::IsASCIIPS(character))
     {
       if(index + 1 <= lastCharacter)
       {

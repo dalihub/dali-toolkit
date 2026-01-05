@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
           isNewVariationSelectorSequence = currentRunScript != TextAbstraction::EMOJI_TEXT;
           currentCharacterScript         = TextAbstraction::EMOJI_TEXT;
         }
-        else if(TextAbstraction::IsASCIIDigits(currentCharacter))
+        else if(TextAbstraction::IsASCIIDigits(currentCharacter) || TextAbstraction::IsASCIIPS(currentCharacter))
         {
           // There is no variation selector.
           isNewVariationSelectorSequence = false;
@@ -152,7 +152,7 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
       if(currentCharacterIndex > 0)
       {
         Character prevCharacter = *(textBuffer + currentCharacterIndex - 1);
-        if(TextAbstraction::IsEmojiVariationSequences(prevCharacter) && !TextAbstraction::IsASCIIDigits(prevCharacter))
+        if(TextAbstraction::IsEmojiVariationSequences(prevCharacter) && !TextAbstraction::IsASCIIDigits(prevCharacter) && !TextAbstraction::IsASCIIPS(prevCharacter))
         {
           // The end of a variation sequence, start of a new sequence.
           isNewVariationSelectorSequence = true;
