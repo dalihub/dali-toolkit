@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -554,6 +554,7 @@ public:
   // Decoration data (CornerRadius, Borderline)
   DecorationData* mDecorationData;
   Constraint      mInnerShadowCornerRadiusConstraint; ///< InnerShadow's CornerRadius constriant
+  Constraint      mBorderlineCornerRadiusConstraint;  ///< Borderline's CornerRadius constriant
 
   // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
   using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;

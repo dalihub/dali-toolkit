@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,55 @@ constexpr const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 1;
 constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::FOREGROUND_EFFECT - 1;
 
-static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
+static constexpr uint32_t BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
+static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 11);
+
+/**
+ * @brief Constraint function for Borderline's CornerRadius
+ * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : ExtraSize, [4] : Borderline Width, [5] : Borderline Offset
+ * @param[out] current InnerShadow's corner radius value.
+ * @param[in] inputs Input properties.
+ */
+static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInputContainer& inputs)
+{
+  // We just assume below state are applied.
+  // - Transform::SIZE_POLICY are RELATIVE
+  // - Transform::SIZE is Vector2::ONE
+
+  Vector4 viewCornerRadius = inputs[0]->GetVector4();
+
+  const int     viewCornerRadiusPolicy = inputs[1]->GetInteger();
+  const Vector3 visualSize             = inputs[2]->GetVector3(); // We use VisualSize as ViewSize.
+
+  Vector2 extraSize = inputs[3]->GetVector2();
+
+  if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
+  {
+    const float minViewSize = std::min(visualSize.x, visualSize.y);
+    viewCornerRadius *= minViewSize;
+  }
+
+  const float borderlineWidth  = inputs[4]->GetFloat();
+  const float borderlineOffset = inputs[5]->GetFloat();
+  const float expendedRadius   = borderlineWidth * (1.0f + borderlineOffset) * 0.5f;
+
+  // Corner Radius for Borderline is expand about borderlineWidth.
+
+  // Calculate on pixel scale.
+  current.x = viewCornerRadius.x < Dali::Math::MACHINE_EPSILON_100 ? 0.0f : viewCornerRadius.x + expendedRadius;
+  current.y = viewCornerRadius.y < Dali::Math::MACHINE_EPSILON_100 ? 0.0f : viewCornerRadius.y + expendedRadius;
+  current.z = viewCornerRadius.z < Dali::Math::MACHINE_EPSILON_100 ? 0.0f : viewCornerRadius.z + expendedRadius;
+  current.w = viewCornerRadius.w < Dali::Math::MACHINE_EPSILON_100 ? 0.0f : viewCornerRadius.w + expendedRadius;
+
+  if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
+  {
+    const float minVisualSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
+    if(DALI_LIKELY(minVisualSize > Math::MACHINE_EPSILON_100))
+    {
+      current /= minVisualSize;
+    }
+  }
+}
 
 /**
  * @brief Constraint function for InnerShadow's CornerRadius
@@ -133,7 +181,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
     viewCornerRadius *= minViewSize;
   }
 
-  float borderlineWidth = inputs[4]->GetFloat();
+  const float borderlineWidth = inputs[4]->GetFloat();
 
   // Corner Radius for Innershadow is expand about borderlineWidth.
 
@@ -145,10 +193,10 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minInnerShadowSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
-    if(DALI_LIKELY(minInnerShadowSize > Math::MACHINE_EPSILON_100))
+    const float minVisualSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
+    if(DALI_LIKELY(minVisualSize > Math::MACHINE_EPSILON_100))
     {
-      current /= minInnerShadowSize;
+      current /= minVisualSize;
     }
   }
 }
@@ -1940,7 +1988,33 @@ void Control::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
     if(visual)
     {
       mVisualData->RegisterVisual(Toolkit::DevelControl::Property::BORDERLINE, visual, BORDERLINE_DEPTH_INDEX);
-      EnableCornerPropertiesOverridden(visual, true);
+
+      if(mBorderlineCornerRadiusConstraint)
+      {
+        // Reset previously applied constraints.
+        mBorderlineCornerRadiusConstraint.Remove();
+        mBorderlineCornerRadiusConstraint.Reset();
+      }
+
+      auto visualCornerRadiusProperty = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
+      auto visualBorderlineProperty   = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
+
+      if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object) &&
+         DALI_LIKELY(visualBorderlineProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineProperty.object))
+      {
+        Dali::CustomActor handle(mControlImpl.GetOwner());
+
+        mBorderlineCornerRadiusConstraint = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, BorderlineCornerRadiusConstraint);
+        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS));
+        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS_POLICY));
+        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, Dali::Actor::Property::SIZE));
+        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::EXTRA_SIZE));
+        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
+        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET));
+
+        Dali::Integration::ConstraintSetInternalTag(mBorderlineCornerRadiusConstraint, BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG);
+      }
+      EnableCornerPropertiesOverridden(visual, true, mBorderlineCornerRadiusConstraint);
 
       mControlImpl.RelayoutRequest();
     }
@@ -1952,6 +2026,13 @@ void Control::Impl::ClearBorderline()
   if(DALI_LIKELY(mVisualData))
   {
     mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::BORDERLINE);
+
+    if(mBorderlineCornerRadiusConstraint)
+    {
+      // Reset previously applied constraints.
+      mBorderlineCornerRadiusConstraint.Remove();
+      mBorderlineCornerRadiusConstraint.Reset();
+    }
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     mControlImpl.RelayoutRequest();
@@ -2165,11 +2246,19 @@ void Control::Impl::UpdateCornerRadius()
   if(DALI_LIKELY(mVisualData))
   {
     RegisteredVisualContainer& visuals = mVisualData->mVisuals;
+
+    // ApplyOnce if their is animation constraint exist.
+    const bool notifyConstraint = mPropertyOnAnimation.find(DevelControl::Property::CORNER_RADIUS) == mPropertyOnAnimation.end() ? true : false;
+
     for(auto it = visuals.begin(); it != visuals.end(); it++)
     {
       if((*it)->overrideCornerProperties)
       {
         (*it)->visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+        if(notifyConstraint && (*it)->animationConstraint.count(Dali::Toolkit::DevelControl::Property::CORNER_RADIUS) != 0)
+        {
+          (*it)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS].SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
+        }
       }
     }
   }
