@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -309,6 +309,7 @@ private:
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   TextureManager::MaskingDataPointer              mMaskingData;
   Dali::ImageDimensions                           mDesiredSize;
+  Dali::ImageDimensions                           mLastRequiredSize;
   float                                           mFrameSpeedFactor;
 
   // Shared variables
@@ -322,8 +323,13 @@ private:
   DevelImageVisual::StopBehavior::Type mStopBehavior : 2;
   Dali::FittingMode::Type              mFittingMode : 4;
   Dali::SamplingMode::Type             mSamplingMode : 5;
-  bool                                 mStartFirstFrame : 1;
-  bool                                 mIsJumpTo : 1;
+
+  bool mStartFirstFrame : 1;
+  bool mIsJumpTo : 1;
+  bool mEnableBrokenImage : 1;      ///< true if enable broken image.
+  bool mRendererAdded : 1;          ///< True if renderer added into actor.
+  bool mUseBrokenImageRenderer : 1; ///< True if renderer changed as broken image.
+  bool mUseSynchronousSizing : 1;   ///< True if we need to synchronize image texture size to visual size, otherwise use mDesiredSize.
 };
 
 } // namespace Internal

@@ -130,6 +130,18 @@ KeyboardFocusManager::FocusedActorEnterKeySignalType& KeyboardFocusManager::Focu
   return GetImpl(*this).FocusedActorEnterKeySignal();
 }
 
+Control::KeyboardFocus::Device KeyboardFocusManager::GetLastFocusChangeDevice() const
+{
+  const auto& internalCtx = GetImpl(*this).FocusChangedContext();
+  return internalCtx.device;
+}
+
+const std::string& KeyboardFocusManager::GetLastFocusChangeDeviceName() const
+{
+  const auto& internalCtx = GetImpl(*this).FocusChangedContext();
+  return internalCtx.deviceName;
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

@@ -374,7 +374,16 @@ int UtcDaliGlViewDirectRenderingTerminate(void)
   application.Render();
 
   // Make sure that Terminate is completed.
-  Test::WaitForEventThreadTrigger(1);
+  int       tryCount    = 0;
+  const int maxTryCount = 10;
+  while(++tryCount < maxTryCount)
+  {
+    Test::WaitForEventThreadTrigger(1, 5);
+    if(DirectRenderingCode::gDRFrameTerminatedCount > 0)
+    {
+      break;
+    }
+  }
   DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
 
   END_TEST;
@@ -459,7 +468,16 @@ int UtcDaliGlViewDirectRenderingOnScene(void)
   application.Render();
 
   // Make sure that Terminate is completed.
-  Test::WaitForEventThreadTrigger(1);
+  int       tryCount    = 0;
+  const int maxTryCount = 10;
+  while(++tryCount < maxTryCount)
+  {
+    Test::WaitForEventThreadTrigger(1, 5);
+    if(DirectRenderingCode::gDRFrameTerminatedCount > 0)
+    {
+      break;
+    }
+  }
   DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
 
   END_TEST;
@@ -680,7 +698,16 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene01(void)
   application.SendNotification();
   application.Render();
 
-  Test::WaitForEventThreadTrigger(1);
+  int       tryCount    = 0;
+  const int maxTryCount = 10;
+  while(++tryCount < maxTryCount)
+  {
+    Test::WaitForEventThreadTrigger(1, 5);
+    if(DirectRenderingCode::gDRFrameTerminatedCount > 0)
+    {
+      break;
+    }
+  }
   DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 1, TEST_LOCATION);
 
   END_TEST;

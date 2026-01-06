@@ -292,6 +292,220 @@ struct CallbackFunctor
 
 } // namespace
 
+int UtcDaliKeyboardFocusManagerLastFocusChangeContext(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerLastFocusChangeContext");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  // Keyboard move
+  PushButton kb1 = PushButton::New();
+  PushButton kb2 = PushButton::New();
+  kb1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  kb2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(kb1);
+  application.GetScene().Add(kb2);
+
+  // Focus kb1 first
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(kb1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == kb1);
+
+  // Set navigation from kb1 to kb2 on RIGHT
+  kb1.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)kb2.GetProperty<int>(Actor::Property::ID)));
+
+  Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(rightEvent);
+
+  // Send a right key event
+  application.ProcessEvent(rightEvent);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == kb2);
+  {
+    auto device = manager.GetLastFocusChangeDevice();
+    DALI_TEST_CHECK(device == Dali::Toolkit::Control::KeyboardFocus::Device::KEYBOARD);
+    auto deviceName = manager.GetLastFocusChangeDeviceName();
+    DALI_TEST_EQUALS(deviceName, DEFAULT_DEVICE_NAME, TEST_LOCATION);
+  }
+
+  // Touch focus
+  Actor touchable = Actor::New();
+  touchable.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  touchable.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  touchable.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  touchable.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  touchable.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
+  application.GetScene().Add(touchable);
+
+  application.SendNotification();
+  application.Render();
+
+  // Touch
+  {
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetDeviceId(1);
+    pointDown.SetDeviceClass(Device::Class::Type::TOUCH);
+    pointDown.SetScreenPosition(Vector2(15.0f, 15.0f));
+    touchEvent.AddPoint(pointDown);
+    application.ProcessEvent(touchEvent);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(manager.GetCurrentFocusActor() == touchable);
+    {
+      auto device = manager.GetLastFocusChangeDevice();
+      DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::TOUCH);
+    }
+
+    // reset
+    manager.ClearFocus();
+  }
+
+  // Mouse
+  {
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetDeviceId(1);
+    pointDown.SetDeviceClass(Device::Class::Type::MOUSE);
+    pointDown.SetScreenPosition(Vector2(15.0f, 15.0f));
+    touchEvent.AddPoint(pointDown);
+    application.ProcessEvent(touchEvent);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(manager.GetCurrentFocusActor() == touchable);
+    {
+      auto device = manager.GetLastFocusChangeDevice();
+      DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::MOUSE);
+    }
+
+    manager.ClearFocus();
+  }
+
+  // Pen
+  {
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetDeviceId(1);
+    pointDown.SetDeviceClass(Device::Class::Type::PEN);
+    pointDown.SetScreenPosition(Vector2(15.0f, 15.0f));
+    touchEvent.AddPoint(pointDown);
+    application.ProcessEvent(touchEvent);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(manager.GetCurrentFocusActor() == touchable);
+    {
+      auto device = manager.GetLastFocusChangeDevice();
+      DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::PEN);
+    }
+
+    manager.ClearFocus();
+  }
+
+  // Pointer
+  {
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetDeviceId(1);
+    pointDown.SetDeviceClass(Device::Class::Type::POINTER);
+    pointDown.SetScreenPosition(Vector2(15.0f, 15.0f));
+    touchEvent.AddPoint(pointDown);
+    application.ProcessEvent(touchEvent);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(manager.GetCurrentFocusActor() == touchable);
+    {
+      auto device = manager.GetLastFocusChangeDevice();
+      DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::POINTER);
+    }
+
+    manager.ClearFocus();
+  }
+
+  // Gamepad
+  {
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      pointDown;
+    pointDown.SetState(PointState::DOWN);
+    pointDown.SetDeviceId(1);
+    pointDown.SetDeviceClass(Device::Class::Type::GAMEPAD);
+    pointDown.SetScreenPosition(Vector2(15.0f, 15.0f));
+    touchEvent.AddPoint(pointDown);
+    application.ProcessEvent(touchEvent);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(manager.GetCurrentFocusActor() == touchable);
+    {
+      auto device = manager.GetLastFocusChangeDevice();
+      DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::GAMEPAD);
+    }
+
+    manager.ClearFocus();
+  }
+
+  // Wheel move (custom wheel)
+  PushButton w1 = PushButton::New();
+  PushButton w2 = PushButton::New();
+  w1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  w2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(w1);
+  application.GetScene().Add(w2);
+
+  // Set clockwise from w1 to w2, and set current to w1
+  w1.SetProperty(Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::Value((int)w2.GetProperty<int>(Actor::Property::ID)));
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(w1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == w1);
+
+  Integration::WheelEvent clockwise(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(clockwise);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == w2);
+  {
+    auto device = manager.GetLastFocusChangeDevice();
+    DALI_TEST_CHECK(device == Control::KeyboardFocus::Device::WHEEL);
+  }
+
+  // Programmatic focus set
+  Actor programmatic = Actor::New();
+  programmatic.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(programmatic);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(programmatic) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == programmatic);
+  {
+    auto device = manager.GetLastFocusChangeDevice();
+    DALI_TEST_CHECK(device == Dali::Toolkit::Control::KeyboardFocus::Device::PROGRAMMATIC);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliKeyboardFocusManagerGet(void)
 {
   ToolkitTestApplication application;

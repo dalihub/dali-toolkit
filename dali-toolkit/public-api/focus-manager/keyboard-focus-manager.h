@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <string>
 
 namespace Dali
 {
@@ -220,6 +221,31 @@ public:
    * @SINCE_1_2.19
    */
   void MoveFocusBackward();
+
+  /**
+   * @brief Gets the device of the last focus change.
+   *
+   * This method returns what caused the most recent focus change,
+   * allowing applications to differentiate between different input methods.
+   *
+   * @SINCE_2_5.5
+   * @return The device of the last focus change
+   * @pre The KeyboardFocusManager has been initialized.
+   */
+  Control::KeyboardFocus::Device GetLastFocusChangeDevice() const;
+
+  /**
+   * @brief Gets the device name that caused the last focus change.
+   *
+   * This method returns the name of the input device that caused
+   * the most recent focus change. For non-device inputs (like programmatic
+   * focus changes), an empty string may be returned.
+   *
+   * @SINCE_2_5.5
+   * @return The device name that caused the last focus change
+   * @pre The KeyboardFocusManager has been initialized.
+   */
+  const std::string& GetLastFocusChangeDeviceName() const;
 
 public: // Signals
   /**

@@ -179,6 +179,7 @@ enum Type
    * Some of visual don't need to show broken image(ex. placeholder)
    * Disable broken image for these visuals.
    * default is true.
+   * @note This property is write-only. Only be used for ImageView internal.
    */
   ENABLE_BROKEN_IMAGE = ORIENTATION_CORRECTION + 14,
 
