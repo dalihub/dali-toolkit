@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1758,7 +1758,7 @@ int Controller::GetCharacterIndexAtPosition(float visualX, float visualY)
   return GetCharIndexAtPosition(mImpl->mModel, visualX, visualY);
 }
 
-Rect<> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
+Rect<float> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
 {
   return Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mImpl->mModel, startIndex, endIndex);
 }

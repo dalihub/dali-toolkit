@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex
   return GetImpl(textEditor).GetTextPosition(startIndex, endIndex);
 }
 
-Rect<> GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
+Rect<float> GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textEditor).GetTextBoundingRectangle(startIndex, endIndex);
 }
