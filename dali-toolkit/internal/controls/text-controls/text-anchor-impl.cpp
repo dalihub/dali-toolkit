@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,13 @@ TextAnchor::TextAnchor()
 
 TextAnchor::~TextAnchor()
 {
+}
+
+Dali::Accessibility::AtspiInterfaces TextAnchor::TextAnchorAccessible::DoGetInterfaces() const
+{
+  Dali::Accessibility::AtspiInterfaces interfaces            = DevelControl::ControlAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::HYPERLINK] = true;
+  return interfaces;
 }
 
 int32_t TextAnchor::TextAnchorAccessible::GetEndIndex() const

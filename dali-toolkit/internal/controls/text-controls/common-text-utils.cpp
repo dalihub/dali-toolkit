@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,33 @@
 
 namespace Dali::Toolkit::Internal
 {
-Rect<> CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex)
+namespace
+{
+/**
+ * @brief Checks whether [startPosition, endPosition) is a valid, non-empty range within a given string.
+ *
+ * @param string Source string
+ * @param begin Start index (inclusive)
+ * @param end End index (exclusive)
+ * @return true if the range is valid, false otherwise
+ */
+bool ValidateRange(const std::string& string, std::size_t begin, std::size_t end)
+{
+  auto size = string.size();
+
+  if(end <= begin || begin >= size || end > size)
+  {
+    return false;
+  }
+
+  // TODO: Check whether the range [begin, end) describes a valid substring:
+  // 1. It does not break multi-byte UTF-8 sequences.
+  // 2. It does not break graphemes (compound emojis, glyphs with combining characters etc.).
+
+  return true;
+}
+} //namespace
+Rect<float> CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex)
 {
   Vector<Vector2> sizeList;
   Vector<Vector2> positionList;
@@ -204,6 +230,14 @@ void CommonTextUtils::RenderText(
   }
 }
 
+Dali::Accessibility::AtspiInterfaces TextControlAccessible::DoGetInterfaces() const
+{
+  Dali::Accessibility::AtspiInterfaces interfaces            = DevelControl::ControlAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::TEXT]      = true;
+  interfaces[Dali::Accessibility::AtspiInterface::HYPERTEXT] = true;
+  return interfaces;
+}
+
 std::size_t TextControlAccessible::GetCharacterCount() const
 {
   return GetWholeText().size();
@@ -214,7 +248,7 @@ std::size_t TextControlAccessible::GetCursorOffset() const
   return 0u;
 }
 
-Rect<> TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type)
+Rect<float> TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type)
 {
   if(!ValidateRange(GetWholeText(), startOffset, endOffset))
   {
@@ -409,7 +443,7 @@ Accessibility::Hyperlink* TextControlAccessible::GetLink(std::int32_t linkIndex)
 
   auto anchor = GetTextAnchors()[linkIndex];
 
-  return Accessibility::Hyperlink::DownCast(Accessibility::Accessible::Get(anchor));
+  return Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERLINK>(Accessibility::Accessible::Get(anchor));
 }
 
 std::int32_t TextControlAccessible::GetLinkCount() const
@@ -455,20 +489,11 @@ bool TextControlAccessible::IsHiddenInput() const
   return false;
 }
 
-bool TextControlAccessible::ValidateRange(const std::string& string, std::size_t begin, std::size_t end)
+Dali::Accessibility::AtspiInterfaces EditableTextControlAccessible::DoGetInterfaces() const
 {
-  auto size = string.size();
-
-  if(end <= begin || begin >= size || end > size)
-  {
-    return false;
-  }
-
-  // TODO: Check whether the range [begin, end) describes a valid substring:
-  // 1. It does not break multi-byte UTF-8 sequences.
-  // 2. It does not break graphemes (compound emojis, glyphs with combining characters etc.).
-
-  return true;
+  Dali::Accessibility::AtspiInterfaces interfaces                = TextControlAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::EDITABLE_TEXT] = true;
+  return interfaces;
 }
 
 Accessibility::States EditableTextControlAccessible::CalculateStates()

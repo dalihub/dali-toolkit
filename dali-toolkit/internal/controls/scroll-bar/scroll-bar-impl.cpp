@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -876,6 +876,13 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
   impl->Initialize();
 
   return handle;
+}
+
+Dali::Accessibility::AtspiInterfaces ScrollBar::ScrollBarAccessible::DoGetInterfaces() const
+{
+  Dali::Accessibility::AtspiInterfaces interfaces        = DevelControl::ControlAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::VALUE] = true;
+  return interfaces;
 }
 
 double ScrollBar::ScrollBarAccessible::GetMinimum() const

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,11 @@ static constexpr const char* READING_INFO_TYPE_DESCRIPTION    = "description";
 static constexpr const char* READING_INFO_TYPE_STATE          = "state";
 static constexpr const char* READING_INFO_TYPE_SEPARATOR      = "|";
 
-Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
+Dali::Rect<float> GetShowingGeometry(Dali::Rect<float> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
 {
-  Rect<>  parentRect;
-  Vector2 currentPosition;
-  auto    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
+  Rect<float> parentRect;
+  Vector2     currentPosition;
+  auto        parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
 
   while(parent)
   {
@@ -65,7 +65,7 @@ Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::
 
   return rect;
 }
-static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
+static bool IsShowingGeometryOnScreen(Dali::Rect<float> rect)
 {
   return rect.width > 0 && rect.height > 0;
 }

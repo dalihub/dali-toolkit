@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -467,6 +467,13 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   return result;
 }
 
+Dali::Accessibility::AtspiInterfaces ControlAccessible::DoGetInterfaces() const
+{
+  Dali::Accessibility::AtspiInterfaces interfaces         = Dali::Accessibility::ActorAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::ACTION] = true;
+  return interfaces;
+}
+
 bool ControlAccessible::IsHidden() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
@@ -558,7 +565,7 @@ bool ControlAccessible::GrabHighlight()
   // Clear the old highlight.
   if(oldHighlightedActor)
   {
-    auto oldHighlightedObject = Dali::Accessibility::Component::DownCast(Accessible::Get(oldHighlightedActor));
+    auto oldHighlightedObject = Accessible::Get(oldHighlightedActor);
     if(oldHighlightedObject)
     {
       oldHighlightedObject->ClearHighlight();

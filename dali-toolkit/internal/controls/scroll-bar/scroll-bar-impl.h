@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,8 +319,7 @@ private:
   bool mIndicatorFirstShow : 1; ///< True if the indicator has never been shown
 
 protected:
-  class ScrollBarAccessible : public DevelControl::ControlAccessible,
-                              public virtual Dali::Accessibility::Value
+  class ScrollBarAccessible : public DevelControl::ControlAccessible
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -354,6 +353,12 @@ protected:
      * @copydoc Dali::Accessibility::Value::GetMinimumIncrement()
      */
     double GetMinimumIncrement() const override;
+
+  protected:
+    /**
+     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     */
+    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
   };
 };
 
