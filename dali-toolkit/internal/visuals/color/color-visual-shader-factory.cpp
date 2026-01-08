@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,11 +72,18 @@ enum ColorVisualRequireFlag
 
 static constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 2u;
 
-constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
-  "",                                     // VisualFactoryCache::COLOR_SHADER
-  "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
-};
-constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
+// constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
+//   "",                                     // VisualFactoryCache::COLOR_SHADER
+//   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+// };
+// constexpr std::string_view FragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
+//   "",                                     // VisualFactoryCache::COLOR_SHADER
+//   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
+// };
+
+// Since ASAN detect odr-violatoin due to both string has same text,
+// let we just use one string tables for it.
+constexpr std::string_view VertexFragmentPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
   "",                                     // VisualFactoryCache::COLOR_SHADER
   "#define IS_REQUIRED_ROUNDED_CORNER\n", // VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER
 };
@@ -303,8 +310,10 @@ void ColorVisualShaderFactory::GetPreCompiledShader(ShaderPreCompiler::RawShader
 
   for(uint32_t i = 0u; i < PREDEFINED_SHADER_TYPE_COUNT; ++i)
   {
-    vertexPrefix.push_back(std::string(VertexPredefines[i]));
-    fragmentPrefix.push_back(std::string(FragmentPredefines[i]));
+    // vertexPrefix.push_back(std::string(VertexPredefines[i]));
+    // fragmentPrefix.push_back(std::string(FragmentPredefines[i]));
+    vertexPrefix.push_back(std::string(VertexFragmentPredefines[i]));
+    fragmentPrefix.push_back(std::string(VertexFragmentPredefines[i]));
     shaderName.push_back(std::string(Scripting::GetLinearEnumerationName<VisualFactoryCache::ShaderType>(ShaderTypePredefines[i], VISUAL_SHADER_TYPE_TABLE, VISUAL_SHADER_TYPE_TABLE_COUNT)));
     shaderCount++;
   }
