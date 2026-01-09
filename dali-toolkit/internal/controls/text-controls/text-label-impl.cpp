@@ -2228,7 +2228,7 @@ int TextLabel::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
-Rect<> TextLabel::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+Rect<float> TextLabel::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
 {
   return mController->GetTextBoundingRectangle(startIndex, endIndex);
 }

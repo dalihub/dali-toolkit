@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, 
   return GetImpl(textLabel).GetTextPosition(startIndex, endIndex);
 }
 
-Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex)
+Rect<float> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textLabel).GetTextBoundingRectangle(startIndex, endIndex);
 }

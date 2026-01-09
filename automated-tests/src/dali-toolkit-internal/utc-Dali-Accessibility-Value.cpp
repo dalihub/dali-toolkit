@@ -26,7 +26,6 @@
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
-#include <dali/devel-api/atspi-interfaces/component.h>
 #include <dali/devel-api/atspi-interfaces/value.h>
 
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
@@ -54,7 +53,7 @@ int utcDaliAccessibilityProgressBarGetMinimum(void)
 
   Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
   auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto                 x            = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimum(), 0.0, TEST_LOCATION);
 
@@ -67,7 +66,7 @@ int utcDaliAccessibilityProgressBarGetMaximum(void)
 
   Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
   auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto                 x            = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMaximum(), 1.0, TEST_LOCATION);
 
@@ -80,7 +79,7 @@ int utcDaliAccessibilityProgressBarGetMinimumIncrement(void)
 
   Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
   auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto                 x            = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimumIncrement(), 0.0, TEST_LOCATION);
 
@@ -94,9 +93,9 @@ int utcDaliAccessibilityProgressBarGetSetCurrent(void)
 
   Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
   auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto                 x            = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
-  DALI_TEST_CHECK(Dali::Accessibility::Component::DownCast(q)->GrabHighlight());
+  DALI_TEST_CHECK(q->GrabHighlight());
   DALI_TEST_EQUALS(x->GetCurrent(), 0.0, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(2.0), false, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(0.25), true, TEST_LOCATION);
@@ -126,7 +125,7 @@ int utcDaliAccessibilityScrollBarGetMinimum(void)
   scroll_bar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
 
   auto q = Dali::Accessibility::Accessible::Get(scroll_bar);
-  auto x = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto x = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimum(), 10.0, TEST_LOCATION);
 
@@ -152,7 +151,7 @@ int utcDaliAccessibilityScrollBarGetMaximum(void)
   scroll_bar.SetScrollPropertySource(sourceActor, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
 
   auto q = Dali::Accessibility::Accessible::Get(scroll_bar);
-  auto x = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto x = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMaximum(), 100.0, TEST_LOCATION);
 
@@ -165,7 +164,7 @@ int utcDaliAccessibilityScrollBarGetMinimumIncrement(void)
 
   Toolkit::ScrollBar scroll_bar = Toolkit::ScrollBar::New();
   auto               q          = Dali::Accessibility::Accessible::Get(scroll_bar);
-  auto               x          = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto               x          = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimumIncrement(), 1.0, TEST_LOCATION);
 
@@ -194,9 +193,9 @@ int utcDaliAccessibilityScrollBarGetSetCurrent(void)
   //sourceActor.SetProperty(propertyScrollPosition, 20.0f);
 
   auto q = Dali::Accessibility::Accessible::Get(scroll_bar);
-  auto x = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto x = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
-  DALI_TEST_CHECK(Dali::Accessibility::Component::DownCast(q)->GrabHighlight());
+  DALI_TEST_CHECK(q->GrabHighlight());
   DALI_TEST_EQUALS(x->GetCurrent(), 0.0, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(1000.0), false, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(50.0), false, TEST_LOCATION);
@@ -213,7 +212,7 @@ int utcDaliAccessibilitySliderGetMinimum(void)
 
   Toolkit::Slider slider = Toolkit::Slider::New();
   auto            q      = Dali::Accessibility::Accessible::Get(slider);
-  auto            x      = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto            x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimum(), 0.0, TEST_LOCATION);
 
@@ -226,7 +225,7 @@ int utcDaliAccessibilitySliderGetMaximum(void)
 
   Toolkit::Slider slider = Toolkit::Slider::New();
   auto            q      = Dali::Accessibility::Accessible::Get(slider);
-  auto            x      = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto            x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMaximum(), 1.0, TEST_LOCATION);
 
@@ -239,7 +238,7 @@ int utcDaliAccessibilitySliderGetMinimumIncrement(void)
 
   Toolkit::Slider slider = Toolkit::Slider::New();
   auto            q      = Dali::Accessibility::Accessible::Get(slider);
-  auto            x      = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto            x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS<float>(x->GetMinimumIncrement(), 0.0, TEST_LOCATION);
 
@@ -253,9 +252,9 @@ int utcDaliAccessibilitySliderGetSetCurrent(void)
 
   Toolkit::Slider slider = Toolkit::Slider::New();
   auto            q      = Dali::Accessibility::Accessible::Get(slider);
-  auto            x      = dynamic_cast<Dali::Accessibility::Value*>(q);
+  auto            x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::VALUE>(q);
   DALI_TEST_CHECK(x);
-  DALI_TEST_CHECK(Dali::Accessibility::Component::DownCast(q)->GrabHighlight());
+  DALI_TEST_CHECK(q->GrabHighlight());
   DALI_TEST_EQUALS(x->GetCurrent(), 0.0, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(2.0), false, TEST_LOCATION);
   DALI_TEST_EQUALS(x->SetCurrent(0.25), true, TEST_LOCATION);

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1765,12 +1765,12 @@ public: // Default style & Input style
    */
   void SetLayoutAlignmentOffset(Vector2 offset);
 
-   /**
-    * @brief Sets the layout alignment offset with padding.
-    *
-    * @param[in] offset The offset.
-    */
-   void SetLayoutOffsetWithPadding(Vector2 offset);
+  /**
+   * @brief Sets the layout alignment offset with padding.
+   *
+   * @param[in] offset The offset.
+   */
+  void SetLayoutOffsetWithPadding(Vector2 offset);
 
   /**
    * @brief Sets whether background color with cutout is enabled.
@@ -2122,7 +2122,7 @@ public: // Queries & retrieves.
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  Rect<> GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex);
+  Rect<float> GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex);
 
   /**
    * @brief Sets the layout direction changed.
