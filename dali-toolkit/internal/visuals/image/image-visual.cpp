@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -728,7 +728,7 @@ void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions&
     }
     else if(mUseFastTrackUploading)
     {
-      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s%s\n",
+      DALI_LOG_DEBUG_INFO("FastTrack : Fail to load fast track. mUrl : [%s]%s%s%s%s%s%s%s%s\n",
                           mImageUrl.GetEllipsedUrl().c_str(),
                           (mLoadPolicy != Toolkit::ImageVisual::LoadPolicy::ATTACHED) ? "/ mLoadPolicy != ATTACHED" : "",
                           (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED) ? "/ mReleasePolicy != DETACHED" : "",
