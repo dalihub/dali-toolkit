@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSER_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,12 @@ public:
    * @copydoc Toolkit::JsonParser::Write()
    */
   void Write(std::ostream& output, int indent) const;
+
+private:
+  /**
+   * @brief Ensure to destroy and release all memory under tree root
+   */
+  void DeleteRootNode() noexcept;
 
 private:
   typedef std::vector<char>    VectorChar;
