@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -735,8 +735,9 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
 
     if(enable)
     {
-      DecorationData* decorationData = mOuter.mControlImpl.mImpl->mDecorationData;
-      const Vector4   cornerRadius   = DecorationData::GetCornerRadius(decorationData);
+      auto self = mOuter.mControlImpl.Self();
+
+      const Vector4 cornerRadius = self.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
 
       // TODO This condition is to cover utc failtures. Remove this after updating them.
       // e.g Setting control's corner radius and then setting background visual: Changing visual's corner radius crashes utc.
@@ -744,8 +745,8 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
       {
         Property::Map map;
         map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
-        map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, DecorationData::GetCornerRadiusPolicy(decorationData));
-        map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, DecorationData::GetCornerSquareness(decorationData));
+        map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, self.GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY));
+        map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, self.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS));
 
         visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
       }
@@ -760,7 +761,7 @@ void Control::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual
           (*iter)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS] = cornerRadiusConstraint;
           cornerRadiusConstraint.SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
         }
-        cornerRadiusConstraint.Apply();
+        cornerRadiusConstraint.ApplyPost();
       }
       else
       {
@@ -1043,7 +1044,7 @@ void Control::Impl::VisualData::BindAnimatablePropertyFromControlToVisual(Proper
         Constraint             constraint      = Constraint::New<Vector4>(property.object, property.propertyIndex, EqualToConstraint());
         constraint.AddSource(Source(handle, index));
         registeredVisual->animationConstraint[index] = constraint;
-        registeredVisual->animationConstraint[index].Apply();
+        registeredVisual->animationConstraint[index].ApplyPost();
       }
       registeredVisual->animationConstraint[index].SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ALWAYS);
     }
