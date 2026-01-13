@@ -82,13 +82,7 @@ JsonParser::JsonParser(const TreeNode& tree)
 
 JsonParser::~JsonParser()
 {
-  if(mRoot)
-  {
-    TreeNodeManipulator modify(mRoot);
-    modify.RemoveChildren();
-    delete mRoot;
-    mRoot = NULL;
-  }
+  DeleteRootNode();
 }
 
 bool JsonParser::Parse(const std::string& source)
@@ -111,8 +105,6 @@ bool JsonParser::Parse(const std::string& source)
   }
   else
   {
-    mRoot = NULL;
-
     mErrorDescription = parserState.GetErrorDescription();
     if(NULL == mErrorDescription)
     {
@@ -121,6 +113,11 @@ bool JsonParser::Parse(const std::string& source)
     mErrorPosition = parserState.GetErrorPosition();
     mErrorLine     = parserState.GetErrorLineNumber();
     mErrorColumn   = parserState.GetErrorColumn();
+
+    // Destroy already parsed tree data.
+    mRoot = parserState.GetRoot();
+    DeleteRootNode();
+    mRoot = NULL;
   }
 
   return mRoot != NULL;
@@ -175,6 +172,17 @@ void JsonParser::Write(std::ostream& output, int indent) const
 {
   TreeNodeManipulator modify(mRoot);
   modify.Write(output, indent);
+}
+
+void JsonParser::DeleteRootNode() noexcept
+{
+  if(mRoot)
+  {
+    TreeNodeManipulator modify(mRoot);
+    modify.RemoveChildren();
+    delete mRoot;
+    mRoot = NULL;
+  }
 }
 
 } // namespace Internal

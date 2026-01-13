@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -414,7 +414,7 @@ public:
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  Rect<> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
+  Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
 
   /**
    * @brief Set the @p spannedText into current textField

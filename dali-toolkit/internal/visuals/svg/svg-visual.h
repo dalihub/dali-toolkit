@@ -162,7 +162,7 @@ protected: // Implementation of  SvgLoaderObserver
   /**
    * @copydoc Dali::Toolkit::Internal::SvgLoaderObserver::RasterizeComplete
    */
-  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override;
+  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet) override;
 
 private:
   /**
@@ -178,12 +178,6 @@ private:
    * @param[in] value The value
    */
   void DoSetProperty(Property::Index index, const Property::Value& value);
-
-  /**
-   * @brief Checks if atlasing should be attempted
-   * @return bool returns true if atlasing can be attempted.
-   */
-  bool AttemptAtlasing() const;
 
   /**
    * @brief Emit ResourceReady signal.
@@ -204,8 +198,6 @@ private:
   SvgLoader::SvgLoadId      mSvgLoadId;
   SvgLoader::SvgRasterizeId mSvgRasterizeId;
 
-  Vector4               mAtlasRect;
-  Property::Index       mAtlasRectIndex;
   VisualUrl             mImageUrl;
   uint32_t              mDefaultWidth;
   uint32_t              mDefaultHeight;
@@ -220,7 +212,6 @@ private:
   bool mRasterizeCompleted : 1;
   bool mLoadFailed : 1;
   bool mRasterizeForcibly : 1;
-  bool mAttemptAtlasing : 1; ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

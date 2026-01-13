@@ -42,7 +42,7 @@ enum Type
   WRAP_MODE_U            = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U,
   WRAP_MODE_V            = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V,
   BORDER                 = Dali::Toolkit::ImageVisual::Property::BORDER,
-  ATLASING               = Dali::Toolkit::ImageVisual::Property::ATLASING,
+  REMOVED_PROPERTY_01    = Dali::Toolkit::ImageVisual::Property::REMOVED_PROPERTY_01,
   ALPHA_MASK_URL         = Dali::Toolkit::ImageVisual::Property::ALPHA_MASK_URL,
   BATCH_SIZE             = Dali::Toolkit::ImageVisual::Property::BATCH_SIZE,
   CACHE_SIZE             = Dali::Toolkit::ImageVisual::Property::CACHE_SIZE,
@@ -168,7 +168,6 @@ enum Type
    *    - Alpha masking
    *    - Synchronous loading
    *    - Reload action
-   *    - Atlas loading
    *    - Custom shader
    * @note Used by the ImageVisual. The default is false.
    */

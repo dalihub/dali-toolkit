@@ -599,7 +599,6 @@ int UtcDaliImageViewPixelArea(void)
   graphics.AddCustomUniforms(customUniforms);
 
   // Gif image, use AnimatedImageVisual internally
-  // Atlasing is applied to pack multiple frames, use custom wrap mode
   ImageView     gifView = ImageView::New();
   const Vector4 pixelAreaVisual(0.f, 0.f, 2.f, 2.f);
   gifView.SetProperty(ImageView::Property::IMAGE,
@@ -652,14 +651,14 @@ int UtcDaliImageViewPixelArea(void)
   END_TEST;
 }
 
-int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
+int UtcDaliImageViewAsyncLoading(void)
 {
   ToolkitTestApplication     application;
   TestGlAbstraction&         gl          = application.GetGlAbstraction();
   const std::vector<GLuint>& textures    = gl.GetBoundTextures();
   size_t                     numTextures = textures.size();
 
-  // Async loading, no atlasing for big size image
+  // Async loading
   ImageView imageView = ImageView::New(gImage_600_RGB);
 
   // By default, Aysnc loading is used
@@ -679,84 +678,6 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
   END_TEST;
 }
 
-int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
-{
-  ToolkitTestApplication application;
-
-  //Async loading, automatic atlasing for small size image
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  callStack.Reset();
-  callStack.Enable(true);
-
-  Property::Map imageMap;
-
-  imageMap[ImageVisual::Property::URL]            = gImage_34_RGBA;
-  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 34;
-  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 34;
-  imageMap[ImageVisual::Property::ATLASING]       = true;
-
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageView.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
-
-  // By default, Aysnc loading is used
-  // loading is not started if the actor is offScene
-
-  application.GetScene().Add(imageView);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  callStack.Enable(false);
-
-  TraceCallStack::NamedParams params;
-  params["width"] << 34;
-  params["height"] << 34;
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params), true, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
-{
-  ToolkitTestApplication application;
-
-  //Async loading, automatic atlasing for small size image
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  callStack.Reset();
-  callStack.Enable(true);
-
-  Property::Map asyncLoadingMap;
-  asyncLoadingMap["url"]                = gImage_34_RGBA;
-  asyncLoadingMap["desiredHeight"]      = 34;
-  asyncLoadingMap["desiredWidth"]       = 34;
-  asyncLoadingMap["synchronousLoading"] = false;
-  asyncLoadingMap["atlasing"]           = true;
-
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty(ImageView::Property::IMAGE, asyncLoadingMap);
-
-  application.GetScene().Add(imageView);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  callStack.Enable(false);
-
-  TraceCallStack::NamedParams params;
-  params["width"] << 34;
-  params["height"] << 34;
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params), true, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliImageViewSyncLoading(void)
 {
   ToolkitTestApplication application;
@@ -765,9 +686,8 @@ int UtcDaliImageViewSyncLoading(void)
 
   Property::Map syncLoadingMap;
   syncLoadingMap[ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
-  syncLoadingMap[ImageVisual::Property::ATLASING]            = true;
 
-  // Sync loading, no atlasing for big size image
+  // Sync loading, big size image
   {
     ImageView imageView = ImageView::New();
 
@@ -776,7 +696,7 @@ int UtcDaliImageViewSyncLoading(void)
     imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
   }
 
-  // Sync loading, automatic atlasing for small size image
+  // Sync loading, small size image
   {
     TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
     callStack.Reset();
@@ -797,7 +717,7 @@ int UtcDaliImageViewSyncLoading(void)
     TraceCallStack::NamedParams params;
     params["width"] << 34;
     params["height"] << 34;
-    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params),
+    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params),
                      true,
                      TEST_LOCATION);
   }
@@ -810,7 +730,7 @@ int UtcDaliImageViewSyncLoading02(void)
 
   tet_infoline("ImageView Testing sync loading and size using string key property map");
 
-  // Sync loading, automatic atlasing for small size image
+  // Sync loading, small size image
   {
     TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
     callStack.Reset();
@@ -824,7 +744,6 @@ int UtcDaliImageViewSyncLoading02(void)
     syncLoadingMap["desiredHeight"]      = 34;
     syncLoadingMap["desiredWidth"]       = 34;
     syncLoadingMap["synchronousLoading"] = true;
-    syncLoadingMap["atlasing"]           = true;
     imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
 
     application.GetScene().Add(imageView);
@@ -834,7 +753,7 @@ int UtcDaliImageViewSyncLoading02(void)
     TraceCallStack::NamedParams params;
     params["width"] << 34;
     params["height"] << 34;
-    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params),
+    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params),
                      true,
                      TEST_LOCATION);
   }
@@ -852,7 +771,7 @@ int UtcDaliImageViewAsyncLoadingEncodedBuffer(void)
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
   ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
 
-  // Async loading, no atlasing for big size image
+  // Async loading, big size image
   ImageView imageView = ImageView::New(url.GetUrl());
 
   // By default, Aysnc loading is used
@@ -872,93 +791,6 @@ int UtcDaliImageViewAsyncLoadingEncodedBuffer(void)
   END_TEST;
 }
 
-int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
-{
-  ToolkitTestApplication application;
-
-  // Get encoded raw-buffer image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
-  ImageUrl           url2   = Toolkit::Image::GenerateUrl(buffer);
-
-  // Generate url is not equal to url2
-  // NOTE : This behavior may changed when ImageUrl compare operator changed.
-  DALI_TEST_CHECK(url != url2);
-  // Generate url's string is equal to url2's string
-  DALI_TEST_CHECK(url.GetUrl() == url2.GetUrl());
-
-  EncodedImageBuffer buffer2 = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  url2                       = Toolkit::Image::GenerateUrl(buffer2);
-
-  // Check whethere two url are not equal
-  DALI_TEST_CHECK(url.GetUrl() != url2.GetUrl());
-
-  // Async loading, automatic atlasing for small size image
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  callStack.Reset();
-  callStack.Enable(true);
-
-  Property::Map imageMap;
-
-  imageMap[ImageVisual::Property::URL]            = url.GetUrl();
-  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 600;
-  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 600;
-  imageMap[ImageVisual::Property::ATLASING]       = true;
-
-  // No atlasing with big image
-  ImageView imageViewBigdesired = ImageView::New();
-  imageViewBigdesired.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageViewBigdesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
-
-  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 0;
-  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 0;
-
-  // No atlasing with zero desired size
-  ImageView imageViewNodesired = ImageView::New();
-  imageViewNodesired.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageViewNodesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
-
-  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 34;
-  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 34;
-
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
-  imageView.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
-
-  // By default, Aysnc loading is used
-  // loading is not started if the actor is offScene
-  application.GetScene().Add(imageView);
-  application.GetScene().Add(imageViewBigdesired);
-  application.GetScene().Add(imageViewNodesired);
-  application.SendNotification();
-  application.Render(16);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Change url to url2
-  imageMap[ImageVisual::Property::URL] = url2.GetUrl();
-  imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  callStack.Enable(false);
-
-  TraceCallStack::NamedParams params;
-  params["width"] << 34;
-  params["height"] << 34;
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params), true, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
 {
   ToolkitTestApplication application;
@@ -969,7 +801,7 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA);
   ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
 
-  // Sync loading, automatic atlasing for small size image
+  // Sync loading, small size image
   {
     TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
     callStack.Reset();
@@ -984,7 +816,6 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
     syncLoadingMap["desiredHeight"]      = 34;
     syncLoadingMap["desiredWidth"]       = 34;
     syncLoadingMap["synchronousLoading"] = true;
-    syncLoadingMap["atlasing"]           = true;
     imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
 
     application.GetScene().Add(imageView);
@@ -994,7 +825,7 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
     TraceCallStack::NamedParams params;
     params["width"] << 34;
     params["height"] << 34;
-    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params),
+    DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params),
                      true,
                      TEST_LOCATION);
   }
@@ -1013,7 +844,7 @@ int UtcDaliImageViewEncodedBufferWithSvg(void)
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
   ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
 
-  // Async loading, no atlasing for big size image
+  // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
 
   // By default, Aysnc loading is used
@@ -1053,7 +884,7 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
   ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
 
-  // Async loading, no atlasing for big size image
+  // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
 
   // By default, Aysnc loading is used
@@ -1093,7 +924,7 @@ int UtcDaliImageViewEncodedBufferWithInvalidImageType(void)
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA, static_cast<EncodedImageBuffer::ImageType>(-1));
   ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
 
-  // Async loading, no atlasing for big size image
+  // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
 
   // By default, Aysnc loading is used
@@ -1976,31 +1807,6 @@ int UtcDaliImageViewTransformTest01(void)
   // Image Visual should be positioned depending on ImageView's padding
   DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::OFFSET)->Get<Vector2>(), Vector2(8, 8), TEST_LOCATION);
   DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::OFFSET_POLICY)->Get<Vector2>(), Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE), TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageViewUsingAtlasAndGetNaturalSize(void)
-{
-  ToolkitTestApplication application;
-
-  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
-  ImageView     imageView = ImageView::New();
-  Property::Map imageMap;
-  imageMap[Toolkit::Visual::Property::TYPE]          = Toolkit::Visual::IMAGE;
-  imageMap[Toolkit::ImageVisual::Property::URL]      = gImage_34_RGBA;
-  imageMap[Toolkit::ImageVisual::Property::ATLASING] = true;
-  imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imageMap);
-  application.GetScene().Add(imageView);
-
-  // Trigger a potential relayout
-  application.SendNotification();
-  application.Render();
-
-  Vector3 naturalSize = imageView.GetNaturalSize();
-
-  DALI_TEST_EQUALS(naturalSize.width, 34.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(naturalSize.height, 34.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3589,136 +3395,6 @@ int UtcDaliImageViewSvgChageSize(void)
 
   // We should not load the file again.
   DALI_TEST_EQUALS(Test::VectorImageRenderer::GetLoadCount(), 1, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSvgAtlasing(void)
-{
-  ToolkitTestApplication application;
-
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  callStack.Reset();
-  callStack.Enable(true);
-
-  Property::Map propertyMap;
-  propertyMap["url"]      = TEST_SVG_FILE_NAME;
-  propertyMap["atlasing"] = true;
-
-  gResourceReadySignalFired = false;
-
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
-  imageView.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
-  imageView.ResourceReadySignal().Connect(&ResourceReadySignal);
-  application.GetScene().Add(imageView);
-
-  application.SendNotification();
-
-  // Wait for loading & rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  DALI_TEST_CHECK(gResourceReadySignalFired);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // use atlas
-  TraceCallStack::NamedParams params1;
-  params1["width"] << 100;
-  params1["height"] << 100;
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params1), true, TEST_LOCATION);
-
-  callStack.Reset();
-
-  gResourceReadySignalFired = false;
-
-  // Also use new image view with atlas.
-  ImageView imageView2 = ImageView::New();
-  imageView2.SetProperty(ImageView::Property::IMAGE, propertyMap);
-  imageView2.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
-  imageView2.ResourceReadySignal().Connect(&ResourceReadySignal);
-  application.GetScene().Add(imageView2);
-
-  application.SendNotification();
-
-  // Let we check that we use cached image, and cached texture.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
-
-  DALI_TEST_CHECK(gResourceReadySignalFired);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Check there is no newly generated texture
-  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params1), false, TEST_LOCATION);
-
-  callStack.Reset();
-
-  gResourceReadySignalFired = false;
-
-  // Also use new image view 'without'' atlas.
-  propertyMap["atlasing"] = false;
-  ImageView imageView3    = ImageView::New();
-  imageView3.SetProperty(ImageView::Property::IMAGE, propertyMap);
-  imageView3.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
-  imageView3.ResourceReadySignal().Connect(&ResourceReadySignal);
-  application.GetScene().Add(imageView3);
-
-  application.SendNotification();
-
-  // Let we check that we use cached image, but not cached texture.
-  // Wait rasterize.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  DALI_TEST_CHECK(gResourceReadySignalFired);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Check that we generate new texture
-  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params1), true, TEST_LOCATION);
-
-  callStack.Reset();
-
-  gResourceReadySignalFired = false;
-
-  // Try to atlas over the size.
-  imageView.SetProperty(Actor::Property::SIZE, Vector2(600.f, 600.f));
-
-  application.SendNotification();
-
-  // Wait for rasterization
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // not use atlas
-  TraceCallStack::NamedParams params2;
-  params2["width"] << 600;
-  params2["height"] << 600;
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexImage2D", params2), true, TEST_LOCATION);
-
-  callStack.Reset();
-
-  // Try to load over the size.
-  // Note that imageView3's atlas attempt is false.
-  imageView3.SetProperty(Actor::Property::SIZE, Vector2(600.f, 600.f));
-
-  // Let we check atlas cached.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // Check there is no newly generated texture
-  DALI_TEST_EQUALS(callStack.CountMethod("GenTextures"), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(callStack.FindMethodAndParams("TexSubImage2D", params2), false, TEST_LOCATION);
-
-  gResourceReadySignalFired = false;
 
   END_TEST;
 }

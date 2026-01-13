@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,7 +383,7 @@ int TextEditor::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
-Rect<> TextEditor::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+Rect<float> TextEditor::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
 {
   return mController->GetTextBoundingRectangle(startIndex, endIndex);
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,12 +158,9 @@ enum
   BORDER,
 
   /**
-   * @brief Whether to use the texture atlas
-   * @details Name "atlasing", type Property::BOOLEAN.
-   * @SINCE_1_2.60
-   * @note Optional. By default atlasing is off.
+   * @note Removed property. But keep it not to change enum values.
    */
-  ATLASING,
+  REMOVED_PROPERTY_01,
 
   /**
    * @brief URL of a masking image

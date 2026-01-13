@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,8 +99,7 @@ enum class AccessibilityRole : uint32_t
  * @see Dali::Accessibility::Text
  * @see Dali::Accessibility::EditableText
  */
-struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible,
-                                            public virtual Dali::Accessibility::Action
+struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible
 {
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};
@@ -135,6 +134,11 @@ protected:
    * @return True if the actor is showing
    */
   bool IsShowing();
+
+  /**
+   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+   */
+  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
 
 public:
   ControlAccessible(Dali::Actor self);

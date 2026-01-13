@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -415,11 +414,25 @@ void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
   // Clear constraint, and keep default renderer's constraint only.
   if(mColorConstraint)
   {
+    for(auto& constraint : mColorConstraintList)
+    {
+      if(constraint && (constraint != mColorConstraint))
+      {
+        constraint.Remove();
+      }
+    }
     mColorConstraintList.clear();
     mColorConstraintList.push_back(mColorConstraint);
   }
   if(mOpacityConstraint)
   {
+    for(auto& constraint : mOpacityConstraintList)
+    {
+      if(constraint && (constraint != mOpacityConstraint))
+      {
+        constraint.Remove();
+      }
+    }
     mOpacityConstraintList.clear();
     mOpacityConstraintList.push_back(mOpacityConstraint);
   }
@@ -433,26 +446,14 @@ void TextVisual::DoSetOffScene(Actor& actor)
     mIsTextLoadingTaskRunning = false;
   }
 
+  RemoveRenderer(actor, true);
+
+  // Change the constraint as APPLY_ONCE if apply rate was always.
   if(mIsConstraintAppliedAlways)
   {
-    // Change the constraint as APPLY_ONCE if apply rate was always.
-    for(auto& constraint : mColorConstraintList)
-    {
-      if(constraint)
-      {
-        constraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
-      }
-    }
-    for(auto& constraint : mOpacityConstraintList)
-    {
-      if(constraint)
-      {
-        constraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
-      }
-    }
+    mColorConstraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
+    mOpacityConstraint.SetApplyRate(Dali::Constraint::APPLY_ONCE);
   }
-
-  RemoveRenderer(actor, true);
 
   // Resets the control handle.
   mControl.Reset();
@@ -1020,8 +1021,6 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       }
     }
 
-    mImpl->mFlags &= ~Visual::Base::Impl::IS_ATLASING_APPLIED;
-
     const Vector4& defaultColor = parameters.textColor;
 
     for(RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
@@ -1104,6 +1103,11 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       // Remove the texture set and any renderer previously set.
       RemoveRenderer(control, true);
       return;
+    }
+    else
+    {
+      // Apply constraint once after async text completed.
+      SetConstraintApplyAlways(mIsConstraintAppliedAlways, true);
     }
   }
   else
@@ -1375,8 +1379,6 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       verifiedHeight -= maxTextureSize;
     }
   }
-
-  mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
   const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
 

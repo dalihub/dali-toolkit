@@ -43,7 +43,7 @@ class VisualFactoryCache;
  * It caches them internally for better performance; i.e. to avoid loading and
  * parsing the files over and over.
  *
- * @note To use EncodedImageBuffer and AtlasManager, we need to set VisualFactoryCache.
+ * @note To use EncodedImageBuffer, we need to set VisualFactoryCache.
  */
 class SvgLoader : public ConnectionTracker, public Integration::Processor
 {
@@ -119,12 +119,11 @@ public:
    * @param[in] loaderId to retrieve
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
-   * @param[in] attemptAtlasing True if we need to attempt atlas the image.
    * @param[in] svgObserver The SvgVisual that requested loading.
    * @param[in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the rasterize request.
    */
-  SvgRasterizeId Rasterize(SvgLoadId loaderId, uint32_t width, uint32_t height, bool attemptAtlasing, SvgLoaderObserver* svgObserver, bool synchronousLoading);
+  SvgRasterizeId Rasterize(SvgLoadId loaderId, uint32_t width, uint32_t height, SvgLoaderObserver* svgObserver, bool synchronousLoading);
 
   /**
    * @brief Request to remove a texture matching id.
@@ -179,7 +178,7 @@ private:
 
   SvgCacheIndex FindCacheIndexFromLoadCache(const VisualUrl& imageUrl, float dpi) const;
 
-  SvgCacheIndex FindCacheIndexFromRasterizeCache(const SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing) const;
+  SvgCacheIndex FindCacheIndexFromRasterizeCache(const SvgLoadId loadId, uint32_t width, uint32_t height) const;
 
   /**
    * @brief Remove a texture matching id.
@@ -286,17 +285,14 @@ public:
    */
   struct SvgRasterizeInfo
   {
-    SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing)
+    SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height)
     : mId(rasterizeId),
       mTask(),
       mLoadId(loadId),
       mWidth(width),
       mHeight(height),
-      mAttemptAtlasing(attemptAtlasing),
       mRasterizeState(RasterizeState::NOT_STARTED),
       mTextureSet(),
-      mAtlasRect(Vector4(0.0f, 0.0f, 1.0f, 1.0f)),
-      mAtlasAttempted(attemptAtlasing), ///< Let we assume that atlas attempted until rasterize completed.
       mObservers(),
       mReferenceCount(1u)
     {
@@ -310,11 +306,8 @@ public:
       mLoadId(info.mLoadId),
       mWidth(info.mWidth),
       mHeight(info.mHeight),
-      mAttemptAtlasing(info.mAttemptAtlasing),
       mRasterizeState(info.mRasterizeState),
       mTextureSet(std::move(info.mTextureSet)),
-      mAtlasRect(std::move(info.mAtlasRect)),
-      mAtlasAttempted(info.mAtlasAttempted),
       mObservers(std::move(info.mObservers)),
       mReferenceCount(info.mReferenceCount)
     {
@@ -329,17 +322,13 @@ public:
         mId   = info.mId;
         mTask = std::move(info.mTask);
 
-        mLoadId          = info.mLoadId;
-        mWidth           = info.mWidth;
-        mHeight          = info.mHeight;
-        mAttemptAtlasing = info.mAttemptAtlasing;
+        mLoadId = info.mLoadId;
+        mWidth  = info.mWidth;
+        mHeight = info.mHeight;
 
         mRasterizeState = info.mRasterizeState;
         mTextureSet     = std::move(info.mTextureSet);
-        mAtlasRect      = std::move(info.mAtlasRect);
-        mAtlasAttempted = info.mAtlasAttempted;
-
-        mObservers = std::move(info.mObservers);
+        mObservers      = std::move(info.mObservers);
 
         mReferenceCount = info.mReferenceCount;
 
@@ -362,13 +351,9 @@ public:
     SvgLoadId mLoadId;
     uint32_t  mWidth;
     uint32_t  mHeight;
-    bool      mAttemptAtlasing; ///< True if atlas requested.
 
-    RasterizeState   mRasterizeState;
-    Dali::TextureSet mTextureSet; ///< The texture set from atlas manager, or rasterized result at index 0.
-    Vector4          mAtlasRect;
-    bool             mAtlasAttempted; ///< True if atlasing attempted. False if atlasing failed
-
+    RasterizeState    mRasterizeState;
+    Dali::TextureSet  mTextureSet; ///< rasterized result at index 0.
     ObserverContainer mObservers;
 
     int32_t mReferenceCount; ///< The number of Svg visuals that use this data.
@@ -449,7 +434,7 @@ protected:
   SvgLoader& operator=(const SvgLoader& rhs) = delete;
 
 private:
-  VisualFactoryCache* mFactoryCache; ///< The holder of visual factory cache. It will be used when we want to get atlas manager;
+  VisualFactoryCache* mFactoryCache; ///< The holder of visual factory cache.
 
   SvgLoadId      mCurrentSvgLoadId;
   SvgRasterizeId mCurrentSvgRasterizeId;

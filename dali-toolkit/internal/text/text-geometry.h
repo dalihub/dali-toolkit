@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GEOMETRY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun);
  * @param[in] charIndex character index to which we want to calculate the geometry for.
  * @return Rect {x, y, width, height}.
  */
-Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex);
+Rect<float> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex);
 
 /**
  * @brief Get the character index.

@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSE_STATE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,14 +251,6 @@ private:
   }
 
   /**
-   * Get the current character
-   */
-  inline char Char()
-  {
-    return *mIter;
-  }
-
-  /**
    * @return True if there are at least n character left
    */
   inline bool AtLeast(int n)
@@ -275,6 +267,18 @@ private:
   inline bool AtEnd()
   {
     return mEnd == mIter;
+  }
+
+  /**
+   * Get the current character. Or return \0 if we meet end.
+   */
+  inline char Char()
+  {
+    if(DALI_UNLIKELY(AtEnd()))
+    {
+      return '\0';
+    }
+    return *mIter;
   }
 
   /**

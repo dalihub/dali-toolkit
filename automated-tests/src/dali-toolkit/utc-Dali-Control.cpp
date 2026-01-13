@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1850,6 +1850,9 @@ int UtcDaliControlBorderline(void)
   DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
   DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
 
+  application.SendNotification();
+  application.Render();
+
   tet_printf("Set corner radius. Check BORDERLINE visual has corner radius value now.\n");
   Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
   Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
@@ -1887,6 +1890,9 @@ int UtcDaliControlBorderline(void)
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
   DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   tet_printf("Change borderline value. Check BORDERLINE visual.\n");
   borderlineWidth  = 20.0f;
@@ -1926,6 +1932,9 @@ int UtcDaliControlBorderline(void)
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
   DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   tet_printf("Set borderline property forcibly!\n");
   borderlineWidth  = 30.0f;
@@ -1971,6 +1980,14 @@ int UtcDaliControlBorderline(void)
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedFloat));
   DALI_TEST_EQUALS(retrievedFloat, borderlineOffset, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Set empty value (for line coverage)
+  Property::Map emptyMap;
+  control.SetProperty(DevelControl::Property::BORDERLINE, emptyMap);
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE).Get<Property::Map>().Empty());
 
   END_TEST;
 }

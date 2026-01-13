@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_CONTROLS_COMMON_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,12 +87,10 @@ public:
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  static Rect<> GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex);
+  static Rect<float> GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex);
 };
 
-class TextControlAccessible : public DevelControl::ControlAccessible,
-                              public virtual Dali::Accessibility::Text,
-                              public virtual Dali::Accessibility::Hypertext
+class TextControlAccessible : public DevelControl::ControlAccessible
 {
 public:
   using DevelControl::ControlAccessible::ControlAccessible;
@@ -112,7 +110,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Text::GetRangeExtents()
    */
-  Rect<> GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type) override;
+  Rect<float> GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type) override;
 
   /**
    * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
@@ -163,6 +161,12 @@ public:
 
 protected:
   /**
+   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+   */
+  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+
+protected:
+  /**
    * @brief Gets whole text.
    *
    * @return The text
@@ -203,20 +207,9 @@ protected:
    * @return True if text should be hidden, false otherwise
    */
   virtual bool IsHiddenInput() const;
-
-  /**
-   * @brief Checks whether [startPosition, endPosition) is a valid, non-empty range within a given string.
-   *
-   * @param string Source string
-   * @param begin Start index (inclusive)
-   * @param end End index (exclusive)
-   * @return true if the range is valid, false otherwise
-   */
-  static bool ValidateRange(const std::string& string, std::size_t begin, std::size_t end);
 };
 
-class EditableTextControlAccessible : public TextControlAccessible,
-                                      public virtual Dali::Accessibility::EditableText
+class EditableTextControlAccessible : public TextControlAccessible
 {
 public:
   using TextControlAccessible::TextControlAccessible;
@@ -264,6 +257,12 @@ public:
    * @copydoc Dali::Accessibility::EditableText::SetTextContents()
    */
   bool SetTextContents(std::string newContents) override;
+
+protected:
+  /**
+   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+   */
+  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
 
 protected:
   /**

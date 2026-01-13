@@ -29,7 +29,6 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 namespace
@@ -77,8 +76,6 @@ Debug::Filter* gTextureManagerLogFilter = Debug::Filter::New(Debug::NoLogging, f
 
 namespace
 {
-const Vector4 FULL_ATLAS_RECT(0.0f, 0.0f, 1.0f, 1.0f); ///< UV Rectangle that covers the full Texture
-
 void PreMultiply(Devel::PixelBuffer pixelBuffer, TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
 {
   if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
@@ -306,154 +303,63 @@ TextureSet TextureManager::LoadTexture(
   MaskingDataPointer&                maskInfo,
   const bool                         synchronousLoading,
   TextureManager::TextureId&         textureId,
-  Vector4&                           textureRect,
-  Dali::ImageDimensions&             textureRectSize,
-  bool&                              atlasingStatus,
   bool&                              loadingStatus,
   TextureUploadObserver*             textureObserver,
-  AtlasUploadObserver*               atlasObserver,
-  ImageAtlasManagerPtr               imageAtlasManager,
   const bool                         orientationCorrection,
   const TextureManager::ReloadPolicy reloadPolicy,
   TextureManager::MultiplyOnLoad&    preMultiplyOnLoad)
 {
   TextureSet textureSet;
 
-  loadingStatus = false;
-  textureRect   = FULL_ATLAS_RECT;
+  loadingStatus = true;
 
-  if(VisualUrl::TEXTURE == url.GetProtocolType())
+  TextureId alphaMaskId        = INVALID_TEXTURE_ID;
+  float     contentScaleFactor = 1.0f;
+  bool      cropToMask         = false;
+  if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
   {
-    // Ensure that external texture don't allow atlasing.
-    atlasingStatus = false;
-  }
+    const bool preappliedMasking = maskInfo->mPreappliedMasking && (VisualUrl::TEXTURE != url.GetProtocolType());
+    maskInfo->mPreappliedMasking = preappliedMasking;
 
-  // For Atlas
-  if(synchronousLoading && atlasingStatus)
-  {
-    const bool synchronousAtlasAvaliable = (desiredSize != ImageDimensions() || url.IsLocalResource()) ? imageAtlasManager->CheckAtlasAvailable(url, desiredSize)
-                                                                                                       : false;
-    if(synchronousAtlasAvaliable)
+    maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl, preappliedMasking ? TextureManager::StorageType::KEEP_PIXEL_BUFFER : TextureManager::StorageType::KEEP_TEXTURE, synchronousLoading);
+    alphaMaskId            = maskInfo->mAlphaMaskId;
+    if(maskInfo && preappliedMasking)
     {
-      std::vector<Devel::PixelBuffer> pixelBuffers;
-      LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection, false, pixelBuffers);
-
-      if(!pixelBuffers.empty() && maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
-      {
-        std::vector<Devel::PixelBuffer> maskPixelBuffers;
-        LoadImageSynchronously(maskInfo->mAlphaMaskUrl, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true, false, maskPixelBuffers);
-        if(!maskPixelBuffers.empty())
-        {
-          pixelBuffers[0].ApplyMask(maskPixelBuffers[0], maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
-        }
-      }
-
-      PixelData data;
-      if(!pixelBuffers.empty())
-      {
-        PreMultiply(pixelBuffers[0], preMultiplyOnLoad);
-        data = Devel::PixelBuffer::Convert(pixelBuffers[0]); // takes ownership of buffer
-
-        if(data)
-        {
-          textureSet = imageAtlasManager->Add(textureRect, data);
-          if(textureSet)
-          {
-            textureRectSize.SetWidth(data.GetWidth());
-            textureRectSize.SetHeight(data.GetHeight());
-          }
-        }
-        else
-        {
-          DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous Texture loading with atlasing is failed.\n");
-        }
-      }
-      if(!textureSet)
-      {
-        atlasingStatus = false;
-      }
+      contentScaleFactor = maskInfo->mContentScaleFactor;
+      cropToMask         = maskInfo->mCropToMask;
     }
   }
 
-  if(!textureSet)
+  textureId = RequestLoad(
+    url,
+    alphaMaskId,
+    textureId,
+    contentScaleFactor,
+    desiredSize,
+    fittingMode,
+    samplingMode,
+    cropToMask,
+    textureObserver,
+    orientationCorrection,
+    reloadPolicy,
+    preMultiplyOnLoad,
+    synchronousLoading);
+
+  TextureManager::LoadState loadState = mTextureCacheManager.GetTextureState(textureId);
+  if(loadState == TextureManager::LoadState::UPLOADED)
   {
-    loadingStatus = true;
-    // Atlas manager can chage desired size when it is set by 0,0.
-    // We should store into textureRectSize only if atlasing successed.
-    // So copy inputed desiredSize, and replace value into textureRectSize only if atlasing success.
-    Dali::ImageDimensions atlasDesiredSize = desiredSize;
-    if(atlasingStatus)
-    {
-      if(url.IsBufferResource())
-      {
-        const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
-        if(encodedImageBuffer)
-        {
-          textureSet = imageAtlasManager->Add(textureRect, encodedImageBuffer, desiredSize, fittingMode, true, atlasObserver);
-        }
-      }
-      else
-      {
-        textureSet = imageAtlasManager->Add(textureRect, url, atlasDesiredSize, fittingMode, true, atlasObserver);
-      }
-    }
-    if(!textureSet) // big image, no atlasing or atlasing failed
-    {
-      atlasingStatus = false;
-
-      TextureId alphaMaskId        = INVALID_TEXTURE_ID;
-      float     contentScaleFactor = 1.0f;
-      bool      cropToMask         = false;
-      if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
-      {
-        const bool preappliedMasking = maskInfo->mPreappliedMasking && (VisualUrl::TEXTURE != url.GetProtocolType());
-        maskInfo->mPreappliedMasking = preappliedMasking;
-
-        maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl, preappliedMasking ? TextureManager::StorageType::KEEP_PIXEL_BUFFER : TextureManager::StorageType::KEEP_TEXTURE, synchronousLoading);
-        alphaMaskId            = maskInfo->mAlphaMaskId;
-        if(maskInfo && preappliedMasking)
-        {
-          contentScaleFactor = maskInfo->mContentScaleFactor;
-          cropToMask         = maskInfo->mCropToMask;
-        }
-      }
-
-      textureId = RequestLoad(
-        url,
-        alphaMaskId,
-        textureId,
-        contentScaleFactor,
-        desiredSize,
-        fittingMode,
-        samplingMode,
-        cropToMask,
-        textureObserver,
-        orientationCorrection,
-        reloadPolicy,
-        preMultiplyOnLoad,
-        synchronousLoading);
-
-      TextureManager::LoadState loadState = mTextureCacheManager.GetTextureState(textureId);
-      if(loadState == TextureManager::LoadState::UPLOADED)
-      {
-        // LoadComplete has already been called - keep the same texture set
-        textureSet = GetTextureSet(textureId);
-      }
-
-      // If we are loading the texture, or waiting for the ready signal handler to complete, inform
-      // caller that they need to wait.
-      loadingStatus = (loadState == TextureManager::LoadState::LOADING ||
-                       loadState == TextureManager::LoadState::WAITING_FOR_MASK ||
-                       loadState == TextureManager::LoadState::MASK_APPLYING ||
-                       loadState == TextureManager::LoadState::MASK_APPLIED ||
-                       loadState == TextureManager::LoadState::NOT_STARTED ||
-                       mLoadingQueueTextureId != INVALID_TEXTURE_ID);
-    }
-    else
-    {
-      textureRectSize = atlasDesiredSize;
-    }
+    // LoadComplete has already been called - keep the same texture set
+    textureSet = GetTextureSet(textureId);
   }
+
+  // If we are loading the texture, or waiting for the ready signal handler to complete, inform
+  // caller that they need to wait.
+  loadingStatus = (loadState == TextureManager::LoadState::LOADING ||
+                   loadState == TextureManager::LoadState::WAITING_FOR_MASK ||
+                   loadState == TextureManager::LoadState::MASK_APPLYING ||
+                   loadState == TextureManager::LoadState::MASK_APPLIED ||
+                   loadState == TextureManager::LoadState::NOT_STARTED ||
+                   mLoadingQueueTextureId != INVALID_TEXTURE_ID);
 
   if(synchronousLoading)
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1415,6 +1415,13 @@ Property::Value Slider::GetProperty(BaseObject* object, Property::Index property
   }
 
   return value;
+}
+
+Dali::Accessibility::AtspiInterfaces Slider::SliderAccessible::DoGetInterfaces() const
+{
+  Dali::Accessibility::AtspiInterfaces interfaces        = DevelControl::ControlAccessible::DoGetInterfaces();
+  interfaces[Dali::Accessibility::AtspiInterface::VALUE] = true;
+  return interfaces;
 }
 
 double Slider::SliderAccessible::GetMinimum() const

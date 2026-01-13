@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -399,7 +399,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint
  * @param[in] endIndex end index(included) of the text requested to get bounding box to.
  * @return bounding box of the requested text.
  */
-DALI_TOOLKIT_API Rect<> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
+DALI_TOOLKIT_API Rect<float> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Set text fit array to text label.

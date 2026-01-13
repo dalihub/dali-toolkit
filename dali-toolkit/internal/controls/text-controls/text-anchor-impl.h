@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_ANCHOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,8 +110,7 @@ protected:
   /**
    * @brief This structure is to connect TextAnchor with Accessible functions.
    */
-  class TextAnchorAccessible : public DevelControl::ControlAccessible,
-                               public virtual Dali::Accessibility::Hyperlink
+  class TextAnchorAccessible : public DevelControl::ControlAccessible
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -145,6 +144,12 @@ protected:
      * @copydoc Dali::Accessibility::Hyperlink::IsValid()
      */
     bool IsValid() const override;
+
+  protected:
+    /**
+     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     */
+    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
   };
 };
 

@@ -17,9 +17,6 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 
-// INTERNAL HEADERS
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h> // For ImageAtlasManagerPtr
-
 // EXTERNAL HEADERS
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -156,19 +153,14 @@ void FixedImageCache::LoadBatch()
     mRequestingLoad = true;
     mLoadState      = TextureManager::LoadState::LOADING;
 
-    bool                  synchronousLoading = false;
-    bool                  atlasingStatus     = false;
-    bool                  loadingStatus      = false;
-    AtlasUploadObserver*  atlasObserver      = nullptr;
-    ImageAtlasManagerPtr  imageAtlasManager  = nullptr;
-    Vector4               textureRect;
-    Dali::ImageDimensions textureRectSize;
+    bool synchronousLoading = false;
+    bool loadingStatus      = false;
 
     auto preMultiplyOnLoading = mPreMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                    : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
-    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[frameIndex].mTextureId = loadTextureId;
     mRequestingLoad                   = false;
   }

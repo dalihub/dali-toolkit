@@ -34,7 +34,6 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -236,17 +235,6 @@ Geometry VisualFactoryCache::CreateQuadGeometry()
   geometry.SetType(Geometry::TRIANGLE_STRIP);
 
   return geometry;
-}
-
-ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
-{
-  if(!mAtlasManager)
-  {
-    mAtlasManager = new ImageAtlasManager();
-    mAtlasManager->SetBrokenImage(mDefaultBrokenImageUrl);
-  }
-
-  return mAtlasManager;
 }
 
 TextureManager& VisualFactoryCache::GetTextureManager()

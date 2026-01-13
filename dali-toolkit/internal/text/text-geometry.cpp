@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -359,7 +359,7 @@ float GetCharacterWidth(const GlyphInfo& glyph)
   return glyph.advance;
 }
 
-Rect<> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
+Rect<float> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
 {
   if(textModel->mVisualModel == nullptr)
   {

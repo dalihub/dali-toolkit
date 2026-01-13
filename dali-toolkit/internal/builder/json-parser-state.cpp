@@ -747,7 +747,7 @@ bool JsonParserState::HandleKeyState(char*& name)
   {
     return false;
   }
-  if(DALI_UNLIKELY(AtEnd()) || ':' != Char())
+  if(DALI_UNLIKELY(':' != Char()))
   {
     return Error("Expected ':'");
   }

@@ -82,7 +82,6 @@ extern const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME;
 
 // Image visual
 extern const char* const IMAGE_URL_NAME;
-extern const char* const ATLAS_RECT_UNIFORM_NAME;
 extern const char* const PIXEL_AREA_UNIFORM_NAME;
 extern const char* const WRAP_MODE_UNIFORM_NAME;
 extern const char* const IMAGE_WRAP_MODE_U;
@@ -106,7 +105,6 @@ extern const char* const CURRENT_FRAME_NUMBER_NAME;
 extern const char* const TOTAL_FRAME_NUMBER_NAME;
 extern const char* const STOP_BEHAVIOR_NAME;
 extern const char* const LOOPING_MODE_NAME;
-extern const char* const IMAGE_ATLASING;
 extern const char* const SYNCHRONOUS_LOADING;
 extern const char* const IMAGE_FITTING_MODE;
 extern const char* const IMAGE_SAMPLING_MODE;

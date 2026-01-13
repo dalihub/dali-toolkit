@@ -27,7 +27,6 @@
 #include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
-#include <dali-toolkit/internal/visuals/image/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-loader-observer.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member SvgLoader.
 #include <dali-toolkit/public-api/image-loader/image-url.h>
@@ -76,8 +75,7 @@ public:
     mRasterizeCalled(false),
     mRasterizeSuccess(false),
     mVectorImageRenderer(),
-    mTextureSet(),
-    mAtlasRect(FULL_TEXTURE_RECT)
+    mTextureSet()
   {
   }
 
@@ -91,12 +89,10 @@ public: ///< Implement of SvgLoaderObserver
     tet_printf("loadId[%d] complete. Success[%d]\n", loadId, mLoadSuccess);
   }
 
-  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override
+  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet) override
   {
-    mRasterizeCalled = true;
-    mTextureSet      = textureSet;
-    mAtlasRect       = atlasRect;
-
+    mRasterizeCalled  = true;
+    mTextureSet       = textureSet;
     mRasterizeSuccess = !!mTextureSet;
     tet_printf("rasterizeId[%d] complete. Success[%d]\n", rasterizeId, mRasterizeSuccess);
   }
@@ -132,7 +128,6 @@ public:
   Dali::VectorImageRenderer mVectorImageRenderer;
 
   TextureSet mTextureSet;
-  Vector4    mAtlasRect;
 };
 
 class TestObserverWithCustomFunction : public TestObserver
@@ -156,9 +151,9 @@ public: ///< Implement of SvgLoaderObserver
     mLoadSignal(mLoadData);
   }
 
-  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet, Vector4 atlasRect) override
+  void RasterizeComplete(int32_t rasterizeId, Dali::TextureSet textureSet) override
   {
-    TestObserver::RasterizeComplete(rasterizeId, textureSet, atlasRect);
+    TestObserver::RasterizeComplete(rasterizeId, textureSet);
 
     // Execute signals.
     mRasterizeSignal(mRasterizeData);
@@ -194,7 +189,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
   EncodedImageBuffer svgBuffer = Dali::ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
 
   auto       visualFactory = Toolkit::VisualFactory::Get();
-  SvgLoader& svgLoader     = GetImplementation(visualFactory).GetSvgLoader(); // Use VisualFactory's svg loader, for use atlas and EncodedImageBuffer.
+  SvgLoader& svgLoader     = GetImplementation(visualFactory).GetSvgLoader(); // Use VisualFactory's svg loader
 
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(svgBuffer);
   svgBuffer.Reset();
@@ -210,7 +205,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
   const std::vector<std::pair<uint32_t, uint32_t>> rasterizeSizes = {
     {0u, 0u},
     {100u, 100u},
-    {600u, 600u}, ///< To big so atlas attempt failed.
+    {600u, 600u},
   };
   const int rasterizeSizesCount = rasterizeSizes.size();
 
@@ -220,84 +215,68 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
     const bool rasterizeSuccess = loadSuccess && (fileType == 0 || fileType == 2);
     for(int synchronousLoading = 0; synchronousLoading < 2; ++synchronousLoading)
     {
-      for(int attemptAtlasing = 0; attemptAtlasing < 2; ++attemptAtlasing)
+      for(int sizeType = 0; sizeType < rasterizeSizesCount; ++sizeType)
       {
-        for(int sizeType = 0; sizeType < rasterizeSizesCount; ++sizeType)
+        tet_printf("\n\nTesting fileType %d, synchronousLoading %d, sizeType %d\n\n", fileType, synchronousLoading, sizeType);
+
+        TestObserver observer;
+        std::string  filename(fileNames[fileType]);
+
+        SvgLoader::SvgLoadId      loadId      = svgLoader.Load(filename, DEFAULT_DPI, &observer, synchronousLoading == 1);
+        SvgLoader::SvgRasterizeId rasterizeId = svgLoader.Rasterize(loadId, rasterizeSizes[sizeType].first, rasterizeSizes[sizeType].second, &observer, synchronousLoading == 1);
+        DALI_TEST_CHECK(loadId != SvgLoader::INVALID_SVG_LOAD_ID);
+        DALI_TEST_CHECK(rasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID);
+
+        if(synchronousLoading == 1)
         {
-          const bool atlasAttempted = (attemptAtlasing == 1) && (sizeType == 0 || sizeType == 1);
+          observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
+        }
+        else
+        {
+          observer.CheckTest(false, false, false, false, TEST_LOCATION);
 
-          tet_printf("\n\nTesting fileType %d, synchronousLoading %d, attemptAtlasing %d, sizeType %d\n\n", fileType, synchronousLoading, attemptAtlasing, sizeType);
+          // Wait async load complete
+          DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-          TestObserver observer;
-          std::string  filename(fileNames[fileType]);
-
-          SvgLoader::SvgLoadId      loadId      = svgLoader.Load(filename, DEFAULT_DPI, &observer, synchronousLoading == 1);
-          SvgLoader::SvgRasterizeId rasterizeId = svgLoader.Rasterize(loadId, rasterizeSizes[sizeType].first, rasterizeSizes[sizeType].second, attemptAtlasing == 1, &observer, synchronousLoading == 1);
-          DALI_TEST_CHECK(loadId != SvgLoader::INVALID_SVG_LOAD_ID);
-          DALI_TEST_CHECK(rasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID);
-
-          if(synchronousLoading == 1)
+          // Suprizely, Rasterize callback could be comes before Load callback.
+          // We should pass both case.
+          if(observer.mLoadCalled)
           {
-            observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
-          }
-          else
-          {
-            observer.CheckTest(false, false, false, false, TEST_LOCATION);
+            observer.CheckTest(true, loadSuccess, false, false, TEST_LOCATION);
 
-            // Wait async load complete
-            DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-            // Suprizely, Rasterize callback could be comes before Load callback.
-            // We should pass both case.
-            if(observer.mLoadCalled)
+            if(loadSuccess)
             {
-              observer.CheckTest(true, loadSuccess, false, false, TEST_LOCATION);
-
-              if(loadSuccess)
-              {
-                // Wait async rasterize complete
-                DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-                // TODO : We don't notify rasterize failed even if load failed. Should we notify it?
-                observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
-              }
-            }
-            else
-            {
-              observer.CheckTest(false, false, true, rasterizeSuccess, TEST_LOCATION);
-
-              // Consume the load callback.
+              // Wait async rasterize complete
               DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
               // TODO : We don't notify rasterize failed even if load failed. Should we notify it?
-              observer.CheckTest(true, true, true, rasterizeSuccess, TEST_LOCATION);
+              observer.CheckTest(true, loadSuccess, true, rasterizeSuccess, TEST_LOCATION);
             }
           }
-
-          DALI_TEST_EQUALS(!!observer.mVectorImageRenderer, loadSuccess, TEST_LOCATION);
-          DALI_TEST_EQUALS(!!observer.mTextureSet, rasterizeSuccess, TEST_LOCATION);
-          if(rasterizeSuccess)
+          else
           {
-            if(atlasAttempted)
-            {
-              DALI_TEST_NOT_EQUALS(observer.mAtlasRect, FULL_TEXTURE_RECT, 0.01f, TEST_LOCATION);
-            }
-            else
-            {
-              DALI_TEST_EQUALS(observer.mAtlasRect, FULL_TEXTURE_RECT, TEST_LOCATION);
-            }
+            observer.CheckTest(false, false, true, rasterizeSuccess, TEST_LOCATION);
+
+            // Consume the load callback.
+            DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+            // TODO : We don't notify rasterize failed even if load failed. Should we notify it?
+            observer.CheckTest(true, true, true, rasterizeSuccess, TEST_LOCATION);
           }
-
-          // Remove cache
-          svgLoader.RequestLoadRemove(loadId, &observer);
-          svgLoader.RequestRasterizeRemove(rasterizeId, &observer, false);
-
-          // Ensure svg loader cache removed.
-          application.SendNotification();
-          application.Render();
-          application.SendNotification();
-          application.Render();
         }
+
+        DALI_TEST_EQUALS(!!observer.mVectorImageRenderer, loadSuccess, TEST_LOCATION);
+        DALI_TEST_EQUALS(!!observer.mTextureSet, rasterizeSuccess, TEST_LOCATION);
+
+        // Remove cache
+        svgLoader.RequestLoadRemove(loadId, &observer);
+        svgLoader.RequestRasterizeRemove(rasterizeId, &observer, false);
+
+        // Ensure svg loader cache removed.
+        application.SendNotification();
+        application.Render();
+        application.SendNotification();
+        application.Render();
       }
     }
   }
@@ -359,8 +338,8 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   observer5.CheckLoadTest(true, true, TEST_LOCATION);
 
   tet_printf("Request Rasterize\n");
-  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, false, &observer1, false);
-  auto rasterizeId2 = svgLoader.Rasterize(loadId1, 100u, 100u, false, &observer2, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, &observer1, false);
+  auto rasterizeId2 = svgLoader.Rasterize(loadId1, 100u, 100u, &observer2, false);
 
   tet_printf("Test Rasterize cached well\n");
   DALI_TEST_EQUALS(rasterizeId1, rasterizeId2, TEST_LOCATION);
@@ -376,8 +355,8 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   observer2.CheckRasterizeTest(true, true, TEST_LOCATION);
 
   tet_printf("Test difference loadId and size return not equal id\n");
-  auto rasterizeId3 = svgLoader.Rasterize(loadId1, 200u, 200u, false, &observer3, false);
-  auto rasterizeId4 = svgLoader.Rasterize(loadId3, 100u, 100u, false, &observer4, false);
+  auto rasterizeId3 = svgLoader.Rasterize(loadId1, 200u, 200u, &observer3, false);
+  auto rasterizeId4 = svgLoader.Rasterize(loadId3, 100u, 100u, &observer4, false);
   DALI_TEST_CHECK(rasterizeId1 != rasterizeId3);
   DALI_TEST_CHECK(rasterizeId1 != rasterizeId4);
   DALI_TEST_CHECK(rasterizeId3 != rasterizeId4);
@@ -391,7 +370,7 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   observer4.CheckRasterizeTest(true, true, TEST_LOCATION);
 
   tet_printf("Test Rasterize cached well even after rasterize completed\n");
-  auto rasterizeId5 = svgLoader.Rasterize(loadId1, 100u, 100u, false, &observer5, false);
+  auto rasterizeId5 = svgLoader.Rasterize(loadId1, 100u, 100u, &observer5, false);
 
   DALI_TEST_EQUALS(rasterizeId1, rasterizeId5, TEST_LOCATION);
   // Check observer5 loaded.
@@ -420,7 +399,7 @@ int UtcSvgLoaderCacheLoadAndRasterize02(void)
   observer1.CheckLoadTest(true, true, TEST_LOCATION);
 
   tet_printf("Request Rasterize\n");
-  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, false, &observer1, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, &observer1, false);
 
   tet_printf("Remove loadId1 during rasterize execute\n");
   svgLoader.RequestLoadRemove(loadId1, &observer1);
@@ -499,9 +478,9 @@ int UtcSvgLoaderCacheLoadAndRasterize03(void)
   observer3.CheckLoadTest(true, true, TEST_LOCATION);
 
   tet_printf("Request Rasterize async / sync / and async again\n");
-  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, false, &observer1, false);
-  auto rasterizeId2 = svgLoader.Rasterize(loadId2, 100u, 100u, false, &observer2, true);
-  auto rasterizeId3 = svgLoader.Rasterize(loadId3, 100u, 100u, false, &observer3, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, &observer1, false);
+  auto rasterizeId2 = svgLoader.Rasterize(loadId2, 100u, 100u, &observer2, true);
+  auto rasterizeId3 = svgLoader.Rasterize(loadId3, 100u, 100u, &observer3, false);
 
   tet_printf("Test Rasterize cached well\n");
   DALI_TEST_EQUALS(rasterizeId1, rasterizeId2, TEST_LOCATION);
@@ -698,8 +677,8 @@ int UtcSvgLoaderDestructDuringObserver02(void)
   observer1->CheckLoadTest(true, true, TEST_LOCATION);
   observer2->CheckLoadTest(true, true, TEST_LOCATION);
 
-  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, false, observer1, false);
-  auto rasterizeId2 = svgLoader.Rasterize(loadId2, 100u, 100u, false, observer2, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId1, 100u, 100u, observer1, false);
+  auto rasterizeId2 = svgLoader.Rasterize(loadId2, 100u, 100u, observer2, false);
   DALI_TEST_EQUALS(rasterizeId1, rasterizeId2, TEST_LOCATION);
 
   observer1->CheckRasterizeTest(false, false, TEST_LOCATION);
@@ -964,9 +943,9 @@ int UtcSvgLoaderReqestDuringObserver03(void)
     DALI_TEST_CHECK(observer6);
 
     tet_printf("Request for observer2(cached) and observer3, observer4(non-cached)\n");
-    customData->cachedId     = svgLoader.Rasterize(loadId, 100u, 100u, false, observer2, false);
-    customData->nonCachedId1 = svgLoader.Rasterize(loadId, 200u, 200u, false, observer3, false);
-    customData->nonCachedId2 = svgLoader.Rasterize(loadId, 200u, 200u, false, observer4, false);
+    customData->cachedId     = svgLoader.Rasterize(loadId, 100u, 100u, observer2, false);
+    customData->nonCachedId1 = svgLoader.Rasterize(loadId, 200u, 200u, observer3, false);
+    customData->nonCachedId2 = svgLoader.Rasterize(loadId, 200u, 200u, observer4, false);
 
     tet_printf("Test observer2 still not notify yet even if it is cached\n");
     observer2->CheckRasterizeTest(false, false, TEST_LOCATION);
@@ -974,15 +953,15 @@ int UtcSvgLoaderReqestDuringObserver03(void)
     observer4->CheckRasterizeTest(false, false, TEST_LOCATION);
 
     tet_printf("Test observer5 rasterize request and cancel\n");
-    auto rasterizeId = svgLoader.Rasterize(loadId, 200u, 200u, false, observer5, false);
+    auto rasterizeId = svgLoader.Rasterize(loadId, 200u, 200u, observer5, false);
     svgLoader.RequestRasterizeRemove(rasterizeId, observer5, true);
 
     tet_printf("Test observer6 rasterize request and destruct\n");
-    rasterizeId = svgLoader.Rasterize(loadId, 200u, 200u, false, observer6, false);
+    rasterizeId = svgLoader.Rasterize(loadId, 200u, 200u, observer6, false);
     delete observer6; });
 
   tet_printf("rasterize request for rasterizeId1.\n");
-  auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, false, &observer1, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, &observer1, false);
 
   observer1.CheckRasterizeTest(false, false, TEST_LOCATION);
   observer2.CheckRasterizeTest(false, false, TEST_LOCATION);
@@ -1065,9 +1044,9 @@ int UtcSvgLoaderReqestDuringObserver04(void)
 
     tet_printf("Request for observer2(cached) and observer3, observer4(non-cached)\n");
     tet_printf("For here, let we request observer4 as sync!\n");
-    customData->cachedId     = svgLoader.Rasterize(loadId, 100u, 100u, false, observer2, false);
-    customData->nonCachedId1 = svgLoader.Rasterize(loadId, 200u, 200u, false, observer3, false);
-    customData->nonCachedId2 = svgLoader.Rasterize(loadId, 200u, 200u, false, observer4, true);
+    customData->cachedId     = svgLoader.Rasterize(loadId, 100u, 100u, observer2, false);
+    customData->nonCachedId1 = svgLoader.Rasterize(loadId, 200u, 200u, observer3, false);
+    customData->nonCachedId2 = svgLoader.Rasterize(loadId, 200u, 200u, observer4, true);
 
     tet_printf("Test observer2 still not notify yet even if it is cached\n");
     observer2->CheckRasterizeTest(false, false, TEST_LOCATION);
@@ -1077,7 +1056,7 @@ int UtcSvgLoaderReqestDuringObserver04(void)
     observer4->CheckRasterizeTest(true, true, TEST_LOCATION); });
 
   tet_printf("rasterize request for rasterizeId1.\n");
-  auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, false, &observer1, false);
+  auto rasterizeId1 = svgLoader.Rasterize(loadId, 100u, 100u, &observer1, false);
 
   observer1.CheckRasterizeTest(false, false, TEST_LOCATION);
   observer2.CheckRasterizeTest(false, false, TEST_LOCATION);

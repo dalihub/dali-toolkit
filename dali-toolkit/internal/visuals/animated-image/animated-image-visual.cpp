@@ -27,7 +27,6 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
@@ -1013,7 +1012,7 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
   {
     if(DALI_LIKELY(mImageCache))
     {
-      mImageCache->ClearCache(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+      mImageCache->ClearCache();
     }
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
@@ -1041,7 +1040,7 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
   {
     if(DALI_LIKELY(mImageCache))
     {
-      mImageCache->ClearCache(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+      mImageCache->ClearCache();
     }
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 

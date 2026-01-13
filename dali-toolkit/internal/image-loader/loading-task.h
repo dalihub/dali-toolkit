@@ -43,7 +43,7 @@ class LoadingTask;
 using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
 
 /**
- * The task of loading and packing an image into the atlas
+ * The task of an image loading
  */
 class LoadingTask : public AsyncTask
 {

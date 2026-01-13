@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SLIDER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -759,8 +759,7 @@ private:
     mSnapToMarks : 1;  ///< Turn on or off snapping to marks
 
 protected:
-  class SliderAccessible : public DevelControl::ControlAccessible,
-                           public virtual Dali::Accessibility::Value
+  class SliderAccessible : public DevelControl::ControlAccessible
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -794,6 +793,12 @@ protected:
      * @copydoc Dali::Accessibility::Value::GetMinimumIncrement()
      */
     double GetMinimumIncrement() const override;
+
+  protected:
+    /**
+     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     */
+    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
   };
 };
 

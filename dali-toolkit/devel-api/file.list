@@ -48,8 +48,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.cpp
   ${devel_api_src_dir}/focus-manager/focus-finder.cpp
   ${devel_api_src_dir}/image-loader/async-image-loader-devel.cpp
-  ${devel_api_src_dir}/image-loader/atlas-upload-observer.cpp
-  ${devel_api_src_dir}/image-loader/image-atlas.cpp
   ${devel_api_src_dir}/image-loader/texture-manager.cpp
   ${devel_api_src_dir}/layouting/flex-node.cpp
   ${devel_api_src_dir}/property-bridge/property-bridge.cpp
@@ -219,8 +217,6 @@ SET( devel_api_focus_manager_header_files
 
 SET( devel_api_image_loader_header_files
   ${devel_api_src_dir}/image-loader/async-image-loader-devel.h
-  ${devel_api_src_dir}/image-loader/atlas-upload-observer.h
-  ${devel_api_src_dir}/image-loader/image-atlas.h
   ${devel_api_src_dir}/image-loader/texture-manager.h
 )
 
