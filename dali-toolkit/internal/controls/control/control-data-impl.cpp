@@ -1948,6 +1948,12 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
       }
       EnableCornerPropertiesOverridden(visual, true, mInnerShadowCornerRadiusConstraint);
 
+      // TODO : Fix it if we can detect size animation.
+      if(DecorationData::GetCornerRadiusPolicy(mDecorationData) == Toolkit::Visual::Transform::Policy::Type::RELATIVE)
+      {
+        mInnerShadowCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+      }
+
       mControlImpl.RelayoutRequest();
     }
   }
