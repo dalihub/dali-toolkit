@@ -154,6 +154,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mIsWaitingKeyboardFocusChangeCommit(false),
   mClearFocusOnTouch(true),
   mEnableDefaultAlgorithm(false),
+  mClearFocusOnWindowFocusLost(true),
   mCurrentWindowId(0),
   mLastFocusChangeContext()
 {
@@ -1200,7 +1201,7 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
       }
     }
   }
-  else if(!focusIn && mCurrentFocusedWindow.GetHandle() == window.GetRootLayer())
+  else if(!focusIn && mCurrentFocusedWindow.GetHandle() == window.GetRootLayer() && mClearFocusOnWindowFocusLost)
   {
     mCurrentFocusedWindow.Reset();
     ClearFocus();
@@ -1302,6 +1303,16 @@ void KeyboardFocusManager::SetFocusFinderRootActor(Actor actor)
 void KeyboardFocusManager::ResetFocusFinderRootActor()
 {
   mFocusFinderRootActor.Reset();
+}
+
+void KeyboardFocusManager::SetClearFocusOnWindowFocusLost(bool enabled)
+{
+  mClearFocusOnWindowFocusLost = enabled;
+}
+
+bool KeyboardFocusManager::GetClearFocusOnWindowFocusLost() const
+{
+  return mClearFocusOnWindowFocusLost;
 }
 
 void KeyboardFocusManager::OnSceneDisconnection(Dali::Actor actor)

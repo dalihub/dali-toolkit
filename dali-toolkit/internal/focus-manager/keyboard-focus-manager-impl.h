@@ -190,6 +190,18 @@ public:
    */
   const FocusChangeContext& FocusChangedContext() const;
 
+  /**
+   * @brief Sets whether to clear focus when window loses focus
+   * @param enabled Whether to clear focus when window loses focus
+   */
+  void SetClearFocusOnWindowFocusLost(bool enabled);
+
+  /**
+   * @brief Gets whether to clear focus when window loses focus
+   * @return Whether clear focus is enabled when window loses focus
+   */
+  bool GetClearFocusOnWindowFocusLost() const;
+
 public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
@@ -427,6 +439,8 @@ private:
   bool mClearFocusOnTouch : 1; ///< Whether clear focus on touch.
 
   bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
+
+  bool mClearFocusOnWindowFocusLost : 1; ///< Whether clear focus when window loses focus
 
   uint32_t mCurrentWindowId; ///< The current native window id
 

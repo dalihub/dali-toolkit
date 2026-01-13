@@ -247,6 +247,25 @@ public:
    */
   const std::string& GetLastFocusChangeDeviceName() const;
 
+  /**
+   * @brief Sets whether to clear focus when window loses focus.
+   *
+   * By default, this is enabled.
+   * When disabled, the focus state is preserved even when the window loses focus,
+   *
+   * @SINCE_2_5.7
+   * @param enabled Whether to clear focus when window loses focus
+   */
+  void SetClearFocusOnWindowFocusLost(bool enabled);
+
+  /**
+   * @brief Gets whether to clear focus when window loses focus.
+   *
+   * @SINCE_2_5.7
+   * @return Whether clear focus is enabled when window loses focus
+   */
+  bool GetClearFocusOnWindowFocusLost() const;
+
 public: // Signals
   /**
    * @brief This signal is emitted before the focus is going to be changed.
