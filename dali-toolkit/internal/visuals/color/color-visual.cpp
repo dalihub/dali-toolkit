@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +181,8 @@ void ColorVisual::DoSetOnScene(Actor& actor)
     mCutoutCornerRadiusConstraint.AddSource(Source(control, Toolkit::DevelControl::Property::CORNER_RADIUS));
     Dali::Integration::ConstraintSetInternalTag(mCutoutCornerRadiusConstraint, CUTOUT_CORNER_RADIUS_CONSTRAINT_TAG);
 
+    AddConstraintFeature(mCutoutCornerRadiusConstraint, {Toolkit::DevelControl::Property::CORNER_RADIUS});
+
     // Apply the constraint to renderer
     mCutoutCornerRadiusConstraint.Apply();
   }
@@ -193,6 +195,8 @@ void ColorVisual::DoSetOffScene(Actor& actor)
 {
   if(mCuroutCornerRadiusIndex != Property::INVALID_INDEX)
   {
+    RemoveConstraintFeature(mCutoutCornerRadiusConstraint);
+
     // Remove the constraint
     mCutoutCornerRadiusConstraint.Remove();
     mCutoutCornerRadiusConstraint.Reset();
@@ -360,7 +364,7 @@ Shader ColorVisual::GenerateShader() const
   return shader;
 }
 
-Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
+Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
 {
   if(!mImpl->mRenderer)
   {
@@ -371,24 +375,27 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
   if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
      (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
   {
-    const bool updateShader = !IsUsingCustomShader() && !IsBlurRequired();
-
-    // Blur is animated now. we always have to use blur feature.
-    mAlwaysUsingBlurRadius = true;
-
-    if(updateShader)
+    if(changeProperties)
     {
-      // Update each values to renderer
-      DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
-      mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
+      const bool updateShader = !IsUsingCustomShader() && !IsBlurRequired();
 
-      // Change shader
-      UpdateShader();
-    }
-    if(!IsBorderlineRequired())
-    {
-      // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
-      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      // Blur is animated now. we always have to use blur feature.
+      mAlwaysUsingBlurRadius = true;
+
+      if(updateShader)
+      {
+        // Update each values to renderer
+        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
+        mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
+
+        // Change shader
+        UpdateShader();
+      }
+      if(!IsBorderlineRequired())
+      {
+        // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      }
     }
     return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::BLUR_RADIUS);
   }

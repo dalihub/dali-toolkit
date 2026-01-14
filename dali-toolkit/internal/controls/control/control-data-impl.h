@@ -550,45 +550,6 @@ public:
   TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
-  // Decoration constraint data (CornerRadius, Borderline)
-  Constraint mInnerShadowCornerRadiusConstraint; ///< InnerShadow's CornerRadius constriant
-
-  // Keep as seperated struct. Only initialize this struct ondemand use case.
-  struct BorderlineConstraintHolder
-  {
-    BorderlineConstraintHolder()
-    {
-    }
-    ~BorderlineConstraintHolder()
-    {
-      if(mBorderlineCornerRadiusConstraint)
-      {
-        mBorderlineCornerRadiusConstraint.Remove();
-      }
-      if(mBorderlineWidthConstraint)
-      {
-        mBorderlineWidthConstraint.Remove();
-      }
-      if(mBorderlineColorConstraint)
-      {
-        mBorderlineColorConstraint.Remove();
-      }
-      if(mBorderlineOffsetConstraint)
-      {
-        mBorderlineOffsetConstraint.Remove();
-      }
-    }
-    Constraint mBorderlineCornerRadiusConstraint{}; ///< Borderline's CornerRadius constriant
-    Constraint mBorderlineWidthConstraint{};        ///< Borderline's width constraint
-    Constraint mBorderlineColorConstraint{};        ///< Borderline's color constraint
-    Constraint mBorderlineOffsetConstraint{};       ///< Borderline's offset constraint
-  };
-  std::unique_ptr<BorderlineConstraintHolder> mBorderlineConstraintHolder;
-
-  // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
-  using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;
-  PropertyOnAnimationContainer mPropertyOnAnimation; ///< Properties that are currently on animation or constraint applied
-
   // Off screen rendering context
   std::unique_ptr<OffScreenRenderingImpl>                mOffScreenRenderingImpl;
   DevelControl::OffScreenRenderingType                   mOffScreenRenderingType;

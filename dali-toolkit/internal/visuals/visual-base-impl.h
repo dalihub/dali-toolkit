@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,15 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 
+#include <unordered_set>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/direction-enums.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-constraint-observer.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
@@ -347,7 +350,56 @@ public:
    * @param[in] key The Property key of the visual.
    * @return The Property object
    */
-  Dali::Property GetPropertyObject(Dali::Property::Key key);
+  Dali::Property GetPropertyObject(Dali::Property::Key key, bool changeProperties = true);
+
+  /**
+   * @brief Query whether this visual could be rendered in control's offscreen-rendering result
+   *
+   * @return True if this visual rendered at offscreen-rendering render task.
+   *         False if this visual will be rendered at on-screen even if control set offscreen rendering type.
+   */
+  bool IsOffscreenRenderingCaptureEnabled() const;
+
+  /**
+   * @brief Add an observer to watch for when the Visuals have constraint to notify
+   * Currently only supports a single observer
+   */
+  void AddConstraintObserver(Visual::ConstraintObserver& observer);
+
+  /**
+   * @brief Remove an observer
+   */
+  void RemoveConstraintObserver(Visual::ConstraintObserver& observer);
+
+  /**
+   * @brief Add new constraint that this visual will control apply rate.
+   */
+  void AddConstraintFeature(Dali::Constraint constraint, std::unordered_set<Property::Index> properties);
+
+  /**
+   * @brief Remove constraint feature by constraint handle.
+   */
+  void RemoveConstraintFeature(Dali::Constraint constraint);
+
+  /**
+   * @brief Remove constraint feature by property index.
+   */
+  void RemoveConstraintFeatureByIndex(Property::Index index);
+
+  /**
+   * @brief Notify to visuals who has constraints that given ConstraintObserver's property updated
+   */
+  void UpdateApplyRate(Property::Index updatedProperty);
+
+  /**
+   * @brief Apply constraints by specific property index
+   */
+  void StartConstraintFeature(Property::Index index);
+
+  /**
+   * @brief Remove constraints by specific property index
+   */
+  void StopConstraintFeature(Property::Index index);
 
 protected:
   /**
@@ -459,7 +511,7 @@ protected:
    * @param[in] key The key of the visual's property.
    * @return The Property object
    */
-  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key)
+  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
   {
     Handle handle;
     return Dali::Property(handle, Property::INVALID_INDEX);
@@ -507,7 +559,7 @@ private:
    * @param[in] key The key to match.
    * @return the matching index, or INVALID_INDEX if it's not found
    */
-  Property::Index GetPropertyIndex(Property::Key key);
+  Property::Index GetPropertyIndex(Property::Key key) const;
 
   /**
    * Set up the transition. If no animation is required, then

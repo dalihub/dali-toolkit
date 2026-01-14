@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1143,7 +1143,7 @@ Shader AnimatedImageVisual::GenerateShader() const
   return shader;
 }
 
-Dali::Property AnimatedImageVisual::OnGetPropertyObject(Dali::Property::Key key)
+Dali::Property AnimatedImageVisual::OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
 {
   if((key.type == Property::Key::INDEX && key.indexKey == Toolkit::ImageVisual::Property::PIXEL_AREA) ||
      (key.type == Property::Key::STRING && key.stringKey == PIXEL_AREA_UNIFORM_NAME))
