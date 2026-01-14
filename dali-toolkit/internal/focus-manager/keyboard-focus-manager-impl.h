@@ -354,6 +354,13 @@ private:
   void OnWindowFocusChanged(Window window, bool focusIn);
 
   /**
+   * Called when the scene holder focus is changed.
+   * @param[in] sceneHolder The scene holder whose focus is changed
+   * @param[in] focusIn Whether the focus is in/out
+   */
+  void OnSceneHolderFocusChanged(Dali::Integration::SceneHolder sceneHolder, bool focusIn);
+
+  /**
    * Get the focus Actor from current window
    */
   Actor GetFocusActorFromCurrentWindow();

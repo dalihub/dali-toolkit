@@ -175,6 +175,7 @@ void KeyboardFocusManager::OnAdaptorInit()
       (*iter).TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
       (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
       (*iter).WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
+      (*iter).FocusChangedGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneHolderFocusChanged);
       Window window = Window::DownCast(*iter);
       if(window)
       {
@@ -193,6 +194,7 @@ void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& 
   sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
   sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
   sceneHolder.WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
+  sceneHolder.FocusChangedGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneHolderFocusChanged);
   Window window = Window::DownCast(sceneHolder);
   if(window)
   {
@@ -1201,10 +1203,18 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
       }
     }
   }
-  else if(!focusIn && mCurrentFocusedWindow.GetHandle() == window.GetRootLayer() && mClearFocusOnWindowFocusLost)
+}
+
+void KeyboardFocusManager::OnSceneHolderFocusChanged(Dali::Integration::SceneHolder sceneHolder, bool focusIn)
+{
+  Window window = Window::DownCast(sceneHolder);
+  if(window)
   {
-    mCurrentFocusedWindow.Reset();
-    ClearFocus();
+    if(!focusIn && mCurrentFocusedWindow.GetHandle() == window.GetRootLayer() && mClearFocusOnWindowFocusLost)
+    {
+      mCurrentFocusedWindow.Reset();
+      ClearFocus();
+    }
   }
 }
 
