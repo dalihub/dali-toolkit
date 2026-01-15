@@ -60,7 +60,7 @@ int utcDaliAccessibilityTextEditorGetText(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -78,7 +78,7 @@ int utcDaliAccessibilityTextEditorGetCharacterCount(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -96,7 +96,7 @@ int utcDaliAccessibilityTextEditorGetTextAtOffset(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -151,7 +151,7 @@ int utcDaliAccessibilityTextEditorGetSetRangeOfSelection(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -178,7 +178,7 @@ int utcDaliAccessibilityTextEditorRemoveSelection(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -206,7 +206,7 @@ int utcDaliAccessibilityTextEditorGetRangeExtents(void)
 
   auto editor = Dali::Toolkit::TextEditor::New();
   auto q      = Dali::Accessibility::Accessible::Get(editor);
-  auto x      = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
 
   if(x)
@@ -262,7 +262,7 @@ int utcDaliAccessibilityTextFieldGetText(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -294,7 +294,7 @@ int utcDaliAccessibilityTextFieldGetCharacterCount(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -312,7 +312,7 @@ int utcDaliAccessibilityTextFieldGetTextAtOffset(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -376,7 +376,7 @@ int utcDaliAccessibilityTextFieldGetSetRangeOfSelection(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -412,7 +412,7 @@ int utcDaliAccessibilityTextFieldRemoveSelection(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -440,7 +440,7 @@ int utcDaliAccessibilityTextFieldGetRangeExtents(void)
 
   auto field = Dali::Toolkit::TextField::New();
   auto q     = Dali::Accessibility::Accessible::Get(field);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
 
   if(x)
@@ -496,7 +496,7 @@ int utcDaliAccessibilityTextLabelGetText(void)
 
   auto label = Dali::Toolkit::TextLabel::New();
   auto q     = Dali::Accessibility::Accessible::Get(label);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -514,7 +514,7 @@ int utcDaliAccessibilityTextLabelGetCharacterCount(void)
 
   auto label = Dali::Toolkit::TextLabel::New();
   auto q     = Dali::Accessibility::Accessible::Get(label);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -532,7 +532,7 @@ int utcDaliAccessibilityTextLabelGetTextAtOffset(void)
 
   auto label = Dali::Toolkit::TextLabel::New();
   auto q     = Dali::Accessibility::Accessible::Get(label);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
   if(x)
   {
@@ -587,7 +587,7 @@ int utcDaliAccessibilityTextLabelGetRangeExtents(void)
 
   auto label = Dali::Toolkit::TextLabel::New();
   auto q     = Dali::Accessibility::Accessible::Get(label);
-  auto x     = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(q);
+  auto x      = q->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(x);
 
   if(x)

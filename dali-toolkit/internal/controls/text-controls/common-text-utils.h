@@ -90,7 +90,9 @@ public:
   static Rect<float> GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex);
 };
 
-class TextControlAccessible : public DevelControl::ControlAccessible
+class TextControlAccessible : public DevelControl::ControlAccessible,
+                              public Dali::Accessibility::Text,
+                              public Dali::Accessibility::Hypertext
 {
 public:
   using DevelControl::ControlAccessible::ControlAccessible;
@@ -147,7 +149,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Hypertext::GetLink()
    */
-  Accessibility::Hyperlink* GetLink(std::int32_t linkIndex) const override;
+  Accessibility::Accessible* GetLink(std::int32_t linkIndex) const override;
 
   /**
    * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
@@ -161,9 +163,9 @@ public:
 
 protected:
   /**
-   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+   * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
    */
-  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+  void InitDefaultFeatures() override;
 
 protected:
   /**
@@ -209,7 +211,8 @@ protected:
   virtual bool IsHiddenInput() const;
 };
 
-class EditableTextControlAccessible : public TextControlAccessible
+class EditableTextControlAccessible : public TextControlAccessible,
+                                      public Dali::Accessibility::EditableText
 {
 public:
   using TextControlAccessible::TextControlAccessible;
@@ -260,9 +263,9 @@ public:
 
 protected:
   /**
-   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+   * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
    */
-  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+  void InitDefaultFeatures() override;
 
 protected:
   /**

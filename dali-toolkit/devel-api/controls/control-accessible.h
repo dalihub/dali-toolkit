@@ -99,7 +99,8 @@ enum class AccessibilityRole : uint32_t
  * @see Dali::Accessibility::Text
  * @see Dali::Accessibility::EditableText
  */
-struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible
+struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible,
+                                            public Dali::Accessibility::Action
 {
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};
@@ -134,11 +135,6 @@ protected:
    * @return True if the actor is showing
    */
   bool IsShowing();
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
-   */
-  virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
 
 public:
   ControlAccessible(Dali::Actor self);
@@ -188,6 +184,11 @@ public:
    * @copydoc Dali::Accessibility::Accessible::GetAttributes()
    */
   Dali::Accessibility::Attributes GetAttributes() const override;
+
+  /**
+   * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
+   */
+  void InitDefaultFeatures() override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::IsHidden()

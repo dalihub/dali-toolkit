@@ -270,7 +270,8 @@ private:
   Property::Map           mSecondaryProgressVisualMap;    ///< To backup visual properties when switching determinate/indeterminate.
 
 protected:
-  class ProgressBarAccessible : public DevelControl::ControlAccessible
+  class ProgressBarAccessible : public DevelControl::ControlAccessible,
+                                public Dali::Accessibility::Value
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -307,9 +308,9 @@ protected:
 
   protected:
     /**
-     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
      */
-    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+    void InitDefaultFeatures() override;
   };
 };
 

@@ -300,9 +300,8 @@ int UtcDaliAccessibilityPushButtonStates(void)
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::PRESSED]), true, TEST_LOCATION);
 
   // Grab highlite now.
-  auto i = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COMPONENT>(accessible);
-  DALI_TEST_CHECK(i);
-  i->GrabHighlight();
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
 
   pushbutton.SetProperty(Toolkit::Button::Property::SELECTED, false);
 
@@ -358,9 +357,8 @@ int UtcDaliAccessibilityToggleButtonStates(void)
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::CHECKED]), true, TEST_LOCATION);
 
   // Grab highlite now.
-  auto i = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COMPONENT>(accessible);
-  DALI_TEST_CHECK(i);
-  i->GrabHighlight();
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
 
   togglebutton.SetProperty(Toolkit::Button::Property::SELECTED, false);
 
@@ -458,9 +456,8 @@ int UtcDaliAccessibilityRadioButtonStates(void)
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::CHECKED]), true, TEST_LOCATION);
 
   // Grab highlite now.
-  auto i = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COMPONENT>(accessible);
-  DALI_TEST_CHECK(i);
-  i->GrabHighlight();
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
 
   radiobutton.SetProperty(Toolkit::RadioButton::Property::SELECTED, false);
   states = accessible->GetStates();
@@ -509,9 +506,8 @@ int UtcDaliAccessibilityCheckBoxButton(void)
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::CHECKED]), true, TEST_LOCATION);
 
   // Grab highlite now.
-  auto i = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COMPONENT>(accessible);
-  DALI_TEST_CHECK(i);
-  i->GrabHighlight();
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
 
   checkboxbutton.SetProperty(Toolkit::CheckBoxButton::Property::SELECTED, false);
   states = accessible->GetStates();
@@ -758,11 +754,11 @@ int UtcDaliAccessibilityTextAnchor(void)
   textlabel.Add(textanchor);
   auto accessible = Dali::Accessibility::Accessible::Get(textanchor);
   DALI_TEST_CHECK(accessible);
-  auto hyperlink = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERLINK>(accessible);
+  auto hyperlink = accessible->GetFeature<Accessibility::Hyperlink>();
   DALI_TEST_CHECK(hyperlink);
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "https://www.tizen.org");
   DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
-  auto action = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(accessible);
+  auto action = accessible->GetFeature<Accessibility::Action>();
   // activation of valid hyperlink
   DALI_TEST_CHECK(action->DoAction("activate"));
   // making hyperlink invalid
@@ -777,11 +773,11 @@ int UtcDaliAccessibilityTextAnchor(void)
   textField.Add(textanchor);
   accessible = Dali::Accessibility::Accessible::Get(textanchor);
   DALI_TEST_CHECK(accessible);
-  hyperlink = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERLINK>(accessible);
+  hyperlink = accessible->GetFeature<Accessibility::Hyperlink>();
   DALI_TEST_CHECK(hyperlink);
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "https://www.tizen.org");
   DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
-  action = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(accessible);
+  action = accessible->GetFeature<Accessibility::Action>();
   DALI_TEST_CHECK(action->DoAction("activate"));
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
@@ -793,11 +789,11 @@ int UtcDaliAccessibilityTextAnchor(void)
   textEditor.Add(textanchor);
   accessible = Dali::Accessibility::Accessible::Get(textanchor);
   DALI_TEST_CHECK(accessible);
-  hyperlink = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERLINK>(accessible);
+  hyperlink = accessible->GetFeature<Accessibility::Hyperlink>();
   DALI_TEST_CHECK(hyperlink);
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "https://www.tizen.org");
   DALI_TEST_EQUALS(hyperlink->IsValid(), true, TEST_LOCATION);
-  action = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(accessible);
+  action = accessible->GetFeature<Accessibility::Action>();
   DALI_TEST_CHECK(action->DoAction("activate"));
   textanchor.SetProperty(Toolkit::TextAnchor::Property::URI, "");
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
@@ -829,14 +825,14 @@ int UtcDaliAccessibilityTextField(void)
   Dali::Accessibility::TestEnableSC(true);
 
   textfield.SetProperty(Toolkit::TextField::Property::TEXT, "test");
-  auto text = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(accessible);
+  auto text = accessible->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(text);
   DALI_TEST_EQUALS(text->GetText(0, 10), "", TEST_LOCATION);
   DALI_TEST_EQUALS(text->SetCursorOffset(100), false, TEST_LOCATION);
   DALI_TEST_EQUALS(text->SetCursorOffset(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetCursorOffset(), 2, TEST_LOCATION);
 
-  auto editabletext = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::EDITABLE_TEXT>(accessible);
+  auto editabletext = accessible->GetFeature<Accessibility::EditableText>();
   DALI_TEST_CHECK(editabletext);
   DALI_TEST_EQUALS(editabletext->CopyText(3, 1), false, TEST_LOCATION);
   DALI_TEST_EQUALS(editabletext->CopyText(1, 3), true, TEST_LOCATION);
@@ -868,7 +864,7 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
 
-  auto hypertext = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERTEXT>(accessible);
+  auto hypertext = accessible->GetFeature<Accessibility::Hypertext>();
   DALI_TEST_CHECK(hypertext);
   // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
   DALI_TEST_EQUALS(hypertext->GetLinkCount(), 0, TEST_LOCATION);
@@ -896,19 +892,19 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(17), 1, TEST_LOCATION); //2nd anchor index
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(66), 2, TEST_LOCATION); //3rd anchor index
   DALI_TEST_EQUALS(hypertext->GetLink(-1) == nullptr, true, TEST_LOCATION);
-  auto hyperlink = hypertext->GetLink(0);
+  auto hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(0));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 5, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 12, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorCount(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorUri(0), "https://www.tizen.org", TEST_LOCATION);
   auto anchorAccessible = hyperlink->GetAnchorAccessible(0);
-  DALI_TEST_EQUALS(hyperlink == anchorAccessible, true, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(1);
+  DALI_TEST_EQUALS(hypertext->GetLink(0) == anchorAccessible, true, TEST_LOCATION);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(1));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 17, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 60, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(2);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(2));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
@@ -940,14 +936,14 @@ int UtcDaliAccessibilityTextEditor(void)
   Dali::Accessibility::TestEnableSC(true);
 
   texteditor.SetProperty(Toolkit::TextEditor::Property::TEXT, "test");
-  auto text = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(accessible);
+  auto text = accessible->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(text);
   DALI_TEST_EQUALS(text->GetText(0, 10), "", TEST_LOCATION);
   DALI_TEST_EQUALS(text->SetCursorOffset(100), false, TEST_LOCATION);
   DALI_TEST_EQUALS(text->SetCursorOffset(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetCursorOffset(), 2, TEST_LOCATION);
 
-  auto editabletext = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::EDITABLE_TEXT>(accessible);
+  auto editabletext = accessible->GetFeature<Accessibility::EditableText>();
   DALI_TEST_CHECK(editabletext);
   DALI_TEST_EQUALS(editabletext->CopyText(3, 1), false, TEST_LOCATION);
   DALI_TEST_EQUALS(editabletext->CopyText(1, 3), true, TEST_LOCATION);
@@ -979,7 +975,7 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
 
-  auto hypertext = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERTEXT>(accessible);
+  auto hypertext = accessible->GetFeature<Accessibility::Hypertext>();
   DALI_TEST_CHECK(hypertext);
   // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
   DALI_TEST_EQUALS(hypertext->GetLinkCount(), 0, TEST_LOCATION);
@@ -1007,19 +1003,19 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(17), 1, TEST_LOCATION); //2nd anchor index
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(66), 2, TEST_LOCATION); //3rd anchor index
   DALI_TEST_EQUALS(hypertext->GetLink(-1) == nullptr, true, TEST_LOCATION);
-  auto hyperlink = hypertext->GetLink(0);
+  auto hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(0));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 5, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 12, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorCount(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorUri(0), "https://www.tizen.org", TEST_LOCATION);
   auto anchorAccessible = hyperlink->GetAnchorAccessible(0);
-  DALI_TEST_EQUALS(hyperlink == anchorAccessible, true, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(1);
+  DALI_TEST_EQUALS(hypertext->GetLink(0) == anchorAccessible, true, TEST_LOCATION);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(1));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 17, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 60, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(2);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(2));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
@@ -1065,7 +1061,7 @@ int UtcDaliAccessibilityTextLabel(void)
   Dali::Accessibility::TestEnableSC(true);
 
   textlabel.SetProperty(Toolkit::TextLabel::Property::TEXT, "test");
-  auto text = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::TEXT>(accessible);
+  auto text = accessible->GetFeature<Accessibility::Text>();
   DALI_TEST_CHECK(text);
   DALI_TEST_EQUALS(text->GetText(0, 10), "", TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 4), "test", TEST_LOCATION);
@@ -1079,7 +1075,7 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(text->SetRangeOfSelection(1, 0, 1), false, TEST_LOCATION);
   DALI_TEST_EQUALS(text->RemoveSelection(1), false, TEST_LOCATION);
 
-  auto hypertext = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERTEXT>(accessible);
+  auto hypertext = accessible->GetFeature<Accessibility::Hypertext>();
   DALI_TEST_CHECK(hypertext);
   // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
   DALI_TEST_EQUALS(hypertext->GetLinkCount(), 0, TEST_LOCATION);
@@ -1110,19 +1106,19 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(17), 1, TEST_LOCATION); //2nd anchor index
   DALI_TEST_EQUALS(hypertext->GetLinkIndex(66), 2, TEST_LOCATION); //3rd anchor index
   DALI_TEST_EQUALS(hypertext->GetLink(-1) == nullptr, true, TEST_LOCATION);
-  auto hyperlink = hypertext->GetLink(0);
+  auto hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(0));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 5, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 12, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorCount(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetAnchorUri(0), "https://www.tizen.org", TEST_LOCATION);
   auto anchorAccessible = hyperlink->GetAnchorAccessible(0);
-  DALI_TEST_EQUALS(hyperlink == anchorAccessible, true, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(1);
+  DALI_TEST_EQUALS(hypertext->GetLink(0) == anchorAccessible, true, TEST_LOCATION);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(1));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 17, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 60, TEST_LOCATION);
-  hyperlink = hypertext->GetLink(2);
+  hyperlink = dynamic_cast<Dali::Accessibility::Hyperlink*>(hypertext->GetLink(2));
   DALI_TEST_CHECK(hyperlink);
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
