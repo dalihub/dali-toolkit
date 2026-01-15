@@ -1588,29 +1588,33 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if(mController->IsTextElideEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
   {
-    bool enableAutoScroll = false;
-    if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
+    bool visible = DevelActor::IsEffectivelyVisible(self);
+    if(visible)
     {
-      if(mController->IsMultiLineEnabled())
+      bool enableAutoScroll = false;
+      if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
       {
-        DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
-        enableAutoScroll = false;
+        if(mController->IsMultiLineEnabled())
+        {
+          DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+          enableAutoScroll = false;
+        }
+        else
+        {
+          const Size naturalSize = mController->GetNaturalSize(false).GetVectorXY();
+          enableAutoScroll       = contentSize.width < naturalSize.width ? true : false;
+        }
       }
       else
       {
-        const Size naturalSize = mController->GetNaturalSize(false).GetVectorXY();
-        enableAutoScroll       = contentSize.width < naturalSize.width ? true : false;
+        const float textHeight = mController->GetHeightForWidth(contentSize.width);
+        enableAutoScroll       = contentSize.height < textHeight ? true : false;
       }
-    }
-    else
-    {
-      const float textHeight = mController->GetHeightForWidth(contentSize.width);
-      enableAutoScroll       = contentSize.height < textHeight ? true : false;
-    }
 
-    if(enableAutoScroll != mController->IsAutoScrollEnabled())
-    {
-      mController->SetAutoScrollEnabled(enableAutoScroll, false, autoScrollDirection);
+      if(enableAutoScroll != mController->IsAutoScrollEnabled())
+      {
+        mController->SetAutoScrollEnabled(enableAutoScroll, false, autoScrollDirection);
+      }
     }
   }
 
