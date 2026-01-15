@@ -110,7 +110,8 @@ protected:
   /**
    * @brief This structure is to connect TextAnchor with Accessible functions.
    */
-  class TextAnchorAccessible : public DevelControl::ControlAccessible
+  class TextAnchorAccessible : public DevelControl::ControlAccessible,
+                               public Dali::Accessibility::Hyperlink
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -147,9 +148,9 @@ protected:
 
   protected:
     /**
-     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
      */
-    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+    void InitDefaultFeatures() override;
   };
 };
 

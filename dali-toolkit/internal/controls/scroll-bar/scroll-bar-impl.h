@@ -319,7 +319,8 @@ private:
   bool mIndicatorFirstShow : 1; ///< True if the indicator has never been shown
 
 protected:
-  class ScrollBarAccessible : public DevelControl::ControlAccessible
+  class ScrollBarAccessible : public DevelControl::ControlAccessible,
+                              public Dali::Accessibility::Value
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -356,9 +357,9 @@ protected:
 
   protected:
     /**
-     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
      */
-    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+    void InitDefaultFeatures() override;
   };
 };
 

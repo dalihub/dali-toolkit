@@ -467,11 +467,10 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   return result;
 }
 
-Dali::Accessibility::AtspiInterfaces ControlAccessible::DoGetInterfaces() const
+void ControlAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces         = Dali::Accessibility::ActorAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::ACTION] = true;
-  return interfaces;
+  Dali::Accessibility::ActorAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Action>(this);
 }
 
 bool ControlAccessible::IsHidden() const
