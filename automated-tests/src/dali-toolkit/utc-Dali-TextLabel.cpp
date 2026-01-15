@@ -4289,6 +4289,61 @@ int utcDaliTextLabelSetMaskEffect(void)
   END_TEST;
 }
 
+int utcDaliTextLabelRequestUpdateManually(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelRequestUpdateManually");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text label.
+  TestGenerateTap(application, 5.0f, 25.0f, 100);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+  // reset
+  gAnchorClickedCallBackCalled = false;
+  anchorClickedSignal          = false;
+
+  // Markup information must not be deleted.
+  DevelTextLabel::RequestUpdateManually(label);
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text label.
+  TestGenerateTap(application, 5.0f, 25.0f, 100);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+  END_TEST;
+}
+
 int utcDaliTextLabelNaturalSize(void)
 {
   ToolkitTestApplication application;

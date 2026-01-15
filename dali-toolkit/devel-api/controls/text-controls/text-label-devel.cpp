@@ -150,6 +150,11 @@ void RemoveMaskEffect(TextLabel textLabel)
   GetImpl(textLabel).RemoveMaskEffect();
 }
 
+void RequestUpdateManually(TextLabel textLabel)
+{
+  GetImpl(textLabel).RequestUpdateManually();
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit
