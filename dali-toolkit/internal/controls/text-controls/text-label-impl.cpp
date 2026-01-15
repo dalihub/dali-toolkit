@@ -315,20 +315,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::TextLabel::Property::TEXT:
       {
-        impl.mController->SetText(value.Get<std::string>());
-        impl.mTextUpdateNeeded = true;
-
-        if(impl.mController->HasAnchors())
-        {
-          impl.mIsHasAnchors = true;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
-        }
-        else
-        {
-          impl.mIsHasAnchors = false;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
-        }
-
+        impl.UpdateText(value.Get<std::string>());
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
@@ -1800,6 +1787,23 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   return parameters;
 }
 
+void TextLabel::UpdateText(const std::string& text)
+{
+  mController->SetText(text);
+  mTextUpdateNeeded = true;
+
+  if(mController->HasAnchors())
+  {
+    mIsHasAnchors = true;
+    Dali::DevelActor::InterceptTouchedSignal(Self()).Connect(this, &TextLabel::OnInterceptTouched);
+  }
+  else
+  {
+    mIsHasAnchors = false;
+    Dali::DevelActor::InterceptTouchedSignal(Self()).Disconnect(this, &TextLabel::OnInterceptTouched);
+  }
+}
+
 void TextLabel::UpdateAutoScrollState()
 {
   if(mController->IsAutoScrollEnabled())
@@ -2537,6 +2541,18 @@ void TextLabel::RemoveMaskEffect()
     self.Remove(control);
   }
   selfControl.ClearRenderEffect();
+}
+
+void TextLabel::RequestUpdateManually()
+{
+  std::string text;
+  mController->GetRawText(text);
+  UpdateText(text);
+  if(mTextUpdateNeeded)
+  {
+    RequestTextRelayout();
+    mIsAsyncRenderNeeded = true;
+  }
 }
 
 std::pair<std::string, bool> TextLabel::TextLabelAccessible::GetNameRaw() const

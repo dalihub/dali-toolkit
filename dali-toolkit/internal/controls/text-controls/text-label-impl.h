@@ -329,6 +329,11 @@ public:
    */
   void RemoveMaskEffect();
 
+  /**
+   * @brief Request an update manually.
+   */
+  void RequestUpdateManually();
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -449,6 +454,12 @@ private:
    * @return The parameters for async text render.
    */
   Text::AsyncTextParameters GetAsyncTextParameters(const Text::Async::RequestType requestType, const Vector2& contentSize, const Extents& padding, const Dali::LayoutDirection::Type layoutDirection);
+
+  /**
+   * @brief Update text.
+   * @param[in] text The text.
+   */
+  void UpdateText(const std::string& text);
 
   /**
    * @brief Set up Autoscrolling

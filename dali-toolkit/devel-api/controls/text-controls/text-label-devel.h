@@ -552,6 +552,13 @@ DALI_TOOLKIT_API void SetMaskEffect(TextLabel textLabel, Toolkit::Control contro
 DALI_TOOLKIT_API void RemoveMaskEffect(TextLabel textLabel);
 
 /**
+ * @brief Request an update manually.
+ *
+ * @param[in] textLabel The instance of TextLabel.
+ */
+DALI_TOOLKIT_API void RequestUpdateManually(TextLabel textLabel);
+
+/**
  * @brief Anchor clicked signal type.
  *
  * @note Signal
