@@ -1334,7 +1334,7 @@ int UtcDaliAccessibilityAction(void)
 
   auto control = Control::New();
   auto a       = Dali::Accessibility::Accessible::Get(control);
-  auto b       = Dali::Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(a);
+  auto b       = a->GetFeature<Accessibility::Action>();
 
   std::vector<std::string> actions{"activate", "escape", "increment", "decrement", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide"};
   auto                     count = b->GetActionCount();
@@ -1412,7 +1412,7 @@ int UtcDaliAccessibilityDoAction(void)
 
   auto                     control = Control::New();
   auto                     a       = Dali::Accessibility::Accessible::Get(control);
-  auto                     b       = Dali::Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(a);
+  auto                     b       = a->GetFeature<Accessibility::Action>();
   std::vector<std::string> actions{"activate", "escape", "increment", "decrement", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed"};
 
   // Negative test of calling action with not defined name
@@ -1499,7 +1499,7 @@ int UtcDaliAccessibilityActivateFallbackToLegacy(void)
 
   auto control = Control::New();
   auto a       = Dali::Accessibility::Accessible::Get(control);
-  auto b       = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::ACTION>(a);
+  auto b       = a->GetFeature<Accessibility::Action>();
 
   DevelControl::AccessibilityActivateSignal(control).Connect([]()
   {
@@ -2366,7 +2366,7 @@ int UtcDaliAccessibleGetMatches(void)
 
   auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
   DALI_TEST_CHECK(appAccessible);
-  auto collection = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COLLECTION>(appAccessible);
+  auto collection = appAccessible->GetFeature<Accessibility::Collection>();
   DALI_TEST_CHECK(collection);
 
   auto         rule          = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});
@@ -2392,7 +2392,7 @@ int UtcDaliAccessibleGetMatchesInMatches(void)
 
   auto appAccessible = Accessibility::Bridge::GetCurrentBridge()->GetApplication();
   DALI_TEST_CHECK(appAccessible);
-  auto collection = Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::COLLECTION>(appAccessible);
+  auto collection = appAccessible->GetFeature<Accessibility::Collection>();
   DALI_TEST_CHECK(collection);
 
   auto rule1   = GetMatchRule({Accessibility::State::SENSITIVE, Accessibility::State::SHOWING}, {});

@@ -681,11 +681,10 @@ void ProgressBar::OnSceneConnection(int depth)
   }
 }
 
-Dali::Accessibility::AtspiInterfaces ProgressBar::ProgressBarAccessible::DoGetInterfaces() const
+void ProgressBar::ProgressBarAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces        = DevelControl::ControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::VALUE] = true;
-  return interfaces;
+  DevelControl::ControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Value>(this);
 }
 
 double ProgressBar::ProgressBarAccessible::GetMinimum() const
