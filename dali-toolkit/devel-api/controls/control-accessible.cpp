@@ -455,7 +455,7 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
 void ControlAccessible::InitDefaultFeatures()
 {
   Dali::Accessibility::ActorAccessible::InitDefaultFeatures();
-  AddFeature<Dali::Accessibility::Action>(this);
+  AddFeature<Dali::Accessibility::Action>(shared_from_this());
 }
 
 bool ControlAccessible::IsHidden() const
