@@ -771,6 +771,13 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.RequestTextRelayout();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::ENABLE_CURSOR_INSET:
+    {
+      const bool enable = value.Get<bool>();
+      impl.mController->SetCursorInsetEnabled(enable);
+      impl.mController->GetLayoutEngine().SetCursorInsetEnabled(enable);
+      break;
+    }
   }
 }
 
@@ -1216,6 +1223,11 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       impl.mController->GetVariationsMap(variationsMap);
 
       value = variationsMap;
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::ENABLE_CURSOR_INSET:
+    {
+      value = impl.mController->IsCursorInsetEnabled();
       break;
     }
   } //switch

@@ -345,6 +345,12 @@ enum Type
    * @note This property can be used only when using variable fonts.
    */
   FONT_VARIATIONS,
+
+  /**
+   * @brief Enables applying a leading text inset based on the cursor width.
+   * @details Name "enableCursorInset", type Property::BOOLEAN.
+   */
+  ENABLE_CURSOR_INSET,
 };
 
 } // namespace Property

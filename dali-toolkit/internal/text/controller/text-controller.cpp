@@ -327,6 +327,16 @@ void Controller::SetRemoveBackInset(bool remove)
   mImpl->mModel->mRemoveBackInset = remove;
 }
 
+bool Controller::IsCursorInsetEnabled() const
+{
+  return mImpl->mIsCursorInsetEnabled;
+}
+
+void Controller::SetCursorInsetEnabled(bool enable)
+{
+  mImpl->mIsCursorInsetEnabled = enable;
+}
+
 bool Controller::IsTextCutout() const
 {
   return mImpl->mTextCutout;

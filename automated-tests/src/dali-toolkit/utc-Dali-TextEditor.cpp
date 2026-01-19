@@ -117,9 +117,10 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP        = "enableGrabHan
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS           = "inputMethodSettings";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
-const char* const PROPERTY_NAME_REMOVE_FRONT_INSET = "removeFrontInset";
-const char* const PROPERTY_NAME_REMOVE_BACK_INSET  = "removeBackInset";
-const char* const PROPERTY_NAME_FONT_VARIATIONS    = "fontVariations";
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET  = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET   = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS     = "fontVariations";
+const char* const PROPERTY_NAME_ENABLE_CURSOR_INSET = "enableCursorInset";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -641,6 +642,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextEditor::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextEditor::Property::REMOVE_BACK_INSET);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextEditor::Property::FONT_VARIATIONS);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_ENABLE_CURSOR_INSET) == DevelTextEditor::Property::ENABLE_CURSOR_INSET);
 
   END_TEST;
 }
@@ -779,6 +781,11 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<float>(TextEditor::Property::CURSOR_BLINK_DURATION), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   editor.SetProperty(TextEditor::Property::CURSOR_WIDTH, 1);
   DALI_TEST_EQUALS(editor.GetProperty<int>(TextEditor::Property::CURSOR_WIDTH), 1, TEST_LOCATION);
+
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_CURSOR_INSET, false);
+  DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_CURSOR_INSET), false, TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_CURSOR_INSET, true);
+  DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_CURSOR_INSET), true, TEST_LOCATION);
 
   // Check handle images
   editor.SetProperty(TextEditor::Property::GRAB_HANDLE_IMAGE, "image1");
