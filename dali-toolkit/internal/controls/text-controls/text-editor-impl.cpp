@@ -164,7 +164,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalAlignme
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "selectionPopupStyle",                  MAP,       SELECTION_POPUP_STYLE               )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeFrontInset",                     BOOLEAN,   REMOVE_FRONT_INSET                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeBackInset",                      BOOLEAN,   REMOVE_BACK_INSET                   )
-DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontVariations",                       MAP,       FONT_VARIATIONS                )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontVariations",                       MAP,       FONT_VARIATIONS                     )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableCursorInset",                    BOOLEAN,   ENABLE_CURSOR_INSET                 )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )

@@ -2017,6 +2017,18 @@ public: // Queries & retrieves.
   void SetRemoveBackInset(bool remove);
 
   /**
+   * @brief Retrieves cursorInsetEnabled value.
+   * @return Wether the cursor inset is enabled.
+   */
+  bool IsCursorInsetEnabled() const;
+
+  /**
+   * @brief Sets cursorInsetEnabled value.
+   * @param[in] enable Wether the cursor inset is enabled.
+   */
+  void SetCursorInsetEnabled(bool enable);
+
+  /**
    * @brief Retrieves cutout value to model
    * @return The value of cutout for the text
    */
