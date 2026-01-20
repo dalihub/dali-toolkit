@@ -115,9 +115,10 @@ const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE          = "enableFontSiz
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR               = "grabHandleColor";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
-const char* const PROPERTY_NAME_REMOVE_FRONT_INSET = "removeFrontInset";
-const char* const PROPERTY_NAME_REMOVE_BACK_INSET  = "removeBackInset";
-const char* const PROPERTY_NAME_FONT_VARIATIONS    = "fontVariations";
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET  = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET   = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS     = "fontVariations";
+const char* const PROPERTY_NAME_ENABLE_CURSOR_INSET = "enableCursorInset";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -650,6 +651,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_FRONT_INSET) == DevelTextField::Property::REMOVE_FRONT_INSET);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextField::Property::REMOVE_BACK_INSET);
   DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextField::Property::FONT_VARIATIONS);
+  DALI_TEST_CHECK(field.GetPropertyIndex(PROPERTY_NAME_ENABLE_CURSOR_INSET) == DevelTextField::Property::ENABLE_CURSOR_INSET);
 
   END_TEST;
 }
@@ -802,6 +804,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS(field.GetProperty<float>(TextField::Property::CURSOR_BLINK_DURATION), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   field.SetProperty(TextField::Property::CURSOR_WIDTH, 1);
   DALI_TEST_EQUALS(field.GetProperty<int>(TextField::Property::CURSOR_WIDTH), 1, TEST_LOCATION);
+
+  field.SetProperty(DevelTextField::Property::ENABLE_CURSOR_INSET, false);
+  DALI_TEST_EQUALS(field.GetProperty<bool>(DevelTextField::Property::ENABLE_CURSOR_INSET), false, TEST_LOCATION);
+  field.SetProperty(DevelTextField::Property::ENABLE_CURSOR_INSET, true);
+  DALI_TEST_EQUALS(field.GetProperty<bool>(DevelTextField::Property::ENABLE_CURSOR_INSET), true, TEST_LOCATION);
 
   // Check scroll properties.
   field.SetProperty(TextField::Property::SCROLL_THRESHOLD, 1.f);

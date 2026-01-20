@@ -99,6 +99,13 @@ public:
   int GetCursorWidth() const;
 
   /**
+   * @brief Enables applying a leading text inset based on the cursor width.
+   *
+   * @param[in] enable Whether the cursor inset is enabled.
+   */
+  void SetCursorInsetEnabled(bool enable);
+
+  /**
    * @brief Store the visual position of glyphs in the VisualModel.
    *
    * Builds the bidirectional info and reorders RTL lines.
