@@ -729,6 +729,13 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       impl.RequestTextRelayout();
       break;
     }
+    case Toolkit::DevelTextField::Property::ENABLE_CURSOR_INSET:
+    {
+      const bool enable = value.Get<bool>();
+      impl.mController->SetCursorInsetEnabled(enable);
+      impl.mController->GetLayoutEngine().SetCursorInsetEnabled(enable);
+      break;
+    }
   }
 }
 
@@ -1132,6 +1139,11 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
       impl.mController->GetVariationsMap(variationsMap);
 
       value = variationsMap;
+      break;
+    }
+    case Toolkit::DevelTextField::Property::ENABLE_CURSOR_INSET:
+    {
+      value = impl.mController->IsCursorInsetEnabled();
       break;
     }
 

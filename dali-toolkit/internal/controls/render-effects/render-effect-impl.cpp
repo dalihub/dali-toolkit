@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
@@ -263,42 +264,21 @@ void RenderEffectImpl::Refresh()
 
 bool RenderEffectImpl::IsActivateValid() const
 {
-  // Activate is valid if
-  // - Owner control is on scene
-  // - All actors of owner control are visible
-  // - The SceneHolder is exist, and it is visible
-  // TODO : Currently we don't check SceneHolder's visibility.
-
   bool ret = false;
 
   Vector2 size = GetTargetSize();
   if(size.x > Math::MACHINE_EPSILON_1000 && size.y > Math::MACHINE_EPSILON_1000)
   {
     Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
-    if(ownerControl && ownerControl.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+    if(ownerControl && DevelActor::IsEffectivelyVisible(ownerControl))
     {
-      Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
-      if(sceneHolder)
-      {
-        ret = true;
-
-        // Check visibility of owner control's parents.
-        // TODO : We'd better check the control visibility at core side.
-        // TODO : Window visibility will be consider at dali-core actor side in future.
-        Dali::Actor self = ownerControl;
-        while(self)
-        {
-          if(!self.GetProperty<bool>(Dali::Actor::Property::VISIBLE))
-          {
-            ret = false;
-            break;
-          }
-          self = self.GetParent();
-        }
-      }
+      ret = true;
     }
-
-    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][ret:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, ret);
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][size:%fx%f][ret:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y, ret);
+  }
+  else
+  {
+    DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] IsActivateValid? [ID:%d][size:%fx%f][ret:%d]\n", this, -1, size.x, size.y, ret);
   }
 
   return ret;

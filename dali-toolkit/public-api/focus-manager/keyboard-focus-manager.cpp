@@ -142,6 +142,16 @@ const std::string& KeyboardFocusManager::GetLastFocusChangeDeviceName() const
   return internalCtx.deviceName;
 }
 
+void KeyboardFocusManager::SetClearFocusOnWindowFocusLost(bool enabled)
+{
+  GetImpl(*this).SetClearFocusOnWindowFocusLost(enabled);
+}
+
+bool KeyboardFocusManager::GetClearFocusOnWindowFocusLost() const
+{
+  return GetImpl(*this).GetClearFocusOnWindowFocusLost();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

@@ -177,7 +177,8 @@ struct Engine::Impl
     mDefaultLineSpacing{LINE_SPACING},
     mDefaultLineSize{MIN_LINE_SIZE},
     mRelativeLineSize{GetDefaultRelativeLineSize()},
-    mPixelSize{DEFAULT_FONT_PIXEL_SIZE}
+    mPixelSize{DEFAULT_FONT_PIXEL_SIZE},
+    mIsCursorInsetEnabled{true}
   {
   }
 
@@ -439,7 +440,7 @@ struct Engine::Impl
                      mMetrics,
                      calculatedAdvance);
 
-    float penX = -glyphMetrics.xBearing + mCursorWidth + outlineWidth;
+    float penX = -glyphMetrics.xBearing + GetCursorInsetWidth() + outlineWidth;
 
     // Traverses the characters of the right to left paragraph.
     // Continue in the second half of line, because in it the first index of character that is not WhiteSpace.
@@ -820,7 +821,7 @@ struct Engine::Impl
     // i.e. if the bearing of the first glyph is negative it may exceed the boundaries of the text area.
     // It needs to add as well space for the cursor if the text is in edit mode and extra space in case the text is outlined.
 
-    tmpLineLayout.penX = mCursorWidth + outlineWidth;
+    tmpLineLayout.penX = GetCursorInsetWidth() + outlineWidth;
     if(parameters.textModel->mRemoveFrontInset)
     {
       tmpLineLayout.penX -= glyphMetrics.xBearing;
@@ -1191,7 +1192,7 @@ struct Engine::Impl
     // If it has a negative x bearing, it will exceed the boundaries of the actor,
     // so the penX position needs to be moved to the right.
     const GlyphInfo& glyph = *(glyphsBuffer + startIndexForGlyph);
-    float            penX  = mCursorWidth + outlineWidth; //
+    float            penX  = GetCursorInsetWidth() + outlineWidth;
 
     if(layoutParameters.textModel->mRemoveFrontInset)
     {
@@ -2318,6 +2319,11 @@ struct Engine::Impl
     }
   }
 
+  float GetCursorInsetWidth()
+  {
+    return mIsCursorInsetEnabled ? mCursorWidth : 0.0f;
+  }
+
   void Initialize(LineRun& line)
   {
     line.glyphRun.glyphIndex                              = 0u;
@@ -2347,6 +2353,7 @@ struct Engine::Impl
   IntrusivePtr<Metrics> mMetrics;
   float                 mRelativeLineSize;
   float                 mPixelSize;
+  bool                  mIsCursorInsetEnabled : 1;
 };
 
 Engine::Engine()
@@ -2384,6 +2391,11 @@ void Engine::SetCursorWidth(int width)
 int Engine::GetCursorWidth() const
 {
   return static_cast<int>(mImpl->mCursorWidth);
+}
+
+void Engine::SetCursorInsetEnabled(bool enable)
+{
+  mImpl->mIsCursorInsetEnabled = enable;
 }
 
 bool Engine::LayoutText(Parameters&                       layoutParameters,

@@ -1417,11 +1417,10 @@ Property::Value Slider::GetProperty(BaseObject* object, Property::Index property
   return value;
 }
 
-Dali::Accessibility::AtspiInterfaces Slider::SliderAccessible::DoGetInterfaces() const
+void Slider::SliderAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces        = DevelControl::ControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::VALUE] = true;
-  return interfaces;
+  DevelControl::ControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Value>(shared_from_this());
 }
 
 double Slider::SliderAccessible::GetMinimum() const

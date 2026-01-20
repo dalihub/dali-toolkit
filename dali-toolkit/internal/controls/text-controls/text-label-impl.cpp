@@ -315,20 +315,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::TextLabel::Property::TEXT:
       {
-        impl.mController->SetText(value.Get<std::string>());
-        impl.mTextUpdateNeeded = true;
-
-        if(impl.mController->HasAnchors())
-        {
-          impl.mIsHasAnchors = true;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
-        }
-        else
-        {
-          impl.mIsHasAnchors = false;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
-        }
-
+        impl.UpdateText(value.Get<std::string>());
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
@@ -1588,29 +1575,33 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if(mController->IsTextElideEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
   {
-    bool enableAutoScroll = false;
-    if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
+    bool visible = DevelActor::IsEffectivelyVisible(self);
+    if(visible)
     {
-      if(mController->IsMultiLineEnabled())
+      bool enableAutoScroll = false;
+      if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
       {
-        DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
-        enableAutoScroll = false;
+        if(mController->IsMultiLineEnabled())
+        {
+          DALI_LOG_DEBUG_INFO("Attempted ellipsize auto scroll on a non SINGLE_LINE_BOX, request ignored\n");
+          enableAutoScroll = false;
+        }
+        else
+        {
+          const Size naturalSize = mController->GetNaturalSize(false).GetVectorXY();
+          enableAutoScroll       = contentSize.width < naturalSize.width ? true : false;
+        }
       }
       else
       {
-        const Size naturalSize = mController->GetNaturalSize(false).GetVectorXY();
-        enableAutoScroll       = contentSize.width < naturalSize.width ? true : false;
+        const float textHeight = mController->GetHeightForWidth(contentSize.width);
+        enableAutoScroll       = contentSize.height < textHeight ? true : false;
       }
-    }
-    else
-    {
-      const float textHeight = mController->GetHeightForWidth(contentSize.width);
-      enableAutoScroll       = contentSize.height < textHeight ? true : false;
-    }
 
-    if(enableAutoScroll != mController->IsAutoScrollEnabled())
-    {
-      mController->SetAutoScrollEnabled(enableAutoScroll, false, autoScrollDirection);
+      if(enableAutoScroll != mController->IsAutoScrollEnabled())
+      {
+        mController->SetAutoScrollEnabled(enableAutoScroll, false, autoScrollDirection);
+      }
     }
   }
 
@@ -1794,6 +1785,23 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.embossShadowColor = mController->GetEmbossShadowColor();
 
   return parameters;
+}
+
+void TextLabel::UpdateText(const std::string& text)
+{
+  mController->SetText(text);
+  mTextUpdateNeeded = true;
+
+  if(mController->HasAnchors())
+  {
+    mIsHasAnchors = true;
+    Dali::DevelActor::InterceptTouchedSignal(Self()).Connect(this, &TextLabel::OnInterceptTouched);
+  }
+  else
+  {
+    mIsHasAnchors = false;
+    Dali::DevelActor::InterceptTouchedSignal(Self()).Disconnect(this, &TextLabel::OnInterceptTouched);
+  }
 }
 
 void TextLabel::UpdateAutoScrollState()
@@ -2533,6 +2541,18 @@ void TextLabel::RemoveMaskEffect()
     self.Remove(control);
   }
   selfControl.ClearRenderEffect();
+}
+
+void TextLabel::RequestUpdateManually()
+{
+  std::string text;
+  mController->GetRawText(text);
+  UpdateText(text);
+  if(mTextUpdateNeeded)
+  {
+    RequestTextRelayout();
+    mIsAsyncRenderNeeded = true;
+  }
 }
 
 std::pair<std::string, bool> TextLabel::TextLabelAccessible::GetNameRaw() const

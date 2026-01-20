@@ -759,7 +759,8 @@ private:
     mSnapToMarks : 1;  ///< Turn on or off snapping to marks
 
 protected:
-  class SliderAccessible : public DevelControl::ControlAccessible
+  class SliderAccessible : public DevelControl::ControlAccessible,
+                           public Dali::Accessibility::Value
   {
   public:
     using DevelControl::ControlAccessible::ControlAccessible;
@@ -796,9 +797,9 @@ protected:
 
   protected:
     /**
-     * @copydoc Dali::Accessibility::Accessible::DoGetInterfaces()
+     * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
      */
-    virtual Dali::Accessibility::AtspiInterfaces DoGetInterfaces() const override;
+    void InitDefaultFeatures() override;
   };
 };
 

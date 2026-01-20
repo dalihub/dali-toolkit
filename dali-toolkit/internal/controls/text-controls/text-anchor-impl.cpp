@@ -167,11 +167,10 @@ TextAnchor::~TextAnchor()
 {
 }
 
-Dali::Accessibility::AtspiInterfaces TextAnchor::TextAnchorAccessible::DoGetInterfaces() const
+void TextAnchor::TextAnchorAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces            = DevelControl::ControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::HYPERLINK] = true;
-  return interfaces;
+  DevelControl::ControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Hyperlink>(shared_from_this());
 }
 
 int32_t TextAnchor::TextAnchorAccessible::GetEndIndex() const

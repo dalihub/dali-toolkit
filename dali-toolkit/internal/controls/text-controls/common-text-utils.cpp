@@ -230,12 +230,11 @@ void CommonTextUtils::RenderText(
   }
 }
 
-Dali::Accessibility::AtspiInterfaces TextControlAccessible::DoGetInterfaces() const
+void TextControlAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces            = DevelControl::ControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::TEXT]      = true;
-  interfaces[Dali::Accessibility::AtspiInterface::HYPERTEXT] = true;
-  return interfaces;
+  DevelControl::ControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Text>(shared_from_this());
+  AddFeature<Dali::Accessibility::Hypertext>(shared_from_this());
 }
 
 std::size_t TextControlAccessible::GetCharacterCount() const
@@ -434,7 +433,7 @@ bool TextControlAccessible::SetRangeOfSelection(std::size_t selectionIndex, std:
   return true;
 }
 
-Accessibility::Hyperlink* TextControlAccessible::GetLink(std::int32_t linkIndex) const
+Accessibility::Accessible* TextControlAccessible::GetLink(std::int32_t linkIndex) const
 {
   if(linkIndex < 0 || linkIndex >= GetLinkCount())
   {
@@ -443,7 +442,7 @@ Accessibility::Hyperlink* TextControlAccessible::GetLink(std::int32_t linkIndex)
 
   auto anchor = GetTextAnchors()[linkIndex];
 
-  return Accessibility::Accessible::DownCast<Accessibility::AtspiInterface::HYPERLINK>(Accessibility::Accessible::Get(anchor));
+  return Accessibility::Accessible::Get(anchor);
 }
 
 std::int32_t TextControlAccessible::GetLinkCount() const
@@ -489,11 +488,10 @@ bool TextControlAccessible::IsHiddenInput() const
   return false;
 }
 
-Dali::Accessibility::AtspiInterfaces EditableTextControlAccessible::DoGetInterfaces() const
+void EditableTextControlAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces                = TextControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::EDITABLE_TEXT] = true;
-  return interfaces;
+  TextControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::EditableText>(shared_from_this());
 }
 
 Accessibility::States EditableTextControlAccessible::CalculateStates()

@@ -320,24 +320,9 @@ std::string ControlAccessible::GetLocalizedRoleName() const
 bool ControlAccessible::IsShowing()
 {
   Dali::Actor self = Self();
-  if(!self.GetProperty<bool>(Actor::Property::VISIBLE) || Dali::EqualsZero(self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a) || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED))
+  if(Dali::EqualsZero(self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a) || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED) || !DevelActor::IsEffectivelyVisible(self))
   {
     return false;
-  }
-
-  Dali::Actor parent = self.GetParent();
-  if(!parent)
-  {
-    return true;
-  }
-
-  while(parent)
-  {
-    if(!parent.GetProperty<bool>(Actor::Property::VISIBLE))
-    {
-      return false;
-    }
-    parent = parent.GetParent();
   }
 
   return true;
@@ -467,11 +452,10 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   return result;
 }
 
-Dali::Accessibility::AtspiInterfaces ControlAccessible::DoGetInterfaces() const
+void ControlAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces         = Dali::Accessibility::ActorAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::ACTION] = true;
-  return interfaces;
+  Dali::Accessibility::ActorAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Action>(shared_from_this());
 }
 
 bool ControlAccessible::IsHidden() const

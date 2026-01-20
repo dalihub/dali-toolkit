@@ -878,11 +878,10 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
   return handle;
 }
 
-Dali::Accessibility::AtspiInterfaces ScrollBar::ScrollBarAccessible::DoGetInterfaces() const
+void ScrollBar::ScrollBarAccessible::InitDefaultFeatures()
 {
-  Dali::Accessibility::AtspiInterfaces interfaces        = DevelControl::ControlAccessible::DoGetInterfaces();
-  interfaces[Dali::Accessibility::AtspiInterface::VALUE] = true;
-  return interfaces;
+  DevelControl::ControlAccessible::InitDefaultFeatures();
+  AddFeature<Dali::Accessibility::Value>(shared_from_this());
 }
 
 double ScrollBar::ScrollBarAccessible::GetMinimum() const
