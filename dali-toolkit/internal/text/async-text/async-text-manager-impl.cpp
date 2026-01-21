@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 
+#include <mutex>
+
 // INTERNAL INCLUDES
 
 namespace Dali
@@ -46,6 +48,11 @@ namespace Text
 {
 namespace Internal
 {
+namespace
+{
+std::mutex                                       gStaticAsyncTextManagerMutex; ///< Mutex for AsyncTextManager
+Dali::Toolkit::Text::Internal::AsyncTextManager* gAsyncTextManager = nullptr;  ///< Must be used under gStaticAsyncTextManagerMutex
+} // namespace
 AsyncTextManager::AsyncTextManager()
 : mLocale(),
   mTaskId(0u),
@@ -76,10 +83,20 @@ AsyncTextManager::AsyncTextManager()
     TextAbstraction::FontClient::Get().CustomFontAddedSignal().Connect(this, &AsyncTextManager::OnCustomFontAdded);
     Dali::Adaptor::Get().LocaleChangedSignal().Connect(this, &AsyncTextManager::OnLocaleChanged);
   }
+
+  std::unique_lock<std::mutex> lock(gStaticAsyncTextManagerMutex);
+  gAsyncTextManager = this;
 }
 
 AsyncTextManager::~AsyncTextManager()
 {
+  {
+    std::unique_lock<std::mutex> lock(gStaticAsyncTextManagerMutex);
+    if(gAsyncTextManager == this)
+    {
+      gAsyncTextManager = nullptr;
+    }
+  }
   {
     Mutex::ScopedLock lock(mTasksMutex);
     {
@@ -224,7 +241,7 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
   // Each task must have its own unique id.
   mTaskId++;
 
-  auto task = new Dali::Toolkit::Internal::TextLoadingTask(mTaskId, parameters, Dali::AsyncTaskManager::Get(), MakeCallback(this, &AsyncTextManager::LoadComplete));
+  auto task = new Dali::Toolkit::Internal::TextLoadingTask(mTaskId, parameters, MakeCallback(this, &AsyncTextManager::LoadComplete));
 
   LoadElement element(task, observer, parameters);
 
@@ -250,7 +267,7 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
       mRunningTasks[mTaskId] = element;
 
       // Loader move available list -> running list.
-      task->SetLoader(loader, this);
+      task->SetLoader(loader);
 
 #ifdef TRACE_ENABLED
       if(gTraceFilter && gTraceFilter->IsTraceEnabled())
@@ -404,6 +421,20 @@ void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
 }
 
 /// Worker thread called
+void AsyncTextManager::ReleaseLoaderToManager(Toolkit::Internal::TextLoadingTaskPtr task, Text::AsyncTextLoader loader)
+{
+  std::unique_lock<std::mutex> lock(gStaticAsyncTextManagerMutex);
+  if(gAsyncTextManager)
+  {
+    gAsyncTextManager->ReleaseLoader(task, loader);
+  }
+  else
+  {
+    DALI_LOG_DEBUG_INFO("Skip ReleaseLoader\n");
+  }
+}
+
+/// Worker thread called
 void AsyncTextManager::ReleaseLoader(Toolkit::Internal::TextLoadingTaskPtr task, Text::AsyncTextLoader loader)
 {
 #ifdef TRACE_ENABLED
@@ -472,7 +503,7 @@ void AsyncTextManager::SetLoaderToWaitingTask()
         mRunningTasks[watingTaskId] = element;
 
         // Set loader and ready to process.
-        element.mTask->SetLoader(loader, this);
+        element.mTask->SetLoader(loader);
 
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())

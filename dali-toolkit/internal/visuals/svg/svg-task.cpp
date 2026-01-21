@@ -78,11 +78,10 @@ VectorImageRenderer SvgTask::GetRenderer()
   return mVectorRenderer;
 }
 
-SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback)
+SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
 : SvgTask(vectorRenderer, id, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mImageUrl(url),
   mEncodedImageBuffer(encodedImageBuffer),
-  mAsyncTaskManager(asyncTaskManager),
   mNotifyRequiredTasks(),
   mDpi(dpi)
 {

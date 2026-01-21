@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1206,7 +1206,10 @@ void AsyncTask::NotifyToReady()
   if(!grabed)
   {
     tet_printf("NotifyToReady[%s]\n", GetTaskName().data());
-    Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));
+    if(Dali::Internal::Adaptor::gAsyncTaskManager)
+    {
+      Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));
+    }
   }
 }
 
