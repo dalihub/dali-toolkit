@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,7 +194,6 @@ void SvgLoadingTask::NotifyTasksReady()
       rasterizingTask->NotifyToReady();
     }
   }
-  mAsyncTaskManager.Reset();
 }
 
 SvgRasterizingTask::SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback)
