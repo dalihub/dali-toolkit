@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,6 @@ void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader, TextLoadingTask::
   {
     mIsReady = true;
     NotifyToReady();
-    mAsyncTaskManager.Reset();
   }
 }
 
@@ -151,12 +150,12 @@ void TextLoadingTask::Load()
             }
             if(mParameters.textWidth < naturalSize.width)
             {
-    #ifdef TRACE_ENABLED
+#ifdef TRACE_ENABLED
               if(gTraceFilter && gTraceFilter->IsTraceEnabled())
               {
                 DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
               }
-    #endif
+#endif
               mParameters.isAutoScrollEnabled = true;
               mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
             }
@@ -181,8 +180,8 @@ void TextLoadingTask::Load()
         }
       }
       else if(mParameters.isAutoScrollEnabled &&
-             ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
-             (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
+              ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
+               (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
       {
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())
@@ -254,7 +253,6 @@ void TextLoadingTask::ReleaseLoader()
       auto loader = std::move(mLoader);
       mAsyncTextManager->ReleaseLoader(this, loader);
     }
-    mAsyncTextManager.Reset();
   }
 }
 
