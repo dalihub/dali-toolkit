@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, SVG)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, ANIMATED_IMAGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, WIREFRAME)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ANIMATED_GRADIENT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ANIMATED_VECTOR_IMAGE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ARC)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_TYPE)
@@ -171,19 +170,6 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_EMBOSS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_OVERLAY_AND_EMBOSS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE_AND_OVERLAY_AND_EMBOSS)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REFLECT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REPEAT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_CLAMP)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REFLECT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REPEAT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_REPEAT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_LINEAR_USER_CLAMP)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REFLECT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REPEAT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_CLAMP)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_REFLECT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_REPEAT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ANIMATED_GRADIENT_SHADER_RADIAL_USER_CLAMP)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, WIREFRAME_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ARC_BUTT_CAP_SHADER)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, ARC_ROUND_CAP_SHADER)
@@ -299,40 +285,6 @@ const char* const STRIKETHROUGH_PROPERTY("strikethrough");
 const char* const BORDER_ONLY("borderOnly");
 const char* const BORDER("border");
 
-// non-animated property
-const char* const GRADIENT_TYPE_NAME("gradientType");
-const char* const UNIT_TYPE_NAME("unitType");
-const char* const SPREAD_TYPE_NAME("spreadType");
-
-// animated property
-const char* const START_POSITION_NAME("startPosition");
-const char* const START_COLOR_NAME("startColor");
-const char* const END_POSITION_NAME("endPosition");
-const char* const END_COLOR_NAME("endColor");
-const char* const ROTATE_CENTER_NAME("rotateCenter");
-const char* const ROTATE_AMOUNT_NAME("rotateAmount");
-const char* const OFFSET_NAME("offset");
-
-// animation parameter property
-const char* const START_VALUE_NAME("startValue");
-const char* const TARGET_VALUE_NAME("targetValue");
-const char* const DIRECTION_TYPE_NAME("directionType");
-const char* const DURATION_NAME("duration");
-const char* const DELAY_NAME("delay");
-const char* const REPEAT_NAME("repeat");
-const char* const REPEAT_DELAY_NAME("repeatDelay");
-const char* const MOTION_TYPE_NAME("motionType");
-const char* const EASING_TYPE_NAME("easingType");
-
-// common shader property
-const char* const UNIFORM_START_POINT_NAME("start_point");
-const char* const UNIFORM_START_COLOR_NAME("start_color");
-const char* const UNIFORM_END_POINT_NAME("end_point");
-const char* const UNIFORM_END_COLOR_NAME("end_color");
-const char* const UNIFORM_ROTATE_CENTER_NAME("rotate_center");
-const char* const UNIFORM_ROTATE_ANGLE_NAME("rotate_angle");
-const char* const UNIFORM_OFFSET_NAME("gradient_offset");
-
 // Border visual
 const char* const COLOR_NAME("borderColor");
 const char* const SIZE_NAME("borderSize");
@@ -346,6 +298,8 @@ const char* const RADIUS_NAME("radius"); // Property::FLOAT
 const char* const CONIC_START_ANGLE_NAME("conicStartAngle"); // Property::FLOAT
 
 // properties: linear&radial gradient
+const char* const START_POSITION_NAME("startPosition");
+const char* const END_POSITION_NAME("endPosition");
 const char* const STOP_OFFSET_NAME("stopOffset");     // Property::Array FLOAT
 const char* const STOP_COLOR_NAME("stopColor");       // Property::Array VECTOR4
 const char* const UNITS_NAME("units");                // Property::String  "userSpaceOnUse | objectBoundingBox"

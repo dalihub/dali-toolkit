@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,40 +145,6 @@ extern const char* const BORDER;
 extern const char* const AUXILIARY_IMAGE_NAME;
 extern const char* const AUXILIARY_IMAGE_ALPHA_NAME;
 
-// non-animated property
-extern const char* const GRADIENT_TYPE_NAME;
-extern const char* const UNIT_TYPE_NAME;
-extern const char* const SPREAD_TYPE_NAME;
-
-// animated property
-extern const char* const START_POSITION_NAME;
-extern const char* const START_COLOR_NAME;
-extern const char* const END_POSITION_NAME;
-extern const char* const END_COLOR_NAME;
-extern const char* const ROTATE_CENTER_NAME;
-extern const char* const ROTATE_AMOUNT_NAME;
-extern const char* const OFFSET_NAME;
-
-// animation parameter property
-extern const char* const START_VALUE_NAME;
-extern const char* const TARGET_VALUE_NAME;
-extern const char* const DIRECTION_TYPE_NAME;
-extern const char* const DURATION_NAME;
-extern const char* const DELAY_NAME;
-extern const char* const REPEAT_NAME;
-extern const char* const REPEAT_DELAY_NAME;
-extern const char* const MOTION_TYPE_NAME;
-extern const char* const EASING_TYPE_NAME;
-
-// common shader property
-extern const char* const UNIFORM_START_POINT_NAME;
-extern const char* const UNIFORM_START_COLOR_NAME;
-extern const char* const UNIFORM_END_POINT_NAME;
-extern const char* const UNIFORM_END_COLOR_NAME;
-extern const char* const UNIFORM_ROTATE_CENTER_NAME;
-extern const char* const UNIFORM_ROTATE_ANGLE_NAME;
-extern const char* const UNIFORM_OFFSET_NAME;
-
 // Border visual
 extern const char* const COLOR_NAME;
 extern const char* const SIZE_NAME;
@@ -192,6 +158,8 @@ extern const char* const RADIUS_NAME; // Property::FLOAT
 extern const char* const CONIC_START_ANGLE_NAME; // Property::FLOAT
 
 // properties: linear&radial gradient
+extern const char* const START_POSITION_NAME;
+extern const char* const END_POSITION_NAME;
 extern const char* const STOP_OFFSET_NAME;   // Property::Array FLOAT
 extern const char* const STOP_COLOR_NAME;    // Property::Array VECTOR4
 extern const char* const UNITS_NAME;         // Property::String  "userSpaceOnUse | objectBoundingBox"

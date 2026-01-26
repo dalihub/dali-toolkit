@@ -43,7 +43,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/gradient/conic-gradient.cpp
    ${toolkit_src_dir}/visuals/gradient/linear-gradient.cpp
    ${toolkit_src_dir}/visuals/gradient/radial-gradient.cpp
-   ${toolkit_src_dir}/visuals/animated-gradient/animated-gradient-visual.cpp
    ${toolkit_src_dir}/visuals/image/image-visual.cpp
    ${toolkit_src_dir}/visuals/image/image-visual-shader-debug.cpp
    ${toolkit_src_dir}/visuals/image/image-visual-shader-factory.cpp
