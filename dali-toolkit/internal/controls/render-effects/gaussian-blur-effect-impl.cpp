@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ GaussianBlurEffectImplPtr GaussianBlurEffectImpl::New(uint32_t blurRadius)
 
 OffScreenRenderable::Type GaussianBlurEffectImpl::GetOffScreenRenderableType()
 {
-  return mSkipBlur ? OffScreenRenderable::NONE : OffScreenRenderable::FORWARD;
+  return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::FORWARD;
 }
 
 void GaussianBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)

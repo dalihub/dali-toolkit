@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New(uint32_t blurRadius)
 
 OffScreenRenderable::Type BackgroundBlurEffectImpl::GetOffScreenRenderableType()
 {
-  return mSkipBlur ? OffScreenRenderable::NONE : OffScreenRenderable::BACKWARD;
+  return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::BACKWARD;
 }
 
 void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
@@ -616,7 +616,7 @@ void BackgroundBlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRende
     }
 
     Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
-    if(control && (GetImplementation(control).GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD) == OffScreenRenderable::Type::FORWARD)
+    if(control && (((GetImplementation(control).GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD)) == OffScreenRenderable::Type::FORWARD))
     {
       sourceActor         = GetImplementation(control).GetOffScreenRenderableSourceActor();
       isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
