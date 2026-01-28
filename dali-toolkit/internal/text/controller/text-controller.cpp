@@ -894,7 +894,7 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
 
   if(mImpl->mEventData && EventData::INACTIVE != mImpl->mEventData->mState)
   {
-    SetInputFontPointSize(fontSize, true);
+    SetInputFontPointSize(mImpl->mFontDefaults->mDefaultPointSize, true);
   }
 }
 
