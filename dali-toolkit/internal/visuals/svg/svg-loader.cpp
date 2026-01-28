@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -612,7 +612,7 @@ void SvgLoader::LoadRequest(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObserver*
     }
   }
 
-  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, Dali::AsyncTaskManager::Get(), MakeCallback(this, &SvgLoader::AsyncLoadComplete));
+  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, MakeCallback(this, &SvgLoader::AsyncLoadComplete));
 
   Dali::AsyncTaskManager::Get().AddTask(loadInfo.mTask);
 }
@@ -633,7 +633,7 @@ void SvgLoader::LoadSynchronously(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObs
   }
 
   // Note, we will not store this task after this API called.
-  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, Dali::AsyncTaskManager(), nullptr);
+  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, nullptr);
   loadingTask->Process();
   if(!loadingTask->HasSucceeded())
   {

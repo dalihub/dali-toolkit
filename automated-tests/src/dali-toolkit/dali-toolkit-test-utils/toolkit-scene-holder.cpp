@@ -77,7 +77,8 @@ private:
 SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
 : mId(0),
   mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)))),
-  mRenderSurface(new TestRenderSurface(positionSize))
+  mRenderSurface(new TestRenderSurface(positionSize)),
+  mFocusChangedGeneratedSignal()
 {
 }
 
@@ -174,6 +175,20 @@ Dali::Integration::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
 Dali::RenderTaskList SceneHolder::GetRenderTaskList()
 {
   return mScene.GetRenderTaskList();
+}
+
+Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType& SceneHolder::FocusChangedGeneratedSignal()
+{
+  return mFocusChangedGeneratedSignal;
+}
+
+void SceneHolder::FocusChanged(bool focusIn)
+{
+  if(!mFocusChangedGeneratedSignal.Empty())
+  {
+    Dali::Integration::SceneHolder handle(this);
+    mFocusChangedGeneratedSignal.Emit(handle, focusIn);
+  }
 }
 
 } // namespace Adaptor
@@ -293,6 +308,11 @@ SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
 SceneHolder::WheelEventGeneratedSignalType& SceneHolder::WheelEventGeneratedSignal()
 {
   return GetImplementation(*this).WheelEventGeneratedSignal();
+}
+
+SceneHolder::FocusChangedGeneratedSignalType& SceneHolder::FocusChangedGeneratedSignal()
+{
+  return GetImplementation(*this).FocusChangedGeneratedSignal();
 }
 
 } // namespace Integration

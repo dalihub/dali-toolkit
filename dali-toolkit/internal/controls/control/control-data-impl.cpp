@@ -33,6 +33,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -102,27 +103,33 @@ constexpr const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 constexpr int INNER_SHADOW_DEPTH_INDEX = DepthIndex::DECORATION - 1;
 constexpr int BORDERLINE_DEPTH_INDEX   = DepthIndex::FOREGROUND_EFFECT - 1;
 
-static constexpr uint32_t BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
-static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 11);
+static constexpr uint32_t INNER_SHADOW_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 10);
+static constexpr uint32_t BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 11);
+
+static constexpr uint32_t BORDERLINE_WIDTH_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 12);
+static constexpr uint32_t BORDERLINE_COLOR_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 13);
+static constexpr uint32_t BORDERLINE_OFFSET_CONSTRAINT_TAG(Dali::Toolkit::ConstraintTagRanges::TOOLKIT_CONSTRAINT_TAG_START + 14);
 
 /**
  * @brief Constraint function for Borderline's CornerRadius
- * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : ExtraSize, [4] : Borderline Width, [5] : Borderline Offset
+ * inputs[0] : View CornerRadius, [1] : View CornerRadiusPolicy, [2] : View size, [3] : Borderline Width, [4] : Borderline Offset
  * @param[out] current InnerShadow's corner radius value.
  * @param[in] inputs Input properties.
  */
 static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInputContainer& inputs)
 {
   // We just assume below state are applied.
+  // - Transform::ORIGIN is CENTER
+  // - Transform::ANCHOR_POINT is CENTER
+  // - Transform::OFFSET_POLICY are ABSOLUTE
   // - Transform::SIZE_POLICY are RELATIVE
   // - Transform::SIZE is Vector2::ONE
+  // - Transform::EXTRA_SIZE is Vector2::ZERO
 
   Vector4 viewCornerRadius = inputs[0]->GetVector4();
 
   const int     viewCornerRadiusPolicy = inputs[1]->GetInteger();
   const Vector3 visualSize             = inputs[2]->GetVector3(); // We use VisualSize as ViewSize.
-
-  Vector2 extraSize = inputs[3]->GetVector2();
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
@@ -130,8 +137,8 @@ static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInp
     viewCornerRadius *= minViewSize;
   }
 
-  const float borderlineWidth  = inputs[4]->GetFloat();
-  const float borderlineOffset = inputs[5]->GetFloat();
+  const float borderlineWidth  = inputs[3]->GetFloat();
+  const float borderlineOffset = inputs[4]->GetFloat();
   const float expendedRadius   = borderlineWidth * (1.0f + borderlineOffset) * 0.5f;
 
   // Corner Radius for Borderline is expand about borderlineWidth.
@@ -144,7 +151,7 @@ static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInp
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minVisualSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
+    const float minVisualSize = std::min(visualSize.x + expendedRadius, visualSize.y + expendedRadius);
     if(DALI_LIKELY(minVisualSize > Math::MACHINE_EPSILON_100))
     {
       current /= minVisualSize;
@@ -166,7 +173,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
   // - Transform::OFFSET_POLICY are ABSOLUTE
   // - Transform::SIZE_POLICY are RELATIVE
   // - Transform::SIZE is Vector2::ONE
-  // - Visual::BORDERLINE_OFFSET is -1.0f
+  // - Visual::BORDERLINE_OFFSET is 1.0f
 
   Vector4 viewCornerRadius = inputs[0]->GetVector4();
 
@@ -485,12 +492,12 @@ const PropertyRegistration Control::Impl::PROPERTY_31(typeRegistration, "offScre
 const PropertyRegistration Control::Impl::PROPERTY_32(typeRegistration, "innerShadow",                    Toolkit::DevelControl::Property::INNER_SHADOW,                     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_33(typeRegistration, "borderline",                     Toolkit::DevelControl::Property::BORDERLINE,                       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::Value(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)), &Control::Impl::SetProperty, &Control::Impl::GetProperty); ///< Make animatable, for constarint-input
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_6(typeRegistration, "viewBorderlineOffset",   Toolkit::DevelControl::Property::BORDERLINE_OFFSET,    Property::FLOAT,   &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::Impl::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::Value(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)), &Control::Impl::SetProperty, nullptr); ///< Make animatable, for constarint-input
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::Impl::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &Control::Impl::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::Value(Color::BLACK), &Control::Impl::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_6(typeRegistration, "viewBorderlineOffset",   Toolkit::DevelControl::Property::BORDERLINE_OFFSET,    Property::FLOAT,   &Control::Impl::SetProperty, nullptr);
 
 // clang-format on
 
@@ -521,8 +528,8 @@ Control::Impl::Impl(Control& controlImpl)
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
-  mDecorationData{nullptr},
   mInnerShadowCornerRadiusConstraint{},
+  mBorderlineConstraintHolder{nullptr},
   mOffScreenRenderingImpl(nullptr),
   mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
@@ -545,11 +552,6 @@ Control::Impl::~Impl()
   if(mVisualData)
   {
     mVisualData->ClearVisuals();
-  }
-
-  if(mDecorationData)
-  {
-    delete mDecorationData;
   }
 
   // All gesture detectors will be destroyed so no need to disconnect.
@@ -1272,24 +1274,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
 
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
       {
-        bool    radiusUpdated = false;
+        float radiusFloat = 0.0f;
+        if(value.Get(radiusFloat))
+        {
+          control.SetProperty(Toolkit::DevelControl::Property::CORNER_RADIUS, Vector4(radiusFloat, radiusFloat, radiusFloat, radiusFloat));
+          break;
+        }
+
         Vector4 radius;
         if(value.Get(radius))
         {
-          radiusUpdated = true;
-        }
-        else
-        {
-          float radiusFloat = 0.0f;
-          if(value.Get(radiusFloat))
-          {
-            radius        = Vector4(radiusFloat, radiusFloat, radiusFloat, radiusFloat);
-            radiusUpdated = true;
-          }
-        }
-        if(radiusUpdated && DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData) != radius)
-        {
-          DecorationData::SetCornerRadius(controlImpl.mImpl->mDecorationData, radius);
           controlImpl.mImpl->UpdateCornerRadius();
         }
         break;
@@ -1300,35 +1294,23 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int policy;
         if(value.Get(policy))
         {
-          if(DecorationData::GetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData) != policy)
-          {
-            DecorationData::SetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData, policy);
-            controlImpl.mImpl->UpdateCornerRadius();
-          }
+          controlImpl.mImpl->UpdateCornerRadius();
         }
         break;
       }
 
       case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
       {
-        bool    squarenessUpdated = false;
+        float squarenessFloat = 0.0f;
+        if(value.Get(squarenessFloat))
+        {
+          control.SetProperty(Toolkit::DevelControl::Property::CORNER_SQUARENESS, Vector4(squarenessFloat, squarenessFloat, squarenessFloat, squarenessFloat));
+          break;
+        }
+
         Vector4 squareness;
         if(value.Get(squareness))
         {
-          squarenessUpdated = true;
-        }
-        else
-        {
-          float squarenessFloat = 0.0f;
-          if(value.Get(squarenessFloat))
-          {
-            squareness        = Vector4(squarenessFloat, squarenessFloat, squarenessFloat, squarenessFloat);
-            squarenessUpdated = true;
-          }
-        }
-        if(squarenessUpdated && DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData) != squareness)
-        {
-          DecorationData::SetCornerSquareness(controlImpl.mImpl->mDecorationData, squareness);
           controlImpl.mImpl->UpdateCornerRadius();
         }
         break;
@@ -1339,11 +1321,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         float width;
         if(value.Get(width))
         {
-          if(DecorationData::GetBorderlineWidth(controlImpl.mImpl->mDecorationData) != width)
-          {
-            DecorationData::SetBorderlineWidth(controlImpl.mImpl->mDecorationData, width);
-            controlImpl.mImpl->UpdateBorderline();
-          }
+          controlImpl.mImpl->UpdateBorderline();
         }
         break;
       }
@@ -1353,11 +1331,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         Vector4 color;
         if(value.Get(color))
         {
-          if(DecorationData::GetBorderlineColor(controlImpl.mImpl->mDecorationData) != color)
-          {
-            DecorationData::SetBorderlineColor(controlImpl.mImpl->mDecorationData, color);
-            controlImpl.mImpl->UpdateBorderline();
-          }
+          controlImpl.mImpl->UpdateBorderline();
         }
         break;
       }
@@ -1367,11 +1341,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         float offset;
         if(value.Get(offset))
         {
-          if(DecorationData::GetBorderlineOffset(controlImpl.mImpl->mDecorationData) != offset)
-          {
-            DecorationData::SetBorderlineOffset(controlImpl.mImpl->mDecorationData, offset);
-            controlImpl.mImpl->UpdateBorderline();
-          }
+          controlImpl.mImpl->UpdateBorderline();
         }
         break;
       }
@@ -1633,38 +1603,14 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       }
 
       case Toolkit::DevelControl::Property::CORNER_RADIUS:
-      {
-        value = DecorationData::GetCornerRadius(controlImpl.mImpl->mDecorationData);
-        break;
-      }
-
       case Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY:
-      {
-        value = DecorationData::GetCornerRadiusPolicy(controlImpl.mImpl->mDecorationData);
-        break;
-      }
-
       case Toolkit::DevelControl::Property::CORNER_SQUARENESS:
-      {
-        value = DecorationData::GetCornerSquareness(controlImpl.mImpl->mDecorationData);
-        break;
-      }
-
       case Toolkit::DevelControl::Property::BORDERLINE_WIDTH:
-      {
-        value = DecorationData::GetBorderlineWidth(controlImpl.mImpl->mDecorationData);
-        break;
-      }
-
       case Toolkit::DevelControl::Property::BORDERLINE_COLOR:
-      {
-        value = DecorationData::GetBorderlineColor(controlImpl.mImpl->mDecorationData);
-        break;
-      }
-
       case Toolkit::DevelControl::Property::BORDERLINE_OFFSET:
       {
-        value = DecorationData::GetBorderlineOffset(controlImpl.mImpl->mDecorationData);
+        // Do not return property for animatable custom properties.
+        // Actual variables of each property will be registered at custom area.
         break;
       }
     }
@@ -1946,6 +1892,12 @@ void Control::Impl::SetInnerShadow(const Property::Map& map)
       }
       EnableCornerPropertiesOverridden(visual, true, mInnerShadowCornerRadiusConstraint);
 
+      // TODO : Fix it if we can detect size animation.
+      if(mControlImpl.Self().GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY) == static_cast<int>(Toolkit::Visual::Transform::Policy::Type::RELATIVE))
+      {
+        mInnerShadowCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+      }
+
       mControlImpl.RelayoutRequest();
     }
   }
@@ -1979,6 +1931,35 @@ void Control::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
       if(previousVisualImplPtr)
       {
         previousVisualImplPtr->DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
+        // Trigger borderline relative constraints once
+        if(mInnerShadowCornerRadiusConstraint)
+        {
+          mInnerShadowCornerRadiusConstraint.SetApplyRate(mInnerShadowCornerRadiusConstraint.GetApplyRate());
+        }
+        if(mBorderlineConstraintHolder)
+        {
+          auto& borderlineCornerRadiusConstraint = mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint;
+          auto& borderlineWidthConstraint        = mBorderlineConstraintHolder->mBorderlineWidthConstraint;
+          auto& borderlineColorConstraint        = mBorderlineConstraintHolder->mBorderlineColorConstraint;
+          auto& borderlineOffsetConstraint       = mBorderlineConstraintHolder->mBorderlineOffsetConstraint;
+
+          if(borderlineCornerRadiusConstraint)
+          {
+            borderlineCornerRadiusConstraint.SetApplyRate(borderlineCornerRadiusConstraint.GetApplyRate());
+          }
+          if(borderlineWidthConstraint)
+          {
+            borderlineWidthConstraint.SetApplyRate(borderlineWidthConstraint.GetApplyRate());
+          }
+          if(borderlineColorConstraint)
+          {
+            borderlineColorConstraint.SetApplyRate(borderlineColorConstraint.GetApplyRate());
+          }
+          if(borderlineOffsetConstraint)
+          {
+            borderlineOffsetConstraint.SetApplyRate(borderlineOffsetConstraint.GetApplyRate());
+          }
+        }
         return;
       }
     }
@@ -1989,32 +1970,87 @@ void Control::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
     {
       mVisualData->RegisterVisual(Toolkit::DevelControl::Property::BORDERLINE, visual, BORDERLINE_DEPTH_INDEX);
 
-      if(mBorderlineCornerRadiusConstraint)
+      if(mBorderlineConstraintHolder)
       {
-        // Reset previously applied constraints.
-        mBorderlineCornerRadiusConstraint.Remove();
-        mBorderlineCornerRadiusConstraint.Reset();
+        mBorderlineConstraintHolder.reset();
       }
 
-      auto visualCornerRadiusProperty = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
-      auto visualBorderlineProperty   = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
-
-      if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object) &&
-         DALI_LIKELY(visualBorderlineProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineProperty.object))
+      // Create constraint only if we set Borderline property as DevelControl::BORDERLINE_XXX.
+      if(!forciblyCreate)
       {
-        Dali::CustomActor handle(mControlImpl.GetOwner());
+        // Trigger borderline relative constraints once
+        if(mInnerShadowCornerRadiusConstraint)
+        {
+          mInnerShadowCornerRadiusConstraint.SetApplyRate(mInnerShadowCornerRadiusConstraint.GetApplyRate());
+        }
 
-        mBorderlineCornerRadiusConstraint = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, BorderlineCornerRadiusConstraint);
-        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS));
-        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS_POLICY));
-        mBorderlineCornerRadiusConstraint.AddSource(Source(handle, Dali::Actor::Property::SIZE));
-        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::VisualRenderer::Property::EXTRA_SIZE));
-        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
-        mBorderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET));
+        auto visualCornerRadiusProperty    = visual.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS);
+        auto visualBorderlineWidthProperty = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_WIDTH);
 
-        Dali::Integration::ConstraintSetInternalTag(mBorderlineCornerRadiusConstraint, BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG);
+        if(DALI_LIKELY(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object) &&
+           DALI_LIKELY(visualBorderlineWidthProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineWidthProperty.object))
+        {
+          mBorderlineConstraintHolder.reset(new BorderlineConstraintHolder());
+          Dali::CustomActor handle(mControlImpl.GetOwner());
+
+          auto& borderlineCornerRadiusConstraint = mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint;
+
+          borderlineCornerRadiusConstraint = Constraint::New<Vector4>(visualCornerRadiusProperty.object, visualCornerRadiusProperty.propertyIndex, BorderlineCornerRadiusConstraint);
+          borderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS));
+          borderlineCornerRadiusConstraint.AddSource(Source(handle, DevelControl::Property::CORNER_RADIUS_POLICY));
+          borderlineCornerRadiusConstraint.AddSource(Source(handle, Dali::Actor::Property::SIZE));
+          borderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH));
+          borderlineCornerRadiusConstraint.AddSource(LocalSource(Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET));
+
+          Dali::Integration::ConstraintSetInternalTag(borderlineCornerRadiusConstraint, BORDERLINE_CORNER_RADIUS_CONSTRAINT_TAG);
+
+          auto visualBorderlineColorProperty  = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_COLOR);
+          auto visualBorderlineOffsetProperty = visual.GetPropertyObject(DevelVisual::Property::BORDERLINE_OFFSET);
+
+          if(DALI_LIKELY(visualBorderlineColorProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineColorProperty.object) &&
+             DALI_LIKELY(visualBorderlineOffsetProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineOffsetProperty.object))
+          {
+            auto& borderlineWidthConstraint  = mBorderlineConstraintHolder->mBorderlineWidthConstraint;
+            auto& borderlineColorConstraint  = mBorderlineConstraintHolder->mBorderlineColorConstraint;
+            auto& borderlineOffsetConstraint = mBorderlineConstraintHolder->mBorderlineOffsetConstraint;
+
+            borderlineWidthConstraint = Constraint::New<float>(visualBorderlineWidthProperty.object, visualBorderlineWidthProperty.propertyIndex, EqualToConstraint());
+            borderlineWidthConstraint.AddSource(Source(handle, DevelControl::Property::BORDERLINE_WIDTH));
+            borderlineColorConstraint = Constraint::New<Vector4>(visualBorderlineColorProperty.object, visualBorderlineColorProperty.propertyIndex, EqualToConstraint());
+            borderlineColorConstraint.AddSource(Source(handle, DevelControl::Property::BORDERLINE_COLOR));
+            borderlineOffsetConstraint = Constraint::New<float>(visualBorderlineOffsetProperty.object, visualBorderlineOffsetProperty.propertyIndex, EqualToConstraint());
+            borderlineOffsetConstraint.AddSource(Source(handle, DevelControl::Property::BORDERLINE_OFFSET));
+
+            Dali::Integration::ConstraintSetInternalTag(borderlineWidthConstraint, BORDERLINE_WIDTH_CONSTRAINT_TAG);
+            Dali::Integration::ConstraintSetInternalTag(borderlineColorConstraint, BORDERLINE_COLOR_CONSTRAINT_TAG);
+            Dali::Integration::ConstraintSetInternalTag(borderlineOffsetConstraint, BORDERLINE_OFFSET_CONSTRAINT_TAG);
+
+            borderlineWidthConstraint.SetApplyRate(mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_WIDTH) == mPropertyOnAnimation.end() ? Constraint::APPLY_ONCE : Constraint::APPLY_ALWAYS);
+            borderlineColorConstraint.SetApplyRate(mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_COLOR) == mPropertyOnAnimation.end() ? Constraint::APPLY_ONCE : Constraint::APPLY_ALWAYS);
+            borderlineOffsetConstraint.SetApplyRate(mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_OFFSET) == mPropertyOnAnimation.end() ? Constraint::APPLY_ONCE : Constraint::APPLY_ALWAYS);
+
+            borderlineWidthConstraint.Apply();
+            borderlineColorConstraint.Apply();
+            borderlineOffsetConstraint.Apply();
+          }
+
+          EnableCornerPropertiesOverridden(visual, true, borderlineCornerRadiusConstraint);
+
+          // TODO : Fix it if we can detect size animation.
+          if(mControlImpl.Self().GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY) == static_cast<int>(Toolkit::Visual::Transform::Policy::Type::RELATIVE))
+          {
+            borderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+          }
+
+          // Special case. If CornerRadius is not animation but BorderlineWidth / BorderlineOffset still animate, we should keep apply always the mBorderlineCornerRadiusConstraint.
+          // Since it's apply rate be chagned at UnbindAnimatablePropertyFromControlToVisual, we should restore the apply rate.
+          if((mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_WIDTH) != mPropertyOnAnimation.end() || mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_OFFSET) != mPropertyOnAnimation.end()) &&
+             borderlineCornerRadiusConstraint)
+          {
+            borderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+          }
+        }
       }
-      EnableCornerPropertiesOverridden(visual, true, mBorderlineCornerRadiusConstraint);
 
       mControlImpl.RelayoutRequest();
     }
@@ -2027,11 +2063,9 @@ void Control::Impl::ClearBorderline()
   {
     mVisualData->UnregisterVisual(Toolkit::DevelControl::Property::BORDERLINE);
 
-    if(mBorderlineCornerRadiusConstraint)
+    if(mBorderlineConstraintHolder)
     {
-      // Reset previously applied constraints.
-      mBorderlineCornerRadiusConstraint.Remove();
-      mBorderlineCornerRadiusConstraint.Reset();
+      mBorderlineConstraintHolder.reset();
     }
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
@@ -2238,10 +2272,12 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
 
 void Control::Impl::UpdateCornerRadius()
 {
+  Actor self = mControlImpl.Self();
+
   Property::Map map;
-  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, DecorationData::GetCornerRadius(mDecorationData));
-  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, DecorationData::GetCornerRadiusPolicy(mDecorationData));
-  map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, DecorationData::GetCornerSquareness(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, self.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS));
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, self.GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY));
+  map.Insert(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, self.GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS));
 
   if(DALI_LIKELY(mVisualData))
   {
@@ -2257,9 +2293,23 @@ void Control::Impl::UpdateCornerRadius()
         (*it)->visual.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
         if(notifyConstraint && (*it)->animationConstraint.count(Dali::Toolkit::DevelControl::Property::CORNER_RADIUS) != 0)
         {
-          (*it)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS].SetApplyRate(Dali::Constraint::ApplyRate::APPLY_ONCE);
+          auto& constraint = (*it)->animationConstraint[Dali::Toolkit::DevelControl::Property::CORNER_RADIUS];
+          constraint.SetApplyRate(constraint.GetApplyRate());
         }
       }
+    }
+  }
+
+  // TODO : Fix it if we can detect size animation.
+  if(self.GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY) == static_cast<int>(Toolkit::Visual::Transform::Policy::Type::RELATIVE))
+  {
+    if(mInnerShadowCornerRadiusConstraint)
+    {
+      mInnerShadowCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+    }
+    if(mBorderlineConstraintHolder && mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint)
+    {
+      mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
     }
   }
 
@@ -2276,12 +2326,14 @@ void Control::Impl::UpdateCornerRadius()
 
 void Control::Impl::UpdateBorderline()
 {
+  Actor self = mControlImpl.Self();
+
   Property::Map map;
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::Type::COLOR);
   map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT);
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, DecorationData::GetBorderlineWidth(mDecorationData));
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, DecorationData::GetBorderlineColor(mDecorationData));
-  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, DecorationData::GetBorderlineOffset(mDecorationData));
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, self.GetProperty<float>(Toolkit::DevelControl::Property::BORDERLINE_WIDTH));
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, self.GetProperty<Vector4>(Toolkit::DevelControl::Property::BORDERLINE_COLOR));
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, self.GetProperty<float>(Toolkit::DevelControl::Property::BORDERLINE_OFFSET));
 
   SetBorderline(map, false);
 }
@@ -2290,11 +2342,53 @@ void Control::Impl::CreateAnimationConstraints(const Dali::BaseObject& animation
 {
   if(DALI_LIKELY(mVisualData))
   {
-    if(index == DevelControl::Property::CORNER_RADIUS || index == DevelControl::Property::CORNER_SQUARENESS)
+    if(index == DevelControl::Property::CORNER_RADIUS ||
+       index == DevelControl::Property::CORNER_SQUARENESS ||
+       index == DevelControl::Property::BORDERLINE_WIDTH ||
+       index == DevelControl::Property::BORDERLINE_COLOR ||
+       index == DevelControl::Property::BORDERLINE_OFFSET)
     {
       if(mPropertyOnAnimation.find(index) == mPropertyOnAnimation.end())
       {
         mVisualData->BindAnimatablePropertyFromControlToVisual(index);
+        if(index == DevelControl::Property::BORDERLINE_WIDTH ||
+           index == DevelControl::Property::BORDERLINE_COLOR ||
+           index == DevelControl::Property::BORDERLINE_OFFSET)
+        {
+          if(!mBorderlineConstraintHolder)
+          {
+            // Create visual and constraint for borderline first.
+            UpdateBorderline();
+          }
+
+          if(DALI_LIKELY(mBorderlineConstraintHolder))
+          {
+            auto& borderlineWidthConstraint  = mBorderlineConstraintHolder->mBorderlineWidthConstraint;
+            auto& borderlineColorConstraint  = mBorderlineConstraintHolder->mBorderlineColorConstraint;
+            auto& borderlineOffsetConstraint = mBorderlineConstraintHolder->mBorderlineOffsetConstraint;
+            if(borderlineWidthConstraint && index == DevelControl::Property::BORDERLINE_WIDTH)
+            {
+              borderlineWidthConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+            }
+            if(borderlineColorConstraint && index == DevelControl::Property::BORDERLINE_COLOR)
+            {
+              borderlineColorConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+            }
+            if(borderlineOffsetConstraint && index == DevelControl::Property::BORDERLINE_OFFSET)
+            {
+              borderlineOffsetConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+            }
+
+            auto& borderlineCornerRadiusConstraint = mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint;
+            if(borderlineCornerRadiusConstraint &&
+               mPropertyOnAnimation.find(DevelControl::Property::CORNER_RADIUS) == mPropertyOnAnimation.end() &&
+               (index == DevelControl::Property::BORDERLINE_WIDTH ||
+                index == DevelControl::Property::BORDERLINE_OFFSET))
+            {
+              borderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+            }
+          }
+        }
       }
 
       // Get or create counter
@@ -2332,7 +2426,60 @@ void Control::Impl::ClearAnimationConstraints(const Dali::BaseObject& animationO
           if(animationCounter.empty())
           {
             mVisualData->UnbindAnimatablePropertyFromControlToVisual(index);
+            if(mBorderlineConstraintHolder &&
+               (index == DevelControl::Property::BORDERLINE_WIDTH ||
+                index == DevelControl::Property::BORDERLINE_COLOR ||
+                index == DevelControl::Property::BORDERLINE_OFFSET))
+            {
+              auto& borderlineWidthConstraint  = mBorderlineConstraintHolder->mBorderlineWidthConstraint;
+              auto& borderlineColorConstraint  = mBorderlineConstraintHolder->mBorderlineColorConstraint;
+              auto& borderlineOffsetConstraint = mBorderlineConstraintHolder->mBorderlineOffsetConstraint;
+              if(borderlineWidthConstraint && index == DevelControl::Property::BORDERLINE_WIDTH)
+              {
+                borderlineWidthConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+              }
+              if(borderlineColorConstraint && index == DevelControl::Property::BORDERLINE_COLOR)
+              {
+                borderlineColorConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+              }
+              if(borderlineOffsetConstraint && index == DevelControl::Property::BORDERLINE_OFFSET)
+              {
+                borderlineOffsetConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+              }
+
+              auto& borderlineCornerRadiusConstraint = mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint;
+              if(borderlineCornerRadiusConstraint &&
+                 mPropertyOnAnimation.find(DevelControl::Property::CORNER_RADIUS) == mPropertyOnAnimation.end() &&
+                 (index == DevelControl::Property::BORDERLINE_WIDTH ||
+                  index == DevelControl::Property::BORDERLINE_OFFSET))
+              {
+                borderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+              }
+            }
             mPropertyOnAnimation.erase(index);
+
+            // TODO : Fix it if we can detect size animation.
+            if(mControlImpl.Self().GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY) == static_cast<int>(Toolkit::Visual::Transform::Policy::Type::RELATIVE))
+            {
+              if(mInnerShadowCornerRadiusConstraint)
+              {
+                mInnerShadowCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+              }
+              if(mBorderlineConstraintHolder && mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint)
+              {
+                mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+              }
+            }
+
+            // Special case. If CornerRadius is not animation but BorderlineWidth / BorderlineOffset still animate, we should keep apply always the mBorderlineCornerRadiusConstraint.
+            // Since it's apply rate be chagned at UnbindAnimatablePropertyFromControlToVisual, we should restore the apply rate.
+            if(index == DevelControl::Property::CORNER_RADIUS &&
+               (mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_WIDTH) != mPropertyOnAnimation.end() || mPropertyOnAnimation.find(DevelControl::Property::BORDERLINE_OFFSET) != mPropertyOnAnimation.end()) &&
+               mBorderlineConstraintHolder &&
+               mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint)
+            {
+              mBorderlineConstraintHolder->mBorderlineCornerRadiusConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+            }
           }
         }
       }

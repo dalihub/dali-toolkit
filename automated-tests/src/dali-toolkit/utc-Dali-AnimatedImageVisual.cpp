@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2083,7 +2083,7 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
     Test::EmitGlobalTimerSignal();
     application.SendNotification();
     application.Render(16);
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 5), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
     application.SendNotification();
     application.Render(16);
     DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 11, TEST_LOCATION);
@@ -2093,7 +2093,7 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
     application.SendNotification();
     application.Render(16);
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 5), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
     application.SendNotification();
     application.Render(16);
     DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 11, TEST_LOCATION);

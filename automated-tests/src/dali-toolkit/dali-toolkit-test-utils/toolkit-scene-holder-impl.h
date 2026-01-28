@@ -65,11 +65,15 @@ public:
 
   Dali::Integration::SceneHolder::WheelEventGeneratedSignalType& WheelEventGeneratedSignal();
 
+  Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType& FocusChangedGeneratedSignal();
+
   Integration::Scene GetScene();
 
   Dali::Integration::RenderSurfaceInterface& GetRenderSurface();
 
   Dali::RenderTaskList GetRenderTaskList();
+
+  void FocusChanged(bool focusIn);
 
   class SceneHolderLifeCycleObserver;
   std::unique_ptr<SceneHolderLifeCycleObserver> mLifeCycleObserver; ///< The adaptor life cycle observer
@@ -81,6 +85,7 @@ public:
   std::string              mName;           ///< The name of the SceneHolder
 
   std::unique_ptr<TestRenderSurface> mRenderSurface;
+  Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType mFocusChangedGeneratedSignal;
 };
 
 } // namespace Adaptor

@@ -193,11 +193,13 @@ Vector4 Window::GetBackgroundColor() const
 void Window::Raise()
 {
   GetImplementation(*this).mFocusChangeSignal.Emit(*this, true);
+  GetImplementation(*this).FocusChanged(true);
 }
 
 void Window::Lower()
 {
   GetImplementation(*this).mFocusChangeSignal.Emit(*this, false);
+  GetImplementation(*this).FocusChanged(false);
 }
 
 void Window::Show()

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LOADING_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,20 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Text
-{
-namespace Internal
-{
-class AsyncTextManager;
-using AsyncTextManagerPtr = IntrusivePtr<AsyncTextManager>;
-} // namespace Internal
-} // namespace Text
-
-namespace Internal
+namespace Dali::Toolkit::Internal
 {
 class TextLoadingTask;
 using TextLoadingTaskPtr = IntrusivePtr<TextLoadingTask>;
@@ -54,12 +41,10 @@ public:
    * Constructor.
    * @param [in] id The task id assigned from async text manager.
    * @param [in] paramaters The async text parameters.
-   * @param [in] asyncTaskManager The singletone async task manager to keep reference.
    * @param [in] callback The callback that is called when the operation is completed.
    */
   TextLoadingTask(const uint32_t                   id,
                   const Text::AsyncTextParameters& paramaters,
-                  Dali::AsyncTaskManager           asyncTaskManager,
                   CallbackBase*                    callback);
 
   /**
@@ -73,14 +58,12 @@ public:
    */
   uint32_t GetId();
 
-  using ReleaseCallbackReceiver = Text::Internal::AsyncTextManagerPtr; // TODO : Make it seperated interface.
   /**
    * Set async text loader to process.
    * The task becomes ready to process.
    * @param [in] loader The async text loader, a loader can only process one task at a time.
-   * @param [in] releaseCallbackReceiver The callback receiver when we can release loader at worker thread.
    */
-  void SetLoader(Text::AsyncTextLoader& loader, ReleaseCallbackReceiver releaseCallbackReceiver);
+  void SetLoader(Text::AsyncTextLoader& loader);
 
 public: // Implementation of AsyncTask
   /**
@@ -125,17 +108,10 @@ public:
   Text::AsyncTextRenderInfo mRenderInfo;
 
 private:
-  Dali::AsyncTaskManager  mAsyncTaskManager; ///< Keep reference to call NotifyToReady(). TODO : Could we remove it?
-  ReleaseCallbackReceiver mAsyncTextManager; ///< Keep reference to call ReleaseLoader(). TODO : Could we remove it?
-
   bool  mIsReady : 1; ///< Whether this task ready to run
   Mutex mMutex;
 };
 
-} // namespace Internal
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit::Internal
 
 #endif // DALI_TOOLKIT_TEXT_LOADING_TASK_H

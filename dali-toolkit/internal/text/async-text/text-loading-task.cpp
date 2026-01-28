@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,11 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
-TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, Dali::AsyncTaskManager asyncTaskManager, CallbackBase* callback)
+TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, CallbackBase* callback)
 : AsyncTask(callback),
   mId(id),
   mParameters(parameters),
   mRenderInfo(),
-  mAsyncTaskManager(asyncTaskManager),
-  mAsyncTextManager(),
   mIsReady(false),
   mMutex()
 {
@@ -57,10 +55,10 @@ TextLoadingTask::~TextLoadingTask()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     // To avoid loader leaking. Never ever happend, but for safety.
-    if(DALI_UNLIKELY(mAsyncTextManager && mLoader))
+    if(DALI_UNLIKELY(mLoader))
     {
       DALI_LOG_ERROR("Need to release loader!!");
-      mAsyncTextManager->ReleaseLoader(nullptr, mLoader);
+      Text::Internal::AsyncTextManager::ReleaseLoaderToManager(nullptr, mLoader);
     }
   }
 }
@@ -70,42 +68,33 @@ uint32_t TextLoadingTask::GetId()
   return mId;
 }
 
-void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader, TextLoadingTask::ReleaseCallbackReceiver releaseCallbackReceiver)
+void TextLoadingTask::SetLoader(Text::AsyncTextLoader& loader)
 {
-  {
-    Dali::Mutex::ScopedLock lock(mMutex);
-    mLoader = loader;
-  }
-
-  mAsyncTextManager = releaseCallbackReceiver;
+  mLoader = loader;
 
   if(DALI_LIKELY(!mIsReady && mLoader))
   {
-    mIsReady = true;
+    {
+      Dali::Mutex::ScopedLock lock(mMutex);
+      mIsReady = true;
+    }
     NotifyToReady();
-    mAsyncTaskManager.Reset();
   }
 }
 
 void TextLoadingTask::Process()
 {
-  if(mId == 0u)
-  {
-    return;
-  }
+  if(DALI_LIKELY(mId != 0u))
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
     Load();
   }
-  if(DALI_LIKELY(mAsyncTextManager))
-  {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_RELEASE");
-    ReleaseLoader();
-  }
+  ReleaseLoader();
 }
 
 bool TextLoadingTask::IsReady()
 {
+  Dali::Mutex::ScopedLock lock(mMutex);
   return mIsReady;
 }
 
@@ -151,12 +140,12 @@ void TextLoadingTask::Load()
             }
             if(mParameters.textWidth < naturalSize.width)
             {
-    #ifdef TRACE_ENABLED
+#ifdef TRACE_ENABLED
               if(gTraceFilter && gTraceFilter->IsTraceEnabled())
               {
                 DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
               }
-    #endif
+#endif
               mParameters.isAutoScrollEnabled = true;
               mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
             }
@@ -181,8 +170,8 @@ void TextLoadingTask::Load()
         }
       }
       else if(mParameters.isAutoScrollEnabled &&
-             ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
-             (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
+              ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
+               (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
       {
 #ifdef TRACE_ENABLED
         if(gTraceFilter && gTraceFilter->IsTraceEnabled())
@@ -246,15 +235,12 @@ void TextLoadingTask::Load()
 
 void TextLoadingTask::ReleaseLoader()
 {
-  if(DALI_LIKELY(mAsyncTextManager))
+  // Release all local varaibles before execute callback.
+  if(DALI_LIKELY(mLoader))
   {
-    // Release all local varaibles before execute callback.
-    if(DALI_LIKELY(mLoader))
-    {
-      auto loader = std::move(mLoader);
-      mAsyncTextManager->ReleaseLoader(this, loader);
-    }
-    mAsyncTextManager.Reset();
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_RELEASE");
+    auto loader = std::move(mLoader);
+    Text::Internal::AsyncTextManager::ReleaseLoaderToManager(this, loader);
   }
 }
 

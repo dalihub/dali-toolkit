@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ enum Type
   SVG            = Dali::Toolkit::Visual::SVG,
   ANIMATED_IMAGE = Dali::Toolkit::Visual::ANIMATED_IMAGE,
 
-  ANIMATED_GRADIENT     = ANIMATED_IMAGE + 1, ///< Renders an animated gradient.
+  NOT_IN_USE_1          = ANIMATED_IMAGE + 1,
   ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2, ///< Renders an animated vector image.
   ARC                   = ANIMATED_IMAGE + 3, ///< Renders an arc.
 };

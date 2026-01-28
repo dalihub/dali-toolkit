@@ -1941,9 +1941,13 @@ int UtcDaliControlBorderline(void)
   borderlineColor  = Color::GREEN;
   borderlineOffset = -0.3f;
   // Just re-use retrieved map, to reduce duplicated property settings.
-  retrievedMap[DevelVisual::Property::CORNER_RADIUS]        = Vector4(10.f, 20.f, 30.f, 40.f);
+
+  Vector4 visualRadius    = Vector4(10.f, 20.f, 30.f, 40.f);
+  Vector4 visualSqureness = Vector4(0.7f, 0.6f, 0.5f, 0.4f);
+
+  retrievedMap[DevelVisual::Property::CORNER_RADIUS]        = visualRadius;
   retrievedMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = (int)Toolkit::Visual::Transform::Policy::Type::ABSOLUTE;
-  retrievedMap[DevelVisual::Property::CORNER_SQUARENESS]    = Vector4(0.7f, 0.6f, 0.5f, 0.4f);
+  retrievedMap[DevelVisual::Property::CORNER_SQUARENESS]    = visualSqureness;
   retrievedMap[DevelVisual::Property::BORDERLINE_WIDTH]     = borderlineWidth;
   retrievedMap[DevelVisual::Property::BORDERLINE_COLOR]     = borderlineColor;
   retrievedMap[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
@@ -1954,19 +1958,19 @@ int UtcDaliControlBorderline(void)
   DALI_TEST_CHECK(value.GetMap());
   retrievedMap = *(value.GetMap());
 
-  // Check we are using Control's corner radius feature instead it's own.
+  // Check we are using Visual's corner radius feature instead it's own.
   valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS);
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
-  DALI_TEST_EQUALS(retrievedVector, radius, TEST_LOCATION);
+  DALI_TEST_EQUALS(retrievedVector, visualRadius, TEST_LOCATION);
   valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY);
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedInteger));
-  DALI_TEST_EQUALS(retrievedInteger, (int)Toolkit::Visual::Transform::Policy::Type::RELATIVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(retrievedInteger, (int)Toolkit::Visual::Transform::Policy::Type::ABSOLUTE, TEST_LOCATION);
   valuePtr = retrievedMap.Find(DevelVisual::Property::CORNER_SQUARENESS);
   DALI_TEST_CHECK(valuePtr);
   DALI_TEST_CHECK(valuePtr->Get(retrievedVector));
-  DALI_TEST_EQUALS(retrievedVector, squreness, TEST_LOCATION);
+  DALI_TEST_EQUALS(retrievedVector, visualSqureness, TEST_LOCATION);
 
   valuePtr = retrievedMap.Find(DevelVisual::Property::BORDERLINE_WIDTH);
   DALI_TEST_CHECK(valuePtr);
@@ -1988,6 +1992,363 @@ int UtcDaliControlBorderline(void)
   Property::Map emptyMap;
   control.SetProperty(DevelControl::Property::BORDERLINE, emptyMap);
   DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE).Get<Property::Map>().Empty());
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderlineAnimation01(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  float   originWidth  = 50.0f;
+  Vector4 originColor  = Color::YELLOW;
+  float   originOffset = -0.9f;
+
+  control.SetProperty(DevelControl::Property::BORDERLINE_WIDTH, originWidth);
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, originColor);
+  control.SetProperty(DevelControl::Property::BORDERLINE_OFFSET, originOffset);
+
+  application.GetScene().Add(control);
+
+  float   borderlineWidth  = 10.0f;
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 0.2f;
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_COLOR), borderlineColor);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), (borderlineWidth + originWidth) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), (borderlineColor + originColor) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), (borderlineOffset + originOffset) * 0.5f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  animation.Stop();
+  application.SendNotification();
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderlineAnimation02(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  float   borderlineWidth  = 10.0f;
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 0.2f;
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_COLOR), borderlineColor);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  animation.Stop();
+  application.SendNotification();
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderlineAnimation03(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  float   borderlineWidth  = 10.0f;
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 0.2f;
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_COLOR), borderlineColor);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  // Set empty value (for line coverage)
+  // Will unregister borderline visual.
+  // The property of control has no dependency with visual itself.
+  Property::Map emptyMap;
+  control.SetProperty(DevelControl::Property::BORDERLINE, emptyMap);
+  DALI_TEST_CHECK(control.GetProperty(DevelControl::Property::BORDERLINE).Get<Property::Map>().Empty());
+
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  animation.Stop();
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderlineAnimation04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlBorderlineAnimation04: Get actual property from visual\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  float   borderlineWidth  = 10.0f;
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 0.2f;
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_COLOR), borderlineColor);
+  animation.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset);
+  animation.Play();
+
+  auto visualCornerRadiusProperty     = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::CORNER_RADIUS);
+  auto visualBorderlineWidthProperty  = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_WIDTH);
+  auto visualBorderlineColorProperty  = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_COLOR);
+  auto visualBorderlineOffsetProperty = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_OFFSET);
+
+  DALI_TEST_CHECK(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object);
+  DALI_TEST_CHECK(visualBorderlineWidthProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineWidthProperty.object);
+  DALI_TEST_CHECK(visualBorderlineColorProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineColorProperty.object);
+  DALI_TEST_CHECK(visualBorderlineOffsetProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineOffsetProperty.object);
+
+  auto TestVisualCurrentPropertyVector4 = [&](Dali::Property& property, const Vector4& expected, const char* location)
+  {
+    DALI_TEST_EQUALS(property.object.GetCurrentProperty<Vector4>(property.propertyIndex), expected, location);
+  };
+  auto TestVisualCurrentPropertyFloat = [&](Dali::Property& property, float expected, const char* location)
+  {
+    DALI_TEST_EQUALS(property.object.GetCurrentProperty<float>(property.propertyIndex), expected, location);
+  };
+
+  // progress 50%
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  // Check borderline visual's corner radius is zero.
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4::ZERO, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  tet_printf("Set CornerRadius during animate borderline\n");
+  control.SetProperty(DevelControl::Property::CORNER_RADIUS, 30.0f);
+
+  // progress still 50%
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  // Check borderline visual's corner radius is changed.
+  float expectedVisualCornerRadius = 30.0f + (borderlineWidth + 0.0f) * 0.5f * ((borderlineOffset + 0.0f) * 0.5f + 1.0f) * 0.5f;
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4(expectedVisualCornerRadius, expectedVisualCornerRadius, expectedVisualCornerRadius, expectedVisualCornerRadius), TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, (borderlineColor + Color::BLACK) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  // progress become 100%
+  application.SendNotification();
+  application.Render(250);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::BORDERLINE_COLOR), borderlineColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<float>(DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset, TEST_LOCATION);
+
+  expectedVisualCornerRadius = 30.0f + borderlineWidth * (borderlineOffset + 1.0f) * 0.5f;
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4(expectedVisualCornerRadius, expectedVisualCornerRadius, expectedVisualCornerRadius, expectedVisualCornerRadius), TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, borderlineWidth, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, borderlineColor, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, borderlineOffset, TEST_LOCATION);
+
+  animation.Stop();
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
+int UtcDaliControlBorderlineAnimation05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlBorderlineAnimation05: Get actual property from visual - animate corner radius and borderlin\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(control);
+
+  Vector4 cornerRadius     = Vector4(20.0f, 30.0f, 40.0f, 50.0f);
+  float   borderlineWidth  = 10.0f;
+  float   borderlineOffset = 0.2f;
+
+  // Set dummy Borderine, for get visual property.
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, Color::RED);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_RADIUS), cornerRadius);
+  animation.Play();
+
+  auto visualCornerRadiusProperty     = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::CORNER_RADIUS);
+  auto visualBorderlineWidthProperty  = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_WIDTH);
+  auto visualBorderlineColorProperty  = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_COLOR);
+  auto visualBorderlineOffsetProperty = DevelControl::GetVisualProperty(control, DevelControl::Property::BORDERLINE, DevelVisual::Property::BORDERLINE_OFFSET);
+
+  DALI_TEST_CHECK(visualCornerRadiusProperty.propertyIndex != Property::INVALID_INDEX && visualCornerRadiusProperty.object);
+  DALI_TEST_CHECK(visualBorderlineWidthProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineWidthProperty.object);
+  DALI_TEST_CHECK(visualBorderlineColorProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineColorProperty.object);
+  DALI_TEST_CHECK(visualBorderlineOffsetProperty.propertyIndex != Property::INVALID_INDEX && visualBorderlineOffsetProperty.object);
+
+  auto TestVisualCurrentPropertyVector4 = [&](Dali::Property& property, const Vector4& expected, const char* location)
+  {
+    DALI_TEST_EQUALS(property.object.GetCurrentProperty<Vector4>(property.propertyIndex), expected, location);
+  };
+  auto TestVisualCurrentPropertyFloat = [&](Dali::Property& property, float expected, const char* location)
+  {
+    DALI_TEST_EQUALS(property.object.GetCurrentProperty<float>(property.propertyIndex), expected, location);
+  };
+  // progress 50% for corner radius
+  application.SendNotification();
+  application.Render(250);
+
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, (cornerRadius + Vector4::ZERO) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, 0.0f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, Color::RED, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, 0.0f, TEST_LOCATION);
+
+  Animation animation2 = Animation::New(0.5f);
+  animation2.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_WIDTH), borderlineWidth);
+  animation2.AnimateTo(Property(control, DevelControl::Property::BORDERLINE_OFFSET), borderlineOffset);
+  animation2.Play();
+
+  // progress 50% for corner radius, progress 0% for borderline
+  application.SendNotification();
+  application.Render(0);
+
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, (cornerRadius + Vector4::ZERO) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, 0.0f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, Color::RED, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, 0.0f, TEST_LOCATION);
+
+  // progress 100% for corner radius, progress 50% for borderline
+  application.SendNotification();
+  application.Render(250);
+
+  float expectedExpandRadius = (borderlineWidth + 0.0f) * 0.5f * ((borderlineOffset + 0.0f) * 0.5f + 1.0f) * 0.5f;
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4(cornerRadius.x + expectedExpandRadius, cornerRadius.y + expectedExpandRadius, cornerRadius.z + expectedExpandRadius, cornerRadius.w + expectedExpandRadius), TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, Color::RED, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  tet_printf("Set BorderlineColor during animate borderline\n");
+  control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, Color::BLUE);
+
+  // progress 100% for corner radius, progress 50% for borderline
+  application.SendNotification();
+  application.Render(0);
+
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4(cornerRadius.x + expectedExpandRadius, cornerRadius.y + expectedExpandRadius, cornerRadius.z + expectedExpandRadius, cornerRadius.w + expectedExpandRadius), TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, (borderlineWidth + 0.0f) * 0.5f, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, Color::BLUE, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, (borderlineOffset + 0.0f) * 0.5f, TEST_LOCATION);
+
+  // progress become 100%
+  application.SendNotification();
+  application.Render(250);
+
+  expectedExpandRadius = borderlineWidth * (borderlineOffset + 1.0f) * 0.5f;
+  TestVisualCurrentPropertyVector4(visualCornerRadiusProperty, Vector4(cornerRadius.x + expectedExpandRadius, cornerRadius.y + expectedExpandRadius, cornerRadius.z + expectedExpandRadius, cornerRadius.w + expectedExpandRadius), TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineWidthProperty, borderlineWidth, TEST_LOCATION);
+  TestVisualCurrentPropertyVector4(visualBorderlineColorProperty, Color::BLUE, TEST_LOCATION);
+  TestVisualCurrentPropertyFloat(visualBorderlineOffsetProperty, borderlineOffset, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
 
   END_TEST;
 }
