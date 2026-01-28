@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_VISUAL_DATA_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,16 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
 #include <dali-toolkit/internal/builder/style.h>
+#include <dali-toolkit/internal/visuals/visual-constraint-observer.h>
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/common/owner-container.h>
@@ -49,8 +53,6 @@ struct RegisteredVisual
   Property::Index       index;
   Toolkit::Visual::Base visual;
 
-  std::unordered_map<Property::Index, Constraint> animationConstraint; // map to bind control's animatable property to this visual
-
   bool enabled : 1;
   bool pending : 1;
   bool overideReadyTransition : 1;
@@ -70,7 +72,7 @@ struct RegisteredVisual
 typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
 
 // private inner class
-class Control::Impl::VisualData : public Visual::EventObserver
+class Control::Impl::VisualData : public Visual::EventObserver, public Visual::ConstraintObserver
 {
 public:
   // Constructor
@@ -79,6 +81,7 @@ public:
   // Destructor
   ~VisualData();
 
+public: // Visual::EventObserver
   /**
    * @brief Called when a resource is ready.
    * @param[in] object The visual whose resources are ready
@@ -100,6 +103,13 @@ public:
    */
   void RelayoutRequest(Visual::Base& object) override;
 
+public: // Visual::ConstraintObserver
+  /**
+   * @copydoc Dali::Toolkit::Internal::Visual::ConstraintObserver::IsAnyPropertyAnimate
+   */
+  bool IsAnyPropertyAnimate(const std::unordered_set<Property::Index>& properties) const override;
+
+public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::IsResourceReady()
    */
@@ -280,16 +290,26 @@ public:
   void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
-   * @brief Insert constraint that binds control's animatable property to visual's.
-   * @param[in] index Animatable property index from Control
+   * @copydoc Dali::Toolkit::Internal::Control::Impl::CreateAnimationConstraints()
    */
-  void BindAnimatablePropertyFromControlToVisual(Property::Index index);
+  void CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
 
   /**
-   * @brief Remove constraint that binds control's animatable property to visual's.
+   * @copydoc Dali::Toolkit::Internal::Control::Impl::ClearAnimationConstraints()
+   */
+  void ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
+
+  /**
+   * @brief Notify to visual added constraint that control's animatable property updated.
    * @param[in] index Animatable property index from Control
    */
-  void UnbindAnimatablePropertyFromControlToVisual(Property::Index index);
+  void NotifyConstraintPropertyChanged(Property::Index index);
+
+  /**
+   * @brief Notify to visual that offscreen rendering is enabled or not.
+   * @param[in] enabled true if offscreen rendering is enabled, false otherwise
+   */
+  void OffscreenRenderingEnabled(bool enabled);
 
 private:
   /**
@@ -335,8 +355,17 @@ public:
   RegisteredVisualContainer           mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
   DevelControl::VisualEventSignalType mVisualEventSignal;
   RegisteredVisualContainer           mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
+
 private:
   Control::Impl& mOuter;
+
+  // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
+  using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;
+  PropertyOnAnimationContainer mPropertyOnAnimation; ///< Properties that are currently on animation or constraint applied
+
+  bool mOffscreenRenderingEnabled : 1;  ///< True if offscreen rendering is enabled.
+  bool mCornerRadiusValueAdded : 1;     ///< True if corner radius value setted at least 1 time. Could not be reset to false.
+  bool mCornerSquarenessValueAdded : 1; ///< True if corner squareness value setted at least 1 time. Could not be reset to false.
 };
 } // namespace Internal
 } // namespace Toolkit
