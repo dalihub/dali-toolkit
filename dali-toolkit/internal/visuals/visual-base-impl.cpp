@@ -1219,6 +1219,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       {
         return DecoratedVisualRenderer::Property::CORNER_RADIUS;
       }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS:
     {
@@ -1226,6 +1227,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       {
         return DecoratedVisualRenderer::Property::CORNER_SQUARENESS;
       }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH:
     {
@@ -1233,6 +1235,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       {
         return DecoratedVisualRenderer::Property::BORDERLINE_WIDTH;
       }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
     {
@@ -1240,6 +1243,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       {
         return DecoratedVisualRenderer::Property::BORDERLINE_COLOR;
       }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
     {
@@ -1247,6 +1251,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       {
         return DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;
       }
+      break;
     }
   }
 
