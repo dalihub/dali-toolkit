@@ -24,6 +24,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/math/math-utils.h>
 
 #include <mutex>
 
@@ -65,7 +66,7 @@ AsyncTextManager::AsyncTextManager()
   auto numberOfLoaderString = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_TEXT_NUMBER_OF_ASYNC_TEXT_LOADER);
   int  numberOfLoader       = numberOfLoaderString ? std::atoi(numberOfLoaderString) : DEFAULT_NUMBER_OF_LOADER;
 
-  numberOfLoader = std::clamp(numberOfLoader, MINIMUM_NUMBER_OF_LOADER, MAXIMUM_NUMBER_OF_LOADER);
+  numberOfLoader = Dali::Clamp(numberOfLoader, MINIMUM_NUMBER_OF_LOADER, MAXIMUM_NUMBER_OF_LOADER);
   DALI_LOG_RELEASE_INFO("Number of async text loaders:%d\n", numberOfLoader);
 
   mLocale = TextAbstraction::GetLocaleFull();

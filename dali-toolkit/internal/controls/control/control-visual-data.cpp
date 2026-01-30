@@ -26,6 +26,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 
+#include <algorithm>
 #include <unordered_set>
 
 // INTERNAL INCLUDES

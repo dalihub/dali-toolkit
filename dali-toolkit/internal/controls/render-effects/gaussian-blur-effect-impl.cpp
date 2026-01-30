@@ -24,6 +24,7 @@
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -231,8 +232,8 @@ void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Alph
     return;
   }
 
-  fromValue = std::clamp(fromValue, 0.0f, 1.0f);
-  toValue   = std::clamp(toValue, 0.0f, 1.0f);
+  fromValue = Dali::Clamp(fromValue, 0.0f, 1.0f);
+  toValue   = Dali::Clamp(toValue, 0.0f, 1.0f);
 
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, fromValue);
@@ -257,8 +258,8 @@ void GaussianBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, Alpha
     return;
   }
 
-  fromValue = std::clamp(fromValue, 0.0f, 1.0f);
-  toValue   = std::clamp(toValue, 0.0f, 1.0f);
+  fromValue = Dali::Clamp(fromValue, 0.0f, 1.0f);
+  toValue   = Dali::Clamp(toValue, 0.0f, 1.0f);
 
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, fromValue);
@@ -354,7 +355,7 @@ void GaussianBlurEffectImpl::OnActivate()
   CreateRenderTasks(GetSceneHolder(), ownerControl);
 
   // Reset shader constants
-  auto& blurShader = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
+  auto&    blurShader             = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
   Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
   horizontalBlurRenderer.SetShader(blurShader);
   horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
