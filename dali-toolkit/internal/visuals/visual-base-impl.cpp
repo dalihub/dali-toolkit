@@ -1404,6 +1404,23 @@ void Visual::Base::AnimateRendererProperty(
 
   if(index != Property::INVALID_INDEX)
   {
+    switch(index)
+    {
+      case VisualRenderer::Property::TRANSFORM_OFFSET:
+      case VisualRenderer::Property::TRANSFORM_SIZE:
+      case VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      {
+        // Need to change visual transform is not default anymore.
+        if(mImpl->mTransformMapUsingDefault)
+        {
+          mImpl->mTransformMapUsingDefault = false;
+          mImpl->mRenderer.RegisterVisualTransformUniform();
+        }
+        break;
+      }
+    }
+
     if(animator.targetValue.GetType() != Property::NONE)
     {
       // Try writing target value into transform property map
@@ -1699,6 +1716,6 @@ void Visual::Base::StopConstraintFeature(Property::Index index)
 
 } // namespace Internal
 
-} // namespace Toolkit
+} //namespace Toolkit
 
-} // namespace Dali
+} //namespace Dali
