@@ -34,6 +34,7 @@
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/common/stage.h>
 
+#include <algorithm>
 #include <cstdlib>
 
 using namespace Dali::Toolkit;

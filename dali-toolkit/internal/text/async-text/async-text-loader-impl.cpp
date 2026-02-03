@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
+#include <algorithm>
 #include <cmath>
 
 // INTERNAL INCLUDES
@@ -1214,7 +1215,7 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
 
   if(!cachedNaturalSize)
   {
-    naturalSize  = ComputeNaturalSize(parameters);
+    naturalSize       = ComputeNaturalSize(parameters);
     cachedNaturalSize = true;
   }
 
@@ -1361,15 +1362,15 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
       mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
     }
 
-  #ifdef TRACE_ENABLED
+#ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
       DALI_LOG_RELEASE_INFO("natural size : %f, %f, control size : %f, %f\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
     }
-  #endif
+#endif
 
     // Calculate the actual gap before scrolling wraps.
-    int     textPadding = std::max(controlSize.x - textNaturalSize.x, 0.0f);
+    int textPadding     = std::max(controlSize.x - textNaturalSize.x, 0.0f);
     wrapGap             = std::max(parameters.autoScrollGap, textPadding);
     Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture.
 
@@ -1425,7 +1426,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
     if(needLayoutSizeCalculation)
     {
       parameters.isAutoScrollEnabled = false;
-      originSize = ComputeLayoutSize(parameters, parameters.textWidth, parameters.textHeight, layoutOnly);
+      originSize                     = ComputeLayoutSize(parameters, parameters.textWidth, parameters.textHeight, layoutOnly);
       parameters.isAutoScrollEnabled = true;
       parameters.originWidth         = originSize.width;
       parameters.originHeight        = originSize.height;
@@ -1435,8 +1436,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
     textHeight = useCachedHeight ? textHeight : ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // Calculate the actual gap before scrolling wraps.
-    int     textPadding = std::max(controlSize.y - textHeight, 0.0f);
-    wrapGap             = std::max(parameters.autoScrollGap, textPadding);
+    int textPadding = std::max(controlSize.y - textHeight, 0.0f);
+    wrapGap         = std::max(parameters.autoScrollGap, textPadding);
     Vector2 textureSize(controlSize.width, textHeight + wrapGap); // Add the gap as a part of the texture
 
     // Calculate a size of texture for text scrolling
