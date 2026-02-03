@@ -51,7 +51,7 @@ NativeImageSourcePtr NativeImageSource::New(Any nativeImageSource)
   return image;
 }
 
-bool NativeImageSource::GetPixels(std::vector<unsigned char>& pixbuf, unsigned int& width, unsigned int& height, Pixel::Format& pixelFormat) const
+bool NativeImageSource::GetPixels(Dali::Vector<unsigned char>& pixbuf, unsigned int& width, unsigned int& height, Pixel::Format& pixelFormat) const
 {
   return false;
 }

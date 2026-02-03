@@ -5403,6 +5403,47 @@ int UtcDaliVisualGetVisualProperty07(void)
   END_TEST;
 }
 
+int UtcDaliVisualGetVisualPropertyInvalidType(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetVisualPropertyInvalidType: Test that animatable property not exist, NPatchVisual");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::Type::N_PATCH);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME);
+
+  Visual::Base nPatchVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, nPatchVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - load image
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  auto CheckPropertyValidation = [](const Dali::Property& result, const char* location)
+  {
+    DALI_TEST_CHECK(!result.object);
+    DALI_TEST_EQUALS(result.propertyIndex, Dali::Property::INVALID_INDEX, location);
+  };
+  CheckPropertyValidation(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), TEST_LOCATION);
+  CheckPropertyValidation(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), TEST_LOCATION);
+  CheckPropertyValidation(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), TEST_LOCATION);
+  CheckPropertyValidation(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), TEST_LOCATION);
+  CheckPropertyValidation(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_SQUARENESS), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVisualUpdateProperty01(void)
 {
   ToolkitTestApplication application;

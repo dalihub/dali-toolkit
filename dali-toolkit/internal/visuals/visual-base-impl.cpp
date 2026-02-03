@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -708,6 +708,8 @@ void Visual::Base::SetOnScene(Actor& actor)
     }
 
     mImpl->mFlags |= Impl::IS_ON_SCENE;
+
+    mImpl->mConstraintFeatureList.UpdateAllApplyRate();
   }
 }
 
@@ -717,6 +719,7 @@ void Visual::Base::SetOffScene(Actor& actor)
   {
     DoSetOffScene(actor);
     mImpl->mFlags &= ~Impl::IS_ON_SCENE;
+    mImpl->mConstraintFeatureList.SceneDisconnected();
   }
 }
 
@@ -1074,6 +1077,9 @@ void Visual::Base::SetTransformMapUsageForFittingMode(bool used)
 
 void Visual::Base::SetControlSize(Size controlSize)
 {
+  // Notify to visual's constraint that control's size is changed.
+  UpdateApplyRate(Actor::Property::SIZE);
+
   const static Property::Map emptyMap;
   SetTransformAndSize(emptyMap, controlSize);
 }
@@ -1175,7 +1181,7 @@ Property::Index Visual::Base::GetIntKey(Property::Key key)
   return Property::INVALID_INDEX;
 }
 
-Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
+Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
 {
   switch(GetIntKey(key))
   {
@@ -1209,23 +1215,43 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
     }
     case Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS:
     {
-      return DecoratedVisualRenderer::Property::CORNER_RADIUS;
+      if(IsTypeAvailableForCornerRadius(mImpl->mType))
+      {
+        return DecoratedVisualRenderer::Property::CORNER_RADIUS;
+      }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS:
     {
-      return DecoratedVisualRenderer::Property::CORNER_SQUARENESS;
+      if(IsTypeAvailableForCornerRadius(mImpl->mType))
+      {
+        return DecoratedVisualRenderer::Property::CORNER_SQUARENESS;
+      }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH:
     {
-      return DecoratedVisualRenderer::Property::BORDERLINE_WIDTH;
+      if(IsTypeAvailableForBorderline(mImpl->mType))
+      {
+        return DecoratedVisualRenderer::Property::BORDERLINE_WIDTH;
+      }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
     {
-      return DecoratedVisualRenderer::Property::BORDERLINE_COLOR;
+      if(IsTypeAvailableForBorderline(mImpl->mType))
+      {
+        return DecoratedVisualRenderer::Property::BORDERLINE_COLOR;
+      }
+      break;
     }
     case Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
     {
-      return DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;
+      if(IsTypeAvailableForBorderline(mImpl->mType))
+      {
+        return DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;
+      }
+      break;
     }
   }
 
@@ -1378,6 +1404,23 @@ void Visual::Base::AnimateRendererProperty(
 
   if(index != Property::INVALID_INDEX)
   {
+    switch(index)
+    {
+      case VisualRenderer::Property::TRANSFORM_OFFSET:
+      case VisualRenderer::Property::TRANSFORM_SIZE:
+      case VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      {
+        // Need to change visual transform is not default anymore.
+        if(mImpl->mTransformMapUsingDefault)
+        {
+          mImpl->mTransformMapUsingDefault = false;
+          mImpl->mRenderer.RegisterVisualTransformUniform();
+        }
+        break;
+      }
+    }
+
     if(animator.targetValue.GetType() != Property::NONE)
     {
       // Try writing target value into transform property map
@@ -1444,7 +1487,7 @@ void Visual::Base::AnimateMixColorProperty(
   }
 }
 
-Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
+Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key, bool changeProperties)
 {
   if(!mImpl->mRenderer)
   {
@@ -1466,7 +1509,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     case Toolkit::Visual::Transform::Property::OFFSET:
     {
       // Need to change visual transform is not default anymore.
-      if(mImpl->mTransformMapUsingDefault)
+      if(changeProperties && mImpl->mTransformMapUsingDefault)
       {
         mImpl->mTransformMapUsingDefault = false;
         mImpl->mRenderer.RegisterVisualTransformUniform();
@@ -1477,7 +1520,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     case Toolkit::Visual::Transform::Property::SIZE:
     {
       // Need to change visual transform is not default anymore.
-      if(mImpl->mTransformMapUsingDefault)
+      if(changeProperties && mImpl->mTransformMapUsingDefault)
       {
         mImpl->mTransformMapUsingDefault = false;
         mImpl->mRenderer.RegisterVisualTransformUniform();
@@ -1491,33 +1534,36 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForCornerRadius(mImpl->mType))
       {
-        const bool updateShader = !IsUsingCustomShader() && !IsRoundedCornerRequired();
-
-        // CornerRadius is animated now. we always have to use corner radius feature.
-        mImpl->mAlwaysUsingCornerRadius = true;
-
-        if(updateShader)
+        if(changeProperties)
         {
-          // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
+          const bool updateShader = !IsUsingCustomShader() && !IsRoundedCornerRequired();
 
-          if(IsSquircleCornerRequired())
+          // CornerRadius is animated now. we always have to use corner radius feature.
+          mImpl->mAlwaysUsingCornerRadius = true;
+
+          if(updateShader)
           {
-            // Change the shader must not be occured many times. we always have to use corner squreness feature.
-            mImpl->mAlwaysUsingCornerSquareness = true;
+            // Update each values to renderer
+            DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
 
-            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+            if(IsSquircleCornerRequired())
+            {
+              // Change the shader must not be occured many times. we always have to use corner squreness feature.
+              mImpl->mAlwaysUsingCornerSquareness = true;
+
+              mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+            }
+
+            // Change shader
+            UpdateShader();
           }
-
-          // Change shader
-          UpdateShader();
-        }
-        if(!IsBorderlineRequired())
-        {
-          // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
-          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          if(!IsBorderlineRequired())
+          {
+            // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+            mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          }
         }
         return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::CORNER_RADIUS);
       }
@@ -1527,26 +1573,29 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForCornerRadius(mImpl->mType))
       {
-        const bool updateShader = !IsUsingCustomShader() && !IsSquircleCornerRequired();
-
-        // CornerSquareness is animated now. we always have to use corner squareness feature.
-        mImpl->mAlwaysUsingCornerSquareness = true;
-
-        if(updateShader)
+        if(changeProperties)
         {
-          // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+          const bool updateShader = !IsUsingCustomShader() && !IsSquircleCornerRequired();
 
-          // Change shader
-          UpdateShader();
-        }
-        if(!IsBorderlineRequired())
-        {
-          // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
-          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          // CornerSquareness is animated now. we always have to use corner squareness feature.
+          mImpl->mAlwaysUsingCornerSquareness = true;
+
+          if(updateShader)
+          {
+            // Update each values to renderer
+            DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
+
+            // Change shader
+            UpdateShader();
+          }
+          if(!IsBorderlineRequired())
+          {
+            // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+            mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          }
         }
         return Dali::Property(mImpl->mRenderer, DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
       }
@@ -1558,23 +1607,26 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       if(IsTypeAvailableForBorderline(mImpl->mType))
       {
-        const bool updateShader = !IsUsingCustomShader() && !IsBorderlineRequired();
-
-        // Borderline is animated now. we always have to use borderline feature.
-        mImpl->mAlwaysUsingBorderline = true;
-
-        if(updateShader)
+        if(changeProperties)
         {
-          // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBorderlineUniform();
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, mImpl->GetBorderlineWidth());
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, mImpl->GetBorderlineColor());
-          mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, mImpl->GetBorderlineOffset());
+          const bool updateShader = !IsUsingCustomShader() && !IsBorderlineRequired();
 
-          // Change shader
-          UpdateShader();
+          // Borderline is animated now. we always have to use borderline feature.
+          mImpl->mAlwaysUsingBorderline = true;
+
+          if(updateShader)
+          {
+            // Update each values to renderer
+            DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBorderlineUniform();
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, mImpl->GetBorderlineWidth());
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, mImpl->GetBorderlineColor());
+            mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, mImpl->GetBorderlineOffset());
+
+            // Change shader
+            UpdateShader();
+          }
+          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
         }
-        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
 
         return Dali::Property(mImpl->mRenderer, GetPropertyIndex(key));
       }
@@ -1596,7 +1648,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
           (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME)))
       {
         // Request to color-visual class
-        return OnGetPropertyObject(key);
+        return OnGetPropertyObject(key, changeProperties);
       }
     }
   }
@@ -1610,11 +1662,60 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
 
   // We can't find the property in the base class.
   // Request to child class
-  return OnGetPropertyObject(key);
+  return OnGetPropertyObject(key, changeProperties);
+}
+
+bool Visual::Base::IsOffscreenRenderingCaptureEnabled() const
+{
+  const int depthIndex = mImpl->mDepthIndex;
+  return depthIndex == DepthIndex::AUTO_INDEX || (DepthIndex::BACKGROUND_EFFECT < depthIndex && depthIndex <= DepthIndex::DECORATION);
+}
+
+void Visual::Base::AddConstraintObserver(Visual::ConstraintObserver& observer)
+{
+  mImpl->mConstraintFeatureList.SetObserver(observer);
+}
+
+void Visual::Base::RemoveConstraintObserver(Visual::ConstraintObserver& observer)
+{
+  mImpl->mConstraintFeatureList.ResetObserver(observer);
+}
+
+void Visual::Base::AddConstraintFeature(Dali::Constraint constraint, std::unordered_set<Property::Index> properties)
+{
+  mImpl->mConstraintFeatureList.AddFeature(std::move(constraint), std::move(properties));
+}
+
+void Visual::Base::RemoveConstraintFeature(Dali::Constraint constraint)
+{
+  mImpl->mConstraintFeatureList.RemoveFeature(std::move(constraint));
+}
+
+void Visual::Base::RemoveConstraintFeatureByIndex(Property::Index index)
+{
+  mImpl->mConstraintFeatureList.RemoveFeature(index);
+}
+
+void Visual::Base::UpdateApplyRate(Property::Index updatedProperty)
+{
+  if(IsOnScene())
+  {
+    mImpl->mConstraintFeatureList.UpdateApplyRateByIndex(updatedProperty);
+  }
+}
+
+void Visual::Base::StartConstraintFeature(Property::Index index)
+{
+  mImpl->mConstraintFeatureList.StartFeature(index);
+}
+
+void Visual::Base::StopConstraintFeature(Property::Index index)
+{
+  mImpl->mConstraintFeatureList.StopFeature(index);
 }
 
 } // namespace Internal
 
-} // namespace Toolkit
+} //namespace Toolkit
 
-} // namespace Dali
+} //namespace Dali

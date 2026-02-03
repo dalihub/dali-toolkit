@@ -1376,7 +1376,7 @@ Shader ImageVisual::GenerateShader() const
   return shader;
 }
 
-Dali::Property ImageVisual::OnGetPropertyObject(Dali::Property::Key key)
+Dali::Property ImageVisual::OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
 {
   if((key.type == Property::Key::INDEX && key.indexKey == Toolkit::ImageVisual::Property::PIXEL_AREA) ||
      (key.type == Property::Key::STRING && key.stringKey == PIXEL_AREA_UNIFORM_NAME))

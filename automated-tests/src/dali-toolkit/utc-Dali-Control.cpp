@@ -1792,7 +1792,7 @@ int UtcDaliControlCornerRadius(void)
   END_TEST;
 }
 
-int UtcDaliControlBorderline(void)
+int UtcDaliControlBorderline01(void)
 {
   ToolkitTestApplication application;
 

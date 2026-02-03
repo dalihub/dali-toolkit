@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/rendering/visual-renderer.h>
+
 #include <memory> ///< for std::unique_ptr
+#include <unordered_set>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-decoration-data.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-constraint-observer.h>
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -122,10 +126,203 @@ struct Base::Impl
     Toolkit::Align::Type mAnchorPoint;
   };
 
+  struct ConstraintFeature
+  {
+  public:
+    // Constructor & Destructor
+    ConstraintFeature(const ConstraintObserver* observer, Dali::Constraint constraint, std::unordered_set<Property::Index> properties)
+    : mConstraint(constraint),
+      mRelativeProperties(std::move(properties))
+    {
+      if(mConstraint && observer)
+      {
+        UpdateApplyRate(observer);
+      }
+    }
+
+    ~ConstraintFeature()
+    {
+      if(mConstraint)
+      {
+        mConstraint.Remove();
+      }
+    }
+
+    ConstraintFeature(ConstraintFeature&& rhs) noexcept
+    : mConstraint(std::move(rhs.mConstraint)),
+      mRelativeProperties(std::move(rhs.mRelativeProperties))
+    {
+    }
+
+    ConstraintFeature& operator=(ConstraintFeature&& rhs) noexcept
+    {
+      if(this != &rhs)
+      {
+        if(mConstraint)
+        {
+          mConstraint.Remove();
+        }
+        mConstraint         = std::move(rhs.mConstraint);
+        mRelativeProperties = std::move(rhs.mRelativeProperties);
+      }
+      return *this;
+    }
+
+  private:
+    // Do not allow to copy the struct
+    ConstraintFeature(const ConstraintFeature&)            = delete;
+    ConstraintFeature& operator=(const ConstraintFeature&) = delete;
+
+  public:
+    void UpdateApplyRateByIndex(const ConstraintObserver* observer, Property::Index updatedProperty)
+    {
+      if(mRelativeProperties.find(updatedProperty) != mRelativeProperties.end())
+      {
+        UpdateApplyRate(observer);
+      }
+    }
+
+    void UpdateApplyRate(const ConstraintObserver* observer)
+    {
+      if(observer->IsAnyPropertyAnimate(mRelativeProperties))
+      {
+        mConstraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+      }
+      else
+      {
+        mConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+      }
+    }
+
+  public:
+    Dali::Constraint                    mConstraint;
+    std::unordered_set<Property::Index> mRelativeProperties; ///< The list of observer's property which we should check apply always, or notify just once.
+  };
+
+  struct ConstraintFeatureList
+  {
+    void SetObserver(const ConstraintObserver& observer)
+    {
+      mConstraintObserver = &observer;
+      UpdateAllApplyRate();
+    }
+
+    void ResetObserver(const ConstraintObserver& observer)
+    {
+      mFeatures.clear();
+      mConstraintObserver = nullptr;
+    }
+
+    void AddFeature(Dali::Constraint constraint, std::unordered_set<Property::Index> properties)
+    {
+      if(constraint)
+      {
+        mFeatures.emplace_back(mConstraintObserver, constraint, std::move(properties));
+      }
+    }
+
+    void RemoveFeature(Dali::Constraint constraint)
+    {
+      for(auto iter = mFeatures.begin(); iter != mFeatures.end();)
+      {
+        if((*iter).mConstraint == constraint)
+        {
+          iter = mFeatures.erase(iter);
+        }
+        else
+        {
+          ++iter;
+        }
+      }
+    }
+
+    void RemoveFeature(Property::Index index)
+    {
+      for(auto iter = mFeatures.begin(); iter != mFeatures.end();)
+      {
+        if((*iter).mRelativeProperties.find(index) != (*iter).mRelativeProperties.end())
+        {
+          iter = mFeatures.erase(iter);
+        }
+        else
+        {
+          ++iter;
+        }
+      }
+    }
+
+    void SceneDisconnected()
+    {
+      if(mConstraintObserver)
+      {
+        for(auto& feature : mFeatures)
+        {
+          // Make APPLY_ONCE forcibly.
+          feature.mConstraint.SetApplyRate(Constraint::APPLY_ONCE);
+        }
+      }
+    }
+
+    void UpdateAllApplyRate()
+    {
+      if(mConstraintObserver)
+      {
+        for(auto& feature : mFeatures)
+        {
+          feature.UpdateApplyRate(mConstraintObserver);
+        }
+      }
+    }
+
+    void StartFeature(Property::Index index)
+    {
+      if(mConstraintObserver)
+      {
+        for(auto& feature : mFeatures)
+        {
+          if(feature.mRelativeProperties.find(index) != feature.mRelativeProperties.end())
+          {
+            feature.mConstraint.Apply();
+          }
+        }
+      }
+    }
+
+    void StopFeature(Property::Index index)
+    {
+      if(mConstraintObserver)
+      {
+        for(auto& feature : mFeatures)
+        {
+          if(feature.mRelativeProperties.find(index) != feature.mRelativeProperties.end())
+          {
+            feature.mConstraint.Remove();
+          }
+        }
+      }
+    }
+
+    void UpdateApplyRateByIndex(Property::Index updatedProperty)
+    {
+      if(mConstraintObserver)
+      {
+        for(auto& feature : mFeatures)
+        {
+          feature.UpdateApplyRateByIndex(mConstraintObserver, updatedProperty);
+        }
+      }
+    }
+
+    const ConstraintObserver*      mConstraintObserver{nullptr};
+    bool                           mApplied{false};
+    std::vector<ConstraintFeature> mFeatures;
+  };
+
   /**
    * @brief Adds new Custom Shader for the visual.
    */
-  void AddCustomShader(const Property::Map& shaderMap)
+  void
+  AddCustomShader(const Property::Map& shaderMap)
   {
     mCustomShaders.emplace_back(std::make_unique<CustomShader>(shaderMap));
   }
@@ -345,6 +542,7 @@ struct Base::Impl
   VisualRenderer                             mRenderer;
   std::vector<std::unique_ptr<CustomShader>> mCustomShaders;
   EventObserver*                             mEventObserver; ///< Allows controls to observe when the visual has events to notify
+  ConstraintFeatureList                      mConstraintFeatureList;
   std::string                                mName;
   std::unique_ptr<Transform>                 mTransform;
   Vector4                                    mMixColor;
