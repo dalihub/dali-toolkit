@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,8 @@ void VectorAnimationTask::Process()
 
 void VectorAnimationTask::Finalize()
 {
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Finalize [%p]\n", this);
+
   {
     Mutex::ScopedLock lock(mMutex);
 

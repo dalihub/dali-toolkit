@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4247,7 +4247,10 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(1, 0, 1, TEST_BROKEN_IMAGE_L, "", TEST_LOCATION);
 
   TestResourceReadyUrl(2, 0, 1, TEST_GIF_FILE_NAME, "", TEST_LOCATION);                   // 2 image loading - batch size
-  TestResourceReadyUrl(2, 0, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // load & rasterize
+  TestResourceReadyUrl(3, 0, 1, TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, "", TEST_LOCATION); // load & rasterize + for discarded tasks at worker thread.
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   TestResourceReadyUrl(3, 0, 1, gImage_600_RGB, gImage_34_RGBA, TEST_LOCATION); // 2 image loading + 1 applymask
 
@@ -4258,7 +4261,10 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestResourceReadyUrl(1, 0, 0, "invalid.svg", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.9.png", "", TEST_LOCATION);
   TestResourceReadyUrl(1, 0, 0, "invalid.gif", "", TEST_LOCATION);  // 1 image loading
-  TestResourceReadyUrl(1, 0, 0, "invalid.json", "", TEST_LOCATION); // 0 rasterize
+  TestResourceReadyUrl(2, 0, 0, "invalid.json", "", TEST_LOCATION); // 1 load + 1 for discarded tasks at worker thread.
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize failed) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   TestResourceReadyUrl(2, 0, 0, "invalid.jpg", "invalid.png", TEST_LOCATION);  // 2 image loading
   TestResourceReadyUrl(2, 0, 1, gImage_600_RGB, "invalid.png", TEST_LOCATION); // 2 image loading

@@ -108,7 +108,7 @@ void CheckAndRetryPlayRange(DummyControl dummyControl, int expectStartFrame, int
     {
       tet_printf("Retry to get value again! [%d]\n", tryCount);
       // Dummy sleep 1 second.
-      Test::WaitForEventThreadTrigger(1, 1);
+      Test::WaitForEventThreadTrigger(1, 0);
       continue;
     }
 
@@ -184,8 +184,17 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -221,8 +230,17 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual02(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -267,16 +285,16 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
   // if ForceRenderOnce triggered before render complete, renderer count could be zero.
   // Consume it if required.
-  if(actor.GetRendererCount() == 0)
+  while(actor.GetRendererCount() == 0)
   {
     tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 1);
+    Test::WaitForEventThreadTrigger(1, 0);
   }
 
   // renderer is added to actor
@@ -341,16 +359,16 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
   // if ForceRenderOnce triggered before render complete, renderer count could be zero.
   // Consume it if required.
-  if(actor.GetRendererCount() == 0)
+  while(actor.GetRendererCount() == 0)
   {
     tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 1);
+    Test::WaitForEventThreadTrigger(1, 0);
   }
 
   // renderer is added to actor
@@ -504,8 +522,20 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
+
+  // renderer is added to actor
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Property::Map resultMap;
   resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -776,8 +806,8 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Renderer        renderer = dummy.GetRendererAt(0);
   Shader          shader2  = renderer.GetShader();
@@ -828,12 +858,14 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   visual.GetNaturalSize(naturalSize);
 
   // Some magical async-task ordering issue, Rasterize might be finished before load completed.
-  if(DALI_UNLIKELY(naturalSize != Vector2(100.0f, 100.0f)))
+  while(DALI_UNLIKELY(naturalSize != Vector2(100.0f, 100.0f)))
   {
     // Trigger one more time
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(naturalSize, Vector2(100.0f, 100.0f), TEST_LOCATION); // 100x100 is the content default size.
+    Test::WaitForEventThreadTrigger(1, 0);
+    visual.GetNaturalSize(naturalSize);
   }
+
+  DALI_TEST_EQUALS(naturalSize, Vector2(100.0f, 100.0f), TEST_LOCATION); // 100x100 is the content default size.
 
   actor.SetProperty(Actor::Property::SIZE, controlSize);
 
@@ -876,8 +908,17 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -921,16 +962,16 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
   // if ForceRenderOnce triggered before render complete, renderer count could be zero.
   // Consume it if required.
-  if(actor.GetRendererCount() == 0)
+  while(actor.GetRendererCount() == 0)
   {
     tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 1);
+    Test::WaitForEventThreadTrigger(1, 0);
   }
 
   // renderer is added to actor
@@ -981,7 +1022,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.Render();
 
   // Jump to action when paused, will make one or more event trigger
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - force render once + discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // Test whether current frame is 3.
   CheckAndRetryCurrentFrame(actor, 3, {0, 1, 2}, TEST_LOCATION);
@@ -1000,7 +1042,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 3 - Rasterize size changed + force render once due to frame changed + discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   CheckAndRetryPlayRange(actor, 0, 2, {{1, totalFrameNumber - 1}}, TEST_LOCATION);
 
@@ -1050,10 +1093,10 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
   // if ForceRenderOnce triggered before render complete, renderer count could be zero.
   // Consume it if required.
-  if(actor.GetRendererCount() == 0)
+  while(actor.GetRendererCount() == 0)
   {
     tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 1);
+    Test::WaitForEventThreadTrigger(1, 0);
   }
 
   // renderer is added to actor
@@ -1185,6 +1228,15 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfo(void)
   // Trigger count is 2 - load & render a frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
+
   // renderer is added to actor
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   Renderer renderer = actor.GetRendererAt(0u);
@@ -1240,7 +1292,7 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid(void)
 
   Property::Map propertyMap;
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
-    .Add(ImageVisual::Property::URL, "invalid.json")
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
@@ -1263,6 +1315,15 @@ int UtcDaliAnimatedVectorImageVisualMarkerInfoFromInvalid(void)
 
   // Trigger count is 1 - load, and failed.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1309,8 +1370,17 @@ int UtcDaliAnimatedVectorImageVisualEnableFrameCache(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1351,6 +1421,15 @@ int UtcDaliAnimatedVectorImageVisualEnableFrameCacheFailed(void)
 
   // Trigger count is 1 - load, and failed.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
@@ -1403,8 +1482,8 @@ int UtcDaliAnimatedVectorImageVisualNotifyAfterRasterization(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // Play animation
   Property::Map attributes;
@@ -1416,7 +1495,7 @@ int UtcDaliAnimatedVectorImageVisualNotifyAfterRasterization(void)
   // There might be 1 event triggered if render frame spend long time.
   // if ForceRenderOnce triggered before render complete, renderer count could be zero.
   // Consume it if required.
-  if(actor.GetRendererCount() == 0)
+  while(actor.GetRendererCount() == 0)
   {
     tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
     Test::WaitForEventThreadTrigger(1, 1);
@@ -1491,8 +1570,8 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   propertyMap.Clear();
   propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
@@ -1505,7 +1584,8 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   application.Render();
 
   // Wait for animation finish
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_STATE);
@@ -1544,16 +1624,19 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 2);
 
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - Jump to during stopped
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - Jump to during stopped + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1571,12 +1654,10 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
 
-  // To make event trigger
-  actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - Jump to during stopped but failed, so force render not requested + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
@@ -1602,9 +1683,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.Render();
 
   // Wait for animation finish
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-  // Note : AnimationFinished will occure force-render, and it might required another trigger. Test one more trigger now.
-  Test::WaitForEventThreadTrigger(1, 1);
+  // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   // Jump to 3
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
@@ -1612,8 +1692,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - Jump to during stopped.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - Jump to during stopped + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1630,7 +1710,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - Jump to during stopped + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1673,8 +1754,11 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::LOOP_COUNT);
@@ -1705,7 +1789,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::LOOP_COUNT);
@@ -1734,7 +1819,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::PLAY_RANGE);
@@ -1791,9 +1877,12 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
   tet_printf("First upload. Check load + render\n");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   propertyMap.Clear();
   propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
@@ -1806,9 +1895,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - animation finished + force render request
+  // Trigger count is 3 - animation finished + force render request + for discarded tasks at worker thread.
   tet_printf("Wait until animation finished. Check render finished + force render trigger\n");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1827,9 +1916,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - animation finished + force render request
+  // Trigger count is 3 - animation finished + force render request + for discarded tasks at worker thread.
   tet_printf("Wait until animation finished again. Check render finished + force render trigger\n");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   map = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
 
@@ -1862,9 +1951,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - force render request due to pause
+  // Trigger count is 3 - size changed + force render request due to pause + for discarded tasks at worker thread.
   tet_printf("Check force render trigger due to pause action\n");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   map                    = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value                  = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1879,9 +1968,9 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - animation finished + force render request
+  // Trigger count is 3 - animation finished + force render request + for discarded tasks at worker thread.
   tet_printf("Check animation stop + force render trigger\n");
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1915,8 +2004,11 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load, render
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   propertyMap.Clear();
   propertyMap.Add(DevelImageVisual::Property::LOOP_COUNT, 3);
@@ -1930,8 +2022,8 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1948,8 +2040,8 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
@@ -1966,8 +2058,8 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Value* value1           = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
   int              totalFrameNumber = value1->Get<int>();
@@ -2004,8 +2096,8 @@ int UtcDaliAnimatedVectorImageVisualFrameSpeedFactor(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value = map.Find(DevelImageVisual::Property::FRAME_SPEED_FACTOR);
@@ -2114,8 +2206,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -2129,8 +2221,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at work thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   auto textureSet = renderer.GetTextures();
   auto texture    = textureSet.GetTexture(0);
@@ -2148,8 +2240,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at work thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -2172,8 +2264,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at work thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   renderer = actor.GetRendererAt(0u);
   DALI_TEST_CHECK(renderer);
@@ -2212,8 +2304,11 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   propertyMap.Clear();
   propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
@@ -2234,8 +2329,11 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   DevelControl::DoAction(actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, Property::Map());
 
@@ -2245,6 +2343,7 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - size changed. Keep going for animate
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   Property::Map attributes;
@@ -2293,8 +2392,11 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
@@ -2343,8 +2445,8 @@ int UtcDaliAnimatedVectorImageVisualInheritedVisibilityChanged(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
@@ -2398,8 +2500,11 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile01(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - load
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - load + resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize failed) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   application.SendNotification();
   application.Render();
@@ -2483,8 +2588,11 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile03(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - load
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - load + resource ready
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize failed) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   application.SendNotification();
   application.Render();
@@ -2525,8 +2633,11 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load, render the first frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   Property::Map    map              = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   Property::Value* value            = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
@@ -2573,8 +2684,8 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   textureTrace.Enable(true);
 
@@ -2593,8 +2704,8 @@ int UtcDaliAnimatedVectorImageVisualSize(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - size changed + for discarded tasks at work thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   textureTrace.Reset();
 
@@ -2696,8 +2807,11 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty01(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+  Test::WaitForEventThreadTrigger(1, 1);
 
   // Test whether the property callback is called
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[1], true, TEST_LOCATION);
@@ -2764,8 +2878,8 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
   // Test whether the property callback is called
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[1], true, TEST_LOCATION);
@@ -2784,7 +2898,7 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
       application.Render();
 
       // Dummy sleep 1 second.
-      Test::WaitForEventThreadTrigger(1, 1);
+      Test::WaitForEventThreadTrigger(1, 0);
 
       application.SendNotification();
       application.Render();
@@ -2840,11 +2954,11 @@ int UtcDaliAnimatedVectorImageVisualUseReleasePolicy(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
   tet_printf("First frame render request\n");
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -2905,11 +3019,11 @@ int UtcDaliAnimatedVectorImageVisualUseReleasePolicy(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - force render-once call due to jump to action.
+  // Trigger count is 2 - force render-once call due to jump to action. + for discarded tasks at worker thread.
   tet_printf("Frame render request\n");
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -2965,11 +3079,11 @@ int UtcDaliAnimatedVectorImageVisualUseReleasePolicy(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready, (due to size changed)
+  // Trigger count is 2 - resource ready, (due to size changed) + for discarded tasks at worker thread.
   tet_printf("Frame render request\n");
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -3035,10 +3149,10 @@ int UtcDaliAnimatedVectorImageVisualUseReleasePolicy(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready for 200 x 200 after scale notification comes.
+  // Trigger count is 2 - resource ready for 200 x 200 after scale notification comes. + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -3103,10 +3217,10 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -3142,12 +3256,13 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
 
   application.SendNotification();
   application.Render();
@@ -3191,10 +3306,10 @@ int UtcDaliAnimatedVectorImageVisualDesiredSizeUseReleasePolicy(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   gResourceReadySignalFired = false;
@@ -3366,8 +3481,8 @@ int UtcDaliAnimatedVectorImageNativeTextureChangeShader(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - resource ready
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -3417,8 +3532,11 @@ int UtcDaliAnimatedVectorImageVisualDestroyApplicationWhenFrameDropped(void)
       application.SendNotification();
       application.Render();
 
-      // Trigger count is 2 - load, render the first frame
-      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+      // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+      // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 2 seconds more.
+      Test::WaitForEventThreadTrigger(1, 1);
 
       Property::Map attributes;
       DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
