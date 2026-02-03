@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -51,6 +52,8 @@ VectorAnimationThread::VectorAnimationThread()
   mEventTriggerMutex(),
   mAnimationTasksMutex(),
   mTaskCompletedMutex(),
+  mDiscardedTasksMutex(),
+  mEventTrigger(new EventThreadCallback(MakeCallback(this, &VectorAnimationThread::OnEventCallbackTriggered))),
   mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
   mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mNeedToSleep(false),
@@ -60,7 +63,6 @@ VectorAnimationThread::VectorAnimationThread()
   mAsyncTaskManager = Dali::AsyncTaskManager::Get();
   mSleepThread.Start();
 
-  mEventTrigger = std::unique_ptr<EventThreadCallback>(new EventThreadCallback(MakeCallback(this, &VectorAnimationThread::OnEventCallbackTriggered)));
   DALI_LOG_DEBUG_INFO("VectorAnimationThread Trigger Id(%d)\n", mEventTrigger->GetId());
 }
 
@@ -217,6 +219,7 @@ void VectorAnimationThread::RequestForceRenderOnce()
 /// Event thread called
 void VectorAnimationThread::Finalize()
 {
+  Mutex::ScopedLock discardedTasksLock(mDiscardedTasksMutex);
   Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
   Mutex::ScopedLock taskCompletedLock(mTaskCompletedMutex);
   Mutex::ScopedLock animationTasksLock(mAnimationTasksMutex);
@@ -333,6 +336,20 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
           needRasterize = true;
         }
       }
+      else
+      {
+        Mutex::ScopedLock discardedTasksLock(mDiscardedTasksMutex);
+        if(mDiscardedTasks.empty())
+        {
+          Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
+          if(DALI_LIKELY(!mDestroyThread && mEventTrigger))
+          {
+            DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered for discard tasks!\n");
+            mEventTrigger->Trigger();
+          }
+        }
+        mDiscardedTasks.insert(task);
+      }
     }
   }
 
@@ -445,14 +462,37 @@ void VectorAnimationThread::OnEventCallbackTriggered()
     }
     CallbackBase::Execute(*callbackPair.first, callbackPair.second);
   }
+
+  bool                      dummyTaskRequired = false;
+  decltype(mDiscardedTasks) discardedTasks;
+  {
+    Mutex::ScopedLock lock(mDiscardedTasksMutex);
+    if(!mDiscardedTasks.empty())
+    {
+      mDiscardedTasks.swap(discardedTasks);
+    }
+  }
+  // Remove discarded tasks now, out of mutex.
+  if(!discardedTasks.empty())
+  {
+    dummyTaskRequired = true;
+    discardedTasks.clear();
+  }
+
   // Request update once if we need.
   {
     Mutex::ScopedLock lock(mEventTriggerMutex);
-    if(!mDestroyThread && mForceRenderOnce)
+    if(DALI_LIKELY(!mDestroyThread && Dali::Adaptor::IsAvailable()))
     {
-      mForceRenderOnce = false;
-      if(Dali::Adaptor::IsAvailable())
+      if(dummyTaskRequired)
       {
+        // Request to remove pending tasks at AsyncTaskManager side.
+        mAsyncTaskManager.AddTask(nullptr);
+        Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+      }
+      if(mForceRenderOnce)
+      {
+        mForceRenderOnce = false;
         Dali::Adaptor::Get().UpdateOnce();
       }
     }
