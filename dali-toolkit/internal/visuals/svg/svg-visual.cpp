@@ -308,20 +308,20 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 
     if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
     {
-      // Use desired size. Need to request rasterize forcibly.
+      // Use desired size. We don't need to wait size negotiation this case.
       AddRasterizationTask(mDesiredSize);
+    }
 
-      if(mRasterizeCompleted)
-      {
-        // The case when we got cached rasterized result. Since "IsOnScene()" still false,
-        // RasterizeComplete will not send resource ready signal. Need to emit this time.
-        EmitResourceReady(Toolkit::Visual::ResourceStatus::READY);
-      }
-      else if(DALI_UNLIKELY(mLoadFailed))
-      {
-        // If rasterize failed.
-        EmitResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-      }
+    if(DALI_UNLIKELY(mLoadFailed))
+    {
+      // If rasterize failed.
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    }
+    else if(mRasterizeCompleted && mLoadCompleted)
+    {
+      // The case when we got cached rasterized result, or case ReleasePolicy is not DETACHED.
+      // Since "IsOnScene()" still false, RasterizeComplete will not send resource ready signal. Need to emit this time.
+      EmitResourceReady(Toolkit::Visual::ResourceStatus::READY);
     }
   }
 }
@@ -331,13 +331,15 @@ void SvgVisual::DoSetOffScene(Actor& actor)
   // Remove rasterizing task
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED && mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
+    // When adding the actor back to stage the SVG rasterization should be forced again. (To emit ResourceReady signal at SceneOn).
+    mRasterizeForcibly     = true;
+    mRasterizeCompleted    = false;
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+
     // We don't need to remove task synchronously.
     mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
   }
-
-  // When adding the actor back to stage the SVG rasterization should be forced again. (To emit ResourceReady signal at SceneOn).
-  mRasterizeForcibly = true;
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
