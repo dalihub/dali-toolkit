@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -350,9 +350,13 @@ int UtcDaliSvgVisualReleasePolicy01(void)
   TestResourceReadySignalFired(control2, false, TEST_LOCATION);
 
   // Check we request rasterize 1 time.
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   TestResourceReadySignalFired(control1, true, TEST_LOCATION);
   TestResourceReadySignalFired(control2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 1u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -372,6 +376,8 @@ int UtcDaliSvgVisualReleasePolicy01(void)
   tet_printf("Detach visual1 and visual2\n");
   control1.Unparent();
   control2.Unparent();
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -392,7 +398,11 @@ int UtcDaliSvgVisualReleasePolicy01(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    // Still rasterize not requested. The number of renderer still zero.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    // After request rasterize, we will use cached svg texture. The number of renderer is one.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Check we don't request load and rasterize.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
@@ -413,8 +423,21 @@ int UtcDaliSvgVisualReleasePolicy01(void)
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
 
+  // Only control1 have renderer this time, since release policy is not DETACHED.
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
+
+  // Note : We don't send ResourceReady signal again for release-policy is not DETACHED.
+  TestResourceReadySignalFired(control1, false, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, false, TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 1u, TEST_LOCATION);
+  TestResourceReadySignalFired(control1, false, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, true, TEST_LOCATION);
   application.RunIdles();
   application.SendNotification();
   application.Render();
@@ -432,7 +455,11 @@ int UtcDaliSvgVisualReleasePolicy01(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    // Still rasterize not requested. The number of renderer still zero.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    // After request rasterize, we will use cached svg texture. The number of renderer is one.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Check we don't request load and rasterize.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
@@ -477,12 +504,15 @@ int UtcDaliSvgVisualReleasePolicy01(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
 
     // Check we request load and rasterize.
     TestResourceReadySignalFired(dummyControl, false, TEST_LOCATION);
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
     TestResourceReadySignalFired(dummyControl, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     dummyControl.Unparent();
     dummyControl.Reset();
@@ -546,9 +576,13 @@ int UtcDaliSvgVisualReleasePolicy02(void)
   TestResourceReadySignalFired(control2, false, TEST_LOCATION);
 
   // Check we request rasterize 1 time.
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   TestResourceReadySignalFired(control1, true, TEST_LOCATION);
   TestResourceReadySignalFired(control2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 1u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -568,6 +602,8 @@ int UtcDaliSvgVisualReleasePolicy02(void)
   tet_printf("Detach visual1 and visual2\n");
   control1.Unparent();
   control2.Unparent();
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -588,7 +624,11 @@ int UtcDaliSvgVisualReleasePolicy02(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    // Still rasterize not requested. The number of renderer still zero.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    // After request rasterize, we will use cached svg texture. The number of renderer is one.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Check we don't request load and rasterize.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
@@ -609,8 +649,22 @@ int UtcDaliSvgVisualReleasePolicy02(void)
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
 
+  // Only control1 have renderer this time, since release policy is not DETACHED.
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 0u, TEST_LOCATION);
+
+  // Note : We don't send ResourceReady signal again for release-policy is not DETACHED.
+  TestResourceReadySignalFired(control1, false, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, false, TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS(control1.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control2.GetRendererCount(), 1u, TEST_LOCATION);
+  TestResourceReadySignalFired(control1, false, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, true, TEST_LOCATION);
+
   application.RunIdles();
   application.SendNotification();
   application.Render();
@@ -628,7 +682,11 @@ int UtcDaliSvgVisualReleasePolicy02(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    // Still rasterize not requested. The number of renderer still zero.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    // After request rasterize, we will use cached svg texture. The number of renderer is one.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Check we don't request load and rasterize.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
@@ -672,7 +730,11 @@ int UtcDaliSvgVisualReleasePolicy02(void)
     dummyControl.SetProperty(Actor::Property::SIZE, size);
     application.GetScene().Add(dummyControl);
 
+    // Still rasterize not requested. The number of renderer still zero.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
     dummyVisual.SetTransformAndSize(Property::Map(), size);
+    // After request rasterize, we will use cached svg texture. The number of renderer is one.
+    DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Check we don't request load and rasterize.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
@@ -688,6 +750,74 @@ int UtcDaliSvgVisualReleasePolicy02(void)
     application.SendNotification();
     application.Render();
   }
+
+  END_TEST;
+}
+
+int UtcDaliSvgVisualReleasePolicy03(void)
+{
+  tet_infoline("Test detached policy release cache well");
+
+  ToolkitTestApplication application;
+
+  TraceCallStack& textureTrace = application.GetGlAbstraction().GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      control   = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(control.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  AttachResourceReadySignal(control);
+
+  application.SendNotification();
+
+  // request load.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Vector2 size(100.0f, 100.0f);
+  control.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control);
+
+  visual.SetTransformAndSize(Property::Map(), size);
+  TestResourceReadySignalFired(control, false, TEST_LOCATION);
+
+  // request rasterize.
+  DALI_TEST_EQUALS(control.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetRendererCount(), 1u, TEST_LOCATION);
+
+  TestResourceReadySignalFired(control, true, TEST_LOCATION);
+
+  // Unparent control.
+  control.Unparent();
+
+  // Ensure to remove cache.
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Add again, and check resource ready callback comes again too.
+  application.GetScene().Add(control);
+
+  visual.SetTransformAndSize(Property::Map(), size);
+  TestResourceReadySignalFired(control, false, TEST_LOCATION);
+
+  // request rasterize.
+  DALI_TEST_EQUALS(control.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetRendererCount(), 1u, TEST_LOCATION);
+
+  TestResourceReadySignalFired(control, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -921,6 +1051,85 @@ int UtcDaliSvgVisualRasterizeWithDesiredSize03(void)
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   TestResourceReadySignalFired(control1, true, TEST_LOCATION);
   TestResourceReadySignalFired(control2, false, TEST_LOCATION); ///< Control without desired size till not reasource ready. (For match old behavior)
+
+  visual1.SetTransformAndSize(Property::Map(), size);
+  visual2.SetTransformAndSize(Property::Map(), size);
+
+  // Since rasterize result is failed, control2 try to re-rasterize. Trigger will comes.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  TestResourceReadySignalFired(control1, false, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Unparent and reload again. Check rasterization requested again.\n");
+  control1.Unparent();
+  control2.Unparent();
+
+  // Ensure to remove the cache.
+  application.SendNotification();
+  application.Render();
+  application.RunIdles();
+  application.SendNotification();
+  application.Render();
+
+  // Scene on again. Rasterization should be requested again for visual1.
+  application.GetScene().Add(control1);
+  // rasterize will not requested here.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliSvgVisualRasterizeWithDesiredSize04(void)
+{
+  tet_infoline("Test desired size case rasterize request for invalid svg (rasterize failed) as synchrnously");
+
+  ToolkitTestApplication application;
+
+  TraceCallStack& textureTrace = application.GetGlAbstraction().GetTextureTrace();
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_INVALID_RASTERIZE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_WIDTH, 100);
+  propertyMap.Insert(ImageVisual::Property::DESIRED_HEIGHT, 100);
+
+  Visual::Base visual1 = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual1);
+
+  Visual::Base visual2 = VisualFactory::Get().CreateVisual(Property::Map().Add(ImageVisual::Property::URL, TEST_SVG_INVALID_RASTERIZE_FILE_NAME));
+  DALI_TEST_CHECK(visual2);
+
+  DummyControl      control1   = DummyControl::New();
+  DummyControlImpl& dummyImpl1 = static_cast<DummyControlImpl&>(control1.GetImplementation());
+  dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual1);
+
+  DummyControl      control2   = DummyControl::New();
+  DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(control2.GetImplementation());
+  dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual2);
+  AttachResourceReadySignal(control1);
+  AttachResourceReadySignal(control2);
+
+  application.SendNotification();
+
+  // Check we don't request load for visual2, since we already load synchronously.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  Vector2 size(100.0f, 100.0f);
+  control1.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control1);
+  control2.SetProperty(Actor::Property::SIZE, size);
+  application.GetScene().Add(control2);
+  TestResourceReadySignalFired(control1, true, TEST_LOCATION);
+  TestResourceReadySignalFired(control2, false, TEST_LOCATION);
 
   visual1.SetTransformAndSize(Property::Map(), size);
   visual2.SetTransformAndSize(Property::Map(), size);
