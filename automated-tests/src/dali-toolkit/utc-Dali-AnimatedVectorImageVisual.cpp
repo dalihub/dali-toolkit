@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,6 +302,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   Vector4         borderlineColor  = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
   float           borderlineOffset = 0.1f;
   float           cornerSquareness = 0.6f;
+  int             releasePolicy    = static_cast<int>(Toolkit::ImageVisual::ReleasePolicy::DESTROYED);
   Property::Array playRange;
   playRange.PushBack(startFrame);
   playRange.PushBack(endFrame);
@@ -325,7 +326,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
     .Add("borderlineOffset", borderlineOffset)
     .Add("cornerSquareness", cornerSquareness)
     .Add("desiredWidth", desiredWidth)
-    .Add("desiredHeight", desiredHeight);
+    .Add("desiredHeight", desiredHeight)
+    .Add("releasePolicy", releasePolicy);
 
   Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
   DALI_TEST_CHECK(visual);
@@ -442,6 +444,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), desiredHeight, TEST_LOCATION);
 
+  value = resultMap.Find(ImageVisual::Property::RELEASE_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), releasePolicy, TEST_LOCATION);
+
   actor.Unparent();
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
 
@@ -453,13 +459,15 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliAnimatedVectorImageVisualGetPropertyMap01");
 
-  int             startFrame = 1, endFrame = 3;
-  int             desiredWidth = 100, desiredHeight = 150;
-  Vector4         cornerRadius(50.0f, 22.0f, 0.0f, 3.0f);
-  float           borderlineWidth  = 2.3f;
-  Vector4         borderlineColor  = Vector4(0.3f, 0.3f, 1.0f, 1.0f);
-  float           borderlineOffset = 0.3f;
-  Vector4         cornerSquareness(0.1f, 0.4f, 0.2f, 0.3f);
+  int     startFrame = 1, endFrame = 3;
+  int     desiredWidth = 100, desiredHeight = 150;
+  Vector4 cornerRadius(50.0f, 22.0f, 0.0f, 3.0f);
+  float   borderlineWidth  = 2.3f;
+  Vector4 borderlineColor  = Vector4(0.3f, 0.3f, 1.0f, 1.0f);
+  float   borderlineOffset = 0.3f;
+  Vector4 cornerSquareness(0.1f, 0.4f, 0.2f, 0.3f);
+  int     releasePolicy = static_cast<int>(Toolkit::ImageVisual::ReleasePolicy::NEVER);
+
   Property::Array playRange;
   playRange.PushBack(startFrame);
   playRange.PushBack(endFrame);
@@ -477,7 +485,8 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
     .Add(DevelVisual::Property::CORNER_SQUARENESS, cornerSquareness)
     .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
     .Add(ImageVisual::Property::DESIRED_WIDTH, desiredWidth)
-    .Add(ImageVisual::Property::DESIRED_HEIGHT, desiredHeight);
+    .Add(ImageVisual::Property::DESIRED_HEIGHT, desiredHeight)
+    .Add(ImageVisual::Property::RELEASE_POLICY, releasePolicy);
 
   // request AnimatedVectorImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -584,6 +593,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find(ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), desiredHeight, TEST_LOCATION);
+
+  value = resultMap.Find(ImageVisual::Property::RELEASE_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_EQUALS(value->Get<int>(), releasePolicy, TEST_LOCATION);
 
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions());
@@ -2787,6 +2800,285 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
   END_TEST;
 }
 
+namespace
+{
+bool gResourceReadySignalFired = false;
+
+void ResourceReadySignal(Control control)
+{
+  gResourceReadySignalFired = true;
+}
+
+} // namespace
+
+int UtcDaliAnimatedVectorImageVisualUseReleasePolicy(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualUseReleasePolicy");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+
+  gResourceReadySignalFired = false;
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  actor.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  // Set visual size
+  actor.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  tet_printf("First frame render request\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << 300 << ", " << 300;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Add again, and check cached\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  // tet_printf("Check no additional frame rendered\n");
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Jump to specific frame during scene off\n");
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
+
+  tet_printf("Resend flag is not zero. We use previous renderer here\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - force render-once call due to jump to action.
+  tet_printf("Frame render request\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Add again, and check cached\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+
+  // tet_printf("Check no additional frame rendered\n");
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Change visual size\n");
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Resend flag is not zero. We use previous renderer here\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready, (due to size changed)
+  tet_printf("Frame render request\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << 100 << ", " << 100;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Add again, and check cached\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+
+  // tet_printf("Check no additional frame rendered\n");
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Change visual scale\n");
+  actor.SetProperty(Actor::Property::SCALE, Vector3(2.0f, 2.0f, 1.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // tet_printf("Check no additional frame rendered (use 100x100)\n");
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 0), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready for 200 x 200 after scale notification comes.
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << 200 << ", " << 200;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Unparent
+  tet_printf("Unparenting actor\n");
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  textureTrace.Reset();
+
+  tet_printf("Change visual scale and size as 200 x 200\n");
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  actor.SetProperty(Actor::Property::SCALE, Vector3(1.0f, 1.0f, 1.0f));
+
+  // Add to scene. We can reuse cached texture here.
+  tet_printf("Add and check cached\n");
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
 {
   ToolkitTestApplication application;
@@ -2796,12 +3088,15 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   int                desiredWidth = 150, desiredHeight = 200;
 
+  gResourceReadySignalFired = false;
+
   Visual::Base visual = VisualFactory::Get().CreateVisual(TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
   DALI_TEST_CHECK(visual);
 
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  actor.ResourceReadySignal().Connect(&ResourceReadySignal);
 
   application.GetScene().Add(actor);
 
@@ -2809,7 +3104,12 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
   application.Render();
 
   // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
 
   textureTrace.Enable(true);
 
@@ -2830,15 +3130,24 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
 
   // Set visual size
   actor.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+
+  textureTrace.Reset();
+
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
   application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
   // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  textureTrace.Reset();
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -2846,8 +3155,81 @@ int UtcDaliAnimatedVectorImageVisualDesiredSize(void)
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
-    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should not be changed
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualDesiredSizeUseReleasePolicy(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDesiredSizeUseReleasePolicy");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  int                desiredWidth = 150, desiredHeight = 200;
+
+  gResourceReadySignalFired = false;
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::DESIRED_WIDTH, desiredWidth)
+      .Add(ImageVisual::Property::DESIRED_HEIGHT, desiredHeight)
+      .Add(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  actor.ResourceReadySignal().Connect(&ResourceReadySignal);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - resource ready
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalFired, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  gResourceReadySignalFired = false;
+
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Unparent to make next trigger
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  // Set visual size
+  actor.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+
+  textureTrace.Reset();
+  // Add to scene. We can reuse cached texture here.
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  application.GetScene().Add(actor);
+  // TODO : For now, we don't emit resource ready signal when we use release policy. Could this be changed?
+  DALI_TEST_EQUALS(gResourceReadySignalFired, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
