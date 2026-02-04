@@ -27,7 +27,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/popup/confirmation-popup.cpp
   ${devel_api_src_dir}/controls/popup/popup.cpp
   ${devel_api_src_dir}/controls/progress-bar/progress-bar-devel.cpp
-  ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.cpp
   ${devel_api_src_dir}/controls/scroll-bar/scroll-bar.cpp
   ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
   ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
@@ -198,10 +197,6 @@ SET( devel_api_visuals_header_files
   ${devel_api_src_dir}/visuals/text-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/visual-actions-devel.h
   ${devel_api_src_dir}/visuals/visual-properties-devel.h
-)
-
-SET( devel_api_scene3d_view_header_files
-  ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.h
 )
 
 SET( devel_api_shadow_view_header_files
