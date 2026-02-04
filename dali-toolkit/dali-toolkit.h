@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
 #include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>

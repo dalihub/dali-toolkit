@@ -535,20 +535,6 @@ int UtcDaliAccessibilityTextSelectionConstructor(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityModel3dViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto model3dview = Model3dView::New();
-  DALI_TEST_CHECK(model3dview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(model3dview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::IMAGE, TEST_LOCATION);
-
-  END_TEST;
-}
-
 #include <dali-toolkit/internal/controls/effects-view/effects-view-impl.h>
 int UtcDaliAccessibilityEffectsViewConstructor(void)
 {

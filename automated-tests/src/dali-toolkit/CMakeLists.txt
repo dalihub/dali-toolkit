@@ -84,7 +84,6 @@ SET(TC_SOURCES
   utc-Dali-SuperBlurView.cpp
   utc-Dali-SvgVisual.cpp
   utc-Dali-Toolkit.cpp
-  utc-Dali-Model3dView.cpp
   utc-Dali-Visual.cpp
   utc-Dali-VisualFactory.cpp
   utc-Dali-VideoView.cpp
