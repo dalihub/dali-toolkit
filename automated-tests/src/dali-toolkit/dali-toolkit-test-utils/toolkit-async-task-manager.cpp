@@ -23,8 +23,8 @@
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
-#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <algorithm>

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/integration-api/adaptor-framework/trace-factory-interface.h>
-#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <memory>
 
