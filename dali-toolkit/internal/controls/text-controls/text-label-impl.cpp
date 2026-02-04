@@ -31,8 +31,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/controls/render-effects/mask-effect-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/render-effects/mask-effect-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -47,7 +47,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
-#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
+#include <dali-toolkit/public-api/render-effects/mask-effect.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *
  */
 // CLASS HEADER
-#include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
+#include <dali-toolkit/public-api/render-effects/background-blur-effect.h>
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/render-effects/background-blur-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/background-blur-effect-impl.h>
 namespace Dali
 {
 namespace Toolkit

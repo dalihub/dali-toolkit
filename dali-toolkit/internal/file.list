@@ -68,12 +68,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/visual-url.cpp
    ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
    ${toolkit_src_dir}/controls/alignment/alignment-impl.cpp
-   ${toolkit_src_dir}/controls/render-effects/render-effect-impl.cpp
-   ${toolkit_src_dir}/controls/render-effects/mask-effect-impl.cpp
-   ${toolkit_src_dir}/controls/render-effects/gaussian-blur-algorithm.cpp
-   ${toolkit_src_dir}/controls/render-effects/background-blur-effect-impl.cpp
-   ${toolkit_src_dir}/controls/render-effects/gaussian-blur-effect-impl.cpp
-   ${toolkit_src_dir}/controls/render-effects/offscreen-rendering-impl.cpp
    ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
@@ -153,6 +147,12 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/image-loader/loading-task.cpp
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp
    ${toolkit_src_dir}/property-bridge/property-bridge-impl.cpp
+   ${toolkit_src_dir}/render-effects/render-effect-impl.cpp
+   ${toolkit_src_dir}/render-effects/mask-effect-impl.cpp
+   ${toolkit_src_dir}/render-effects/gaussian-blur-algorithm.cpp
+   ${toolkit_src_dir}/render-effects/background-blur-effect-impl.cpp
+   ${toolkit_src_dir}/render-effects/gaussian-blur-effect-impl.cpp
+   ${toolkit_src_dir}/render-effects/offscreen-rendering-impl.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
    ${toolkit_src_dir}/text/abstract-style-character-run.cpp
    ${toolkit_src_dir}/text/bidirectional-support.cpp

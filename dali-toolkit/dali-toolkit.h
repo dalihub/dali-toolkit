@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,10 @@
 
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-#include <dali-toolkit/public-api/controls/render-effects/background-blur-effect.h>
-#include <dali-toolkit/public-api/controls/render-effects/gaussian-blur-effect.h>
-#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
-#include <dali-toolkit/public-api/controls/render-effects/render-effect.h>
+#include <dali-toolkit/public-api/render-effects/background-blur-effect.h>
+#include <dali-toolkit/public-api/render-effects/gaussian-blur-effect.h>
+#include <dali-toolkit/public-api/render-effects/mask-effect.h>
+#include <dali-toolkit/public-api/render-effects/render-effect.h>
 
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 

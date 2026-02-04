@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/controls/render-effects/mask-effect.h>
+#include <dali-toolkit/public-api/render-effects/mask-effect.h>
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/render-effects/mask-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/mask-effect-impl.h>
 namespace Dali
 {
 namespace Toolkit

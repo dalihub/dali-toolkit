@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H
-#define DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H
+#ifndef DALI_TOOLKIT_INTERNAL_BACKGROUND_BLUR_EFFECT_H
+#define DALI_TOOLKIT_INTERNAL_BACKGROUND_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@
 #include <dali/public-api/rendering/frame-buffer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/render-effects/gaussian-blur-algorithm.h>
-#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
-#include <dali-toolkit/public-api/controls/render-effects/gaussian-blur-effect.h>
+#include <dali-toolkit/internal/render-effects/gaussian-blur-algorithm.h>
+#include <dali-toolkit/internal/render-effects/render-effect-impl.h>
+#include <dali-toolkit/public-api/render-effects/background-blur-effect.h>
 
 namespace Dali
 {
@@ -38,18 +38,17 @@ namespace Toolkit
 {
 namespace Internal
 {
-class GaussianBlurEffectImpl;
-using GaussianBlurEffectImplPtr = IntrusivePtr<GaussianBlurEffectImpl>;
+class BackgroundBlurEffectImpl;
+using BackgroundBlurEffectImplPtr = IntrusivePtr<BackgroundBlurEffectImpl>;
 
-class GaussianBlurEffectImpl : public RenderEffectImpl
+class BackgroundBlurEffectImpl : public RenderEffectImpl
 {
 public:
   /**
    * @brief Creates an initialized BlurEffect implementation, using default settings. As default, blur radius is set to 10u.
    * @return A handle to a newly allocated Dali resource
    */
-
-  static GaussianBlurEffectImplPtr New();
+  static BackgroundBlurEffectImplPtr New();
 
   /**
    * @brief Creates an initialized BlurEffect implementation.
@@ -57,7 +56,7 @@ public:
    * @param[in] blurRadius The radius of Gaussian kernel.
    * @return A handle to a newly allocated Dali resource
    */
-  static GaussianBlurEffectImplPtr New(uint32_t blurRadius);
+  static BackgroundBlurEffectImplPtr New(uint32_t blurRadius);
 
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
@@ -70,66 +69,76 @@ public:
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::SetBlurOnce
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurOnce
    */
   void SetBlurOnce(bool blurOnce);
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::GetBlurOnce
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurOnce
    */
   bool GetBlurOnce() const;
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::SetBlurRadius
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurRadius
    */
   void SetBlurRadius(uint32_t blurRadius);
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::GetBlurRadius
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurRadius
    */
   uint32_t GetBlurRadius() const;
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::SetBlurDownscaleFactor
+   * @copydoc Toolkit::BackgroundBlurEffect::SetBlurDownscaleFactor
    */
   void SetBlurDownscaleFactor(float downscaleFactor);
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::GetBlurDownscaleFactor
+   * @copydoc Toolkit::BackgroundBlurEffect::GetBlurDownscaleFactor
    */
   float GetBlurDownscaleFactor() const;
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::AddBlurStrengthAnimation
+   * @copydoc Toolkit::BackgroundBlurEffect::AddBlurStrengthAnimation
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::AddBlurOpacityAnimation
+   * @copydoc Toolkit::BackgroundBlurEffect::AddBlurOpacityAnimation
    */
   void AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
 
   /**
-   * @copydoc Toolkit::GaussianBlurEffect::FinishedSignal
+   * @copydoc Toolkit::BackgroundBlurEffect::FinishedSignal
    */
-  Dali::Toolkit::GaussianBlurEffect::FinishedSignalType& FinishedSignal();
+  Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType& FinishedSignal();
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetSourceActor
+   */
+  void SetSourceActor(Dali::Actor sourceActor);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetStopperActor
+   */
+  void SetStopperActor(Dali::Actor stopperActor);
 
 protected:
   /**
    * @brief Creates an uninitialized blur effect implementation
    */
-  GaussianBlurEffectImpl();
+  BackgroundBlurEffectImpl();
 
   /**
    * @brief Creates an uninitialized blur effect implementation
    * @param[in] blurRadius The radius of Gaussian kernel.
    */
-  GaussianBlurEffectImpl(uint32_t blurRadius);
+  BackgroundBlurEffectImpl(uint32_t blurRadius);
 
   /**
    * @brief Destructor
    */
-  virtual ~GaussianBlurEffectImpl();
+  virtual ~BackgroundBlurEffectImpl();
 
   /**
    * @brief Initializes blur effect
@@ -147,7 +156,7 @@ protected:
   void OnDeactivate() override;
 
   /**
-   * @brief Redraw effect without deactivation
+   * @brief Redraws effect without deactivation
    */
   void OnRefresh() override;
 
@@ -197,13 +206,13 @@ private:
    */
   void UpdateDownscaledBlurRadius();
 
-  GaussianBlurEffectImpl(const GaussianBlurEffectImpl&)            = delete;
-  GaussianBlurEffectImpl(GaussianBlurEffectImpl&&)                 = delete;
-  GaussianBlurEffectImpl& operator=(GaussianBlurEffectImpl&&)      = delete; // no move()
-  GaussianBlurEffectImpl& operator=(const GaussianBlurEffectImpl&) = delete; // no copy()
+  BackgroundBlurEffectImpl(const BackgroundBlurEffectImpl&)            = delete;
+  BackgroundBlurEffectImpl(BackgroundBlurEffectImpl&&)                 = delete;
+  BackgroundBlurEffectImpl& operator=(BackgroundBlurEffectImpl&&)      = delete; // no move()
+  BackgroundBlurEffectImpl& operator=(const BackgroundBlurEffectImpl&) = delete; // no copy()
 
 public:
-  Dali::Toolkit::GaussianBlurEffect::FinishedSignalType mFinishedSignal; // Emits when blur once is enabled
+  Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType mFinishedSignal; // Emits when blur once is enabled
 
 private:
   // Camera actors
@@ -211,7 +220,7 @@ private:
   CameraActor mRenderDownsampledCamera;
 
   // Resource
-  FrameBuffer mInputFrameBuffer; // Input. What to blur.
+  FrameBuffer mInputBackgroundFrameBuffer; // Input. Background. What to blur.
 
   Actor       mInternalRoot;
   Actor       mHorizontalBlurActor;
@@ -227,6 +236,9 @@ private:
   float    mDownscaleFactor;
   uint32_t mBlurRadius;
 
+  Dali::WeakHandle<Dali::Actor> mUserSourceActor;  ///< Weakhandle of source actor from user.
+  Dali::WeakHandle<Dali::Actor> mUserStopperActor; ///< Weakhandle of stopper actor from user.
+
   float    mInternalDownscaleFactor;
   uint32_t mInternalBlurRadius;
 
@@ -237,19 +249,19 @@ private:
 };
 } // namespace Internal
 
-inline Toolkit::Internal::GaussianBlurEffectImpl& GetImplementation(Toolkit::GaussianBlurEffect& obj)
+inline Toolkit::Internal::BackgroundBlurEffectImpl& GetImplementation(Toolkit::BackgroundBlurEffect& obj)
 {
   BaseObject& handle = obj.GetBaseObject();
-  return static_cast<Toolkit::Internal::GaussianBlurEffectImpl&>(handle);
+  return static_cast<Toolkit::Internal::BackgroundBlurEffectImpl&>(handle);
 }
 
-inline const Toolkit::Internal::GaussianBlurEffectImpl& GetImplementation(const Toolkit::GaussianBlurEffect& obj)
+inline const Toolkit::Internal::BackgroundBlurEffectImpl& GetImplementation(const Toolkit::BackgroundBlurEffect& obj)
 {
   const BaseObject& handle = obj.GetBaseObject();
-  return static_cast<const Toolkit::Internal::GaussianBlurEffectImpl&>(handle);
+  return static_cast<const Toolkit::Internal::BackgroundBlurEffectImpl&>(handle);
 }
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H
+#endif // DALI_TOOLKIT_INTERNAL_BACKGROUND_BLUR_EFFECT_H

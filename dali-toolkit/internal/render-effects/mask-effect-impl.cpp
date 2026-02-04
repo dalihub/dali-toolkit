@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/controls/render-effects/mask-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/mask-effect-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>

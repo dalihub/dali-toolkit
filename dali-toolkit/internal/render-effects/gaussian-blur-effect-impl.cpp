@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/controls/render-effects/background-blur-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/gaussian-blur-effect-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
@@ -54,55 +54,50 @@ namespace Internal
 extern Debug::Filter* gRenderEffectLogFilter; ///< Define at render-effect-impl.cpp
 #endif
 
-BackgroundBlurEffectImpl::BackgroundBlurEffectImpl()
-: BackgroundBlurEffectImpl(BLUR_EFFECT_BLUR_RADIUS)
+GaussianBlurEffectImpl::GaussianBlurEffectImpl()
+: GaussianBlurEffectImpl(BLUR_EFFECT_BLUR_RADIUS)
 {
 }
 
-BackgroundBlurEffectImpl::BackgroundBlurEffectImpl(uint32_t blurRadius)
+GaussianBlurEffectImpl::GaussianBlurEffectImpl(uint32_t blurRadius)
 : RenderEffectImpl(),
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mBlurRadius(blurRadius),
-  mInternalDownscaleFactor(mDownscaleFactor),
-  mInternalBlurRadius(mBlurRadius),
   mSkipBlur(false),
   mBlurOnce(false)
 {
   UpdateDownscaledBlurRadius();
 }
 
-BackgroundBlurEffectImpl::~BackgroundBlurEffectImpl()
+GaussianBlurEffectImpl::~GaussianBlurEffectImpl()
 {
 }
 
-BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New()
+GaussianBlurEffectImplPtr GaussianBlurEffectImpl::New()
 {
-  return BackgroundBlurEffectImpl::New(BLUR_EFFECT_BLUR_RADIUS);
+  return GaussianBlurEffectImpl::New(BLUR_EFFECT_BLUR_RADIUS);
 }
 
-BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New(uint32_t blurRadius)
+GaussianBlurEffectImplPtr GaussianBlurEffectImpl::New(uint32_t blurRadius)
 {
-  BackgroundBlurEffectImplPtr handle = new BackgroundBlurEffectImpl(blurRadius);
+  GaussianBlurEffectImplPtr handle = new GaussianBlurEffectImpl(blurRadius);
   handle->Initialize();
   return handle;
 }
 
-OffScreenRenderable::Type BackgroundBlurEffectImpl::GetOffScreenRenderableType()
+OffScreenRenderable::Type GaussianBlurEffectImpl::GetOffScreenRenderableType()
 {
-  return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::BACKWARD;
+  return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::FORWARD;
 }
 
-void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void GaussianBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
 {
   tasks.clear();
-  if(!isForward)
+  if(isForward)
   {
     if(mSourceRenderTask)
     {
-      // Re-initialize source actor of rendertask since it might be changed.
-      // TODO : Should it be required always? Couldn't we skip it?
-      ApplyRenderTaskSourceActor(mSourceRenderTask, GetOwnerControl());
       tasks.push_back(mSourceRenderTask);
     }
     if(mHorizontalBlurTask)
@@ -116,7 +111,7 @@ void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderT
   }
 }
 
-void BackgroundBlurEffectImpl::SetBlurOnce(bool blurOnce)
+void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
 {
   mBlurOnce = blurOnce;
 
@@ -133,7 +128,7 @@ void BackgroundBlurEffectImpl::SetBlurOnce(bool blurOnce)
       mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
       mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
 
-      mVerticalBlurTask.FinishedSignal().Connect(this, &BackgroundBlurEffectImpl::OnRenderFinished);
+      mVerticalBlurTask.FinishedSignal().Connect(this, &GaussianBlurEffectImpl::OnRenderFinished);
     }
     else
     {
@@ -144,12 +139,12 @@ void BackgroundBlurEffectImpl::SetBlurOnce(bool blurOnce)
   }
 }
 
-bool BackgroundBlurEffectImpl::GetBlurOnce() const
+bool GaussianBlurEffectImpl::GetBlurOnce() const
 {
   return mBlurOnce;
 }
 
-void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
+void GaussianBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
 {
   if(mBlurRadius != blurRadius)
   {
@@ -160,6 +155,7 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
 
     mBlurRadius = blurRadius;
     UpdateDownscaledBlurRadius();
+
     if(DALI_UNLIKELY(mSkipBlur))
     {
       return;
@@ -180,14 +176,14 @@ void BackgroundBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
   }
 }
 
-uint32_t BackgroundBlurEffectImpl::GetBlurRadius() const
+uint32_t GaussianBlurEffectImpl::GetBlurRadius() const
 {
   return mBlurRadius;
 }
 
-void BackgroundBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
+void GaussianBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
 {
-  if(!Dali::Equals(mDownscaleFactor, downscaleFactor))
+  if(mDownscaleFactor != downscaleFactor)
   {
     if(!mSkipBlur && IsActivated())
     {
@@ -196,6 +192,7 @@ void BackgroundBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
 
     mDownscaleFactor = downscaleFactor;
     UpdateDownscaledBlurRadius();
+
     if(DALI_UNLIKELY(mSkipBlur))
     {
       return;
@@ -216,22 +213,22 @@ void BackgroundBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
   }
 }
 
-float BackgroundBlurEffectImpl::GetBlurDownscaleFactor() const
+float GaussianBlurEffectImpl::GetBlurDownscaleFactor() const
 {
   return mDownscaleFactor;
 }
 
-void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
+void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
-    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.\n");
+    DALI_LOG_ERROR("Blur radius is too small. Blur animation will be ignored.");
     return;
   }
 
   if(mBlurOnce)
   {
-    DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.\n");
+    DALI_LOG_ERROR("This blur effect is set to render only once, so the animation will be ignored. Call SetBlurOnce(false) to render it every frame.");
     return;
   }
 
@@ -248,7 +245,7 @@ void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Al
   animation.AnimateBetween(Property(mVerticalBlurActor, verticalAnimationIndex), keyFrames, alphaFunction, timePeriod);
 }
 
-void BackgroundBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
+void GaussianBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
@@ -274,7 +271,7 @@ void BackgroundBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, Alp
   animation.AnimateBetween(Property(mVerticalBlurActor, verticalAnimationIndex), keyFrames, alphaFunction, timePeriod);
 }
 
-void BackgroundBlurEffectImpl::OnInitialize()
+void GaussianBlurEffectImpl::OnInitialize()
 {
   // Create blur actors
   {
@@ -304,7 +301,7 @@ void BackgroundBlurEffectImpl::OnInitialize()
   }
 }
 
-void BackgroundBlurEffectImpl::OnActivate()
+void GaussianBlurEffectImpl::OnActivate()
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
@@ -322,7 +319,7 @@ void BackgroundBlurEffectImpl::OnActivate()
 
   // Get size
   Vector2 size = GetTargetSize();
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BackgroundBlurEffect:%p] OnActivated! [ID:%d][size:%fx%f] [radius:%u, scale:%f, downscaledRadius:%u=%u*%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y, mBlurRadius, mDownscaleFactor, mDownscaledBlurRadius, mInternalBlurRadius, mInternalDownscaleFactor);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[GaussianBlurEffect:%p] OnActivated! [ID:%d][size:%fx%f] [radius:%u, scale:%f, downscaledRadius:%u=%u*%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y, mBlurRadius, mDownscaleFactor, mDownscaledBlurRadius, mInternalBlurRadius, mInternalDownscaleFactor);
 
   uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
   uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
@@ -358,20 +355,21 @@ void BackgroundBlurEffectImpl::OnActivate()
   CreateRenderTasks(GetSceneHolder(), ownerControl);
 
   // Reset shader constants
-  auto&    blurShader         = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
-  Renderer horizontalRenderer = mHorizontalBlurActor.GetRendererAt(0u);
-  horizontalRenderer.SetShader(blurShader);
-  horizontalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
+  auto&    blurShader             = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
+  Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
+  horizontalBlurRenderer.SetShader(blurShader);
+  horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
 
-  Renderer verticalRenderer = mVerticalBlurActor.GetRendererAt(0u);
-  verticalRenderer.SetShader(blurShader);
-  verticalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
+  Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
+  verticalBlurRenderer.SetShader(blurShader);
+  verticalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   // Inject blurred output to control
-  Renderer renderer = GetTargetRenderer();
-  renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::BACKGROUND_EFFECT);
-  ownerControl.AddRenderer(renderer);
-  SetRendererTexture(renderer, mBlurredOutputFrameBuffer);
+  Renderer targetRenderer = GetTargetRenderer();
+  targetRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::FOREGROUND_EFFECT);
+  ownerControl.AddCacheRenderer(targetRenderer);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  SetRendererTexture(targetRenderer, mBlurredOutputFrameBuffer);
 
   ownerControl.Add(mInternalRoot);
 
@@ -380,7 +378,7 @@ void BackgroundBlurEffectImpl::OnActivate()
   GetImplementation(ownerControl).RequestRenderTaskReorder();
 }
 
-void BackgroundBlurEffectImpl::OnDeactivate()
+void GaussianBlurEffectImpl::OnDeactivate()
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
@@ -390,10 +388,11 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    Renderer renderer = GetTargetRenderer();
-    ownerControl.RemoveRenderer(renderer);
+    Renderer targetRenderer = GetTargetRenderer();
+    ownerControl.RemoveCacheRenderer(targetRenderer);
+    ownerControl.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
   }
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BackgroundBlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[GaussianBlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
   mInternalRoot.Unparent();
 
@@ -401,7 +400,7 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   DestroyRenderTasks();
 }
 
-void BackgroundBlurEffectImpl::OnRefresh()
+void GaussianBlurEffectImpl::OnRefresh()
 {
   if(DALI_UNLIKELY(mSkipBlur))
   {
@@ -438,13 +437,13 @@ void BackgroundBlurEffectImpl::OnRefresh()
   }
   else
   {
-    mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
+    mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
     mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
     mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
   }
 
   Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
-  SetRendererTexture(horizontalBlurRenderer, mInputBackgroundFrameBuffer);
+  SetRendererTexture(horizontalBlurRenderer, mInputFrameBuffer);
   horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
 
   Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
@@ -454,15 +453,15 @@ void BackgroundBlurEffectImpl::OnRefresh()
   SetRendererTexture(GetTargetRenderer(), mBlurredOutputFrameBuffer);
 }
 
-void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsampledSize)
+void GaussianBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsampledSize)
 {
   uint32_t downsampledWidth  = downsampledSize.GetWidth();
   uint32_t downsampledHeight = downsampledSize.GetHeight();
 
   // buffer to draw input texture
-  mInputBackgroundFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mInputFrameBuffer              = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
   Texture inputBackgroundTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
+  mInputFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 
   // buffer to draw half-blurred output
   mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
@@ -475,37 +474,38 @@ void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsamp
   mBlurredOutputFrameBuffer.AttachColorTexture(sourceTexture);
 }
 
-void BackgroundBlurEffectImpl::DestroyFrameBuffers()
+void GaussianBlurEffectImpl::DestroyFrameBuffers()
 {
-  mInputBackgroundFrameBuffer.Reset();
+  mInputFrameBuffer.Reset();
   mTemporaryFrameBuffer.Reset();
   mBlurredOutputFrameBuffer.Reset();
 }
 
-void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
+void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
 {
   RenderTaskList taskList = sceneHolder.GetRenderTaskList();
 
   // draw input texture
   mSourceRenderTask = taskList.CreateTask();
+  mSourceRenderTask.SetSourceActor(sourceControl); // -> should use cache renderer
+  mSourceRenderTask.SetExclusive(true);
+  mSourceRenderTask.SetInputEnabled(true);
+  mSourceRenderTask.SetScreenToFrameBufferMappingActor(sourceControl);
   mSourceRenderTask.SetCameraActor(mCamera);
-  mSourceRenderTask.SetFrameBuffer(mInputBackgroundFrameBuffer);
-  mSourceRenderTask.SetInputEnabled(false);
+  mSourceRenderTask.SetFrameBuffer(mInputFrameBuffer);
   mSourceRenderTask.SetRenderPassTag(GetRenderPassTag());
 
-  ApplyRenderTaskSourceActor(mSourceRenderTask, sourceControl);
-
-  // Clear inputBackgroundTexture as scene holder background.
+  // Clear inputBackgroundTexture as scene holder
   mSourceRenderTask.SetClearEnabled(true);
-  mSourceRenderTask.SetClearColor(sceneHolder.GetBackgroundColor());
+  mSourceRenderTask.SetClearColor(Color::TRANSPARENT);
   mSourceRenderTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, mInternalDownscaleFactor);
 
   // draw half-blurred output
-  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
+  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetExclusive(true);
-  mHorizontalBlurTask.SetInputEnabled(false);
+  mHorizontalBlurTask.SetInputEnabled(true);
   mHorizontalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizontalBlurTask.SetFrameBuffer(mTemporaryFrameBuffer);
 
@@ -518,7 +518,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
   mVerticalBlurTask.SetExclusive(true);
-  mVerticalBlurTask.SetInputEnabled(false);
+  mVerticalBlurTask.SetInputEnabled(true);
   mVerticalBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mVerticalBlurTask.SetFrameBuffer(mBlurredOutputFrameBuffer);
 
@@ -534,7 +534,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
     mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
     mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
 
-    mVerticalBlurTask.FinishedSignal().Connect(this, &BackgroundBlurEffectImpl::OnRenderFinished);
+    mVerticalBlurTask.FinishedSignal().Connect(this, &GaussianBlurEffectImpl::OnRenderFinished);
   }
   else
   {
@@ -544,7 +544,7 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneH
   }
 }
 
-void BackgroundBlurEffectImpl::DestroyRenderTasks()
+void GaussianBlurEffectImpl::DestroyRenderTasks()
 {
   auto sceneHolder = GetSceneHolder();
   if(DALI_LIKELY(sceneHolder))
@@ -560,7 +560,7 @@ void BackgroundBlurEffectImpl::DestroyRenderTasks()
   mSourceRenderTask.Reset();
 }
 
-void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
+void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 {
   mFinishedSignal.Emit();
 
@@ -572,7 +572,7 @@ void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
   mInternalRoot.Unparent();
 }
 
-void BackgroundBlurEffectImpl::UpdateDownscaledBlurRadius()
+void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius()
 {
   mInternalDownscaleFactor = mDownscaleFactor;
   mInternalBlurRadius      = mBlurRadius;
@@ -594,75 +594,9 @@ void BackgroundBlurEffectImpl::UpdateDownscaledBlurRadius()
   }
 }
 
-void BackgroundBlurEffectImpl::ApplyRenderTaskSourceActor(RenderTask sourceRenderTask, const Toolkit::Control sourceControl)
-{
-  if(DALI_UNLIKELY(!sourceRenderTask || !sourceControl))
-  {
-    return;
-  }
-
-  bool        isExclusiveRequired = false;
-  bool        useUserSourceActor  = false;
-  Dali::Actor userSourceActor     = mUserSourceActor.GetHandle();
-  Dali::Actor sourceActor         = sourceControl;
-  Dali::Actor stopperActor        = mUserStopperActor.GetHandle() ? mUserStopperActor.GetHandle() : Dali::Actor::DownCast(sourceControl);
-
-  while(sourceActor && sourceActor.GetParent())
-  {
-    sourceActor = sourceActor.GetParent();
-
-    if(userSourceActor == sourceActor)
-    {
-      useUserSourceActor = true;
-    }
-
-    Toolkit::Control control = Toolkit::Control::DownCast(sourceActor);
-    if(control && (((GetImplementation(control).GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD)) == OffScreenRenderable::Type::FORWARD))
-    {
-      sourceActor         = GetImplementation(control).GetOffScreenRenderableSourceActor();
-      isExclusiveRequired = GetImplementation(control).IsOffScreenRenderTaskExclusive();
-      break;
-    }
-  }
-
-  // Use user defined source actor only if it is parent of sourceControl.
-  if(useUserSourceActor)
-  {
-    sourceActor = userSourceActor;
-  }
-
-  sourceRenderTask.SetExclusive(isExclusiveRequired);
-  sourceRenderTask.SetSourceActor(sourceActor);
-  sourceRenderTask.RenderUntil(stopperActor);
-}
-
-Dali::Toolkit::BackgroundBlurEffect::FinishedSignalType& BackgroundBlurEffectImpl::FinishedSignal()
+Dali::Toolkit::GaussianBlurEffect::FinishedSignalType& GaussianBlurEffectImpl::FinishedSignal()
 {
   return mFinishedSignal;
-}
-
-void BackgroundBlurEffectImpl::SetSourceActor(Dali::Actor sourceActor)
-{
-  mUserSourceActor = sourceActor;
-
-  if(mSourceRenderTask)
-  {
-    // Re-initialize source actor of rendertask
-    Toolkit::Control ownerControl = GetOwnerControl();
-    ApplyRenderTaskSourceActor(mSourceRenderTask, ownerControl);
-  }
-}
-
-void BackgroundBlurEffectImpl::SetStopperActor(Dali::Actor stopperActor)
-{
-  mUserStopperActor = stopperActor;
-
-  if(mSourceRenderTask)
-  {
-    // Re-initialize stopper actor of rendertask
-    Toolkit::Control ownerControl = GetOwnerControl();
-    ApplyRenderTaskSourceActor(mSourceRenderTask, ownerControl);
-  }
 }
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 
 void utc_dali_toolkit_internal_render_effect_startup(void)
 {

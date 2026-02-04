@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-impl.h>
+#include <dali-toolkit/internal/render-effects/offscreen-rendering-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>

@@ -28,9 +28,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/render-effects/offscreen-rendering-impl.h>
-#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
+#include <dali-toolkit/internal/render-effects/offscreen-rendering-impl.h>
+#include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
 #include <map>

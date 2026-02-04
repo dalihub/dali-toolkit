@@ -39,7 +39,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-visual-data.h>
-#include <dali-toolkit/internal/controls/render-effects/render-effect-impl.h>
+#include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
