@@ -168,6 +168,15 @@ public:
   const StylePtr GetStyle(const std::string& styleName);
 
   /**
+   * @brief Get the properties of a style directly from the parsed tree.
+   * @param[in] styleName The name of the style
+   * @param[in] controlType The type of control
+   * @param[out] result The map to store properties
+   * @return True if style found and properties extracted
+   */
+  bool GetStyleProperties(const std::string& styleName, const Handle& controlType, Property::Map& result);
+
+  /**
    * @copydoc Toolkit::Builder::AddActors
    */
   void AddActors(Actor toActor);

@@ -526,6 +526,15 @@ public: // API for derived classes to override
    */
   virtual void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change);
 
+  /**
+   * @brief This method is called when DISABLE_STYLE_CHANGE_SIGNALS is set to apply default theme.
+   *
+   * By default, this method does nothing. Derived classes can override this to apply
+   * default theme styles during initialization.
+   * @note TextLabel, TextField, and TextEditor override this to apply DefaultTheme.
+   */
+  virtual void OnApplyDefaultStyle();
+
   // Accessibility
 
   /**
