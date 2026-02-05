@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,40 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(LOOPING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelImageVisual::LoopingMode, AUTO_REVERSE)
 DALI_ENUM_TO_STRING_TABLE_END(LOOPING_MODE)
 
+// release policies
+DALI_ENUM_TO_STRING_TABLE_BEGIN(RELEASE_POLICY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, DETACHED)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, DESTROYED)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::ImageVisual::ReleasePolicy, NEVER)
+DALI_ENUM_TO_STRING_TABLE_END(RELEASE_POLICY)
+
 constexpr float MINIMUM_FRAME_SPEED_FACTOR(0.01f);
 constexpr float MAXIMUM_FRAME_SPEED_FACTOR(100.0f);
+
+struct NameIndexMatch
+{
+  const char* const name;
+  Property::Index   index;
+};
+
+const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
+  {
+    {SYNCHRONOUS_LOADING, Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING},
+    {IMAGE_DESIRED_WIDTH, Toolkit::ImageVisual::Property::DESIRED_WIDTH},
+    {IMAGE_DESIRED_HEIGHT, Toolkit::ImageVisual::Property::DESIRED_HEIGHT},
+    {RELEASE_POLICY_NAME, Toolkit::ImageVisual::Property::RELEASE_POLICY},
+    {LOOP_COUNT_NAME, Toolkit::DevelImageVisual::Property::LOOP_COUNT},
+    {PLAY_RANGE_NAME, Toolkit::DevelImageVisual::Property::PLAY_RANGE},
+    {STOP_BEHAVIOR_NAME, Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR},
+    {LOOPING_MODE_NAME, Toolkit::DevelImageVisual::Property::LOOPING_MODE},
+    {REDRAW_IN_SCALING_DOWN_NAME, Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN},
+    {REDRAW_IN_SCALING_UP_NAME, Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_UP},
+    {ENABLE_FRAME_CACHE, Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE},
+    {NOTIFY_AFTER_RASTERIZATION, Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION},
+    {FRAME_SPEED_FACTOR, Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR},
+    {RENDER_SCALE_NAME, Toolkit::DevelImageVisual::Property::RENDER_SCALE},
+};
+const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
@@ -105,7 +137,9 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
   mEventCallback(nullptr),
   mFrameSpeedFactor(1.0f),
   mRenderScale(1.0f),
+  mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mLastSentPlayStateId(0u),
+  mRasterizeCompleted(false),
   mLoadFailed(false),
   mRendererAdded(false),
   mRedrawInScalingDown(true),
@@ -221,6 +255,8 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
   map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
+
   map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, mEnableFrameCache);
   map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
   map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
@@ -253,57 +289,13 @@ void AnimatedVectorImageVisual::DoSetProperties(const Property::Map& propertyMap
     }
     else
     {
-      if(keyValue.first == LOOP_COUNT_NAME)
+      for(int i = 0; i < NAME_INDEX_MATCH_TABLE_SIZE; ++i)
       {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::LOOP_COUNT, keyValue.second);
-      }
-      else if(keyValue.first == PLAY_RANGE_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::PLAY_RANGE, keyValue.second);
-      }
-      else if(keyValue.first == STOP_BEHAVIOR_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, keyValue.second);
-      }
-      else if(keyValue.first == LOOPING_MODE_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::LOOPING_MODE, keyValue.second);
-      }
-      else if(keyValue.first == REDRAW_IN_SCALING_DOWN_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, keyValue.second);
-      }
-      else if(keyValue.first == REDRAW_IN_SCALING_UP_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_UP, keyValue.second);
-      }
-      else if(keyValue.first == SYNCHRONOUS_LOADING)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
-      }
-      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
-      {
-        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
-      }
-      else if(keyValue.first == ENABLE_FRAME_CACHE)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::ENABLE_FRAME_CACHE, keyValue.second);
-      }
-      else if(keyValue.first == NOTIFY_AFTER_RASTERIZATION)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, keyValue.second);
-      }
-      else if(keyValue.first == FRAME_SPEED_FACTOR)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, keyValue.second);
-      }
-      else if(keyValue.first == RENDER_SCALE_NAME)
-      {
-        DoSetProperty(Toolkit::DevelImageVisual::Property::RENDER_SCALE, keyValue.second);
+        if(keyValue.first == NAME_INDEX_MATCH_TABLE[i].name)
+        {
+          DoSetProperty(NAME_INDEX_MATCH_TABLE[i].index, keyValue.second);
+          break;
+        }
       }
     }
   }
@@ -416,6 +408,16 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       if(value.Get(desiredHeight))
       {
         mDesiredSize.SetHeight(desiredHeight);
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::RELEASE_POLICY:
+    {
+      int releasePolicy = static_cast<int>(mReleasePolicy);
+      if(DALI_LIKELY(Scripting::GetEnumerationProperty(value, RELEASE_POLICY_TABLE, RELEASE_POLICY_TABLE_COUNT, releasePolicy)))
+      {
+        mReleasePolicy = Toolkit::ImageVisual::ReleasePolicy::Type(releasePolicy);
       }
       break;
     }
@@ -555,8 +557,19 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
       mImpl->mEventObserver->RelayoutRequest(*this);
     }
 
-    mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NEED_RESOURCE_READY;
-    TriggerVectorRasterization();
+    // Check whether we can re-use latest frame.
+    if(mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::DETACHED && mRasterizeCompleted)
+    {
+      DALI_LOG_DEBUG_INFO("[%p] Reuse cached texture (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
+
+      // Call OnResourceReady synchronously.
+      OnResourceReady(VectorAnimationTask::ResourceStatus::READY);
+    }
+    else
+    {
+      mAnimationData.resendFlag |= VectorAnimationTask::RESEND_NEED_RESOURCE_READY;
+      TriggerVectorRasterization();
+    }
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnScene [%p]\n", this);
@@ -581,11 +594,17 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
 
   mPlacementActor.Reset();
 
-  // Reset the visual size to zero so that when adding the actor back to stage the rasterization is forced
-  mVisualSize           = Vector2::ZERO;
-  mVisualScale          = Vector2::ONE;
-  mAnimationData.width  = 0;
-  mAnimationData.height = 0;
+  if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
+  {
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+
+    // Reset the visual size to zero so that when adding the actor back to stage the rasterization is forced
+    mRasterizeCompleted   = false;
+    mVisualSize           = Vector2::ZERO;
+    mVisualScale          = Vector2::ONE;
+    mAnimationData.width  = 0;
+    mAnimationData.height = 0;
+  }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffScene [%p]\n", this);
 }
@@ -724,6 +743,8 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
   }
   else
   {
+    mRasterizeCompleted = true;
+
     mLoadFailed = status == VectorAnimationTask::ResourceStatus::FAILED ? true : false;
     if(status == VectorAnimationTask::ResourceStatus::READY)
     {
