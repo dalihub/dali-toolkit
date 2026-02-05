@@ -48,6 +48,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/image/image-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/image/image-visual-shader-feature-builder.cpp
    ${toolkit_src_dir}/visuals/mesh/mesh-visual.cpp
+   ${toolkit_src_dir}/visuals/mesh/obj-loader.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-data.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-loader.cpp
    ${toolkit_src_dir}/visuals/npatch/npatch-shader-factory.cpp
@@ -90,8 +91,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/magnifier/magnifier-impl.cpp
    ${toolkit_src_dir}/controls/navigation-view/navigation-view-impl.cpp
    ${toolkit_src_dir}/controls/popup/confirmation-popup-impl.cpp
-   ${toolkit_src_dir}/controls/model3d-view/model3d-view-impl.cpp
-   ${toolkit_src_dir}/controls/model3d-view/obj-loader.cpp
    ${toolkit_src_dir}/controls/popup/popup-impl.cpp
    ${toolkit_src_dir}/controls/page-turn-view/page-turn-portrait-view-impl.cpp
    ${toolkit_src_dir}/controls/page-turn-view/page-turn-effect.cpp
@@ -112,8 +111,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-constraints.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-property-handler.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp
-   ${toolkit_src_dir}/controls/scene3d-view/scene3d-view-impl.cpp
-   ${toolkit_src_dir}/controls/scene3d-view/gltf-loader.cpp
    ${toolkit_src_dir}/controls/shadow-view/shadow-view-impl.cpp
    ${toolkit_src_dir}/controls/slider/slider-impl.cpp
    ${toolkit_src_dir}/controls/super-blur-view/super-blur-view-impl.cpp

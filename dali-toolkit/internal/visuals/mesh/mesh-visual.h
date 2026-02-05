@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MESH_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <fstream>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
+#include <dali-toolkit/internal/visuals/mesh/obj-loader.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 
