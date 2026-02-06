@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,10 +91,10 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.get());
 
-  std::unique_ptr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(windowSize.GetWidth(), windowSize.GetHeight(), renderTask.GetCameraActor(), this);
+  UniquePtr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(windowSize.GetWidth(), windowSize.GetHeight(), renderTask.GetCameraActor(), this);
 
-  mDebugActor = DrawableActor::New(*(debugRenderer->GetCallback().get()));
-  world->SetDebugRenderer(debugRenderer.release());
+  mDebugActor = DrawableActor::New(*(debugRenderer->GetCallback().Get()));
+  world->SetDebugRenderer(debugRenderer.Release());
 
   mDebugActor[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
   mDebugActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;

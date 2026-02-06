@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_MODIFIER_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_MODIFIER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
-#include <memory>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -100,7 +99,7 @@ public:
    * @param[in] modifierUpdater Functor for the modifier
    * @return New ParticleModifier object
    */
-  static ParticleModifier New(std::unique_ptr<ParticleModifierInterface>&& modifierUpdater);
+  static ParticleModifier New(UniquePtr<ParticleModifierInterface>&& modifierUpdater);
 
   /**
    * @brief Creates new modifier with given class and construction arguments
@@ -110,8 +109,9 @@ public:
   template<class T, class... Args>
   static ParticleModifier New(Args... args)
   {
-    return New(std::move(std::make_unique<T>(args...)));
+    return New(std::move(MakeUnique<T>(args...)));
   }
+
   /**
    * @brief Returns associated particle modifier callback
    *

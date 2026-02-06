@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,11 +90,11 @@ cpSpaceDebugColor DebugDrawColorForShapeImpl(cpShape* shape, cpDataPointer data)
   return debugRenderer->DrawColorForShape(shape);
 }
 
-std::unique_ptr<PhysicsDebugRenderer> PhysicsDebugRenderer::New(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor)
+UniquePtr<PhysicsDebugRenderer> PhysicsDebugRenderer::New(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor)
 {
-  auto renderer = std::make_unique<PhysicsDebugRenderer>(width, height, camera, adaptor);
+  auto renderer = MakeUnique<PhysicsDebugRenderer>(width, height, camera, adaptor);
 
-  renderer->mRenderCallback = Dali::RenderCallback::New<PhysicsDebugRenderer>(renderer.get(), &PhysicsDebugRenderer::OnRender);
+  renderer->mRenderCallback = Dali::RenderCallback::New<PhysicsDebugRenderer>(renderer.Get(), &PhysicsDebugRenderer::OnRender);
   return renderer;
 }
 

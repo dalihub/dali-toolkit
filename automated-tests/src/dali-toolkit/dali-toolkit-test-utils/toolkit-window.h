@@ -88,6 +88,7 @@ public:
   TouchEventSignalType&                      TouchedSignal();
   ResizeSignalType&                          ResizeSignal();
   Dali::RenderTaskList                       GetRenderTaskList();
+  void                                       KeepRendering(float durationSeconds);
 
 public:
   explicit Window(Internal::Adaptor::Window* window);

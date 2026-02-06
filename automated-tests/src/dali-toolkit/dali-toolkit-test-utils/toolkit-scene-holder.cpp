@@ -177,6 +177,11 @@ Dali::RenderTaskList SceneHolder::GetRenderTaskList()
   return mScene.GetRenderTaskList();
 }
 
+int32_t SceneHolder::GetNativeId() const
+{
+  return mScene.GetNativeId();
+}
+
 Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType& SceneHolder::FocusChangedGeneratedSignal()
 {
   return mFocusChangedGeneratedSignal;

@@ -73,6 +73,8 @@ public:
 
   Dali::RenderTaskList GetRenderTaskList();
 
+  int32_t GetNativeId() const;
+
   void FocusChanged(bool focusIn);
 
   class SceneHolderLifeCycleObserver;

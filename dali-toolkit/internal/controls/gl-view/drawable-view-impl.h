@@ -157,7 +157,7 @@ private:
   bool mStencil;
   int  mMSAA;
 
-  std::unique_ptr<RenderCallback> mRenderCallback;
+  UniquePtr<RenderCallback> mRenderCallback;
 
   /*
    * Used within RenderCallback to handle the current render state

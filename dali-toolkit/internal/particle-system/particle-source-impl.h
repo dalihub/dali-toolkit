@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_SOURCE_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_SOURCE_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
  *
  */
 
-#include <dali-toolkit/public-api/particle-system/particle-source.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-object.h>
-#include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/particle-system/particle-source.h>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -30,14 +33,14 @@ class ParticleSource : public Dali::BaseObject
 public:
   ~ParticleSource() override = default;
 
-  explicit ParticleSource(std::unique_ptr<ParticleSourceInterface>&& sourceUpdater);
+  explicit ParticleSource(UniquePtr<ParticleSourceInterface>&& sourceUpdater);
 
   void Update(ParticleSystem::ParticleList& list, uint32_t count);
 
-  [[nodiscard]] ParticleSourceInterface& GetUpdater() const;
+  [[nodiscard]] ParticleSourceInterface& GetUpdater();
 
 private:
-  std::unique_ptr<ParticleSourceInterface> mUpdater;
+  UniquePtr<ParticleSourceInterface> mUpdater;
 };
 
 } // namespace Dali::Toolkit::ParticleSystem::Internal

@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_RENDERER_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_RENDERER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public:
   Dali::VertexBuffer mStreamBuffer;
   BlendingMode       mBlendingMode{BlendingMode::DEFAULT};
 
-  std::unique_ptr<Dali::VertexBufferUpdateCallback> mStreamBufferUpdateCallback;
+  UniquePtr<Dali::VertexBufferUpdateCallback> mStreamBufferUpdateCallback;
 
   bool mInitialized{false};
 };

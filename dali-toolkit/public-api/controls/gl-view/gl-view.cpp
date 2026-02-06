@@ -25,8 +25,8 @@
 #include <dali/devel-api/common/addon-binder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/graphics-backend.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dlfcn.h>
-#include <memory>
 
 namespace Dali::Toolkit
 {
@@ -55,7 +55,7 @@ struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder
   ADDON_BIND_FUNCTION(GlViewTerminate, void(Internal::GlViewImpl&));
 };
 
-std::unique_ptr<ToolkitGlesAddOn> gToolkitGlesAddon;
+UniquePtr<ToolkitGlesAddOn> gToolkitGlesAddon;
 } // namespace
 
 GlView::GlView() = default;
@@ -81,7 +81,7 @@ GlView GlView::New(BackendMode backendMode, ColorFormat colorFormat)
   {
     if(!gToolkitGlesAddon)
     {
-      gToolkitGlesAddon.reset(new ToolkitGlesAddOn);
+      gToolkitGlesAddon.Reset(new ToolkitGlesAddOn);
     }
     DALI_ASSERT_ALWAYS(gToolkitGlesAddon && "Cannot load the GlView Addon\n");
     return gToolkitGlesAddon->GlViewNew(backendMode, colorFormat);
