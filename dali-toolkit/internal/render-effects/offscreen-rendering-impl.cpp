@@ -59,13 +59,13 @@ OffScreenRenderable::Type OffScreenRenderingImpl::GetOffScreenRenderableType() c
   return OffScreenRenderable::Type::FORWARD;
 }
 
-void OffScreenRenderingImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void OffScreenRenderingImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(isForward)
   {
     if(mRenderTask)
     {
-      tasks.push_back(mRenderTask);
+      tasks.PushBack(mRenderTask);
     }
   }
 }

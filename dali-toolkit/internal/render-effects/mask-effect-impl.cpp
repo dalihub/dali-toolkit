@@ -105,17 +105,17 @@ OffScreenRenderable::Type MaskEffectImpl::GetOffScreenRenderableType() const
   return OffScreenRenderable::Type::FORWARD;
 }
 
-void MaskEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void MaskEffectImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(isForward)
   {
     if(mMaskTargetRenderTask)
     {
-      tasks.push_back(mMaskTargetRenderTask);
+      tasks.PushBack(mMaskTargetRenderTask);
     }
     if(mMaskSourceRenderTask)
     {
-      tasks.push_back(mMaskSourceRenderTask);
+      tasks.PushBack(mMaskSourceRenderTask);
     }
   }
 }

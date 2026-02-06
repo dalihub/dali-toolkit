@@ -22,6 +22,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-notification.h>
@@ -90,7 +91,7 @@ public:
    * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
    * RenderTasks.
    */
-  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
+  virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
   /**
    * @copydoc Dali::Toolkit::RenderEffect::Activate

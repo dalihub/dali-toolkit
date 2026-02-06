@@ -736,7 +736,7 @@ void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::I
   }
 }
 
-void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void Control::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(mImpl->mRenderEffect)
   {

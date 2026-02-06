@@ -67,7 +67,7 @@ public:
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
    */
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override;
 
   /**
    * @copydoc Toolkit::GaussianBlurEffect::SetBlurOnce

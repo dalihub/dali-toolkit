@@ -64,7 +64,7 @@ public:
   OffScreenRenderable::Type GetOffScreenRenderableType() const override;
 
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override;
 
   /**
    * @brief Get rendered output. Only valid when type is set to OffScreenRenderingType::RENDER_ONCE

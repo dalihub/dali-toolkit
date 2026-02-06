@@ -93,7 +93,7 @@ OffScreenRenderable::Type BackgroundBlurEffectImpl::GetOffScreenRenderableType()
   return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::BACKWARD;
 }
 
-void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(!isForward)
   {
@@ -102,15 +102,15 @@ void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderT
       // Re-initialize source actor of rendertask since it might be changed.
       // TODO : Should it be required always? Couldn't we skip it?
       ApplyRenderTaskSourceActor(mSourceRenderTask, GetOwnerControl());
-      tasks.push_back(mSourceRenderTask);
+      tasks.PushBack(mSourceRenderTask);
     }
     if(mHorizontalBlurTask)
     {
-      tasks.push_back(mHorizontalBlurTask);
+      tasks.PushBack(mHorizontalBlurTask);
     }
     if(mVerticalBlurTask)
     {
-      tasks.push_back(mVerticalBlurTask);
+      tasks.PushBack(mVerticalBlurTask);
     }
   }
 }

@@ -91,21 +91,21 @@ OffScreenRenderable::Type GaussianBlurEffectImpl::GetOffScreenRenderableType() c
   return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::FORWARD;
 }
 
-void GaussianBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void GaussianBlurEffectImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(isForward)
   {
     if(mSourceRenderTask)
     {
-      tasks.push_back(mSourceRenderTask);
+      tasks.PushBack(mSourceRenderTask);
     }
     if(mHorizontalBlurTask)
     {
-      tasks.push_back(mHorizontalBlurTask);
+      tasks.PushBack(mHorizontalBlurTask);
     }
     if(mVerticalBlurTask)
     {
-      tasks.push_back(mVerticalBlurTask);
+      tasks.PushBack(mVerticalBlurTask);
     }
   }
 }
