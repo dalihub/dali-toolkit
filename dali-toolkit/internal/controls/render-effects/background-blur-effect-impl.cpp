@@ -87,14 +87,13 @@ BackgroundBlurEffectImplPtr BackgroundBlurEffectImpl::New(uint32_t blurRadius)
   return handle;
 }
 
-OffScreenRenderable::Type BackgroundBlurEffectImpl::GetOffScreenRenderableType()
+OffScreenRenderable::Type BackgroundBlurEffectImpl::GetOffScreenRenderableType() const
 {
   return mSkipBlur ? OffScreenRenderable::NONE : OffScreenRenderable::BACKWARD;
 }
 
 void BackgroundBlurEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
 {
-  tasks.clear();
   if(!isForward)
   {
     if(mSourceRenderTask)
@@ -370,6 +369,7 @@ void BackgroundBlurEffectImpl::OnActivate()
   Renderer renderer = GetTargetRenderer();
   renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Dali::Toolkit::DepthIndex::BACKGROUND_EFFECT);
   ownerControl.AddRenderer(renderer);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(GetOffScreenRenderableType());
   SetRendererTexture(renderer, mBlurredOutputFrameBuffer);
 
   ownerControl.Add(mInternalRoot);
@@ -391,6 +391,7 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   {
     Renderer renderer = GetTargetRenderer();
     ownerControl.RemoveRenderer(renderer);
+    ownerControl.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[BackgroundBlurEffect:%p] OnDeactivated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 

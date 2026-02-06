@@ -74,7 +74,7 @@ public:
    *
    * @return OffScreenRenderableType for this RenderEffect.
    */
-  virtual OffScreenRenderable::Type GetOffScreenRenderableType() = 0;
+  virtual OffScreenRenderable::Type GetOffScreenRenderableType() const = 0;
 
   /**
    * @brief Retrieves the off-screen RenderTasks associated with the RenderEffect.

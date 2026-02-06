@@ -62,7 +62,7 @@ public:
     return handle;
   }
 
-  OffScreenRenderable::Type GetOffScreenRenderableType() override
+  OffScreenRenderable::Type GetOffScreenRenderableType() const override
   {
     return OffScreenRenderable::Type::NONE;
   }
