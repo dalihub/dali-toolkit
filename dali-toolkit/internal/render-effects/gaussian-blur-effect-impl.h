@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderableType
    */
-  OffScreenRenderable::Type GetOffScreenRenderableType() override;
+  OffScreenRenderable::Type GetOffScreenRenderableType() const override;
 
   /**
    * @copydoc Toolkit::Internal::RenderEffectImpl::GetOffScreenRenderTasks
