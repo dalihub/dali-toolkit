@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
 
   // Set control to currentFocusControl
   mCurrentFocusControl = control;
-  mCurrentWindowId     = static_cast<uint32_t>(Integration::SceneHolder::Get(control).GetNativeId());
+  mCurrentWindowId     = static_cast<uint32_t>(Dali::Integration::SceneHolder::Get(control).GetNativeId());
 
   if(previousFocusControl)
   {

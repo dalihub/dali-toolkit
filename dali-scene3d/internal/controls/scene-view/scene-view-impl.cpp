@@ -1216,7 +1216,7 @@ void SceneView::OnSceneConnection(int depth)
   }
 
   // On-screen / Off-screen window
-  mSceneHolder = Integration::SceneHolder::Get(Self());
+  mSceneHolder = Dali::Integration::SceneHolder::Get(Self());
   if(mSceneHolder)
   {
     RenderTaskList taskList = mSceneHolder.GetRenderTaskList();

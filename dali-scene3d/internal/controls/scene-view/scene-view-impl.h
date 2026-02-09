@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace Internal
 /**
  * @brief Impl class for SceneView.
  */
-class SceneView : public Dali::Toolkit::Internal::Control, public Integration::Processor
+class SceneView : public Dali::Toolkit::Internal::Control, public Dali::Integration::Processor
 {
 private:
   /**
@@ -572,7 +572,7 @@ private: // Implementation of Processor
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
   Dali::WeakHandle<Dali::Window>                      mWindow;
-  Integration::SceneHolder                            mSceneHolder;
+  Dali::Integration::SceneHolder                      mSceneHolder;
   CameraActor                                         mDefaultCamera;
   CameraActor                                         mSelectedCamera;
   std::vector<CameraActor>                            mCameras;

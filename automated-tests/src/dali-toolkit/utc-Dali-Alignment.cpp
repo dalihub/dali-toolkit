@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -976,8 +976,8 @@ int UtcDaliAlignmentOnTouchEvent(void)
   application.Render();
   application.SendNotification();
 
-  Integration::TouchEvent touchEvent(1);
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent(1);
+  Dali::Integration::Point      point;
   point.SetDeviceId(1);
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(20.0f, 20.0f));
@@ -1002,7 +1002,7 @@ int UtcDaliAlignmentOnKeyEvent(void)
   application.Render();
   application.SendNotification();
 
-  Integration::KeyEvent keyEvent;
+  Dali::Integration::KeyEvent keyEvent;
   application.ProcessEvent(keyEvent);
 
   tet_result(TET_PASS); // For line coverage, as long as there are no exceptions, we assume passed.

@@ -482,7 +482,7 @@ void BackgroundBlurEffectImpl::DestroyFrameBuffers()
   mBlurredOutputFrameBuffer.Reset();
 }
 
-void BackgroundBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
+void BackgroundBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
 {
   RenderTaskList taskList = sceneHolder.GetRenderTaskList();
 

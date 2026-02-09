@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,8 +143,8 @@ int UtcDaliKeyInputFocusManagerGet(void)
 
 int UtcDaliKeyInputFocusManagerSetFocus01(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline(" Check that there is no focused control. Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal");
 
@@ -173,8 +173,8 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
 
 int UtcDaliKeyInputFocusManagerSetFocus02(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline(" Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal. Set focuse to another control - check that the first control receives KeyInputFocusLost");
 
@@ -213,8 +213,8 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
 
 int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered to KeyboardFocusManager via Stage's KeyEventSignal");
 
@@ -248,7 +248,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   manager.SetFocus(dummy3);
   DALI_TEST_CHECK(dummy3Impl.keyInputFocusGained);
 
-  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK(callback1.mIsCalled);
@@ -261,8 +261,8 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
 
 int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered from dummy3 to dummy2");
 
@@ -293,7 +293,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   manager.SetFocus(dummy3);
   DALI_TEST_CHECK(dummy3Impl.keyInputFocusGained);
 
-  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK(!callback1.mIsCalled);
@@ -305,8 +305,8 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
 
 int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline("Test KeyEvents propagation. If DISPATCH_KEY_EVENTS property is false, the KeyEvent is also not received.");
 
@@ -339,7 +339,7 @@ int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
   manager.SetFocus(dummy3);
   DALI_TEST_CHECK(dummy3Impl.keyInputFocusGained);
 
-  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK(!callback1.mIsCalled);
@@ -351,8 +351,8 @@ int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
 
 int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline(" Add 2 controls, check they each get focused. Re-focus the first control - ensure it's now got focus (check signals)");
 
@@ -403,8 +403,8 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
 
 int UtcDaliKeyInputFocusManagerRemoveFocus(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline(" Add focus controls. Test that removing focus from control which has focus. ");
 
@@ -433,9 +433,9 @@ int UtcDaliKeyInputFocusManagerRemoveFocus(void)
 
 int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
 {
-  ToolkitTestApplication application;
-  KeyInputFocusManager   manager = KeyInputFocusManager::Get();
-  Integration::Scene     stage   = application.GetScene();
+  ToolkitTestApplication   application;
+  KeyInputFocusManager     manager = KeyInputFocusManager::Get();
+  Dali::Integration::Scene stage   = application.GetScene();
 
   tet_infoline(" UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged");
 
@@ -539,7 +539,7 @@ int UtcDaliKeyInputFocusManagerKeyEventOtherWindow(void)
 
   manager.SetFocus(pushButton1);
 
-  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE);
   event.windowId = 3;
 
   application.ProcessEvent(event);

@@ -58,7 +58,7 @@ enum class TriStateProperty
 /**
  * @brief Holds the Implementation for the internal control class
  */
-class Control::Impl : public ConnectionTracker, public Integration::Processor
+class Control::Impl : public ConnectionTracker, public Dali::Integration::Processor
 {
 private:
   class AccessibilityData;

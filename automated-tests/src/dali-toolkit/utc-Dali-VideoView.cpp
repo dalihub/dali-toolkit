@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ int UtcDaliVideoViewProperty1b(void)
 
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK(view);
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   std::string   file;
   Property::Map map;

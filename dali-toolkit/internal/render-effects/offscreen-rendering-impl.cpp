@@ -145,9 +145,9 @@ void OffScreenRenderingImpl::DestroyFrameBuffer()
 
 void OffScreenRenderingImpl::CreateRenderTask()
 {
-  Toolkit::Control         control     = GetOwnerControl();
-  Integration::SceneHolder sceneHolder = GetSceneHolder();
-  RenderTaskList           taskList    = sceneHolder.GetRenderTaskList();
+  Toolkit::Control               control     = GetOwnerControl();
+  Dali::Integration::SceneHolder sceneHolder = GetSceneHolder();
+  RenderTaskList                 taskList    = sceneHolder.GetRenderTaskList();
 
   mRenderTask = taskList.CreateTask();
   mRenderTask.SetSourceActor(control);

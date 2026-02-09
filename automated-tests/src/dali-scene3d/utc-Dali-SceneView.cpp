@@ -1618,8 +1618,8 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliPanelRenderTaskOrdering");
 
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
 
   uint32_t   defaultTaskCount  = taskList.GetTaskCount();
   RenderTask defaultRenderTask = taskList.GetTask(defaultTaskCount - 1);

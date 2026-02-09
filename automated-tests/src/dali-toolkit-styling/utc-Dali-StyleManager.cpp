@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,20 +77,20 @@ Visual::Base CheckVisual(Impl::DummyControl& dummyImpl, Property::Index visualId
   return visual;
 }
 
-Integration::Bitmap* CreateBitmap(unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat)
+Dali::Integration::Bitmap* CreateBitmap(unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat)
 {
-  Integration::Bitmap*      bitmap        = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN);
-  Integration::PixelBuffer* pixbuffer     = bitmap->GetPackedPixelsProfile()->ReserveBuffer(pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight);
-  unsigned int              bytesPerPixel = GetBytesPerPixel(pixelFormat);
+  Dali::Integration::Bitmap*      bitmap        = Dali::Integration::Bitmap::New(Dali::Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN);
+  Dali::Integration::PixelBuffer* pixbuffer     = bitmap->GetPackedPixelsProfile()->ReserveBuffer(pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight);
+  unsigned int                    bytesPerPixel = GetBytesPerPixel(pixelFormat);
 
   memset(pixbuffer, initialColor, imageHeight * imageWidth * bytesPerPixel);
 
   return bitmap;
 }
 
-Integration::ResourcePointer CustomizeNinePatch(ToolkitTestApplication& application,
-                                                unsigned int            ninePatchImageWidth,
-                                                unsigned int            ninePatchImageHeight)
+Dali::Integration::ResourcePointer CustomizeNinePatch(ToolkitTestApplication& application,
+                                                      unsigned int            ninePatchImageWidth,
+                                                      unsigned int            ninePatchImageHeight)
 {
   TestPlatformAbstraction& platform = application.GetPlatform();
 
@@ -98,10 +98,10 @@ Integration::ResourcePointer CustomizeNinePatch(ToolkitTestApplication& applicat
 
   tet_infoline("Create Bitmap");
   platform.SetClosestImageSize(Vector2(ninePatchImageWidth, ninePatchImageHeight));
-  Integration::Bitmap* bitmap = CreateBitmap(ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat);
+  Dali::Integration::Bitmap* bitmap = CreateBitmap(ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat);
 
   tet_infoline("Getting resource");
-  Integration::ResourcePointer resourcePtr(bitmap);
+  Dali::Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetSynchronouslyLoadedResource(resourcePtr);
 
   return resourcePtr;
@@ -1225,8 +1225,8 @@ int UtcDaliStyleManagerSetState01(void)
   actor.SetStyleName("BasicControl");
   application.GetScene().Add(actor);
 
-  Impl::DummyControl&          dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Impl::DummyControl&                dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
 
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
   Visual::Base  visual1      = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
@@ -1300,8 +1300,8 @@ int UtcDaliStyleManagerSetState02(void)
   actor.SetStyleName("BasicControl");
   application.GetScene().Add(actor);
 
-  Impl::DummyControl&          dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Impl::DummyControl&                dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
 
   int state = actor.GetProperty<int>(DevelControl::Property::STATE);
   DALI_TEST_EQUALS(state, (int)DevelControl::NORMAL, TEST_LOCATION);
@@ -1475,7 +1475,7 @@ int UtcDaliStyleManagerSetSubState01(void)
   actor.SetStyleName("ComplexControl");
   application.GetScene().Add(actor);
 
-  Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
@@ -1518,7 +1518,7 @@ int UtcDaliStyleManagerSetSubState02(void)
   actor.SetStyleName("ComplexControl");
   application.GetScene().Add(actor);
 
-  Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
@@ -1614,7 +1614,7 @@ int UtcDaliStyleManagerConfigSectionTestP(void)
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
 
-  application.ProcessEvent(Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(Dali::Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -1644,7 +1644,7 @@ int UtcDaliStyleManagerConfigSectionTestN(void)
 
     Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
 
-    application.ProcessEvent(Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
+    application.ProcessEvent(Dali::Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
     application.SendNotification();
     application.Render();
 

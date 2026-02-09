@@ -67,7 +67,7 @@ struct Constraint100
 };
 
 // Convenience function to quickly set up a 10x10 table with each cell being 10x10 pixels in size by default.
-static void SetupTableViewAndActors(Integration::Scene scene, TableView& tableView, Actor& actor1, Actor& actor2, Actor& actor3)
+static void SetupTableViewAndActors(Dali::Integration::Scene scene, TableView& tableView, Actor& actor1, Actor& actor2, Actor& actor3)
 {
   tableView = TableView::New(10, 10); // 10 by 10 grid.
   DALI_TEST_CHECK(tableView);

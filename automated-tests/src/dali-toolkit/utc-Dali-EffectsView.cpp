@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
   tet_infoline("Checking number of render tasks = 1");
   application.SendNotification();
   application.Render();
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   DALI_TEST_EQUALS(stage.GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
 
   tet_infoline("Create effects view");
@@ -207,7 +207,7 @@ int UtcDaliEffectsViewOnStage(void)
 
   EffectsView view = EffectsView::New(EffectsView::EMBOSS);
   view.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   DALI_TEST_CHECK(stage.GetRenderTaskList().GetTaskCount() == 1);
 
   stage.Add(view);
@@ -224,7 +224,7 @@ int UtcDaliEffectsViewOffStage(void)
 
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
   view.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   DALI_TEST_CHECK(stage.GetRenderTaskList().GetTaskCount() == 1);
 
   stage.Add(view);
@@ -458,7 +458,7 @@ int UtcDaliEffectsViewSetRefreshOnDemandP(void)
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
   view.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(view);
   application.SendNotification();
   application.Render();
@@ -495,8 +495,8 @@ int UtcDaliEffectsViewSetRefreshOnDemandN(void)
 
 int UtcDaliEffectsViewSizeSet(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   {
     EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);

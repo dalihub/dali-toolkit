@@ -48,7 +48,7 @@ class TextureAsyncLoadingHelper;
  * Texture caching is provided and performed by TextureCacheManager.
  * TextureUploadObserver.LoadComplete called when async load completed.
  */
-class TextureManager : public ConnectionTracker, public Integration::Processor
+class TextureManager : public ConnectionTracker, public Dali::Integration::Processor
 {
 public:
   // Copy enum and types and const values that TextureManager will use.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ void Adaptor::Stop()
 {
   if(mTestApplication)
   {
-    Integration::Core& core = mTestApplication->GetCore();
+    Dali::Integration::Core& core = mTestApplication->GetCore();
     tet_printf("Adaptor::SceneDestroyed\n");
     core.SceneDestroyed();
   }
@@ -102,7 +102,7 @@ void Adaptor::Stop()
   mStopped = true;
 }
 
-Integration::Scene Adaptor::GetScene(Dali::Window window)
+Dali::Integration::Scene Adaptor::GetScene(Dali::Window window)
 {
   return window.GetScene();
 }
@@ -273,30 +273,30 @@ void Adaptor::RemoveWindow(Internal::Adaptor::SceneHolder* window)
   }
 }
 
-void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
+void Adaptor::RegisterProcessor(Dali::Integration::Processor& processor, bool postProcessor)
 {
-  Integration::Core& core = mTestApplication->GetCore();
+  Dali::Integration::Core& core = mTestApplication->GetCore();
   tet_printf("Adaptor::RegisterProcessor : %s\n", processor.GetProcessorName().data());
   core.RegisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
+void Adaptor::UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor)
 {
-  Integration::Core& core = mTestApplication->GetCore();
+  Dali::Integration::Core& core = mTestApplication->GetCore();
   tet_printf("Adaptor::UnregisterProcessor : %s\n", processor.GetProcessorName().data());
   core.UnregisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+void Adaptor::RegisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor)
 {
-  Integration::Core& core = mTestApplication->GetCore();
+  Dali::Integration::Core& core = mTestApplication->GetCore();
   tet_printf("Adaptor::RegisterProcessorOnce : %s\n", processor.GetProcessorName().data());
   core.RegisterProcessorOnce(processor, postProcessor);
 }
 
-void Adaptor::UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+void Adaptor::UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor)
 {
-  Integration::Core& core = mTestApplication->GetCore();
+  Dali::Integration::Core& core = mTestApplication->GetCore();
   tet_printf("Adaptor::UnregisterProcessorOnce : %s\n", processor.GetProcessorName().data());
   core.UnregisterProcessorOnce(processor, postProcessor);
 }
@@ -522,22 +522,22 @@ const TraceFactoryInterface& Adaptor::GetTraceFactory()
   return *gTraceFactory;
 }
 
-void Adaptor::RegisterProcessor(Integration::Processor& processor, bool postProcessor)
+void Adaptor::RegisterProcessor(Dali::Integration::Processor& processor, bool postProcessor)
 {
   mImpl->RegisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::UnregisterProcessor(Integration::Processor& processor, bool postProcessor)
+void Adaptor::UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessor(processor, postProcessor);
 }
 
-void Adaptor::RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+void Adaptor::RegisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor)
 {
   mImpl->RegisterProcessorOnce(processor, postProcessor);
 }
 
-void Adaptor::UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+void Adaptor::UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessorOnce(processor, postProcessor);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,8 +211,8 @@ int UtcDaliSuperBlurViewSetTexture(void)
 
 int UtcDaliSuperBlurViewSetTexture2(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   tet_infoline(" UtcDaliSuperBlurViewSetTexture2 - test setting a second texture ");
 

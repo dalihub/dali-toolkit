@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,7 +316,7 @@ int UtcDaliKeyboardFocusManagerLastFocusChangeContext(void)
   // Set navigation from kb1 to kb2 on RIGHT
   kb1.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)kb2.GetProperty<int>(Actor::Property::ID)));
 
-  Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   // It makes mIsFocusIndicatorEnabled true
   application.ProcessEvent(rightEvent);
 
@@ -476,7 +476,7 @@ int UtcDaliKeyboardFocusManagerLastFocusChangeContext(void)
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(w1) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == w1);
 
-  Integration::WheelEvent clockwise(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  Dali::Integration::WheelEvent clockwise(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
   application.ProcessEvent(clockwise);
 
   application.SendNotification();
@@ -1169,7 +1169,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
   manager.FocusedActorEnterKeySignal().Connect(&focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback);
 
-  Integration::KeyEvent returnEvent("Return", "", "", 0, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent returnEvent("Return", "", "", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1220,7 +1220,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivatedLogicalKeyEvent(void)
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
   manager.FocusedActorEnterKeySignal().Connect(&focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback);
 
-  Integration::KeyEvent returnEvent("", "KP_Enter", "", 0, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent returnEvent("", "KP_Enter", "", 0, 0, 0, Dali::Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1278,8 +1278,8 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
   FocusGroupChangedCallback focusGroupChangedCallback(focusGroupChangedSignalVerified);
   manager.FocusGroupChangedSignal().Connect(&focusGroupChangedCallback, &FocusGroupChangedCallback::Callback);
 
-  Integration::KeyEvent tabEvent("Tab", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent shiftTabEvent("Tab", "", "", 0, 1, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent tabEvent("Tab", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent shiftTabEvent("Tab", "", "", 0, 1, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1418,12 +1418,12 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
   manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
 
-  Integration::KeyEvent leftEvent("Left", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent upEvent("Up", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent downEvent("Down", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent pageUpEvent("Prior", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent pageDownEvent("Next", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent leftEvent("Left", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent upEvent("Up", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent downEvent("Down", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent pageUpEvent("Prior", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent pageDownEvent("Next", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1579,12 +1579,12 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByLogicalKeyEvents(void)
   FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
   manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
 
-  Integration::KeyEvent leftEvent("", "KP_Left", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent rightEvent("", "KP_Right", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent upEvent("", "KP_Up", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent downEvent("", "KP_Down", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent pageUpEvent("", "KP_Prior", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
-  Integration::KeyEvent pageDownEvent("", "KP_Next", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent leftEvent("", "KP_Left", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent rightEvent("", "KP_Right", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent upEvent("", "KP_Up", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent downEvent("", "KP_Down", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent pageUpEvent("", "KP_Prior", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent pageDownEvent("", "KP_Next", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1736,7 +1736,7 @@ int UtcDaliKeyboardFocusManagerSignalChangedBySpaceKeyEvent(void)
   PreFocusChangeCallback preFocusChangeCallback(preFocusChangeSignalVerified);
   manager.PreFocusChangeSignal().Connect(&preFocusChangeCallback, &PreFocusChangeCallback::Callback);
 
-  Integration::KeyEvent spaceEvent("space", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent spaceEvent("space", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -2015,7 +2015,7 @@ int UtcDaliKeyboardFocusManagerEnableFocusIndicator(void)
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true and add focus indicator to focused actor.
-  Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent rightEvent("Right", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(rightEvent);
 
   Actor indicatorActor = manager.GetFocusIndicatorActor();
@@ -2057,7 +2057,7 @@ int UtcDaliKeyboardFocusManagerCheckConsumedKeyEvent(void)
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true and add focus indicator to focused actor.
-  Integration::KeyEvent event1("Right", "", "", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event1("Right", "", "", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event1);
 
   DALI_TEST_CHECK(controlCallback.mIsCalled);
@@ -2701,7 +2701,7 @@ int UtcDaliKeyboardFocusManagerCheckWheelEvent(void)
   manager.SetCurrentFocusActor(child);
 
   // Emit custom wheel event is comming to KeyboardFocusManager
-  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK(childCallback.mIsCalled);
@@ -2725,8 +2725,8 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByCustomWheelEvent(void)
   FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
   manager.FocusChangedSignal().Connect(&focusChangedCallback, &FocusChangedCallback::Callback);
 
-  Integration::WheelEvent clockwiseEvent(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
-  Integration::WheelEvent counterClockwiseEvent(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1100u);
+  Dali::Integration::WheelEvent clockwiseEvent(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  Dali::Integration::WheelEvent counterClockwiseEvent(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1100u);
 
   // Create the first button
   PushButton first = PushButton::New();
@@ -2986,7 +2986,7 @@ int UtcDaliKeyboardFocusManagerKeyEventOtherWindow(void)
   button1.SetProperty(Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
   button1.SetProperty(Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty<int>(Actor::Property::ID)));
 
-  Integration::KeyEvent event("Right", "", "Right", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("Right", "", "Right", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   // It makes mIsFocusIndicatorEnabled true
   application.ProcessEvent(event);
 
@@ -3002,7 +3002,7 @@ int UtcDaliKeyboardFocusManagerKeyEventOtherWindow(void)
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(button1) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
 
-  Integration::KeyEvent event1("Right", "", "Right", 0, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event1("Right", "", "Right", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   event1.windowId = 3;
   application.ProcessEvent(event1);
 

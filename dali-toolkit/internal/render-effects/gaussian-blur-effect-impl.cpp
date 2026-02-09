@@ -481,7 +481,7 @@ void GaussianBlurEffectImpl::DestroyFrameBuffers()
   mBlurredOutputFrameBuffer.Reset();
 }
 
-void GaussianBlurEffectImpl::CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
+void GaussianBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl)
 {
   RenderTaskList taskList = sceneHolder.GetRenderTaskList();
 

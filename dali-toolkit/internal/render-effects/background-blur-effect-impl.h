@@ -179,7 +179,7 @@ private:
    * @param[in] sceneHolder SceneHolder of source control
    * @param[in] sourceControl Input source control
    */
-  void CreateRenderTasks(Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
+  void CreateRenderTasks(Dali::Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
 
   /**
    * @brief Removes and destroys local render tasks.

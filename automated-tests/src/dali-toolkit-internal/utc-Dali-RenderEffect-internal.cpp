@@ -159,7 +159,7 @@ int UtcDaliInternalRenderEffectGetOwnerControl01(void)
   DALI_TEST_EQUALS(impl.mOnActivated, false, TEST_LOCATION);
   DALI_TEST_EQUALS(impl.GetOwnerControl(), Toolkit::Control(), TEST_LOCATION);
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -212,7 +212,7 @@ int UtcDaliInternalRenderEffectGetOwnerControl02(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliInternalRenderEffecGetOwnerControl02");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

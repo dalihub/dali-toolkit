@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -605,7 +605,7 @@ int UtcDaliImageViewPixelArea(void)
                       Property::Map().Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME).Add(ImageVisual::Property::PIXEL_AREA, pixelAreaVisual));
 
   // Add to stage
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(gifView);
 
   // loading started

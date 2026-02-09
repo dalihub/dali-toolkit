@@ -170,7 +170,7 @@ Toolkit::Control RenderEffectImpl::GetOwnerControl() const
   return mOwnerControl.GetHandle();
 }
 
-Integration::SceneHolder RenderEffectImpl::GetSceneHolder() const
+Dali::Integration::SceneHolder RenderEffectImpl::GetSceneHolder() const
 {
   return mPlacementSceneHolder.GetHandle();
 }
@@ -193,7 +193,7 @@ void RenderEffectImpl::Activate()
     DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Activated! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
 
     // Keep sceneHolder as weak handle.
-    Integration::SceneHolder sceneHolder = Integration::SceneHolder::Get(ownerControl);
+    Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(ownerControl);
     if(DALI_UNLIKELY(!sceneHolder))
     {
       DALI_LOG_ERROR("RenderEffect Could not be activated due to ownerControl's SceneHolder is not exist\n");

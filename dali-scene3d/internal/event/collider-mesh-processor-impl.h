@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Dali::Scene3D
 {
 namespace Internal
 {
-class ColliderMeshProcessor : public BaseObject, public Dali::ConnectionTracker, public Integration::Processor
+class ColliderMeshProcessor : public BaseObject, public Dali::ConnectionTracker, public Dali::Integration::Processor
 {
 public:
   ColliderMeshProcessor();

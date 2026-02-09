@@ -157,7 +157,7 @@ protected:
    * @brief Get scene holder of owner control.
    * @return mPlacementSceneHolder
    */
-  Integration::SceneHolder GetSceneHolder() const;
+  Dali::Integration::SceneHolder GetSceneHolder() const;
 
   /// For sub classes
 protected:
@@ -209,8 +209,8 @@ private:
 
   std::vector<Constraint> mAnimationConstraints; // For corner animation on owner control.
 
-  Dali::WeakHandle<Dali::Toolkit::Control> mOwnerControl;         ///< Weakhandle of owner control.
-  WeakHandle<Integration::SceneHolder>     mPlacementSceneHolder; ///< Weakhandle of scene
+  Dali::WeakHandle<Dali::Toolkit::Control>   mOwnerControl;         ///< Weakhandle of owner control.
+  WeakHandle<Dali::Integration::SceneHolder> mPlacementSceneHolder; ///< Weakhandle of scene
 
   Vector2 mTargetSize; // The final size of mOwnerControl
 

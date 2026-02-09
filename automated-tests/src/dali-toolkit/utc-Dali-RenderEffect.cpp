@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ int UtcDaliRenderEffectActivateP01(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectActivateP01");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -111,7 +111,7 @@ int UtcDaliRenderEffectActivateP02(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectActivateP02");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -142,7 +142,7 @@ int UtcDaliRenderEffectActivateP03(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectActivateP03");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -173,7 +173,7 @@ int UtcDaliRenderEffectDeactivateP(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectDeactivateP");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -214,7 +214,7 @@ int UtcDaliRenderEffectDeactivateN(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectDeactivateN");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -234,7 +234,7 @@ int UtcDaliRenderEffectActivateDeactivateInplace(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectActivateDeactivateInplace");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -261,7 +261,7 @@ int UtcDaliRenderEffectReassign(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectReassign");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -283,8 +283,8 @@ int UtcDaliRenderEffectResize(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectResize");
 
-  Integration::Scene scene   = application.GetScene();
-  Control            control = Control::New();
+  Dali::Integration::Scene scene   = application.GetScene();
+  Control                  control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scene.Add(control);
 
@@ -385,7 +385,7 @@ int UtcDaliRenderEffectSynchronizeControlCornerRadius(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectSynchronizeBackgroundCornerRadius");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Property::Map blackDimmerMap;
   blackDimmerMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -439,8 +439,8 @@ int UtcDaliRenderEffectInvalidTargetSize(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectInvalidTargetSize");
 
-  Integration::Scene scene          = application.GetScene();
-  const uint32_t     maxTextureSize = Dali::GetMaxTextureSize();
+  Dali::Integration::Scene scene          = application.GetScene();
+  const uint32_t           maxTextureSize = Dali::GetMaxTextureSize();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -468,7 +468,7 @@ int UtcDaliRenderEffectControlSceneOnAndSceneOff01(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectControlSceneOnAndSceneOff01");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -522,7 +522,7 @@ int UtcDaliRenderEffectControlSceneOnAndSceneOff02(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectControlSceneOnAndSceneOff02");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -572,7 +572,7 @@ int UtcDaliRenderEffectControlVisiblityChanged01(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectControlVisiblityChanged01");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -638,7 +638,7 @@ int UtcDaliRenderEffectControlVisiblityChanged02(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectControlVisiblityChanged02");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -688,8 +688,8 @@ int UtcDaliRenderEffectRenderTaskOrdering(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectRenderTaskOrdering");
 
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -929,7 +929,7 @@ int UtcDaliRenderEffectReInitialize(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectReInitialize");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -997,7 +997,7 @@ int UtcDaliBlurEffectBlurOnce(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliBlurEffectBlurOnce");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1072,7 +1072,7 @@ int UtcDaliBlurEffectDownscaleFactor(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliBlurEffectDownscaleFactor");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1135,7 +1135,7 @@ int UtcDaliMaskEffect(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliMaskEffect");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1174,7 +1174,7 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectBlurStrengthAnimation");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1242,7 +1242,7 @@ int UtcDaliMaskEffectScaleN(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliMaskEffect");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1274,7 +1274,7 @@ int UtcDaliRenderEffectBlurOpacityAnimation(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliRenderEffectBlurOpacityAnimation");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1339,7 +1339,7 @@ int UtcDaliMaskEffectMaskOnce(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliMaskEffectMaskOnce");
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1422,7 +1422,7 @@ int UtcDaliBackgroundBlurEffectSetSourceActor(void)
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Control grandParentActor = Control::New();
   grandParentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

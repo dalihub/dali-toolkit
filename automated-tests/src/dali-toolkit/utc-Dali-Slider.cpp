@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ int UtcDaliSliderSignals1(void)
 
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point            pointDown;
+    Dali::Integration::Point      pointDown;
     pointDown.SetState(PointState::DOWN);
     pointDown.SetScreenPosition(Vector2(10.0f, 10.0f));
     event.AddPoint(pointDown);
@@ -235,7 +235,7 @@ int UtcDaliSliderSignals1(void)
   for(int i = 0; i < 5; ++i)
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point            pointMotion;
+    Dali::Integration::Point      pointMotion;
     pointMotion.SetState(PointState::MOTION);
     pointMotion.SetScreenPosition(Vector2(10.0f + i * 10.0f, 10.0f));
     event.AddPoint(pointMotion);
@@ -247,7 +247,7 @@ int UtcDaliSliderSignals1(void)
 
   {
     Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
-    Integration::Point            pointUp;
+    Dali::Integration::Point      pointUp;
     pointUp.SetState(PointState::UP);
     pointUp.SetScreenPosition(Vector2(10.0f, 10.0f));
     event.AddPoint(pointUp);
@@ -319,20 +319,20 @@ int UtcDaliSliderSignals2(void)
 
   event = Dali::Integration::TouchEvent();
 
-  Integration::Point pointDown;
+  Dali::Integration::Point pointDown;
   pointDown.SetState(PointState::DOWN);
   pointDown.SetScreenPosition(Vector2(10.0f, 10.0f));
   event.AddPoint(pointDown);
 
   for(int i = 0; i < 5; ++i)
   {
-    Integration::Point pointMotion;
+    Dali::Integration::Point pointMotion;
     pointMotion.SetState(PointState::MOTION);
     pointMotion.SetScreenPosition(Vector2(10.0f + i * 10.0f, 10.0f));
     event.AddPoint(pointMotion);
   }
 
-  Integration::Point pointUp;
+  Dali::Integration::Point pointUp;
   pointUp.SetState(PointState::UP);
   pointUp.SetScreenPosition(Vector2(10.0f, 10.0f));
   event.AddPoint(pointUp);

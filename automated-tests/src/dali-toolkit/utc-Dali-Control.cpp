@@ -300,8 +300,8 @@ int UtcDaliControlNavigationProperties(void)
 
 int UtcDaliControlKeyInputFocus(void)
 {
-  ToolkitTestApplication application;
-  Integration::Scene     stage = application.GetScene();
+  ToolkitTestApplication   application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   DummyControl control;
 

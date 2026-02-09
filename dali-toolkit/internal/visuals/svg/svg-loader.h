@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_LOADER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class VisualFactoryCache;
  *
  * @note To use EncodedImageBuffer, we need to set VisualFactoryCache.
  */
-class SvgLoader : public ConnectionTracker, public Integration::Processor
+class SvgLoader : public ConnectionTracker, public Dali::Integration::Processor
 {
 public:
   typedef int32_t SvgLoadId;      ///< The SvgLoadId type. This is used as a handle to refer to a particular SvgLoader Data.
