@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ int gBoundTextureCount = 0;
 int glRenderFrameWithTextures(Dali::RenderCallbackInput& input)
 {
   ++gDRFrameRenderedCount;
-  gBoundTextureCount = input.textureBindings.size();
+  gBoundTextureCount = input.textureBindings.Count();
   return 1;
 }
 
@@ -622,9 +622,9 @@ int UtcDaliGlViewDirectRenderingTextureBinding(void)
   PixelData pixelData2 = PixelData::New(data2, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
   texture2.Upload(pixelData2);
 
-  std::vector<Texture> texturesToBind;
-  texturesToBind.push_back(texture1);
-  texturesToBind.push_back(texture2);
+  Dali::Vector<Texture> texturesToBind;
+  texturesToBind.PushBack(texture1);
+  texturesToBind.PushBack(texture2);
 
   view.BindTextureResources(texturesToBind);
 
@@ -633,7 +633,7 @@ int UtcDaliGlViewDirectRenderingTextureBinding(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(DirectRenderingCode::gBoundTextureCount, texturesToBind.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gBoundTextureCount, texturesToBind.Count(), TEST_LOCATION);
 
   END_TEST;
 }

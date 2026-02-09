@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder
   ADDON_BIND_FUNCTION(GlViewGetRenderingMode, GlView::RenderingMode(const Internal::GlViewImpl&));
   ADDON_BIND_FUNCTION(GlViewGetBackendMode, GlView::BackendMode(const Internal::GlViewImpl&));
   ADDON_BIND_FUNCTION(GlViewRenderOnce, void(Internal::GlViewImpl&));
-  ADDON_BIND_FUNCTION(GlViewBindTextureResources, void(Internal::GlViewImpl&, std::vector<Dali::Texture>));
+  ADDON_BIND_FUNCTION(GlViewBindTextureResources, void(Internal::GlViewImpl&, Dali::Vector<Dali::Texture>));
   ADDON_BIND_FUNCTION(GlViewTerminate, void(Internal::GlViewImpl&));
 };
 
@@ -148,7 +148,7 @@ void GlView::RenderOnce()
   }
 }
 
-void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
+void GlView::BindTextureResources(Dali::Vector<Dali::Texture> textures)
 {
   Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
   if(gToolkitGlesAddon)
