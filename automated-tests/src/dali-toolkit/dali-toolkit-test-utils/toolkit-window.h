@@ -2,7 +2,7 @@
 #define TOOLKIT_WINDOW_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public:
   Window&       operator=(Window&& rhs);
   static Window DownCast(BaseHandle handle);
 
-  Integration::Scene                         GetScene();
+  Dali::Integration::Scene                   GetScene();
   Dali::Integration::RenderSurfaceInterface& GetRenderSurface();
   void                                       Add(Dali::Actor actor);
   void                                       Remove(Dali::Actor actor);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,12 +139,12 @@ Visual::Base CreateVisualWithPolicy(const char* url, Property::Index key, const 
 
 } // namespace
 
-void TestVisualRender(ToolkitTestApplication&      application,
-                      DummyControl&                actor,
-                      Visual::Base&                visual,
-                      std::size_t                  expectedSamplers = 0,
-                      ImageDimensions              imageDimensions  = ImageDimensions(),
-                      Integration::ResourcePointer resourcePtr      = Integration::ResourcePointer())
+void TestVisualRender(ToolkitTestApplication&            application,
+                      DummyControl&                      actor,
+                      Visual::Base&                      visual,
+                      std::size_t                        expectedSamplers = 0,
+                      ImageDimensions                    imageDimensions  = ImageDimensions(),
+                      Dali::Integration::ResourcePointer resourcePtr      = Dali::Integration::ResourcePointer())
 {
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);

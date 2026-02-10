@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ int UtcDaliNavigationViewPush(void)
 {
   ToolkitTestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // 1 Create and Add Navigation View to stage, actor count should be zero
   NavigationView naviView = NavigationView::New();
@@ -137,7 +137,7 @@ int UtcDaliNavigationViewPop(void)
 {
   ToolkitTestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();
@@ -170,7 +170,7 @@ int UtcDaliNavigationViewPushAndPop(void)
 {
   ToolkitTestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();
@@ -211,7 +211,7 @@ int UtcDaliNavigationViewPreventLastPop(void)
 {
   ToolkitTestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();

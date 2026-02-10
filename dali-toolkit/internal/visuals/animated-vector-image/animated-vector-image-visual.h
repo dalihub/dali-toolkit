@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_VECTOR_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,8 +243,11 @@ private:
   float                              mFrameSpeedFactor;
   float                              mRenderScale;
 
+  Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
+
   uint32_t mLastSentPlayStateId;
 
+  bool mRasterizeCompleted : 1;
   bool mLoadFailed : 1;
   bool mRendererAdded : 1;
   bool mRedrawInScalingDown : 1;

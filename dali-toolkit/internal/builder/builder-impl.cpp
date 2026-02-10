@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode& root,
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode& root, const TreeNode& child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 
 #if defined(DEBUG_ENABLED)
-Integration::Log::Filter* gFilterScript = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_SCRIPT");
+Dali::Integration::Log::Filter* gFilterScript = Dali::Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_SCRIPT");
 #endif
 
 namespace
@@ -840,19 +840,19 @@ void Builder::LoadConstants(const TreeNode& root, Property::Map& intoMap)
     std::string logLevel(iter->Get<std::string>());
     if(logLevel == "NoLogging")
     {
-      gFilterScript->SetLogLevel(Integration::Log::NoLogging);
+      gFilterScript->SetLogLevel(Dali::Integration::Log::NoLogging);
     }
     else if(logLevel == "Concise")
     {
-      gFilterScript->SetLogLevel(Integration::Log::Concise);
+      gFilterScript->SetLogLevel(Dali::Integration::Log::Concise);
     }
     else if(logLevel == "General")
     {
-      gFilterScript->SetLogLevel(Integration::Log::General);
+      gFilterScript->SetLogLevel(Dali::Integration::Log::General);
     }
     else if(logLevel == "Verbose")
     {
-      gFilterScript->SetLogLevel(Integration::Log::Verbose);
+      gFilterScript->SetLogLevel(Dali::Integration::Log::Verbose);
     }
   }
 #endif

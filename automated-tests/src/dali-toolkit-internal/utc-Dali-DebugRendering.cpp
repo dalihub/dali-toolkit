@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ const char* TEST_GIF_FILE_NAME    = TEST_RESOURCE_DIR "/anim.gif";
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
 const char* const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
 
-void TestDebugVisual(Integration::Scene scene, Visual::Base& visual, DevelVisual::Type actualType, Vector2 expectedNaturalSize)
+void TestDebugVisual(Dali::Integration::Scene scene, Visual::Base& visual, DevelVisual::Type actualType, Vector2 expectedNaturalSize)
 {
   {
     auto& impl = GetImplementation(visual);
@@ -76,7 +76,7 @@ void TestDebugVisual(Integration::Scene scene, Visual::Base& visual, DevelVisual
     DALI_TEST_CHECK(geometry.GetType() == Geometry::LINES);
   }
 }
-void TestDebugVisual(Integration::Scene scene, Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize)
+void TestDebugVisual(Dali::Integration::Scene scene, Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize)
 {
   TestDebugVisual(scene, visual, (DevelVisual::Type)actualType, expectedNaturalSize);
 }

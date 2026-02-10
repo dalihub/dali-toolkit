@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -479,7 +479,7 @@ int UtcDaliControlImplKeyEvent(void)
     application.SendNotification();
 
     DALI_TEST_EQUALS(dummyImpl.keyEventCalled, false, TEST_LOCATION);
-    Integration::KeyEvent keyEvent;
+    Dali::Integration::KeyEvent keyEvent;
     application.ProcessEvent(keyEvent);
     DALI_TEST_EQUALS(dummyImpl.keyEventCalled, true, TEST_LOCATION);
 
@@ -498,7 +498,7 @@ int UtcDaliControlImplKeyEvent(void)
     application.Render();
     application.SendNotification();
 
-    Integration::KeyEvent keyEvent;
+    Dali::Integration::KeyEvent keyEvent;
     application.ProcessEvent(keyEvent);
 
     application.GetScene().Remove(dummy);

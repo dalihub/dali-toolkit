@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,8 +141,8 @@ int UtcDaliBuilderQuitSignal(void)
   application.Render();
 
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);
@@ -327,8 +327,8 @@ int UtcDaliBuilderAnimationP(void)
 
   // trigger play
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);
@@ -731,8 +731,8 @@ int UtcDaliBuilderChildActionP(void)
   application.Render();
 
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);
@@ -787,8 +787,8 @@ int UtcDaliBuilderSetPropertyActionP(void)
   application.Render();
 
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);
@@ -840,8 +840,8 @@ int UtcDaliBuilderGenericActionP(void)
   application.Render();
 
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);
@@ -924,8 +924,8 @@ int UtcDaliBuilderPropertyNotificationP(void)
   application.Render();
 
   // Emit touch event and check that our quit method is called
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(10.0f, 10.0f));
   touchEvent.points.push_back(point);

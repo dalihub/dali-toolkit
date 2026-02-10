@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <algorithm>
 #include <string_view>
 
 // INTERNAL INCLUDES
@@ -1215,7 +1216,7 @@ void SceneView::OnSceneConnection(int depth)
   }
 
   // On-screen / Off-screen window
-  mSceneHolder = Integration::SceneHolder::Get(Self());
+  mSceneHolder = Dali::Integration::SceneHolder::Get(Self());
   if(mSceneHolder)
   {
     RenderTaskList taskList = mSceneHolder.GetRenderTaskList();

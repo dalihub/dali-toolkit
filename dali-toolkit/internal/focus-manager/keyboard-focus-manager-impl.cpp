@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,16 +233,16 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor, const FocusChange
     GetConfigurationFromStyleManger();
   }
 
-  bool                     success = false;
-  Integration::SceneHolder currentWindow;
+  bool                           success = false;
+  Dali::Integration::SceneHolder currentWindow;
 
   // Check whether the actor is in the stage and is keyboard focusable.
   if(actor &&
      actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
      actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
      actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
-     (currentWindow = Integration::SceneHolder::Get(actor))) ///< Note : SceneHolder might not be valid even if actor is connected to scene.
-                                                             ///         (e.g. Adaptor Stopped, SceneHolder removed but Scene is still alive)
+     (currentWindow = Dali::Integration::SceneHolder::Get(actor))) ///< Note : SceneHolder might not be valid even if actor is connected to scene.
+                                                                   ///         (e.g. Adaptor Stopped, SceneHolder removed but Scene is still alive)
   {
     // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
     Actor parent = actor.GetParent();
@@ -434,7 +434,7 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   Actor parent;
   if(actor)
   {
-    Integration::SceneHolder window = Integration::SceneHolder::Get(actor);
+    Dali::Integration::SceneHolder window = Dali::Integration::SceneHolder::Get(actor);
     if(window)
     {
       rootActor = window.GetRootLayer();
@@ -479,7 +479,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
 bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const FocusChangeContext& context)
 {
-  Actor              currentFocusActor = GetCurrentFocusActor();
+  Actor currentFocusActor = GetCurrentFocusActor();
 
   bool succeed = false;
 
@@ -557,7 +557,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
           if(!nextFocusableActor)
           {
-            Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
+            Dali::Integration::SceneHolder window = Dali::Integration::SceneHolder::Get(currentFocusActor);
             if(window)
             {
               nextFocusableActor = window.GetRootLayer().FindChildById(actorId);
@@ -591,7 +591,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
           if(currentFocusActor)
           {
             // Find the window of the focused actor.
-            Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
+            Dali::Integration::SceneHolder window = Dali::Integration::SceneHolder::Get(currentFocusActor);
             if(window)
             {
               rootActor = window.GetRootLayer();
@@ -895,11 +895,11 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
   }
 
-  const std::string& keyName        = event.GetKeyName();
-  const std::string& logicalKeyName = event.GetLogicalKey();
-  const std::string& deviceName     = event.GetDeviceName();
-  Toolkit::Control::KeyboardFocus::Device device = Toolkit::Control::KeyboardFocus::Device::KEYBOARD;
-  FocusChangeContext                      context = {device, deviceName};
+  const std::string&                      keyName        = event.GetKeyName();
+  const std::string&                      logicalKeyName = event.GetLogicalKey();
+  const std::string&                      deviceName     = event.GetDeviceName();
+  Toolkit::Control::KeyboardFocus::Device device         = Toolkit::Control::KeyboardFocus::Device::KEYBOARD;
+  FocusChangeContext                      context        = {device, deviceName};
 
   if(mIsFocusIndicatorShown == UNKNOWN)
   {
@@ -1187,7 +1187,7 @@ void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
     // Change Current Focused Window
     Layer rootLayer       = window.GetRootLayer();
     mCurrentFocusedWindow = rootLayer;
-    mCurrentWindowId      = static_cast<uint32_t>(Integration::SceneHolder::Get(rootLayer).GetNativeId());
+    mCurrentWindowId      = static_cast<uint32_t>(Dali::Integration::SceneHolder::Get(rootLayer).GetNativeId());
 
     // Get Current Focused Actor from window
     Actor currentFocusedActor = GetFocusActorFromCurrentWindow();

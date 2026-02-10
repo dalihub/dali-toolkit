@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ namespace Internal
 namespace
 {
 #ifdef DECORATOR_DEBUG
-Integration::Log::Filter* gLogFilter(Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_TEXT_DECORATOR"));
+Dali::Integration::Log::Filter* gLogFilter(Dali::Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_TEXT_DECORATOR"));
 #endif
 } // namespace
 } // namespace Internal

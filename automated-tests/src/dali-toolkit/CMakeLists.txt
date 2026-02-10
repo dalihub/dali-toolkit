@@ -33,7 +33,6 @@ SET(TC_SOURCES
   utc-Dali-PageTurnView.cpp
   utc-Dali-ParticleSystem.cpp
   utc-Dali-PropertyBridge.cpp
-  utc-Dali-Scene3dView.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp
   utc-Dali-ShaderEffects.cpp
@@ -85,7 +84,6 @@ SET(TC_SOURCES
   utc-Dali-SuperBlurView.cpp
   utc-Dali-SvgVisual.cpp
   utc-Dali-Toolkit.cpp
-  utc-Dali-Model3dView.cpp
   utc-Dali-Visual.cpp
   utc-Dali-VisualFactory.cpp
   utc-Dali-VideoView.cpp

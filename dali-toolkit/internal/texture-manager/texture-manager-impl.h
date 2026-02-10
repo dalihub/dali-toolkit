@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
-#include <dali/public-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
 
@@ -49,7 +48,7 @@ class TextureAsyncLoadingHelper;
  * Texture caching is provided and performed by TextureCacheManager.
  * TextureUploadObserver.LoadComplete called when async load completed.
  */
-class TextureManager : public ConnectionTracker, public Integration::Processor
+class TextureManager : public ConnectionTracker, public Dali::Integration::Processor
 {
 public:
   // Copy enum and types and const values that TextureManager will use.

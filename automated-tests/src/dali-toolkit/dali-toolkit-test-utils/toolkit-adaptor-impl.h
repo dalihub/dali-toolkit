@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ADAPTOR_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public:
   void RequestUpdateOnce();
   void RequestProcessEventsOnIdle();
 
-  static Integration::Scene GetScene(Dali::Window window);
+  static Dali::Integration::Scene GetScene(Dali::Window window);
 
   Dali::Integration::RenderSurfaceInterface& GetSurface();
   Dali::WindowContainer                      GetWindows();
@@ -84,10 +84,10 @@ public:
   void                                  AddWindow(Internal::Adaptor::SceneHolder* window);
   void                                  RemoveWindow(Internal::Adaptor::SceneHolder* window);
 
-  void RegisterProcessor(Integration::Processor& processor, bool postProcessor = false);
-  void UnregisterProcessor(Integration::Processor& processor, bool postProcessor = false);
-  void RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor = false);
-  void UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor = false);
+  void RegisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
+  void UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
+  void RegisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
+  void UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
 
   void SetApplication(Dali::TestApplication& testApplication);
 

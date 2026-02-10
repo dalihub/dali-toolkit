@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_vi
   // If the shader name is empty, it means that the shader is not generated internally. So, there is need to support file caching. Otherwise, it is defined externally. So, it needs not to support file caching.
   Shader::Hint::Value shaderHints = shaderName.empty() ? Shader::Hint::NONE : static_cast<Dali::Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
 
-  mShader[type] = Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
+  mShader[type] = Dali::Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
 
   return mShader[type];
 }

@@ -30,6 +30,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <algorithm>
 
 namespace Dali
 {

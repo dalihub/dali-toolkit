@@ -76,7 +76,7 @@ class Controller : public RefObject,
                    public TextSelectionPopupCallbackInterface,
                    public HiddenText::Observer,
                    public ConnectionTracker,
-                   public Integration::Processor
+                   public Dali::Integration::Processor
 {
 public: // Enumerated types.
   /**
@@ -2467,7 +2467,7 @@ protected: // Inherit from HiddenText.
    */
   void DisplayTimeExpired() override;
 
-protected: // Inherit from Integration::Processor
+protected: // Inherit from Dali::Integration::Processor
   /**
    * @copydoc Dali::Integration::Processor::Process()
    */

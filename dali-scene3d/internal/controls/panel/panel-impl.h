@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_PANEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,7 +260,7 @@ private:
   Scene3D::ModelNode             mBackPlaneNode;
   Scene3D::ModelNode             mDoubleSidedPlaneNode;
   Dali::Layer                    mRootLayer;
-  Integration::SceneHolder       mSceneHolder;
+  Dali::Integration::SceneHolder mSceneHolder;
   CameraActor                    mCamera;
   Dali::FrameBuffer              mFrameBuffer;
   Dali::Texture                  mTexture;

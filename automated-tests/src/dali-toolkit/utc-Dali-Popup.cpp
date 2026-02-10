@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,29 +175,29 @@ struct PopupTestFunctor
 };
 
 // Generate a KeyEvent to send to Core.
-Integration::KeyEvent GenerateKey(const std::string&                  keyName,
-                                  const std::string&                  logicalKey,
-                                  const std::string&                  keyString,
-                                  int                                 keyCode,
-                                  int                                 keyModifier,
-                                  unsigned long                       timeStamp,
-                                  const Integration::KeyEvent::State& keyState,
-                                  const std::string&                  compose        = "",
-                                  const std::string&                  deviceName     = "",
-                                  const Device::Class::Type&          deviceClass    = Device::Class::NONE,
-                                  const Device::Subclass::Type&       deviceSubclass = Device::Subclass::NONE)
+Dali::Integration::KeyEvent GenerateKey(const std::string&                        keyName,
+                                        const std::string&                        logicalKey,
+                                        const std::string&                        keyString,
+                                        int                                       keyCode,
+                                        int                                       keyModifier,
+                                        unsigned long                             timeStamp,
+                                        const Dali::Integration::KeyEvent::State& keyState,
+                                        const std::string&                        compose        = "",
+                                        const std::string&                        deviceName     = "",
+                                        const Device::Class::Type&                deviceClass    = Device::Class::NONE,
+                                        const Device::Subclass::Type&             deviceSubclass = Device::Subclass::NONE)
 {
-  return Integration::KeyEvent(keyName,
-                               logicalKey,
-                               keyString,
-                               keyCode,
-                               keyModifier,
-                               timeStamp,
-                               keyState,
-                               compose,
-                               deviceName,
-                               deviceClass,
-                               deviceSubclass);
+  return Dali::Integration::KeyEvent(keyName,
+                                     logicalKey,
+                                     keyString,
+                                     keyCode,
+                                     keyModifier,
+                                     timeStamp,
+                                     keyState,
+                                     compose,
+                                     deviceName,
+                                     deviceClass,
+                                     deviceSubclass);
 }
 
 } // Anonymous namespace
@@ -1481,7 +1481,7 @@ int UtcDaliPopupOnKeyEvent(void)
 
   popup.SetKeyInputFocus();
 
-  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::TOUCH, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_ESCAPE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", "", Device::Class::TOUCH, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 

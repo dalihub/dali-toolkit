@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -598,7 +598,7 @@ int UtcDaliWebViewTouchAndKeys(void)
 
   // Key event
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(view);
-  application.ProcessEvent(Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(Dali::Integration::KeyEvent("", "", "", DALI_KEY_ESCAPE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
 
   DALI_TEST_CHECK(gTouched);

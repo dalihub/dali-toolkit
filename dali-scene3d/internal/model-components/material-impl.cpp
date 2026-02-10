@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/rendering/sampler.h>
+#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
