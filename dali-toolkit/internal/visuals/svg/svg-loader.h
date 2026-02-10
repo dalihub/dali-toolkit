@@ -286,13 +286,20 @@ public:
    */
   struct SvgRasterizeInfo
   {
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing, VisualUrl imageUrl)
+#else
     SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing)
+#endif
     : mId(rasterizeId),
       mTask(),
       mLoadId(loadId),
       mWidth(width),
       mHeight(height),
       mAttemptAtlasing(attemptAtlasing),
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      mImageUrl(std::move(imageUrl)),
+#endif
       mRasterizeState(RasterizeState::NOT_STARTED),
       mTextureSet(),
       mAtlasRect(Vector4(0.0f, 0.0f, 1.0f, 1.0f)),
@@ -311,6 +318,9 @@ public:
       mWidth(info.mWidth),
       mHeight(info.mHeight),
       mAttemptAtlasing(info.mAttemptAtlasing),
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      mImageUrl(std::move(info.mImageUrl)),
+#endif
       mRasterizeState(info.mRasterizeState),
       mTextureSet(std::move(info.mTextureSet)),
       mAtlasRect(std::move(info.mAtlasRect)),
@@ -333,6 +343,10 @@ public:
         mWidth           = info.mWidth;
         mHeight          = info.mHeight;
         mAttemptAtlasing = info.mAttemptAtlasing;
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+        mImageUrl = std::move(info.mImageUrl);
+#endif
 
         mRasterizeState = info.mRasterizeState;
         mTextureSet     = std::move(info.mTextureSet);
@@ -363,6 +377,10 @@ public:
     uint32_t  mWidth;
     uint32_t  mHeight;
     bool      mAttemptAtlasing; ///< True if atlas requested.
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    VisualUrl mImageUrl;
+#endif
 
     RasterizeState   mRasterizeState;
     Dali::TextureSet mTextureSet; ///< The texture set from atlas manager, or rasterized result at index 0.
