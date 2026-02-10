@@ -2795,7 +2795,7 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
   END_TEST;
 }
 
-int UtcDaliImageViewLoadRemoteSVG(void)
+int UtcDaliImageViewLoadRemoteSVG01(void)
 {
   tet_infoline("Test load from a remote server.");
 
@@ -2831,12 +2831,16 @@ int UtcDaliImageViewLoadRemoteSVG(void)
     imageView.Unparent();
   }
 
-  // Insure to Remove svg cache.
-  application.SendNotification();
-  application.Render();
-  application.RunIdles();
-  application.SendNotification();
-  application.Render();
+  END_TEST;
+}
+
+int UtcDaliImageViewLoadRemoteSVG02(void)
+{
+  tet_infoline("Test load from a remote server.");
+
+  ToolkitTestApplication application;
+
+  const std::string svgImageUrl("https://dalihub.github.io/images/check.svg");
 
   // Without size set
   {
