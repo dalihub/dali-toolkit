@@ -200,15 +200,18 @@ private:
   VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks. Thread warning : This should be touched only at VectorAnimationThread.
   VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Thread warning : This should be touched only at VectorAnimationThread.
 
+  VectorAnimationTaskSet mDiscardedTasks; ///< Tasks which are discarded but still in processing in the worker thread. Attached at VectorAnimationThread, and removed at main thread.
+
   std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
                                                                              ///< It will be moved at begin of Rasterize().
 
   std::vector<std::pair<CallbackBase*, uint32_t>> mTriggerEventCallbacks{}; // Callbacks are not owned
   SleepThread                                     mSleepThread;
   ConditionalWait                                 mConditionalWait;
-  Mutex                                           mEventTriggerMutex;
+  Mutex                                           mEventTriggerMutex;   ///< Mutex to validate mEventTrigger callback. Could be locked under mConditionalWait and mDiscardedTasksMutex scope.
   Mutex                                           mAnimationTasksMutex; ///< Mutex to change + get mAnimationTasks from event thread
   Mutex                                           mTaskCompletedMutex;  ///< Mutex to collect completed tasks to mCompletedTasksQueue from worker threads
+  Mutex                                           mDiscardedTasksMutex; ///< Mutex to collect discarded tasks from worker thread + remove from event thread
   std::unique_ptr<EventThreadCallback>            mEventTrigger{};
   const Dali::LogFactoryInterface&                mLogFactory;
   const Dali::TraceFactoryInterface&              mTraceFactory;
