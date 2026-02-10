@@ -73,7 +73,11 @@ void SetTextureSetToRasterizeInfo(const Dali::PixelData rasterizedPixelData, Svg
 {
   // Convert pixelData to texture.
   Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  texture.Upload(rasterizedPixelData, rasterizeInfo.mImageUrl.GetUrl(), rasterizeInfo.mId + 1000'000'000); ///< Add some number to avoid conflict with TextureManager ID.
+#else
   texture.Upload(rasterizedPixelData);
+#endif
 
   rasterizeInfo.mTextureSet = TextureSet::New();
   rasterizeInfo.mTextureSet.SetTexture(0u, texture);
@@ -258,16 +262,27 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
   {
     // Increase loadId reference first
     // It would be decreased at rasterizate removal.
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    VisualUrl imageUrl;
+#endif
     {
       auto loadCacheIndex = GetCacheIndexFromLoadCacheById(loadId);
       DALI_ASSERT_ALWAYS(loadCacheIndex != SvgLoader::INVALID_SVG_CACHE_INDEX && "Invalid cache index");
       ++mLoadCache[loadCacheIndex].mReferenceCount;
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      imageUrl = mLoadCache[loadCacheIndex].mImageUrl;
+#endif
       DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) Increase loadId loadState:%s, refCount=%d\n", loadId, width, height, svgObserver, GET_LOAD_STATE_STRING(mLoadCache[loadCacheIndex].mLoadState), static_cast<int>(mLoadCache[loadCacheIndex].mReferenceCount));
     }
 
     rasterizeId = GenerateUniqueSvgRasterizeId();
     cacheIndex  = static_cast<SvgCacheIndex>(mRasterizeCache.size());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height, std::move(imageUrl)));
+#else
     mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height));
+#endif
     DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) New cached index:%d rasterizeId@%d\n", loadId, width, height, svgObserver, cacheIndex, rasterizeId);
   }
   else
