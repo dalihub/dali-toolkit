@@ -1550,8 +1550,8 @@ void ImageVisual::ResetRenderer()
   RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
   mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
-  TextureSet textureSet = TextureSet::New();
-  mImpl->mRenderer.SetTextures(textureSet);
+  // Remove textureset now.
+  mImpl->mRenderer.RemoveTextures();
   ComputeTextureSize();
 
   mLoadState = TextureManager::LoadState::NOT_STARTED;
