@@ -708,7 +708,9 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
                                  data.GetWidth(),
                                  data.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data, "TextVisual");
+  std::string text;
+  mController->GetText(text);
+  texture.Upload(data, text + std::string("(TextVisual)"));
 #else
   texture.Upload(data);
 #endif
