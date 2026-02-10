@@ -411,6 +411,12 @@ void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
   // Clear the renderer list
   mRendererList.clear();
 
+  if(removeDefaultRenderer)
+  {
+    // Remove default renderer's textureset
+    mImpl->mRenderer.RemoveTextures();
+  }
+
   // Clear constraint, and keep default renderer's constraint only.
   if(mColorConstraint)
   {
