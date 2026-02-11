@@ -1125,11 +1125,6 @@ Shader AnimatedImageVisual::GenerateShader() const
     // Most of image visual shader user (like svg, animated vector image visual) use pre-multiplied alpha.
     // If the visual dont want to using pre-multiplied alpha, it should be set as 0.0f as renderer side.
     shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
-
-    if(mImpl->mRenderer)
-    {
-      mImpl->mRenderer.RegisterVisualTransformUniform();
-    }
   }
   else
   {
@@ -1182,10 +1177,6 @@ void AnimatedImageVisual::OnInitialize()
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-  if(IsUsingCustomShader())
-  {
-    mImpl->mRenderer.RegisterVisualTransformUniform();
-  }
 
   if(!defaultWrapMode) // custom wrap mode
   {

@@ -477,11 +477,6 @@ Shader NPatchVisual::CreateShader()
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
       shader = Shader::New(vertexShader.str(), fragmentShader, Dali::Shader::Hint::NONE, shaderName.str());
-
-      if(DALI_LIKELY(mImpl->mRenderer))
-      {
-        mImpl->mRenderer.RegisterVisualTransformUniform();
-      }
     }
   }
   else
@@ -517,11 +512,6 @@ Shader NPatchVisual::CreateShader()
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
 
       shader = Shader::New(vertexShader.str(), fragmentShader, hints, shaderName.str());
-    }
-
-    if(DALI_LIKELY(mImpl->mRenderer))
-    {
-      mImpl->mRenderer.RegisterVisualTransformUniform();
     }
   }
 
