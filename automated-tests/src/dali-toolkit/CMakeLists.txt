@@ -39,7 +39,6 @@ SET(TC_SOURCES
   utc-Dali-ShadowView.cpp
   utc-Dali-ScaleTransition.cpp
   utc-Dali-SlideTransition.cpp
-  utc-Dali-Slider.cpp
   utc-Dali-TableView.cpp
   utc-Dali-Text-BaseSpan.cpp
   utc-Dali-Text-ForegroundColorSpan.cpp
