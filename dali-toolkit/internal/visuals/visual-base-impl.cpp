@@ -289,7 +289,6 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
               if(mImpl->mTransformMapUsingDefault)
               {
                 mImpl->mTransformMapUsingDefault = false;
-                mImpl->mRenderer.RegisterVisualTransformUniform();
               }
 
               if(!mImpl->mTransformMapUsingDefault)
@@ -368,7 +367,6 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBorderlineUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, mImpl->GetBorderlineWidth());
 
           // Check whether we must update shader.
@@ -453,7 +451,6 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
 
           // Check whether we must update shader.
@@ -537,7 +534,6 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           // Unusual case. SetProperty called after OnInitialize().
           // Assume that DoAction call UPDATE_PROPERTY.
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
 
           // Check whether we must update shader.
@@ -584,7 +580,6 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
   if(mImpl->mTransformMapChanged && mImpl->mTransformMapUsingDefault)
   {
     mImpl->mTransformMapUsingDefault = false;
-    mImpl->mRenderer.RegisterVisualTransformUniform();
   }
   if(!mImpl->mTransformMapUsingDefault)
   {
@@ -940,13 +935,11 @@ void Visual::Base::RegisterDecoration()
     {
       if(mImpl->mAlwaysUsingCornerRadius || !(mImpl->GetCornerRadius() == Vector4::ZERO))
       {
-        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
       }
       if(mImpl->mAlwaysUsingCornerSquareness || !(mImpl->GetCornerSquareness() == Vector4::ZERO))
       {
-        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
       }
     }
@@ -954,7 +947,6 @@ void Visual::Base::RegisterDecoration()
     {
       if(mImpl->mAlwaysUsingBorderline || !EqualsZero(mImpl->GetBorderlineWidth()))
       {
-        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBorderlineUniform();
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, mImpl->GetBorderlineWidth());
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, mImpl->GetBorderlineColor());
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, mImpl->GetBorderlineOffset());
@@ -1378,6 +1370,22 @@ void Visual::Base::AnimateRendererProperty(
 
   if(index != Property::INVALID_INDEX)
   {
+    switch(index)
+    {
+      case VisualRenderer::Property::TRANSFORM_OFFSET:
+      case VisualRenderer::Property::TRANSFORM_SIZE:
+      case VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      {
+        // Need to change visual transform is not default anymore.
+        if(mImpl->mTransformMapUsingDefault)
+        {
+          mImpl->mTransformMapUsingDefault = false;
+        }
+        break;
+      }
+    }
+
     if(animator.targetValue.GetType() != Property::NONE)
     {
       // Try writing target value into transform property map
@@ -1469,7 +1477,6 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       if(mImpl->mTransformMapUsingDefault)
       {
         mImpl->mTransformMapUsingDefault = false;
-        mImpl->mRenderer.RegisterVisualTransformUniform();
       }
 
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_OFFSET);
@@ -1480,7 +1487,6 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       if(mImpl->mTransformMapUsingDefault)
       {
         mImpl->mTransformMapUsingDefault = false;
-        mImpl->mRenderer.RegisterVisualTransformUniform();
       }
 
       return Dali::Property(mImpl->mRenderer, VisualRenderer::Property::TRANSFORM_SIZE);
@@ -1499,7 +1505,6 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
         if(updateShader)
         {
           // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerRadiusUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
 
@@ -1535,7 +1540,6 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
         if(updateShader)
         {
           // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterCornerSquarenessUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, mImpl->GetCornerRadius());
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, static_cast<float>(mImpl->GetCornerRadiusPolicy()));
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, mImpl->GetCornerSquareness());
@@ -1566,7 +1570,6 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
         if(updateShader)
         {
           // Update each values to renderer
-          DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBorderlineUniform();
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, mImpl->GetBorderlineWidth());
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, mImpl->GetBorderlineColor());
           mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, mImpl->GetBorderlineOffset());
