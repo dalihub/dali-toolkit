@@ -210,6 +210,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mLoadState(TextureManager::LoadState::NOT_STARTED),
   mOrientationCorrection(true),
   mNeedYuvToRgb(false),
+  mNeedYuva(false),
   mNeedUnifiedYuvAndRgb(false),
   mEnableBrokenImage(true),
   mUseFastTrackUploading(false),
@@ -758,7 +759,8 @@ void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions&
     }
     else
     {
-      DALI_ASSERT_ALWAYS(mFastTrackLoadingTask->mTextures.size() >= 3u);
+      DALI_ASSERT_ALWAYS(mFastTrackLoadingTask->mTextures.size() >= 4u);
+      textureSet.SetTexture(3u, mFastTrackLoadingTask->mTextures[3]);
       textureSet.SetTexture(2u, mFastTrackLoadingTask->mTextures[2]);
       textureSet.SetTexture(1u, mFastTrackLoadingTask->mTextures[1]);
       textureSet.SetTexture(0u, mFastTrackLoadingTask->mTextures[0]);
@@ -843,13 +845,14 @@ void ImageVisual::InitializeRenderer()
 
     bool needToUpdateShader = (!!mNativeTexture) || mUseBrokenImageRenderer;
 
-    if(mTextures.GetTextureCount() == 3)
+    if(mTextures.GetTextureCount() >= 3)
     {
       if(mTextures.GetTexture(0).GetPixelFormat() == Pixel::L8 && mTextures.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U && mTextures.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
       {
         mNeedYuvToRgb      = true;
         needToUpdateShader = true;
       }
+      mNeedYuva = (mTextures.GetTextureCount() == 3) ? false : true;
     }
 
     if(needToUpdateShader)
@@ -1098,6 +1101,16 @@ void ImageVisual::FastLoadComplete(FastTrackLoadingTaskPtr task)
       {
         // Let we use regular yuv cases.
         mNeedYuvToRgb = true;
+        if(!mFastTrackLoadingTask->mHasAlpha)
+        {
+          auto textureSet = mImpl->mRenderer.GetTextures();
+          textureSet.SetTexture(3u, Texture());
+          mNeedYuva = false;
+        }
+        else
+        {
+          mNeedYuva = true;
+        }
       }
       else
       {
@@ -1162,14 +1175,14 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       UpdateNativeTextureInfomation(textureInformation.textureSet);
 
       bool needToUpdateShader = mUseBrokenImageRenderer;
-
-      if(textureInformation.textureSet.GetTextureCount() == 3)
+      if(textureInformation.textureSet.GetTextureCount() >= 3)
       {
         if(textureInformation.textureSet.GetTexture(0).GetPixelFormat() == Pixel::L8 && textureInformation.textureSet.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U && textureInformation.textureSet.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
         {
           mNeedYuvToRgb      = true;
           needToUpdateShader = true;
         }
+        mNeedYuva = (textureInformation.textureSet.GetTextureCount() == 3) ? false : true;
       }
 
       if(needToUpdateShader)
@@ -1310,7 +1323,7 @@ Shader ImageVisual::GenerateShader() const
         .EnableBorderline(IsBorderlineRequired())
         .SetTextureForFragmentShaderCheck(useNativeImage ? mNativeTexture : Dali::Texture())
         .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
-        .EnableYuvToRgb(mNeedYuvToRgb, mNeedUnifiedYuvAndRgb));
+        .EnableYuvToRgb(mNeedYuvToRgb, mNeedYuva, mNeedUnifiedYuvAndRgb));
   }
   else
   {

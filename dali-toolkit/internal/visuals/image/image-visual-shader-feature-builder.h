@@ -106,6 +106,7 @@ enum Type
 {
   DONT_NEED = 0,      ///< Not need to convert
   YUV_TO_RGB,         ///< Need yuv to rgb conversion
+  YUVA_TO_RGBA,       ///< Need yuv to rgb conversion
   UNIFIED_YUV_AND_RGB ///< Need to support both yuv conversion case and normal case.
 };
 } // namespace ColorConversion
@@ -128,7 +129,7 @@ public:
 
   FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
 
-  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
+  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableYuva = false, bool enableUnifiedYuvAndRgb = false);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
 

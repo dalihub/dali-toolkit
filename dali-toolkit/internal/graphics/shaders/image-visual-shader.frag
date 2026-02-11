@@ -23,6 +23,9 @@ UNIFORM sampler2D sTexture;
 #if defined(IS_REQUIRED_YUV_TO_RGB) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
 UNIFORM sampler2D sTextureU;
 UNIFORM sampler2D sTextureV;
+#if defined(IS_REQUIRED_YUV_ALPHA) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
+UNIFORM sampler2D sTextureA;
+#endif
 #endif
 
 #ifdef IS_REQUIRED_ALPHA_MASKING
@@ -292,6 +295,12 @@ lowp vec4 ConvertYuvToRgba(mediump vec2 texCoord)
   rgba.g = y - (0.344 * u) - (0.714 * v);
   rgba.b = y + (1.770 * u);
   rgba.a = 1.0;
+
+#if defined(IS_REQUIRED_YUV_ALPHA) || defined(IS_REQUIRED_UNIFIED_YUV_AND_RGB)
+  rgba.a = TEXTURE(sTextureA, texCoord).r;
+  rgba.rgb *= mix(1.0, rgba.a, premultipliedAlpha);
+#endif
+
   return rgba;
 }
 #endif
@@ -326,6 +335,11 @@ const bool IS_REQUIRED_YUV_TO_RGB_BOOL = false;
 const bool IS_REQUIRED_UNIFIED_YUV_AND_RGB_BOOL = true;
 #else
 const bool IS_REQUIRED_UNIFIED_YUV_AND_RGB_BOOL = false;
+#endif
+#ifdef IS_REQUIRED_YUV_ALPHA
+const bool IS_REQUIRED_YUV_ALPHA_BOOL = true;
+#else
+const bool IS_REQUIRED_YUV_ALPHA_BOOL = false;
 #endif
 #ifdef IS_REQUIRED_ALPHA_MASKING
 const bool IS_REQUIRED_ALPHA_MASKING_BOOL = true;

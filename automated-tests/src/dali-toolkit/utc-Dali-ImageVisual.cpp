@@ -61,17 +61,18 @@ void dali_image_visual_cleanup(void)
 
 namespace
 {
-const char* TEST_IMAGE_FILE_NAME          = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const char* TEST_BROKEN_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/a-random-nonimage.jpg";
-const char* TEST_LARGE_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/tbcol.png";
-const char* TEST_SMALL_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/icon-edit.png";
-const char* TEST_REMOTE_IMAGE_FILE_NAME   = "https://www.tizen.org/wp-content/themes/tizentheme/logo.png";
-const char* TEST_INVALID_FILE_NAME        = TEST_RESOURCE_DIR "/invalid.jpg";
-const char* TEST_REMOTE_INVALID_FILE_NAME = "https://www.tizen.org/invalid.png";
-const char* TEST_MASK_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/mask.png";
-const char* TEST_ROTATED_IMAGE            = TEST_RESOURCE_DIR "/keyboard-Landscape.jpg";
-const char* TEST_YUV420_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
-const char* TEST_N_PATCH_IMAGE_FILE_NAME  = TEST_RESOURCE_DIR "/heartsframe.9.png";
+const char* TEST_IMAGE_FILE_NAME           = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+const char* TEST_BROKEN_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/a-random-nonimage.jpg";
+const char* TEST_LARGE_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/tbcol.png";
+const char* TEST_SMALL_IMAGE_FILE_NAME     = TEST_RESOURCE_DIR "/icon-edit.png";
+const char* TEST_REMOTE_IMAGE_FILE_NAME    = "https://www.tizen.org/wp-content/themes/tizentheme/logo.png";
+const char* TEST_INVALID_FILE_NAME         = TEST_RESOURCE_DIR "/invalid.jpg";
+const char* TEST_REMOTE_INVALID_FILE_NAME  = "https://www.tizen.org/invalid.png";
+const char* TEST_MASK_IMAGE_FILE_NAME      = TEST_RESOURCE_DIR "/mask.png";
+const char* TEST_ROTATED_IMAGE             = TEST_RESOURCE_DIR "/keyboard-Landscape.jpg";
+const char* TEST_YUV420_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
+const char* TEST_YUVA_WEBP_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/application-icon-45.webp";
+const char* TEST_N_PATCH_IMAGE_FILE_NAME   = TEST_RESOURCE_DIR "/heartsframe.9.png";
 
 const char* TEST_COMPRESSED_ALPHA_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/RGBA_ASTC_4x4.ktx";
 
@@ -3980,6 +3981,54 @@ int UtcDaliImageVisualLoadImagePlanes03(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualLoadImagePlanesYUVA01(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUVA_WEBP_IMAGE_FILE_NAME);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap, Dali::Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 4, TEST_LOCATION);
+
+  Renderer renderer           = actor.GetRendererAt(0);
+  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+
+  // Let we allow to premultiply alpha for YUV case, since it doesn't have alpha channel.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualLoadFastTrackImage01(void)
 {
   tet_infoline("Test worker thread uploading with Local URL");
@@ -4272,7 +4321,7 @@ int UtcDaliImageVisualLoadFastTrackImagePlanes01(void)
   // Render only without SendNotification(). And check whether glTexImage2D called or not.
   application.Render();
 
-  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 4, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -4281,6 +4330,63 @@ int UtcDaliImageVisualLoadFastTrackImagePlanes01(void)
 }
 
 int UtcDaliImageVisualLoadFastTrackImagePlanes02(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUVA_WEBP_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap, Dali::Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread without callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION);
+
+  {
+    // TODO : There is no way to flush TextureUploadManager in test-application's Render() now.
+    // How can we make it? Should it be integration-api?
+    auto textureUploadManager = Dali::Devel::TextureUploadManager::Get();
+    textureUploadManager.ResourceUpload();
+    application.Render();
+  }
+  // Render only without SendNotification(). And check whether glTexImage2D called or not.
+  application.Render();
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 4, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImagePlanes03(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
   EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
@@ -4333,6 +4439,52 @@ int UtcDaliImageVisualLoadFastTrackImagePlanes02(void)
 
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadFastTrackImageResourcePlanesReady(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  tet_infoline("Test worker thread uploading with Local URL");
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_YUVA_WEBP_IMAGE_FILE_NAME);
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap, Dali::Toolkit::VisualFactory::CreationOptions::IMAGE_VISUAL_LOAD_STATIC_IMAGES_ONLY);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread with callback
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Check resource ready comes after
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
 
   END_TEST;
 }

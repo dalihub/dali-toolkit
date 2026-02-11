@@ -384,6 +384,7 @@ private:
 
   bool mOrientationCorrection : 1;  ///< true if the image will have it's orientation corrected.
   bool mNeedYuvToRgb : 1;           ///< true if we need to convert yuv to rgb.
+  bool mNeedYuva : 1;               ///< true if the yuv texture has alpha.
   bool mNeedUnifiedYuvAndRgb : 1;   ///< true if we need to support both yuv and rgb.
   bool mEnableBrokenImage : 1;      ///< true if enable broken image.
   bool mUseFastTrackUploading : 1;  ///< True if we use fast tack feature.
