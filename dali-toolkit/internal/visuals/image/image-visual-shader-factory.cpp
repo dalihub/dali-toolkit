@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -281,12 +281,12 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
       }
       case PrecompileShaderOption::Flag::YUV_TO_RGB:
       {
-        builder.EnableYuvToRgb(true, false);
+        builder.EnableYuvToRgb(true, false, false);
         break;
       }
       case PrecompileShaderOption::Flag::YUV_AND_RGB:
       {
-        builder.EnableYuvToRgb(false, true);
+        builder.EnableYuvToRgb(false, false, true);
         break;
       }
       default:

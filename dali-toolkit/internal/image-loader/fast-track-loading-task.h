@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_FAST_TRACK_IMAGE_LOADING_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,7 @@ public:
   bool mLoadPlanesAvaliable : 1; ///< If image valid to load as planes or not.
   bool mPremultiplied : 1;       ///< True if the image's color was multiplied by it's alpha
   bool mPlanesLoaded : 1;        ///< True if the image load as planes.
+  bool mHasAlpha : 1;
 };
 
 } // namespace Internal

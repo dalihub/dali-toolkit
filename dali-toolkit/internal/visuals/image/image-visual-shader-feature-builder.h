@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FEATURE_BUILDER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,7 @@ enum Type
 {
   DONT_NEED = 0,      ///< Not need to convert
   YUV_TO_RGB,         ///< Need yuv to rgb conversion
+  YUVA_TO_RGBA,       ///< Need yuv to rgb conversion
   UNIFIED_YUV_AND_RGB ///< Need to support both yuv conversion case and normal case.
 };
 } // namespace ColorConversion
@@ -142,7 +143,7 @@ public:
 
   FeatureBuilder& EnableAlphaMaskingOnRendering(bool enableAlphaMaskingOnRendering);
 
-  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb = false);
+  FeatureBuilder& EnableYuvToRgb(bool enableYuvToRgb, bool enableYuva = false, bool enableUnifiedYuvAndRgb = false);
 
   VisualFactoryCache::ShaderType GetShaderType() const;
 

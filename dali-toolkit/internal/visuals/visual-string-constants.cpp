@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,12 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_SHADER_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_YUV_TO_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUV_TO_RGB)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_YUVA_TO_RGBA)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_YUVA_TO_RGBA)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_CORNER_YUVA_TO_RGBA)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_BORDERLINE_YUVA_TO_RGBA)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_BORDERLINE_YUVA_TO_RGBA)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUVA_TO_RGBA)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_YUV_AND_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Internal::VisualFactoryCache::ShaderType, IMAGE_SHADER_SQUIRCLE_CORNER_YUV_AND_RGB)

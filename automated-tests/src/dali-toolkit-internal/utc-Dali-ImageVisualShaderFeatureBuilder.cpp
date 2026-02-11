@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty02(void)
                           .EnableRoundedCorner(true)
                           .EnableBorderline(true)
                           .EnableAlphaMaskingOnRendering(true)
-                          .EnableYuvToRgb(true, false);
+                          .EnableYuvToRgb(true, false, false);
 
   std::string vertexPrefixList;
   std::string fragmentPrefixList;
@@ -106,7 +106,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty02(void)
   DALI_TEST_EQUALS(vertexPrefixList, vertexPrefixListResult, TEST_LOCATION);
   DALI_TEST_EQUALS(fragmentPrefixList, fragmentPrefixListResult, TEST_LOCATION);
 
-  featureBuilder = featureBuilder.EnableYuvToRgb(true, true);
+  featureBuilder = featureBuilder.EnableYuvToRgb(true, false, true);
 
   vertexPrefixList.clear();
   fragmentPrefixList.clear();

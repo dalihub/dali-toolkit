@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -407,6 +407,7 @@ private:
   bool mAttemptAtlasing : 1;        ///< If true will attempt atlasing, otherwise create unique texture
   bool mOrientationCorrection : 1;  ///< true if the image will have it's orientation corrected.
   bool mNeedYuvToRgb : 1;           ///< true if we need to convert yuv to rgb.
+  bool mNeedYuva : 1;               ///< true if the yuv texture has alpha.
   bool mNeedUnifiedYuvAndRgb : 1;   ///< true if we need to support both yuv and rgb.
   bool mEnableBrokenImage : 1;      ///< true if enable broken image.
   bool mUseFastTrackUploading : 1;  ///< True if we use fast tack feature.
