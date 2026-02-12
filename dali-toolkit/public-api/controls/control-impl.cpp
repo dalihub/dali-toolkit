@@ -205,8 +205,6 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
     Internal::RenderEffectImpl* object = dynamic_cast<Internal::RenderEffectImpl*>(effect.GetObjectPtr());
     DALI_ASSERT_ALWAYS(object && "Given render effect is not valid.");
 
-    RegisterOffScreenRenderableType(object->GetOffScreenRenderableType());
-
     Dali::Toolkit::Control ownerControl(GetOwner());
     object->SetOwnerControl(ownerControl);
 
@@ -232,7 +230,6 @@ void Control::ClearRenderEffect()
     // Reset handle first to avoid circular reference
     mImpl->mRenderEffect.Reset();
 
-    UnregisterOffScreenRenderableType(effectImpl->GetOffScreenRenderableType());
     effectImpl->ClearOwnerControl();
   }
 }
@@ -739,11 +736,15 @@ void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::I
   }
 }
 
-void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void Control::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(mImpl->mRenderEffect)
   {
     mImpl->mRenderEffect->GetOffScreenRenderTasks(tasks, isForward);
+  }
+  if(mImpl->mOffScreenRenderingImpl)
+  {
+    mImpl->mOffScreenRenderingImpl->GetOffScreenRenderTasks(tasks, isForward);
   }
 }
 
