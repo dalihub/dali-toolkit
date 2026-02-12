@@ -322,6 +322,9 @@ void SvgVisual::DoSetOffScene(Actor& actor)
     // We don't need to remove task synchronously.
     mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
     mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
+
+    // Remove textureset now.
+    mImpl->mRenderer.RemoveTextures();
   }
 
   actor.RemoveRenderer(mImpl->mRenderer);

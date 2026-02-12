@@ -3385,8 +3385,17 @@ int UtcDaliVisualRoundedCornerAnimatedVectorImageVisual(void)
     application.SendNotification();
     application.Render();
 
-    // Trigger count is 2 - load & render a frame
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    // There might be 1 event triggered if render frame spend long time.
+    // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+    // Consume it if required.
+    while(dummy.GetRendererCount() == 0)
+    {
+      tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+      Test::WaitForEventThreadTrigger(1, 0);
+    }
 
     application.SendNotification();
     application.Render();
@@ -3913,8 +3922,17 @@ int UtcDaliVisualBorderlineAnimatedVectorImageVisual(void)
     application.SendNotification();
     application.Render();
 
-    // Trigger count is 2 - load & render a frame
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+    // There might be 1 event triggered if render frame spend long time.
+    // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+    // Consume it if required.
+    while(dummy.GetRendererCount() == 0)
+    {
+      tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+      Test::WaitForEventThreadTrigger(1, 0);
+    }
 
     application.SendNotification();
     application.Render();
@@ -5338,8 +5356,17 @@ int UtcDaliVisualGetVisualProperty07(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - load & render a frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(dummyControl.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   application.SendNotification();
   application.Render();

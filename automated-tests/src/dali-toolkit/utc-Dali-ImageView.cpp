@@ -895,8 +895,17 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
   application.SendNotification();
   application.Render(16);
 
-  // Load lottie image is sync. Only wait rasterize.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  // There might be 1 event triggered if render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(imageView.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
 
   application.SendNotification();
   application.Render(16);
@@ -2795,7 +2804,7 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
   END_TEST;
 }
 
-int UtcDaliImageViewLoadRemoteSVG(void)
+int UtcDaliImageViewLoadRemoteSVG01(void)
 {
   tet_infoline("Test load from a remote server.");
 
@@ -2831,12 +2840,16 @@ int UtcDaliImageViewLoadRemoteSVG(void)
     imageView.Unparent();
   }
 
-  // Insure to Remove svg cache.
-  application.SendNotification();
-  application.Render();
-  application.RunIdles();
-  application.SendNotification();
-  application.Render();
+  END_TEST;
+}
+
+int UtcDaliImageViewLoadRemoteSVG02(void)
+{
+  tet_infoline("Test load from a remote server.");
+
+  ToolkitTestApplication application;
+
+  const std::string svgImageUrl("https://dalihub.github.io/images/check.svg");
 
   // Without size set
   {

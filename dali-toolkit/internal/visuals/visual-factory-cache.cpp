@@ -360,7 +360,11 @@ Texture VisualFactoryCache::GetBrokenVisualImage(uint32_t brokenIndex)
     {
       pixelData                                      = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
       mBrokenImageInfoContainer[brokenIndex].texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData, mBrokenImageInfoContainer[brokenIndex].url.c_str());
+#else
       mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData);
+#endif
       mBrokenImageInfoContainer[brokenIndex].width  = pixelData.GetWidth();
       mBrokenImageInfoContainer[brokenIndex].height = pixelData.GetHeight();
     }

@@ -1952,7 +1952,9 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
   Texture             texture    = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data, "TextLabel");
+  std::string text;
+  mController->GetText(text);
+  texture.Upload(data, text + std::string("(TextScroll)"));
 #else
   texture.Upload(data);
 #endif
@@ -2004,8 +2006,11 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   float     wrapGap      = renderInfo.autoScrollWrapGap;
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
+
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data, "TextLabel");
+  std::string text;
+  mController->GetText(text);
+  texture.Upload(data, text + std::string("(TextScroll)"));
 #else
   texture.Upload(data);
 #endif

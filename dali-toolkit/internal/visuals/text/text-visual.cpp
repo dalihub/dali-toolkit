@@ -411,6 +411,12 @@ void TextVisual::RemoveRenderer(Actor& actor, bool removeDefaultRenderer)
   // Clear the renderer list
   mRendererList.clear();
 
+  if(removeDefaultRenderer)
+  {
+    // Remove default renderer's textureset
+    mImpl->mRenderer.RemoveTextures();
+  }
+
   // Clear constraint, and keep default renderer's constraint only.
   if(mColorConstraint)
   {
@@ -702,7 +708,9 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
                                  data.GetWidth(),
                                  data.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(data, "TextVisual");
+  std::string text;
+  mController->GetText(text);
+  texture.Upload(data, text + std::string("(TextVisual)"));
 #else
   texture.Upload(data);
 #endif

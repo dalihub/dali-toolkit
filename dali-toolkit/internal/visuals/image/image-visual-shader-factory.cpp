@@ -269,12 +269,12 @@ void ImageVisualShaderFactory::CreatePrecompileShader(ImageVisualShaderFeature::
       }
       case PrecompileShaderOption::Flag::YUV_TO_RGB:
       {
-        builder.EnableYuvToRgb(true, false);
+        builder.EnableYuvToRgb(true, false, false);
         break;
       }
       case PrecompileShaderOption::Flag::YUV_AND_RGB:
       {
-        builder.EnableYuvToRgb(false, true);
+        builder.EnableYuvToRgb(false, false, true);
         break;
       }
       default:

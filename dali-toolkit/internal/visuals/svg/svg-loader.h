@@ -285,12 +285,19 @@ public:
    */
   struct SvgRasterizeInfo
   {
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, VisualUrl imageUrl)
+#else
     SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height)
+#endif
     : mId(rasterizeId),
       mTask(),
       mLoadId(loadId),
       mWidth(width),
       mHeight(height),
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      mImageUrl(std::move(imageUrl)),
+#endif
       mRasterizeState(RasterizeState::NOT_STARTED),
       mTextureSet(),
       mObservers(),
@@ -306,6 +313,9 @@ public:
       mLoadId(info.mLoadId),
       mWidth(info.mWidth),
       mHeight(info.mHeight),
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+      mImageUrl(std::move(info.mImageUrl)),
+#endif
       mRasterizeState(info.mRasterizeState),
       mTextureSet(std::move(info.mTextureSet)),
       mObservers(std::move(info.mObservers)),
@@ -325,6 +335,10 @@ public:
         mLoadId = info.mLoadId;
         mWidth  = info.mWidth;
         mHeight = info.mHeight;
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+        mImageUrl = std::move(info.mImageUrl);
+#endif
 
         mRasterizeState = info.mRasterizeState;
         mTextureSet     = std::move(info.mTextureSet);
@@ -351,6 +365,10 @@ public:
     SvgLoadId mLoadId;
     uint32_t  mWidth;
     uint32_t  mHeight;
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+    VisualUrl mImageUrl;
+#endif
 
     RasterizeState    mRasterizeState;
     Dali::TextureSet  mTextureSet; ///< rasterized result at index 0.

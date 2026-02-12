@@ -55,6 +55,7 @@ uint64_t GetNanoseconds()
 
 constexpr uint32_t CHROMINANCE_U_INDEX = 1u;
 constexpr uint32_t CHROMINANCE_V_INDEX = 2u;
+constexpr uint32_t A_INDEX             = 3u;
 
 Dali::PixelData GetDummyChrominanceUPixelData()
 {
@@ -66,6 +67,12 @@ Dali::PixelData GetDummyChrominanceVPixelData()
 {
   static Dali::PixelData pixelDataV = PixelData::New(new uint8_t[2]{0x00, 0x00}, 2, 2, 1, Pixel::L8, PixelData::DELETE_ARRAY);
   return pixelDataV;
+}
+
+Dali::PixelData GetDummyAPixelData()
+{
+  static Dali::PixelData pixelDataA = PixelData::New(new uint8_t[1]{0xFF}, 1, 1, 1, Pixel::A8, PixelData::DELETE_ARRAY);
+  return pixelDataA;
 }
 
 } // namespace
@@ -86,7 +93,8 @@ FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions
   mLoadSuccess(false),
   mLoadPlanesAvaliable(loadPlanes),
   mPremultiplied(false),
-  mPlanesLoaded(false)
+  mPlanesLoaded(false),
+  mHasAlpha(false)
 {
   mCallback = std::unique_ptr<CallbackBase>(callback);
   PrepareTexture();
@@ -98,7 +106,7 @@ FastTrackLoadingTask::~FastTrackLoadingTask()
 
 void FastTrackLoadingTask::PrepareTexture()
 {
-  const uint32_t requiredTexturesCount = mLoadPlanesAvaliable ? 3u : 1u;
+  const uint32_t requiredTexturesCount = mLoadPlanesAvaliable ? 4u : 1u;
 
   mTextures.resize(requiredTexturesCount);
   mImageInformations.resize(requiredTexturesCount);
@@ -114,6 +122,7 @@ void FastTrackLoadingTask::PrepareTexture()
     // Create static dummy chrominance pixel data now, for thread safety.
     [[maybe_unused]] auto pixelDataU = GetDummyChrominanceUPixelData();
     [[maybe_unused]] auto pixelDataV = GetDummyChrominanceVPixelData();
+    [[maybe_unused]] auto pixelDataA = GetDummyAPixelData();
   }
 }
 
@@ -206,15 +215,26 @@ void FastTrackLoadingTask::Load()
 
     if(pixelBuffers.size() > 1u)
     {
+      mPixelData.resize(4u);
+      if(pixelBuffers.size() == 3u)
+      {
+        mPixelData[A_INDEX] = GetDummyAPixelData();
+        mHasAlpha = false;
+      }
+      else
+      {
+        mHasAlpha = true;
+      }
       mPlanesLoaded = true;
     }
-    else if(mLoadPlanesAvaliable && pixelBuffers.size() == 1u && mTextures.size() == 3u) ///< Case when we prepare three textures to render YUV, but loaded image is not YUV.
+    else if(mLoadPlanesAvaliable && pixelBuffers.size() == 1u && mTextures.size() >= 3u) ///< Case when we prepare three textures to render YUV, but loaded image is not YUV.
     {
       // Dummy pixel data for fake shader that we don't use actual YUV format.
       // To fake shader, let we use indivisual sizes of texture for U and V.
-      mPixelData.resize(3u);
+      mPixelData.resize(4u);
       mPixelData[CHROMINANCE_U_INDEX] = GetDummyChrominanceUPixelData();
       mPixelData[CHROMINANCE_V_INDEX] = GetDummyChrominanceVPixelData();
+      mPixelData[A_INDEX]             = GetDummyAPixelData();
     }
 
     if(DALI_UNLIKELY(mPixelData.size() != mImageInformations.size()))

@@ -604,6 +604,10 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
     mVisualScale          = Vector2::ONE;
     mAnimationData.width  = 0;
     mAnimationData.height = 0;
+
+    // Remove textureset now.
+    // TODO : Could we reset textureset here?
+    // mImpl->mRenderer.RemoveTextures();
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffScene [%p]\n", this);

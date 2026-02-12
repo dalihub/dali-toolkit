@@ -1044,8 +1044,8 @@ void AnimatedImageVisual::DoSetOffScene(Actor& actor)
     }
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures(textureSet);
+    // Remove textureset now.
+    mImpl->mRenderer.RemoveTextures();
   }
 
   mPlacementActor.Reset();

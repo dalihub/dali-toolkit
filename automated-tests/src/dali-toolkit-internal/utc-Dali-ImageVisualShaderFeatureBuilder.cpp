@@ -64,7 +64,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty02(void)
                           .EnableRoundedCorner(true)
                           .EnableBorderline(true)
                           .EnableAlphaMaskingOnRendering(true)
-                          .EnableYuvToRgb(true, false);
+                          .EnableYuvToRgb(true, false, false);
 
   std::string vertexPrefixList;
   std::string fragmentPrefixList;
@@ -103,7 +103,7 @@ int UtcImageVisualShaderFeatureBuilderSetGetProperty02(void)
   DALI_TEST_EQUALS(vertexPrefixList, vertexPrefixListResult, TEST_LOCATION);
   DALI_TEST_EQUALS(fragmentPrefixList, fragmentPrefixListResult, TEST_LOCATION);
 
-  featureBuilder = featureBuilder.EnableYuvToRgb(true, true);
+  featureBuilder = featureBuilder.EnableYuvToRgb(true, false, true);
 
   vertexPrefixList.clear();
   fragmentPrefixList.clear();
