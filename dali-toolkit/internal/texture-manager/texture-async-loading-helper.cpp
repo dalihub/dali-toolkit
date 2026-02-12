@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,10 @@ void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureI
                                                   const Dali::ImageDimensions&                   desiredSize,
                                                   const Dali::FittingMode::Type                  fittingMode,
                                                   const Dali::SamplingMode::Type                 samplingMode,
-                                                  const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+                                                  const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                                                  const bool                                     loadYuvPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }

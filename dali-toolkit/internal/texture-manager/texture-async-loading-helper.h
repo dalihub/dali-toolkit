@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_ASYNC_LOADING_HELPER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ public:
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param[in] loadYuvPlanes         True if the image should be loaded as yuv planes
    */
   void LoadAnimatedImage(const TextureManager::TextureId                textureId,
                          Dali::AnimatedImageLoading                     animatedImageLoading,
@@ -59,7 +60,8 @@ public:
                          const Dali::ImageDimensions&                   desiredSize,
                          const Dali::FittingMode::Type                  fittingMode,
                          const Dali::SamplingMode::Type                 samplingMode,
-                         const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+                         const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                         const bool                                     loadYuvPlanes);
 
   /**
    * @brief Load a new texture.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,10 @@ uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading         
                                              Dali::ImageDimensions                    desiredSize,
                                              Dali::FittingMode::Type                  fittingMode,
                                              Dali::SamplingMode::Type                 samplingMode,
-                                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+                                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                                             bool                                     loadPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   return mLoadTaskId;
 }

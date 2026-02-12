@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
   encodedImageBuffer(),
@@ -92,7 +92,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(false)
+  loadPlanes(loadPlanes)
 {
 }
 
@@ -217,7 +217,14 @@ void LoadingTask::Load()
   Devel::PixelBuffer pixelBuffer;
   if(animatedImageLoading)
   {
-    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
+    if(loadPlanes)
+    {
+      animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, dimensions);
+    }
+    else
+    {
+      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
+    }
   }
   else if(encodedImageBuffer)
   {
