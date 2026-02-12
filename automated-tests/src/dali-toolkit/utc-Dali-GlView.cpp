@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,16 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+
+void dali_gl_view_startup(void)
+{
+  test_return_value = TET_UNDEF;
+}
+
+void dali_gl_view_cleanup(void)
+{
+  test_return_value = TET_PASS;
+}
 
 int UtcDaliGlViewNew(void)
 {
@@ -187,24 +197,28 @@ int UtcDaliGlViewOnSizeSet(void)
   END_TEST;
 }
 
+namespace
+{
 // Internal callback function
-void glInit(void)
+void glViewInit(void)
 {
 }
 
-int glRenderFrame(void)
+// return int32_t, to avoid that this function capture as UTC by retriever.sh.
+int32_t glViewRenderFrame(void)
 {
-  static unsigned int retFlag = 0;
+  static int32_t retFlag = 0;
   return retFlag++;
 }
 
-void glTerminate(void)
+void glViewTerminate(void)
 {
 }
 
-void resizeCB(Vector2 size)
+void glViewResizeCB(Vector2 size)
 {
 }
+} //namespace
 
 int UtcDaliGlViewRegisterGlCallbacksN(void)
 {
@@ -215,7 +229,7 @@ int UtcDaliGlViewRegisterGlCallbacksN(void)
 
   try
   {
-    view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+    view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
     DALI_TEST_CHECK(false);
   }
   catch(...)
@@ -234,7 +248,7 @@ int UtcDaliGlViewSetResizeCallbackN(void)
 
   try
   {
-    view.SetResizeCallback(Dali::MakeCallback(resizeCB));
+    view.SetResizeCallback(Dali::MakeCallback(glViewResizeCB));
     DALI_TEST_CHECK(false);
   }
   catch(...)
@@ -282,6 +296,48 @@ int UtcDaliGlViewTerminate(void)
   END_TEST;
 }
 
+int UtcDaliGlViewTextureBindingN(void)
+{
+  ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+  tet_infoline("UtcDaliGlViewTextureBindingN");
+  GlView view = Toolkit::GlView::New(GlView::ColorFormat::RGB888);
+  application.GetScene().Add(view);
+  view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
+  view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
+  view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
+  view.SetResizeCallback(Dali::MakeCallback(glViewResizeCB));
+
+  application.SendNotification();
+  application.Render();
+
+  // Prepare texture 1
+  Texture   texture1   = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 512, 512);
+  auto*     data1      = reinterpret_cast<uint8_t*>(malloc(512 * 512 * 4));
+  PixelData pixelData1 = PixelData::New(data1, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  texture1.Upload(pixelData1);
+
+  // Prepare texture 2
+  Texture   texture2   = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 512, 512);
+  auto*     data2      = reinterpret_cast<uint8_t*>(malloc(512 * 512 * 4));
+  PixelData pixelData2 = PixelData::New(data2, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  texture2.Upload(pixelData2);
+
+  Dali::Vector<Texture> texturesToBind;
+  texturesToBind.PushBack(texture1);
+  texturesToBind.PushBack(texture2);
+
+  view.BindTextureResources(texturesToBind);
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing happened. Just pass this UTC
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
 int UtcDaliGlViewWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
@@ -291,8 +347,8 @@ int UtcDaliGlViewWindowVisibilityChanged(void)
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
-  view.SetResizeCallback(Dali::MakeCallback(resizeCB));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
+  view.SetResizeCallback(Dali::MakeCallback(glViewResizeCB));
 
   application.SendNotification();
   application.Render();
@@ -317,7 +373,7 @@ int UtcDaliGlViewOnScene(void)
   application.GetScene().Add(view);
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
 
   application.SendNotification();
   application.Render();
@@ -366,8 +422,8 @@ int UtcDaliGlViewResize(void)
 
   application.GetScene().Add(view);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
-  view.SetResizeCallback(Dali::MakeCallback(resizeCB));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
+  view.SetResizeCallback(Dali::MakeCallback(glViewResizeCB));
   view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
