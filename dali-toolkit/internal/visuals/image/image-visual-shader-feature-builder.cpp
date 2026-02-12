@@ -36,7 +36,8 @@ enum class ImageVisualRequireFlag : uint32_t
   ALPHA_MASKING    = (1 << 1) * 3,
   COLOR_CONVERSION = (1 << 2) * 3,
 
-  UNIFIED_YUV_AND_RGB = (1 << 1) * 3, // Special enum to trick unified YUV and RGB.
+  YUVA_SAMPLING       = (1 << 1) * 3,
+  UNIFIED_YUV_AND_RGB = (1 << 2) * 3, // Special enum to trick unified YUV and RGB.
 };
 
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
@@ -52,12 +53,24 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
   VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
   VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_MASKING,
+
+  // [12 ~ 17] YUV_TO_RGB (Base: 12)
   VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB,
   VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_TO_RGB,
   VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_YUV_TO_RGB,
   VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUV_TO_RGB,
   VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_TO_RGB,
   VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUV_TO_RGB,
+
+  // [18 ~ 23] YUVA_TO_RGBA (Base: 12 + 6 = 18)
+  VisualFactoryCache::IMAGE_SHADER_YUVA_TO_RGBA,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUVA_TO_RGBA,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_YUVA_TO_RGBA,
+  VisualFactoryCache::IMAGE_SHADER_BORDERLINE_YUVA_TO_RGBA,
+  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUVA_TO_RGBA,
+  VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUVA_TO_RGBA,
+
+  // [24 ~ 29] UNIFIED_YUV_AND_RGB (Base: 12 + 12 = 24)
   VisualFactoryCache::IMAGE_SHADER_YUV_AND_RGB,
   VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_YUV_AND_RGB,
   VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_CORNER_YUV_AND_RGB,
@@ -110,9 +123,9 @@ FeatureBuilder& FeatureBuilder::EnableAlphaMaskingOnRendering(bool enableAlphaMa
   return *this;
 }
 
-FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb, bool enableUnifiedYuvAndRgb)
+FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb, bool enableYuva, bool enableUnifiedYuvAndRgb)
 {
-  mColorConversion = (enableUnifiedYuvAndRgb ? ColorConversion::UNIFIED_YUV_AND_RGB : (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED));
+  mColorConversion = (enableUnifiedYuvAndRgb ? ColorConversion::UNIFIED_YUV_AND_RGB : (enableYuvToRgb ? (enableYuva ? ColorConversion::YUVA_TO_RGBA : ColorConversion::YUV_TO_RGB) : ColorConversion::DONT_NEED));
   return *this;
 }
 
@@ -138,12 +151,20 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
   {
     shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::ALPHA_MASKING);
   }
-  else if(mColorConversion == ColorConversion::YUV_TO_RGB) // Not support gpu masking and color conversion at the same time now
+  else if(mColorConversion == ColorConversion::YUV_TO_RGB)
   {
+    // Index: 12
     shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+  }
+  else if(mColorConversion == ColorConversion::YUVA_TO_RGBA)
+  {
+    // Index: 18 (12 + 6)
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
+    shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::YUVA_SAMPLING);
   }
   else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
   {
+    // Index: 24 (12 + 12)
     shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::COLOR_CONVERSION);
     shaderTypeFlag += static_cast<uint32_t>(ImageVisualRequireFlag::UNIFIED_YUV_AND_RGB);
   }
@@ -199,6 +220,11 @@ void FeatureBuilder::GetFragmentShaderPrefixList(std::string& fragmentShaderPref
   else if(mColorConversion == ColorConversion::YUV_TO_RGB)
   {
     fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
+  }
+  else if(mColorConversion == ColorConversion::YUVA_TO_RGBA)
+  {
+    fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB\n";
+    fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_ALPHA\n";
   }
   else if(mColorConversion == ColorConversion::UNIFIED_YUV_AND_RGB)
   {
