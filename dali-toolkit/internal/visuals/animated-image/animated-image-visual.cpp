@@ -117,6 +117,7 @@ constexpr float MAXIMUM_FRAME_SPEED_FACTOR(100.0f);
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
+constexpr uint32_t TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB = 3u;
 
 struct NameIndexMatch
 {
@@ -317,6 +318,7 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
+  mNativeTexture(),
   mPixelArea(FULL_TEXTURE_RECT),
   mPixelAreaIndex(Property::INVALID_INDEX),
   mPreMultipliedAlphaIndex(Property::INVALID_INDEX),
@@ -346,6 +348,8 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
   mStartFirstFrame(false),
   mIsJumpTo(false),
+  mNeedYuvToRgb(false),
+  mNeedYuva(false),
   mEnableBrokenImage(true),
   mRendererAdded(false),
   mUseBrokenImageRenderer(false),
@@ -1139,7 +1143,9 @@ Shader AnimatedImageVisual::GenerateShader() const
         .ApplyDefaultTextureWrapMode(defaultWrapMode)
         .EnableRoundedCorner(IsRoundedCornerRequired(), IsSquircleCornerRequired())
         .EnableBorderline(IsBorderlineRequired())
-        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering));
+        .SetTextureForFragmentShaderCheck(mNativeTexture)
+        .EnableAlphaMaskingOnRendering(requiredAlphaMaskingOnRendering)
+        .EnableYuvToRgb(mNeedYuvToRgb, mNeedYuva, false));
   }
   return shader;
 }
@@ -1213,8 +1219,7 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t first
   mStartFirstFrame = false;
   if(mImpl->mRenderer && DALI_LIKELY(textureSet))
   {
-    mImpl->mRenderer.SetTextures(textureSet);
-    CheckMaskTexture();
+    SetTexturesToRenderer(textureSet);
 
     if(!mRendererAdded)
     {
@@ -1274,7 +1279,7 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
       mImageSize.SetHeight(texture.GetHeight());
     }
 
-    if(textureSet.GetTextureCount() > 1u && mMaskingData && mMaskingData->mCropToMask)
+    if(textureSet.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_ALPHA_MASK && mMaskingData && mMaskingData->mCropToMask)
     {
       Texture maskTexture = textureSet.GetTexture(1);
       if(maskTexture)
@@ -1325,12 +1330,12 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
   {
     if(mImpl->mRenderer)
     {
+      SetTexturesToRenderer(textureSet);
+
       if(mFrameDelayTimer && interval > 0u)
       {
         mFrameDelayTimer.SetInterval(CalculateInterval(interval, mFrameSpeedFactor));
       }
-      mImpl->mRenderer.SetTextures(textureSet);
-      CheckMaskTexture();
     }
   }
 }
@@ -1396,11 +1401,9 @@ bool AnimatedImageVisual::DisplayNextFrame()
     if(textureSet)
     {
       SetImageSize(textureSet);
-      if(mImpl->mRenderer)
-      {
-        mImpl->mRenderer.SetTextures(textureSet);
-        CheckMaskTexture();
-      }
+
+      SetTexturesToRenderer(textureSet);
+
       if(mFrameDelayTimer)
       {
         mFrameDelayTimer.SetInterval(CalculateInterval(mImageCache->GetFrameInterval(frameIndex), mFrameSpeedFactor));
@@ -1489,8 +1492,9 @@ void AnimatedImageVisual::AllocateMaskData()
   }
 }
 
-void AnimatedImageVisual::CheckMaskTexture()
+bool AnimatedImageVisual::CheckMaskTexture()
 {
+  bool needShaderUpdate = false;
   if(mMaskingData && !mMaskingData->mPreappliedMasking)
   {
     bool       maskLoadFailed = true;
@@ -1502,8 +1506,88 @@ void AnimatedImageVisual::CheckMaskTexture()
     if(mMaskingData->mMaskImageLoadingFailed != maskLoadFailed)
     {
       mMaskingData->mMaskImageLoadingFailed = maskLoadFailed;
-      UpdateShader();
+      needShaderUpdate                      = true;
     }
+  }
+  return needShaderUpdate;
+}
+
+bool AnimatedImageVisual::UpdateNativeTextureInfomation(TextureSet& textureSet)
+{
+  const bool wasNativeTexture = !!mNativeTexture;
+
+  // Reset previous flags and infomations.
+  mNativeTexture.Reset();
+
+  if(textureSet && textureSet.GetTextureCount() > 0u)
+  {
+    Texture texture = textureSet.GetTexture(0u);
+    if(DevelTexture::IsNative(texture))
+    {
+      // Keep native texture handle.
+      mNativeTexture = texture;
+    }
+  }
+
+  return (wasNativeTexture != (!!mNativeTexture));
+}
+
+bool AnimatedImageVisual::UpdateYuvInformation(TextureSet& textureSet)
+{
+  const bool wasYuv  = mNeedYuvToRgb;
+  const bool wasYuva = mNeedYuva;
+
+  mNeedYuvToRgb = false;
+  mNeedYuva     = false;
+
+  if(DALI_LIKELY(textureSet) && textureSet.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB)
+  {
+    if(textureSet.GetTexture(0).GetPixelFormat() == Pixel::L8 &&
+       textureSet.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U &&
+       textureSet.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
+    {
+      mNeedYuvToRgb = true;
+    }
+    mNeedYuva = (textureSet.GetTextureCount() > TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB) ? true : false;
+  }
+
+  return (wasYuv != mNeedYuvToRgb || wasYuva != mNeedYuva);
+}
+
+void AnimatedImageVisual::SetTexturesToRenderer(TextureSet& textureSet)
+{
+  if(mImpl->mRenderer && DALI_LIKELY(textureSet))
+  {
+    mImpl->mRenderer.SetTextures(textureSet);
+
+    bool needToUpdateShader = mUseBrokenImageRenderer;
+
+    // TODO : Change shader whenever information changes for image sequence cases, might be heavy operation.
+    if(!IsUsingCustomShader() || needToUpdateShader)
+    {
+      needToUpdateShader |= UpdateNativeTextureInfomation(textureSet);
+      needToUpdateShader |= UpdateYuvInformation(textureSet);
+      needToUpdateShader |= CheckMaskTexture();
+      if(needToUpdateShader)
+      {
+        UpdateShader();
+      }
+    }
+
+    if(DALI_UNLIKELY(mUseBrokenImageRenderer))
+    {
+      // We need to re-generate geometry only if it was broken image before, and result changed after Reload.
+      auto geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+
+      // Update geometry only if we need.
+      if(geometry)
+      {
+        mImpl->mRenderer.SetGeometry(geometry);
+      }
+    }
+
+    // We don't use broken image anymore.
+    mUseBrokenImageRenderer = false;
   }
 }
 

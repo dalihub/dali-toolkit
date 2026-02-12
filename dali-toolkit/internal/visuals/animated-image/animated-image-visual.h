@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,8 +264,31 @@ private:
   /**
    * @brief Check whether the mask texture is loaded or not.
    * If MaskingType is MASKING_ON_LOADING and mask texture is failed to load, update shader.
+   * @note Should call at SetTexturesToRenderer() only.
+   * @return true if we need to update shader. false otherwise.
    */
-  void CheckMaskTexture();
+  bool CheckMaskTexture();
+
+  /**
+   * @brief Update the informations whether this visual using native texture or not.
+   * @note Should call at SetTexturesToRenderer() only.
+   * @return true if we need to update shader. false otherwise.
+   */
+  bool UpdateNativeTextureInfomation(TextureSet& textureSet);
+
+  /**
+   * @brief Update yuv to rgb information.
+   * @note Should call at SetTexturesToRenderer() only.
+   * @return true if we need to update shader. false otherwise.
+   */
+  bool UpdateYuvInformation(TextureSet& textureSet);
+
+  /**
+   * @brief Set the texture set to the renderer.
+   * Change shader if required.
+   * @param[in] textureSet The texture set to set.
+   */
+  void SetTexturesToRenderer(TextureSet& textureSet);
 
   /**
    * @brief Callback when the inherited visibility of the actor is changed.
@@ -282,6 +305,8 @@ private:
   Timer                     mFrameDelayTimer;
   WeakHandle<Actor>         mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
+
+  Dali::Texture mNativeTexture; ///< The handle of native texture if we are using it.
 
   // Variables for Image renderer
   Vector4         mPixelArea;
@@ -325,6 +350,8 @@ private:
 
   bool mStartFirstFrame : 1;
   bool mIsJumpTo : 1;
+  bool mNeedYuvToRgb : 1;           ///< true if we need to convert yuv to rgb.
+  bool mNeedYuva : 1;               ///< true if the yuv texture has alpha.
   bool mEnableBrokenImage : 1;      ///< true if enable broken image.
   bool mRendererAdded : 1;          ///< True if renderer added into actor.
   bool mUseBrokenImageRenderer : 1; ///< True if renderer changed as broken image.
