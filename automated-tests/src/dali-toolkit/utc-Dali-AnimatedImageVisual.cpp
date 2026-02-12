@@ -19,6 +19,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 
+#include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>
 
@@ -56,9 +57,15 @@ const char* TEST_GIF_FILE_NAME        = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_MASK_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/mask.png";
 const char* TEST_WEBP_FILE_NAME       = TEST_RESOURCE_DIR "/dali-logo.webp";
 
+const char* TEST_YUV420_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/gallery-small-1-yuv420.jpg";
+const char* TEST_YUVA_WEBP_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/application-icon-45.webp";
+
 const char* TEST_N_PATCH_IMAGE_FILE_NAME         = TEST_RESOURCE_DIR "/heartsframe.9.png";
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+
+constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
+constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
 
 void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
 {
@@ -3689,6 +3696,283 @@ int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage02(void)
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoadImagePlanesMultiImage01(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  tet_infoline("AnimatedImageVisual load YUV420 image planes");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // ImageSequence include YUV420
+  Property::Array urls;
+  urls.PushBack(TEST_YUV420_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_YUV420_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, urls);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for loading 2 image (batch size)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Test that a timer has been started");
+  DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3 + 1, TEST_LOCATION);
+  textureTrace.Reset();
+
+  Renderer renderer           = actor.GetRendererAt(0);
+  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+
+  Shader yuvShader = renderer.GetShader();
+  DALI_TEST_CHECK(yuvShader);
+
+  // Let we allow to premultiply alpha for YUV case, since it doesn't have alpha channel.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to normal shader when the second image FrameReady called\n");
+  Shader normalShader = renderer.GetShader();
+  DALI_TEST_CHECK(normalShader != yuvShader);
+
+  // Note that we can use cached image here. So, GenTextures won't be called.
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to yuv shader when the third image FrameReady called\n");
+  DALI_TEST_CHECK(renderer.GetShader() == yuvShader);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to normal shader when the fourth image FrameReady called\n");
+  DALI_TEST_CHECK(renderer.GetShader() == normalShader);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoadImagePlanesMultiImage02(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // ImageSequence include YUV420
+  Property::Array urls;
+  urls.PushBack(TEST_YUV420_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_YUV420_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+
+  // Alpha masking case - not support yuv planes
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, urls);
+  propertyMap.Insert(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // load 2 image (batch size) + masking image load (storage type is difference so not cached.) + 2 masking.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5), true, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 2, TEST_LOCATION);
+  textureTrace.Reset();
+
+  Renderer renderer           = actor.GetRendererAt(0);
+  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+
+  // Let we allow to premultiply alpha for CPU masking case.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  Shader normalShader = renderer.GetShader();
+  DALI_TEST_CHECK(normalShader);
+
+  application.SendNotification();
+  application.Render();
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader keep as normal shader when the second image FrameReady called\n");
+  DALI_TEST_CHECK(normalShader == renderer.GetShader());
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoadImagePlanesYUVAMultiImage01(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  // ImageSequence include YUVA and YUV420
+  Property::Array urls;
+  urls.PushBack(TEST_YUVA_WEBP_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_YUV420_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, urls);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for loading 2 image (batch size)
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Test that a timer has been started");
+  DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 4 + 1, TEST_LOCATION);
+  textureTrace.Reset();
+
+  Renderer renderer           = actor.GetRendererAt(0);
+  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+
+  // Let we allow to premultiply alpha for YUVA case.
+  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+  Shader yuvaShader = renderer.GetShader();
+  DALI_TEST_CHECK(yuvaShader);
+
+  application.SendNotification();
+  application.Render();
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to normal shader when the second image FrameReady called\n");
+  Shader normalShader = renderer.GetShader();
+  DALI_TEST_CHECK(normalShader != yuvaShader);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 3, TEST_LOCATION);
+  textureTrace.Reset();
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to yuv shader when the third image FrameReady called\n");
+  Shader yuvShader = renderer.GetShader();
+  DALI_TEST_CHECK(yuvaShader != yuvShader);
+  DALI_TEST_CHECK(normalShader != yuvShader);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Test that shader is switched to normal shader when the fourth image FrameReady called\n");
+  DALI_TEST_CHECK(renderer.GetShader() == normalShader);
 
   END_TEST;
 }
