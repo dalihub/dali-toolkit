@@ -125,10 +125,6 @@
  *    <td>VideoView is a control for video playback and display.</td>
  * </tr>
  * <tr>
- *    <td style="padding-left:1em">@ref dali_toolkit_controls_slider</td>
- *    <td>Slider is a control to enable sliding an indicator between two values.</td>
- * </tr>
- * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_progress_bar</td>
  *    <td>ProgressBar is a control to give the user an indication of the progress of an operation.</td>
  * </tr>
@@ -216,9 +212,6 @@
 
  *     @defgroup dali_toolkit_controls_video_view Video View
  *     @brief VideoView is a control for video playback and display.
-
- *     @defgroup dali_toolkit_controls_slider Slider
- *     @brief Slider is a control to enable sliding an indicator between two values.
 
  *     @defgroup dali_toolkit_controls_progress_bar Progress Bar
  *     @brief ProgressBar is a control to give the user an indication of the progress of an operation.
