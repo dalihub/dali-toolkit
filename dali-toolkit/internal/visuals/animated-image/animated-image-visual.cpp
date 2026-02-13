@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1301,8 +1301,16 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
   // When image visual requested to load new frame to mImageCache and it is failed.
   if(!mImageCache || !textureSet)
   {
-    textureSet = SetLoadingFailed();
+    SetLoadingFailed();
+    return;
   }
+  if(mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED)
+  {
+    // When loading is failed, FrameReady can be called with valid textureSet because of the asynchronous loading.
+    // In this case, just ignore it because ResourceReady with FAILED status is already sent.
+    return;
+  }
+
   SetImageSize(textureSet);
 
   if(mStartFirstFrame)
@@ -1315,7 +1323,7 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval, b
   }
   else
   {
-    if(mImpl->mRenderer && DALI_LIKELY(textureSet))
+    if(mImpl->mRenderer)
     {
       if(mFrameDelayTimer && interval > 0u)
       {
@@ -1406,11 +1414,8 @@ bool AnimatedImageVisual::DisplayNextFrame()
   return continueTimer;
 }
 
-TextureSet AnimatedImageVisual::SetLoadingFailed()
+void AnimatedImageVisual::SetLoadingFailed()
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
-  ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-
   Actor   actor     = mPlacementActor.GetHandle();
   Vector2 imageSize = Vector2::ZERO;
   if(actor)
@@ -1418,14 +1423,25 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
     imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
   }
 
-  TextureSet textureSet;
   if(mEnableBrokenImage)
   {
     if(DALI_LIKELY(mImpl->mRenderer))
     {
       mUseBrokenImageRenderer = true;
       mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-      textureSet = mImpl->mRenderer.GetTextures();
+      TextureSet textureSet = mImpl->mRenderer.GetTextures();
+
+      SetImageSize(textureSet);
+
+      if(!mRendererAdded)
+      {
+        if(actor)
+        {
+          mRendererAdded = true;
+          actor.AddRenderer(mImpl->mRenderer);
+          mPlacementActor.Reset();
+        }
+      }
     }
   }
   else
@@ -1446,9 +1462,8 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
     mFrameDelayTimer.Reset();
   }
 
-  SetImageSize(textureSet);
-
-  return textureSet;
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
+  ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
 }
 
 void AnimatedImageVisual::AllocateMaskData()
