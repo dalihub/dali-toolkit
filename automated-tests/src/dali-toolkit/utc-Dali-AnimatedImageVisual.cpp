@@ -784,6 +784,113 @@ int UtcDaliAnimatedImageVisualImageLoadingFail03(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualImageLoadingFail04(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test with one of image sequence is broken. We should show broken image than.");
+
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load image sequence image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+
+    for(int totalImageCount = 1; totalImageCount <= 4; ++totalImageCount)
+    {
+      tet_printf("  total image count : %d\n", totalImageCount);
+
+      for(int brokenImageIndex = 0; brokenImageIndex < totalImageCount; ++brokenImageIndex)
+      {
+        tet_printf("  broken image index : %d\n", brokenImageIndex);
+        Property::Array urls;
+
+        for(int imageIndex = 0; imageIndex < totalImageCount; ++imageIndex)
+        {
+          if(imageIndex == brokenImageIndex)
+          {
+            urls.PushBack("invalid.png"); // broken image
+          }
+          else
+          {
+            urls.PushBack(TEST_MASK_IMAGE_FILE_NAME); // valid image
+          }
+        }
+
+        Property::Map propertyMap;
+        propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+        propertyMap.Insert(ImageVisual::Property::URL, urls);
+        propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
+
+        VisualFactory factory = VisualFactory::Get();
+        Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+        DummyControl        dummyControl = DummyControl::New(true);
+        Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+        dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+        dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+        DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
+
+        application.GetScene().Add(dummyControl);
+
+        application.SendNotification();
+        application.Render(20);
+
+        // TODO : Since fixed-image-cache didn't support synchronous loading now, we need to wait for a while.
+        // We have to remove it in future!
+        //if(!(isSynchronousLoading == 1))
+        {
+          DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+        }
+
+        if(totalImageCount > 1)
+        {
+          if(brokenImageIndex < 2)
+          {
+            // If the first batch load broken, timer will not be started.
+            // But the second image which is valid will be loaded, so need to wait 1 trigger.
+            DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+          }
+          else
+          {
+            tet_infoline("Test that a timer has been started");
+            DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+            // Wait for loading batch by batch until broken image is loaded.
+            for(int i = 0; i < brokenImageIndex - 1; ++i)
+            {
+              Test::EmitGlobalTimerSignal();
+              application.SendNotification();
+              application.Render(20);
+            }
+
+            // broken image is loaded for this batch.
+            DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+          }
+        }
+
+        application.SendNotification();
+        application.Render(20);
+
+        // Check broken image uploaded.
+        DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 1u, TEST_LOCATION);
+        DALI_TEST_EQUALS(dummyControl.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL), Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+        dummyControl.Unparent();
+
+        // Remove cached image at TextureManager.
+        application.RunIdles();
+        application.SendNotification();
+        application.Render(20);
+        application.RunIdles();
+        application.SendNotification();
+        application.Render(20);
+      }
+    }
+  }
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualSetInvalidImageWithDisabledBroken(void)
 {
   ToolkitTestApplication application;

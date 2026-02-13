@@ -252,9 +252,8 @@ private:
 
   /**
    * @brief Set the state of loading fail of an image or a frame.
-   * @return TextureSet of broken image.
    */
-  TextureSet SetLoadingFailed();
+  void SetLoadingFailed();
 
   /**
    * @brief Allocate mask data.
