@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <limits> ///< for std::numeric_limits
 
 using namespace Dali::Scene3D::Loader;
@@ -1169,14 +1170,14 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   const auto index    = scene.GetNodeCount();
   auto       weakNode = scene.AddNode([&]()
   {
-    std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
+    Dali::UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
     nodeDefinition->mName      = node.mName;
     if(nodeDefinition->mName.empty())
     {
       // TODO: Production quality generation of unique names.
-      nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.get()));
+      nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get()));
     }
 
     if(!node.mSkin) // Nodes with skinned meshes are not supposed to have local transforms.
@@ -1208,7 +1209,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
     weakNode->mRenderables.reserve(primitiveCount);
     for(uint32_t i = 0; i < primitiveCount; ++i)
     {
-      std::unique_ptr<NodeDefinition::Renderable> renderable;
+      Dali::UniquePtr<NodeDefinition::Renderable> renderable;
       auto                                        modelRenderable = MakeModelRenderable(mesh.mPrimitives[i], context);
       modelRenderable->mMeshIdx                                   = meshIndex + i;
 
@@ -1216,7 +1217,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
                         resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx == skeletonIdx);
       resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx = skeletonIdx;
 
-      renderable.reset(modelRenderable);
+      renderable.Reset(modelRenderable);
       weakNode->mRenderables.push_back(std::move(renderable));
     }
   }
@@ -1252,7 +1253,7 @@ void ConvertSceneNodes(const gltf2::Scene& scene, ConversionContext& context, bo
 
     default:
     {
-      std::unique_ptr<NodeDefinition> sceneRoot{new NodeDefinition()};
+      Dali::UniquePtr<NodeDefinition> sceneRoot{new NodeDefinition()};
       sceneRoot->mName = "GLTF_LOADER_SCENE_ROOT_" + std::to_string(outScene.GetRoots().size());
 
       outScene.AddNode(std::move(sceneRoot));
@@ -1539,14 +1540,14 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
 
   for(auto& skin : document.mSkins)
   {
-    std::unique_ptr<IInverseBindMatrixProvider> inverseBindMatrixProvider;
+    Dali::UniquePtr<IInverseBindMatrixProvider> inverseBindMatrixProvider;
     if(skin.mInverseBindMatrices)
     {
-      inverseBindMatrixProvider.reset(new InverseBindMatrixAccessor(*skin.mInverseBindMatrices, context));
+      inverseBindMatrixProvider.Reset(new InverseBindMatrixAccessor(*skin.mInverseBindMatrices, context));
     }
     else
     {
-      inverseBindMatrixProvider.reset(new DefaultInverseBindMatrixProvider());
+      inverseBindMatrixProvider.Reset(new DefaultInverseBindMatrixProvider());
     }
 
     SkeletonDefinition skeleton;

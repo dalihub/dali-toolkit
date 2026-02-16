@@ -354,14 +354,14 @@ uint32_t SceneDefinition::GetNodeCount() const
 
 const NodeDefinition* SceneDefinition::GetNode(Index iNode) const
 {
-  return mNodes[iNode].get();
+  return mNodes[iNode].Get();
 }
 
 NodeDefinition* SceneDefinition::GetNode(Index iNode)
 {
   if(iNode != Scene3D::Loader::INVALID_INDEX && iNode < mNodes.size())
   {
-    return mNodes[iNode].get();
+    return mNodes[iNode].Get();
   }
   return nullptr;
 }
@@ -468,7 +468,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
   }
 }
 
-NodeDefinition* SceneDefinition::AddNode(std::unique_ptr<NodeDefinition>&& nodeDef)
+NodeDefinition* SceneDefinition::AddNode(UniquePtr<NodeDefinition>&& nodeDef)
 {
   // add next index (to which we're about to push) as a child to the designated parent, if any.
   if(nodeDef->mParentIdx != INVALID_INDEX)
@@ -478,15 +478,15 @@ NodeDefinition* SceneDefinition::AddNode(std::unique_ptr<NodeDefinition>&& nodeD
 
   mNodes.push_back(std::move(nodeDef));
 
-  return mNodes.back().get();
+  return mNodes.back().Get();
 }
 
 bool SceneDefinition::ReparentNode(const std::string& name, const std::string& newParentName, Index siblingOrder)
 {
   LOGD(("reparenting %s to %s @ %d", name.c_str(), newParentName.c_str(), siblingOrder));
 
-  std::unique_ptr<NodeDefinition>* nodePtr      = nullptr;
-  std::unique_ptr<NodeDefinition>* newParentPtr = nullptr;
+  UniquePtr<NodeDefinition>* nodePtr      = nullptr;
+  UniquePtr<NodeDefinition>* newParentPtr = nullptr;
   if(!FindNode(name, &nodePtr) || !FindNode(newParentName, &newParentPtr))
   {
     return false;
@@ -539,24 +539,24 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
 
 bool SceneDefinition::RemoveNode(const std::string& name)
 {
-  std::unique_ptr<NodeDefinition>* node = nullptr;
+  UniquePtr<NodeDefinition>* node = nullptr;
   if(!FindNode(name, &node))
   {
     return false;
   }
 
   // Reset node def pointers recursively.
-  auto&                                                 thisNodes = mNodes;
-  unsigned int                                          numReset  = 0;
-  std::function<void(std::unique_ptr<NodeDefinition>&)> resetFn =
-    [&thisNodes, &resetFn, &numReset](std::unique_ptr<NodeDefinition>& nd)
+  auto&                                           thisNodes = mNodes;
+  unsigned int                                    numReset  = 0;
+  std::function<void(UniquePtr<NodeDefinition>&)> resetFn =
+    [&thisNodes, &resetFn, &numReset](UniquePtr<NodeDefinition>& nd)
   {
     LOGD(("resetting %d", &nd - thisNodes.data()));
     for(auto i : nd->mChildren)
     {
       resetFn(thisNodes[i]);
     }
-    nd.reset();
+    nd.Reset();
     ++numReset;
   };
 
@@ -624,7 +624,7 @@ void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
   auto&                    thisNodes  = mNodes;
   std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i)
   {
-    auto node = thisNodes[i].get();
+    auto node = thisNodes[i].Get();
     if(node->mParentIdx != INVALID_INDEX)
     {
       buildStack(node->mParentIdx);
@@ -638,10 +638,10 @@ NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outInd
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd)
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
    { return nd->mName == name; });
 
-  auto result = iFind != iEnd ? iFind->get() : nullptr;
+  auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
   {
     *outIndex = std::distance(iBegin, iFind);
@@ -653,10 +653,10 @@ const NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* 
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd)
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
    { return nd->mName == name; });
 
-  auto result = iFind != iEnd ? iFind->get() : nullptr;
+  auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
   {
     *outIndex = std::distance(iBegin, iFind);
@@ -668,8 +668,8 @@ Index SceneDefinition::FindNodeIndex(const NodeDefinition& node) const
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&node](const std::unique_ptr<NodeDefinition>& n)
-   { return n.get() == &node; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&node](const UniquePtr<NodeDefinition>& n)
+   { return n.Get() == &node; });
   return iFind != iEnd ? std::distance(iBegin, iFind) : INVALID_INDEX;
 }
 
@@ -764,7 +764,7 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
   }
 }
 
-void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resources) const
+void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resources)
 {
   std::map<Index, std::map<Index, std::vector<Index*>>> skinningShaderUsers;
   for(auto& node : mNodes)
@@ -776,7 +776,7 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
 
       if(reflector.iMesh)
       {
-        const auto& mesh = resources.mMeshes[*reflector.iMesh].first;
+        auto& mesh = resources.mMeshes[*reflector.iMesh].first;
         if(mesh.IsSkinned())
         {
           skinningShaderUsers[*reflector.iShader][mesh.mSkeletonIdx].push_back(reflector.iShader);
@@ -902,7 +902,7 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
   return ok;
 }
 
-void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources) const
+void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources)
 {
   std::map<Index, std::map<std::string, std::vector<Index*>>> blendShapeShaderUsers;
   for(auto& node : mNodes)
@@ -914,7 +914,7 @@ void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& reso
 
       if(reflector.iMesh)
       {
-        const auto& mesh = resources.mMeshes[*reflector.iMesh].first;
+        auto& mesh = resources.mMeshes[*reflector.iMesh].first;
         if(mesh.HasBlendShapes())
         {
           blendShapeShaderUsers[*reflector.iShader][node->mName].push_back(reflector.iShader);
@@ -955,12 +955,12 @@ SceneDefinition& SceneDefinition::operator=(SceneDefinition&& other)
   return *this;
 }
 
-bool SceneDefinition::FindNode(const std::string& name, std::unique_ptr<NodeDefinition>** result)
+bool SceneDefinition::FindNode(const std::string& name, UniquePtr<NodeDefinition>** result)
 {
   // We're searching from the end assuming a higher probability of operations targeting
   // recently added nodes. (conf.: root, which is immovable, cannot be removed, and was
   // the first to be added, is index 0.)
-  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const std::unique_ptr<NodeDefinition>& nd)
+  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const UniquePtr<NodeDefinition>& nd)
   { return nd->mName == name; })
                  .base();
 

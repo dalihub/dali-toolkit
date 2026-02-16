@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ int UtcDaliNodeDefinitionRenderableRegisterResources(void)
 {
   NodeDefinition nodeDef;
 
-  std::unique_ptr<NodeDefinition::Renderable> renderable = std::unique_ptr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
+  UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
   nodeDef.mRenderables.push_back(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 
@@ -174,7 +174,7 @@ int UtcDaliNodeDefinitionRenderableReflectResources(void)
 {
   NodeDefinition nodeDef;
 
-  std::unique_ptr<NodeDefinition::Renderable> renderable = std::unique_ptr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
+  UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
   nodeDef.mRenderables.push_back(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 
@@ -210,7 +210,7 @@ int UtcDaliNodeDefinitionRenderable(void)
   ToolkitTestApplication testApp;
   NodeDefinition         nodeDef;
 
-  std::unique_ptr<NodeDefinition::Renderable> renderable = std::unique_ptr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
+  UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
   nodeDef.mRenderables.push_back(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 

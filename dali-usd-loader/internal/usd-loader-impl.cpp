@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,7 +314,7 @@ bool UsdLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
   Index rootIndex = result.mScene.GetNodeCount();
 
   // Create a node definition for the scene root
-  std::unique_ptr<NodeDefinition> sceneRoot{new NodeDefinition()};
+  UniquePtr<NodeDefinition> sceneRoot{new NodeDefinition()};
   sceneRoot->mName = "USD_SCENE_ROOT_NODE";
 
   // Add the scene root node to the result scene
@@ -424,25 +424,26 @@ NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, cons
   // Add the node to the scene graph
   auto weakNode = scene.AddNode([&]()
   {
-        std::unique_ptr<NodeDefinition> nodeDefinition{new NodeDefinition()};
+    UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
-        nodeDefinition->mParentIdx = parentIndex;
-        nodeDefinition->mName      = nodeName;
-        if(nodeDefinition->mName.empty())
-        {
-          nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.get()));
-        }
+    nodeDefinition->mParentIdx = parentIndex;
+    nodeDefinition->mName      = nodeName;
+    if(nodeDefinition->mName.empty())
+    {
+      nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get()));
+    }
 
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "scene.AddNode (ConvertNode): %s, parentIndex: %d\n", nodeDefinition->mName.c_str(), parentIndex);
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "scene.AddNode (ConvertNode): %s, parentIndex: %d\n", nodeDefinition->mName.c_str(), parentIndex);
 
-        if (setTransformation)
-        {
-          nodeDefinition->mPosition    = position;
-          nodeDefinition->mOrientation = rotation;
-          nodeDefinition->mScale       = scale;
-        }
+    if(setTransformation)
+    {
+      nodeDefinition->mPosition    = position;
+      nodeDefinition->mOrientation = rotation;
+      nodeDefinition->mScale       = scale;
+    }
 
-        return nodeDefinition; }());
+    return nodeDefinition;
+  }());
 
   if(!weakNode)
   {
@@ -1230,14 +1231,14 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
       ProcessMaterialBinding(output, prim, subsets, subIndex, meshSubMaterialId);
 
       // Create a renderable object for the model and associate the mesh and material with the renderable
-      std::unique_ptr<NodeDefinition::Renderable> renderable;
+      UniquePtr<NodeDefinition::Renderable> renderable;
 
       auto modelRenderable      = new ModelRenderable();
       modelRenderable->mMeshIdx = mMeshCount - 1 + subIndex;
 
       modelRenderable->mMaterialIdx = meshSubMaterialId;
 
-      renderable.reset(modelRenderable);
+      renderable.Reset(modelRenderable);
       weakNode->mRenderables.push_back(std::move(renderable));
 
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "weakNode %s->mRenderables.push_back, ", weakNode->mName.c_str());

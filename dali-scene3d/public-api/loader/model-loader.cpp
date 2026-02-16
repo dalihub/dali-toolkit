@@ -153,15 +153,15 @@ void ModelLoader::CreateModelLoader()
 
   if(extension == DLI_EXTENSION)
   {
-    mImpl = std::make_unique<Dali::Scene3D::Loader::Internal::DliLoaderImpl>();
+    mImpl = MakeUnique<Dali::Scene3D::Loader::Internal::DliLoaderImpl>();
   }
   else if(extension == GLTF_EXTENSION)
   {
-    mImpl = std::make_unique<Dali::Scene3D::Loader::Internal::Gltf2LoaderImpl>();
+    mImpl = MakeUnique<Dali::Scene3D::Loader::Internal::Gltf2LoaderImpl>();
   }
   else if(extension == GLB_EXTENSION)
   {
-    mImpl = std::make_unique<Dali::Scene3D::Loader::Internal::GlbLoaderImpl>();
+    mImpl = MakeUnique<Dali::Scene3D::Loader::Internal::GlbLoaderImpl>();
   }
   else if(extension == USD_EXTENSION || extension == USDZ_EXTENSION || extension == USDA_EXTENSION || extension == USDC_EXTENSION)
   {

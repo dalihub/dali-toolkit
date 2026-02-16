@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Dali::Scene3D::Algorithm
 {
 WayPoint::WayPoint()
 {
-  mImpl = std::make_unique<Scene3D::Internal::Algorithm::WayPointData>();
+  mImpl = MakeUnique<Scene3D::Internal::Algorithm::WayPointData>();
 }
 
 WayPoint::~WayPoint() = default;
@@ -50,13 +50,13 @@ Dali::Vector3 WayPoint::GetScenePosition() const
 
 WayPoint::WayPoint(const WayPoint& wp)
 {
-  mImpl  = std::make_unique<Internal::Algorithm::WayPointData>();
+  mImpl  = MakeUnique<Internal::Algorithm::WayPointData>();
   *mImpl = *wp.mImpl;
 }
 
 WayPoint& WayPoint::operator=(const WayPoint& wp)
 {
-  mImpl  = std::make_unique<Internal::Algorithm::WayPointData>();
+  mImpl  = MakeUnique<Internal::Algorithm::WayPointData>();
   *mImpl = *wp.mImpl;
   return *this;
 }

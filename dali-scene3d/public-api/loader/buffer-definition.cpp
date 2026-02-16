@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ struct BufferDefinition::Impl
 BufferDefinition::BufferDefinition(std::vector<uint8_t>&& buffer)
 : mImpl{new BufferDefinition::Impl}
 {
-  mImpl.get()->buffer = std::move(buffer);
-  mImpl.get()->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl.get()->buffer.data()), mImpl.get()->buffer.size(), FileStream::READ | FileStream::BINARY);
-  mIsEmbedded         = true;
+  mImpl->buffer = std::move(buffer);
+  mImpl->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl->buffer.data()), mImpl->buffer.size(), FileStream::READ | FileStream::BINARY);
+  mIsEmbedded   = true;
 }
 
 BufferDefinition::BufferDefinition()
@@ -65,7 +65,7 @@ BufferDefinition::BufferDefinition(BufferDefinition&& other)
 std::iostream& BufferDefinition::GetBufferStream()
 {
   LoadBuffer();
-  return mImpl.get()->stream.get()->GetStream();
+  return mImpl->stream.get()->GetStream();
 }
 
 std::string BufferDefinition::GetUri()
@@ -76,12 +76,12 @@ std::string BufferDefinition::GetUri()
 bool BufferDefinition::IsAvailable()
 {
   LoadBuffer();
-  return mImpl.get()->stream != nullptr;
+  return mImpl->stream != nullptr;
 }
 
 void BufferDefinition::LoadBuffer()
 {
-  if(mImpl.get()->stream == nullptr)
+  if(mImpl->stream == nullptr)
   {
     if(mUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && mUri.find(EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
     {
@@ -90,16 +90,16 @@ void BufferDefinition::LoadBuffer()
       {
         position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
         std::string_view data = std::string_view(mUri).substr(position);
-        mImpl.get()->buffer.clear();
-        Dali::Toolkit::DecodeBase64FromString(data, mImpl.get()->buffer);
-        mImpl.get()->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl.get()->buffer.data()), mByteLength, FileStream::READ | FileStream::BINARY);
-        mIsEmbedded         = true;
+        mImpl->buffer.clear();
+        Dali::Toolkit::DecodeBase64FromString(data, mImpl->buffer);
+        mImpl->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl->buffer.data()), mByteLength, FileStream::READ | FileStream::BINARY);
+        mIsEmbedded   = true;
       }
     }
     else
     {
-      mImpl.get()->stream = std::make_shared<Dali::FileStream>(mResourcePath + mUri, FileStream::READ | FileStream::BINARY);
-      if(mImpl.get()->stream == nullptr)
+      mImpl->stream = std::make_shared<Dali::FileStream>(mResourcePath + mUri, FileStream::READ | FileStream::BINARY);
+      if(mImpl->stream == nullptr)
       {
         DALI_LOG_ERROR("Failed to load %s\n", (mResourcePath + mUri).c_str());
       }

@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
-#include <memory> // for std::unique_ptr
+#include <dali/public-api/common/unique-ptr.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -48,7 +48,7 @@ namespace Scene3D
 
 namespace Internal
 {
-using ColliderMeshUniquePtr = std::unique_ptr<Dali::Scene3D::Algorithm::ColliderMesh>;
+using ColliderMeshUniquePtr = Dali::UniquePtr<Dali::Scene3D::Algorithm::ColliderMesh>;
 /**
  * @brief This is the internal base class for custom node of model.
  *
@@ -350,7 +350,7 @@ private:
   Internal::Model* mParentModel{nullptr};
 
   // Collider mesh
-  std::unique_ptr<Dali::Scene3D::Algorithm::ColliderMesh> mColliderMesh;
+  Dali::UniquePtr<Dali::Scene3D::Algorithm::ColliderMesh> mColliderMesh;
 
   float    mIblScaleFactor{1.0f};
   uint32_t mSpecularMipmapLevels{1u};

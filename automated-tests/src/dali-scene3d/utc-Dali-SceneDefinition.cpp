@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ int UtcDaliSceneDefinitionAddNode(void)
   auto node   = new NodeDefinition();
   node->mName = "First";
 
-  auto result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{node});
+  auto result = sceneDef.AddNode(UniquePtr<NodeDefinition>{node});
   DALI_TEST_EQUAL(result, node);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 1u);
   DALI_TEST_EQUAL(sceneDef.GetNode(0), node);
@@ -41,7 +41,7 @@ int UtcDaliSceneDefinitionAddNode(void)
 
   auto node2   = new NodeDefinition();
   node2->mName = node->mName;
-  result       = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{node2});
+  result       = sceneDef.AddNode(UniquePtr<NodeDefinition>{node2});
   DALI_TEST_EQUAL(result, node2);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 2u);
   DALI_TEST_EQUAL(sceneDef.GetNode(1), node2);
@@ -52,7 +52,7 @@ int UtcDaliSceneDefinitionAddNode(void)
 
   DALI_TEST_CHECK(node->mChildren.empty()); // these are hooked up by AddNode, base on parent idx.
 
-  result = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{child});
+  result = sceneDef.AddNode(UniquePtr<NodeDefinition>{child});
   DALI_TEST_EQUAL(result, child);
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 3u);
   DALI_TEST_EQUAL(sceneDef.GetNode(2), child);
@@ -93,9 +93,9 @@ struct TestContext
     childA->mParentIdx = 0;
     childB->mParentIdx = 0;
 
-    root   = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{root});
-    childA = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{childA});
-    childB = sceneDef.AddNode(std::unique_ptr<NodeDefinition>{childB});
+    root   = sceneDef.AddNode(UniquePtr<NodeDefinition>{root});
+    childA = sceneDef.AddNode(UniquePtr<NodeDefinition>{childA});
+    childB = sceneDef.AddNode(UniquePtr<NodeDefinition>{childB});
   }
 };
 
@@ -220,7 +220,7 @@ int UtcDaliSceneDefinitionVisitCustomized(void)
 {
   TestContext ctx;
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
+  ctx.root->mCustomization.Reset(new NodeDefinition::CustomizationDefinition{"A/B"});
 
   const NodeVisitor::Visit expected[]{
     {START, ctx.root},
@@ -247,7 +247,7 @@ int UtcDaliSceneDefinitionConstVisitCustomized(void)
 {
   TestContext ctx;
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
+  ctx.root->mCustomization.Reset(new NodeDefinition::CustomizationDefinition{"A/B"});
 
   const ConstNodeVisitor::Visit expected[]{
     {START, ctx.root},
@@ -276,9 +276,9 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
 
   ctx.sceneDef.AddRootNode(0); // GetCustomizationOptions requires this.
 
-  ctx.root->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"A/B"});
-  ctx.childA->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"hello"});
-  ctx.childB->mCustomization.reset(new NodeDefinition::CustomizationDefinition{"goodbye"});
+  ctx.root->mCustomization.Reset(new NodeDefinition::CustomizationDefinition{"A/B"});
+  ctx.childA->mCustomization.Reset(new NodeDefinition::CustomizationDefinition{"hello"});
+  ctx.childB->mCustomization.Reset(new NodeDefinition::CustomizationDefinition{"goodbye"});
 
   Customization::Choices choices;
   Customization::Map     options;

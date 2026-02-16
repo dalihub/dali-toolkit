@@ -192,7 +192,7 @@ int UtcDaliNavigationMeshCreateFromFileFail1(void)
   // No such file, misspelled name
   auto result = NavigationMeshFactory::CreateFromFile("notexisting.bin");
 
-  DALI_TEST_CHECK(result == nullptr);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
@@ -205,7 +205,7 @@ int UtcDaliNavigationMeshCreateFromFileFail2(void)
   call_fseek.SetReturnValue(-1, 0);
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result == nullptr);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
@@ -218,7 +218,7 @@ int UtcDaliNavigationMeshCreateFromFileFail3(void)
   call_ftell.SetReturnValue(-1, 0);
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result == nullptr);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
@@ -231,7 +231,7 @@ int UtcDaliNavigationMeshCreateFromFileFail4(void)
   call_fseek.SetReturnValue(-1, 1);
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result == nullptr);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
@@ -244,7 +244,7 @@ int UtcDaliNavigationMeshCreateFromFileFail5(void)
   call_fread.SetReturnValue(-1, 0);
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result == nullptr);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
@@ -255,7 +255,7 @@ int UtcDaliNavigationMeshCreateFromFileOk1(void)
 
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result != nullptr);
+  DALI_TEST_CHECK(result);
 
   END_TEST;
 }
@@ -273,7 +273,7 @@ int UtcDaliNavigationMeshCreateFromBufferP(void)
   fread(buffer.data(), 1, length, fin);
   fclose(fin);
   auto result = NavigationMeshFactory::CreateFromBuffer(buffer);
-  DALI_TEST_CHECK(result != nullptr);
+  DALI_TEST_CHECK(result);
 
   END_TEST;
 }
@@ -284,7 +284,7 @@ int UtcDaliNavigationMeshCountersP(void)
 
   auto result = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(result != nullptr);
+  DALI_TEST_CHECK(result);
 
   auto vertexCount = result->GetVertexCount();
   auto edgeCount   = result->GetEdgeCount();
@@ -303,7 +303,7 @@ int UtcDaliNavigationMeshGetVertexP(void)
 
   auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(navmesh != nullptr);
+  DALI_TEST_CHECK(navmesh);
 
   auto vertexCount = navmesh->GetVertexCount();
 
@@ -340,7 +340,7 @@ int UtcDaliNavigationMeshGetEdgeP(void)
 
   auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(navmesh != nullptr);
+  DALI_TEST_CHECK(navmesh);
 
   auto edgeCount = navmesh->GetEdgeCount();
 
@@ -385,7 +385,7 @@ int UtcDaliNavigationMeshGetFaceP(void)
 
   auto navmesh = NavigationMeshFactory::CreateFromFile("resources/navmesh-test.bin");
 
-  DALI_TEST_CHECK(navmesh != nullptr);
+  DALI_TEST_CHECK(navmesh);
 
   auto faceCount = navmesh->GetFaceCount();
 
@@ -788,13 +788,13 @@ int UtcDaliColliderMeshModelNodeSetup(void)
 
   // Redundant setup test
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
   node.SetColliderMesh(std::move(colliderMesh));
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
 
   // Reset collider mesh
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   auto colliderMesh2 = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(1));
@@ -810,7 +810,7 @@ int UtcDaliColliderMeshModelNodeSetup(void)
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(&node.GetColliderMesh(), &cm3, TEST_LOCATION);
 
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   END_TEST;
@@ -833,7 +833,7 @@ int UtcDaliColliderMeshModelNodeRemoveModelNode(void)
 
   // Redundant setup test
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
   node.SetColliderMesh(std::move(colliderMesh));
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
@@ -842,7 +842,7 @@ int UtcDaliColliderMeshModelNodeRemoveModelNode(void)
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
 
   // Reset collider mesh
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   auto colliderMesh1 = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(0));
@@ -864,7 +864,7 @@ int UtcDaliColliderMeshModelNodeRemoveModelNode(void)
   DALI_TEST_EQUALS(node.HasColliderMesh(), true, TEST_LOCATION);
 
   // Reset collider mesh
-  node.SetColliderMesh(nullptr);
+  node.SetColliderMesh({});
   DALI_TEST_EQUALS(node.HasColliderMesh(), false, TEST_LOCATION);
 
   model.RemoveModelNode(node);

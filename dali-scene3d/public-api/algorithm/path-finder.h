@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_PATH_FINDER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>
 #include <dali-scene3d/public-api/api.h>
+#include <dali/public-api/common/unique-ptr.h>
 
 namespace Dali::Scene3D::Algorithm
 {
@@ -92,7 +93,7 @@ public:
    * @param[in] algorithm algorithm to use
    * @return Valid pointer to PathFinder object or nullptr
    */
-  static std::unique_ptr<PathFinder> New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm);
+  static UniquePtr<PathFinder> New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm);
 
   /**
    * @brief Looks for a path from point A to point B.
@@ -132,9 +133,9 @@ public:
 private:
   PathFinder() = delete;
 
-  DALI_INTERNAL explicit PathFinder(std::unique_ptr<PathFinderBase>&& baseImpl);
+  DALI_INTERNAL explicit PathFinder(UniquePtr<PathFinderBase>&& baseImpl);
 
-  std::unique_ptr<PathFinderBase> mImpl;
+  UniquePtr<PathFinderBase> mImpl;
 };
 
 } // namespace Dali::Scene3D::Algorithm

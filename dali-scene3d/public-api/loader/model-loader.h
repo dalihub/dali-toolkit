@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MODEL_LOADER_H
 #define DALI_SCENE3D_LOADER_MODEL_LOADER_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <string>
 
 namespace Dali::Scene3D::Loader
@@ -127,7 +128,7 @@ private:
   Dali::Scene3D::Loader::LoadResult             mLoadResult;
   Dali::Scene3D::Loader::Customization::Choices mResourceChoices;
 
-  using ModelLoaderImplUniquePtr = std::unique_ptr<Dali::Scene3D::Loader::ModelLoaderImpl>;
+  using ModelLoaderImplUniquePtr = UniquePtr<Dali::Scene3D::Loader::ModelLoaderImpl>;
   ModelLoaderImplUniquePtr mImpl;
 };
 } // namespace Dali::Scene3D::Loader

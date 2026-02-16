@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <stdlib.h>
-#include <memory>
 
 namespace Dali::Scene3D::Loader
 {
-std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::string filename)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::string filename)
 {
   std::vector<uint8_t> buffer;
 
@@ -44,27 +44,27 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile
     [[maybe_unused]] auto ret = strerror_r(errno, buffer, bufferLength - 1);
 
     DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), buffer);
-    return nullptr;
+    return {};
   }
 
   if(DALI_UNLIKELY(fseek(fin, 0, SEEK_END)))
   {
     DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-    return nullptr;
+    return {};
   }
 
   auto size = ftell(fin);
   if(DALI_UNLIKELY(size < 0))
   {
     DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-    return nullptr;
+    return {};
   }
 
   auto fileSize = size_t(size);
   if(DALI_UNLIKELY(fseek(fin, 0, SEEK_SET)))
   {
     DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-    return nullptr;
+    return {};
   }
 
   buffer.resize(size);
@@ -72,18 +72,18 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile
   if(DALI_UNLIKELY(count != fileSize))
   {
     DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
-    return nullptr;
+    return {};
   }
   return CreateFromBuffer(buffer);
 }
 
-std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
 {
   auto impl = new Scene3D::Internal::Algorithm::NavigationMesh(buffer);
-  return std::make_unique<Algorithm::NavigationMesh>(impl);
+  return MakeUnique<Algorithm::NavigationMesh>(impl);
 }
 
-std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const Vector3* vertices, const Vector3* vertexNormals, uint32_t vertexCount, const uint32_t* faceIndices, uint32_t indexCount)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const Vector3* vertices, const Vector3* vertexNormals, uint32_t vertexCount, const uint32_t* faceIndices, uint32_t indexCount)
 {
   // The function takes the data and creates a binary buffer out of it
   using namespace Dali::Scene3D::Algorithm;
@@ -195,7 +195,7 @@ std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVert
   return NavigationMeshFactory::CreateFromBuffer(navigationMeshBinary);
 }
 
-std::unique_ptr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals, const std::vector<uint32_t>& faceIndices)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals, const std::vector<uint32_t>& faceIndices)
 {
   return CreateFromVertexFaceList(vertices.data(), normals.data(), vertices.size(), faceIndices.data(), faceIndices.size());
 }

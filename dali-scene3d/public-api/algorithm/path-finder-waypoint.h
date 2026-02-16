@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_PATH_FINDER_WAYPOINT_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
 #include <cinttypes>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -108,7 +108,7 @@ public:
   WayPoint& operator=(const WayPoint&);
 
 private:
-  std::unique_ptr<Internal::Algorithm::WayPointData> mImpl;
+  UniquePtr<Internal::Algorithm::WayPointData> mImpl;
 
 public:
   DALI_INTERNAL operator Internal::Algorithm::WayPointData&();

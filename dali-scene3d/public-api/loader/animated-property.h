@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H
 #define DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/property.h>
 #include <functional>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -89,8 +89,8 @@ public: // DATA
   std::string mNodeName;
   std::string mPropertyName;
 
-  KeyFrames              mKeyFrames;
-  std::unique_ptr<Value> mValue;
+  KeyFrames        mKeyFrames;
+  UniquePtr<Value> mValue;
 
   AlphaFunction mAlphaFunction = AlphaFunction::DEFAULT;
   TimePeriod    mTimePeriod    = TimePeriod(0.f);

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_USD_LOADER_IMPL_H
 #define DALI_SCENE3D_LOADER_USD_LOADER_IMPL_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -38,7 +39,7 @@ public:
 
 private:
   struct Impl;
-  const std::unique_ptr<Impl> mImpl;
+  UniquePtr<Impl> mImpl;
 };
 
 } // namespace Dali::Scene3D::Loader

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 
 namespace Dali::Scene3D::Algorithm
 {
-std::unique_ptr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm)
+UniquePtr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm)
 {
   PathFinderBase* impl = nullptr;
 
@@ -53,9 +53,9 @@ std::unique_ptr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, Path
     return {};
   }
 
-  auto retval = std::unique_ptr<PathFinderBase>();
-  retval.reset(impl);
-  return std::unique_ptr<Algorithm::PathFinder>(new Algorithm::PathFinder(std::move(retval)));
+  auto retval = UniquePtr<PathFinderBase>();
+  retval.Reset(impl);
+  return UniquePtr<Algorithm::PathFinder>(new Algorithm::PathFinder(std::move(retval)));
 }
 
 WayPointList PathFinder::FindPath(const Dali::Vector3& positionFrom, const Dali::Vector3& positionTo)
@@ -68,7 +68,7 @@ WayPointList PathFinder::FindPath(FaceIndex polyIndexFrom, FaceIndex polyIndexTo
   return mImpl->FindPath(polyIndexFrom, polyIndexTo);
 }
 
-PathFinder::PathFinder(std::unique_ptr<PathFinderBase>&& baseImpl)
+PathFinder::PathFinder(UniquePtr<PathFinderBase>&& baseImpl)
 {
   mImpl = std::move(baseImpl);
 }
