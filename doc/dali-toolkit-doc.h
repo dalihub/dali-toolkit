@@ -125,10 +125,6 @@
  *    <td>VideoView is a control for video playback and display.</td>
  * </tr>
  * <tr>
- *    <td style="padding-left:1em">@ref dali_toolkit_controls_progress_bar</td>
- *    <td>ProgressBar is a control to give the user an indication of the progress of an operation.</td>
- * </tr>
- * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_camera_view</td>
  *    <td>CameraView is a control for camera display.</td>
  * </tr>
@@ -212,9 +208,6 @@
 
  *     @defgroup dali_toolkit_controls_video_view Video View
  *     @brief VideoView is a control for video playback and display.
-
- *     @defgroup dali_toolkit_controls_progress_bar Progress Bar
- *     @brief ProgressBar is a control to give the user an indication of the progress of an operation.
 
  *     @defgroup dali_toolkit_controls_camera_view Camera View
  *     @brief CameraView is a control for camera display.

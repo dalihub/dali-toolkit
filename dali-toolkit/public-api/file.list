@@ -12,8 +12,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/controls/flex-container/flex-container.cpp
   ${public_api_src_dir}/controls/gl-view/gl-view.cpp
   ${public_api_src_dir}/controls/image-view/image-view.cpp
-  ${public_api_src_dir}/controls/progress-bar/progress-bar.cpp
-  ${public_api_src_dir}/controls/scrollable/item-view/default-item-layout.cpp
+    ${public_api_src_dir}/controls/scrollable/item-view/default-item-layout.cpp
   ${public_api_src_dir}/controls/scrollable/item-view/item-layout.cpp
   ${public_api_src_dir}/controls/scrollable/item-view/item-view.cpp
   ${public_api_src_dir}/controls/scrollable/scroll-view/scroll-view-constraints.cpp
@@ -97,10 +96,6 @@ SET( public_api_image_loader_header_files
   ${public_api_src_dir}/image-loader/image-url.h
   ${public_api_src_dir}/image-loader/async-image-loader.h
   ${public_api_src_dir}/image-loader/sync-image-loader.h
-)
-
-SET( public_api_progress_bar_header_files
-  ${public_api_src_dir}/controls/progress-bar/progress-bar.h
 )
 
 SET( public_api_render_effects_header_files
@@ -199,7 +194,6 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_image_view_header_files}
   ${public_api_item_view_header_files}
   ${public_api_image_loader_header_files}
-  ${public_api_progress_bar_header_files}
   ${public_api_render_effects_header_files}
   ${public_api_scrollable_header_files}
   ${public_api_scroll_view_header_files}

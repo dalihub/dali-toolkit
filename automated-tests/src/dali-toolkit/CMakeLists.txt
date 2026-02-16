@@ -75,7 +75,6 @@ SET(TC_SOURCES
   utc-Dali-Magnifier.cpp
   utc-Dali-NavigationView.cpp
   utc-Dali-Popup.cpp
-  utc-Dali-ProgressBar.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
   utc-Dali-ToggleButton.cpp

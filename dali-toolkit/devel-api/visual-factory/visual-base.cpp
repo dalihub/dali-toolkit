@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,11 @@ Visual::Type Visual::Base::GetType() const
 Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
 {
   return GetImplementation(*this).GetPropertyObject(std::move(key));
+}
+
+void Visual::Base::SetProperties(const Dali::Property::Map& properties)
+{
+  GetImplementation(*this).SetProperties(properties);
 }
 
 } // namespace Toolkit

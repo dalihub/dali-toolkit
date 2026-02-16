@@ -47,65 +47,6 @@ void utc_dali_toolkit_accessibility_value_cleanup(void)
   DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
-int utcDaliAccessibilityProgressBarGetMinimum(void)
-{
-  ToolkitTestApplication application;
-
-  Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
-  auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = q->GetFeature<Accessibility::Value>();
-  DALI_TEST_CHECK(x);
-  DALI_TEST_EQUALS(x->GetMinimum(), 0.0, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int utcDaliAccessibilityProgressBarGetMaximum(void)
-{
-  ToolkitTestApplication application;
-
-  Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
-  auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = q->GetFeature<Accessibility::Value>();
-  DALI_TEST_CHECK(x);
-  DALI_TEST_EQUALS(x->GetMaximum(), 1.0, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int utcDaliAccessibilityProgressBarGetMinimumIncrement(void)
-{
-  ToolkitTestApplication application;
-
-  Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
-  auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = q->GetFeature<Accessibility::Value>();
-  DALI_TEST_CHECK(x);
-  DALI_TEST_EQUALS(x->GetMinimumIncrement(), 0.0, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int utcDaliAccessibilityProgressBarGetSetCurrent(void)
-{
-  ToolkitTestApplication application;
-  Dali::Accessibility::TestEnableSC(true);
-
-  Toolkit::ProgressBar progress_bar = Toolkit::ProgressBar::New();
-  auto                 q            = Dali::Accessibility::Accessible::Get(progress_bar);
-  auto                 x            = q->GetFeature<Accessibility::Value>();
-  DALI_TEST_CHECK(x);
-  DALI_TEST_CHECK(q->GrabHighlight());
-  DALI_TEST_EQUALS(x->GetCurrent(), 0.0, TEST_LOCATION);
-  DALI_TEST_EQUALS(x->SetCurrent(2.0), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(x->SetCurrent(0.25), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(x->GetCurrent(), 0.25, TEST_LOCATION);
-  DALI_TEST_EQUALS(x->GetValueText().empty(), true, TEST_LOCATION); // not implemented
-
-  Dali::Accessibility::TestEnableSC(false);
-  END_TEST;
-}
-
 int utcDaliAccessibilityScrollBarGetMinimum(void)
 {
   ToolkitTestApplication application;

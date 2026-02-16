@@ -6558,3 +6558,50 @@ int UtcDaliGradientAnimateTest(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualSetProperties(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualSetProperties: Test SetProperties API");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+  propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
+  propertyMap.Insert(Visual::Property::OPACITY, 1.0f);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  // Verify initial properties
+  Property::Map resultMap;
+  visual.CreatePropertyMap(resultMap);
+
+  Property::Value* mixColorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(mixColorValue);
+  DALI_TEST_EQUALS(mixColorValue->Get<Vector4>(), Color::BLUE, TEST_LOCATION);
+
+  Property::Value* opacityValue = resultMap.Find(Visual::Property::OPACITY, Property::FLOAT);
+  DALI_TEST_CHECK(opacityValue);
+  DALI_TEST_EQUALS(opacityValue->Get<float>(), 1.0f, TEST_LOCATION);
+
+  // Set new properties using SetProperties
+  Property::Map newProperties;
+  newProperties.Insert(Visual::Property::MIX_COLOR, Color::RED);
+  newProperties.Insert(Visual::Property::OPACITY, 1.0f);
+
+  visual.SetProperties(newProperties);
+
+  // Verify properties were updated
+  visual.CreatePropertyMap(resultMap);
+
+  mixColorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(mixColorValue);
+  DALI_TEST_EQUALS(mixColorValue->Get<Vector4>(), Color::RED, TEST_LOCATION);
+
+  opacityValue = resultMap.Find(Visual::Property::OPACITY, Property::FLOAT);
+  DALI_TEST_CHECK(opacityValue);
+  DALI_TEST_EQUALS(opacityValue->Get<float>(), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}
