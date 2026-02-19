@@ -650,21 +650,6 @@ int UtcDaliAccessibilityScrollableConstructor(void)
   END_TEST;
 }
 
-#include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
-int UtcDaliAccessibilityMagnifierConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto magnifier = Magnifier::New();
-  DALI_TEST_CHECK(magnifier);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(magnifier);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityTableViewConstructor(void)
 {
   ToolkitTestApplication application;

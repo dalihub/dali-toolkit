@@ -18,7 +18,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/bubble-effect/bubble-emitter.cpp
   ${devel_api_src_dir}/controls/buttons/toggle-button.cpp
   ${devel_api_src_dir}/controls/effects-view/effects-view.cpp
-  ${devel_api_src_dir}/controls/magnifier/magnifier.cpp
   ${devel_api_src_dir}/controls/navigation-view/navigation-view.cpp
   ${devel_api_src_dir}/controls/page-turn-view/page-turn-landscape-view.cpp
   ${devel_api_src_dir}/controls/page-turn-view/page-turn-portrait-view.cpp
@@ -138,10 +137,6 @@ SET( devel_api_layouting_header_files
 
 SET( devel_api_property_bridge_header_files
   ${devel_api_src_dir}/property-bridge/property-bridge.h
-)
-
-SET( devel_api_magnifier_header_files
-  ${devel_api_src_dir}/controls/magnifier/magnifier.h
 )
 
 SET( devel_api_navigation_view_header_files
@@ -303,7 +298,6 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_effects_view_header_files}
   ${devel_api_layouting_header_files}
   ${devel_api_property_bridge_header_files}
-  ${devel_api_magnifier_header_files}
   ${devel_api_navigation_view_header_files}
   ${devel_api_page_turn_view_header_files}
   ${devel_api_popup_header_files}
