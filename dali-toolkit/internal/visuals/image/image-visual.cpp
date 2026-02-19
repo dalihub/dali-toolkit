@@ -106,8 +106,7 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
 
 constexpr uint32_t TEXTURE_COUNT_FOR_GPU_ALPHA_MASK = 2u;
-
-constexpr uint32_t MINIMUM_SHADER_VERSION_SUPPORT_UNIFIED_YUV_AND_RGB = 300;
+constexpr uint32_t TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB = 3u;
 
 struct NameIndexMatch
 {
@@ -845,14 +844,16 @@ void ImageVisual::InitializeRenderer()
 
     bool needToUpdateShader = (!!mNativeTexture) || mUseBrokenImageRenderer;
 
-    if(mTextures.GetTextureCount() >= 3)
+    if(mTextures.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB)
     {
-      if(mTextures.GetTexture(0).GetPixelFormat() == Pixel::L8 && mTextures.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U && mTextures.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
+      if(mTextures.GetTexture(0).GetPixelFormat() == Pixel::L8 &&
+         mTextures.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U &&
+         mTextures.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
       {
         mNeedYuvToRgb      = true;
         needToUpdateShader = true;
       }
-      mNeedYuva = (mTextures.GetTextureCount() == 3) ? false : true;
+      mNeedYuva = (mTextures.GetTextureCount() > TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB) ? true : false;
     }
 
     if(needToUpdateShader)
@@ -1175,14 +1176,16 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
       UpdateNativeTextureInfomation(textureInformation.textureSet);
 
       bool needToUpdateShader = mUseBrokenImageRenderer;
-      if(textureInformation.textureSet.GetTextureCount() >= 3)
+      if(textureInformation.textureSet.GetTextureCount() >= TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB)
       {
-        if(textureInformation.textureSet.GetTexture(0).GetPixelFormat() == Pixel::L8 && textureInformation.textureSet.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U && textureInformation.textureSet.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
+        if(textureInformation.textureSet.GetTexture(0).GetPixelFormat() == Pixel::L8 &&
+           textureInformation.textureSet.GetTexture(1).GetPixelFormat() == Pixel::CHROMINANCE_U &&
+           textureInformation.textureSet.GetTexture(2).GetPixelFormat() == Pixel::CHROMINANCE_V)
         {
           mNeedYuvToRgb      = true;
           needToUpdateShader = true;
         }
-        mNeedYuva = (textureInformation.textureSet.GetTextureCount() == 3) ? false : true;
+        mNeedYuva = (textureInformation.textureSet.GetTextureCount() > TEXTURE_COUNT_FOR_GPU_YUV_TO_RGB) ? true : false;
       }
 
       if(needToUpdateShader)

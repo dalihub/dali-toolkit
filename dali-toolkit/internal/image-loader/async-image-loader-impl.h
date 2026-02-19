@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ public:
    * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param[in] loadPlanes true to load image planes or false to load bitmap image.
    * @return The loading task id
    */
   uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
@@ -82,7 +83,8 @@ public:
                              Dali::ImageDimensions                    desiredSize,
                              Dali::FittingMode::Type                  fittingMode,
                              Dali::SamplingMode::Type                 samplingMode,
-                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                             bool                                     loadPlanes);
 
   /**
    * @brief Starts an image loading task.
