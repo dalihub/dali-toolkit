@@ -68,7 +68,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/visual-string-constants.cpp
    ${toolkit_src_dir}/visuals/visual-url.cpp
    ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
-   ${toolkit_src_dir}/controls/alignment/alignment-impl.cpp
    ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
    ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
@@ -123,7 +122,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/text-controls/text-selection-popup-impl.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-popup-property-handler.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
-   ${toolkit_src_dir}/controls/tool-bar/tool-bar-impl.cpp
    ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
