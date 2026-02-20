@@ -218,21 +218,6 @@ int UtcDaliControlAccessibilityHighlight(void)
   END_TEST;
 }
 
-#include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
-int UtcDaliAccessibilityToolBarConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto toolbar = ToolBar::New();
-  DALI_TEST_CHECK(toolbar);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(toolbar);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::TOOL_BAR, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityPushButtonConstructor(void)
 {
   ToolkitTestApplication application;
@@ -415,20 +400,6 @@ int UtcDaliAccessibilityPopupGetNameRaw(void)
   // Test with AccessibilityName property set - this should override GetNameRaw
   popup.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
   DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliAccessibilityAlignmentConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto alignment = Alignment::New();
-  DALI_TEST_CHECK(alignment);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(alignment);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
 
   END_TEST;
 }
