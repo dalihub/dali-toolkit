@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <cstdint> ///< for uint32_t
 #include <string>
 
 // INTERNAL INCLUDES
