@@ -217,11 +217,12 @@ void LoadingTask::Load()
   Devel::PixelBuffer pixelBuffer;
   if(animatedImageLoading)
   {
+    bool planeLoaded = false;
     if(loadPlanes)
     {
-      animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, dimensions);
+      planeLoaded = animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, dimensions);
     }
-    else
+    if(!planeLoaded)
     {
       pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
     }
