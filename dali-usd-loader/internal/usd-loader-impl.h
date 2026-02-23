@@ -35,7 +35,7 @@ public:
   /**
    * @copydoc Dali::Scene3D::Loader::Internal::ModelLoaderImpl::LoadMode()
    */
-  bool LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result) override;
+  bool LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result) override;
 
 private:
   struct Impl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,12 +121,12 @@ int UtcDaliShaderOptionGetDefines(void)
     option.AddOption(types[i]);
     DALI_TEST_EQUALS(option.GetOptionHash(), hash, TEST_LOCATION);
 
-    std::vector<std::string> defines;
+    std::vector<Dali::String> defines;
     option.GetDefines(defines);
     DALI_TEST_EQUALS(defines.size(), i + 1, TEST_LOCATION);
     for(uint32_t j = 0; j < defines.size(); ++j)
     {
-      DALI_TEST_EQUALS(defines[j], option.GetDefineKeyword(types[j]), TEST_LOCATION);
+      DALI_TEST_EQUALS(std::string(defines[j].CStr()), std::string(option.GetDefineKeyword(types[j]).Data()), TEST_LOCATION);
     }
   }
 

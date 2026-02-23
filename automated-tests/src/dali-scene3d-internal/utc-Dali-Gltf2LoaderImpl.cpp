@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 #include <dali-scene3d/public-api/loader/shader-manager.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include <string_view>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 #define DALI_TEST_THROW(expression, exception, predicate) \
   {                                                       \
@@ -585,7 +587,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
     resources.mEnvironmentMaps.push_back({});
 
     printf("%s\n", modelName);
-    ctx.loader.LoadModel(resourcePath + modelName + ".gltf", ctx.loadResult);
+    ctx.loader.LoadModel(ToDaliString(resourcePath + modelName + ".gltf"), ctx.loadResult);
     DALI_TEST_CHECK(ctx.scene.GetNodeCount() > 0);
 
     auto& scene = ctx.scene;
@@ -625,7 +627,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
       {
         if(visitor.receiver.mCounts[i0])
         {
-          auto raw = resources.mMeshes[i0].first.LoadRaw(resourcePath, resources.mBuffers);
+          auto raw = resources.mMeshes[i0].first.LoadRaw(ToDaliString(resourcePath), resources.mBuffers);
           DALI_TEST_CHECK(!raw.mAttribs.empty());
 
           resources.mMeshes[i0].second = resources.mMeshes[i0].first.Load(std::move(raw));
@@ -688,7 +690,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
   DALI_TEST_EQUAL(root.GetChildCount(), 1u);
   Actor child = root.GetChildAt(0);
 
-  DALI_TEST_EQUAL(child.GetProperty(Actor::Property::NAME).Get<std::string>(), "RootNode");
+  DALI_TEST_EQUAL(child.GetProperty(Actor::Property::NAME).Get<Dali::String>(), Dali::String("RootNode"));
   DALI_TEST_EQUAL(child.GetProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3(1.0f, 1.0f, 1.0f));
   DALI_TEST_EQUAL(child.GetRendererCount(), 1u);
   DALI_TEST_EQUAL(child.GetRendererAt(0).GetTextures().GetTextureCount(), 5u);

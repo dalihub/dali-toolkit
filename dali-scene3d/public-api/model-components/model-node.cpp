@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/custom-actor.h>
 
 // INTERNAL INCLUDES
@@ -113,19 +114,26 @@ ModelPrimitive ModelNode::GetModelPrimitive(uint32_t index) const
   return Internal::GetImplementation(*this).GetModelPrimitive(index);
 }
 
-ModelNode ModelNode::FindChildModelNodeByName(std::string_view nodeName)
+ModelNode ModelNode::FindChildModelNodeByName(Dali::StringView nodeName)
 {
-  return Internal::GetImplementation(*this).FindChildModelNodeByName(nodeName);
+  return Internal::GetImplementation(*this).FindChildModelNodeByName(Dali::Integration::ToStdStringView(nodeName));
 }
 
-void ModelNode::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
+void ModelNode::RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const
 {
-  return Internal::GetImplementation(*this).RetrieveBlendShapeNames(blendShapeNames);
+  std::vector<std::string> stdNames;
+  Internal::GetImplementation(*this).RetrieveBlendShapeNames(stdNames);
+  blendShapeNames.clear();
+  blendShapeNames.reserve(stdNames.size());
+  for(auto& name : stdNames)
+  {
+    blendShapeNames.push_back(Dali::Integration::ToDaliString(name));
+  }
 }
 
-Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view blendShapeName) const
+Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(Dali::StringView blendShapeName) const
 {
-  return Internal::GetImplementation(*this).GetBlendShapeIndexByName(blendShapeName);
+  return Internal::GetImplementation(*this).GetBlendShapeIndexByName(Dali::Integration::ToStdStringView(blendShapeName));
 }
 
 void ModelNode::SetColliderMesh(UniquePtr<Algorithm::ColliderMesh>&& colliderMesh)

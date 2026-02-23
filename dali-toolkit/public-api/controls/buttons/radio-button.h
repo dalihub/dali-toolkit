@@ -148,7 +148,7 @@ public:
    * @param[in] label The button label
    * @return A handle to a newly allocated Dali resource
    */
-  static RadioButton New(const std::string& label);
+  static RadioButton New(const Dali::String& label);
 
   /**
    * @brief Downcasts a handle to RadioButton handle.

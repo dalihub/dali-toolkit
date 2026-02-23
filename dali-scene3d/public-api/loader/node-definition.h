@@ -75,8 +75,8 @@ public:
  */
 struct DALI_SCENE3D_API ConstraintDefinition
 {
-  std::string mProperty;  ///< name of the property to constrain.
-  Index       mSourceIdx; ///< index of the node to serve as the source of the constraint.
+  Dali::String mProperty;  ///< name of the property to constrain.
+  Index        mSourceIdx; ///< index of the node to serve as the source of the constraint.
 
   bool operator<(const ConstraintDefinition& other) const
   {
@@ -123,7 +123,7 @@ struct DALI_SCENE3D_API SkinningShaderConfigurationRequest
  */
 struct DALI_SCENE3D_API BlendshapeShaderConfigurationRequest
 {
-  std::string    mNodeName;
+  Dali::String   mNodeName;
   Index          mMeshIdx;
   Shader         mShader;
   ModelPrimitive mPrimitive;
@@ -187,7 +187,7 @@ public: // TYPES
 
   struct CustomizationDefinition
   {
-    std::string mTag;
+    Dali::String mTag;
 
     Index GetChildId(const Customization::Choices& choices, const NodeDefinition& node)
     {
@@ -219,7 +219,7 @@ public: // TYPES
 
   struct Extra
   {
-    std::string     mKey;
+    Dali::String    mKey;
     Property::Value mValue;
 
     bool operator<(const Extra& other) const
@@ -258,33 +258,33 @@ public: // METHODS
    *
    * This uniform name can be used to change scale factor for ibl.
    * @SINCE_2_1.32
-   * @return std::string_view of the scale factor uniform name.
+   * @return Dali::StringView of the scale factor uniform name.
    */
-  static std::string_view GetIblScaleFactorUniformName();
+  static Dali::StringView GetIblScaleFactorUniformName();
 
   /**
    * @brief Retrieves ibl Ydirection uniform name.
    *
    * This uniform name can be used to flip y direction of ibl in shader.
    * @SINCE_2_1.32
-   * @return std::string_view of the YDirection uniform name.
+   * @return Dali::StringView of the YDirection uniform name.
    */
-  static std::string_view GetIblYDirectionUniformName();
+  static Dali::StringView GetIblYDirectionUniformName();
 
   /**
    * @brief Retrieves ibl MaxLod uniform name.
    *
    * This uniform name can be used to set max lod of ibl in shader.
    * @SINCE_2_2.19
-   * @return std::string_view of the Max Lod uniform name.
+   * @return Dali::StringView of the Max Lod uniform name.
    */
-  static std::string_view GetIblMaxLodUniformName();
+  static Dali::StringView GetIblMaxLodUniformName();
 
 public: // DATA
   static const char* ORIGINAL_MATRIX_PROPERTY_NAME;
 
-  std::string mName;
-  uint32_t    mNodeId = INVALID_INDEX;
+  Dali::String mName;
+  uint32_t     mNodeId = INVALID_INDEX;
 
   Vector3    mPosition    = Vector3::ZERO;
   Quaternion mOrientation = Quaternion::IDENTITY;

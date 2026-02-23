@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ int UtcDaliTextEditorMarkupUnderlineAttributes(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText =
+  String testText =
     "start<u>ABC1</u>then"
     "<u type='solid'>ABC2</u>then"
     "<u type='dashed'>ABC3</u>then"
@@ -148,7 +148,7 @@ int UtcDaliTextEditorMarkupUnderlineAttributes(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -312,7 +312,7 @@ int UtcDaliTextEditorMarkupUnderlineAttributes(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -330,7 +330,7 @@ int UtcDaliTextEditorMarkupSpanUnderline(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText =
+  String testText =
     "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
     "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>then"
     "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>then"
@@ -360,7 +360,7 @@ int UtcDaliTextEditorMarkupSpanUnderline(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -507,7 +507,7 @@ int UtcDaliTextEditorMarkupSpanUnderline(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -525,7 +525,7 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText = "start<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>end";
+  String testText = "start<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>end";
 
   textEditor.SetProperty(TextEditor::Property::TEXT, testText);
   textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
@@ -546,7 +546,7 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -591,7 +591,7 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -609,7 +609,7 @@ int UtcDaliTextEditorMarkupNestedStrikethroughTags(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
+  String testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
 
   textEditor.SetProperty(TextEditor::Property::TEXT, testText);
   textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
@@ -630,7 +630,7 @@ int UtcDaliTextEditorMarkupNestedStrikethroughTags(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -663,7 +663,7 @@ int UtcDaliTextEditorMarkupNestedStrikethroughTags(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -681,7 +681,7 @@ int UtcDaliTextEditorMarkupStrikethroughAttributes(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText =
+  String testText =
     "start<s>ABC1</s>then"
     "<s color='green'>ABC2</s>then"
     "<s height='5.0f'>ABC3</s>then"
@@ -706,7 +706,7 @@ int UtcDaliTextEditorMarkupStrikethroughAttributes(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -750,7 +750,7 @@ int UtcDaliTextEditorMarkupStrikethroughAttributes(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -768,7 +768,7 @@ int UtcDaliTextEditorMarkupSpanStrikethrough(void)
 
   application.GetScene().Add(textEditor);
 
-  std::string testText =
+  String testText =
     "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
     "<span s-color='blue'>ABC2</span>then"
     "<span s-height='2.0f'>ABC3</span>then"
@@ -793,7 +793,7 @@ int UtcDaliTextEditorMarkupSpanStrikethrough(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -829,7 +829,7 @@ int UtcDaliTextEditorMarkupSpanStrikethrough(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -1205,8 +1205,8 @@ int UtcDaliTextEditorMarkupParagraphTagAlignAttribute(void)
   // Using the same text to gain similar results from both the property level and the markup.
   // Compare line alignment between the property level and the markup.
 
-  std::string textAlignOnPropertyLevel = "text outside<p>Paragraph end</p>text outside<p>Paragraph center</p>text outside<p>Paragraph begin</p><p>Paragraph property alignment</p>";
-  std::string textAlignInMarkup        = "text outside<p align='end'>Paragraph end</p>text outside<p align='center'>Paragraph center</p>text outside<p align='begin' >Paragraph begin</p><p>Paragraph property alignment</p>";
+  String textAlignOnPropertyLevel = "text outside<p>Paragraph end</p>text outside<p>Paragraph center</p>text outside<p>Paragraph begin</p><p>Paragraph property alignment</p>";
+  String textAlignInMarkup        = "text outside<p align='end'>Paragraph end</p>text outside<p align='center'>Paragraph center</p>text outside<p align='begin' >Paragraph begin</p><p>Paragraph property alignment</p>";
 
   //Set size to avoid automatic eliding
   Vector2 controllerSize = Vector2(1025, 1025);
@@ -1393,7 +1393,7 @@ int UtcDaliTextEditorMarkupSpanCharacterSpacing(void)
   const float expandedCharSpacing  = 10.0f;
   const float condensedCharSpacing = -5.0f;
 
-  std::string testText =
+  String testText =
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='blue' >ABC EF\n</span>"
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' char-space-value='-5.0f'>ABC EF\n</span>"
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='green' char-space-value='10.0f'>ABC EF\n</span>";

@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/compile-time-math.h>
 
 #include <algorithm>
@@ -29,6 +30,9 @@
 #include <fstream>
 #include <functional>
 #include <type_traits>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Scene3D::Loader
 {
@@ -826,7 +830,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
 std::iostream& GetAvailableData(std::iostream* meshStream, const std::string& meshPath, BufferDefinition& buffer, std::string& availablePath)
 {
   auto& stream  = meshStream ? *meshStream : buffer.GetBufferStream();
-  availablePath = meshStream ? meshPath : buffer.GetUri();
+  availablePath = meshStream ? meshPath : ToStdString(buffer.GetUri());
   return stream;
 }
 
@@ -842,7 +846,7 @@ void ReadTypedVectorAccessors(LoadAccessorListInputs loadAccessorListInputs, Loa
     name << attributeName << setIndex++;
     std::vector<uint8_t> buffer;
     ReadTypedVectorAccessor<needsNormalize>(loadDataType, accessor, dataStream, buffer);
-    loadAccessorListInputs.rawData.mAttribs.push_back({name.str(), Property::VECTOR4, static_cast<uint32_t>(buffer.size() / sizeof(Vector4)), std::move(buffer)});
+    loadAccessorListInputs.rawData.mAttribs.push_back({ToDaliString(name.str()), Property::VECTOR4, static_cast<uint32_t>(buffer.size() / sizeof(Vector4)), std::move(buffer)});
   }
 }
 
@@ -1434,8 +1438,8 @@ void MeshDefinition::Blob::ApplyMinMax(uint32_t count, float* values, std::vecto
 void MeshDefinition::RawData::Attrib::AttachBuffer(Geometry& g) const
 {
   Property::Map attribMap;
-  attribMap[mName]          = mType;
-  VertexBuffer attribBuffer = VertexBuffer::New(attribMap);
+  attribMap[ToDaliString(mName)] = mType;
+  VertexBuffer attribBuffer      = VertexBuffer::New(attribMap);
   attribBuffer.SetData(mData.data(), mNumElements);
 
   g.AddVertexBuffer(attribBuffer);
@@ -1482,7 +1486,7 @@ void MeshDefinition::RequestTangents()
 }
 
 MeshDefinition::RawData
-MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers)
+MeshDefinition::LoadRaw(const Dali::String& modelsPath, BufferDefinition::Vector& buffers)
 {
   RawData raw;
   if(IsQuad())
@@ -1491,11 +1495,11 @@ MeshDefinition::LoadRaw(const std::string& modelsPath, BufferDefinition::Vector&
   }
 
   std::string meshPath;
-  meshPath = modelsPath + mUri;
+  meshPath = ToStdString(modelsPath) + ToStdString(mUri);
 
   std::unique_ptr<Dali::FileStream> daliFileStream(nullptr);
   std::iostream*                    fileStream = nullptr;
-  if(!mUri.empty())
+  if(!mUri.Empty())
   {
     daliFileStream.reset(new Dali::FileStream(meshPath, FileStream::READ | FileStream::BINARY));
     fileStream = &daliFileStream->GetStream();

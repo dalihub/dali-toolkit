@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,9 +83,9 @@ void dali_textselectionpopupmirroringltr_cleanup(void)
 int UtcDaliToolkitTextSelectionPopupMirroringLTR(void)
 {
   // Test the popup mirroring.
-  const std::string CUT("optionCut");
-  const std::string COPY("optionCopy");
-  const std::string PASTE("optionPaste");
+  const String CUT("optionCut");
+  const String COPY("optionCopy");
+  const String PASTE("optionPaste");
 
   ToolkitTestApplication application;
 
@@ -115,9 +115,9 @@ int UtcDaliToolkitTextSelectionPopupMirroringLTR(void)
   }
 
   // The order should be COPY, CUT, PASTE
-  DALI_TEST_EQUALS(COPY, tableOfButtons.GetChildAt(0).GetProperty<std::string>(Dali::Actor::Property::NAME), TEST_LOCATION);
-  DALI_TEST_EQUALS(CUT, tableOfButtons.GetChildAt(2).GetProperty<std::string>(Dali::Actor::Property::NAME), TEST_LOCATION);
-  DALI_TEST_EQUALS(PASTE, tableOfButtons.GetChildAt(4).GetProperty<std::string>(Dali::Actor::Property::NAME), TEST_LOCATION);
+  DALI_TEST_EQUALS(COPY, tableOfButtons.GetChildAt(0).GetProperty<Dali::String>(Dali::Actor::Property::NAME), TEST_LOCATION);
+  DALI_TEST_EQUALS(CUT, tableOfButtons.GetChildAt(2).GetProperty<Dali::String>(Dali::Actor::Property::NAME), TEST_LOCATION);
+  DALI_TEST_EQUALS(PASTE, tableOfButtons.GetChildAt(4).GetProperty<Dali::String>(Dali::Actor::Property::NAME), TEST_LOCATION);
 
   tet_result(TET_PASS);
   END_TEST;

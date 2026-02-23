@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_SCENE_VIEW_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,7 +305,7 @@ public:
    *
    * @return CameraActor that has the name as a Dali::Actor::Property::NAME
    */
-  CameraActor GetCamera(const std::string& name) const;
+  CameraActor GetCamera(const Dali::String& name) const;
 
   /**
    * @brief Makes SceneView use a CameraActor of index as a selected camera.
@@ -323,7 +323,7 @@ public:
    * @param[in] name string keyword of CameraActor to be used as a selected camera.
    * @note If the Camera is not added in this Scene, this method adds it on SceneView root.
    */
-  void SelectCamera(const std::string& name);
+  void SelectCamera(const Dali::String& name);
 
   /**
    * @brief Starts camera transition from currently selected camera to a camera of index.
@@ -351,7 +351,7 @@ public:
    * During camera transition, Selected Camera should not be changed by using SelectCamera() or StartCameraTransition() method.
    * During camera transition, Camera properties of Selected Camera should not be changed.
    */
-  void StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction = AlphaFunction::DEFAULT);
+  void StartCameraTransition(Dali::String name, float durationSeconds, Dali::AlphaFunction alphaFunction = AlphaFunction::DEFAULT);
 
   /**
    * @brief Sets Image Based Light Source to apply it on the all Models those added on this SceneView.
@@ -365,7 +365,7 @@ public:
    * @param[in] specularUrl cube map that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
    */
-  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor = 1.0f);
+  void SetImageBasedLightSource(const Dali::String& diffuseUrl, const Dali::String& specularUrl, float scaleFactor = 1.0f);
 
   /**
    * @brief Sets Scale Factor of Image Based Light Source.
@@ -485,7 +485,7 @@ public:
    * @param[in] skyboxUrl image url for skybox.
    * @note Default SkyboxEnvironmentMapType is Cube Map. Use SetSkyboxEnvironmentMapType method to set type explicitly.
    */
-  void SetSkybox(const std::string& skyboxUrl);
+  void SetSkybox(const Dali::String& skyboxUrl);
 
   /**
    * @brief Sets Skybox environment map type for this skybox.

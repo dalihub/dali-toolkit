@@ -23,10 +23,12 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <limits> ///< for std::numeric_limits
 
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 namespace Dali::Scene3D::Loader::Internal
 {
@@ -535,8 +537,8 @@ void ConvertBuffer(const gltf2::Buffer& buffer, decltype(ResourceBundle::mBuffer
 {
   BufferDefinition bufferDefinition;
 
-  bufferDefinition.mResourcePath = resourcePath;
-  bufferDefinition.mUri          = buffer.mUri;
+  bufferDefinition.mResourcePath = ToDaliString(resourcePath);
+  bufferDefinition.mUri          = ToDaliString(buffer.mUri);
   bufferDefinition.mByteLength   = buffer.mByteLength;
 
   outBuffers.emplace_back(std::move(bufferDefinition));
@@ -613,7 +615,7 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
   }
   else
   {
-    return TextureDefinition{uri, ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode, textureInfo.mTextureExtensions.mTextureTransform.GetTransform()};
+    return TextureDefinition{ToDaliString(uri), ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode, textureInfo.mTextureExtensions.mTextureTransform.GetTransform()};
   }
 }
 
@@ -628,13 +630,13 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
   materialDefinition.mFlags |= semantic;
 }
 
-void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<std::string, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
+void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<Dali::String, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<std::string, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
+  auto getTextureMetaData = [](const std::unordered_map<Dali::String, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
   {
     if(!info.mTexture->mSource->mUri.empty())
     {
-      if(auto search = metaData.find(info.mTexture->mSource->mUri.data()); search != metaData.end())
+      if(auto search = metaData.find(Dali::String(info.mTexture->mSource->mUri.data())); search != metaData.end())
       {
         return search->second;
       }
@@ -1078,15 +1080,15 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
           // Get blendshape name from extras / SXR_targets_names / avatar_shape_names.
           if(blendShapeIndex < mesh.mExtras.mTargetNames.size())
           {
-            blendShape.name = mesh.mExtras.mTargetNames[blendShapeIndex];
+            blendShape.name = ToDaliString(mesh.mExtras.mTargetNames[blendShapeIndex]);
           }
           else if(blendShapeIndex < mesh.mExtensions.mSXRTargetsNames.size())
           {
-            blendShape.name = mesh.mExtensions.mSXRTargetsNames[blendShapeIndex];
+            blendShape.name = ToDaliString(mesh.mExtensions.mSXRTargetsNames[blendShapeIndex]);
           }
           else if(blendShapeIndex < mesh.mExtensions.mAvatarShapeNames.size())
           {
-            blendShape.name = mesh.mExtensions.mAvatarShapeNames[blendShapeIndex];
+            blendShape.name = ToDaliString(mesh.mExtensions.mAvatarShapeNames[blendShapeIndex]);
           }
 
           meshDefinition.mBlendShapes.push_back(std::move(blendShape));
@@ -1158,7 +1160,7 @@ void ConvertCamera(const gltf2::Camera& camera, CameraParameters& cameraParamete
     cameraParameters.zFar  = ortho.mZFar;
   }
 
-  cameraParameters.name = std::string(camera.mName);
+  cameraParameters.name = ToDaliString(camera.mName);
 }
 
 void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentIndex, ConversionContext& context, bool isMRendererModel)
@@ -1173,11 +1175,11 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
     Dali::UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
-    nodeDefinition->mName      = node.mName;
-    if(nodeDefinition->mName.empty())
+    nodeDefinition->mName      = ToDaliString(node.mName);
+    if(nodeDefinition->mName.Empty())
     {
       // TODO: Production quality generation of unique names.
-      nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get()));
+      nodeDefinition->mName = ToDaliString(std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get())));
     }
 
     if(!node.mSkin) // Nodes with skinned meshes are not supposed to have local transforms.
@@ -1254,7 +1256,7 @@ void ConvertSceneNodes(const gltf2::Scene& scene, ConversionContext& context, bo
     default:
     {
       Dali::UniquePtr<NodeDefinition> sceneRoot{new NodeDefinition()};
-      sceneRoot->mName = "GLTF_LOADER_SCENE_ROOT_" + std::to_string(outScene.GetRoots().size());
+      sceneRoot->mName = ToDaliString("GLTF_LOADER_SCENE_ROOT_" + std::to_string(outScene.GetRoots().size()));
 
       outScene.AddNode(std::move(sceneRoot));
       outScene.AddRootNode(rootIndex);
@@ -1377,7 +1379,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
 
     animatedProperty.mNodeIndex = nodeIndex;
     snprintf(pWeightName, remainingSize, "%d]", weightIndex);
-    animatedProperty.mPropertyName = std::string(weightNameBuffer);
+    animatedProperty.mPropertyName = ToDaliString(std::string(weightNameBuffer));
 
     animatedProperty.mKeyFrames = KeyFrames::New();
 
@@ -1404,7 +1406,7 @@ float LoadAnimation(AnimationDefinition& animationDefinition, Index nodeIndex, I
 {
   AnimatedProperty animatedProperty;
   animatedProperty.mNodeIndex    = nodeIndex;
-  animatedProperty.mPropertyName = propertyName;
+  animatedProperty.mPropertyName = ToDaliString(propertyName);
 
   animatedProperty.mKeyFrames  = KeyFrames::New();
   float duration               = LoadKeyFrames<T>(context, channel, animatedProperty.mKeyFrames, channel.mTarget.mPath);

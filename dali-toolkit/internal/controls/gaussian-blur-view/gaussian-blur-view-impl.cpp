@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -39,6 +40,8 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::ToDaliStringView;
 
 // TODO:
 // pixel format / size - set from JSON
@@ -600,11 +603,11 @@ void GaussianBlurView::SetShaderConstants()
   // set shader constants
   for(unsigned int i = 0; i < numSamples; ++i)
   {
-    mHorizontalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(uvOffsets[i] / mDownsampledWidth, 0.0f));
-    mHorizontalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);
+    mHorizontalBlurActor.RegisterProperty(ToDaliStringView(GetSampleOffsetsPropertyName(i)), Vector2(uvOffsets[i] / mDownsampledWidth, 0.0f));
+    mHorizontalBlurActor.RegisterProperty(ToDaliStringView(GetSampleWeightsPropertyName(i)), weights[i]);
 
-    mVerticalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(0.0f, uvOffsets[i] / mDownsampledHeight));
-    mVerticalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);
+    mVerticalBlurActor.RegisterProperty(ToDaliStringView(GetSampleOffsetsPropertyName(i)), Vector2(0.0f, uvOffsets[i] / mDownsampledHeight));
+    mVerticalBlurActor.RegisterProperty(ToDaliStringView(GetSampleWeightsPropertyName(i)), weights[i]);
   }
 }
 

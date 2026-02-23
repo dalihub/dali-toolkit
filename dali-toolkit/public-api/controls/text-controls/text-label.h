@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -395,7 +395,7 @@ public:
    * @param[in] text The text to display
    * @return A handle to the TextLabel control
    */
-  static TextLabel New(const std::string& text);
+  static TextLabel New(const Dali::String& text);
 
   /**
    * @brief Creates the TextLabel control with additional behaviour.
@@ -414,7 +414,7 @@ public:
    * @param[in] text The text to display
    * @return A handle to the TextLabel control
    */
-  static TextLabel New(ControlBehaviour additionalBehaviour, const std::string& text);
+  static TextLabel New(ControlBehaviour additionalBehaviour, const Dali::String& text);
 
   /**
    * @brief Creates an empty handle.

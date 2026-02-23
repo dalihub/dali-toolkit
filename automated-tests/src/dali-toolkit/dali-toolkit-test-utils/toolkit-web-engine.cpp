@@ -38,6 +38,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
@@ -46,6 +47,8 @@
 #include <string.h>
 #include <toolkit-application.h>
 #include <memory>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -1628,7 +1631,7 @@ public:
 
   bool AddResponseHeader(const std::string& fieldName, const std::string& fieldValue) override
   {
-    mockHeadersMap.Add(fieldName, fieldValue);
+    mockHeadersMap.Add(ToDaliString(fieldName), ToDaliString(fieldValue));
     return true;
   }
 

@@ -22,8 +22,10 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
 using namespace Dali::Toolkit;
 
 int UtcDaliRenderEffectNewP(void)
@@ -789,13 +791,13 @@ int UtcDaliRenderEffectSynchronizeControlCornerRadius(void)
 
   Renderer renderer = control.GetRendererAt(1u);
   Vector4  radius   = Vector4::ZERO;
-  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadius"))).Get(radius);
+  renderer.GetProperty(renderer.GetPropertyIndex(Dali::String("uCornerRadius"))).Get(radius);
 
   Vector4 squreness = Vector4::ZERO;
-  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerSquareness"))).Get(squreness);
+  renderer.GetProperty(renderer.GetPropertyIndex(Dali::String("uCornerSquareness"))).Get(squreness);
 
   Toolkit::Visual::Transform::Policy::Type policy;
-  renderer.GetProperty(renderer.GetPropertyIndex(std::string("uCornerRadiusPolicy"))).Get(policy);
+  renderer.GetProperty(renderer.GetPropertyIndex(Dali::String("uCornerRadiusPolicy"))).Get(policy);
   DALI_TEST_CHECK(policy == Visual::Transform::Policy::Type::ABSOLUTE);
 
   DALI_TEST_CHECK(radius.x == 30.0f);

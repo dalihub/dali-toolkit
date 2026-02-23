@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -30,6 +31,9 @@
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
+
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -278,7 +282,7 @@ Dali::Scene3D::ModelPrimitive ModelNode::GetModelPrimitive(uint32_t index) const
 
 Scene3D::ModelNode ModelNode::FindChildModelNodeByName(std::string_view nodeName)
 {
-  Actor childActor = Self().FindChildByName(nodeName);
+  Actor childActor = Self().FindChildByName(ToDaliStringView(nodeName));
   return Scene3D::ModelNode::DownCast(childActor);
 }
 
@@ -387,9 +391,9 @@ void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData&&
   for(Loader::BlendShapes::Index index = 0u; index < blendShapeCount; ++index)
   {
     auto& name = data.names[index];
-    if(!name.empty())
+    if(!name.Empty())
     {
-      mBlendShapeIndexMap[name] = index;
+      mBlendShapeIndexMap[ToStdString(name)] = index;
     }
   }
 
@@ -436,7 +440,7 @@ void ModelNode::UpdateBoneMatrix(Scene3D::ModelPrimitive primitive)
       boneData.constraint.Reset();
     }
 
-    auto propBoneXform = renderer.GetPropertyIndex(boneData.propertyName);
+    auto propBoneXform = renderer.GetPropertyIndex(Dali::StringView(boneData.propertyName));
     if(propBoneXform == Property::INVALID_INDEX)
     {
       propBoneXform = renderer.RegisterProperty(boneData.propertyName, Matrix{false});

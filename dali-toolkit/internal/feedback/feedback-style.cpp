@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/object-registry.h>
 
@@ -141,7 +142,7 @@ void FeedbackStyle::ObjectCreated(BaseHandle handle)
 {
   if(handle)
   {
-    const std::string& type = handle.GetTypeName();
+    const std::string type = Dali::Integration::ToStdString(handle.GetTypeName());
 
     const FeedbackStyleInfo styleInfo = GetStyleInfo(type);
 
@@ -155,7 +156,7 @@ void FeedbackStyle::ObjectCreated(BaseHandle handle)
            !info.mSoundFeedbackPattern.empty() || !info.mSoundFeedbackFile.empty())
         {
           handle.ConnectSignal(this,
-                               info.mSignalName,
+                               Dali::Integration::ToDaliStringView(info.mSignalName),
                                PlayFeedbackFromSignal(*this, type, info.mSignalName));
 
           DALI_LOG_INFO(gLogFilter, Debug::Verbose, "FeedbackStyle::Set found Haptic pattern %s for Object type: %s, Signal Type: %s\n", info.mHapticFeedbackPattern.c_str(), type.c_str(), info.mSignalName.c_str());

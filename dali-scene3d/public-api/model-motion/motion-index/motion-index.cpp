@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
 // CLASS HEADER
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-index.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-motion/motion-index/motion-index-impl.h>
@@ -63,9 +66,9 @@ Property::Key MotionIndex::GetModelNodeId() const
   return GetImplementation(*this).GetModelNodeId();
 }
 
-std::string MotionIndex::GetPropertyName(ModelNode node)
+Dali::String MotionIndex::GetPropertyName(ModelNode node)
 {
-  return GetImplementation(*this).GetPropertyName(node);
+  return Dali::Integration::ToDaliString(GetImplementation(*this).GetPropertyName(node));
 }
 
 Property::Index MotionIndex::GetPropertyIndex(ModelNode node)

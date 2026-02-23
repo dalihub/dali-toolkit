@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,13 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/property-bridge/property-bridge.h>
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_property_bridge_startup(void)
 {
   test_return_value = TET_UNDEF;

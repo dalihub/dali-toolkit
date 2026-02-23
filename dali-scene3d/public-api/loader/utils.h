@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_UTILS_H_
 #define DALI_SCENE3D_LOADER_UTILS_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <cctype>
 #include <sstream>
@@ -65,6 +66,12 @@ public:
     return *this;
   }
 
+  ExceptionFlinger& operator<<(const Dali::String& rhs) noexcept(true)
+  {
+    mStream << rhs.CStr();
+    return *this;
+  }
+
 private:
   struct Impl
   {
@@ -81,10 +88,10 @@ private:
 };
 
 /**
- * @brief Formats the given printf-style varargs into a std::string.
+ * @brief Formats the given printf-style varargs into a Dali::String.
  * @SINCE_2_0.7
  */
-DALI_SCENE3D_API std::string FormatString(const char* format, ...);
+DALI_SCENE3D_API Dali::String FormatString(const char* format, ...);
 
 /**
  * @brief The @n th bit in a bitmask.
@@ -134,12 +141,13 @@ inline DALI_SCENE3D_API bool CaseInsensitiveCharacterCompare(unsigned char a, un
  * @param[in] a compare string
  * @param[in] b compare string
  */
-inline DALI_SCENE3D_API bool CaseInsensitiveStringCompare(const std::string& a, const std::string& b)
+inline DALI_SCENE3D_API bool CaseInsensitiveStringCompare(const Dali::String& a, const Dali::String& b)
 {
   bool result = false;
-  if(a.length() == b.length())
+  if(a.Size() == b.Size())
   {
-    result = std::equal(a.begin(), a.end(), b.begin(), &CaseInsensitiveCharacterCompare);
+    const char* aEnd = a.CStr() + a.Size() + 1;
+    result           = std::equal(a.CStr(), aEnd, b.CStr(), &CaseInsensitiveCharacterCompare);
   }
   return result;
 }
@@ -151,7 +159,7 @@ inline DALI_SCENE3D_API bool CaseInsensitiveStringCompare(const std::string& a, 
  * (should only be checked if the returned string was empty()).
  * @SINCE_2_0.7
  */
-DALI_SCENE3D_API std::string LoadTextFile(const char* path, bool* fail = nullptr);
+DALI_SCENE3D_API Dali::String LoadTextFile(const char* path, bool* fail = nullptr);
 
 /**
  * @brief Makes a number of calls to @a fn, passing to each one the given @a actor then each of its children, in depth-first traversal.
@@ -205,7 +213,7 @@ DALI_SCENE3D_API Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type opt
  * @SINCE_2_0.7
  * @param[in,out] path The path to be fixed.
  */
-DALI_SCENE3D_API void ToUnixFileSeparators(std::string& path);
+DALI_SCENE3D_API void ToUnixFileSeparators(Dali::String& path);
 
 } // namespace Dali::Scene3D::Loader
 

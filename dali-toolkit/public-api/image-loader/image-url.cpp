@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/image-loader/image-url-impl.h>
+#include <dali/integration-api/string-utils.h>
 
 namespace Dali
 {
@@ -57,7 +58,7 @@ ImageUrl::ImageUrl(ImageUrl&& rhs) noexcept = default;
 
 ImageUrl& ImageUrl::operator=(ImageUrl&& rhs) noexcept = default;
 
-const std::string& ImageUrl::GetUrl() const
+const Dali::String& ImageUrl::GetUrl() const
 {
   return GetImpl(*this).GetUrl();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -71,8 +75,8 @@ DALI_PROPERTY_REGISTRATION(Toolkit, ConfirmationPopup, ControlDetails[1].connect
 
 // Note: We do not use the macros for signal registration as we do not want to redefine the signal name strings.
 // We have predefined them for optimal signal name to control name lookup.
-SignalConnectorType signalConnector1(typeRegistration, ControlDetails[0].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
-SignalConnectorType signalConnector2(typeRegistration, ControlDetails[1].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
+SignalConnectorType signalConnector1(typeRegistration, Dali::String(ControlDetails[0].signalName), &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
+SignalConnectorType signalConnector2(typeRegistration, Dali::String(ControlDetails[1].signalName), &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -122,12 +126,12 @@ void ConfirmationPopup::SetProperty(BaseObject* object, Property::Index property
     {
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED:
       {
-        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK, value.Get<std::string>());
+        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK, ToStdString(value));
         break;
       }
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED:
       {
-        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL, value.Get<std::string>());
+        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL, ToStdString(value));
         break;
       }
     }
@@ -148,12 +152,12 @@ Property::Value ConfirmationPopup::GetProperty(BaseObject* object, Property::Ind
     {
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED:
       {
-        value = popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK);
+        value = ToPropertyValue(popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK));
         break;
       }
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED:
       {
-        value = popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL);
+        value = ToPropertyValue(popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL));
         break;
       }
     }
@@ -180,13 +184,13 @@ std::string ConfirmationPopup::GetControlSignalName(unsigned int controlNumber) 
   return "";
 }
 
-bool ConfirmationPopup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ConfirmationPopup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle           handle(object);
   Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast(handle);
 
   // Look up the requested signal, attempting to create it dynamically if it doesn't exist.
-  SignalDelegate* signalDelegate = Dali::Toolkit::GetDerivedImplementation(popup).GetControlSignal(signalName);
+  SignalDelegate* signalDelegate = Dali::Toolkit::GetDerivedImplementation(popup).GetControlSignal(std::string(signalName.CStr()));
   if(signalDelegate)
   {
     // The signal delegate was created successfully, attempt to connect it to a callback if specified.

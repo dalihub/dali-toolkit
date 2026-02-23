@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LOADER_BVH_LOADER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Dali::Scene3D::Loader
  * @param[in] scale The scale factor to set on the position property manually.
  * @return AnimationDefinition that includes joint animation information.
  */
-DALI_SCENE3D_API AnimationDefinition LoadBvh(const std::string& path, const std::string& animationName, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE);
+DALI_SCENE3D_API AnimationDefinition LoadBvh(const Dali::String& path, const Dali::String& animationName, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE);
 
 /**
  * @brief Loads motion capture data from bvh data stream.
@@ -46,7 +46,7 @@ DALI_SCENE3D_API AnimationDefinition LoadBvh(const std::string& path, const std:
  * @param[in] scale The scale factor to set on the position property manually.
  * @return AnimationDefinition that includes joint animation information.
  */
-DALI_SCENE3D_API AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const std::string& animationName, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE);
+DALI_SCENE3D_API AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Dali::String& animationName, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE);
 
 } // namespace Dali::Scene3D::Loader
 

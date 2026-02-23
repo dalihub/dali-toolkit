@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@
 #include <dali-toolkit/internal/builder/builder-set-property.h>
 #include <dali-toolkit/internal/builder/replacement.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -255,7 +258,7 @@ bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Proper
     {
       if(OptionalString v = replacer.IsString(node))
       {
-        value = *v;
+        value = Property::Value(ToDaliString(*v));
         done  = true;
       }
       break;
@@ -308,7 +311,7 @@ bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Proper
           {
             Property::Value childValue;
             DeterminePropertyFromNode((*iter).second, childValue, replacer);
-            map->Insert((*iter).first, childValue);
+            map->Insert(Dali::String((*iter).first), childValue);
           }
 
           done = (map->Count() == node.Size());
@@ -451,7 +454,7 @@ void DeterminePropertyFromNode(const TreeNode& node, Property::Value& value, con
         }
         else
         {
-          value = *aString;
+          value = Property::Value(ToDaliString(*aString));
         }
       } // if aBool
 
@@ -479,7 +482,7 @@ void DeterminePropertyFromNode(const TreeNode& node, Property::Value& value, con
           {
             Property::Value childValue;
             DeterminePropertyFromNode((*containerIterator).second, childValue, replacer);
-            map->Insert((*containerIterator).first, childValue);
+            map->Insert(Dali::String((*containerIterator).first), childValue);
           }
         }
       }

@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
@@ -52,6 +53,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 const char* const TEST_URL1("http://www.somewhere.valid1.com");
@@ -1010,7 +1013,7 @@ int UtcDaliWebViewProperty1(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  std::string local;
+  String local;
   view.SetProperty(WebView::Property::URL, TEST_URL1);
   Property::Value val = view.GetProperty(WebView::Property::URL);
   DALI_TEST_CHECK(val.Get(local));
@@ -1027,11 +1030,11 @@ int UtcDaliWebViewProperty4(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  const std::string kDefaultValue;
-  const std::string kTestValue = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
+  const String kDefaultValue;
+  const String kTestValue = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
 
   // Check default value
-  std::string     output;
+  String          output;
   Property::Value value = view.GetProperty(WebView::Property::USER_AGENT);
   DALI_TEST_CHECK(value.Get(output));
   DALI_TEST_EQUALS(output, kDefaultValue, TEST_LOCATION);
@@ -1091,8 +1094,8 @@ int UtcDaliWebViewPropertyBackgroundColorSelectedTextEtc(void)
   view.SetProperty(WebView::Property::CURSOR_ENABLED_BY_CLIENT, true);
 
   // Check default value
-  std::string testText("test");
-  std::string output;
+  String testText("test");
+  String output;
   view.GetProperty(WebView::Property::SELECTED_TEXT).Get(output);
   DALI_TEST_EQUALS(output, testText, TEST_LOCATION);
 
@@ -1111,8 +1114,8 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   view.ClearAllTilesResources();
 
   // Check default value of title
-  std::string testValue("title");
-  std::string output;
+  String testValue("title");
+  String output;
   view.GetProperty(WebView::Property::TITLE).Get(output);
   DALI_TEST_EQUALS(output, testValue, TEST_LOCATION);
 

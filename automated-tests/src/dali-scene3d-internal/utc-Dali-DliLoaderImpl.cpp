@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 #include <dali-scene3d/public-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include <string_view>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 namespace
 {
@@ -87,7 +89,7 @@ struct Context
 
   Context()
   {
-    input.mAnimationsPath = pathProvider(ResourceType::Mesh);
+    input.mAnimationsPath = ToDaliString(pathProvider(ResourceType::Mesh));
     loader.SetErrorCallback(onError);
     loader.SetInputParameter(input);
   }
@@ -126,7 +128,7 @@ int UtcDaliDliLoaderLoadSceneFailParse(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "invalid.gltf";
-  DALI_TEST_EQUAL(ctx.loader.LoadModel(path, ctx.output), false);
+  DALI_TEST_EQUAL(ctx.loader.LoadModel(ToDaliString(path), ctx.output), false);
 
   auto error = ctx.loader.GetParseError();
   DALI_TEST_CHECK(StringHasTokens(error.c_str(), {"Unexpected character."}));
@@ -175,7 +177,7 @@ int UtcDaliDliLoaderLoadSceneAssertions(void)
 
     auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/" + i.first + ".dli";
     printf("\n\n%s: %s\n", path.c_str(), i.second.c_str());
-    DALI_TEST_ASSERTION(ctx.loader.LoadModel(path, ctx.output), i.second.c_str());
+    DALI_TEST_ASSERTION(ctx.loader.LoadModel(ToDaliString(path), ctx.output), i.second.c_str());
   }
 
   END_TEST;
@@ -187,7 +189,7 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   Context                ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "exercise.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -240,8 +242,8 @@ int UtcDaliDliLoaderLoadSceneExercise(void)
   }
 
   DALI_TEST_EQUAL(root.GetChildCount(), 2u);
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "Backdrop");
-  DALI_TEST_EQUAL(root.GetChildAt(1).GetProperty(Actor::Property::NAME).Get<std::string>(), "ExerciseDemo");
+  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<Dali::String>(), "Backdrop");
+  DALI_TEST_EQUAL(root.GetChildAt(1).GetProperty(Actor::Property::NAME).Get<Dali::String>(), "ExerciseDemo");
 
   END_TEST;
 }
@@ -266,7 +268,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
       auto value = map->Find("value");
       DALI_TEST_EQUAL(key->GetType(), Property::STRING);
       DALI_TEST_EQUAL(value->GetType(), Property::STRING);
-      metadata.push_back(key->Get<std::string>() + ":" + value->Get<std::string>());
+      metadata.push_back(Integration::ToStdString(key->Get<Dali::String>()) + ":" + Integration::ToStdString(value->Get<Dali::String>()));
 
       ++metadataCount;
     }
@@ -287,7 +289,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
       auto url   = map->Find("url");
       DALI_TEST_EQUAL(event->GetType(), Property::STRING);
       DALI_TEST_EQUAL(url->GetType(), Property::STRING);
-      behaviors.push_back(event->Get<std::string>() + ":" + url->Get<std::string>());
+      behaviors.push_back(Integration::ToStdString(event->Get<Dali::String>()) + ":" + Integration::ToStdString(url->Get<Dali::String>()));
 
       ++behaviorCount;
     }
@@ -300,7 +302,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   };
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "morph.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -359,7 +361,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   }
 
   DALI_TEST_EQUAL(root.GetChildCount(), 1u);
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "HeadTest_002");
+  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<Dali::String>(), "HeadTest_002");
 
   END_TEST;
 }
@@ -369,7 +371,7 @@ int UtcDaliDliLoaderLoadSceneArc(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "arc.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -423,7 +425,7 @@ int UtcDaliDliLoaderLoadSceneArc(void)
   }
 
   DALI_TEST_EQUAL(root.GetChildCount(), 1u);
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "root");
+  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<Dali::String>(), "root");
 
   END_TEST;
 }
@@ -433,7 +435,7 @@ int UtcDaliDliLoaderLoadSceneShaderUniforms(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/shader-uniforms.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 1u);
   DALI_TEST_CHECK(ctx.errors[0].find("failed to infer type") != std::string::npos);
 
@@ -451,7 +453,7 @@ int UtcDaliDliLoaderLoadSceneShaderUniforms(void)
   DALI_TEST_EQUAL(resources.mEnvironmentMaps.size(), 0u);
   DALI_TEST_EQUAL(resources.mSkeletons.size(), 0u);
 
-  auto raw = resources.mShaders[0].first.LoadRaw(ctx.pathProvider(ResourceType::Shader));
+  auto raw = resources.mShaders[0].first.LoadRaw(ToDaliString(ctx.pathProvider(ResourceType::Shader)));
 
   ToolkitTestApplication app;
 
@@ -476,7 +478,7 @@ int UtcDaliDliLoaderLoadSceneExtras(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/extras.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 3u);
   DALI_TEST_CHECK(ctx.errors[0].find("already defined; overriding") != std::string::npos);
   DALI_TEST_CHECK(ctx.errors[1].find("empty string is invalid for name") != std::string::npos);
@@ -519,7 +521,7 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/constraints.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_EQUAL(ctx.errors.size(), 1u);
   DALI_TEST_CHECK(ctx.errors[0].find("invalid", ctx.errors[0].find("node ID")) != std::string::npos);
 
@@ -583,12 +585,12 @@ int UtcDaliDliLoaderNodeProcessor(void)
   };
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "dli/node-processor.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
 
   DALI_TEST_EQUAL(nodeMaps.size(), 2u);
   DALI_TEST_EQUAL(nodeMaps[0].Count(), 5u);
-  DALI_TEST_EQUAL(nodeMaps[0].Find("name")->Get<std::string>(), "rootA");
-  DALI_TEST_EQUAL(nodeMaps[0].Find("nickname")->Get<std::string>(), "same as name");
+  DALI_TEST_EQUAL(nodeMaps[0].Find("name")->Get<Dali::String>(), "rootA");
+  DALI_TEST_EQUAL(nodeMaps[0].Find("nickname")->Get<Dali::String>(), "same as name");
   DALI_TEST_EQUAL(nodeMaps[0].Find("favourite number")->Get<int32_t>(), 63478);
 
   auto propArray = nodeMaps[0].Find("array");
@@ -616,8 +618,8 @@ int UtcDaliDliLoaderNodeProcessor(void)
 
   auto innerArray = propInnerArray->GetArray();
   DALI_TEST_EQUAL(innerArray->Count(), 3);
-  DALI_TEST_EQUAL(innerArray->GetElementAt(0).Get<std::string>(), "why");
-  DALI_TEST_EQUAL(innerArray->GetElementAt(1).Get<std::string>(), "not");
+  DALI_TEST_EQUAL(innerArray->GetElementAt(0).Get<Dali::String>(), "why");
+  DALI_TEST_EQUAL(innerArray->GetElementAt(1).Get<Dali::String>(), "not");
   DALI_TEST_EQUAL(innerArray->GetElementAt(2).Get<bool>(), false);
 
   auto propInnerObject = object->Find("inner object");
@@ -628,7 +630,7 @@ int UtcDaliDliLoaderNodeProcessor(void)
   DALI_TEST_EQUAL(innerObject->Find("supported")->Get<bool>(), true);
 
   DALI_TEST_EQUAL(nodeMaps[1].Count(), 1u);
-  DALI_TEST_EQUAL(nodeMaps[1].Find("name")->Get<std::string>(), "rootB");
+  DALI_TEST_EQUAL(nodeMaps[1].Find("name")->Get<Dali::String>(), "rootB");
 
   END_TEST;
 }
@@ -638,7 +640,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   Context ctx;
 
   auto path = ctx.pathProvider(ResourceType::Mesh) + "coverageTest.dli";
-  DALI_TEST_CHECK(ctx.loader.LoadModel(path, ctx.output));
+  DALI_TEST_CHECK(ctx.loader.LoadModel(ToDaliString(path), ctx.output));
   DALI_TEST_CHECK(ctx.errors.empty());
 
   auto& scene = ctx.scene;
@@ -703,7 +705,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   }
 
   DALI_TEST_EQUAL(root.GetChildCount(), 1u);
-  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<std::string>(), "root");
+  DALI_TEST_EQUAL(root.GetChildAt(0).GetProperty(Actor::Property::NAME).Get<Dali::String>(), "root");
 
   END_TEST;
 }

@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -31,6 +32,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/gles-addon/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -193,14 +196,17 @@ void GlView::OnSizeSet(const Vector3& targetSize)
 
 Shader GlView::CreateShader()
 {
-  std::string fragmentShader = std::string(SHADER_GL_VIEW_FRAG);
+  Dali::String fragmentShader = SHADER_GL_VIEW_FRAG.data();
 
   if(mNativeImageQueue)
   {
     mNativeImageQueue->ApplyNativeFragmentShader(fragmentShader, 1);
   }
 
-  return Shader::New(SHADER_GL_VIEW_VERT, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "GL_VIEW");
+  return Shader::New(ToDaliStringView(SHADER_GL_VIEW_VERT),
+                     fragmentShader,
+                     static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL),
+                     "GL_VIEW");
 }
 
 void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible)

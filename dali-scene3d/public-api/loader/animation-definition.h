@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public: // METHODS
    * @SINCE_2_2.22
    * @param[in] name The name of the animation.
    */
-  void SetName(const std::string& name);
+  void SetName(const Dali::String& name);
 
   /**
    * @brief Get the name of the animation.
@@ -83,7 +83,7 @@ public: // METHODS
    * @SINCE_2_2.22
    * @return The name of the animation.
    */
-  const std::string& GetName() const;
+  const Dali::String& GetName() const;
 
   /**
    * @brief Set the duration of the animation in seconds.
@@ -223,7 +223,7 @@ public: // METHODS
   const AnimatedProperty& GetPropertyAt(uint32_t index) const;
 
 private: // DATA
-  std::string mName;
+  Dali::String mName;
 
   float                mDuration         = DEFAULT_DURATION_SECONDS;
   int32_t              mLoopCount        = 1;
@@ -237,8 +237,8 @@ private: // DATA
 
 struct AnimationGroupDefinition
 {
-  std::string              mName;
-  std::vector<std::string> mAnimations;
+  Dali::String              mName;
+  std::vector<Dali::String> mAnimations;
 };
 
 } // namespace Dali::Scene3D::Loader

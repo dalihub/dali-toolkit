@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_MOTION_MOTION_INDEX_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ public: // Public Method
    * @param[in] node The model node to get the property name.
    * @return The name of current property.
    */
-  std::string GetPropertyName(ModelNode node = ModelNode());
+  Dali::String GetPropertyName(ModelNode node = ModelNode());
 
   /**
    * @brief Get the property index of this MotionIndex from given ModelNode.

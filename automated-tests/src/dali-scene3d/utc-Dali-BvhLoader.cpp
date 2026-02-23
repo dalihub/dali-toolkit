@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
 #include <dali-scene3d/public-api/loader/bvh-loader.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <fstream>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 namespace
 {
@@ -169,7 +171,7 @@ int UtcDaliLoadBvhFailed03(void)
     tet_printf("Parse error for hierarchy %u\n", tc);
     std::ostringstream oss;
     oss << TEST_RESOURCE_DIR << "/test-invalid-hierarchy" << tc << ".bvh";
-    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh", false);
+    AnimationDefinition animDef = LoadBvh(ToDaliString(oss.str()), "testBvh", false);
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
 
@@ -179,7 +181,7 @@ int UtcDaliLoadBvhFailed03(void)
     tet_printf("Parse error for motion %u\n", tc);
     std::ostringstream oss;
     oss << TEST_RESOURCE_DIR << "/test-invalid-motion" << tc << ".bvh";
-    AnimationDefinition animDef = LoadBvh(oss.str(), "testBvh", false);
+    AnimationDefinition animDef = LoadBvh(ToDaliString(oss.str()), "testBvh", false);
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
 

@@ -29,10 +29,13 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
+#include <dali/integration-api/string-utils.h>
+
 #include <tuple>
 
 using namespace Dali::Toolkit;
 using namespace Dali::Toolkit::DevelControl;
+using Dali::Integration::ToDaliString;
 
 constexpr const char* OVERLAY_NAME   = "HighlightOverlay";
 constexpr const char* HIGHLIGHT_NAME = "HighlightIndicator";
@@ -107,7 +110,7 @@ int UtcDaliSceneViewUpdateOverlay(void)
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   auto                          model     = Scene3D::Model::New();
   auto                          sceneView = Scene3D::SceneView::New();
   auto                          container = Control::New();
@@ -140,7 +143,7 @@ int UtcDaliSceneViewSetCustomHighlght01(void)
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   auto                          model     = Scene3D::Model::New();
   auto                          sceneView = Scene3D::SceneView::New();
   auto                          container = Control::New();
@@ -174,7 +177,7 @@ int UtcDaliSceneViewSetCustomHighlght02(void)
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   auto                          model     = Scene3D::Model::New();
   auto                          sceneView = Scene3D::SceneView::New();
   auto                          container = Control::New();
@@ -216,7 +219,7 @@ int UtcDaliSceneViewHideOverlay(void)
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   auto                          model     = Scene3D::Model::New();
   auto                          sceneView = Scene3D::SceneView::New();
   auto                          container = Control::New();
@@ -247,7 +250,7 @@ int UtcDaliSceneViewRemoveHighlight(void)
   focusBorderImagePath += "/keyboard_focus.9.png";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
-  auto                          highlight = Toolkit::ImageView::New(focusBorderImagePath);
+  auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   auto                          model     = Scene3D::Model::New();
   auto                          sceneView = Scene3D::SceneView::New();
   auto                          container = Control::New();

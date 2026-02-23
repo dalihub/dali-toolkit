@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -42,6 +43,9 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
@@ -128,7 +132,7 @@ bool MapContainsTextString(Property::Map& map)
   if(value)
   {
     std::string textString;
-    value->Get(textString);
+    GetStdString(*value, textString);
     if(!textString.empty())
     {
       result = true;
@@ -359,11 +363,11 @@ void Button::CreateVisualsForComponent(Property::Index index, const Property::Va
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base  buttonVisual;
 
-  std::string imageUrl;
+  Dali::String imageUrl;
   if(value.Get(imageUrl))
   {
     DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent Using image URL(%d)\n", index);
-    if(!imageUrl.empty())
+    if(!imageUrl.Empty())
     {
       DALI_ASSERT_DEBUG(index != Toolkit::Button::Property::LABEL && "Creating a Image Visual instead of Text Visual ");
       buttonVisual = visualFactory.CreateVisual(imageUrl, ImageDimensions());
@@ -411,7 +415,7 @@ bool Button::GetPropertyMapForVisual(Property::Index visualIndex, Property::Map&
   return success;
 }
 
-bool Button::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool Button::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   bool ret = false;
 
@@ -421,7 +425,7 @@ bool Button::DoAction(BaseObject* object, const std::string& actionName, const P
 
   DALI_ASSERT_DEBUG(button);
 
-  if(0 == strcmp(actionName.c_str(), ACTION_BUTTON_CLICK))
+  if(0 == strcmp(actionName.CStr(), ACTION_BUTTON_CLICK))
   {
     ret = GetImplementation(button).DoClickAction(attributes);
   }
@@ -567,26 +571,26 @@ Toolkit::Button::ButtonSignalType& Button::StateChangedSignal()
   return mStateChangedSignal;
 }
 
-bool Button::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Button::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool            connected(true);
   Toolkit::Button button = Toolkit::Button::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_PRESSED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_PRESSED))
   {
     button.PressedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_RELEASED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_RELEASED))
   {
     button.ReleasedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_CLICKED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_CLICKED))
   {
     button.ClickedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_STATE_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_STATE_CHANGED))
   {
     button.StateChangedSignal().Connect(tracker, functor);
   }
@@ -1132,13 +1136,13 @@ void Button::SetProperty(BaseObject* object, Property::Index index, const Proper
         Property::Map outTextVisualProperties;
         std::string   textString;
 
-        if(value.Get(textString))
+        if(GetStdString(value, textString))
         {
           DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "Button::SetProperty Setting TextVisual with string[%s]\n", textString.c_str());
 
           Property::Map setPropertyMap;
           setPropertyMap.Add(Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT)
-            .Add(Toolkit::TextVisual::Property::TEXT, textString);
+            .Add(Toolkit::TextVisual::Property::TEXT, ToPropertyValue(textString));
 
           GetImplementation(button).MergeWithExistingLabelProperties(setPropertyMap, outTextVisualProperties);
         }
@@ -1163,7 +1167,7 @@ void Button::SetProperty(BaseObject* object, Property::Index index, const Proper
       case Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT:
       {
         Button::Align labelAlignment(END);
-        Scripting::GetEnumeration<Button::Align>(value.Get<std::string>().c_str(),
+        Scripting::GetEnumeration<Button::Align>(Dali::Integration::ToStdString(value).c_str(),
                                                  ALIGNMENT_TABLE,
                                                  ALIGNMENT_TABLE_COUNT,
                                                  labelAlignment);
@@ -1260,7 +1264,7 @@ Property::Value Button::GetProperty(BaseObject* object, Property::Index property
                                                                              ALIGNMENT_STRING_TABLE_COUNT);
         if(alignment)
         {
-          value = std::string(alignment);
+          value = ToPropertyValue(std::string(alignment));
         }
 
         break;
@@ -1317,7 +1321,7 @@ std::pair<std::string, bool> Button::ButtonAccessible::GetNameRaw() const
   Property::Value* textPropertyPtr = labelMap.Find(Toolkit::TextVisual::Property::TEXT);
   if(textPropertyPtr)
   {
-    textPropertyPtr->Get(labelText);
+    GetStdString(*textPropertyPtr, labelText);
   }
 
   return {labelText, false};

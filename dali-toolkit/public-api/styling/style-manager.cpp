@@ -21,8 +21,10 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -41,9 +43,9 @@ StyleManager StyleManager::Get()
   return Internal::StyleManager::Get();
 }
 
-void StyleManager::ApplyTheme(const std::string& themeFile)
+void StyleManager::ApplyTheme(const Dali::String& themeFile)
 {
-  GetImpl(*this).ApplyTheme(themeFile);
+  GetImpl(*this).ApplyTheme(ToStdString(themeFile));
 }
 
 void StyleManager::ApplyDefaultTheme()
@@ -51,19 +53,19 @@ void StyleManager::ApplyDefaultTheme()
   GetImpl(*this).ApplyDefaultTheme();
 }
 
-void StyleManager::SetStyleConstant(const std::string& key, const Property::Value& value)
+void StyleManager::SetStyleConstant(const Dali::String& key, const Property::Value& value)
 {
-  GetImpl(*this).SetStyleConstant(key, value);
+  GetImpl(*this).SetStyleConstant(ToStdString(key), value);
 }
 
-bool StyleManager::GetStyleConstant(const std::string& key, Property::Value& valueOut)
+bool StyleManager::GetStyleConstant(const Dali::String& key, Property::Value& valueOut)
 {
-  return GetImpl(*this).GetStyleConstant(key, valueOut);
+  return GetImpl(*this).GetStyleConstant(ToStdString(key), valueOut);
 }
 
-void StyleManager::ApplyStyle(Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName)
+void StyleManager::ApplyStyle(Toolkit::Control control, const Dali::String& jsonFileName, const Dali::String& styleName)
 {
-  GetImpl(*this).ApplyStyle(control, jsonFileName, styleName);
+  GetImpl(*this).ApplyStyle(control, ToStdString(jsonFileName), ToStdString(styleName));
 }
 
 StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()

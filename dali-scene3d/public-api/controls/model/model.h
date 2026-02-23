@@ -102,7 +102,7 @@ public:
    * @note If resourceDirectoryUrl is empty, the parent directory path of modelUrl is used for resource path.
    * @return A handle to a newly allocated Dali resource
    */
-  static Model New(const std::string& modelUrl = std::string(), const std::string& resourceDirectoryUrl = std::string());
+  static Model New(const Dali::String& modelUrl = Dali::String(), const Dali::String& resourceDirectoryUrl = Dali::String());
 
   /**
    * @brief Creates an uninitialized Model.
@@ -250,7 +250,7 @@ public:
    * @param[in] specularUrl cube map that can be used as a specular IBL source.
    * @param[in] scaleFactor scale factor that controls light source intensity in [0.0f, 1.0f]. Default value is 1.0f.
    */
-  void SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor = 1.0f);
+  void SetImageBasedLightSource(const Dali::String& diffuseUrl, const Dali::String& specularUrl, float scaleFactor = 1.0f);
 
   /**
    * @brief Sets Scale Factor of Image Based Light Source.
@@ -298,7 +298,7 @@ public:
    * @return Animation that has the given name.
    * @note This method should be called after Model load finished.
    */
-  Dali::Animation GetAnimation(const std::string& name) const;
+  Dali::Animation GetAnimation(const Dali::String& name) const;
 
   /**
    * @brief Gets number of camera parameters those loaded from model file.
@@ -344,7 +344,7 @@ public:
    * @param[in] nodeName The name of the child ModelNode object you want to find.
    * @return Returns a child ModelNode object with a name that matches nodeName. If there is no corresponding child ModelNode object, it returns an empty ModelNode object.
    */
-  ModelNode FindChildModelNodeByName(std::string_view nodeName);
+  ModelNode FindChildModelNodeByName(Dali::StringView nodeName);
 
   /**
    * @brief Retrieves the list of blendshape name that current Model hold.
@@ -354,7 +354,7 @@ public:
    * @param[in, out] blendShapeNames The name of blendShape list collected.
    * @note This method should be called after Model load finished.
    */
-  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
+  void RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const;
 
   /**
    * @brief Retrieves the list of ModelNode that contains given blend shape name.
@@ -365,7 +365,7 @@ public:
    * @param[in, out] modelNodes The ModelNode list collected.
    * @note This method should be called after Model load finished.
    */
-  void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<ModelNode>& modelNodes) const;
+  void RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, std::vector<ModelNode>& modelNodes) const;
 
   /**
    * @brief Generates specific animation of this Model by inputed MotionData.

@@ -41,12 +41,13 @@
 #include <dali-toolkit/public-api/image-loader/image.h>
 
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
+#include <dali/integration-api/string-utils.h>
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"
 #include "toolkit-native-image.h"
 
-using namespace Dali;
+using Dali::Integration::ToStdString;
 using namespace Dali::Toolkit;
 
 void dali_image_visual_startup(void)
@@ -428,8 +429,8 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha01(void)
   FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   DALI_TEST_CHECK(frameBuffer);
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -477,8 +478,8 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha02(void)
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   frameBuffer.AttachColorTexture(texture);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, 0u);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, 0u);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -526,8 +527,8 @@ int UtcDaliImageVisualWithPixelData(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -575,8 +576,8 @@ int UtcDaliImageVisualWithPixelDataPreMultipliedAlpha(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl     imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::String url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -628,8 +629,8 @@ int UtcDaliImageVisualWithPixelDataMasking01(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -697,8 +698,8 @@ int UtcDaliImageVisualWithPixelDataMasking02(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -766,8 +767,8 @@ int UtcDaliImageVisualWithPixelDataMasking03(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -835,13 +836,13 @@ int UtcDaliImageVisualWithPixelDataMasking04(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
-  uint8_t*    anotherBuffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData   maskPixelData = PixelData::New(anotherBuffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
-  ImageUrl    maskImageUrl  = Dali::Toolkit::Image::GenerateUrl(maskPixelData);
-  std::string maskUrl       = maskImageUrl.GetUrl();
+  uint8_t*  anotherBuffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  PixelData maskPixelData = PixelData::New(anotherBuffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
+  ImageUrl  maskImageUrl  = Dali::Toolkit::Image::GenerateUrl(maskPixelData);
+  String    maskUrl       = maskImageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -908,8 +909,8 @@ int UtcDaliImageVisualWithPixelDataMasking05(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -961,8 +962,8 @@ int UtcDaliImageVisualWithPixelDataMaskingSynchronously(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
-  std::string url      = imageUrl.GetUrl();
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1003,7 +1004,7 @@ int UtcDaliImageVisualWithNativeImage(void)
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
   ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
-  std::string    url         = imageUrl.GetUrl();
+  String               url               = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1034,10 +1035,10 @@ int UtcDaliImageVisualWithNativeImage(void)
   Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
   DALI_TEST_CHECK(value.GetType() == Property::MAP);
   const Property::Map* outMap         = value.GetMap();
-  std::string          fragmentShader = (*outMap)["fragment"].Get<std::string>();
-
+  String               fragmentShader = (*outMap)["fragment"].Get<Dali::String>();
+  std::string          fragmentShaderString(fragmentShader.CStr(), fragmentShader.Size());
   const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
-  size_t      pos            = fragmentShader.find(fragmentPrefix);
+  size_t               pos            = fragmentShaderString.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
 
@@ -1055,7 +1056,7 @@ int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
   ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
-  std::string    url         = imageUrl.GetUrl();
+  String               url               = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1086,10 +1087,11 @@ int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
   Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
   DALI_TEST_CHECK(value.GetType() == Property::MAP);
   const Property::Map* outMap         = value.GetMap();
-  std::string          fragmentShader = (*outMap)["fragment"].Get<std::string>();
+  Dali::String         fragmentShader = (*outMap)["fragment"].Get<Dali::String>();
+  std::string          fragmentShaderStr(fragmentShader.CStr(), fragmentShader.Size());
 
   const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
-  size_t      pos            = fragmentShader.find(fragmentPrefix);
+  size_t      pos            = fragmentShaderStr.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
 
@@ -1107,15 +1109,15 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
   ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
-  std::string    url         = imageUrl.GetUrl();
+  String               url               = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  Property::Map     propertyMap;
-  Property::Map     shaderMap;
-  const std::string customVertexShaderSource                    = "Foobar";
-  const std::string customFragmentShaderSource                  = "Foobar";
+  Property::Map propertyMap;
+  Property::Map shaderMap;
+  const String  customVertexShaderSource                        = "Foobar";
+  const String  customFragmentShaderSource                      = "Foobar";
   shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = customFragmentShaderSource;
   shaderMap[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = customVertexShaderSource;
 
@@ -1148,19 +1150,21 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
   DALI_TEST_CHECK(value.GetType() == Property::MAP);
   const Property::Map* outMap               = value.GetMap();
-  std::string          fragmentShaderSource = (*outMap)["fragment"].Get<std::string>();
-  std::string          vertexShaderSource   = (*outMap)["vertex"].Get<std::string>();
+  String               fragmentShaderSource = (*outMap)["fragment"].Get<Dali::String>();
+  String               vertexShaderSource   = (*outMap)["vertex"].Get<Dali::String>();
 
   // Compare vertex shader is equal
   DALI_TEST_EQUALS(customVertexShaderSource, vertexShaderSource, TEST_LOCATION);
 
   // Check fragment shader changed
   const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
-  size_t      pos            = fragmentShaderSource.find(fragmentPrefix);
+  std::string fragmentShaderString(fragmentShaderSource.CStr(), fragmentShaderSource.Size());
+
+  size_t pos = fragmentShaderString.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(std::string(fragmentPrefix) + customFragmentShaderSource, fragmentShaderSource, TEST_LOCATION);
+  DALI_TEST_EQUALS(String(fragmentPrefix) + customFragmentShaderSource, fragmentShaderSource, TEST_LOCATION);
 
   // Check whether preMultipliedAlpha is false.
   // Note : We dont use preMultiplied alpha when app developer using custom shader.
@@ -1181,7 +1185,7 @@ int UtcDaliImageVisualWithNativeImageRemoved(void)
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
   ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
-  std::string    url         = imageUrl.GetUrl();
+  String               url               = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1283,7 +1287,7 @@ int UtcDaliImageVisualWithEncodedImageBufferRemoved(void)
 
   EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_LARGE_IMAGE_FILE_NAME);
   ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
-  std::string        url       = imageUrl.GetUrl();
+  String             url       = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -2649,7 +2653,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
 
-  const std::string MASK_IMAGE = TEST_REMOTE_IMAGE_FILE_NAME;
+  const String MASK_IMAGE = TEST_REMOTE_IMAGE_FILE_NAME;
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
@@ -3650,11 +3654,11 @@ int UtcDaliImageVisualCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliImageVisualCustomShader Test custom shader");
 
-  VisualFactory     factory = VisualFactory::Get();
-  Property::Map     properties;
-  Property::Map     shader;
-  const std::string vertexShader                    = "Foobar";
-  const std::string fragmentShader                  = "Foobar";
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+  const String  vertexShader                        = "Foobar";
+  const String  fragmentShader                      = "Foobar";
   shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
   shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -3685,10 +3689,10 @@ int UtcDaliImageVisualCustomShader(void)
   DALI_TEST_CHECK(map);
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
 
   shader.Clear();
 

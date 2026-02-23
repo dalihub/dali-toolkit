@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-debug.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -158,7 +161,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 
   if(featureBuilder.IsEnabledAlphaMaskingOnRendering())
   {
-    shader.RegisterProperty(Y_FLIP_MASK_TEXTURE, NOT_FLIP_MASK_TEXTURE);
+    shader.RegisterProperty(ToDaliStringView(Y_FLIP_MASK_TEXTURE), NOT_FLIP_MASK_TEXTURE);
   }
 
   return shader;

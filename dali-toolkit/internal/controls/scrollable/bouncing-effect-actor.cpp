@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -28,6 +29,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -96,7 +99,7 @@ Actor CreateBouncingEffectActor(Property::Index& bouncePropertyIndex)
   meshGeometry.SetIndexBuffer(indexData, sizeof(indexData) / sizeof(indexData[0]));
 
   // Create the shader
-  Shader shader = Shader::New(SHADER_BOUNCING_EFFECT_MESH_SHADER_VERT, SHADER_BOUNCING_EFFECT_MESH_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "BOUNCING_EFFECT");
+  Shader shader = Shader::New(ToDaliStringView(SHADER_BOUNCING_EFFECT_MESH_SHADER_VERT), ToDaliStringView(SHADER_BOUNCING_EFFECT_MESH_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "BOUNCING_EFFECT");
 
   // Create renderer
   Renderer renderer = Renderer::New(meshGeometry, shader);

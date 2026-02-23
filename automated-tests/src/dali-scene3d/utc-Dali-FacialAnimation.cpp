@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/animation/key-frames-devel.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <fstream>
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -76,7 +79,7 @@ int UtcDaliLoadFacialAnimation(void)
       }
     }
 
-    std::string name = animDef.GetName();
+    std::string name = ToStdString(animDef.GetName());
     DALI_TEST_EQUAL(name, "Facial_Blendshape_Animation");
     DALI_TEST_EQUAL(animDef.GetDuration(), 14.966001f);
     DALI_TEST_EQUAL(animDef.GetEndAction(), Animation::BAKE);
@@ -123,7 +126,7 @@ int UtcDaliLoadFacialAnimation(void)
     {
       snprintf(pWeightName, sizeof(weightNameBuffer) - (pWeightName - weightNameBuffer), "[%d]", i);
       std::string weightName{weightNameBuffer};
-      actor.RegisterProperty(weightName, 0.0f);
+      actor.RegisterProperty(ToDaliString(weightName), 0.0f);
     }
 
     auto getActor = [&actor](const Dali::Scene3D::Loader::AnimatedProperty& property)
@@ -170,7 +173,7 @@ int UtcDaliLoadFacialAnimationFailed03(void)
     tet_printf("Parse error for json %u\n", tc);
     std::ostringstream oss;
     oss << TEST_RESOURCE_DIR << "/test-invalid-facial-animation" << tc << ".json";
-    AnimationDefinition animDef = LoadFacialAnimation(oss.str());
+    AnimationDefinition animDef = LoadFacialAnimation(ToDaliString(oss.str()));
     DALI_TEST_EQUALS(0u, animDef.GetPropertyCount(), TEST_LOCATION);
   }
   END_TEST;

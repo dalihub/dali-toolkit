@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ int UtcDaliPropertyHelperGetStringFromPropertyWithString(void)
 {
   tet_infoline("Test to check if a simple string is parsed correctly");
 
-  const std::string inputString = "Hello World";
-  Property::Value   value(inputString);
+  const String    inputString = "Hello World";
+  Property::Value value(inputString);
 
   std::string output;
   DALI_TEST_CHECK(Toolkit::Internal::GetStringFromProperty(value, output));

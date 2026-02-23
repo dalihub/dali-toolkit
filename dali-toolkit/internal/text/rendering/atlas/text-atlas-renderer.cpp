@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -41,6 +42,7 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 using namespace Dali::Toolkit::Text;
+using Dali::Integration::ToDaliStringView;
 
 namespace
 {
@@ -852,7 +854,7 @@ struct AtlasRenderer::Impl
       // The glyph is an emoji and is not a shadow.
       if(!mShaderRgba)
       {
-        mShaderRgba = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_RGBA");
+        mShaderRgba = Shader::New(ToDaliStringView(SHADER_TEXT_ATLAS_SHADER_VERT), ToDaliStringView(SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_RGBA");
       }
       shader = mShaderRgba;
     }
@@ -861,7 +863,7 @@ struct AtlasRenderer::Impl
       // The glyph is text or a shadow.
       if(!mShaderL8)
       {
-        mShaderL8 = Shader::New(SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_L8");
+        mShaderL8 = Shader::New(ToDaliStringView(SHADER_TEXT_ATLAS_SHADER_VERT), ToDaliStringView(SHADER_TEXT_ATLAS_L8_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_ATLAS_L8");
       }
       shader = mShaderL8;
     }

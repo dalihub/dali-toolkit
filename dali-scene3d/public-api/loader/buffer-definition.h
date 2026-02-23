@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -61,7 +62,7 @@ struct DALI_SCENE3D_API BufferDefinition
    * @SINCE_2_2.12
    * @return uri of the buffer
    */
-  std::string GetUri();
+  Dali::String GetUri();
 
   /**
    * @brief Checks whether the buffer is available or not.
@@ -81,10 +82,10 @@ private:
   /// @endcond
 
 public: // DATA
-  std::string mResourcePath;
-  std::string mUri;
-  uint32_t    mByteLength{0};
-  std::string mName;
+  Dali::String mResourcePath;
+  Dali::String mUri;
+  uint32_t     mByteLength{0};
+  Dali::String mName;
 
 private:
   struct Impl;

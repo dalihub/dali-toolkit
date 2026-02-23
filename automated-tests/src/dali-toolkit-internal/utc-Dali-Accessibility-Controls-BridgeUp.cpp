@@ -33,9 +33,13 @@
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <algorithm>
 #include <cstdlib>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 using namespace Dali::Toolkit;
 
@@ -128,7 +132,7 @@ int UtcDaliControlAccessibilityName(void)
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "Accessibility_Name");
   DALI_TEST_EQUALS("Accessibility_Name", q->GetName(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>(), "Accessibility_Name", TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<String>(), "Accessibility_Name", TEST_LOCATION);
 
   auto nameChangeCallback = [](std::string& accessibilityName)
   { accessibilityName = "Accessibility_Name_With_Callback"; };
@@ -149,7 +153,7 @@ int UtcDaliControlAccessibilityName(void)
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "Changed_Accessiblity_Name");
   DALI_TEST_EQUALS("Changed_Accessiblity_Name", q->GetName(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>(), "Changed_Accessiblity_Name", TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<String>(), "Changed_Accessiblity_Name", TEST_LOCATION);
 
   // test emission of property change signal
   DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
@@ -173,7 +177,7 @@ int UtcDaliControlAccessibilityDescription(void)
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION, "Accessibility_Description");
   DALI_TEST_EQUALS("Accessibility_Description", q->GetDescription(), TEST_LOCATION);
 
-  auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<std::string>();
+  auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<String>();
   DALI_TEST_EQUALS("Accessibility_Description", property, TEST_LOCATION);
 
   auto descriptionChangeCallback = [](std::string& accessibilityDescription)
@@ -195,7 +199,7 @@ int UtcDaliControlAccessibilityDescription(void)
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION, "Changed_Accessiblity_Description");
   DALI_TEST_EQUALS("Changed_Accessiblity_Description", q->GetDescription(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<std::string>(), "Changed_Accessiblity_Description", TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_DESCRIPTION).Get<String>(), "Changed_Accessiblity_Description", TEST_LOCATION);
 
   // test emission of property change signal
   DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
@@ -219,7 +223,7 @@ int UtcDaliControlAccessibilityValue(void)
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Accessibility_Value");
   DALI_TEST_EQUALS("Accessibility_Value", q->GetValue(), TEST_LOCATION);
 
-  auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>();
+  auto property = control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<String>();
   DALI_TEST_EQUALS("Accessibility_Value", property, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(true);
@@ -227,7 +231,7 @@ int UtcDaliControlAccessibilityValue(void)
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Changed_Accessiblity_Value");
   DALI_TEST_EQUALS("Changed_Accessiblity_Value", q->GetValue(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>(), "Changed_Accessiblity_Value", TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<String>(), "Changed_Accessiblity_Value", TEST_LOCATION);
 
   // value property change signal is not emitted if not highlighted
   DALI_TEST_CHECK(!Dali::Accessibility::TestPropertyChangeCalled());
@@ -237,7 +241,7 @@ int UtcDaliControlAccessibilityValue(void)
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_VALUE, "Changed_Accessiblity_Value_2");
   DALI_TEST_EQUALS("Changed_Accessiblity_Value_2", q->GetValue(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<std::string>(), "Changed_Accessiblity_Value_2", TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::ACCESSIBILITY_VALUE).Get<String>(), "Changed_Accessiblity_Value_2", TEST_LOCATION);
 
   // value property change signal is emitted if highlighted
   DALI_TEST_CHECK(Dali::Accessibility::TestPropertyChangeCalled());
@@ -833,20 +837,20 @@ int utcDaliAccessibilityControlAttributes(void)
   attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   attributes_map = attributes.GetMap();
 
-  DALI_TEST_EQUALS((attributes_map->Find("access_key1"))->Get<std::string>(), "access_value1", TEST_LOCATION);
+  DALI_TEST_EQUALS((attributes_map->Find("access_key1"))->Get<String>(), "access_value1", TEST_LOCATION);
 
   DevelControl::AppendAccessibilityAttribute(check_box_button, "access_key2", "access_value2_a");
   attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   attributes_map = attributes.GetMap();
 
-  DALI_TEST_EQUALS((attributes_map->Find("access_key1"))->Get<std::string>(), "access_value1", TEST_LOCATION);
-  DALI_TEST_EQUALS((attributes_map->Find("access_key2"))->Get<std::string>(), "access_value2_a", TEST_LOCATION);
+  DALI_TEST_EQUALS((attributes_map->Find("access_key1"))->Get<String>(), "access_value1", TEST_LOCATION);
+  DALI_TEST_EQUALS((attributes_map->Find("access_key2"))->Get<String>(), "access_value2_a", TEST_LOCATION);
 
   DevelControl::AppendAccessibilityAttribute(check_box_button, "access_key2", "access_value2_b");
   attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   attributes_map = attributes.GetMap();
 
-  DALI_TEST_EQUALS((attributes_map->Find("access_key2"))->Get<std::string>(), "access_value2_b", TEST_LOCATION);
+  DALI_TEST_EQUALS((attributes_map->Find("access_key2"))->Get<String>(), "access_value2_b", TEST_LOCATION);
 
   DevelControl::RemoveAccessibilityAttribute(check_box_button, "access_key2");
   attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
@@ -871,7 +875,7 @@ int utcDaliAccessibilityControlAttributes(void)
   DALI_TEST_EQUALS(counter, attribute_map_bridge.size(), TEST_LOCATION);
 
   for(auto it : attribute_map_bridge)
-    DALI_TEST_EQUALS((attributes_map->Find(it.first))->Get<std::string>(), it.second, TEST_LOCATION);
+    DALI_TEST_EQUALS((attributes_map->Find(ToDaliString(it.first)))->Get<String>(), it.second, TEST_LOCATION);
 
   DevelControl::ClearAccessibilityAttributes(check_box_button);
   attributes     = check_box_button.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
@@ -920,7 +924,7 @@ int UtcDaliControlReadingInfoType(void)
   auto q = control.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   auto z = q.GetMap();
 
-  DALI_TEST_EQUALS((z->Find("reading_info_type"))->Get<std::string>(), "name|role|description|state", TEST_LOCATION);
+  DALI_TEST_EQUALS((z->Find("reading_info_type"))->Get<Dali::String>(), "name|role|description|state", TEST_LOCATION);
   reading_info_type = DevelControl::GetAccessibilityReadingInfoType(control);
   for(auto i = 0u; i < 4; ++i)
     DALI_TEST_CHECK(reading_info_type[static_cast<Dali::Accessibility::ReadingInfoType>(i)]);
@@ -1723,7 +1727,7 @@ public:
 
   Dali::Actor NewItem(unsigned int itemId) override
   {
-    return TextLabel::New(std::to_string(itemId));
+    return TextLabel::New(ToDaliString(std::to_string(itemId)));
   }
 };
 } // namespace
@@ -2262,22 +2266,22 @@ private:
     button.SetProperty(Actor::Property::VISIBLE, true);
     button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-    button.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_0");
+    button.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_0"));
     container.Add(button);
 
     // text label
-    auto text = TextLabel::New(label);
+    auto text = TextLabel::New(ToDaliString(label));
     text.SetProperty(Actor::Property::VISIBLE, true);
     text.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     text.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-    text.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_1");
+    text.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_1"));
     container.Add(text);
 
     // invisible actor
     auto invisibleActor = MakeInvisibleActor();
     invisibleActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::RIGHT);
     invisibleActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-    invisibleActor.SetProperty(DevelControl::Property::AUTOMATION_ID, label + "_2");
+    invisibleActor.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_2"));
     container.Add(invisibleActor);
 
     // add dummy attribute
@@ -2529,7 +2533,7 @@ int UtcDaliAccessibleGetStringProperty(void)
 
     if(std::string(propertyName) == "NAME")
     {
-      *out = control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<std::string>();
+      *out = ToStdString(control.GetProperty(DevelControl::Property::ACCESSIBILITY_NAME).Get<String>());
     }
     else
     {

@@ -26,6 +26,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/shader-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
@@ -182,7 +183,7 @@ Shader VisualFactoryCache::GenerateAndSaveShader(ShaderType type, std::string_vi
   // If the shader name is empty, it means that the shader is not generated internally. So, there is need to support file caching. Otherwise, it is defined externally. So, it needs not to support file caching.
   Shader::Hint::Value shaderHints = shaderName.empty() ? Shader::Hint::NONE : static_cast<Dali::Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
 
-  mShader[type] = Dali::Integration::ShaderNewWithUniformBlock(vertexShader, fragmentShader, shaderHints, shaderName, {GetDefaultUniformBlock()});
+  mShader[type] = Dali::Integration::ShaderNewWithUniformBlock(Dali::Integration::ToDaliStringView(vertexShader), Dali::Integration::ToDaliStringView(fragmentShader), shaderHints, Dali::Integration::ToDaliStringView(shaderName), {GetDefaultUniformBlock()});
 
   return mShader[type];
 }
@@ -473,7 +474,7 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
     vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                  << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                  << SHADER_NPATCH_VISUAL_SHADER_VERT;
-    shader = Shader::New(vertexShader.str(), SHADER_NPATCH_VISUAL_SHADER_FRAG, Dali::Shader::Hint::NONE, shaderName.str());
+    shader = Shader::New(Dali::Integration::ToDaliStringView(vertexShader.str()), Dali::Integration::ToDaliStringView(SHADER_NPATCH_VISUAL_SHADER_FRAG), Dali::Shader::Hint::NONE, Dali::Integration::ToDaliStringView(shaderName.str()));
   }
   return shader;
 }

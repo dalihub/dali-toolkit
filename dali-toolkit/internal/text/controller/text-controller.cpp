@@ -371,9 +371,9 @@ void Controller::SetVariationsMap(const Property::Map& map)
     if(keyvalue.first.type == Property::Key::STRING)
     {
       float value = 0.f;
-      if(keyvalue.first.stringKey.length() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.
+      if(keyvalue.first.stringKey.Size() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.
       {
-        variationsMap[keyvalue.first.stringKey.data()] = value;
+        variationsMap[keyvalue.first.stringKey.CStr()] = value;
       }
     }
   }

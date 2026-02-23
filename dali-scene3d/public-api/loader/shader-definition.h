@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 #define DALI_SCENE3D_LOADER_SHADER_DEFINITION_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,10 @@ struct DALI_SCENE3D_API ShaderDefinition
 
   struct RawData
   {
-    std::string mVertexShaderSource;
-    std::string mFragmentShaderSource;
-    std::string mShadowVertexShaderSource;
-    std::string mShadowFragmentShaderSource;
+    Dali::String mVertexShaderSource;
+    Dali::String mFragmentShaderSource;
+    Dali::String mShadowVertexShaderSource;
+    Dali::String mShadowFragmentShaderSource;
   };
 
   ShaderDefinition() = default;
@@ -61,7 +61,7 @@ struct DALI_SCENE3D_API ShaderDefinition
    * @SINCE_2_0.7
    * @note This may be called from any thread.
    */
-  RawData LoadRaw(const std::string& shadersPath) const;
+  RawData LoadRaw(const Dali::String& shadersPath) const;
 
   /**
    * @brief Creates a DALi Shader from the sources in @a raw, traverses
@@ -76,11 +76,11 @@ public: // DATA
   std::shared_ptr<RawData> mRawData;
   RendererState::Type      mRendererState = RendererState::NONE;
 
-  std::string                                mVertexShaderPath;
-  std::string                                mFragmentShaderPath;
-  std::vector<std::string>                   mDefines;
+  Dali::String                               mVertexShaderPath;
+  Dali::String                               mFragmentShaderPath;
+  std::vector<Dali::String>                  mDefines;
   std::vector<ShaderOption::MacroDefinition> mMacros;
-  std::vector<std::string>                   mHints;
+  std::vector<Dali::String>                  mHints;
   Property::Map                              mUniforms;
 
   std::vector<Dali::UniformBlock> mUniformBlocks{}; ///< Uniform blocks to be connected to shader.

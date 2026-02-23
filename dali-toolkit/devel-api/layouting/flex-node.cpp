@@ -19,12 +19,15 @@
 
 //EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <algorithm>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/third-party/yoga/Yoga.h>
+
+using Dali::Integration::ToStdString;
 
 #if defined(DEBUG_ENABLED)
 static Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FLEX");
@@ -109,7 +112,7 @@ Node* Node::AddChild(Actor child, Extents margin, MeasureCallback measureFunctio
 {
   if(child)
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "AddChild[%s] to node[%p] at index:%d\n", child.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), mImpl->mYogaNode, index);
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "AddChild[%s] to node[%p] at index:%d\n", ToStdString(child.GetProperty(Dali::Actor::Property::NAME)).c_str(), mImpl->mYogaNode, index);
 
     NodePtr childNode(new Node());
 
@@ -145,7 +148,7 @@ Node* Node::AddChild(Actor child, Extents margin, MeasureCallback measureFunctio
 
 void Node::RemoveChild(Actor child)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "RemoveChild child:[%s] from internal nodeCount[%d] childCount[%d]\n", child.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), YGNodeGetChildCount(mImpl->mYogaNode), mImpl->mChildNodes.size());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "RemoveChild child:[%s] from internal nodeCount[%d] childCount[%d]\n", ToStdString(child.GetProperty(Dali::Actor::Property::NAME)).c_str(), YGNodeGetChildCount(mImpl->mYogaNode), mImpl->mChildNodes.size());
 
   auto iterator = std::find_if(mImpl->mChildNodes.begin(), mImpl->mChildNodes.end(), [&child](NodePtr& childNode)
   { return childNode->mImpl->mActor.GetHandle() == child; });
@@ -167,7 +170,7 @@ SizeTuple Node::MeasureNode(float width, int widthMode, float height, int height
   Toolkit::Flex::SizeTuple nodeSize{8, 8}; // Default size set to 8,8 to aid bug detection.
   if(mImpl->mMeasureCallback && mImpl->mActor.GetHandle())
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetProperty<std::string>(Dali::Actor::Property::NAME).c_str());
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", ToStdString(mImpl->mActor.GetHandle().GetProperty(Dali::Actor::Property::NAME)).c_str());
     mImpl->mMeasureCallback(mImpl->mActor.GetHandle(), width, widthMode, height, heightMode, &nodeSize);
   }
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode nodeSize width:%f height:%f\n", nodeSize.width, nodeSize.height);

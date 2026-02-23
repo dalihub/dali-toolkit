@@ -20,12 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/scene.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <string>
 
 namespace Dali
 {
@@ -60,8 +60,8 @@ public:
   using TouchEventSignalType = Signal<void(const TouchEvent&)>;
   using ResizeSignalType     = Signal<void(Window, WindowSize)>;
 
-  static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
-  static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);
+  static Window New(PositionSize windowPosition, const Dali::String& name, bool isTransparent = false);
+  static Window New(PositionSize windowPosition, const Dali::String& name, const Dali::String& className, bool isTransparent = false);
 
   Window();
   ~Window();

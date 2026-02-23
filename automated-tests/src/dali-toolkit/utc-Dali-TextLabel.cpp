@@ -30,11 +30,14 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/string-utils.h>
 #include "test-text-geometry-utils.h"
 
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_textlabel_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -134,7 +137,7 @@ static void TestTextFitChangedCallback(TextLabel control)
   gTextFitChangedCallBackCalled = true;
 }
 
-bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet, const std::vector<std::string>& indexConversionTable = std::vector<std::string>())
+bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet, const std::vector<String>& indexConversionTable = std::vector<String>())
 {
   const Property::Map::SizeType size = mapGet.Count();
 
@@ -146,16 +149,16 @@ bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet,
 
       // Find the keys of the 'get' map
       Property::Index indexKey  = valueGet.first.indexKey;
-      std::string     stringKey = valueGet.first.stringKey;
+      String          stringKey = valueGet.first.stringKey;
 
       if(!indexConversionTable.empty())
       {
-        if(stringKey.empty())
+        if(stringKey.Empty())
         {
           stringKey = indexConversionTable[indexKey];
         }
 
-        if((indexKey == Property::INVALID_INDEX) && !stringKey.empty())
+        if((indexKey == Property::INVALID_INDEX) && !stringKey.Empty())
         {
           Property::Index index = 0u;
           for(auto key : indexConversionTable)
@@ -174,9 +177,9 @@ bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet,
 
       if(nullptr != valueSet)
       {
-        if((valueSet->GetType() == Dali::Property::STRING) && (valueGet.second.Get<std::string>() != valueSet->Get<std::string>()))
+        if((valueSet->GetType() == Dali::Property::STRING) && (valueGet.second.Get<Dali::String>() != valueSet->Get<Dali::String>()))
         {
-          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str());
+          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<Dali::String>().CStr(), valueSet->Get<Dali::String>().CStr());
           return false;
         }
         else if((valueSet->GetType() == Dali::Property::BOOLEAN) && (valueGet.second.Get<bool>() != valueSet->Get<bool>()))
@@ -217,7 +220,7 @@ bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet,
         }
         else
         {
-          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.c_str());
+          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.CStr());
         }
         return false;
       }
@@ -294,12 +297,12 @@ int UtcDaliTextLabelMoveConstructor(void)
 
   TextLabel textLabel = TextLabel::New();
   textLabel.SetProperty(TextLabel::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textLabel.GetProperty<std::string>(TextLabel::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textLabel.GetProperty<Dali::String>(TextLabel::Property::TEXT) == "Test");
 
   TextLabel moved = std::move(textLabel);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextLabel::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextLabel::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textLabel);
 
   END_TEST;
@@ -324,13 +327,13 @@ int UtcDaliTextLabelMoveAssignment(void)
 
   TextLabel textLabel = TextLabel::New();
   textLabel.SetProperty(TextLabel::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textLabel.GetProperty<std::string>(TextLabel::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textLabel.GetProperty<Dali::String>(TextLabel::Property::TEXT) == "Test");
 
   TextLabel moved;
   moved = std::move(textLabel);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextLabel::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextLabel::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textLabel);
 
   END_TEST;
@@ -405,11 +408,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Check that text can be correctly reset
   label.SetProperty(TextLabel::Property::TEXT, "Setting Text");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::TEXT), std::string("Setting Text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::TEXT), std::string("Setting Text"), TEST_LOCATION);
 
   // Check font properties.
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Setting font family");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::FONT_FAMILY), std::string("Setting font family"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::FONT_FAMILY), std::string("Setting font family"), TEST_LOCATION);
 
   Property::Map fontStyleMapSet;
   Property::Map fontStyleMapGet;
@@ -431,7 +434,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   const std::string strFontStyle = "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}";
 
   label.SetProperty(TextLabel::Property::FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}");
-  std::string getFontStyle = label.GetProperty<std::string>(TextLabel::Property::FONT_STYLE);
+  Dali::String getFontStyle = label.GetProperty<Dali::String>(TextLabel::Property::FONT_STYLE);
   DALI_TEST_EQUALS(getFontStyle, strFontStyle, TEST_LOCATION);
 
   label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
@@ -466,7 +469,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Value* slantValue = fontStyleMapGet.Find("slant");
   if(NULL != slantValue)
   {
-    if("normal" == slantValue->Get<std::string>())
+    if(slantValue->Get<Dali::String>() == "normal")
     {
       fontStyleMapGet["slant"] = "roman";
     }
@@ -486,9 +489,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Check that the Alignment properties can be correctly set
   label.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::HORIZONTAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::HORIZONTAL_ALIGNMENT), "CENTER", TEST_LOCATION);
   label.SetProperty(TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
 
   // Check that text color can be properly set
   label.SetProperty(TextLabel::Property::TEXT_COLOR, Color::BLUE);
@@ -575,7 +578,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   TextLabel label2 = TextLabel::New("New text");
   DALI_TEST_CHECK(label2);
-  DALI_TEST_EQUALS(label2.GetProperty<std::string>(TextLabel::Property::TEXT), std::string("New text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label2.GetProperty<Dali::String>(TextLabel::Property::TEXT), std::string("New text"), TEST_LOCATION);
 
   // Check the enable markup property.
   DALI_TEST_CHECK(!label.GetProperty<bool>(TextLabel::Property::ENABLE_MARKUP));
@@ -584,11 +587,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Check the text property when markup is enabled
   label.SetProperty(TextLabel::Property::TEXT, "<color value='white'>Markup</color><color value='cyan'>Text</color>");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::TEXT), std::string("MarkupText"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::TEXT), std::string("MarkupText"), TEST_LOCATION);
 
   // Check for incomplete marks.
   label.SetProperty(TextLabel::Property::TEXT, "<color='white'><i>Markup</i><b>Text</b></color>");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::TEXT), std::string("MarkupText"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::TEXT), std::string("MarkupText"), TEST_LOCATION);
   try
   {
     application.SendNotification();
@@ -628,10 +631,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   //Check autoscroll stop type property
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);
-  DALI_TEST_EQUALS(STOP_IMMEDIATE, label.GetProperty<std::string>(TextLabel::Property::AUTO_SCROLL_STOP_MODE), TEST_LOCATION);
+  DALI_TEST_EQUALS(STOP_IMMEDIATE, label.GetProperty<Dali::String>(TextLabel::Property::AUTO_SCROLL_STOP_MODE), TEST_LOCATION);
 
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP);
-  DALI_TEST_EQUALS(STOP_FINISH_LOOP, label.GetProperty<std::string>(TextLabel::Property::AUTO_SCROLL_STOP_MODE), TEST_LOCATION);
+  DALI_TEST_EQUALS(STOP_FINISH_LOOP, label.GetProperty<Dali::String>(TextLabel::Property::AUTO_SCROLL_STOP_MODE), TEST_LOCATION);
 
   // test natural size with multi-line and line spacing
   {
@@ -714,7 +717,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   strikethroughMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::STRIKETHROUGH);
   DALI_TEST_EQUALS(strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> strikethroughIndicesConversionTable = {"enable", "color", "height"};
+  std::vector<String> strikethroughIndicesConversionTable = {"enable", "color", "height"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(strikethroughMapGet, strikethroughMapSet, strikethroughIndicesConversionTable), true, TEST_LOCATION);
 
   strikethroughMapSet.Clear();
@@ -766,7 +769,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   underlineMapGet = label.GetProperty<Property::Map>(TextLabel::Property::UNDERLINE);
   DALI_TEST_EQUALS(underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> underlineIndicesConversionTable = {"enable", "color", "height", "type", "dashWidth", "dashGap"};
+  std::vector<String> underlineIndicesConversionTable = {"enable", "color", "height", "type", "dashWidth", "dashGap"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(underlineMapGet, underlineMapSet, underlineIndicesConversionTable), true, TEST_LOCATION);
 
   underlineMapSet.Clear();
@@ -947,7 +950,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   shadowMapGet = label.GetProperty<Property::Map>(TextLabel::Property::SHADOW);
   DALI_TEST_EQUALS(shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> shadowIndicesConversionTable = {"color", "offset", "blurRadius"};
+  std::vector<String> shadowIndicesConversionTable = {"color", "offset", "blurRadius"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(shadowMapGet, shadowMapSet, shadowIndicesConversionTable), true, TEST_LOCATION);
 
   shadowMapSet.Clear();
@@ -964,7 +967,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Check the emboss property with string
   label.SetProperty(TextLabel::Property::EMBOSS, "Emboss properties");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
 
   // Check the emboss property
   Property::Map embossMapSet;
@@ -1019,7 +1022,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Test string type first
   // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
   label.SetProperty(TextLabel::Property::OUTLINE, "Outline properties");
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::OUTLINE), std::string("Outline properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::OUTLINE), std::string("Outline properties"), TEST_LOCATION);
 
   // Then test the property map type
   Property::Map outlineMapSet;
@@ -1045,7 +1048,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   outlineMapGet = label.GetProperty<Property::Map>(TextLabel::Property::OUTLINE);
   DALI_TEST_EQUALS(outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> outlineIndicesConversionTable = {"color", "width", "offset", "blurRadius"};
+  std::vector<String> outlineIndicesConversionTable = {"color", "width", "offset", "blurRadius"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(outlineMapGet, outlineMapSet, outlineIndicesConversionTable), true, TEST_LOCATION);
 
   // Check the background property
@@ -1080,7 +1083,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   backgroundMapGet = label.GetProperty<Property::Map>(DevelTextLabel::Property::BACKGROUND);
   DALI_TEST_EQUALS(backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION);
-  std::vector<std::string> backgroundIndicesConversionTable = {"enable", "color"};
+  std::vector<Dali::String> backgroundIndicesConversionTable = {"enable", "color"};
   DALI_TEST_EQUALS(DaliTestCheckMaps(backgroundMapGet, backgroundMapSet, backgroundIndicesConversionTable), true, TEST_LOCATION);
 
   // Check the pixel size of font
@@ -1264,7 +1267,7 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
 
   application.GetScene().Add(label);
 
-  const std::string scripts(
+  const String scripts(
     " привет мир, γειά σου Κόσμε, Hello world, مرحبا بالعالم, שלום עולם, "
     "բարեւ աշխարհը, მსოფლიოში, 안녕하세요, 你好世界, ひらがな, カタカナ, "
     "ওহে বিশ্ব, မင်္ဂလာပါကမ္ဘာလောက, हैलो वर्ल्ड, હેલો વર્લ્ડ, ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਦੁਨਿਆ, ಹಲೋ ವರ್ಲ್ಡ್, "
@@ -1273,7 +1276,7 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
     "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84."); // these characters on the last line are emojis.
 
   label.SetProperty(TextLabel::Property::TEXT, scripts);
-  DALI_TEST_EQUALS(label.GetProperty<std::string>(TextLabel::Property::TEXT), scripts, TEST_LOCATION);
+  DALI_TEST_EQUALS(label.GetProperty<Dali::String>(TextLabel::Property::TEXT), scripts, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1305,7 +1308,7 @@ int UtcDaliToolkitTextLabelEmojisP(void)
 
   fontClient.GetFontId(fontDescription, EMOJI_FONT_SIZE);
 
-  const std::string emojis = "<font family='BreezeColorEmoji' size='60'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
+  const String emojis = "<font family='BreezeColorEmoji' size='60'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::TEXT, emojis);
 
@@ -1318,14 +1321,14 @@ int UtcDaliToolkitTextLabelEmojisP(void)
   application.Render();
 
   // EMOJI + ZWJ + EMOJI case for coverage.
-  const std::string emojiWithZWJ = "&#x1f469;&#x200d;&#x1f52c;";
+  const String emojiWithZWJ = "&#x1f469;&#x200d;&#x1f52c;";
   label.SetProperty(TextLabel::Property::TEXT, emojiWithZWJ);
 
   application.SendNotification();
   application.Render();
 
   // EMOJI Sequences case for coverage.
-  std::string emojiSequences =
+  String emojiSequences =
     "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   // case for coverage when glyph is not included in the font
     "Text VS15 &#x262a;&#xfe0e;\n"                                                         // text presentation sequence and selector
     "Color VS16 &#x262a;&#xfe0f;\n"                                                        // emoji presentation sequence and selector
@@ -1970,7 +1973,7 @@ int UtcDaliToolkitTextlabelScrollingVertical04(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 50);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
+  String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
   label.SetProperty(TextLabel::Property::TEXT, text);
 
   // Auto scroll
@@ -2592,7 +2595,7 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
 
     if(Property::STRING == valueType)
     {
-      std::string stringValue;
+      String stringValue;
       colorValue->Get(stringValue);
       if(stringValue == "red")
       {
@@ -4220,12 +4223,12 @@ int utcDaliTextLabelFontVariationsRegister(void)
   application.SendNotification();
   application.Render();
 
-  std::string WGHT_KEY       = "wght";
+  String      WGHT_KEY       = "wght";
   const float WGHT_VALUE     = 100.f;
   const float WGHT_VALUE_END = 900.f;
 
   // Check with no previous variations.
-  auto fontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, WGHT_KEY.data());
+  auto fontVariationsIndex = DevelTextLabel::RegisterFontVariationProperty(label, WGHT_KEY.CStr());
   label.SetProperty(fontVariationsIndex, WGHT_VALUE);
 
   application.SendNotification();
@@ -4240,7 +4243,7 @@ int utcDaliTextLabelFontVariationsRegister(void)
 
   const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
 
-  std::string key = "";
+  String key = "";
   if(keyvalue.first.type == Property::Key::STRING)
   {
     key = keyvalue.first.stringKey;

@@ -156,7 +156,7 @@ public: // METHODS
    *  sufficient AT LEAST AS LONG AS we recreate the SceneDefinition when loading the scene; if
    *  we ever needed to serialize it, we should ensure correct ordering of nodes.
    */
-  bool ReparentNode(const std::string& name, const std::string& newParentName, Index siblingOrder);
+  bool ReparentNode(const Dali::String& name, const Dali::String& newParentName, Index siblingOrder);
 
   /**
    * @brief Removes a node with the given name, including all of its children, and updating
@@ -164,7 +164,7 @@ public: // METHODS
    * @SINCE_2_0.7
    * @return Whether the operation was successful.
    */
-  bool RemoveNode(const std::string& name);
+  bool RemoveNode(const Dali::String& name);
 
   /**
    * @brief Builds the model matrix stack for the node at the given @a index.
@@ -180,7 +180,7 @@ public: // METHODS
    * @return Pointer to the node definition; nullptr if not found.
    * @note No ownership transfer.
    */
-  NodeDefinition* FindNode(const std::string& name, Index* outIndex = nullptr);
+  NodeDefinition* FindNode(const Dali::String& name, Index* outIndex = nullptr);
 
   /**
    * @brief Attempts to find the definition of a node with the given @a name. Only upon
@@ -189,7 +189,7 @@ public: // METHODS
    * @return Pointer to the node definition; nullptr if not found.
    * @note No ownership transfer.
    */
-  const NodeDefinition* FindNode(const std::string& name, Index* outIndex = nullptr) const;
+  const NodeDefinition* FindNode(const Dali::String& name, Index* outIndex = nullptr) const;
 
   /**
    * @brief The index of the given NodeDefinition @a node, or -1 if the node definition was not found.
@@ -277,7 +277,7 @@ public: // METHODS
   SceneDefinition& operator=(SceneDefinition&& other);
 
 private: // METHODS
-  bool FindNode(const std::string& name, UniquePtr<NodeDefinition>** result);
+  bool FindNode(const Dali::String& name, UniquePtr<NodeDefinition>** result);
 
 private:                                         // DATA
   std::vector<UniquePtr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).

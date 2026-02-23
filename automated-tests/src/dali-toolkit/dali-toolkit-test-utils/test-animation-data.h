@@ -34,8 +34,8 @@ public:
    */
   struct AnimationDataElement
   {
-    std::string                          target;
-    std::string                          property;
+    Dali::String                         target;
+    Dali::String                         property;
     Dali::Property::Value                value;
     Dali::AlphaFunction::BuiltinFunction alphaFunction;
     float                                timePeriodDelay;

@@ -22,6 +22,7 @@
 // test harness headers before dali headers.
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-vector-image-renderer.h>
 #include "dummy-control.h"
@@ -45,6 +46,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void utc_dali_toolkit_image_view_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -94,7 +97,7 @@ void TestUrl(ImageView imageView, const std::string url)
 {
   Property::Value value = imageView.GetProperty(imageView.GetPropertyIndex("image"));
 
-  std::string urlActual;
+  String urlActual;
   DALI_TEST_CHECK(value.Get(urlActual));
   DALI_TEST_EQUALS(urlActual, url, TEST_LOCATION);
 }
@@ -977,9 +980,9 @@ int UtcDaliImageViewAddedTexture(void)
   ImageView imageView = ImageView::New();
 
   // empty texture is ok, though pointless from app point of view
-  TextureSet  empty;
-  std::string url = TextureManager::AddTexture(empty);
-  DALI_TEST_CHECK(url.size() > 0u);
+  TextureSet empty;
+  String     url = TextureManager::AddTexture(empty);
+  DALI_TEST_CHECK(url.Size() > 0u);
 
   Property::Map propertyMap;
   propertyMap[ImageVisual::Property::URL] = url;
@@ -1197,7 +1200,7 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 
   application.GetScene().Add(imageView);
 
-  std::string           url;
+  String                url;
   Property::Map         map;
   Toolkit::Visual::Base visual;
 
@@ -1269,7 +1272,7 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   DALI_TEST_CHECK(visual);          // Visual should be valid
 
   // Set an empty URL in property map
-  propertyMap[ImageVisual::Property::URL] = std::string();
+  propertyMap[ImageVisual::Property::URL] = String();
   imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
 
   application.SendNotification();
@@ -1319,10 +1322,10 @@ int UtcDaliImageViewResourceUrlP(void)
   ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
-  DALI_TEST_CHECK(imageView.GetProperty(ImageView::Property::IMAGE).Get<std::string>().empty());
+  DALI_TEST_CHECK(imageView.GetProperty(ImageView::Property::IMAGE).Get<Dali::String>().Empty());
 
   imageView.SetProperty(ImageView::Property::IMAGE, "TestString");
-  DALI_TEST_EQUALS(imageView.GetProperty(ImageView::Property::IMAGE).Get<std::string>(), "TestString", TEST_LOCATION);
+  DALI_TEST_EQUALS(imageView.GetProperty(ImageView::Property::IMAGE).Get<Dali::String>(), "TestString", TEST_LOCATION);
 
   END_TEST;
 }
@@ -2142,7 +2145,7 @@ int UtcDaliImageViewFittingModesFitHeight01(void)
 
   value = returnedMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), "FIT_HEIGHT", TEST_LOCATION); // OFFSET is zero
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), "FIT_HEIGHT", TEST_LOCATION); // OFFSET is zero
 
   END_TEST;
 }
@@ -2236,7 +2239,7 @@ int UtcDaliImageViewFittingModesFitWidth01(void)
 
   value = returnedMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), "FIT_WIDTH", TEST_LOCATION); // OFFSET is zero
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), "FIT_WIDTH", TEST_LOCATION); // OFFSET is zero
 
   END_TEST;
 }
@@ -2580,10 +2583,10 @@ int UtcDaliImageViewCustomShader(void)
 
   // Set a custom shader with an image url
   {
-    Property::Map     properties;
-    Property::Map     shader;
-    const std::string vertexShader                    = "Foobar";
-    const std::string fragmentShader                  = "Foobar";
+    Property::Map properties;
+    Property::Map shader;
+    const String  vertexShader                        = "Foobar";
+    const String  fragmentShader                      = "Foobar";
     shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
     shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2608,18 +2611,18 @@ int UtcDaliImageViewCustomShader(void)
     DALI_TEST_CHECK(map);
 
     Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
     Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
   }
 
   // Set a custom shader after setting an image url
   {
-    Property::Map     properties;
-    Property::Map     shader;
-    const std::string vertexShader                    = "Foobar";
-    const std::string fragmentShader                  = "Foobar";
+    Property::Map properties;
+    Property::Map shader;
+    const String  vertexShader                        = "Foobar";
+    const String  fragmentShader                      = "Foobar";
     shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
     shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2642,18 +2645,18 @@ int UtcDaliImageViewCustomShader(void)
     DALI_TEST_CHECK(map);
 
     Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
     Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
   }
 
   // Set a custom shader before setting an image url
   {
-    Property::Map     properties;
-    Property::Map     shader;
-    const std::string vertexShader                    = "Foobar";
-    const std::string fragmentShader                  = "Foobar";
+    Property::Map properties;
+    Property::Map shader;
+    const String  vertexShader                        = "Foobar";
+    const String  fragmentShader                      = "Foobar";
     shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
     shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2676,18 +2679,18 @@ int UtcDaliImageViewCustomShader(void)
     DALI_TEST_CHECK(map);
 
     Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
     Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
   }
 
   // Set a custom shader after setting a property map
   {
-    Property::Map     properties;
-    Property::Map     shader;
-    const std::string vertexShader                    = "Foobar";
-    const std::string fragmentShader                  = "Foobar";
+    Property::Map properties;
+    Property::Map shader;
+    const String  vertexShader                        = "Foobar";
+    const String  fragmentShader                      = "Foobar";
     shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
     shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2714,18 +2717,18 @@ int UtcDaliImageViewCustomShader(void)
     DALI_TEST_CHECK(map);
 
     Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
     Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
   }
 
   // Set a custom shader before setting a property map
   {
-    Property::Map     properties;
-    Property::Map     shader;
-    const std::string vertexShader                    = "Foobar";
-    const std::string fragmentShader                  = "Foobar";
+    Property::Map properties;
+    Property::Map shader;
+    const String  vertexShader                        = "Foobar";
+    const String  fragmentShader                      = "Foobar";
     shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
     shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2752,10 +2755,10 @@ int UtcDaliImageViewCustomShader(void)
     DALI_TEST_CHECK(map);
 
     Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-    DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
     Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-    DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
   }
 
   END_TEST;
@@ -2816,7 +2819,7 @@ int UtcDaliImageViewLoadRemoteSVG01(void)
 
   ToolkitTestApplication application;
 
-  const std::string svgImageUrl("https://dalihub.github.io/images/check.svg");
+  const String svgImageUrl("https://dalihub.github.io/images/check.svg");
 
   {
     Toolkit::ImageView imageView;
@@ -2855,7 +2858,7 @@ int UtcDaliImageViewLoadRemoteSVG02(void)
 
   ToolkitTestApplication application;
 
-  const std::string svgImageUrl("https://dalihub.github.io/images/check.svg");
+  const String svgImageUrl("https://dalihub.github.io/images/check.svg");
 
   // Without size set
   {
@@ -3122,7 +3125,8 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
     // The SYNCHRONOUS_LOADING property must be set to the bool value.
     // Check if error log is outputted when setting other value like string.
     // Even if the wrong value is set, the image will be shown normally, and the synchronous value should be the default value(false).
-    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, std::to_string(5));
+    auto str = std::to_string(5);
+    syncLoadingMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, String(str.c_str()));
     imageView.SetProperty(ImageView::Property::IMAGE, syncLoadingMap);
 
     application.GetScene().Add(imageView);
@@ -4091,13 +4095,13 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask01(void)
 
   ToolkitTestApplication application;
 
-  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const std::string& url, const std::string& mask, const char* location)
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, const String& url, const String& mask, const char* location)
   {
     gResourceReadySignalCounter = 0;
 
     Property::Map map;
     map[Toolkit::ImageVisual::Property::URL] = url;
-    if(!mask.empty())
+    if(!mask.Empty())
     {
       map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = mask;
     }
@@ -4117,7 +4121,7 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask01(void)
       // Wait for loading
       DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerCount), true, location);
     }
-    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    tet_printf("test %s [sync:%d] signal fired\n", url.CStr(), isSynchronous ? 1 : 0);
     DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
 
     imageView.Unparent();
@@ -4151,7 +4155,7 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
 
   gResourceReadySignalCounter = 0;
 
-  auto TestBrokenMaskResourceReadyUrl = [&application](const std::string& url, const char* location)
+  auto TestBrokenMaskResourceReadyUrl = [&application](const String& url, const char* location)
   {
     Property::Map map;
     map[Toolkit::ImageVisual::Property::URL] = url;
@@ -4169,7 +4173,7 @@ int UtcDaliImageViewOnResourceReadySignalWithBrokenAlphaMask02(void)
   };
 
   // Use more than 4 images (The number of LocalImageLoadThread)
-  const std::vector<std::string> testUrlList = {gImage_34_RGBA, gImage_600_RGB, "invalid.jpg" /* invalid url */, TEST_IMAGE_1, TEST_IMAGE_2, TEST_BROKEN_IMAGE_DEFAULT};
+  const std::vector<String> testUrlList = {gImage_34_RGBA, gImage_600_RGB, "invalid.jpg" /* invalid url */, TEST_IMAGE_1, TEST_IMAGE_2, TEST_BROKEN_IMAGE_DEFAULT};
 
   int expectResourceReadySignalCounter = 0;
 
@@ -4194,13 +4198,13 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
 
   ToolkitTestApplication application;
 
-  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& mask, const char* location)
+  auto TestResourceReadyUrl = [&application](int eventTriggerCount, bool isSynchronous, bool loadSuccess, const String& url, const String& mask, const char* location)
   {
     gResourceReadySignalCounter = 0;
 
     Property::Map map;
     map[Toolkit::ImageVisual::Property::URL] = url;
-    if(!mask.empty())
+    if(!mask.Empty())
     {
       map[Toolkit::ImageVisual::Property::ALPHA_MASK_URL] = mask;
     }
@@ -4218,14 +4222,14 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
     // Wait for loading
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(eventTriggerCount), true, location);
 
-    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    tet_printf("test %s [sync:%d] signal fired\n", url.CStr(), isSynchronous ? 1 : 0);
     DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
     DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, location);
 
     imageView.Unparent();
   };
 
-  auto TestAuxiliaryResourceReadyUrl = [&application](bool isSynchronous, bool loadSuccess, const std::string& url, const std::string& auxiliaryUrl, const char* location)
+  auto TestAuxiliaryResourceReadyUrl = [&application](bool isSynchronous, bool loadSuccess, const String& url, const String& auxiliaryUrl, const char* location)
   {
     gResourceReadySignalCounter = 0;
 
@@ -4250,7 +4254,7 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
       DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, location);
     }
 
-    tet_printf("test %s [sync:%d] signal fired\n", url.c_str(), isSynchronous ? 1 : 0);
+    tet_printf("test %s [sync:%d] signal fired\n", url.CStr(), isSynchronous ? 1 : 0);
     DALI_TEST_EQUALS(gResourceReadySignalCounter, 1, location);
     DALI_TEST_EQUALS(imageView.GetVisualResourceStatus(Toolkit::ImageView::Property::IMAGE), loadSuccess ? Toolkit::Visual::ResourceStatus::READY : Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
 
@@ -5104,7 +5108,7 @@ int UtcDaliImageViewNpatchImageCacheTest01(void)
   textureCallStack.Enable(true);
   textureCallStack.EnableLogging(true);
 
-  auto TestNPatch = [&](int index, const std::string& nPatchImageUrl, const char* location)
+  auto TestNPatch = [&](int index, const String& nPatchImageUrl, const char* location)
   {
     if(imageView[index])
     {
@@ -5207,7 +5211,7 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   textureCallStack.Enable(true);
   textureCallStack.EnableLogging(true);
 
-  auto TestBorderImage = [&](int index, const std::string& normalImageUrl, const Rect<int> border, const char* location)
+  auto TestBorderImage = [&](int index, const String& normalImageUrl, const Rect<int> border, const char* location)
   {
     Property::Map map;
     map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
@@ -5262,9 +5266,9 @@ int UtcDaliImageViewPlaceholderImage01(void)
   application.GetScene().Add(imageView);
 
   Property::Value value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
-  std::string     url;
+  String          url;
   DALI_TEST_CHECK(value.Get(url));
-  DALI_TEST_CHECK(url.empty());
+  DALI_TEST_CHECK(url.Empty());
   imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
 
   application.SendNotification();
@@ -5341,9 +5345,9 @@ int UtcDaliImageViewPlaceholderImage02(void)
   application.GetScene().Add(imageView);
 
   Property::Value value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
-  std::string     url;
+  String          url;
   DALI_TEST_CHECK(value.Get(url));
-  DALI_TEST_CHECK(url.empty());
+  DALI_TEST_CHECK(url.Empty());
 
   imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
   application.SendNotification();
@@ -5514,9 +5518,9 @@ int UtcDaliImageViewTransitionEffect02(void)
   imageView.SetProperty(Toolkit::ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
 
   value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
-  std::string url;
+  String url;
   DALI_TEST_CHECK(value.Get(url));
-  DALI_TEST_CHECK(url.empty());
+  DALI_TEST_CHECK(url.Empty());
   imageView.SetProperty(Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);
   application.SendNotification();
   application.Render();
@@ -5581,7 +5585,7 @@ int UtcDaliImageViewTransitionEffect03(void)
   DALI_TEST_CHECK(transition == true);
 
   value = imageView.GetProperty(ImageView::Property::PLACEHOLDER_IMAGE);
-  std::string url;
+  String url;
   DALI_TEST_CHECK(value.Get(url));
   DALI_TEST_CHECK(url == gImage_34_RGBA);
 

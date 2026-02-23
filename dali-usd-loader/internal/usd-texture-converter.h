@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_USD_TEXTURE_CONVERTER_H
 #define DALI_SCENE3D_LOADER_USD_TEXTURE_CONVERTER_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,15 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+
+#include <string>
 
 // Some TBB/USD headers produce compile warnings
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <pxr/usd/usdShade/material.h>
 #pragma GCC diagnostic pop
-
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -37,7 +38,7 @@ namespace Dali::Scene3D::Loader
 {
 class MaterialDefinition;
 
-using ImageMetadataMap = std::unordered_map<std::string, ImageMetadata>;
+using ImageMetadataMap = std::unordered_map<Dali::String, ImageMetadata>;
 
 /**
  * @class UsdTextureConverter

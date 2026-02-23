@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,14 @@
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/public-api/loader/environment-map-loader.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -46,12 +49,13 @@ static void RequestLoadBrdfPixelData()
 namespace Dali::Scene3D::Loader
 {
 EnvironmentDefinition::RawData
-EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
+EnvironmentDefinition::LoadRaw(const Dali::String& environmentsPath)
 {
-  RawData raw;
-  auto    loadFn = [&environmentsPath](const std::string& path, EnvironmentMapData& environmentMapData)
+  RawData     raw;
+  std::string envPath = ToStdString(environmentsPath);
+  auto        loadFn  = [&envPath](const Dali::String& path, EnvironmentMapData& environmentMapData)
   {
-    if(path.empty())
+    if(path.Empty())
     {
       environmentMapData.mPixelData.resize(6);
       for(auto& face : environmentMapData.mPixelData)
@@ -60,9 +64,9 @@ EnvironmentDefinition::LoadRaw(const std::string& environmentsPath)
       }
       environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
     }
-    else if(!LoadEnvironmentMap(environmentsPath + path, environmentMapData))
+    else if(!LoadEnvironmentMap(envPath + ToStdString(path), environmentMapData))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load cubemap texture from '" << path << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load cubemap texture from '" << path.CStr() << "'.";
     }
   };
 

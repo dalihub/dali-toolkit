@@ -40,8 +40,11 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 using namespace Dali::Toolkit;
 
 void dali_animated_vector_image_visual_startup(void)
@@ -399,7 +402,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   // check the property values from the returned map from a visual
   Property::Value* value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_VECTOR_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(ToStdString(*value) == TEST_VECTOR_IMAGE_FILE_NAME);
 
   value = resultMap.Find(DevelImageVisual::Property::LOOP_COUNT, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -554,7 +557,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_VECTOR_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(ToStdString(*value) == TEST_VECTOR_IMAGE_FILE_NAME);
 
   value = resultMap.Find(DevelImageVisual::Property::LOOP_COUNT, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -648,7 +651,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_VECTOR_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(ToStdString(*value) == TEST_VECTOR_IMAGE_FILE_NAME);
 
   END_TEST;
 }
@@ -792,8 +795,8 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   Property::Map     shader;
   const std::string vertexShader                    = "Foobar";
   const std::string fragmentShader                  = "Foobar sampler2D Foobar";
-  shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
-  shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
+  shader[Visual::Shader::Property::FRAGMENT_SHADER] = ToPropertyValue(fragmentShader);
+  shader[Visual::Shader::Property::VERTEX_SHADER]   = ToPropertyValue(vertexShader);
 
   properties[Visual::Property::TYPE]     = Visual::IMAGE;
   properties[Visual::Property::SHADER]   = shader;
@@ -822,14 +825,14 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   Property::Map*  map      = value.GetMap();
   DALI_TEST_CHECK(map);
 
-  std::string      resultFragmentShader, resultVertexShader;
+  Dali::String     resultFragmentShader, resultVertexShader;
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
   fragment->Get(resultFragmentShader);
-  DALI_TEST_CHECK(resultFragmentShader.find(fragmentShader) != std::string::npos);
+  DALI_TEST_CHECK(ToStdString(resultFragmentShader).find(fragmentShader) != std::string::npos);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
   vertex->Get(resultVertexShader);
-  DALI_TEST_CHECK(resultVertexShader.find(vertexShader) != std::string::npos);
+  DALI_TEST_CHECK(ToStdString(resultVertexShader).find(vertexShader) != std::string::npos);
 
   END_TEST;
 }
@@ -3441,7 +3444,7 @@ int UtcDaliAnimatedVectorImageNativeTextureChangeShader(void)
 
   std::string      resultFragmentShader, resultVertexShader;
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  fragment->Get(resultFragmentShader);
+  resultFragmentShader      = ToStdString(*fragment);
   DALI_TEST_CHECK(resultFragmentShader.find(NativeImageTest::GetCustomFragmentPrefix()) != std::string::npos);
 
   // Reset to make we use normal texture again.

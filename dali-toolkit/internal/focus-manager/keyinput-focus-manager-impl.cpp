@@ -198,14 +198,14 @@ void KeyInputFocusManager::OnFocusControlSceneDisconnection(Dali::Actor actor)
   RemoveFocus(Dali::Toolkit::Control::DownCast(actor));
 }
 
-bool KeyInputFocusManager::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool KeyInputFocusManager::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool                  connected(true);
   KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>(object);
 
   if(manager)
   {
-    if(0 == strcmp(signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED))
+    if(0 == strcmp(signalName.CStr(), SIGNAL_KEY_INPUT_FOCUS_CHANGED))
     {
       manager->KeyInputFocusChangedSignal().Connect(tracker, functor);
     }

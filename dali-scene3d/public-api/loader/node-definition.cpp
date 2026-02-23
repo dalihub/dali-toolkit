@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/light/light-impl.h>
@@ -28,6 +29,10 @@
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -178,19 +183,19 @@ Matrix NodeDefinition::GetLocalSpace() const
   return localSpace;
 }
 
-std::string_view NodeDefinition::GetIblScaleFactorUniformName()
+Dali::StringView NodeDefinition::GetIblScaleFactorUniformName()
 {
-  return IBL_INTENSITY_STRING;
+  return ToDaliStringView(IBL_INTENSITY_STRING);
 }
 
-std::string_view NodeDefinition::GetIblYDirectionUniformName()
+Dali::StringView NodeDefinition::GetIblYDirectionUniformName()
 {
-  return IBL_Y_DIRECTION;
+  return ToDaliStringView(IBL_Y_DIRECTION);
 }
 
-std::string_view NodeDefinition::GetIblMaxLodUniformName()
+Dali::StringView NodeDefinition::GetIblMaxLodUniformName()
 {
-  return IBL_MAXLOD;
+  return ToDaliStringView(IBL_MAXLOD);
 }
 
 bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
@@ -453,7 +458,7 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
       {
         textureInformation.mTexture   = textures.GetTexture(textureIndex + textureIndexOffset);
         textureInformation.mSampler   = textures.GetSampler(textureIndex + textureIndexOffset);
-        textureInformation.mUrl       = matDef.mTextureStages[textureIndex].mTexture.mDirectoryPath + matDef.mTextureStages[textureIndex].mTexture.mImageUri;
+        textureInformation.mUrl       = ToStdString(matDef.mTextureStages[textureIndex].mTexture.mDirectoryPath + matDef.mTextureStages[textureIndex].mTexture.mImageUri);
         textureInformation.mTransform = matDef.mTextureStages[textureIndex].mTexture.mTransform;
         textureIndex++;
       }

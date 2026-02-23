@@ -26,6 +26,7 @@
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <string.h>
 
@@ -44,6 +45,10 @@
 #include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -193,7 +198,7 @@ Property::Map TextVisual::ConvertStringKeysToIndexKeys(const Property::Map& prop
 
     if(keyValue.first.type == Property::Key::STRING)
     {
-      indexKey = StringKeyToIndexKey(keyValue.first.stringKey);
+      indexKey = StringKeyToIndexKey(ToStdString(keyValue.first.stringKey));
     }
 
     outMap.Insert(indexKey, keyValue.second);
@@ -221,9 +226,9 @@ void TextVisual::DoCreatePropertyMap(Property::Map& map) const
 
   std::string text;
   mController->GetText(text);
-  map.Insert(Toolkit::TextVisual::Property::TEXT, text);
+  map.Insert(Toolkit::TextVisual::Property::TEXT, ToPropertyValue(text));
 
-  map.Insert(Toolkit::TextVisual::Property::FONT_FAMILY, mController->GetDefaultFontFamily());
+  map.Insert(Toolkit::TextVisual::Property::FONT_FAMILY, ToPropertyValue(mController->GetDefaultFontFamily()));
 
   GetFontStyleProperty(mController, value, Text::FontStyle::DEFAULT);
   map.Insert(Toolkit::TextVisual::Property::FONT_STYLE, value);
@@ -262,7 +267,7 @@ void TextVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT);
   std::string text;
   mController->GetText(text);
-  map.Insert(Toolkit::TextVisual::Property::TEXT, text);
+  map.Insert(Toolkit::TextVisual::Property::TEXT, ToPropertyValue(text));
 }
 
 void TextVisual::EnablePreMultipliedAlpha(bool preMultiplied)
@@ -325,7 +330,7 @@ void TextVisual::DoSetProperties(const Property::Map& propertyMap)
 
     if(keyValue.first.type == Property::Key::STRING)
     {
-      indexKey = StringKeyToIndexKey(keyValue.first.stringKey);
+      indexKey = StringKeyToIndexKey(ToStdString(keyValue.first.stringKey));
     }
 
     DoSetProperty(indexKey, keyValue.second);
@@ -481,7 +486,7 @@ void TextVisual::DoSetProperty(Dali::Property::Index index, const Dali::Property
     }
     case Toolkit::TextVisual::Property::TEXT:
     {
-      mController->SetText(propertyValue.Get<std::string>());
+      mController->SetText(ToStdString(propertyValue));
       break;
     }
     case Toolkit::TextVisual::Property::FONT_FAMILY:

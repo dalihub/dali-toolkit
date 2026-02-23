@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MODEL_LOADER_IMPL_H
 #define DALI_SCENE3D_LOADER_MODEL_LOADER_IMPL_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public:
    * @param[out] result loaded model data.
    * @return True if model loading is successfully finished.
    */
-  virtual bool LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result) = 0;
+  virtual bool LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result) = 0;
 
 protected:
   Dali::Scene3D::Loader::ModelLoader::InputParameter* mInputParameter{nullptr};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -29,6 +30,8 @@
 #include <sstream>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+
+using Dali::Integration::ToStdString;
 
 using namespace Dali;
 
@@ -319,7 +322,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetContentDirection(static_cast<Toolkit::FlexContainer::ContentDirection>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::ContentDirection>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::ContentDirection>(value.Get<Dali::String>().CStr(),
                                                                                     CONTENT_DIRECTION_STRING_TABLE,
                                                                                     CONTENT_DIRECTION_STRING_TABLE_COUNT,
                                                                                     contentDirection))
@@ -336,7 +339,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetFlexDirection(static_cast<Toolkit::FlexContainer::FlexDirection>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::FlexDirection>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::FlexDirection>(value.Get<Dali::String>().CStr(),
                                                                                  FLEX_DIRECTION_STRING_TABLE,
                                                                                  FLEX_DIRECTION_STRING_TABLE_COUNT,
                                                                                  flexDirection))
@@ -353,7 +356,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetFlexWrap(static_cast<Toolkit::FlexContainer::WrapType>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::WrapType>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::WrapType>(value.Get<Dali::String>().CStr(),
                                                                             FLEX_WRAP_STRING_TABLE,
                                                                             FLEX_WRAP_STRING_TABLE_COUNT,
                                                                             flexWrap))
@@ -370,7 +373,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetJustifyContent(static_cast<Toolkit::FlexContainer::Justification>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Justification>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Justification>(value.Get<Dali::String>().CStr(),
                                                                                  JUSTIFY_CONTENT_STRING_TABLE,
                                                                                  JUSTIFY_CONTENT_STRING_TABLE_COUNT,
                                                                                  justifyContent))
@@ -387,7 +390,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetAlignItems(static_cast<Toolkit::FlexContainer::Alignment>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Alignment>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Alignment>(ToStdString(value).c_str(),
                                                                              ALIGN_ITEMS_STRING_TABLE,
                                                                              ALIGN_ITEMS_STRING_TABLE_COUNT,
                                                                              alignItems))
@@ -404,7 +407,7 @@ void FlexContainer::SetProperty(BaseObject* object, Property::Index index, const
         {
           flexContainerImpl.SetAlignContent(static_cast<Toolkit::FlexContainer::Alignment>(value.Get<int>()));
         }
-        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Alignment>(value.Get<std::string>().c_str(),
+        else if(Scripting::GetEnumeration<Toolkit::FlexContainer::Alignment>(ToStdString(value).c_str(),
                                                                              ALIGN_CONTENT_STRING_TABLE,
                                                                              ALIGN_CONTENT_STRING_TABLE_COUNT,
                                                                              alignContent))
@@ -632,7 +635,7 @@ void FlexContainer::ComputeLayout()
         }
         else if(alignSelfPropertyValue.GetType() == Property::STRING)
         {
-          std::string value = alignSelfPropertyValue.Get<std::string>();
+          std::string value = ToStdString(alignSelfPropertyValue);
           Scripting::GetEnumeration<Toolkit::FlexContainer::Alignment>(value.c_str(),
                                                                        ALIGN_SELF_STRING_TABLE,
                                                                        ALIGN_SELF_STRING_TABLE_COUNT,

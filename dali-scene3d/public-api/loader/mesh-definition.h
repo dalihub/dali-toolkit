@@ -232,19 +232,19 @@ struct DALI_SCENE3D_API MeshDefinition
    */
   struct BlendShape
   {
-    std::string name;
-    Accessor    deltas;
-    Accessor    normals;
-    Accessor    tangents;
-    float       weight = 0.f;
-    uint32_t    mFlags = 0x0;
+    Dali::String name;
+    Accessor     deltas;
+    Accessor     normals;
+    Accessor     tangents;
+    float        weight = 0.f;
+    uint32_t     mFlags = 0x0;
   };
 
   struct RawData
   {
     struct Attrib
     {
-      std::string          mName;
+      Dali::String         mName;
       Property::Type       mType;
       uint32_t             mNumElements;
       std::vector<uint8_t> mData;
@@ -322,7 +322,7 @@ struct DALI_SCENE3D_API MeshDefinition
    * @SINCE_2_0.7
    * @note This can be done on any thread.
    */
-  RawData LoadRaw(const std::string& modelsPath, BufferDefinition::Vector& buffers);
+  RawData LoadRaw(const Dali::String& modelsPath, BufferDefinition::Vector& buffers);
 
   /**
    * @brief Creates a MeshGeometry based firstly on the value of the uri member:
@@ -348,7 +348,7 @@ public: // DATA
   std::shared_ptr<RawData> mRawData;
   uint32_t                 mFlags         = 0x0;
   Geometry::Type           mPrimitiveType = Geometry::TRIANGLES;
-  std::string              mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
+  Dali::String             mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
   Accessor                 mIndices;
   Accessor                 mPositions;
   Accessor                 mNormals;  // data can be generated based on positions

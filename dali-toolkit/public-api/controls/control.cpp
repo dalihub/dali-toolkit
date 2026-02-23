@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -95,12 +99,12 @@ LongPressGestureDetector Control::GetLongPressGestureDetector() const
   return Internal::GetImplementation(*this).GetLongPressGestureDetector();
 }
 
-void Control::SetStyleName(const std::string& styleName)
+void Control::SetStyleName(const Dali::String& styleName)
 {
   Internal::GetImplementation(*this).SetStyleName(styleName);
 }
 
-const std::string& Control::GetStyleName() const
+const Dali::String& Control::GetStyleName() const
 {
   return Internal::GetImplementation(*this).GetStyleName();
 }

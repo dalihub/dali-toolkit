@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/texture.h>
 #include <fstream>
 #include <memory>
@@ -188,13 +189,15 @@ bool ConvertPixelFormat(const uint32_t ktxPixelFormat, Pixel::Format& format)
   return true;
 }
 
-bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData)
+bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapData)
 {
-  Dali::FileStream fileStream(path, FileStream::READ | FileStream::BINARY);
+  using Dali::Integration::ToStdString;
+  std::string      stdPath = ToStdString(path);
+  Dali::FileStream fileStream(stdPath, FileStream::READ | FileStream::BINARY);
   auto&            stream = fileStream.GetStream();
   if(!stream.good() || !stream.rdbuf()->in_avail())
   {
-    DALI_LOG_ERROR("Load ktx data failed, path : %s\n", path.c_str());
+    DALI_LOG_ERROR("Load ktx data failed, path : %s\n", stdPath.c_str());
     return false;
   }
 
@@ -203,20 +206,20 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
   stream.seekg(0u, stream.beg);
   if(stream.read(reinterpret_cast<char*>(&header), sizeof(KtxFileHeader)).good() == false)
   {
-    DALI_LOG_ERROR("Unable to read ktx header in file, %s\n", path.c_str());
+    DALI_LOG_ERROR("Unable to read ktx header in file, %s\n", stdPath.c_str());
     return false;
   }
 
   if(!header.IsIdentifierValid())
   {
-    DALI_LOG_ERROR("KTX Header Identifier is not valid, %s\n", path.c_str());
+    DALI_LOG_ERROR("KTX Header Identifier is not valid, %s\n", stdPath.c_str());
     return false;
   }
 
   // Skip the key-values:
   if(stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(header.bytesOfKeyValueData)), stream.cur).good() == false)
   {
-    DALI_LOG_ERROR("Unable to skip key-values in KTX file, %s\n", path.c_str());
+    DALI_LOG_ERROR("Unable to skip key-values in KTX file, %s\n", stdPath.c_str());
     return false;
   }
 
@@ -241,7 +244,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
     uint32_t byteSize = 0u;
     if(stream.read(reinterpret_cast<char*>(&byteSize), sizeof(byteSize)).good() == false)
     {
-      DALI_LOG_ERROR("Unable to read byteSize from KTX stream, %s\n", path.c_str());
+      DALI_LOG_ERROR("Unable to read byteSize from KTX stream, %s\n", stdPath.c_str());
       return false;
     }
 
@@ -257,7 +260,7 @@ bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData
         std::unique_ptr<uint8_t, void (*)(uint8_t*)> img(new uint8_t[byteSize], FreeBuffer);
         if(stream.read(reinterpret_cast<char*>(img.get()), static_cast<std::streamsize>(static_cast<size_t>(byteSize))).good() == false)
         {
-          DALI_LOG_ERROR("Unable to read data from KTX stream, %s\n", path.c_str());
+          DALI_LOG_ERROR("Unable to read data from KTX stream, %s\n", stdPath.c_str());
           return false;
         }
         environmentMapData.mPixelData[face][mipmapLevel] = Dali::Integration::NewPixelDataWithReleaseAfterUpload(img.release(), byteSize, header.pixelWidth, header.pixelHeight, 0u, daliformat, PixelData::DELETE_ARRAY);

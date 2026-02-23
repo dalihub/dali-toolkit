@@ -39,7 +39,7 @@ class Window : public SceneHolder
 public:
   Window(const PositionSize& positionSize);
   virtual ~Window() = default;
-  static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
+  static Window* New(const PositionSize& positionSize, const String& name, const String& className, bool isTransparent);
 
   Dali::Window::WindowPosition GetPosition() const;
   PositionSize                 GetPositionSize() const;

@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -28,6 +29,8 @@
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-property-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -197,7 +200,7 @@ void MotionData::OnLoadCompleted(MotionDataLoadTaskPtr task)
         bool specialized = false;
         if(mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::BVH_FILE || mMotionDataLoadTask->GetLoadMethod() == MotionDataLoadTask::LoadMethod::BVH_BUFFER)
         {
-          if(!animatedProperty.mPropertyName.empty())
+          if(!animatedProperty.mPropertyName.Empty())
           {
             // Heuristic checkup : Get only first character.
             if(animatedProperty.mPropertyName[0] == 'p')
@@ -217,13 +220,14 @@ void MotionData::OnLoadCompleted(MotionDataLoadTaskPtr task)
           int indexKey = Property::INVALID_INDEX;
           // Get indexKey from animatedProperty.mPropertyName (format: "WEIGHTS_UNIFORM[index]")
           // Heuristic checkup : Get only braket value..
-          size_t openBracket  = animatedProperty.mPropertyName.find('[');
-          size_t closeBracket = animatedProperty.mPropertyName.find(']');
+          std::string stdPropertyName = ToStdString(animatedProperty.mPropertyName);
+          size_t      openBracket     = stdPropertyName.find('[');
+          size_t      closeBracket    = stdPropertyName.find(']');
           if(openBracket != std::string::npos && closeBracket != std::string::npos && closeBracket > openBracket + 1)
           {
             try
             {
-              indexKey = std::stoi(animatedProperty.mPropertyName.substr(openBracket + 1, closeBracket - openBracket - 1));
+              indexKey = std::stoi(stdPropertyName.substr(openBracket + 1, closeBracket - openBracket - 1));
             }
             catch(...)
             {

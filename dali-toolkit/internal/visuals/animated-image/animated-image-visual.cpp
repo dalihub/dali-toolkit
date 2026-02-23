@@ -23,8 +23,11 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
+
+using Dali::Integration::ToDaliStringView;
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
@@ -218,7 +221,7 @@ AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache
   {
     ImageCache::UrlStore urlStore;
     urlStore.mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    urlStore.mUrl       = imageUrls[i].Get<std::string>();
+    urlStore.mUrl       = Dali::Integration::ToStdString(imageUrls[i]);
     if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
     {
       // Increase reference count of External Resources :
@@ -486,14 +489,14 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
 
   if(mImageUrl.IsValid())
   {
-    map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
+    map.Insert(Toolkit::ImageVisual::Property::URL, Property::Value(Dali::Integration::ToDaliStringView(mImageUrl.GetUrl())));
   }
   if(mImageUrls != nullptr && !mImageUrls->empty())
   {
     Property::Array urls;
     for(unsigned int i = 0; i < mImageUrls->size(); ++i)
     {
-      urls.Add((*mImageUrls)[i].mUrl.GetUrl());
+      urls.Add(Property::Value(Dali::Integration::ToDaliStringView((*mImageUrls)[i].mUrl.GetUrl())));
     }
     Property::Value value(const_cast<Property::Array&>(urls));
     map.Insert(Toolkit::ImageVisual::Property::URL, value);
@@ -541,7 +544,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
 
   if(mMaskingData != nullptr)
   {
-    map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
+    map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, Property::Value(Dali::Integration::ToDaliStringView(mMaskingData->mAlphaMaskUrl.GetUrl())));
     map.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor);
     map.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask);
     map.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, mMaskingData->mPreappliedMasking ? DevelImageVisual::MaskingType::MASKING_ON_LOADING : DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
@@ -823,11 +826,11 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
 
     case Toolkit::ImageVisual::Property::ALPHA_MASK_URL:
     {
-      std::string alphaUrl = "";
+      Dali::String alphaUrl;
       if(value.Get(alphaUrl))
       {
         AllocateMaskData();
-        mMaskingData->mAlphaMaskUrl = alphaUrl;
+        mMaskingData->mAlphaMaskUrl = Dali::Integration::ToStdString(alphaUrl);
         if(mMaskingData->mAlphaMaskUrl.IsValid())
         {
           if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
@@ -1116,8 +1119,8 @@ Shader AnimatedImageVisual::GenerateShader() const
   Shader shader;
   if(IsUsingCustomShader())
   {
-    shader = Shader::New(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->GetCustomShaderAt(0)->mVertexShader,
-                         mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->GetCustomShaderAt(0)->mFragmentShader,
+    shader = Shader::New(Dali::Integration::ToDaliStringView(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : std::string_view(mImpl->GetCustomShaderAt(0)->mVertexShader)),
+                         Dali::Integration::ToDaliStringView(mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : std::string_view(mImpl->GetCustomShaderAt(0)->mFragmentShader)),
                          mImpl->GetCustomShaderAt(0)->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);

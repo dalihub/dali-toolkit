@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
-#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
 namespace Dali
@@ -52,8 +52,8 @@ public:
 
   struct FocusChangeContext
   {
-    Toolkit::Control::KeyboardFocus::Device device      = Toolkit::Control::KeyboardFocus::Device::UNKNOWN;
-    std::string                             deviceName;
+    Toolkit::Control::KeyboardFocus::Device device = Toolkit::Control::KeyboardFocus::Device::UNKNOWN;
+    Dali::String                            deviceName;
   };
 
   enum FocusIndicatorState
@@ -232,7 +232,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
   /**

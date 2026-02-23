@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-property-handler.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gLogFilter;
 #endif
+
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Toolkit::Internal
 {
@@ -57,32 +61,32 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::CUT, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::CUT, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::COPY, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::COPY, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::PASTE, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::PASTE, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
     {
-      impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL, value.Get<std::string>());
+      impl.SetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL, ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR:
@@ -107,7 +111,7 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
     {
-      impl.SetPressedImage(value.Get<std::string>());
+      impl.SetPressedImage(ToStdString(value));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
@@ -191,32 +195,32 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::CLIPBOARD));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::CUT);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::CUT));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::COPY);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::COPY));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::PASTE);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::PASTE));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
     {
-      value = impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL);
+      value = ToPropertyValue(impl.GetButtonImage(Toolkit::TextSelectionPopup::SELECT_ALL));
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR:
@@ -241,7 +245,7 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
     {
-      value = impl.GetPressedImage();
+      value = ToPropertyValue(impl.GetPressedImage());
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:

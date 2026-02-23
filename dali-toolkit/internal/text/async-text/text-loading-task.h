@@ -79,9 +79,9 @@ public: // Implementation of AsyncTask
   /**
    * @copydoc Dali::AsyncTask::GetTaskName()
    */
-  std::string_view GetTaskName() const override
+  Dali::StringView GetTaskName() const override
   {
-    return "TextLoadingTask";
+    return Dali::StringView("TextLoadingTask");
   }
 
 private:

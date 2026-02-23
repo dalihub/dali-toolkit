@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/glyphy-shader/glyphy-shader.h>
 
 // EXTERNAL HEADERS
+#include <dali/integration-api/string-utils.h>
 #include <sstream>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 using namespace Dali;
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -59,10 +61,12 @@ GlyphyShader GlyphyShader::New(const Dali::Vector4& atlasInfo)
                              << SHADER_GLYPHY_SDF_GLSL_SHADER_DEF.data()
                              << SHADER_GLYPHY_SHADER_MAIN_FRAG.data();
 
-  Shader shaderEffectCustom = Shader::New(vertexShaderStringStream.str(),
-                                          fragmentShaderStringStream.str(),
-                                          static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL | Shader::Hint::OUTPUT_IS_TRANSPARENT),
-                                          "GLYPHY_SHADER");
+  std::string vertexStr          = vertexShaderStringStream.str();
+  std::string fragmentStr        = fragmentShaderStringStream.str();
+  Shader      shaderEffectCustom = Shader::New(ToDaliStringView(vertexStr),
+                                               ToDaliStringView(fragmentStr),
+                                               static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL | Shader::Hint::OUTPUT_IS_TRANSPARENT),
+                                               "GLYPHY_SHADER");
 
   GlyphyShader handle(shaderEffectCustom);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -32,6 +33,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void utc_dali_toolkit_button_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -59,13 +62,13 @@ static bool ChildButtonCallback(Button button)
   return false;
 }
 
-static std::string GetButtonText(Button button)
+static String GetButtonText(Button button)
 {
   Property::Value value = button.GetProperty(Toolkit::Button::Property::LABEL);
 
   Property::Map* labelProperty = value.GetMap();
 
-  std::string textLabel;
+  String textLabel;
 
   if(labelProperty)
   {
@@ -328,7 +331,7 @@ int UtcDaliButtonPropertyGetLabelAlignment(void)
 
   Button button = PushButton::New();
   button.SetProperty(Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "END");
-  DALI_TEST_EQUALS(button.GetProperty<std::string>(Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT), "END", TEST_LOCATION);
+  DALI_TEST_EQUALS(button.GetProperty<Dali::String>(Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT), "END", TEST_LOCATION);
 
   END_TEST;
 }
@@ -588,8 +591,8 @@ int UtcDaliButtonSetLabelPropertyP(void)
 
   tet_infoline(" UtcDaliButtonSetLabelPropertyP Set text label and then set again with new text");
 
-  const std::string TEST_LABEL1 = "test label one";
-  const std::string TEST_LABEL2 = "test label two";
+  const String TEST_LABEL1 = "test label one";
+  const String TEST_LABEL2 = "test label two";
 
   Button button = PushButton::New();
 

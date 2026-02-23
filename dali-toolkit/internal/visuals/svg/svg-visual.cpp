@@ -32,7 +32,11 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
+
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -361,7 +365,7 @@ void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::SVG);
   if(mImageUrl.IsValid())
   {
-    map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
+    map.Insert(Toolkit::ImageVisual::Property::URL, ToPropertyValue(mImageUrl.GetUrl()));
   }
 
   map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired());
@@ -565,8 +569,8 @@ Shader SvgVisual::GenerateShader() const
   }
   else
   {
-    shader = Shader::New(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->GetCustomShaderAt(0)->mVertexShader,
-                         mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->GetCustomShaderAt(0)->mFragmentShader,
+    shader = Shader::New(ToDaliStringView(mImpl->GetCustomShaderAt(0)->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : std::string_view(mImpl->GetCustomShaderAt(0)->mVertexShader)),
+                         ToDaliStringView(mImpl->GetCustomShaderAt(0)->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : std::string_view(mImpl->GetCustomShaderAt(0)->mFragmentShader)),
                          mImpl->GetCustomShaderAt(0)->mHints);
 
     shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);

@@ -88,12 +88,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::Control::SetStyleName
    */
-  void SetStyleName(const std::string& styleName);
+  void SetStyleName(const Dali::String& styleName);
 
   /**
    * @copydoc Dali::Toolkit::Control::GetStyleName
    */
-  const std::string& GetStyleName() const;
+  const Dali::String& GetStyleName() const;
 
   // Background
 

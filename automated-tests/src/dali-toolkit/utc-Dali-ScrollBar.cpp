@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <string>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -29,6 +30,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_scrollbar_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -195,14 +198,14 @@ int UtcDaliToolkitScrollBarNewP(void)
   DALI_TEST_CHECK(vertical.GetScrollDirection() == ScrollBar::VERTICAL);
 
   Property::Value value           = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
-  std::string     scrollDirection = value.Get<std::string>();
+  Dali::String    scrollDirection = value.Get<Dali::String>();
   DALI_TEST_EQUALS(scrollDirection, "VERTICAL", TEST_LOCATION);
 
   ScrollBar horizontal = ScrollBar::New(ScrollBar::HORIZONTAL);
   DALI_TEST_CHECK(horizontal);
   DALI_TEST_CHECK(horizontal.GetScrollDirection() == ScrollBar::HORIZONTAL);
   value           = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
-  scrollDirection = value.Get<std::string>();
+  scrollDirection = value.Get<Dali::String>();
   DALI_TEST_EQUALS(scrollDirection, "HORIZONTAL", TEST_LOCATION);
 
   END_TEST;
@@ -744,7 +747,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
   Property::Value value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
-  DALI_TEST_EQUALS(value.Get<std::string>(), "FIXED", TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<Dali::String>(), "FIXED", TEST_LOCATION);
 
   // Render and notify
   application.SendNotification();
@@ -757,7 +760,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   // Set the indicator height to be variable
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
   value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
-  DALI_TEST_EQUALS(value.Get<std::string>(), "VARIABLE", TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<Dali::String>(), "VARIABLE", TEST_LOCATION);
 
   // Render and notify
   application.SendNotification();

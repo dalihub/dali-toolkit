@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/helpers/property-helper.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 
 namespace Dali
@@ -30,7 +31,7 @@ namespace Internal
 bool GetStringFromProperty(const Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if(value.Get(output))
+  if(Dali::Integration::GetStdString(value, output))
   {
     extracted = true;
   }
@@ -43,7 +44,7 @@ bool GetStringFromProperty(const Property::Value& value, std::string& output)
       for(unsigned int i = 0; i < arraySize; ++i)
       {
         std::string element;
-        if(array->GetElementAt(i).Get(element))
+        if(Dali::Integration::GetStdString(array->GetElementAt(i), element))
         {
           extracted = true;
           output += element + '\n';

@@ -19,12 +19,15 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_toggle_button_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -203,10 +206,10 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
 
     // Check that the result is the same as
     DALI_TEST_EQUALS(toggleIcons.Count(), resultIcons.Count(), TEST_LOCATION);
-    DALI_TEST_CHECK(toggleIcons[0].Get<std::string>() == resultIcons[0].Get<std::string>());
-    DALI_TEST_CHECK(toggleIcons[1].Get<std::string>() == resultIcons[1].Get<std::string>());
-    DALI_TEST_CHECK(toggleIcons[2].Get<std::string>() == resultIcons[2].Get<std::string>());
-    DALI_TEST_CHECK(toggleIcons[3].Get<std::string>() == resultIcons[3].Get<std::string>());
+    DALI_TEST_CHECK(toggleIcons[0].Get<Dali::String>() == resultIcons[0].Get<Dali::String>());
+    DALI_TEST_CHECK(toggleIcons[1].Get<Dali::String>() == resultIcons[1].Get<Dali::String>());
+    DALI_TEST_CHECK(toggleIcons[2].Get<Dali::String>() == resultIcons[2].Get<Dali::String>());
+    DALI_TEST_CHECK(toggleIcons[3].Get<Dali::String>() == resultIcons[3].Get<Dali::String>());
   }
 
   { // Check property::map
@@ -295,9 +298,9 @@ int UtcDaliToggleButtonToggleTipsProperty(void)
 
     //Check that the result is the same as
     DALI_TEST_EQUALS(toggleTips.Count(), resultTips.Count(), TEST_LOCATION);
-    DALI_TEST_CHECK(toggleTips[0].Get<std::string>() == resultTips[0].Get<std::string>());
-    DALI_TEST_CHECK(toggleTips[1].Get<std::string>() == resultTips[1].Get<std::string>());
-    DALI_TEST_CHECK(toggleTips[2].Get<std::string>() == resultTips[2].Get<std::string>());
+    DALI_TEST_CHECK(toggleTips[0].Get<Dali::String>() == resultTips[0].Get<Dali::String>());
+    DALI_TEST_CHECK(toggleTips[1].Get<Dali::String>() == resultTips[1].Get<Dali::String>());
+    DALI_TEST_CHECK(toggleTips[2].Get<Dali::String>() == resultTips[2].Get<Dali::String>());
   }
   END_TEST;
 }

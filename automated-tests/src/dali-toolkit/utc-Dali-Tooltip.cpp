@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include <toolkit-timer.h>
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -33,6 +34,8 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void utc_dali_toolkit_tooltip_startup(void)
@@ -110,7 +113,7 @@ int UtcDaliTooltipCreateWithString(void)
   DALI_TEST_CHECK(textStringValue);
 
   tet_infoline("Ensure it matches what we set");
-  DALI_TEST_EQUALS("Hello Test", textStringValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello Test", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent valid text, so ensure the hover signal has been connected to");
   DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
@@ -148,7 +151,7 @@ int UtcDaliTooltipCreateWithTextVisualMap(void)
   DALI_TEST_CHECK(textStringValue);
 
   tet_infoline("Ensure it matches what we set");
-  DALI_TEST_EQUALS("Hello TextVisual Test", textStringValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello TextVisual Test", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent a text visual with TEXT property set, so ensure the hover signal has been connected to");
   DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
@@ -224,7 +227,7 @@ int UtcDaliTooltipCreateWithImageVisualMap(void)
   DALI_TEST_CHECK(urlValue);
 
   tet_infoline("Ensure it matches what we set");
-  DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent an ImageVisual, so ensure the hover signal has been connected to");
   DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
@@ -265,7 +268,7 @@ int UtcDaliTooltipCreateWithArray(void)
   DALI_TEST_CHECK(map1);
   Property::Value* urlValue = map1->Find(ImageVisual::Property::URL);
   DALI_TEST_CHECK(urlValue);
-  DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("Ensure second value is a map and contains the right item");
   const Property::Value mapValue2 = contentArray->GetElementAt(1);
@@ -273,7 +276,7 @@ int UtcDaliTooltipCreateWithArray(void)
   DALI_TEST_CHECK(map2);
   Property::Value* textValue = map2->Find(TextVisual::Property::TEXT);
   DALI_TEST_CHECK(textValue);
-  DALI_TEST_EQUALS("Hello Array Test", textValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello Array Test", textValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent an array, so ensure the hover signal has been connected to");
   DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
@@ -329,7 +332,7 @@ int UtcDaliTooltipCreateWithFullMap(void)
   DALI_TEST_CHECK(backgroundMap);
   Property::Value* backgroundStringValue = backgroundMap->Find(Tooltip::Background::Property::VISUAL);
   DALI_TEST_CHECK(backgroundStringValue);
-  DALI_TEST_EQUALS(backgroundStringValue->Get<std::string>(), "tooltip-background.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundStringValue->Get<Dali::String>(), "tooltip-background.png", TEST_LOCATION);
 
   tet_infoline("Check Tail");
   Property::Value* tailMapValue = map->Find(Tooltip::Property::TAIL);
@@ -391,7 +394,7 @@ int UtcDaliTooltipCreateWithBackgroundMap(void)
   tet_infoline("Check visual");
   Property::Value* backgroundStringValue = backgroundMap->Find(Tooltip::Background::Property::VISUAL);
   DALI_TEST_CHECK(backgroundStringValue);
-  DALI_TEST_EQUALS(backgroundStringValue->Get<std::string>(), "tooltip-background.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundStringValue->Get<Dali::String>(), "tooltip-background.png", TEST_LOCATION);
 
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
@@ -426,7 +429,7 @@ int UtcDaliTooltipCreateWithBackgroundMapVector4(void)
   tet_infoline("Check visual");
   Property::Value* backgroundStringValue = backgroundMap->Find(Tooltip::Background::Property::VISUAL);
   DALI_TEST_CHECK(backgroundStringValue);
-  DALI_TEST_EQUALS(backgroundStringValue->Get<std::string>(), "tooltip-background.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundStringValue->Get<Dali::String>(), "tooltip-background.png", TEST_LOCATION);
 
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
@@ -466,12 +469,12 @@ int UtcDaliTooltipCreateWithTailMap(void)
   tet_infoline("Check above visual");
   Property::Value* aboveVisualValue = tailMap->Find(Tooltip::Tail::Property::ABOVE_VISUAL);
   DALI_TEST_CHECK(aboveVisualValue);
-  DALI_TEST_EQUALS(aboveVisualValue->Get<std::string>(), "above-visual.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(aboveVisualValue->Get<Dali::String>(), "above-visual.png", TEST_LOCATION);
 
   tet_infoline("Check below visual");
   Property::Value* belowVisualValue = tailMap->Find(Tooltip::Tail::Property::BELOW_VISUAL);
   DALI_TEST_CHECK(belowVisualValue);
-  DALI_TEST_EQUALS(belowVisualValue->Get<std::string>(), "below-visual.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(belowVisualValue->Get<Dali::String>(), "below-visual.png", TEST_LOCATION);
 
   END_TEST;
 }
@@ -906,7 +909,7 @@ int UtcDaliTooltipChangeContent(void)
   DALI_TEST_CHECK(contentMap);
   Property::Value* textStringValue = contentMap->Find(TextVisual::Property::TEXT);
   DALI_TEST_CHECK(textStringValue);
-  DALI_TEST_EQUALS("Second Value", textStringValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Second Value", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("Emit signal, nothing should happen as everything has been reset");
   Dali::Timer timer = Timer::New(1u);
@@ -942,7 +945,7 @@ int UtcDaliTooltipChangeContent(void)
   DALI_TEST_CHECK(contentMap);
   textStringValue = contentMap->Find(TextVisual::Property::TEXT);
   DALI_TEST_CHECK(textStringValue);
-  DALI_TEST_EQUALS("Third Value", textStringValue->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Third Value", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("Emit signal, nothing should happen as everything has been reset");
   timer.MockEmitSignal();

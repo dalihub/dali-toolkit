@@ -296,9 +296,9 @@ protected:
       }
       else
       {
-        tet_printf("BEGIN: AsyncTask[%s] Process\n", task->GetTaskName().data());
+        tet_printf("BEGIN: AsyncTask[%s] Process\n", task->GetTaskName().Data());
         task->Process();
-        tet_printf("END: AsyncTask[%s] Process\n", task->GetTaskName().data());
+        tet_printf("END: AsyncTask[%s] Process\n", task->GetTaskName().Data());
         if(!mDestroyThread)
         {
           mAsyncTaskManager.CompleteTask(std::move(task));
@@ -1199,14 +1199,14 @@ void AsyncTask::NotifyToReady()
     grabed = gGrabReadyTasks;
     if(gGrabReadyTasks)
     {
-      tet_printf("NotifyToReady[%s] delayed\n", GetTaskName().data());
+      tet_printf("NotifyToReady[%s] delayed\n", GetTaskName().Data());
       gDelayedReadyTasks.push_back(AsyncTaskPtr(this));
     }
   }
 
   if(!grabed)
   {
-    tet_printf("NotifyToReady[%s]\n", GetTaskName().data());
+    tet_printf("NotifyToReady[%s]\n", GetTaskName().Data());
     if(Dali::Internal::Adaptor::gAsyncTaskManager)
     {
       Dali::Internal::Adaptor::gAsyncTaskManager.NotifyToTaskReady(AsyncTaskPtr(this));

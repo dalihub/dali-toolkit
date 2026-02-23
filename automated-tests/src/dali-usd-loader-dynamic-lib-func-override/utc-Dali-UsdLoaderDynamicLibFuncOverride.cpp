@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,9 +94,10 @@ int UtcDaliUsdLoaderDlopenFail(void)
   gDlopenOverrideEnabled = true;
   gDlsymOverrideEnabled  = false;
 
-  Context ctx;
-
-  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(TEST_RESOURCE_DIR "/usd/CesiumMan.usdz", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
+  Context     ctx;
+  std::string model(TEST_RESOURCE_DIR "/usd/CesiumMan.usdz");
+  std::string resourceProvider(ctx.pathProvider(ResourceType::Mesh) + "/");
+  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(String(model.data()), String(resourceProvider.data()), ctx.loadResult);
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
@@ -126,7 +127,10 @@ int UtcDaliUsdLoaderDlsymFail(void)
 
   Context ctx;
 
-  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(TEST_RESOURCE_DIR "/usd/CesiumMan.usdz", ctx.pathProvider(ResourceType::Mesh) + "/", ctx.loadResult);
+  std::string model(TEST_RESOURCE_DIR "/usd/CesiumMan.usdz");
+  std::string resourceProvider(ctx.pathProvider(ResourceType::Mesh) + "/");
+  ctx.loader = new Dali::Scene3D::Loader::ModelLoader(String(model.data()), String(resourceProvider.data()), ctx.loadResult);
+
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
   DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());

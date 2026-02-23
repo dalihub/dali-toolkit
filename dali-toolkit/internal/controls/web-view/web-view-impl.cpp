@@ -37,6 +37,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -59,6 +60,9 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -1244,7 +1248,7 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::WebView::Property::URL:
       {
         std::string url;
-        if(value.Get(url))
+        if(GetStdString(value, url))
         {
           impl.LoadUrl(url);
         }
@@ -1253,7 +1257,7 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::WebView::Property::USER_AGENT:
       {
         std::string input;
-        if(value.Get(input))
+        if(GetStdString(value, input))
         {
           impl.SetUserAgent(input);
         }
@@ -1368,12 +1372,12 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
     {
       case Toolkit::WebView::Property::URL:
       {
-        value = impl.GetUrl();
+        value = ToPropertyValue(impl.GetUrl());
         break;
       }
       case Toolkit::WebView::Property::USER_AGENT:
       {
-        value = impl.GetUserAgent();
+        value = ToPropertyValue(impl.GetUserAgent());
         break;
       }
       case Toolkit::WebView::Property::SCROLL_POSITION:
@@ -1393,7 +1397,7 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       }
       case Toolkit::WebView::Property::TITLE:
       {
-        value = impl.GetTitle();
+        value = ToPropertyValue(impl.GetTitle());
         break;
       }
       case Toolkit::WebView::Property::VIDEO_HOLE_ENABLED:
@@ -1413,7 +1417,7 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       }
       case Toolkit::WebView::Property::SELECTED_TEXT:
       {
-        value = impl.GetSelectedText();
+        value = ToPropertyValue(impl.GetSelectedText());
         break;
       }
       case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:

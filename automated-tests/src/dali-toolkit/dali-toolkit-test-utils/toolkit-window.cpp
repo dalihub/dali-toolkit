@@ -52,7 +52,7 @@ Window::Window(const PositionSize& positionSize)
 {
 }
 
-Window* Window::New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
+Window* Window::New(const PositionSize& positionSize, const Dali::String& name, const Dali::String& className, bool isTransparent)
 {
   return new Window(positionSize);
 }
@@ -128,12 +128,12 @@ Window::Window(Window&& rhs) = default;
 
 Window& Window::operator=(Window&& rhs) = default;
 
-Dali::Window Window::New(PositionSize windowPosition, const std::string& name, bool isTransparent)
+Dali::Window Window::New(PositionSize windowPosition, const Dali::String& name, bool isTransparent)
 {
   return New(windowPosition, name, "", isTransparent);
 }
 
-Dali::Window Window::New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent)
+Dali::Window Window::New(PositionSize windowPosition, const Dali::String& name, const Dali::String& className, bool isTransparent)
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New(windowPosition, name, className, isTransparent);
 

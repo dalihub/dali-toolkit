@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <algorithm>
 #include <fstream>
@@ -365,9 +366,10 @@ bool ParseBvh(std::istream& file, uint32_t& frameCount, float& frameTime, std::s
 
 AnimationDefinition GenerateAnimation(const std::string& animationName, std::shared_ptr<Joint>& hierarchy, uint32_t frameCount, float frameTime, bool useRootTranslationOnly, const Vector3& scale)
 {
+  using Dali::Integration::ToDaliString;
   AnimationDefinition animationDefinition;
 
-  animationDefinition.SetName(animationName);
+  animationDefinition.SetName(ToDaliString(animationName));
   animationDefinition.SetDuration(frameTime * (frameCount - 1));
   float keyFrameInterval = (frameCount > 1u) ? 1.0f / static_cast<float>(frameCount - 1u) : Dali::Math::MACHINE_EPSILON_10;
 
@@ -386,13 +388,13 @@ AnimationDefinition GenerateAnimation(const std::string& animationName, std::sha
       if(!useRootTranslationOnly || i == 0)
       {
         translationProperty.mTimePeriod   = Dali::TimePeriod(animationDefinition.GetDuration());
-        translationProperty.mNodeName     = jointList[i]->name;
+        translationProperty.mNodeName     = ToDaliString(jointList[i]->name);
         translationProperty.mPropertyName = PROPERTY_NAME_POSITION.data();
       }
 
       AnimatedProperty rotationProperty;
       rotationProperty.mTimePeriod   = Dali::TimePeriod(animationDefinition.GetDuration());
-      rotationProperty.mNodeName     = jointList[i]->name;
+      rotationProperty.mNodeName     = ToDaliString(jointList[i]->name);
       rotationProperty.mPropertyName = PROPERTY_NAME_ORIENTATION.data();
 
       translationProperty.mKeyFrames = Dali::KeyFrames::New();
@@ -436,23 +438,26 @@ AnimationDefinition LoadBvhInternal(std::istream& stream, const std::string& ani
 }
 } // namespace
 
-AnimationDefinition LoadBvh(const std::string& path, const std::string& animationName, bool useRootTranslationOnly, const Vector3& scale)
+AnimationDefinition LoadBvh(const Dali::String& path, const Dali::String& animationName, bool useRootTranslationOnly, const Vector3& scale)
 {
-  Dali::FileStream fileStream(path);
+  using Dali::Integration::ToStdString;
+  std::string      stdPath = ToStdString(path);
+  Dali::FileStream fileStream(stdPath);
   std::iostream&   stream = fileStream.GetStream();
 
   if(stream.fail())
   {
-    DALI_LOG_ERROR("Fail to load bvh file : %s\n", path.c_str());
+    DALI_LOG_ERROR("Fail to load bvh file : %s\n", path.CStr());
     AnimationDefinition animationDefinition;
     return animationDefinition;
   }
 
-  return LoadBvhInternal(stream, animationName, useRootTranslationOnly, scale);
+  return LoadBvhInternal(stream, ToStdString(animationName), useRootTranslationOnly, scale);
 }
 
-AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const std::string& animationName, bool useRootTranslationOnly, const Vector3& scale)
+AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Dali::String& animationName, bool useRootTranslationOnly, const Vector3& scale)
 {
+  using Dali::Integration::ToStdString;
   if(rawBuffer == nullptr || rawBufferLength == 0)
   {
     DALI_LOG_ERROR("Fail to load bvh buffer : buffer is empty!\n");
@@ -470,6 +475,6 @@ AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLen
     return animationDefinition;
   }
 
-  return LoadBvhInternal(stream, animationName, useRootTranslationOnly, scale);
+  return LoadBvhInternal(stream, ToStdString(animationName), useRootTranslationOnly, scale);
 }
 } // namespace Dali::Scene3D::Loader

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/model-motion/motion-index/motion-property-index-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -81,7 +82,7 @@ std::string MotionPropertyIndex::GetPropertyName(Scene3D::ModelNode node)
 {
   if(mPropertyId.type == Property::Key::Type::STRING)
   {
-    return mPropertyId.stringKey;
+    return Dali::Integration::ToStdString(mPropertyId.stringKey);
   }
   return "";
 }

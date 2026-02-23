@@ -63,16 +63,16 @@ void NewAnimator(const Property::Map& map, TestAnimationData::AnimationDataEleme
   for(unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i)
   {
     const StringValuePair& pair(map.GetPair(i));
-    const std::string&     key(pair.first);
+    const Dali::String&    key(pair.first);
     const Property::Value& value(pair.second);
 
     if(key == "actor" || key == "target")
     {
-      element.target = value.Get<std::string>();
+      element.target = value.Get<Dali::String>();
     }
     else if(key == "property")
     {
-      element.property = value.Get<std::string>();
+      element.property = value.Get<Dali::String>();
     }
     else if(key == "value")
     {
@@ -80,7 +80,7 @@ void NewAnimator(const Property::Map& map, TestAnimationData::AnimationDataEleme
     }
     else if(key == "alphaFunction")
     {
-      std::string alphaFunctionValue = value.Get<std::string>();
+      String alphaFunctionValue = value.Get<Dali::String>();
 
       if(alphaFunctionValue == "LINEAR")
       {

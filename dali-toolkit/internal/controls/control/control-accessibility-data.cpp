@@ -20,7 +20,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::InsertToMap;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -96,14 +103,14 @@ Control::Impl::AccessibilityData::AccessibilityData(Control& controlImpl)
 
 void Control::Impl::AccessibilityData::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
-  Property::Value* checkedValue = mAccessibilityProps.extraAttributes.Find(key);
+  Property::Value* checkedValue = mAccessibilityProps.extraAttributes.Find(ToDaliStringView(key));
   if(checkedValue)
   {
-    mAccessibilityProps.extraAttributes[key] = Property::Value(value);
+    mAccessibilityProps.extraAttributes[ToDaliString(key)] = ToPropertyValue(value);
   }
   else
   {
-    mAccessibilityProps.extraAttributes.Insert(key, value);
+    InsertToMap(mAccessibilityProps.extraAttributes, key, value);
   }
 }
 
@@ -252,7 +259,7 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetAcces
   auto        place = mAccessibilityProps.extraAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
   if(place)
   {
-    place->Get(value);
+    GetStdString(*place, value);
   }
   else
   {
@@ -288,10 +295,10 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetAcces
 
 void Control::Impl::AccessibilityData::RemoveAccessibilityAttribute(const std::string& key)
 {
-  Property::Value* value = mAccessibilityProps.extraAttributes.Find(key);
+  Property::Value* value = mAccessibilityProps.extraAttributes.Find(ToDaliStringView(key));
   if(value)
   {
-    mAccessibilityProps.extraAttributes[key] = Property::Value();
+    mAccessibilityProps.extraAttributes[ToDaliString(key)] = Property::Value();
   }
 }
 

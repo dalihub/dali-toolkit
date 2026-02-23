@@ -22,7 +22,6 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -183,7 +182,7 @@ public:
    * @param[in] url The URL of the image file to load
    * @return The loading task id
    */
-  uint32_t Load(const std::string& url);
+  uint32_t Load(const Dali::String& url);
 
   /**
    * @brief Starts an image loading task.
@@ -199,7 +198,7 @@ public:
    * @param[in] dimensions The width and height to fit the loaded image to
    * @return The loading task id
    */
-  uint32_t Load(const std::string& url, ImageDimensions dimensions);
+  uint32_t Load(const Dali::String& url, ImageDimensions dimensions);
 
   /**
    * @brief Starts an image loading task.
@@ -213,11 +212,11 @@ public:
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return The loading task id
    */
-  uint32_t Load(const std::string& url,
-                ImageDimensions    dimensions,
-                FittingMode::Type  fittingMode,
-                SamplingMode::Type samplingMode,
-                bool               orientationCorrection);
+  uint32_t Load(const Dali::String& url,
+                ImageDimensions     dimensions,
+                FittingMode::Type   fittingMode,
+                SamplingMode::Type  samplingMode,
+                bool                orientationCorrection);
 
   /**
    * @brief Cancels an image loading task if it is still queueing in the work thread.

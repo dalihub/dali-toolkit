@@ -36,6 +36,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -48,6 +49,10 @@
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 using namespace Dali;
 
@@ -469,7 +474,7 @@ CameraActor SceneView::GetCamera(const std::string& name) const
   CameraActor returnCamera;
   for(auto&& camera : mCameras)
   {
-    if(camera.GetProperty<std::string>(Actor::Property::NAME) == name)
+    if(ToStdString(camera.GetProperty(Actor::Property::NAME)) == name)
     {
       returnCamera = camera;
       break;
@@ -1127,7 +1132,7 @@ void SceneView::SetProperty(BaseObject* object, Property::Index index, const Pro
     {
       case Scene3D::SceneView::Property::ALPHA_MASK_URL:
       {
-        std::string alphaMaskUrl = value.Get<std::string>();
+        std::string alphaMaskUrl = ToStdString(value);
         sceneViewImpl.SetAlphaMaskUrl(alphaMaskUrl);
         break;
       }
@@ -1159,7 +1164,7 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
     {
       case Scene3D::SceneView::Property::ALPHA_MASK_URL:
       {
-        value = sceneViewImpl.GetAlphaMaskUrl();
+        value = ToPropertyValue(sceneViewImpl.GetAlphaMaskUrl());
         break;
       }
       case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
@@ -1449,12 +1454,12 @@ void SceneView::UpdateRenderTask()
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
         if(!mAlphaMaskUrl.empty())
         {
-          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, ToPropertyValue(mAlphaMaskUrl));
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskContentScaleFactor);
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mCropToMask);
           imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
-          Self().RegisterProperty(Y_FLIP_MASK_TEXTURE, FLIP_MASK_TEXTURE);
+          Self().RegisterProperty(ToDaliString(Y_FLIP_MASK_TEXTURE), FLIP_MASK_TEXTURE);
         }
 
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -29,6 +30,7 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+using Dali::Integration::GetStdString;
 
 int UtcDaliCreateAlphaDiscardEffect(void)
 {
@@ -50,7 +52,7 @@ int UtcDaliCreateAlphaDiscardEffect(void)
   DALI_TEST_CHECK(fragmentShaderValue);
 
   std::string fragmentShader;
-  DALI_TEST_CHECK(fragmentShaderValue->Get(fragmentShader));
+  DALI_TEST_CHECK(GetStdString(*fragmentShaderValue, fragmentShader));
   DALI_TEST_CHECK(!fragmentShader.empty());
 
   Property::Value* gridXValue = customShader.Find(Visual::Shader::Property::SUBDIVIDE_GRID_X);
@@ -82,14 +84,14 @@ int UtcDaliCreateDissolveEffect(bool highPrecision)
   DALI_TEST_CHECK(vertexShaderValue);
 
   std::string vertexShader;
-  DALI_TEST_CHECK(vertexShaderValue->Get(vertexShader));
+  DALI_TEST_CHECK(GetStdString(*vertexShaderValue, vertexShader));
   DALI_TEST_CHECK(!vertexShader.empty());
 
   Property::Value* fragmentShaderValue = customShader.Find(Visual::Shader::Property::FRAGMENT_SHADER);
   DALI_TEST_CHECK(fragmentShaderValue);
 
   std::string fragmentShader;
-  DALI_TEST_CHECK(fragmentShaderValue->Get(fragmentShader));
+  DALI_TEST_CHECK(GetStdString(*fragmentShaderValue, fragmentShader));
   DALI_TEST_CHECK(!fragmentShader.empty());
 
   Property::Value* gridXValue = customShader.Find(Visual::Shader::Property::SUBDIVIDE_GRID_X);
@@ -151,7 +153,7 @@ int UtcDaliCreateDissolveEffect(void)
   DALI_TEST_CHECK(fragmentShaderValue);
 
   std::string fragmentShader;
-  DALI_TEST_CHECK(fragmentShaderValue->Get(fragmentShader));
+  DALI_TEST_CHECK(GetStdString(*fragmentShaderValue, fragmentShader));
   DALI_TEST_CHECK(!fragmentShader.empty());
 
   Property::Value* gridXValue = customShader.Find(Visual::Shader::Property::SUBDIVIDE_GRID_X);
@@ -185,7 +187,7 @@ int UtcDaliCreateImageRegionEffect(void)
   DALI_TEST_CHECK(vertexShaderValue);
 
   std::string vertexShader;
-  DALI_TEST_CHECK(vertexShaderValue->Get(vertexShader));
+  DALI_TEST_CHECK(GetStdString(*vertexShaderValue, vertexShader));
   DALI_TEST_CHECK(!vertexShader.empty());
 
   Property::Value* fragmentShaderValue = customShader.Find(Visual::Shader::Property::FRAGMENT_SHADER);
@@ -220,14 +222,14 @@ int UtcDaliCreateMotionBlurEffect(void)
   DALI_TEST_CHECK(vertexShaderValue);
 
   std::string vertexShader;
-  DALI_TEST_CHECK(vertexShaderValue->Get(vertexShader));
+  DALI_TEST_CHECK(GetStdString(*vertexShaderValue, vertexShader));
   DALI_TEST_CHECK(!vertexShader.empty());
 
   Property::Value* fragmentShaderValue = customShader.Find(Visual::Shader::Property::FRAGMENT_SHADER);
   DALI_TEST_CHECK(fragmentShaderValue);
 
   std::string fragmentShader;
-  DALI_TEST_CHECK(fragmentShaderValue->Get(fragmentShader));
+  DALI_TEST_CHECK(GetStdString(*fragmentShaderValue, fragmentShader));
   DALI_TEST_CHECK(!fragmentShader.empty());
 
   Property::Value* gridXValue = customShader.Find(Visual::Shader::Property::SUBDIVIDE_GRID_X);
@@ -284,14 +286,14 @@ int UtcDaliCreateMotionStretchEffect(void)
   DALI_TEST_CHECK(vertexShaderValue);
 
   std::string vertexShader;
-  DALI_TEST_CHECK(vertexShaderValue->Get(vertexShader));
+  DALI_TEST_CHECK(GetStdString(*vertexShaderValue, vertexShader));
   DALI_TEST_CHECK(!vertexShader.empty());
 
   Property::Value* fragmentShaderValue = customShader.Find(Visual::Shader::Property::FRAGMENT_SHADER);
   DALI_TEST_CHECK(fragmentShaderValue);
 
   std::string fragmentShader;
-  DALI_TEST_CHECK(fragmentShaderValue->Get(fragmentShader));
+  DALI_TEST_CHECK(GetStdString(*fragmentShaderValue, fragmentShader));
   DALI_TEST_CHECK(!fragmentShader.empty());
 
   Property::Value* gridXValue = customShader.Find(Visual::Shader::Property::SUBDIVIDE_GRID_X);

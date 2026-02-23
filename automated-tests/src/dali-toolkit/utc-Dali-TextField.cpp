@@ -31,12 +31,17 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
 using namespace Toolkit;
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 void dali_textfield_startup(void)
 {
@@ -133,7 +138,7 @@ const int KEY_A_CODE         = 38;
 const int KEY_D_CODE         = 40;
 const int KEY_SHIFT_MODIFIER = 257;
 
-const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+const String DEFAULT_DEVICE_NAME("hwKeyboard");
 
 static bool                                       gSelectionChangedCallbackCalled;
 static uint32_t                                   oldSelectionStart;
@@ -303,15 +308,15 @@ static void TestInputStyleChangedCallback(TextField control, TextField::InputSty
 }
 
 // Generate a KeyEvent to send to Core.
-Dali::Integration::KeyEvent GenerateKey(const std::string&                        keyName,
-                                        const std::string&                        logicalKey,
-                                        const std::string&                        keyString,
+Dali::Integration::KeyEvent GenerateKey(const String&                             keyName,
+                                        const String&                             logicalKey,
+                                        const String&                             keyString,
                                         int                                       keyCode,
                                         int                                       keyModifier,
                                         unsigned long                             timeStamp,
                                         const Dali::Integration::KeyEvent::State& keyState,
-                                        const std::string&                        compose        = "",
-                                        const std::string&                        deviceName     = DEFAULT_DEVICE_NAME,
+                                        const String&                             compose        = "",
+                                        const String&                             deviceName     = DEFAULT_DEVICE_NAME,
                                         const Device::Class::Type&                deviceClass    = Device::Class::NONE,
                                         const Device::Subclass::Type&             deviceSubclass = Device::Subclass::NONE)
 {
@@ -349,9 +354,9 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
       if(NULL != valueSet)
       {
-        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<std::string>() != valueSet->Get<std::string>()))
+        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<Dali::String>() != valueSet->Get<Dali::String>()))
         {
-          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str());
+          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<Dali::String>().CStr(), valueSet->Get<Dali::String>().CStr());
           return false;
         }
         else if(valueSet->GetType() == Dali::Property::BOOLEAN && (valueGet.second.Get<bool>() != valueSet->Get<bool>()))
@@ -392,7 +397,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
         }
         else
         {
-          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.c_str());
+          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.CStr());
         }
         return false;
       }
@@ -508,7 +513,7 @@ int UtcDaliToolkitTextFieldCopyConstructorP(void)
 
   TextField copy(textField);
   DALI_TEST_CHECK(copy);
-  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextField::Property::TEXT) == textField.GetProperty<std::string>(TextField::Property::TEXT));
+  DALI_TEST_CHECK(copy.GetProperty<Dali::String>(TextField::Property::TEXT) == textField.GetProperty<Dali::String>(TextField::Property::TEXT));
   END_TEST;
 }
 
@@ -518,12 +523,12 @@ int UtcDaliTextFieldMoveConstructor(void)
 
   TextField textField = TextField::New();
   textField.SetProperty(TextEditor::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textField.GetProperty<std::string>(TextField::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textField.GetProperty<Dali::String>(TextField::Property::TEXT) == "Test");
 
   TextField moved = std::move(textField);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextField::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextField::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textField);
 
   END_TEST;
@@ -538,7 +543,7 @@ int UtcDaliToolkitTextFieldAssignmentOperatorP(void)
 
   TextField copy = textField;
   DALI_TEST_CHECK(copy);
-  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextField::Property::TEXT) == textField.GetProperty<std::string>(TextField::Property::TEXT));
+  DALI_TEST_CHECK(copy.GetProperty<Dali::String>(TextField::Property::TEXT) == textField.GetProperty<Dali::String>(TextField::Property::TEXT));
   END_TEST;
 }
 
@@ -548,13 +553,13 @@ int UtcDaliTextFieldMoveAssignment(void)
 
   TextField textField = TextField::New();
   textField.SetProperty(TextEditor::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textField.GetProperty<std::string>(TextField::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textField.GetProperty<Dali::String>(TextField::Property::TEXT) == "Test");
 
   TextField moved;
   moved = std::move(textField);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextField::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextField::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textField);
 
   END_TEST;
@@ -648,7 +653,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   END_TEST;
 }
 
-bool SetPropertyMapRetrieved(TextField& field, const Property::Index property, const std::string mapKey, const std::string mapValue)
+bool SetPropertyMapRetrieved(TextField& field, const Property::Index property, const String mapKey, const String mapValue)
 {
   bool          result = false;
   Property::Map imageMap;
@@ -658,7 +663,7 @@ bool SetPropertyMapRetrieved(TextField& field, const Property::Index property, c
   Property::Value propValue = field.GetProperty(property);
   Property::Map*  resultMap = propValue.GetMap();
 
-  if(resultMap->Find(mapKey)->Get<std::string>() == mapValue)
+  if(resultMap->Find(mapKey)->Get<Dali::String>() == mapValue)
   {
     result = true;
   }
@@ -686,18 +691,18 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check text property.
   field.SetProperty(TextField::Property::TEXT, "Setting Text");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("Setting Text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("Setting Text"), TEST_LOCATION);
 
   // Check placeholder text properties.
   field.SetProperty(TextField::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::PLACEHOLDER_TEXT), std::string("Setting Placeholder Text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::PLACEHOLDER_TEXT), std::string("Setting Placeholder Text"), TEST_LOCATION);
 
   field.SetProperty(TextField::Property::PLACEHOLDER_TEXT_FOCUSED, "Setting Placeholder Text Focused");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::PLACEHOLDER_TEXT_FOCUSED), std::string("Setting Placeholder Text Focused"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::PLACEHOLDER_TEXT_FOCUSED), std::string("Setting Placeholder Text Focused"), TEST_LOCATION);
 
   // Check font properties.
   field.SetProperty(TextField::Property::FONT_FAMILY, "Setting font family");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::FONT_FAMILY), std::string("Setting font family"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::FONT_FAMILY), std::string("Setting font family"), TEST_LOCATION);
 
   Property::Map    fontStyleMapSet;
   Property::Map    fontStyleMapGet;
@@ -742,7 +747,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   slantValue = fontStyleMapGet.Find("slant");
   if(NULL != slantValue)
   {
-    if("normal" == slantValue->Get<std::string>())
+    if("normal" == slantValue->Get<Dali::String>())
     {
       fontStyleMapGet["slant"] = "roman";
     }
@@ -770,9 +775,9 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check that the Alignment properties can be correctly set
   field.SetProperty(TextField::Property::HORIZONTAL_ALIGNMENT, "END");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
   field.SetProperty(TextField::Property::VERTICAL_ALIGNMENT, "CENTER");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
 
   // Check text's color property
   field.SetProperty(TextField::Property::TEXT_COLOR, Color::WHITE);
@@ -810,9 +815,9 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check handle images
   field.SetProperty(TextField::Property::GRAB_HANDLE_IMAGE, "image1");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::GRAB_HANDLE_IMAGE), "image1", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::GRAB_HANDLE_IMAGE), "image1", TEST_LOCATION);
   field.SetProperty(TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, "image2");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::GRAB_HANDLE_PRESSED_IMAGE), "image2", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::GRAB_HANDLE_PRESSED_IMAGE), "image2", TEST_LOCATION);
   field.SetProperty(TextField::Property::SELECTION_HANDLE_IMAGE_LEFT, "image3");
 
   // Check handle images
@@ -932,7 +937,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check input font properties.
   field.SetProperty(TextField::Property::INPUT_FONT_FAMILY, "Setting input font family");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
 
   fontStyleMapSet.Clear();
   fontStyleMapSet.Insert("weight", "bold");
@@ -967,7 +972,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   slantValue = fontStyleMapGet.Find("slant");
   if(NULL != slantValue)
   {
-    if("normal" == slantValue->Get<std::string>())
+    if("normal" == slantValue->Get<Dali::String>())
     {
       fontStyleMapGet["slant"] = "roman";
     }
@@ -998,7 +1003,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the input strikethrough property
   field.SetProperty(DevelTextField::Property::INPUT_STRIKETHROUGH, "Strikethrough input properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(DevelTextField::Property::INPUT_STRIKETHROUGH), std::string("Strikethrough input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(DevelTextField::Property::INPUT_STRIKETHROUGH), std::string("Strikethrough input properties"), TEST_LOCATION);
 
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
@@ -1068,7 +1073,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the input underline property
   field.SetProperty(TextField::Property::INPUT_UNDERLINE, "Underline input properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_UNDERLINE), std::string("Underline input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::INPUT_UNDERLINE), std::string("Underline input properties"), TEST_LOCATION);
 
   // Check the shadow property
   Property::Map shadowMapSet;
@@ -1086,11 +1091,11 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the input shadow property
   field.SetProperty(TextField::Property::INPUT_SHADOW, "Shadow input properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
 
   // Check the emboss property with string
   field.SetProperty(TextField::Property::EMBOSS, "Emboss properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
 
   // Check the emboss property
   Property::Map embossMapSet;
@@ -1112,7 +1117,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Test string type first
   // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
   field.SetProperty(TextField::Property::OUTLINE, "Outline properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::OUTLINE), std::string("Outline properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::OUTLINE), std::string("Outline properties"), TEST_LOCATION);
 
   // Then test the property map type
   Property::Map outlineMapSet;
@@ -1131,7 +1136,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the input outline property
   field.SetProperty(TextField::Property::INPUT_OUTLINE, "Outline input properties");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_OUTLINE), std::string("Outline input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::INPUT_OUTLINE), std::string("Outline input properties"), TEST_LOCATION);
 
   // Check the hidden input settings property
   Property::Map hiddenMapSet;
@@ -1726,7 +1731,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("ㅎ"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("ㅎ"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "호", 0, 1);
@@ -1734,7 +1739,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("호"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("호"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "혿", 0, 1);
@@ -1742,7 +1747,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("혿"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("혿"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "", 0, 1);
@@ -1760,7 +1765,7 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("호두"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("호두"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1879,7 +1884,7 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("1234"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("1234"), TEST_LOCATION);
 
   inputFilteredSignal                  = false;
   gInputFilteredRejectedCallbackCalled = false;
@@ -1888,7 +1893,7 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredRejectedCallbackCalled);
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("12341234"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("12341234"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2230,7 +2235,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_FAMILY | TextField::InputStyle::POINT_SIZE), TEST_LOCATION);
 
-    const std::string fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = field.GetProperty(TextField::Property::INPUT_POINT_SIZE).Get<float>();
@@ -2347,8 +2352,8 @@ int utcDaliTextFieldInputStyleChanged01(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_STYLE), TEST_LOCATION);
 
-    const std::string style = field.GetProperty(TextField::Property::INPUT_FONT_STYLE).Get<std::string>();
-    DALI_TEST_CHECK(style.empty());
+    const String style = field.GetProperty(TextField::Property::INPUT_FONT_STYLE).Get<Dali::String>();
+    DALI_TEST_CHECK(style.Empty());
   }
   DALI_TEST_CHECK(inputStyleChangedSignal);
 
@@ -2446,7 +2451,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
     const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
     DALI_TEST_EQUALS(color, Color::GREEN, TEST_LOCATION);
 
-    const std::string fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = field.GetProperty(TextField::Property::INPUT_POINT_SIZE).Get<float>();
@@ -2643,7 +2648,7 @@ int utcDaliTextFieldInputStyleChanged03(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_FAMILY | TextField::InputStyle::POINT_SIZE), TEST_LOCATION);
 
-    const std::string fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = field.GetProperty(TextField::Property::INPUT_POINT_SIZE).Get<float>();
@@ -2753,8 +2758,8 @@ int utcDaliTextFieldInputStyleChanged03(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextField::InputStyle::FONT_STYLE), TEST_LOCATION);
 
-    const std::string style = field.GetProperty(TextField::Property::INPUT_FONT_STYLE).Get<std::string>();
-    DALI_TEST_CHECK(style.empty());
+    const String style = field.GetProperty(TextField::Property::INPUT_FONT_STYLE).Get<String>();
+    DALI_TEST_CHECK(style.Empty());
   }
   DALI_TEST_CHECK(inputStyleChangedSignal);
 
@@ -2813,7 +2818,7 @@ int utcDaliTextFieldEvent01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string(""), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string(""), TEST_LOCATION);
 
   // Create a tap event to touch the text field.
   TestGenerateTap(application, 150.0f, 25.0f);
@@ -2836,7 +2841,7 @@ int utcDaliTextFieldEvent01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("aa"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("aa"), TEST_LOCATION);
 
   // Create a second text field and send key events to it.
   TextField field2 = TextField::New();
@@ -2868,7 +2873,7 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Check the text has been added to the second text field.
-  DALI_TEST_EQUALS(field2.GetProperty<std::string>(TextField::Property::TEXT), std::string("aa"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field2.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("aa"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3347,7 +3352,7 @@ int utcDaliTextFieldEvent08(void)
     event.AddPoint(GetPointUpInside(position));
     application.ProcessEvent(event);
   }
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
 
   Dali::Clipboard::ClipData htmlData("application/xhtml+xml", "testTextFieldEventHtml");
   clipboard.SetData(htmlData);
@@ -3396,7 +3401,7 @@ int utcDaliTextFieldEvent08(void)
     event.AddPoint(GetPointUpInside(position));
     application.ProcessEvent(event);
   }
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("testTextFieldEventHtml"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("testTextFieldEventHtml"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3540,7 +3545,7 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   application.Render();
 
   field.SetProperty(TextField::Property::INPUT_FONT_FAMILY, "Setting input font family");
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
 
   Property::Map fontStyleMapSet;
   Property::Map fontStyleMapGet;
@@ -3629,7 +3634,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string(""), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string(""), TEST_LOCATION);
 
   // Create a tap event to touch the text field.
   TestGenerateTap(application, 150.0f, 25.0f);
@@ -3648,7 +3653,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("ad"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("ad"), TEST_LOCATION);
 
   // Generate a Esc key event. The text field should lose the focus.
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_ESCAPE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3668,7 +3673,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), std::string("ad"), TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("ad"), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3688,7 +3693,7 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   application.SendNotification();
   application.Render();
 
-  const std::string longText("This is a long text for the size of the text-field.");
+  const String longText("This is a long text for the size of the text-field.");
 
   field.SetProperty(TextField::Property::TEXT, longText);
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
@@ -3756,7 +3761,7 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   application.Render();
 
   // The text shouldn't be deleted.
-  DALI_TEST_EQUALS(field.GetProperty<std::string>(TextField::Property::TEXT), longText, TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), longText, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4295,7 +4300,7 @@ int UtcDaliTextFieldSelectText(void)
   application.Render();
 
   // Nothing is selected
-  std::string selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   textField.SetProperty(TextField::Property::TEXT, "Hello world");
@@ -4309,7 +4314,7 @@ int UtcDaliTextFieldSelectText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4321,7 +4326,7 @@ int UtcDaliTextFieldSelectText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("world", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 6, TEST_LOCATION);
@@ -4355,7 +4360,7 @@ int UtcDaliTextFieldSelectNone(void)
   application.Render();
 
   // Nothing is selected
-  std::string selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   DevelTextField::SelectWholeText(textField);
@@ -4364,7 +4369,7 @@ int UtcDaliTextFieldSelectNone(void)
   application.Render();
 
   // whole text is selected
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello world", selectedText, TEST_LOCATION);
 
   DevelTextField::SelectNone(textField);
@@ -4373,7 +4378,7 @@ int UtcDaliTextFieldSelectNone(void)
   application.Render();
 
   // Nothing is selected
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   END_TEST;
@@ -4407,7 +4412,7 @@ int UtcDaliTextFieldSelectRange(void)
   textField.SetProperty(DevelTextField::Property::SELECTED_TEXT_END, 5);
 
   // Hello is selected
-  std::string selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4417,7 +4422,7 @@ int UtcDaliTextFieldSelectRange(void)
   textField.SetProperty(DevelTextField::Property::SELECTED_TEXT_END, 11);
 
   // world is selected
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("world", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 6, TEST_LOCATION);
@@ -4456,7 +4461,7 @@ int UtcDaliTextFieldEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::ENABLE_EDITING).Get<bool>(), false, TEST_LOCATION);
 
   textField.SetKeyInputFocus();
@@ -4467,7 +4472,7 @@ int UtcDaliTextFieldEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::ENABLE_EDITING).Get<bool>(), true, TEST_LOCATION);
 
   // Check the user interaction enabled and for coverage
@@ -4485,7 +4490,7 @@ int UtcDaliTextFieldEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
@@ -4551,7 +4556,7 @@ int UtcDaliTextFieldPrimaryCursorPosition(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "ABCDEF", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "ABCDEF", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 4, TEST_LOCATION);
 
   END_TEST;
@@ -4584,7 +4589,7 @@ int utcDaliTextFieldMaxCharactersReachedAfterSetText(void)
 
   DALI_TEST_CHECK(maxLengthReachedSignal);
 
-  DALI_TEST_EQUALS(field.GetProperty(TextField::Property::TEXT).Get<std::string>(), "123456789", TEST_LOCATION);
+  DALI_TEST_EQUALS(field.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "123456789", TEST_LOCATION);
 
   END_TEST;
 }
@@ -4726,8 +4731,8 @@ int UtcDaliTextFieldCopyText(void)
 
   TextField textField = TextField::New();
 
-  std::string selectedText = "";
-  std::string copiedText   = "";
+  String selectedText = "";
+  String copiedText   = "";
 
   application.GetScene().Add(textField);
 
@@ -4752,14 +4757,14 @@ int UtcDaliTextFieldCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_END).Get<int>(), 5, TEST_LOCATION);
 
   // Hello is copied
-  copiedText = DevelTextField::CopyText(textField);
+  copiedText = ToDaliString(DevelTextField::CopyText(textField));
   DALI_TEST_EQUALS("Hello", copiedText, TEST_LOCATION);
 
   // world is selected
@@ -4768,14 +4773,14 @@ int UtcDaliTextFieldCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("world", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 6, TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_END).Get<int>(), 11, TEST_LOCATION);
 
   // world is copied
-  copiedText = DevelTextField::CopyText(textField);
+  copiedText = ToDaliString(DevelTextField::CopyText(textField));
   DALI_TEST_EQUALS("world", copiedText, TEST_LOCATION);
 
   // "lo wo" is selected
@@ -4784,14 +4789,14 @@ int UtcDaliTextFieldCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("lo wo", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 3, TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_END).Get<int>(), 8, TEST_LOCATION);
 
   // "lo wo" is copied
-  copiedText = DevelTextField::CopyText(textField);
+  copiedText = ToDaliString(DevelTextField::CopyText(textField));
   DALI_TEST_EQUALS("lo wo", copiedText, TEST_LOCATION);
 
   END_TEST;
@@ -4804,7 +4809,7 @@ int UtcDaliTextFieldCutText(void)
 
   TextField textField = TextField::New();
 
-  std::string selectedText = "";
+  String selectedText = "";
 
   application.GetScene().Add(textField);
 
@@ -4829,7 +4834,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4838,7 +4843,7 @@ int UtcDaliTextFieldCutText(void)
   // Hello is cut
   DALI_TEST_EQUALS("Hello", DevelTextField::CutText(textField), TEST_LOCATION);
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), " world", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), " world", TEST_LOCATION);
 
   // " w" is selected
   DevelTextField::SelectText(textField, 0, 2);
@@ -4846,7 +4851,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS(" w", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4858,7 +4863,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "orld", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "orld", TEST_LOCATION);
 
   // Test Cut from the middle
 
@@ -4868,7 +4873,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("rl", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 1, TEST_LOCATION);
@@ -4880,7 +4885,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "od", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "od", TEST_LOCATION);
 
   // Test Cut from the end
 
@@ -4890,7 +4895,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textField.GetProperty(DevelTextField::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("d", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::SELECTED_TEXT_START).Get<int>(), 1, TEST_LOCATION);
@@ -4902,7 +4907,7 @@ int UtcDaliTextFieldCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "o", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "o", TEST_LOCATION);
 
   END_TEST;
 }
@@ -4916,8 +4921,8 @@ int UtcDaliTextFieldPasteText(void)
 
   application.GetScene().Add(textField);
 
-  std::string cutText    = "";
-  std::string copiedText = "";
+  String cutText    = "";
+  String copiedText = "";
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -4949,14 +4954,14 @@ int UtcDaliTextFieldPasteText(void)
   application.Render();
 
   // Cut the selected text
-  cutText = DevelTextField::CutText(textField);
+  cutText = ToDaliString(DevelTextField::CutText(textField));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS("Hel", cutText, TEST_LOCATION);
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "lo World", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "lo World", TEST_LOCATION);
 
   DevelTextField::SelectText(textField, 0, 3);
 
@@ -4965,14 +4970,14 @@ int UtcDaliTextFieldPasteText(void)
   application.Render();
 
   // Copy the selected text
-  copiedText = DevelTextField::CopyText(textField);
+  copiedText = ToDaliString(DevelTextField::CopyText(textField));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS("lo ", copiedText, TEST_LOCATION);
-  DALI_TEST_EQUALS("lo World", textField.GetProperty<std::string>(TextField::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("lo World", textField.GetProperty<Dali::String>(TextField::Property::TEXT), TEST_LOCATION);
 
   // Move the cursor to the end of the line
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -4995,7 +5000,7 @@ int UtcDaliTextFieldPasteText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "lo Worldlo ", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "lo Worldlo ", TEST_LOCATION);
 
   END_TEST;
 }
@@ -5707,12 +5712,12 @@ int UtcDaliToolkitTextFieldInputStrikethroughGeneration(void)
   application.SendNotification();
   application.Render();
 
-  std::string strikethroughSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}");
+  String strikethroughSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}");
 
   // Check the strikethrough property
   textField.SetProperty(DevelTextField::Property::INPUT_STRIKETHROUGH, strikethroughSettings1);
   textField.SetProperty(TextField::Property::TEXT, "Test1");
-  DALI_TEST_EQUALS(textField.GetProperty<std::string>(DevelTextField::Property::INPUT_STRIKETHROUGH), strikethroughSettings1, TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty<Dali::String>(DevelTextField::Property::INPUT_STRIKETHROUGH), strikethroughSettings1, TEST_LOCATION);
 
   // Render and notify
   application.SendNotification();
@@ -6022,7 +6027,7 @@ int utcDaliTextFieldClusteredEmojiDeletionBackSpaceKey(void)
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   // Render and notify
@@ -6061,7 +6066,7 @@ int utcDaliTextFieldClusteredEmojiDeletionDeleteKey(void)
   application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);
   DALI_TEST_EQUALS(textField.GetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   // Render and notify
@@ -6293,20 +6298,21 @@ int utcDaliTextFieldFontVariationsRegister(void)
   application.Render();
 
   // Invalid key check
-  std::string INVALID_KEY                = "invalid";
-  auto        invalidFontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, INVALID_KEY.data());
+  String INVALID_KEY = "invalid";
+
+  auto invalidFontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, INVALID_KEY.CStr());
   DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
 
   application.GetScene().Add(field);
   application.SendNotification();
   application.Render();
 
-  std::string WGHT_KEY       = "wght";
+  String      WGHT_KEY       = "wght";
   const float WGHT_VALUE     = 100.f;
   const float WGHT_VALUE_END = 900.f;
 
   // Check with no previous variations.
-  auto fontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, WGHT_KEY.data());
+  auto fontVariationsIndex = DevelTextField::RegisterFontVariationProperty(field, WGHT_KEY.CStr());
   field.SetProperty(fontVariationsIndex, WGHT_VALUE);
 
   application.SendNotification();
@@ -6321,7 +6327,7 @@ int utcDaliTextFieldFontVariationsRegister(void)
 
   const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
 
-  std::string key = "";
+  String key = "";
   if(keyvalue.first.type == Property::Key::STRING)
   {
     key = keyvalue.first.stringKey;
@@ -6371,7 +6377,7 @@ int utcDaliTextFieldLocaleChangedCoverage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello world", field.GetProperty(TextField::Property::TEXT).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello world", field.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), TEST_LOCATION);
 
   tet_result(TET_PASS);
   END_TEST;

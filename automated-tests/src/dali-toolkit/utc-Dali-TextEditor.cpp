@@ -21,6 +21,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
@@ -37,6 +38,10 @@
 
 using namespace Dali;
 using namespace Toolkit;
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 void dali_texteditor_startup(void)
 {
@@ -145,7 +150,7 @@ const char* HANDLE_IMAGE_FILE_NAME           = TEST_RESOURCE_DIR "/insertpoint-i
 const char* HANDLE_LEFT_SELECTION_FILE_NAME  = TEST_RESOURCE_DIR "/selection_handle_drop_left.png";
 const char* HANDLE_RIGHT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_handle_drop_right.png";
 
-const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+const String DEFAULT_DEVICE_NAME("hwKeyboard");
 
 static bool                                        gSelectionChangedCallbackCalled;
 static uint32_t                                    oldSelectionStart;
@@ -257,15 +262,15 @@ static void TestInputFilteredCallback(TextEditor control, Toolkit::InputFilter::
 }
 
 // Generate a KeyEvent to send to Core.
-Dali::Integration::KeyEvent GenerateKey(const std::string&                        keyName,
-                                        const std::string&                        logicalKey,
-                                        const std::string&                        keyString,
+Dali::Integration::KeyEvent GenerateKey(const String&                             keyName,
+                                        const String&                             logicalKey,
+                                        const String&                             keyString,
                                         int                                       keyCode,
                                         int                                       keyModifier,
                                         unsigned long                             timeStamp,
                                         const Dali::Integration::KeyEvent::State& keyState,
-                                        const std::string&                        compose        = "",
-                                        const std::string&                        deviceName     = DEFAULT_DEVICE_NAME,
+                                        const String&                             compose        = "",
+                                        const String&                             deviceName     = DEFAULT_DEVICE_NAME,
                                         const Device::Class::Type&                deviceClass    = Device::Class::NONE,
                                         const Device::Subclass::Type&             deviceSubclass = Device::Subclass::NONE)
 {
@@ -319,9 +324,9 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
       if(NULL != valueSet)
       {
-        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<std::string>() != valueSet->Get<std::string>()))
+        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<Dali::String>() != valueSet->Get<Dali::String>()))
         {
-          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str());
+          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<Dali::String>().CStr(), valueSet->Get<Dali::String>().CStr());
           return false;
         }
         else if(valueSet->GetType() == Dali::Property::BOOLEAN && (valueGet.second.Get<bool>() != valueSet->Get<bool>()))
@@ -362,7 +367,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
         }
         else
         {
-          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.c_str());
+          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.CStr());
         }
         return false;
       }
@@ -503,7 +508,7 @@ int UtcDaliToolkitTextEditorCopyConstructorP(void)
 
   TextEditor copy(textEditor);
   DALI_TEST_CHECK(copy);
-  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextEditor::Property::TEXT) == textEditor.GetProperty<std::string>(TextEditor::Property::TEXT));
+  DALI_TEST_CHECK(copy.GetProperty<Dali::String>(TextEditor::Property::TEXT) == textEditor.GetProperty<Dali::String>(TextEditor::Property::TEXT));
   END_TEST;
 }
 
@@ -513,12 +518,12 @@ int UtcDaliTextEditorMoveConstructor(void)
 
   TextEditor textEditor = TextEditor::New();
   textEditor.SetProperty(TextEditor::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textEditor.GetProperty<std::string>(TextEditor::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textEditor.GetProperty<Dali::String>(TextEditor::Property::TEXT) == "Test");
 
   TextEditor moved = std::move(textEditor);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextEditor::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextEditor::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textEditor);
 
   END_TEST;
@@ -533,7 +538,7 @@ int UtcDaliToolkitTextEditorAssignmentOperatorP(void)
 
   TextEditor copy = textEditor;
   DALI_TEST_CHECK(copy);
-  DALI_TEST_CHECK(copy.GetProperty<std::string>(TextEditor::Property::TEXT) == textEditor.GetProperty<std::string>(TextEditor::Property::TEXT));
+  DALI_TEST_CHECK(copy.GetProperty<Dali::String>(TextEditor::Property::TEXT) == textEditor.GetProperty<Dali::String>(TextEditor::Property::TEXT));
   END_TEST;
 }
 
@@ -543,13 +548,13 @@ int UtcDaliTextEditorMoveAssignment(void)
 
   TextEditor textEditor = TextEditor::New();
   textEditor.SetProperty(TextEditor::Property::TEXT, "Test");
-  DALI_TEST_CHECK(textEditor.GetProperty<std::string>(TextEditor::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(textEditor.GetProperty<Dali::String>(TextEditor::Property::TEXT) == "Test");
 
   TextEditor moved;
   moved = std::move(textEditor);
   DALI_TEST_CHECK(moved);
   DALI_TEST_EQUALS(1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION);
-  DALI_TEST_CHECK(moved.GetProperty<std::string>(TextEditor::Property::TEXT) == "Test");
+  DALI_TEST_CHECK(moved.GetProperty<Dali::String>(TextEditor::Property::TEXT) == "Test");
   DALI_TEST_CHECK(!textEditor);
 
   END_TEST;
@@ -653,13 +658,13 @@ bool SetPropertyMapRetrieved(TextEditor& editor, const Property::Index property,
 {
   bool          result = false;
   Property::Map imageMap;
-  imageMap[mapKey] = mapValue;
+  imageMap[ToDaliString(mapKey)] = ToDaliString(mapValue);
 
   editor.SetProperty(property, imageMap);
   Property::Value propValue = editor.GetProperty(property);
   Property::Map*  resultMap = propValue.GetMap();
 
-  if(resultMap->Find(mapKey)->Get<std::string>() == mapValue)
+  if(resultMap->Find(ToDaliString(mapKey))->Get<Dali::String>() == ToDaliString(mapValue))
   {
     result = true;
   }
@@ -684,7 +689,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check text property.
   editor.SetProperty(TextEditor::Property::TEXT, "Setting Text");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("Setting Text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), String("Setting Text"), TEST_LOCATION);
 
   // Check text's color property
   editor.SetProperty(TextEditor::Property::TEXT_COLOR, Color::WHITE);
@@ -692,7 +697,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check font properties.
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Setting font family");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::FONT_FAMILY), std::string("Setting font family"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::FONT_FAMILY), String("Setting font family"), TEST_LOCATION);
 
   Property::Map    fontStyleMapSet;
   Property::Map    fontStyleMapGet;
@@ -736,7 +741,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   slantValue = fontStyleMapGet.Find("slant");
   if(NULL != slantValue)
   {
-    if("normal" == slantValue->Get<std::string>())
+    if("normal" == slantValue->Get<Dali::String>())
     {
       fontStyleMapGet["slant"] = "roman";
     }
@@ -753,15 +758,15 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check that the Alignment properties can be correctly set
   editor.SetProperty(TextEditor::Property::HORIZONTAL_ALIGNMENT, "END");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::HORIZONTAL_ALIGNMENT), "END", TEST_LOCATION);
 
   // Check that the Alignment properties can be correctly set
   editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "BOTTOM");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "BOTTOM", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "BOTTOM", TEST_LOCATION);
   editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "CENTER");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "CENTER", TEST_LOCATION);
   editor.SetProperty(DevelTextEditor::Property::VERTICAL_ALIGNMENT, "TOP");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "TOP", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::VERTICAL_ALIGNMENT), "TOP", TEST_LOCATION);
 
   // Check scroll properties.
   editor.SetProperty(TextEditor::Property::SCROLL_THRESHOLD, 1.f);
@@ -796,9 +801,9 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check handle images
   editor.SetProperty(TextEditor::Property::GRAB_HANDLE_IMAGE, "image1");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::GRAB_HANDLE_IMAGE), "image1", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::GRAB_HANDLE_IMAGE), "image1", TEST_LOCATION);
   editor.SetProperty(TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE, "image2");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE), "image2", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE), "image2", TEST_LOCATION);
   editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, "image3");
 
   // Check handle images
@@ -886,7 +891,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check input font properties.
   editor.SetProperty(TextEditor::Property::INPUT_FONT_FAMILY, "Setting input font family");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::INPUT_FONT_FAMILY), "Setting input font family", TEST_LOCATION);
 
   fontStyleMapSet.Clear();
   fontStyleMapSet.Insert("weight", "bold");
@@ -921,7 +926,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   slantValue = fontStyleMapGet.Find("slant");
   if(NULL != slantValue)
   {
-    if("normal" == slantValue->Get<std::string>())
+    if("normal" == slantValue->Get<Dali::String>())
     {
       fontStyleMapGet["slant"] = "roman";
     }
@@ -1017,7 +1022,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check the input underline property
   editor.SetProperty(TextEditor::Property::INPUT_UNDERLINE, "Underline input properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_UNDERLINE), std::string("Underline input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::INPUT_UNDERLINE), "Underline input properties", TEST_LOCATION);
 
   // Check the shadow property
   Property::Map shadowMapSet;
@@ -1035,11 +1040,11 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check the input shadow property
   editor.SetProperty(TextEditor::Property::INPUT_SHADOW, "Shadow input properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_SHADOW), std::string("Shadow input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::INPUT_SHADOW), "Shadow input properties", TEST_LOCATION);
 
   // Check the emboss property with string
   editor.SetProperty(TextEditor::Property::EMBOSS, "Emboss properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::EMBOSS), std::string("Emboss properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::EMBOSS), "Emboss properties", TEST_LOCATION);
 
   // Check the emboss property
   Property::Map embossMapSet;
@@ -1061,7 +1066,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Test string type first
   // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
   editor.SetProperty(TextEditor::Property::OUTLINE, "Outline properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::OUTLINE), std::string("Outline properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::OUTLINE), "Outline properties", TEST_LOCATION);
 
   // Then test the property map type
   Property::Map outlineMapSet;
@@ -1080,7 +1085,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check the input outline property
   editor.SetProperty(TextEditor::Property::INPUT_OUTLINE, "Outline input properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::INPUT_OUTLINE), std::string("Outline input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::INPUT_OUTLINE), "Outline input properties", TEST_LOCATION);
 
   // Check the smooth scroll property
   DALI_TEST_EQUALS(editor.GetProperty<bool>(TextEditor::Property::SMOOTH_SCROLL), false, TEST_LOCATION);
@@ -1107,7 +1112,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check placeholder text properties.
   editor.SetProperty(DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::PLACEHOLDER_TEXT), std::string("Setting Placeholder Text"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::PLACEHOLDER_TEXT), "Setting Placeholder Text", TEST_LOCATION);
 
   // Check placeholder text's color property.
   editor.SetProperty(DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED);
@@ -1289,7 +1294,7 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   // Check the input strikethrough property
   editor.SetProperty(DevelTextEditor::Property::INPUT_STRIKETHROUGH, "Strikethrough input properties");
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::INPUT_STRIKETHROUGH), std::string("Strikethrough input properties"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::INPUT_STRIKETHROUGH), "Strikethrough input properties", TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1482,7 +1487,7 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   editor.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
 
   // get InputMethodContext
-  std::string                   text;
+  String                        text;
   InputMethodContext::EventData imfEvent;
   InputMethodContext            inputMethodContext = DevelTextEditor::GetInputMethodContext(editor);
 
@@ -1496,7 +1501,7 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("ㅎ"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "ㅎ", TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "호", 0, 1);
@@ -1504,7 +1509,7 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("호"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "호", TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "혿", 0, 1);
@@ -1512,7 +1517,7 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("혿"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "혿", TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
   imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "", 0, 1);
@@ -1530,7 +1535,7 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("호두"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "호두", TEST_LOCATION);
 
   END_TEST;
 }
@@ -1648,7 +1653,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextEditor::InputStyle::FONT_FAMILY | TextEditor::InputStyle::POINT_SIZE), TEST_LOCATION);
 
-    const std::string fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = editor.GetProperty(TextEditor::Property::INPUT_POINT_SIZE).Get<float>();
@@ -1869,7 +1874,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
     const Vector4 color = editor.GetProperty(TextEditor::Property::INPUT_COLOR).Get<Vector4>();
     DALI_TEST_EQUALS(color, Color::GREEN, TEST_LOCATION);
 
-    const std::string fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = editor.GetProperty(TextEditor::Property::INPUT_POINT_SIZE).Get<float>();
@@ -2107,7 +2112,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   {
     DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask), static_cast<unsigned int>(TextEditor::InputStyle::FONT_FAMILY | TextEditor::InputStyle::POINT_SIZE), TEST_LOCATION);
 
-    const std::string fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<std::string>();
+    const String fontFamily = editor.GetProperty(TextEditor::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
     DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
 
     const float pointSize = editor.GetProperty(TextEditor::Property::INPUT_POINT_SIZE).Get<float>();
@@ -2277,7 +2282,7 @@ int utcDaliTextEditorEvent01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string(""), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "", TEST_LOCATION);
 
   // Create a tap event to touch the text editor.
   TestGenerateTap(application, 150.0f, 25.0f);
@@ -2294,7 +2299,7 @@ int utcDaliTextEditorEvent01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("aa"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), "aa", TEST_LOCATION);
 
   // Create a second text editor and send key events to it.
   TextEditor editor2 = TextEditor::New();
@@ -2326,7 +2331,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Check the text has been added to the second text editor.
-  DALI_TEST_EQUALS(editor2.GetProperty<std::string>(TextEditor::Property::TEXT), std::string("aa"), TEST_LOCATION);
+  DALI_TEST_EQUALS(editor2.GetProperty<Dali::String>(TextEditor::Property::TEXT), "aa", TEST_LOCATION);
 
   END_TEST;
 }
@@ -2621,7 +2626,7 @@ int utcDaliTextEditorEvent04(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Add some key events
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_UP, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -2648,7 +2653,7 @@ int utcDaliTextEditorEvent04(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(" Hello\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS(" Hello\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2790,7 +2795,7 @@ int utcDaliTextEditorEvent06(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello\nworld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nworld\nHello world", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   editor.SetProperty(TextEditor::Property::TEXT, "ảffiff");
   editor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 0);
@@ -2820,7 +2825,7 @@ int utcDaliTextEditorEvent06(void)
   application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS("ffiff", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("ffiff", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // For coverage
   editor.SetProperty(TextEditor::Property::TEXT, "الاخيرالسطر1\nالاخيرالسطر2\nالاخيرالسطر3\nالاخيرالسطر4");
@@ -2918,7 +2923,7 @@ int utcDaliTextEditorEvent07(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Select some text in the left of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -2954,7 +2959,7 @@ int utcDaliTextEditorEvent07(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Disable Shift Selection
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false);
@@ -2978,7 +2983,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // The text isn't selected and not changed because of 'SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false )'
-  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Test to select some text in the left of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -2999,7 +3004,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // The text is not selected and not changed because of 'SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false )'
-  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Select all Text
   application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3016,7 +3021,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   //text is "c"
-  DALI_TEST_EQUALS("c", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("c", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // select all text
   DevelTextEditor::SelectWholeText(editor);
@@ -3045,7 +3050,7 @@ int utcDaliTextEditorEvent07(void)
   application.ProcessEvent(GenerateKey("ر", "v", "ر", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //text is "cc"
-  DALI_TEST_EQUALS("cc", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("cc", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // select all using logical keys
   application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3064,7 +3069,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   //text is ""
-  DALI_TEST_EQUALS("", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3156,7 +3161,7 @@ int utcDaliTextEditorEvent08(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("DdALi", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("DdALi", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Test to select some text in the right of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3181,7 +3186,7 @@ int utcDaliTextEditorEvent08(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("DdALci", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("DdALci", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Test to select some text in the left of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3208,7 +3213,7 @@ int utcDaliTextEditorEvent08(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("DcdALci", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("DcdALci", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Test to select some text in the right of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3234,7 +3239,7 @@ int utcDaliTextEditorEvent08(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("DcxdALci", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("DcxdALci", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Test to select some text in the left of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -3260,7 +3265,7 @@ int utcDaliTextEditorEvent08(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("DcxcdALci", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("DcxcdALci", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3393,12 +3398,12 @@ int utcDaliTextEditorUnderPropertyStringP(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK(editor);
 
-  std::string underlineSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\",\"type\":\"SOLID\",\"dashWidth\":\"2\",\"dashGap\":\"1\"}");
+  String underlineSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\",\"type\":\"SOLID\",\"dashWidth\":\"2\",\"dashGap\":\"1\"}");
 
   application.GetScene().Add(editor);
 
   editor.SetProperty(TextEditor::Property::UNDERLINE, underlineSettings1);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(TextEditor::Property::UNDERLINE), underlineSettings1, TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(TextEditor::Property::UNDERLINE), underlineSettings1, TEST_LOCATION);
 
   tet_infoline("Set underline settings with a map");
   // Check the input underline property
@@ -3471,12 +3476,12 @@ int utcDaliTextEditorUnderPropertyStringP(void)
   tet_infoline("Set underline settings with a string");
   editor.SetProperty(TextEditor::Property::UNDERLINE, underlineSettings1);
   Property::Value value = editor.GetProperty(TextEditor::Property::UNDERLINE);
-  std::string     result;
+  String          result;
   value.Get(result);
   DALI_TEST_EQUALS(result, underlineSettings1, TEST_LOCATION);
 
   tet_infoline("Trying to set invalid underline settings, should not update and stay at previous settings");
-  std::string underlineSettingsVoid("{\"enable\":\"true\",\"coooolor\":\"blue\",\"heeeight\":\"4\"}");
+  String underlineSettingsVoid("{\"enable\":\"true\",\"coooolor\":\"blue\",\"heeeight\":\"4\"}");
   editor.SetProperty(TextEditor::Property::UNDERLINE, underlineSettingsVoid);
   value = editor.GetProperty(TextEditor::Property::UNDERLINE);
   value.Get(result);
@@ -3492,12 +3497,12 @@ int utcDaliTextEditorStrikethroughPropertyStringP(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK(editor);
 
-  std::string strikethroughSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}");
+  String strikethroughSettings1("{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}");
 
   application.GetScene().Add(editor);
 
   editor.SetProperty(DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettings1);
-  DALI_TEST_EQUALS(editor.GetProperty<std::string>(DevelTextEditor::Property::STRIKETHROUGH), strikethroughSettings1, TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty<Dali::String>(DevelTextEditor::Property::STRIKETHROUGH), strikethroughSettings1, TEST_LOCATION);
 
   tet_infoline("Set strikethrough settings with a map");
   // Check the input strikethrough property
@@ -3515,12 +3520,12 @@ int utcDaliTextEditorStrikethroughPropertyStringP(void)
   tet_infoline("Set strikethrough settings with a string");
   editor.SetProperty(DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettings1);
   Property::Value value = editor.GetProperty(DevelTextEditor::Property::STRIKETHROUGH);
-  std::string     result;
+  String          result;
   value.Get(result);
   DALI_TEST_EQUALS(result, strikethroughSettings1, TEST_LOCATION);
 
   tet_infoline("Trying to set invalid strikethrough settings, should not update and stay at previous settings");
-  std::string strikethroughSettingsVoid("{\"enable\":\"true\",\"coooolor\":\"blue\",\"height\":\"2\"}");
+  String strikethroughSettingsVoid("{\"enable\":\"true\",\"coooolor\":\"blue\",\"height\":\"2\"}");
   editor.SetProperty(DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettingsVoid);
   value = editor.GetProperty(TextEditor::Property::UNDERLINE);
   value.Get(result);
@@ -3536,14 +3541,14 @@ int utcDaliTextEditorShadowPropertyStringP(void)
 
   TextEditor editor = TextEditor::New();
 
-  std::string shadowSettings("{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}");
+  String shadowSettings("{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}");
 
   application.GetScene().Add(editor);
 
   editor.SetProperty(TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}");
 
-  Property::Value value = editor.GetProperty<std::string>(TextEditor::Property::SHADOW);
-  std::string     result;
+  Property::Value value = editor.GetProperty<Dali::String>(TextEditor::Property::SHADOW);
+  String          result;
   value.Get(result);
 
   DALI_TEST_EQUALS(result, shadowSettings, TEST_LOCATION);
@@ -3558,14 +3563,14 @@ int utcDaliTextEditorFontStylePropertyStringP(void)
 
   TextEditor editor = TextEditor::New();
 
-  std::string fontStyleSettings("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}");
+  String fontStyleSettings("{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}");
 
   application.GetScene().Add(editor);
 
   editor.SetProperty(TextEditor::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}");
 
-  Property::Value value = editor.GetProperty<std::string>(TextEditor::Property::FONT_STYLE);
-  std::string     result;
+  Property::Value value = editor.GetProperty<Dali::String>(TextEditor::Property::FONT_STYLE);
+  String          result;
   value.Get(result);
 
   DALI_TEST_EQUALS(result, fontStyleSettings, TEST_LOCATION);
@@ -3982,7 +3987,7 @@ int UtcDaliTextEditorSelectText(void)
   application.Render();
 
   // Nothing is selected
-  std::string selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   textEditor.SetProperty(TextEditor::Property::TEXT, "Hello world");
@@ -3995,7 +4000,7 @@ int UtcDaliTextEditorSelectText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4007,7 +4012,7 @@ int UtcDaliTextEditorSelectText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("world", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 6, TEST_LOCATION);
@@ -4041,7 +4046,7 @@ int UtcDaliTextEditorSelectNone(void)
   application.Render();
 
   // Nothing is selected
-  std::string selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   DevelTextEditor::SelectWholeText(textEditor);
@@ -4050,7 +4055,7 @@ int UtcDaliTextEditorSelectNone(void)
   application.Render();
 
   // whole text is selected
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello world", selectedText, TEST_LOCATION);
 
   DevelTextEditor::SelectNone(textEditor);
@@ -4059,7 +4064,7 @@ int UtcDaliTextEditorSelectNone(void)
   application.Render();
 
   // Nothing is selected
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("", selectedText, TEST_LOCATION);
 
   END_TEST;
@@ -4087,7 +4092,7 @@ int UtcDaliTextEditorSelectRange(void)
   textEditor.SetProperty(DevelTextEditor::Property::SELECTED_TEXT_END, 5);
 
   // Hello is selected
-  std::string selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4126,7 +4131,7 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::ENABLE_EDITING).Get<bool>(), false, TEST_LOCATION);
 
   textEditor.SetKeyInputFocus();
@@ -4137,7 +4142,7 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::ENABLE_EDITING).Get<bool>(), true, TEST_LOCATION);
 
   // Check the user interaction enabled and for coverage
@@ -4155,7 +4160,7 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "D", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
@@ -4267,7 +4272,7 @@ int UtcDaliTextEditorPrimaryCursorPosition(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "ABCDEF", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "ABCDEF", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 4, TEST_LOCATION);
 
   END_TEST;
@@ -4716,8 +4721,8 @@ int UtcDaliTextEditorCopyText(void)
 
   TextEditor textEditor = TextEditor::New();
 
-  std::string selectedText = "";
-  std::string copiedText   = "";
+  String selectedText = "";
+  String copiedText   = "";
 
   application.GetScene().Add(textEditor);
 
@@ -4742,14 +4747,14 @@ int UtcDaliTextEditorCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_END).Get<int>(), 5, TEST_LOCATION);
 
   // Hello is copied
-  copiedText = DevelTextEditor::CopyText(textEditor);
+  copiedText = ToDaliString(DevelTextEditor::CopyText(textEditor));
   DALI_TEST_EQUALS("Hello", copiedText, TEST_LOCATION);
 
   // world is selected
@@ -4758,14 +4763,14 @@ int UtcDaliTextEditorCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("world", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 6, TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_END).Get<int>(), 11, TEST_LOCATION);
 
   // world is copied
-  copiedText = DevelTextEditor::CopyText(textEditor);
+  copiedText = ToDaliString(DevelTextEditor::CopyText(textEditor));
   DALI_TEST_EQUALS("world", copiedText, TEST_LOCATION);
 
   // "lo wo" is selected
@@ -4774,14 +4779,14 @@ int UtcDaliTextEditorCopyText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("lo wo", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 3, TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_END).Get<int>(), 8, TEST_LOCATION);
 
   // "lo wo" is copied
-  copiedText = DevelTextEditor::CopyText(textEditor);
+  copiedText = ToDaliString(DevelTextEditor::CopyText(textEditor));
   DALI_TEST_EQUALS("lo wo", copiedText, TEST_LOCATION);
 
   END_TEST;
@@ -4794,7 +4799,7 @@ int UtcDaliTextEditorCutText(void)
 
   TextEditor textEditor = TextEditor::New();
 
-  std::string selectedText = "";
+  String selectedText = "";
 
   application.GetScene().Add(textEditor);
 
@@ -4819,7 +4824,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("Hello", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4831,7 +4836,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), " world", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), " world", TEST_LOCATION);
 
   // " w" is selected
   DevelTextEditor::SelectText(textEditor, 0, 2);
@@ -4839,7 +4844,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS(" w", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 0, TEST_LOCATION);
@@ -4851,7 +4856,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "orld", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "orld", TEST_LOCATION);
 
   // Test Cut from the middle
 
@@ -4861,7 +4866,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("rl", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 1, TEST_LOCATION);
@@ -4873,7 +4878,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "od", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "od", TEST_LOCATION);
 
   // Test Cut from the end
 
@@ -4883,7 +4888,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  selectedText = textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("d", selectedText, TEST_LOCATION);
 
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT_START).Get<int>(), 1, TEST_LOCATION);
@@ -4895,7 +4900,7 @@ int UtcDaliTextEditorCutText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "o", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "o", TEST_LOCATION);
 
   END_TEST;
 }
@@ -4910,8 +4915,8 @@ int UtcDaliTextEditorPasteText(void)
 
   application.GetScene().Add(editor);
 
-  std::string cutText    = "";
-  std::string copiedText = "";
+  String cutText    = "";
+  String copiedText = "";
 
   editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
@@ -4951,14 +4956,14 @@ int UtcDaliTextEditorPasteText(void)
   application.Render();
 
   // Cut the selected text
-  cutText = DevelTextEditor::CutText(editor);
+  cutText = ToDaliString(DevelTextEditor::CutText(editor));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS("wor", cutText, TEST_LOCATION);
-  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Select some text in the left of the current cursor position
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -4971,14 +4976,14 @@ int UtcDaliTextEditorPasteText(void)
   application.Render();
 
   // Copy the selected text
-  copiedText = DevelTextEditor::CopyText(editor);
+  copiedText = ToDaliString(DevelTextEditor::CopyText(editor));
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   DALI_TEST_EQUALS("lo\n", copiedText, TEST_LOCATION);
-  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello world", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // Move the cursor to the third line
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -4995,7 +5000,7 @@ int UtcDaliTextEditorPasteText(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>(TextEditor::Property::TEXT), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello\nld\nHello lo\nworld", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   END_TEST;
 }
@@ -5776,7 +5781,7 @@ int utcDaliTextEditorSelectionWithSecondaryCursor(void)
   application.SendNotification();
   application.Render();
 
-  std::string selectedText = editor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<std::string>();
+  String selectedText = editor.GetProperty(DevelTextEditor::Property::SELECTED_TEXT).Get<Dali::String>();
   DALI_TEST_EQUALS("عليكم ", selectedText, TEST_LOCATION);
 
   END_TEST;
@@ -5999,7 +6004,7 @@ int utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize(void)
   application.Render();
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "Hellod \n World", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "Hellod \n World", TEST_LOCATION);
   DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 6, TEST_LOCATION);
 
   // Render and notify
@@ -6047,7 +6052,7 @@ int utcDaliTextEditorRemoveCharacterAfterInitWithResizePolicyNaturalSize(void)
   application.Render();
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "Hell \n World", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "Hell \n World", TEST_LOCATION);
   DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 4, TEST_LOCATION);
 
   // Render and notify
@@ -6097,7 +6102,7 @@ int utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize(void)
   application.Render();
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "Hel \n World", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "Hel \n World", TEST_LOCATION);
   DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   // Render and notify
@@ -6146,7 +6151,7 @@ int utcDaliTextEditorDoubleEnterAfterInitWithResizePolicyNaturalSize(void)
   application.Render();
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "Hello\n\n \n World", TEST_LOCATION);
+  DALI_TEST_EQUALS(editor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "Hello\n\n \n World", TEST_LOCATION);
   DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 7, TEST_LOCATION);
 
   // Render and notify
@@ -6516,8 +6521,8 @@ int UtcDaliTextEditorLineSpacingKeyArrowDown(void)
 
   application.GetScene().Add(editor);
 
-  std::string cutText    = "";
-  std::string copiedText = "";
+  String cutText    = "";
+  String copiedText = "";
 
   editor.SetProperty(TextEditor::Property::TEXT, "l1\nl2\nl3\n4");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
@@ -6649,7 +6654,7 @@ int utcDaliTextEditorClusteredEmojiDeletionBackSpaceKey(void)
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   // Render and notify
@@ -6688,7 +6693,7 @@ int utcDaliTextEditorClusteredEmojiDeletionDeleteKey(void)
   application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
-  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), "ABCXY", TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);
   DALI_TEST_EQUALS(textEditor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 3, TEST_LOCATION);
 
   // Render and notify
@@ -6852,20 +6857,20 @@ int utcDaliTextEditorFontVariationsRegister(void)
   application.Render();
 
   // Invalid key check
-  std::string INVALID_KEY                = "invalid";
-  auto        invalidFontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, INVALID_KEY.data());
+  String INVALID_KEY                = "invalid";
+  auto   invalidFontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, INVALID_KEY.CStr());
   DALI_TEST_CHECK(invalidFontVariationsIndex == Property::INVALID_INDEX);
 
   application.GetScene().Add(editor);
   application.SendNotification();
   application.Render();
 
-  std::string WGHT_KEY       = "wght";
+  String      WGHT_KEY       = "wght";
   const float WGHT_VALUE     = 100.f;
   const float WGHT_VALUE_END = 900.f;
 
   // Check with no previous variations.
-  auto fontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, WGHT_KEY.data());
+  auto fontVariationsIndex = DevelTextEditor::RegisterFontVariationProperty(editor, WGHT_KEY.CStr());
   editor.SetProperty(fontVariationsIndex, WGHT_VALUE);
 
   application.SendNotification();
@@ -6880,7 +6885,7 @@ int utcDaliTextEditorFontVariationsRegister(void)
 
   const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
 
-  std::string key = "";
+  String key = "";
   if(keyvalue.first.type == Property::Key::STRING)
   {
     key = keyvalue.first.stringKey;
@@ -6930,7 +6935,7 @@ int utcDaliTextEditorLocaleChangedCoverage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS("Hello world", editor.GetProperty(TextEditor::Property::TEXT).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("Hello world", editor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), TEST_LOCATION);
 
   tet_result(TET_PASS);
   END_TEST;

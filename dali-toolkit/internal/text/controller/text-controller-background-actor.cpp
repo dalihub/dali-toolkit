@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-background-actor.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
@@ -27,6 +28,8 @@
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/text-view.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali::Toolkit::Text
 {
@@ -233,7 +236,7 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
 
       if(!textShaderBackground)
       {
-        textShaderBackground = Shader::New(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT, SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER");
+        textShaderBackground = Shader::New(ToDaliStringView(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT), ToDaliStringView(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER");
       }
 
       Dali::Renderer renderer = Dali::Renderer::New(quadGeometry, textShaderBackground);

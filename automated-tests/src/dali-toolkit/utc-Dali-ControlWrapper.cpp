@@ -22,6 +22,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -36,6 +37,10 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 void utc_dali_toolkit_control_wrapper_startup(void)
 {
@@ -103,7 +108,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
 
   void Initialize(const char* name = NULL)
   {
-    mDaliProperty = Self().RegisterProperty("Dali", std::string("no"), Property::READ_WRITE);
+    mDaliProperty = Self().RegisterProperty("Dali", String("no"), Property::READ_WRITE);
 
     OnInitialize(name);
   }
@@ -223,7 +228,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
     return false;
   }
 
-  void SetDaliProperty(std::string s)
+  void SetDaliProperty(String s)
   {
     Self().SetProperty(mDaliProperty, s);
   }
@@ -264,7 +269,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
 
 } // namespace Impl
 
-static std::string      customControlTypeName = "MyTestCustomControl";
+static String           customControlTypeName = "MyTestCustomControl";
 static TypeRegistration customControl(customControlTypeName, typeid(Dali::Toolkit::Control), NULL);
 
 int UtcDaliControlWrapperConstructor(void)
@@ -638,7 +643,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
 
   Property::Value* value = returnedMap.Find("property");
   DALI_TEST_CHECK(value != NULL);
-  DALI_TEST_EQUALS("randomProperty", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("randomProperty", value->Get<Dali::String>(), TEST_LOCATION);
 
   value = returnedMap.Find("initialValue");
   DALI_TEST_CHECK(value != NULL);
@@ -654,7 +659,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
 
   value = returnedAnimatorMap.Find("alphaFunction");
   DALI_TEST_CHECK(value != NULL);
-  DALI_TEST_EQUALS("EASE_OUT", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("EASE_OUT", value->Get<Dali::String>(), TEST_LOCATION);
 
   value = returnedAnimatorMap.Find("timePeriod");
   DALI_TEST_CHECK(value != NULL);
@@ -711,7 +716,7 @@ int UtcDaliControlWrapperTestControlProperties(void)
 
   // "styleName" property
   controlWrapper.SetProperty(Control::Property::STYLE_NAME, "MyCustomStyle");
-  DALI_TEST_EQUALS("MyCustomStyle", controlWrapper.GetProperty(Control::Property::STYLE_NAME).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("MyCustomStyle", controlWrapper.GetProperty(Control::Property::STYLE_NAME).Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -751,7 +756,8 @@ int UtcDaliControlWrapperAnimateVisual(void)
 
     Property::Index index = Control::CONTROL_PROPERTY_END_INDEX + 1;
     std::string     visualName("colorVisual");
-    CSharpTypeRegistry::RegisterProperty(customControlTypeName, visualName, index, Property::VECTOR4, SetProperty, GetProperty);
+    std::string     customControlString(customControlTypeName.CStr(), customControlTypeName.Size());
+    CSharpTypeRegistry::RegisterProperty(customControlString, visualName, index, Property::VECTOR4, SetProperty, GetProperty);
 
     objectDestructionTracker.Start(controlWrapper);
 
@@ -774,7 +780,7 @@ int UtcDaliControlWrapperAnimateVisual(void)
     application.Render(0); // Trigger animation start
 
     Property::Map transition;
-    transition["target"]      = visualName;
+    transition["target"]      = ToDaliString(visualName);
     transition["property"]    = "mixColor";
     transition["targetValue"] = Color::GREEN;
     Property::Map animator;

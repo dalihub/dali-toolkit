@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_TEXTURE_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
@@ -42,7 +43,7 @@ namespace TextureManager
  * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
  * @return the Url string representing this texture
  */
-DALI_TOOLKIT_API std::string AddTexture(Texture& texture, bool preMultiplied = false);
+DALI_TOOLKIT_API String AddTexture(Texture& texture, bool preMultiplied = false);
 
 /**
  * @brief Add a TextureSet to texture manager
@@ -53,7 +54,7 @@ DALI_TOOLKIT_API std::string AddTexture(Texture& texture, bool preMultiplied = f
  * @param[in] preMultiplied Whether this external texture preMultiplied or not. Default as false.
  * @return the Url string representing this texture
  */
-DALI_TOOLKIT_API std::string AddTexture(TextureSet& textureSet, bool preMultiplied = false);
+DALI_TOOLKIT_API String AddTexture(TextureSet& textureSet, bool preMultiplied = false);
 
 /**
  * @brief Removes a TextureSet from toolkit
@@ -61,7 +62,7 @@ DALI_TOOLKIT_API std::string AddTexture(TextureSet& textureSet, bool preMultipli
  * @param[in] textureUrl to remove
  * @return the handle to the TextureSet or empty handle in case TextureSet is not found
  */
-DALI_TOOLKIT_API TextureSet RemoveTexture(const std::string& textureUrl);
+DALI_TOOLKIT_API TextureSet RemoveTexture(const String& textureUrl);
 
 } // namespace TextureManager
 

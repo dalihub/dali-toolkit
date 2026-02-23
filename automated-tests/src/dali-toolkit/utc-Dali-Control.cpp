@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -37,6 +38,8 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void utc_dali_toolkit_control_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -620,7 +623,7 @@ int UtcDaliControlBackgroundImage(void)
   DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
   DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>() == Visual::IMAGE);
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
-  DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>() == "TestImage");
+  DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>() == "TestImage");
 
   tet_infoline("Set replacement background image");
   control.SetProperty(Control::Property::BACKGROUND, "TestImage2");
@@ -628,7 +631,7 @@ int UtcDaliControlBackgroundImage(void)
   propValue = control.GetProperty(Control::Property::BACKGROUND);
   resultMap = propValue.GetMap();
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
-  DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>() == "TestImage2");
+  DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>() == "TestImage2");
 
   END_TEST;
 }
@@ -649,7 +652,7 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION);
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
-  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>(), "TestImage", TEST_LOCATION);
 
   Property::Map rendererMap;
   rendererMap[Visual::Property::TYPE]           = Visual::COLOR;
@@ -671,7 +674,7 @@ int UtcDaliControlBackgroundProperties(void)
   propValue = control.GetProperty(Control::Property::BACKGROUND);
   resultMap = propValue.GetMap();
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION);
-  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "Foobar.png", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>(), "Foobar.png", TEST_LOCATION);
 
   // set as Color
   control.SetProperty(Control::Property::BACKGROUND, Color::RED);
@@ -699,7 +702,7 @@ int UtcDaliControlShadowProperties(void)
   DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION);
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
-  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>(), "TestImage", TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -741,7 +744,7 @@ int UtcDaliControlInnerShadowProperties(void)
   DALI_TEST_CHECK(resultMap->Find(Toolkit::Visual::Property::TYPE));
   DALI_TEST_EQUALS(resultMap->Find(Toolkit::Visual::Property::TYPE)->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION);
   DALI_TEST_CHECK(resultMap->Find(ImageVisual::Property::URL));
-  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<std::string>(), "TestImage", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultMap->Find(ImageVisual::Property::URL)->Get<Dali::String>(), "TestImage", TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

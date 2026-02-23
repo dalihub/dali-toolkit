@@ -20,6 +20,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -34,6 +35,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void utc_dali_toolkit_popup_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -175,15 +178,15 @@ struct PopupTestFunctor
 };
 
 // Generate a KeyEvent to send to Core.
-Dali::Integration::KeyEvent GenerateKey(const std::string&                        keyName,
-                                        const std::string&                        logicalKey,
-                                        const std::string&                        keyString,
+Dali::Integration::KeyEvent GenerateKey(const String&                             keyName,
+                                        const String&                             logicalKey,
+                                        const String&                             keyString,
                                         int                                       keyCode,
                                         int                                       keyModifier,
                                         unsigned long                             timeStamp,
                                         const Dali::Integration::KeyEvent::State& keyState,
-                                        const std::string&                        compose        = "",
-                                        const std::string&                        deviceName     = "",
+                                        const String&                             compose        = "",
+                                        const String&                             deviceName     = "",
                                         const Device::Class::Type&                deviceClass    = Device::Class::NONE,
                                         const Device::Subclass::Type&             deviceSubclass = Device::Subclass::NONE)
 {
@@ -272,14 +275,14 @@ int UtcDaliPopupSetPropertyP(void)
   Popup popup = Popup::New();
 
   //Test properties
-  std::string testString = "Hello World";
+  String testString = "Hello World";
 
   TextLabel     textActorIn = TextLabel::New(testString);
   Property::Map map;
   Scripting::CreatePropertyMap(textActorIn, map);
   popup.SetProperty(popup.GetPropertyIndex("title"), map);
-  TextLabel   textActorOut = TextLabel::DownCast(popup.GetTitle());
-  std::string resultText;
+  TextLabel textActorOut = TextLabel::DownCast(popup.GetTitle());
+  String    resultText;
   DALI_TEST_CHECK(textActorOut.GetProperty(Toolkit::TextLabel::Property::TEXT).Get(resultText));
   DALI_TEST_EQUALS(testString, resultText, TEST_LOCATION);
 
@@ -305,7 +308,7 @@ int UtcDaliPopupSetTitleP(void)
   TextLabel textActor = TextLabel::DownCast(popup.GetTitle());
   DALI_TEST_CHECK(textActor == titleActor);
 
-  std::string resultText;
+  String resultText;
   DALI_TEST_CHECK(textActor.GetProperty(Toolkit::TextLabel::Property::TEXT).Get(resultText));
 
   DALI_TEST_CHECK((popup.GetTitle()) && (resultText == "title"));
@@ -487,7 +490,7 @@ int UtcDaliPopupSetTitleAndFooter(void)
   TextLabel textActor = TextLabel::DownCast(popup.GetTitle());
   DALI_TEST_CHECK(textActor == titleActor);
 
-  std::string resultText;
+  String resultText;
   DALI_TEST_CHECK(textActor.GetProperty(Toolkit::TextLabel::Property::TEXT).Get(resultText));
   DALI_TEST_CHECK((popup.GetTitle()) && (resultText == "title"));
   // verify titleActor is actually inside popup, and not elsewhere on stage, or off even.
@@ -794,7 +797,7 @@ int UtcDaliPopupPropertyAnimationMode(void)
   popup.SetTitle(TextLabel::New("Title"));
   application.GetScene().Add(popup);
 
-  std::string animationModes[] = {"NONE", "ZOOM", "FADE", "CUSTOM"};
+  String animationModes[] = {"NONE", "ZOOM", "FADE", "CUSTOM"};
 
   // Try both default and zero animation duration, as zero has a special case for some animation types.
   for(int j = 0; j <= 1; j++)
@@ -810,13 +813,13 @@ int UtcDaliPopupPropertyAnimationMode(void)
     {
       popup.SetProperty(Popup::Property::ANIMATION_MODE, animationModes[i]);
 
-      std::string checkMode;
+      String checkMode;
       DALI_TEST_CHECK(popup.GetProperty(Popup::Property::ANIMATION_MODE).Get(checkMode))
 
       DALI_TEST_EQUALS(checkMode, animationModes[i], TEST_LOCATION);
 
       popup.SetProperty(Toolkit::Popup::Property::DISPLAY_STATE, "SHOWN");
-      std::string resultState;
+      String resultState;
 
       // Only wait for animation if it isn't instant.
       if(j == 0)
@@ -857,8 +860,8 @@ int UtcDaliPopupPropertyTitle(void)
   // Create the Popup actor
   Popup popup = Popup::New();
 
-  std::string testLabelText = "TitleTest";
-  TextLabel   titleLabel    = TextLabel::New();
+  String    testLabelText = "TitleTest";
+  TextLabel titleLabel    = TextLabel::New();
   titleLabel.SetProperty(Toolkit::TextLabel::Property::TEXT, testLabelText);
   Actor         title = titleLabel;
   Property::Map map;
@@ -871,7 +874,7 @@ int UtcDaliPopupPropertyTitle(void)
   Property::Value* resultProperty = resultMap.Find("text");
   DALI_TEST_CHECK(resultProperty);
 
-  std::string resultText;
+  String resultText;
   DALI_TEST_CHECK(resultProperty->Get(resultText));
 
   DALI_TEST_EQUALS(resultText, testLabelText, TEST_LOCATION);
@@ -887,8 +890,8 @@ int UtcDaliPopupPropertyContent(void)
   // Create the Popup actor
   Popup popup = Popup::New();
 
-  std::string testLabelText = "ContentTest";
-  TextLabel   contentLabel  = TextLabel::New();
+  String    testLabelText = "ContentTest";
+  TextLabel contentLabel  = TextLabel::New();
   contentLabel.SetProperty(Toolkit::TextLabel::Property::TEXT, testLabelText);
   Actor         content = contentLabel;
   Property::Map map;
@@ -901,7 +904,7 @@ int UtcDaliPopupPropertyContent(void)
   Property::Value* resultProperty = resultMap.Find("text");
   DALI_TEST_CHECK(resultProperty);
 
-  std::string resultText;
+  String resultText;
   DALI_TEST_CHECK(resultProperty->Get(resultText));
 
   DALI_TEST_EQUALS(resultText, testLabelText, TEST_LOCATION);
@@ -917,8 +920,8 @@ int UtcDaliPopupPropertyFooter(void)
   // Create the Popup actor
   Popup popup = Popup::New();
 
-  std::string testLabelText = "FooterTest";
-  TextLabel   footerLabel   = TextLabel::New();
+  String    testLabelText = "FooterTest";
+  TextLabel footerLabel   = TextLabel::New();
   footerLabel.SetProperty(Toolkit::TextLabel::Property::TEXT, testLabelText);
   Actor         footer = footerLabel;
   Property::Map map;
@@ -931,7 +934,7 @@ int UtcDaliPopupPropertyFooter(void)
   Property::Value* resultProperty = resultMap.Find("text");
   DALI_TEST_CHECK(resultProperty);
 
-  std::string resultText;
+  String resultText;
   DALI_TEST_CHECK(resultProperty->Get(resultText));
 
   DALI_TEST_EQUALS(resultText, testLabelText, TEST_LOCATION);
@@ -947,7 +950,7 @@ int UtcDaliPopupPropertyContextualMode(void)
   // Create the Popup actor
   Popup popup = Popup::New();
   popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
-  std::string testLabelText = "ContentTest";
+  String testLabelText = "ContentTest";
 
   TextLabel contentLabel = TextLabel::New();
 
@@ -976,9 +979,9 @@ int UtcDaliPopupPropertyContextualMode(void)
   {
     popup.SetProperty(Toolkit::Popup::Property::CONTEXTUAL_MODE, mode[i]);
 
-    std::string propertyResult;
+    String propertyResult;
     DALI_TEST_CHECK(popup.GetProperty(Toolkit::Popup::Property::CONTEXTUAL_MODE).Get(propertyResult));
-    DALI_TEST_EQUALS(propertyResult, std::string(mode[i]), TEST_LOCATION);
+    DALI_TEST_EQUALS(propertyResult, String(mode[i]), TEST_LOCATION);
 
     popup.SetDisplayState(Popup::SHOWN);
     application.SendNotification();
@@ -1066,7 +1069,7 @@ int UtcDaliPopupPropertyBackgroundImage(void)
 
   // Check setting an image
   popup.SetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, "invalid-image.png");
-  std::string resultString;
+  String resultString;
   popup.GetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE).Get(resultString);
   DALI_TEST_EQUALS(resultString, "invalid-image.png", TEST_LOCATION);
 
@@ -1251,13 +1254,13 @@ int UtcDaliPopupPropertyTail(void)
   TextLabel content = TextLabel::New("text");
   popup.SetContent(content);
 
-  std::string imageFilename = "invalid-image.jpg";
+  String imageFilename = "invalid-image.jpg";
   popup.SetProperty(Popup::Property::TAIL_DOWN_IMAGE, imageFilename);
   popup.SetProperty(Popup::Property::TAIL_UP_IMAGE, imageFilename);
   popup.SetProperty(Popup::Property::TAIL_RIGHT_IMAGE, imageFilename);
   popup.SetProperty(Popup::Property::TAIL_LEFT_IMAGE, imageFilename);
 
-  std::string resultString;
+  String resultString;
   popup.GetProperty(Toolkit::Popup::Property::TAIL_DOWN_IMAGE).Get(resultString);
   DALI_TEST_EQUALS(resultString, imageFilename, TEST_LOCATION);
   popup.GetProperty(Toolkit::Popup::Property::TAIL_UP_IMAGE).Get(resultString);
@@ -1453,8 +1456,8 @@ int UtcDaliPopupOnChildAdd(void)
   // Create the Popup actor
   Popup popup = Popup::New();
   popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
-  std::string testLabelText = "ContentTest";
-  TextLabel   contentLabel  = TextLabel::New(testLabelText);
+  String    testLabelText = "ContentTest";
+  TextLabel contentLabel  = TextLabel::New(testLabelText);
 
   popup.Add(contentLabel);
 

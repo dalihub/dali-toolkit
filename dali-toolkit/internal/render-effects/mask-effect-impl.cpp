@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -32,6 +33,8 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace
 {
@@ -212,7 +215,7 @@ void MaskEffectImpl::OnInitialize()
   Renderer maskRenderer = GetTargetRenderer();
   if(!gMaskEffectShader)
   {
-    gMaskEffectShader = Dali::Shader::New(BASIC_VERTEX_SOURCE, SHADER_MASK_EFFECT_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MASK_EFFECT");
+    gMaskEffectShader = Dali::Shader::New(ToDaliStringView(BASIC_VERTEX_SOURCE), ToDaliStringView(SHADER_MASK_EFFECT_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "MASK_EFFECT");
   }
   maskRenderer.SetShader(gMaskEffectShader);
   maskRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true); // Always use pre-multiply alpha

@@ -123,16 +123,16 @@ struct DALI_SCENE3D_API TextureDefinition
 {
   static const Matrix3 DEFAULT_TRANSFORM;
 
-  std::string          mImageUri; // When the texture is loaded from embedded resources, this URI is used as a data stream.
-  std::string          mDirectoryPath;
+  Dali::String         mImageUri; // When the texture is loaded from embedded resources, this URI is used as a data stream.
+  Dali::String         mDirectoryPath;
   SamplerFlags::Type   mSamplerFlags;
   ImageDimensions      mMinImageDimensions;
   SamplingMode::Type   mSamplingMode;
   Matrix3              mTransform{DEFAULT_TRANSFORM}; // Texture transform
   std::vector<uint8_t> mTextureBuffer;
 
-  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
-  TextureDefinition(std::string&& imageUri, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
+  TextureDefinition(const Dali::String& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
+  TextureDefinition(Dali::String&& imageUri, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
   TextureDefinition(std::vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
 };
 
@@ -205,7 +205,7 @@ struct DALI_SCENE3D_API MaterialDefinition
    * @SINCE_2_0.7
    * @note This may be called from any thread.
    */
-  RawData LoadRaw(const std::string& imagesPath);
+  RawData LoadRaw(const Dali::String& imagesPath);
 
   /**
    * @brief Creates Textures from the pixel data in @a raw, gets the

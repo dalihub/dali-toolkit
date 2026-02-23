@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/rendering/sampler.h>
@@ -33,6 +34,12 @@
 #include <dali-scene3d/public-api/loader/renderer-state.h>
 #include <dali-scene3d/public-api/loader/shader-option.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -85,11 +92,11 @@ enum TextureIndex
  * @param[in] defaultUniformValue The default value if renderer don't register given uniform before.
  */
 template<typename T>
-void RegisterUniformIfNotDefinedBefore(Renderer renderer, const std::string_view& uniformName, const T& defaultUniformValue)
+void RegisterUniformIfNotDefinedBefore(Renderer renderer, Dali::StringView uniformName, const T& defaultUniformValue)
 {
-  if(renderer.GetPropertyIndex(uniformName.data()) == Property::INVALID_INDEX)
+  if(renderer.GetPropertyIndex(uniformName) == Property::INVALID_INDEX)
   {
-    renderer.RegisterProperty(uniformName, defaultUniformValue);
+    renderer.RegisterProperty(Dali::String(uniformName), defaultUniformValue);
   }
 }
 
@@ -147,7 +154,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::NAME:
     {
       std::string name;
-      if(propertyValue.Get(name))
+      if(GetStdString(propertyValue, name))
       {
         mName = name;
       }
@@ -157,7 +164,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::BASE_COLOR_URL:
     {
       std::string baseColorUrl;
-      if(propertyValue.Get(baseColorUrl))
+      if(GetStdString(propertyValue, baseColorUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::BASE_COLOR], baseColorUrl);
         needToApply = false;
@@ -177,7 +184,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::METALLIC_ROUGHNESS_URL:
     {
       std::string metallicRoughnessUrl;
-      if(propertyValue.Get(metallicRoughnessUrl))
+      if(GetStdString(propertyValue, metallicRoughnessUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::METALLIC_ROUGHNESS], metallicRoughnessUrl);
         needToApply = false;
@@ -207,7 +214,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::NORMAL_URL:
     {
       std::string normalUrl;
-      if(propertyValue.Get(normalUrl))
+      if(GetStdString(propertyValue, normalUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::NORMAL], normalUrl);
         needToApply = false;
@@ -227,7 +234,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::OCCLUSION_URL:
     {
       std::string occlusionUrl;
-      if(propertyValue.Get(occlusionUrl))
+      if(GetStdString(propertyValue, occlusionUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::OCCLUSION], occlusionUrl);
         needToApply = false;
@@ -247,7 +254,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::EMISSIVE_URL:
     {
       std::string emissiveUrl;
-      if(propertyValue.Get(emissiveUrl))
+      if(GetStdString(propertyValue, emissiveUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::EMISSIVE], emissiveUrl);
         needToApply = false;
@@ -307,7 +314,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::SPECULAR_URL:
     {
       std::string specularUrl;
-      if(propertyValue.Get(specularUrl))
+      if(GetStdString(propertyValue, specularUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::SPECULAR], specularUrl);
         needToApply = false;
@@ -327,7 +334,7 @@ void Material::SetProperty(Dali::Property::Index index, Dali::Property::Value pr
     case Dali::Scene3D::Material::Property::SPECULAR_COLOR_URL:
     {
       std::string specularColorUrl;
-      if(propertyValue.Get(specularColorUrl))
+      if(GetStdString(propertyValue, specularColorUrl))
       {
         RequestTextureLoad(mTextureInformations[TextureIndex::SPECULAR_COLOR], specularColorUrl);
         needToApply = false;
@@ -369,12 +376,12 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
   {
     case Dali::Scene3D::Material::Property::NAME:
     {
-      value = mName;
+      value = ToPropertyValue(mName);
       break;
     }
     case Dali::Scene3D::Material::Property::BASE_COLOR_URL:
     {
-      value = mTextureInformations[TextureIndex::BASE_COLOR].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::BASE_COLOR].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::BASE_COLOR_FACTOR:
@@ -384,7 +391,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::METALLIC_ROUGHNESS_URL:
     {
-      value = mTextureInformations[TextureIndex::METALLIC_ROUGHNESS].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::METALLIC_ROUGHNESS].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::METALLIC_FACTOR:
@@ -399,7 +406,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::NORMAL_URL:
     {
-      value = mTextureInformations[TextureIndex::NORMAL].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::NORMAL].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::NORMAL_SCALE:
@@ -409,7 +416,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::OCCLUSION_URL:
     {
-      value = mTextureInformations[TextureIndex::OCCLUSION].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::OCCLUSION].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::OCCLUSION_STRENGTH:
@@ -419,7 +426,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::EMISSIVE_URL:
     {
-      value = mTextureInformations[TextureIndex::EMISSIVE].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::EMISSIVE].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::EMISSIVE_FACTOR:
@@ -449,7 +456,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::SPECULAR_URL:
     {
-      value = mTextureInformations[TextureIndex::SPECULAR].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::SPECULAR].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::SPECULAR_FACTOR:
@@ -459,7 +466,7 @@ Dali::Property::Value Material::GetProperty(Dali::Property::Index index) const
     }
     case Dali::Scene3D::Material::Property::SPECULAR_COLOR_URL:
     {
-      value = mTextureInformations[TextureIndex::SPECULAR_COLOR].mUrl;
+      value = ToPropertyValue(mTextureInformations[TextureIndex::SPECULAR_COLOR].mUrl);
       break;
     }
     case Dali::Scene3D::Material::Property::SPECULAR_COLOR_FACTOR:
@@ -766,12 +773,12 @@ uint32_t Material::GetDiffuseImageBasedLightTextureOffset()
 
 std::string_view Material::GetImageBasedLightScaleFactorName()
 {
-  return Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName();
+  return ToStdStringView(Dali::Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName());
 }
 
 std::string_view Material::GetImageBasedLightMaxLodUniformName()
 {
-  return Dali::Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName();
+  return ToStdStringView(Dali::Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName());
 }
 
 void Material::ResetFlag()
@@ -832,7 +839,7 @@ void Material::RequestTextureLoad(TextureInformation& textureInformation, const 
     textureInformation.mTexture.Reset();
     return;
   }
-  textureInformation.mLoadingTaskId = mAsyncImageLoader.Load(url);
+  textureInformation.mLoadingTaskId = mAsyncImageLoader.Load(ToDaliString(url));
 }
 
 void Material::TextureLoadComplete(uint32_t loadedTaskId, PixelData pixelData)

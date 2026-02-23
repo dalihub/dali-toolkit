@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -37,6 +38,8 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -321,7 +324,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
         {
           if(mCanvasVisualIndex == Property::INVALID_INDEX)
           {
-            mCanvasVisualIndex = Self().RegisterProperty(CANVAS_VISUAL_INDEX_PROPERTY_NAME, Property::Value(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
+            mCanvasVisualIndex = Self().RegisterProperty(ToDaliStringView(CANVAS_VISUAL_INDEX_PROPERTY_NAME), Dali::Integration::ToPropertyValue(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
           }
           DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
