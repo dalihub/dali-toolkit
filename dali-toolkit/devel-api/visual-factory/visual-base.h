@@ -232,6 +232,12 @@ public:
    */
   void SetProperties(const Dali::Property::Map& properties);
 
+  /**
+   * @brief Attach the visual to an actor.
+   * @param[in] actor The actor to attach the visual to
+   */
+  void SetOnScene(Actor& actor);
+
 public: // Not intended for application developers
   explicit DALI_INTERNAL Base(Internal::Visual::Base* impl);
 };
