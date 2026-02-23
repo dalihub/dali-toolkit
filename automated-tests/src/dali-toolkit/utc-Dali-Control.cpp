@@ -23,7 +23,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
@@ -145,7 +144,7 @@ int UtcDaliControlRegister(void)
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect(&TestCallback);
   {
-    Alignment alignment = Alignment::New();
+    PushButton button = PushButton::New();
   }
   DALI_TEST_CHECK(gObjectCreatedCallBackCalled);
   END_TEST;

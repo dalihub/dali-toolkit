@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_
 #define DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector4.h>
-#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -143,7 +143,7 @@ public: // METHODS
    * @return If the operation was successful - which requires nodeDef->name to be unique -
    *  a pointer to the stored node definition; nullptr otherwise.
    */
-  NodeDefinition* AddNode(std::unique_ptr<NodeDefinition>&& nodeDef);
+  NodeDefinition* AddNode(UniquePtr<NodeDefinition>&& nodeDef);
 
   /**
    * @brief Moves the node to some other parent and / or to a different index.
@@ -225,7 +225,7 @@ public: // METHODS
    * @brief Ensures that there is no overlap between shaders used by nodes that have meshes skinned to different skeletons.
    * @SINCE_2_0.7
    */
-  void EnsureUniqueSkinningShaderInstances(ResourceBundle& resources) const;
+  void EnsureUniqueSkinningShaderInstances(ResourceBundle& resources);
 
   /**
    * @brief Performs the configuration of the given skinning shaders with the given skeleton.
@@ -255,7 +255,7 @@ public: // METHODS
    * @brief Ensures there is no two meshes with blend shapes sharing the same shader.
    * @SINCE_2_0.7
    */
-  void EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources) const;
+  void EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources);
 
   /**
    * @brief Performs the configuration of the given blend shapes.
@@ -277,11 +277,11 @@ public: // METHODS
   SceneDefinition& operator=(SceneDefinition&& other);
 
 private: // METHODS
-  bool FindNode(const std::string& name, std::unique_ptr<NodeDefinition>** result);
+  bool FindNode(const std::string& name, UniquePtr<NodeDefinition>** result);
 
-private:                                               // DATA
-  std::vector<std::unique_ptr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).
-  std::vector<Index>                           mRootNodeIds;
+private:                                         // DATA
+  std::vector<UniquePtr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).
+  std::vector<Index>                     mRootNodeIds;
 };
 
 } // namespace Dali::Scene3D::Loader

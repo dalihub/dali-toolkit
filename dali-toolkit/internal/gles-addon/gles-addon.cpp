@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ void GlViewRenderOnce(GlViewImpl&& glViewImpl)
   glViewImpl.RenderOnce();
 }
 
-void GlViewBindTextureResources(GlViewImpl&& glViewImpl, std::vector<Dali::Texture> textures)
+void GlViewBindTextureResources(GlViewImpl&& glViewImpl, Dali::Vector<Dali::Texture> textures)
 {
   glViewImpl.BindTextureResources(std::move(textures));
 }

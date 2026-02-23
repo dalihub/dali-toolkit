@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ int UtcDaliRadioButtonNewP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliRadioButtonNewP");
 
-  // Create the Slider actor
+  // Create the RadioButton actor
   RadioButton radioButton;
 
   DALI_TEST_CHECK(!radioButton);

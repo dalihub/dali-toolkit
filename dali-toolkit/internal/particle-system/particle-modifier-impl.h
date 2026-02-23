@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_MODIFIER_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_MODIFIER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
  *
  */
 
-#include <dali-toolkit/public-api/particle-system/particle-modifier.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-object.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/particle-system/particle-modifier.h>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -27,14 +31,14 @@ class ParticleEmitter;
 class ParticleModifier : public Dali::BaseObject
 {
 public:
-  ParticleModifier(std::unique_ptr<ParticleModifierInterface>&& updater);
+  ParticleModifier(UniquePtr<ParticleModifierInterface>&& updater);
 
   void Update(ParticleSystem::ParticleList& list, uint32_t first, uint32_t count);
 
   ParticleModifierInterface& GetUpdater();
 
 private:
-  std::unique_ptr<ParticleModifierInterface> mUpdater;
+  UniquePtr<ParticleModifierInterface> mUpdater;
 };
 
 } // namespace Dali::Toolkit::ParticleSystem::Internal

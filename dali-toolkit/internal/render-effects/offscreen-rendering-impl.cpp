@@ -22,6 +22,7 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -53,13 +54,20 @@ void OffScreenRenderingImpl::SetType(DevelControl::OffScreenRenderingType type)
   }
 }
 
-OffScreenRenderable::Type OffScreenRenderingImpl::GetOffScreenRenderableType()
+OffScreenRenderable::Type OffScreenRenderingImpl::GetOffScreenRenderableType() const
 {
   return OffScreenRenderable::Type::FORWARD;
 }
 
-void OffScreenRenderingImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void OffScreenRenderingImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
+  if(isForward)
+  {
+    if(mRenderTask)
+    {
+      tasks.PushBack(mRenderTask);
+    }
+  }
 }
 
 Dali::Texture OffScreenRenderingImpl::GetTexture() const
@@ -77,6 +85,8 @@ void OffScreenRenderingImpl::OnActivate()
   {
     return;
   }
+  Toolkit::Control ownerControl = GetOwnerControl();
+  DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
   if(!mCamera)
   {
@@ -87,7 +97,7 @@ void OffScreenRenderingImpl::OnActivate()
     mCamera.SetType(Dali::Camera::FREE_LOOK);
   }
   mCamera.SetPerspectiveProjection(GetTargetSize());
-  GetOwnerControl().Add(mCamera);
+  ownerControl.Add(mCamera);
 
   CreateFrameBuffer();
   CreateRenderTask();
@@ -96,10 +106,13 @@ void OffScreenRenderingImpl::OnActivate()
   Renderer renderer = GetTargetRenderer();
   SetRendererTexture(renderer, mFrameBuffer);
 
-  Toolkit::Control control = GetOwnerControl();
-  control.AddCacheRenderer(renderer);
-  control.GetImplementation().RegisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
-  mRenderTask.SetScreenToFrameBufferMappingActor(control);
+  ownerControl.AddCacheRenderer(renderer);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(GetOffScreenRenderableType());
+  mRenderTask.SetScreenToFrameBufferMappingActor(ownerControl);
+
+  // Reorder render task
+  // TODO : Can we remove this GetImplementation?
+  GetImplementation(ownerControl).RequestRenderTaskReorder();
 }
 
 void OffScreenRenderingImpl::OnDeactivate()
@@ -109,7 +122,7 @@ void OffScreenRenderingImpl::OnDeactivate()
   {
     Renderer renderer = GetTargetRenderer();
     control.RemoveCacheRenderer(renderer);
-    control.GetImplementation().UnregisterOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
 
     mCamera.Unparent();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
 #include <dali/devel-api/common/addon-binder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/graphics-backend.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dlfcn.h>
-#include <memory>
 
 namespace Dali::Toolkit
 {
@@ -51,11 +51,11 @@ struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder
   ADDON_BIND_FUNCTION(GlViewGetRenderingMode, GlView::RenderingMode(const Internal::GlViewImpl&));
   ADDON_BIND_FUNCTION(GlViewGetBackendMode, GlView::BackendMode(const Internal::GlViewImpl&));
   ADDON_BIND_FUNCTION(GlViewRenderOnce, void(Internal::GlViewImpl&));
-  ADDON_BIND_FUNCTION(GlViewBindTextureResources, void(Internal::GlViewImpl&, std::vector<Dali::Texture>));
+  ADDON_BIND_FUNCTION(GlViewBindTextureResources, void(Internal::GlViewImpl&, Dali::Vector<Dali::Texture>));
   ADDON_BIND_FUNCTION(GlViewTerminate, void(Internal::GlViewImpl&));
 };
 
-std::unique_ptr<ToolkitGlesAddOn> gToolkitGlesAddon;
+UniquePtr<ToolkitGlesAddOn> gToolkitGlesAddon;
 } // namespace
 
 GlView::GlView() = default;
@@ -81,7 +81,7 @@ GlView GlView::New(BackendMode backendMode, ColorFormat colorFormat)
   {
     if(!gToolkitGlesAddon)
     {
-      gToolkitGlesAddon.reset(new ToolkitGlesAddOn);
+      gToolkitGlesAddon.Reset(new ToolkitGlesAddOn);
     }
     DALI_ASSERT_ALWAYS(gToolkitGlesAddon && "Cannot load the GlView Addon\n");
     return gToolkitGlesAddon->GlViewNew(backendMode, colorFormat);
@@ -148,7 +148,7 @@ void GlView::RenderOnce()
   }
 }
 
-void GlView::BindTextureResources(std::vector<Dali::Texture> textures)
+void GlView::BindTextureResources(Dali::Vector<Dali::Texture> textures)
 {
   Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
   if(gToolkitGlesAddon)

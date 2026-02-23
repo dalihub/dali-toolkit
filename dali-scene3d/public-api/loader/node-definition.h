@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 #define DALI_SCENE3D_LOADER_NODE_DEFINITION_H_
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector4.h>
 #include <functional>
-#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -293,10 +293,10 @@ public: // DATA
 
   bool mIsVisible = true;
 
-  std::vector<std::unique_ptr<Renderable>> mRenderables;
-  std::unique_ptr<CustomizationDefinition> mCustomization;
-  std::vector<Extra>                       mExtras;
-  std::vector<ConstraintDefinition>        mConstraints;
+  std::vector<UniquePtr<Renderable>> mRenderables;
+  UniquePtr<CustomizationDefinition> mCustomization;
+  std::vector<Extra>                 mExtras;
+  std::vector<ConstraintDefinition>  mConstraints;
 
   std::vector<Index> mChildren;
   Index              mParentIdx = INVALID_INDEX;

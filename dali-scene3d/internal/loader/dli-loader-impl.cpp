@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/property-array.h>
 
 #include <algorithm>
@@ -29,7 +30,6 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-util.h>
@@ -1190,12 +1190,12 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
       std::string tag;
       if(ReadString(eCustomization->GetChild("tag"), tag))
       {
-        nodeDef.mCustomization.reset(new Dali::Scene3D::Loader::NodeDefinition::CustomizationDefinition{tag});
+        nodeDef.mCustomization.Reset(new Dali::Scene3D::Loader::NodeDefinition::CustomizationDefinition{tag});
       }
     }
     else // something renderable maybe
     {
-      std::unique_ptr<Dali::Scene3D::Loader::NodeDefinition::Renderable> renderable;
+      Dali::UniquePtr<Dali::Scene3D::Loader::NodeDefinition::Renderable> renderable;
       ModelRenderable*                                                   modelRenderable = nullptr; // no ownership, aliasing renderable for the right type.
 
       const TreeNode* eRenderable = nullptr;
@@ -1209,7 +1209,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
         }
 
         modelRenderable = new ModelRenderable();
-        renderable.reset(modelRenderable);
+        renderable.Reset(modelRenderable);
 
         resourceIds.push_back({ResourceType::Mesh, eMesh, modelRenderable->mMeshIdx});
       }
@@ -1223,7 +1223,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
         }
 
         auto arcRenderable = new ArcRenderable;
-        renderable.reset(arcRenderable);
+        renderable.Reset(arcRenderable);
         modelRenderable = arcRenderable;
 
         resourceIds.push_back({ResourceType::Mesh, eMesh, arcRenderable->mMeshIdx});
@@ -1404,7 +1404,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
     }
 
     // Register nodeDef
-    auto rawDef = output->mScene.AddNode(std::make_unique<Dali::Scene3D::Loader::NodeDefinition>(std::move(nodeDef)));
+    auto rawDef = output->mScene.AddNode(MakeUnique<Dali::Scene3D::Loader::NodeDefinition>(std::move(nodeDef)));
     if(rawDef) // NOTE: no ownership. Guaranteed to stay in scope.
     {
       // ...And only then parse children.
@@ -1680,7 +1680,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
           const TreeNode* tnValue = tnProperty.GetChild("value");
           if(tnValue)
           {
-            animProp.mValue.reset(new AnimatedProperty::Value{ReadPropertyValue(*tnValue)});
+            animProp.mValue.Reset(new AnimatedProperty::Value{ReadPropertyValue(*tnValue)});
             ReadBool(tnProperty.GetChild("relative"), animProp.mValue->mIsRelative);
           }
           else

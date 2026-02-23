@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_SOURCE_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_SOURCE_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-types.h>
@@ -107,7 +106,7 @@ public:
    *
    * @return New ParticleSource object handle
    */
-  static ParticleSource New(std::unique_ptr<ParticleSourceInterface>&& particleSourceCallback);
+  static ParticleSource New(UniquePtr<ParticleSourceInterface>&& particleSourceCallback);
 
   /**
    * @brief Creates new ParticleSource with given source callback and arguments
@@ -118,9 +117,9 @@ public:
    * @return New ParticleSource object handle
    */
   template<class T, class... Args>
-  static ParticleSource New(Args... args)
+  static ParticleSource New(Args&&... args)
   {
-    return New(std::move(std::make_unique<T>(args...)));
+    return New(std::move(MakeUnique<T>(args...)));
   }
 
   /**
@@ -139,7 +138,7 @@ public:
    *
    * @return Valid reference to associated callback
    */
-  [[nodiscard]] ParticleSourceInterface& GetSourceCallback() const;
+  [[nodiscard]] ParticleSourceInterface& GetSourceCallback();
 
 private:
   /// @cond internal

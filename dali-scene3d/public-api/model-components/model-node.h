@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,7 +217,7 @@ public: // Public Method
    * @SINCE_2_2.53
    * @param[in] colliderMesh r-value to unique pointer of ColliderMesh
    */
-  void SetColliderMesh(std::unique_ptr<Algorithm::ColliderMesh>&& colliderMesh);
+  void SetColliderMesh(UniquePtr<Algorithm::ColliderMesh>&& colliderMesh);
 
   /**
    * @brief Returns associated collider mesh

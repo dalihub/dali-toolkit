@@ -30,7 +30,6 @@
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
@@ -42,7 +41,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>

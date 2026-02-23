@@ -7,7 +7,6 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
-  utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
   utc-Dali-ArcVisual.cpp
@@ -39,7 +38,6 @@ SET(TC_SOURCES
   utc-Dali-ShadowView.cpp
   utc-Dali-ScaleTransition.cpp
   utc-Dali-SlideTransition.cpp
-  utc-Dali-Slider.cpp
   utc-Dali-TableView.cpp
   utc-Dali-Text-BaseSpan.cpp
   utc-Dali-Text-ForegroundColorSpan.cpp
@@ -62,7 +60,6 @@ SET(TC_SOURCES
   utc-Dali-TextSelectionPopupMirroringLTR.cpp
   utc-Dali-TextSelectionPopupMirroringRTL.cpp
   utc-Dali-TextureManager.cpp
-  utc-Dali-ToolBar.cpp
   utc-Dali-Tooltip.cpp
   utc-Dali-Transition.cpp
   utc-Dali-TransitionData.cpp
@@ -76,7 +73,6 @@ SET(TC_SOURCES
   utc-Dali-Magnifier.cpp
   utc-Dali-NavigationView.cpp
   utc-Dali-Popup.cpp
-  utc-Dali-ProgressBar.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
   utc-Dali-ToggleButton.cpp

@@ -477,14 +477,13 @@ void Panel::OnSceneDisconnection()
   Control::OnSceneDisconnection();
 }
 
-void Panel::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void Panel::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
-  tasks.clear();
   if(isForward)
   {
     if(mRenderTask)
     {
-      tasks.push_back(mRenderTask);
+      tasks.PushBack(mRenderTask);
     }
   }
 }

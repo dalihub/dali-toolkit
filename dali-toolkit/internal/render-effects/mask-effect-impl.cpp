@@ -100,23 +100,22 @@ MaskEffectImplPtr MaskEffectImpl::New(Toolkit::Control maskControl, MaskEffect::
   return handle;
 }
 
-OffScreenRenderable::Type MaskEffectImpl::GetOffScreenRenderableType()
+OffScreenRenderable::Type MaskEffectImpl::GetOffScreenRenderableType() const
 {
   return OffScreenRenderable::Type::FORWARD;
 }
 
-void MaskEffectImpl::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void MaskEffectImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
-  tasks.clear();
   if(isForward)
   {
     if(mMaskTargetRenderTask)
     {
-      tasks.push_back(mMaskTargetRenderTask);
+      tasks.PushBack(mMaskTargetRenderTask);
     }
     if(mMaskSourceRenderTask)
     {
-      tasks.push_back(mMaskSourceRenderTask);
+      tasks.PushBack(mMaskSourceRenderTask);
     }
   }
 }
@@ -193,6 +192,10 @@ void MaskEffectImpl::OnActivate()
 
   ownerControl.Add(mCamera);
 
+  Renderer maskRenderer = GetTargetRenderer();
+  ownerControl.AddCacheRenderer(maskRenderer);
+  ownerControl.GetImplementation().RegisterOffScreenRenderableType(GetOffScreenRenderableType());
+
   ResetMaskData();
   CreateMaskData();
 }
@@ -223,10 +226,6 @@ void MaskEffectImpl::CreateMaskData()
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
-  Renderer maskRenderer = GetTargetRenderer();
-  ownerControl.AddCacheRenderer(maskRenderer);
-  ownerControl.GetImplementation().RegisterOffScreenRenderableType(GetOffScreenRenderableType());
-
   Vector2 size = GetTargetSize();
   mCamera.SetPerspectiveProjection(size);
 
@@ -253,6 +252,10 @@ void MaskEffectImpl::CreateMaskData()
     textureSet.SetTexture(maskSourceIndex, mMaskSourceTexture);
     textureSet.SetTexture(maskTargetIndex, mMaskTargetTexture);
   }
+
+  // Reorder render task
+  // TODO : Can we remove this GetImplementation?
+  GetImplementation(ownerControl).RequestRenderTaskReorder();
 }
 
 void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)

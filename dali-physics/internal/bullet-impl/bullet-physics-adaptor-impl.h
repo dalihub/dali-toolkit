@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,8 +112,8 @@ public:
   Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance) override;
 
 private:
-  Actor                                 mDebugActor;
-  std::unique_ptr<PhysicsDebugRenderer> mDebugRenderer;
+  Actor                           mDebugActor;
+  UniquePtr<PhysicsDebugRenderer> mDebugRenderer;
 };
 
 } // namespace Dali::Toolkit::Physics::Internal

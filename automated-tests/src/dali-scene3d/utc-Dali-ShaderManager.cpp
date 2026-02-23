@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,9 +267,9 @@ int UtcDaliShaderManagerProduceShader(void)
     modelRenderable->mMeshIdx     = 0;
     modelRenderable->mMaterialIdx = 0;
 
-    NodeDefinition                              nodeDefinition;
-    std::unique_ptr<NodeDefinition::Renderable> renderable;
-    renderable.reset(modelRenderable);
+    NodeDefinition                        nodeDefinition;
+    UniquePtr<NodeDefinition::Renderable> renderable;
+    renderable.Reset(modelRenderable);
     nodeDefinition.mRenderables.push_back(std::move(renderable));
 
     MeshDefinition     meshDefinition;

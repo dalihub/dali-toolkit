@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LOADER_NAVIGATION_MESH_FACTORY_H
 
 /*
-* Copyright (c) 2023 Samsung Electronics Co., Ltd.
+* Copyright (c) 2026 Samsung Electronics Co., Ltd.
 
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/texture.h>
 
@@ -41,7 +42,7 @@ public:
    * @param[in] filename file to load
    * @return Valid NavigationMesh or nullptr
    */
-  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromFile(std::string filename);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromFile(std::string filename);
 
   /**
    * @brief Creates NavigationMesh object from binary buffer
@@ -50,7 +51,7 @@ public:
    * @param[in] buffer buffer with data
    * @return Valid NavigationMesh or nullptr
    */
-  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromBuffer(const std::vector<uint8_t>& buffer);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromBuffer(const std::vector<uint8_t>& buffer);
 
   /**
    * @brief Creates new mesh from lists of vertices and faces
@@ -63,7 +64,7 @@ public:
    * @param[in] faceIndices List of faces
    * @return Valid NavigationMesh or nullptr
    */
-  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& vertexNormals, const std::vector<uint32_t>& faceIndices);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& vertexNormals, const std::vector<uint32_t>& faceIndices);
 
   /**
    * @brief Creates new mesh from lists of vertices and faces
@@ -80,7 +81,7 @@ public:
    * @param[in] indexCount Number of indices
    * @return Valid NavigationMesh or nullptr
    */
-  static std::unique_ptr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const Vector3* vertices, const Vector3* vertexNormals, uint32_t vertexCount, const uint32_t* faceIndices, uint32_t indexCount);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const Vector3* vertices, const Vector3* vertexNormals, uint32_t vertexCount, const uint32_t* faceIndices, uint32_t indexCount);
 
   /**
    * @brief Serializes mesh data to the binary format.

@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <memory>
-
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
@@ -78,7 +77,7 @@ class DALI_SCENE3D_API Model : public Dali::Toolkit::Control
 public:
   // Typedefs
   using MeshHitSignalType = Signal<bool(Model, Scene3D::ModelNode)>; ///< Mesh hit signal type @SINCE_2_2.53
-  using ColliderMeshPtr   = std::unique_ptr<Algorithm::NavigationMesh>;
+  using ColliderMeshPtr   = UniquePtr<Algorithm::NavigationMesh>;
 
   using LoadCompletedSignalType = Signal<void(Model, bool)>; ///< Model load completed signal type @SINCE_2_3.46
 

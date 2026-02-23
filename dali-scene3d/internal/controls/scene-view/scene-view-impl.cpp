@@ -1298,18 +1298,17 @@ void SceneView::OnSceneDisconnection()
   Control::OnSceneDisconnection();
 }
 
-void SceneView::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void SceneView::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
-  tasks.clear();
   if(isForward)
   {
     if(mShadowMapRenderTask)
     {
-      tasks.push_back(mShadowMapRenderTask);
+      tasks.PushBack(mShadowMapRenderTask);
     }
     if(mRenderTask)
     {
-      tasks.push_back(mRenderTask);
+      tasks.PushBack(mRenderTask);
     }
   }
 }

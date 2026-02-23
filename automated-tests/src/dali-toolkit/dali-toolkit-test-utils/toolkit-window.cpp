@@ -90,6 +90,11 @@ std::string Window::GetNativeResourceId() const
   return "123";
 }
 
+void Window::KeepRendering(float durationSeconds)
+{
+  mScene.KeepRendering(durationSeconds);
+}
+
 } // namespace Adaptor
 } // namespace Internal
 
@@ -244,6 +249,11 @@ Window::TouchEventSignalType& Window::TouchedSignal()
 Dali::RenderTaskList Window::GetRenderTaskList()
 {
   return GetImplementation(*this).GetRenderTaskList();
+}
+
+void Window::KeepRendering(float durationSeconds)
+{
+  GetImplementation(*this).KeepRendering(durationSeconds);
 }
 
 namespace DevelWindow

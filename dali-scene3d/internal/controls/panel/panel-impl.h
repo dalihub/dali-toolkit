@@ -160,7 +160,7 @@ private:
   /**
    * @copydoc CustomActorImpl::SetFirstOrderIndex()
    */
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override;
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override;
 
 private:
   /**

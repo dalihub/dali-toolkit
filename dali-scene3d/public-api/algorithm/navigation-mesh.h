@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_NAVIGATION_MESH_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
@@ -26,7 +27,6 @@
 #include <cinttypes>
 #include <cstdio>
 #include <limits>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -268,7 +268,7 @@ public:
 public:
   DALI_INTERNAL explicit NavigationMesh(NavigationMeshImpl* impl);
 
-  std::unique_ptr<NavigationMeshImpl> mImpl;
+  UniquePtr<NavigationMeshImpl> mImpl;
 };
 
 // Alias name for collider mesh

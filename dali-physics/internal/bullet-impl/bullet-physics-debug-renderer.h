@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ class PhysicsDebugRenderer : public btIDebugDraw
 {
 public:
   // Creates and initializes a new renderer
-  static std::unique_ptr<PhysicsDebugRenderer> New(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor);
+  static UniquePtr<PhysicsDebugRenderer> New(uint32_t width, uint32_t height, Dali::CameraActor camera, PhysicsAdaptor* adaptor);
 
   /**
    * Get the callback (for actor creation)
    */
-  std::unique_ptr<Dali::RenderCallback>& GetCallback()
+  UniquePtr<Dali::RenderCallback>& GetCallback()
   {
     return mRenderCallback;
   }
@@ -80,9 +80,9 @@ private:
   void Render(const Dali::RenderCallbackInput& input);
 
 private:
-  CameraActor                           mCamera;
-  Renderer                              mDebugRenderer;
-  std::unique_ptr<Dali::RenderCallback> mRenderCallback;
+  CameraActor                     mCamera;
+  Renderer                        mDebugRenderer;
+  UniquePtr<Dali::RenderCallback> mRenderCallback;
 
   enum class State
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,7 +128,7 @@ Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(std::string_view 
   return Internal::GetImplementation(*this).GetBlendShapeIndexByName(blendShapeName);
 }
 
-void ModelNode::SetColliderMesh(std::unique_ptr<Algorithm::ColliderMesh>&& colliderMesh)
+void ModelNode::SetColliderMesh(UniquePtr<Algorithm::ColliderMesh>&& colliderMesh)
 {
   Internal::GetImplementation(*this).SetColliderMesh(std::move(colliderMesh));
 }

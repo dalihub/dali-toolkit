@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_GL_VIEW_H
 #define DALI_TOOLKIT_GL_VIEW_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -359,7 +359,7 @@ public:
    *
    * @SINCE_2_2.2
    */
-  void BindTextureResources(std::vector<Dali::Texture> textures);
+  void BindTextureResources(Dali::Vector<Dali::Texture> textures);
 
   /**
    * @brief Request to terminate the gl rendering.

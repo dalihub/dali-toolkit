@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -499,7 +499,7 @@ void ModelNode::SetColliderMesh(ColliderMeshUniquePtr&& colliderMesh)
 
 bool ModelNode::HasColliderMesh() const
 {
-  return mColliderMesh != nullptr;
+  return mColliderMesh.Get() != nullptr;
 }
 
 const Scene3D::Algorithm::ColliderMesh& ModelNode::GetColliderMesh() const
