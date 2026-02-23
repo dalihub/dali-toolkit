@@ -29,7 +29,6 @@ SET(TC_SOURCES
   utc-Dali-ImageUrl.cpp
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
-  utc-Dali-PageTurnView.cpp
   utc-Dali-ParticleSystem.cpp
   utc-Dali-PropertyBridge.cpp
   utc-Dali-ScrollBar.cpp

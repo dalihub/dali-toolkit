@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 namespace Dali
 {
@@ -149,6 +150,11 @@ bool VisualFactory::AddPrecompileShader(const Property::Map& map)
 void VisualFactory::UsePreCompiledShader()
 {
   GetImplementation(*this).UsePreCompiledShader();
+}
+
+Dali::Geometry VisualFactory::CreateGridGeometry(Dali::Uint16Pair gridSize, bool normalized)
+{
+  return Internal::VisualFactoryCache::CreateGridGeometry(gridSize, normalized);
 }
 
 } // namespace Toolkit

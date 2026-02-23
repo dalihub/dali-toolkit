@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,6 +247,19 @@ public:
    * and the application is simple, it may use memory unnecessarily or slow down the application launching speed.
    */
   void UsePreCompiledShader();
+
+  /**
+   * @brief Create the grid geometry.
+   *
+   * This function creates a grid geometry for use in custom controls and visuals.
+   *
+   * @param[in] gridSize The size of the grid (number of cells in x and y directions).
+   * @param[in] normalized Make the attribute values normalized as [-0.5f ~ 0.5f].
+   *                       If false, attribute values have [0 ~ gridSize) integer values
+   *                       (Usually used for NPatch images).
+   * @return The created grid geometry.
+   */
+  Dali::Geometry CreateGridGeometry(Dali::Uint16Pair gridSize, bool normalized);
 
 private:
   explicit DALI_INTERNAL VisualFactory(Internal::VisualFactory* impl);

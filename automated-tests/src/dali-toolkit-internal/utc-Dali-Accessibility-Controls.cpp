@@ -21,6 +21,7 @@
 
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
@@ -547,61 +548,6 @@ int UtcDaliAccessibilityImageViewConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(imageview);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::IMAGE, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
-class TestPageFactory : public PageFactory
-{
-public:
-  TestPageFactory(bool returnValidTexture = true)
-  : mValidTexture(returnValidTexture)
-  {
-    mTotalPageNumber = 100;
-  }
-
-  /**
-   * Query the number of pages available from the factory.
-   * The maximum available page has an ID of GetNumberOfPages()-1.
-   */
-  virtual unsigned int GetNumberOfPages()
-  {
-    return mTotalPageNumber;
-  }
-
-  /**
-   * Create an texture to represent a page content.
-   * @param[in] pageId The ID of the page to create.
-   * @return An image, or an empty handle if the ID is out of range.
-   */
-  virtual Texture NewPage(unsigned int pageId)
-  {
-    if(mValidTexture)
-    {
-      return Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGB888, 100, 100);
-    }
-    return Texture(); // empty handle
-  }
-
-private:
-  unsigned int mTotalPageNumber;
-  bool         mValidTexture;
-};
-
-#include <dali-toolkit/internal/controls/page-turn-view/page-turn-landscape-view-impl.h>
-int UtcDaliAccessibilityPageTurnViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto testpagefactory       = TestPageFactory();
-  auto vector2               = Vector2(1.0, 1.0);
-  auto pageturnlandscapeview = PageTurnLandscapeView::New(testpagefactory, vector2);
-  DALI_TEST_CHECK(pageturnlandscapeview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(pageturnlandscapeview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::PAGE_TAB_LIST, TEST_LOCATION);
 
   END_TEST;
 }
