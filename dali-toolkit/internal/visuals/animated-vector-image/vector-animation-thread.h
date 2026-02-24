@@ -201,7 +201,8 @@ private:
   VectorAnimationTaskSet mCompletedTasks; ///< Temperal storage for completed tasks. Thread warning : This should be touched only at VectorAnimationThread.
   VectorAnimationTaskSet mWorkingTasks;   ///< Tasks which are currently being processed. Thread warning : This should be touched only at VectorAnimationThread.
 
-  VectorAnimationTaskSet mDiscardedTasks; ///< Tasks which are discarded but still in processing in the worker thread. Attached at VectorAnimationThread, and removed at main thread.
+  VectorAnimationTaskSet mDiscardedTasksQueue; ///< Temperal tasks which will be discarded but still in processing in the worker thread. This should be touched only at VectorAnimationThread.
+  VectorAnimationTaskSet mDiscardedTasks;      ///< Tasks which were discarded. Attached at VectorAnimationThread, and removed at main thread.
 
   std::vector<std::pair<VectorAnimationTaskPtr, bool>> mCompletedTasksQueue; ///< Queue of completed tasks from worker thread. pair of task, and rasterize required.
                                                                              ///< It will be moved at begin of Rasterize().
