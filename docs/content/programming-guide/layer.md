@@ -34,21 +34,7 @@ rootLayer.add( myActor );  // adds an actor to the root layer
 ~~~
 
 Example To create two new layers on top of the root layer.
-  
 
-## Layer clipping
-
-Clips the contents of the layer to a rectangle.
-
-~~~{.cpp}
-// C++
-
-layer1.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-layer1.SetParentOrigin( ParentOrigin::CENTER );
-layer1.SetClipping( true );
-layer1.SetClippingBox( 20, 20, 100, 100 ); // X, Y, Width, Height
-
-~~~
 
 ## Re-ordering layers
 
@@ -184,9 +170,10 @@ Depth testing is not used.
 
 | Name                   |    Type    | Writable     | Animatable|
 |------------------------|------------|--------------|-----------|
-| clippingEnable         |BOOLEAN     | 0     |  X |
-| clippingBox            | ARRAY [0,0,400,600]) | 0 | X|
-| behaviour              | STRING ( "LAYER_2D" or "LAYER_3D") | 0 | X|
+| behaviour              | STRING ( "LAYER_2D" or "LAYER_3D") | O | X|
+| depth                  | INTEGER    | X | X|
+| consumesTouch          | BOOLEAN    | O | X|
+| consumesHover          | BOOLEAN    | O | X|
 
   @extends Actor
 
