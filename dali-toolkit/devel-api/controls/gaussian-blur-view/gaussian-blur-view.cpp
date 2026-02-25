@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,21 @@ void GaussianBlurView::SetBackgroundColor(const Vector4& color)
 Vector4 GaussianBlurView::GetBackgroundColor() const
 {
   return GetImpl(*this).GetBackgroundColor();
+}
+
+void GaussianBlurView::AllocateResources()
+{
+  GetImpl(*this).AllocateResources();
+}
+
+void GaussianBlurView::CreateRenderTasks()
+{
+  GetImpl(*this).CreateRenderTasks();
+}
+
+void GaussianBlurView::RemoveRenderTasks()
+{
+  GetImpl(*this).RemoveRenderTasks();
 }
 
 GaussianBlurView::GaussianBlurViewSignal& GaussianBlurView::FinishedSignal()

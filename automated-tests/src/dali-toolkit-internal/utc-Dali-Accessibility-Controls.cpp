@@ -21,7 +21,6 @@
 
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
@@ -507,37 +506,6 @@ int UtcDaliAccessibilityTextSelectionConstructor(void)
   END_TEST;
 }
 
-#include <dali-toolkit/internal/controls/effects-view/effects-view-impl.h>
-int UtcDaliAccessibilityEffectsViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto etype       = Dali::Toolkit::EffectsView::EffectType::DROP_SHADOW;
-  auto effectsview = EffectsView::New(etype);
-  DALI_TEST_CHECK(effectsview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(effectsview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/internal/controls/super-blur-view/super-blur-view-impl.h>
-int UtcDaliAccessibilitySuperBlurViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto superblurview = SuperBlurView::New(1);
-  DALI_TEST_CHECK(superblurview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(superblurview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityImageViewConstructor(void)
 {
   ToolkitTestApplication application;
@@ -552,6 +520,7 @@ int UtcDaliAccessibilityImageViewConstructor(void)
   END_TEST;
 }
 
+#include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 int UtcDaliAccessibilityGaussianBlurViewConstructor(void)
 {
   ToolkitTestApplication application;
@@ -560,20 +529,6 @@ int UtcDaliAccessibilityGaussianBlurViewConstructor(void)
   DALI_TEST_CHECK(gaussianblurview);
 
   auto accessible = Dali::Accessibility::Accessible::Get(gaussianblurview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliAccessibilityShadowViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto shadowview = ShadowView::New();
-  DALI_TEST_CHECK(shadowview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(shadowview);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
 
@@ -606,21 +561,6 @@ int UtcDaliAccessibilityTableViewConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(tableview);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::TABLE, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/internal/controls/bloom-view/bloom-view-impl.h>
-int UtcDaliAccessibilityBloomViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto bloomview = BloomView::New();
-  DALI_TEST_CHECK(bloomview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(bloomview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::ANIMATION, TEST_LOCATION);
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -353,6 +353,82 @@ int UtcDaliGaussianBlurViewFinishedSignalN(void)
 
   // FinishedSignal is only for ActivateOnce()
   DALI_TEST_CHECK(callback.mFinished == false);
+
+  END_TEST;
+}
+
+int UtcDaliGaussianBlurViewNormalMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGaussianBlurViewNormalMode");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New();
+  DALI_TEST_CHECK(view);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  unsigned int   initialTaskCount = taskList.GetTaskCount();
+  DALI_TEST_CHECK(1u == initialTaskCount);
+
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  view.SetProperty(Actor::Property::SIZE, application.GetScene().GetSize());
+  view.Add(Actor::New());
+  application.GetScene().Add(view);
+
+  view.AllocateResources();
+  RenderTaskList taskListAfterAllocate = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK(initialTaskCount == taskListAfterAllocate.GetTaskCount());
+
+  view.CreateRenderTasks();
+  RenderTaskList taskListAfterCreate = application.GetScene().GetRenderTaskList();
+  unsigned int   createdTaskCount = taskListAfterCreate.GetTaskCount() - initialTaskCount;
+  DALI_TEST_CHECK(4u == createdTaskCount);
+
+  view.RemoveRenderTasks();
+  RenderTaskList taskListAfterRemove = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK(taskListAfterRemove.GetTaskCount() <= initialTaskCount + 1);
+
+  view.Deactivate();
+
+  END_TEST;
+}
+
+int UtcDaliGaussianBlurViewUserImageMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGaussianBlurViewUserImageMode");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
+  DALI_TEST_CHECK(view);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  unsigned int   initialTaskCount = taskList.GetTaskCount();
+  DALI_TEST_CHECK(1u == initialTaskCount);
+
+  view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  view.SetProperty(Actor::Property::SIZE, application.GetScene().GetSize());
+  application.GetScene().Add(view);
+
+  view.AllocateResources();
+  RenderTaskList taskListAfterAllocate = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK(initialTaskCount == taskListAfterAllocate.GetTaskCount());
+
+  PixelData pixels  = Toolkit::SyncImageLoader::Load(TEST_IMAGE_FILE_NAME);
+  Texture   texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
+  texture.Upload(pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight());
+
+  FrameBuffer renderTarget = FrameBuffer::New(480, 800, FrameBuffer::Attachment::NONE);
+  view.SetUserImageAndOutputRenderTarget(texture, renderTarget);
+
+  view.CreateRenderTasks();
+  RenderTaskList taskListAfterCreate = application.GetScene().GetRenderTaskList();
+  unsigned int   createdTaskCount = taskListAfterCreate.GetTaskCount() - initialTaskCount;
+  DALI_TEST_CHECK(2u == createdTaskCount);
+
+  view.RemoveRenderTasks();
+  RenderTaskList taskListAfterRemove = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK(taskListAfterRemove.GetTaskCount() <= initialTaskCount + 1);
+
+  view.Deactivate();
 
   END_TEST;
 }
