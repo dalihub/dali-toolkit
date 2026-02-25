@@ -339,17 +339,7 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
       }
       else
       {
-        Mutex::ScopedLock discardedTasksLock(mDiscardedTasksMutex);
-        if(mDiscardedTasks.empty())
-        {
-          Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
-          if(DALI_LIKELY(!mDestroyThread && mEventTrigger))
-          {
-            DALI_LOG_DEBUG_INFO("VectorAnimationThread::mEventTrigger Triggered for discard tasks!\n");
-            mEventTrigger->Trigger();
-          }
-        }
-        mDiscardedTasks.insert(task);
+        mDiscardedTasksQueue.insert(task);
       }
     }
   }
@@ -360,7 +350,7 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
-  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
+  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",d:" << mDiscardedTasksQueue.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
 }
 
 /// VectorAnimationThread called
@@ -370,7 +360,7 @@ void VectorAnimationThread::Rasterize()
   ConditionalWait::ScopedLock lock(mConditionalWait);
 
   // conditional wait
-  while(DALI_LIKELY(!mDestroyThread) && mNeedToSleep)
+  while(DALI_LIKELY(!mDestroyThread) && mNeedToSleep && mDiscardedTasksQueue.empty())
   {
     // ConditionalWait notifyed when sleep done, or task complete.
     // If task complete, then we need to re-validate the tasks container, and then sleep again.
@@ -447,6 +437,27 @@ void VectorAnimationThread::Rasterize()
       }
     }
   }
+
+  // Move discarded tasks now.
+  if(!mDiscardedTasksQueue.empty())
+  {
+    Mutex::ScopedLock discardedTasksLock(mDiscardedTasksMutex);
+
+    // Trigger only if discarded tasks was empty.
+    const bool needTrigger = mDiscardedTasks.empty();
+
+    mDiscardedTasks.merge(mDiscardedTasksQueue);
+    mDiscardedTasksQueue.clear();
+
+    if(needTrigger)
+    {
+      Mutex::ScopedLock eventTriggerLock(mEventTriggerMutex);
+      if(DALI_LIKELY(!mDestroyThread && mEventTrigger))
+      {
+        mEventTrigger->Trigger();
+      }
+    }
+  }
 }
 
 /// Event thread called (Due to mTrigger triggered)
@@ -473,6 +484,7 @@ void VectorAnimationThread::OnEventCallbackTriggered()
       mDiscardedTasks.swap(discardedTasks);
     }
   }
+
   // Remove discarded tasks now, out of mutex.
   if(!discardedTasks.empty())
   {
@@ -490,6 +502,9 @@ void VectorAnimationThread::OnEventCallbackTriggered()
         // Request to remove pending tasks at AsyncTaskManager side.
         mAsyncTaskManager.AddTask(nullptr);
         Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+
+        // Request ProcessEvents on idle to make ensure Processor executed.
+        Dali::Adaptor::Get().RequestProcessEventsOnIdle();
       }
       if(mForceRenderOnce)
       {
