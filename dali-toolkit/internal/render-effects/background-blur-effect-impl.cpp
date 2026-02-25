@@ -466,12 +466,12 @@ void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsamp
   mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 
   // buffer to draw half-blurred output
-  mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture temporaryTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
 
   // buffer to draw blurred output
-  mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture sourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mBlurredOutputFrameBuffer.AttachColorTexture(sourceTexture);
 }
