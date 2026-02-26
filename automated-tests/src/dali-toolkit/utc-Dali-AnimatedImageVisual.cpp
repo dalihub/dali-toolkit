@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-signals-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -67,9 +68,11 @@ const char* TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_cam
 constexpr auto LOAD_IMAGE_YUV_PLANES_ENV         = "DALI_LOAD_IMAGE_YUV_PLANES";
 constexpr auto ENABLE_DECODE_JPEG_TO_YUV_420_ENV = "DALI_ENABLE_DECODE_JPEG_TO_YUV_420";
 
-void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0)
+void CopyUrlsIntoArray(Property::Array& urls, int startIndex = 0, int endIndex = 10)
 {
-  for(int i = 20 + startIndex; i <= 30; ++i)
+  DALI_ASSERT_ALWAYS(0 <= startIndex && startIndex <= endIndex && endIndex <= 10);
+
+  for(int i = 20 + startIndex; i <= 20 + endIndex; ++i)
   {
     char* url;
     if(asprintf(&url, TEST_IMAGE_FILE_NAME, i) > 0)
@@ -111,9 +114,10 @@ ImageUrl ConvertFileToImageUrl(const char* url, ExternalUrlType type)
   return imageUrl;
 }
 
-void CopyExternalUrlsIntoArray(Property::Array& urls, std::vector<ImageUrl>& imageUrlContainer, int startIndex, ExternalUrlType generationType)
+void CopyExternalUrlsIntoArray(Property::Array& urls, std::vector<ImageUrl>& imageUrlContainer, int startIndex, int endIndex, ExternalUrlType generationType)
 {
-  for(int i = 20 + startIndex; i <= 30; ++i)
+  DALI_ASSERT_ALWAYS(0 <= startIndex && startIndex <= endIndex && endIndex <= 10);
+  for(int i = 20 + startIndex; i <= 20 + endIndex; ++i)
   {
     char* url;
     if(asprintf(&url, TEST_IMAGE_FILE_NAME, i) > 0)
@@ -2425,7 +2429,7 @@ int UtcDaliAnimatedImageVisualExternalMultiImage01(void)
 
     Property::Array       urls;
     std::vector<ImageUrl> imageUrlHolder;
-    CopyExternalUrlsIntoArray(urls, imageUrlHolder, 0, type);
+    CopyExternalUrlsIntoArray(urls, imageUrlHolder, 0, 10, type);
     int preCreatedTextureCount = 0;
     for(size_t i = 0u; i < imageUrlHolder.size(); i++)
     {
@@ -2626,24 +2630,43 @@ int UtcDaliAnimatedImageVisualExternalMultiImage01(void)
 
 namespace
 {
-void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyControl, uint16_t frameCount, uint16_t loopCount, const char* location)
+
+bool gAnimationFinishedSignalFired = false;
+
+void VisualEventSignal(Control control, Dali::Property::Index visualIndex, Dali::Property::Index signalId)
+{
+  tet_printf("visualIndex : %d vs %d, signalId : %d vs %d\n", visualIndex, DummyControl::Property::TEST_VISUAL, signalId, DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED);
+  if(visualIndex == DummyControl::Property::TEST_VISUAL && signalId == DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED)
+  {
+    gAnimationFinishedSignalFired = true;
+  }
+}
+
+void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyControl, uint16_t frameCount, uint16_t loopCount, bool needTriggerWait, const char* location)
 {
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
 
   textureTrace.Enable(true);
+  gAnimationFinishedSignalFired = false;
+
   application.GetScene().Add(dummyControl);
 
   application.SendNotification();
   application.Render(16);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_INNER_LOCATION(location));
+  if(needTriggerWait)
+  {
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_INNER_LOCATION(location));
+  }
 
   application.SendNotification();
   application.Render();
 
   tet_infoline("Test that a timer has been created");
   DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_INNER_LOCATION(location));
+
+  DALI_TEST_EQUALS(false, gAnimationFinishedSignalFired, TEST_LOCATION);
 
   for(uint16_t i = 0; i < loopCount; i++)
   {
@@ -2658,12 +2681,21 @@ void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyContr
       application.SendNotification();
       application.Render(16);
 
-      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_INNER_LOCATION(location));
+      if(needTriggerWait)
+      {
+        DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_INNER_LOCATION(location));
+      }
 
       application.SendNotification();
       application.Render();
-      DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 2, TEST_INNER_LOCATION(location));
+      if(needTriggerWait)
+      {
+        // Skip texture count for external texture cases.
+        DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 2, TEST_INNER_LOCATION(location));
+      }
       DALI_TEST_EQUALS(Test::AreTimersRunning(), true, TEST_INNER_LOCATION(location));
+
+      DALI_TEST_EQUALS(false, gAnimationFinishedSignalFired, TEST_LOCATION);
     }
     tet_printf("Test Loop %u \n\n", i + 1u);
   }
@@ -2674,6 +2706,9 @@ void TestLoopCount(ToolkitTestApplication& application, DummyControl& dummyContr
   application.Render(16);
   DALI_TEST_EQUALS(Test::AreTimersRunning(), false, TEST_INNER_LOCATION(location));
 
+  tet_printf("The final timer with stopped will emit finished signal");
+  DALI_TEST_EQUALS(true, gAnimationFinishedSignalFired, TEST_LOCATION);
+
   dummyControl.Unparent();
 }
 } // namespace
@@ -2682,7 +2717,7 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliAnimatedImageVisualLoopCount");
+  tet_infoline("UtcDaliAnimatedImageVisualLoopCount01");
 
   {
     // request AnimatedImageVisual with a property map
@@ -2701,8 +2736,9 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
     dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
 
-    TestLoopCount(application, dummyControl, 4, 0, TEST_LOCATION);
+    TestLoopCount(application, dummyControl, 4, 0, true, TEST_LOCATION);
 
     dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
     animatedImageVisual.Reset();
@@ -2722,7 +2758,7 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
 
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
 
-    TestLoopCount(application, dummyControl, 4, 1, TEST_LOCATION);
+    TestLoopCount(application, dummyControl, 4, 1, true, TEST_LOCATION);
 
     dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
     animatedImageVisual.Reset();
@@ -2738,11 +2774,156 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
         .Add(ImageVisual::Property::PIXEL_AREA, Vector4())
         .Add(ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT)
         .Add(ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT)
-        .Add(DevelImageVisual::Property::LOOP_COUNT, 100));
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 10));
 
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
 
-    TestLoopCount(application, dummyControl, 4, 100, TEST_LOCATION);
+    TestLoopCount(application, dummyControl, 4, 10, true, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoopCountMultiImage01(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliAnimatedImageVisualLoopCountMultiImage01");
+
+  {
+    Property::Array urls;
+    CopyUrlsIntoArray(urls, 0, 4); // 5 frames
+
+    // request AnimatedImageVisual with a property map
+    // Test with no (0) loop count
+    VisualFactory factory             = VisualFactory::Get();
+    Visual::Base  animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 0));
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
+
+    TestLoopCount(application, dummyControl, 5, 0, true, TEST_LOCATION);
+
+    dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
+
+    // Test with no (1) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 1));
+
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+
+    TestLoopCount(application, dummyControl, 5, 1, true, TEST_LOCATION);
+
+    dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
+
+    // Test with no (100) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 10));
+
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+
+    TestLoopCount(application, dummyControl, 5, 10, true, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualLoopCountMultiImage02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliAnimatedImageVisualLoopCountMultiImage02");
+
+  for(int testCase = 0; testCase < 2; testCase++)
+  {
+    ExternalUrlType type = static_cast<ExternalUrlType>(testCase);
+
+    // It is hard to check trigger events for ExternalUrlType::MIXED. Just test 2 cases.
+    bool loadFile = (type == ExternalUrlType::ENCODED_IMAGE_BUFFER);
+
+    tet_printf("test start for %s\n", type == ExternalUrlType::EXTERNAL_TEXTURE ? "ExternalUrlType::EXTERNAL_TEXTURE" : "ExternalUrlType::ENCODED_IMAGE_BUFFER");
+
+    Property::Array       urls;
+    std::vector<ImageUrl> imageUrlHolder;
+    CopyExternalUrlsIntoArray(urls, imageUrlHolder, 0, 4, type); // 5 frames
+
+    // request AnimatedImageVisual with a property map
+    // Test with no (0) loop count
+    VisualFactory factory             = VisualFactory::Get();
+    Visual::Base  animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 0));
+
+    DummyControl        dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
+
+    TestLoopCount(application, dummyControl, 5, 0, loadFile, TEST_LOCATION);
+
+    dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
+
+    // Test with no (1) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 1));
+
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+
+    TestLoopCount(application, dummyControl, 5, 1, loadFile, TEST_LOCATION);
+
+    dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
+
+    // Test with no (100) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+        .Add(ImageVisual::Property::URL, urls)
+        .Add(DevelImageVisual::Property::LOOP_COUNT, 10));
+
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+
+    TestLoopCount(application, dummyControl, 5, 10, loadFile, TEST_LOCATION);
+
+    dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+    animatedImageVisual.Reset();
+    DevelControl::VisualEventSignal(dummyControl).Disconnect(&VisualEventSignal);
+    dummyControl.Unparent();
+
+    application.SendNotification();
+    application.Render(16);
   }
   END_TEST;
 }
