@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/video-player-plugin.h>
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
@@ -31,9 +32,11 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <memory>
 
 namespace Dali
 {
@@ -43,6 +46,11 @@ class VideoView;
 
 namespace Internal
 {
+
+class VideoRenderingStrategy;
+class WindowSurfaceStrategy;
+class NativeImageStrategy;
+
 class VideoView : public ControlImpl
 {
 protected:
@@ -50,11 +58,105 @@ protected:
 
   virtual ~VideoView();
 
+private: // Internal accessors for Rendering Strategies
+  friend class VideoRenderingStrategy;
+  friend class WindowSurfaceStrategy;
+  friend class NativeImageStrategy;
+
+  /**
+   * @brief Checks if the video is currently playing.
+   *
+   * @return True if video is playing, false otherwise.
+   */
+  bool IsPlay() const { return mIsPlay; }
+
+  /**
+   * @brief Checks if overlay texture rendering is enabled.
+   *
+   * @return True if overlay texture is being used, false otherwise.
+   */
+  bool IsUsingOverlayTexture() const { return mIsUsingOverlayTexture; }
+
+  /**
+   * @brief Gets the native texture used for video rendering.
+   *
+   * @return The native texture handle.
+   */
+  Texture GetNativeTexture() const { return mNativeTexture; }
+
+  /**
+   * @brief Sets the native texture used for video rendering.
+   *
+   * @param[in] texture The texture to set.
+   */
+  void SetNativeTexture(Texture texture) { mNativeTexture = texture; }
+
+  /**
+   * @brief Gets the effect property map.
+   *
+   * @return Const reference to the effect property map.
+   */
+  const Property::Map& GetEffectPropertyMap() const { return mEffectPropertyMap; }
+
+  /**
+   * @brief Gets the texture visual used for rendering.
+   *
+   * @return The texture visual base handle.
+   */
+  Dali::Toolkit::Visual::Base GetTextureVisual() const { return mTextureVisual; }
+
+  /**
+   * @brief Sets the texture visual used for rendering.
+   *
+   * @param[in] visual The visual to set.
+   */
+  void SetTextureVisual(Dali::Toolkit::Visual::Base visual) { mTextureVisual = visual; }
+
+  /**
+   * @brief Gets the overlay visual used for rendering.
+   *
+   * @return The overlay visual base handle.
+   */
+  Dali::Toolkit::Visual::Base GetOverlayVisual() const { return mOverlayVisual; }
+
+  /**
+   * @brief Sets the overlay visual used for rendering.
+   *
+   * @param[in] visual The visual to set.
+   */
+  void SetOverlayVisual(Dali::Toolkit::Visual::Base visual) { mOverlayVisual = visual; }
+
+  /**
+   * @brief Applies backup properties to the VideoView.
+   *
+   * This method restores previously backed up properties when switching rendering modes.
+   */
+  void ApplyBackupProperties();
+
+  /**
+   * @brief Called when the window is resized.
+   *
+   * This method handles window resize events and updates the video display rotation accordingly.
+   *
+   * @param[in] winHandle The window handle that was resized.
+   * @param[in] size The new window size.
+   */
+  void OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size);
+
 public:
   /**
    * @copydoc Toolkit::DevelVideoView::New()
    */
   static Toolkit::VideoView New(VideoSyncMode syncMode);
+
+  /**
+   * @brief Creates a new VideoView wrapper using an externally created native player handle.
+   *
+   * @param[in] playerHandle The externally created player handle with type information.
+   * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer
+   * @return A handle to a newly allocated Dali VideoView
+   */
+  static Toolkit::VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
 
   /**
    * @brief Sets a video url to play.
@@ -148,11 +250,6 @@ public:
   Dali::Toolkit::VideoView::VideoViewSignalType& FinishedSignal();
 
   /**
-   * @brief Emit the finished signal
-   */
-  void EmitSignalFinish();
-
-  /**
    * @brief Set property map
    * @SINCE_1_1.38
    * @param[in] map The Dali::Property::Map to use for to display.
@@ -207,11 +304,6 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
    */
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
-
-  /**
-   * @brief Updates video display area for window rendering target
-   */
-  void UpdateDisplayArea(Dali::PropertyNotification& source);
 
   /**
    * @brief Sets underlay flag and initializes new rendering target by flag.
@@ -375,38 +467,10 @@ private:
   // Undefined assignment operator.
   VideoView& operator=(const VideoView& videoView);
 
-  /**
-   * @brief SetWindowSurfaceTarget for underlay video playback.
-   */
-  void SetWindowSurfaceTarget();
-
-  /**
-   * @brief SetNativeImageTarget for native image video playback.
-   */
-  void SetNativeImageTarget();
-
-  /**
-   * @brief CreateShader for native image target
-   */
-  Property::Map CreateShader();
-
-  /**
-   * @brief Checks whether the property has a string value.
-   * @param Property value
-   * @param String output
-   * @return true if the output was found
-   */
-  bool GetStringFromProperty(const Dali::Property::Value& value, std::string& output);
-
   /*
    * @brief Internal version of SetProperty
    */
   void SetPropertyInternal(Property::Index index, const Property::Value& value);
-
-  /*
-   * @brief Apply properties after reset video player
-   */
-  void ApplyBackupProperties();
 
   /*
    * @brief FrameRender's callback function
@@ -426,14 +490,6 @@ private:
   void SetFrameRenderCallback();
 
   /*
-   * @brief Create OverlayTextureVisual
-   *
-   */
-  void CreateOverlayTextureVisual();
-
-  void ResetOverlayTextureVisual();
-
-  /*
    * @brief resize/move animation finished callback function
    *
    * This function is called the resize/move animation is finished,
@@ -441,14 +497,10 @@ private:
    */
   void OnAnimationFinished(Dali::Animation& animation);
 
-  /*
-   * @brief window's resize callback function
-   * This function is called when window is resized.
-   *
-   * @param[in] winHandle The resized window's handle.
-   * @param[in] size The window's new size.
+  /**
+   * @brief Video player event callback function
    */
-  void OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size);
+  void OnVideoPlayerEvent(Dali::VideoPlayerPlugin::PlayerEventType event);
 
   /**
    * @brief This signal is emitted when an actor's children change their sibling order
@@ -467,7 +519,6 @@ private:
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
 
   std::string       mUrl;
-  Dali::DisplayArea mDisplayArea;
 
   bool                        mIsUsingOverlayTexture{false};
   Property::Index             mOverlayTextureVisualIndex{Property::INVALID_INDEX};
@@ -475,9 +526,7 @@ private:
   Dali::Toolkit::Visual::Base mOverlayTextureVisual;
   Dali::Toolkit::Visual::Base mTextureVisual;
 
-  Dali::PropertyNotification mPositionUpdateNotification;
-  Dali::PropertyNotification mSizeUpdateNotification;
-  Dali::PropertyNotification mScaleUpdateNotification;
+  std::unique_ptr<VideoRenderingStrategy> mRenderingStrategy;
 
   Dali::Property::Map mPropertyBackup;
 
@@ -490,11 +539,7 @@ private:
   Dali::VideoSyncMode mSyncMode;
   int                 mSiblingOrder;
 
-  // For frame interpolation
-  Texture mPreviousFrameTexture; ///< Texture for mNativeImagePrevious
-  Texture mCurrentFrameTexture;  ///< Texture for mNativeImageCurrent
-
-  float mInterpolationInterval; ///< Target duration for interpolation in seconds
+  float mInterpolationInterval{0.0f}; ///< Target duration for interpolation in seconds
 };
 
 } // namespace Internal
