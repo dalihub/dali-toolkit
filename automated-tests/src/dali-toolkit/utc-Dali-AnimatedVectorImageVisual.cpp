@@ -64,6 +64,7 @@ bool gAnimationFinishedSignalFired = false;
 
 void VisualEventSignal(Control control, Dali::Property::Index visualIndex, Dali::Property::Index signalId)
 {
+  tet_printf("visualIndex : %d vs %d, signalId : %d vs %d\n", visualIndex, DummyControl::Property::TEST_VISUAL, signalId, DevelAnimatedVectorImageVisual::Signal::ANIMATION_FINISHED);
   if(visualIndex == DummyControl::Property::TEST_VISUAL && signalId == DevelAnimatedVectorImageVisual::Signal::ANIMATION_FINISHED)
   {
     gAnimationFinishedSignalFired = true;
@@ -1582,6 +1583,8 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
 
   application.SendNotification();
   application.Render();
+
+  gAnimationFinishedSignalFired = false;
 
   // Wait for animation finish
   // Trigger count is 3 - animation finished + force update render thread + for discarded tasks at worker thread.
