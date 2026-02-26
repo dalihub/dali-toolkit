@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1546,6 +1546,9 @@ public:
   void RegisterFileChooserRequestedCallback(WebEngineFileChooserRequestedCallback callback) override
   {
   }
+  void RegisterWebProcessCrashedCallback(WebEngineWebProcessCrashedCallback callback) override
+  {
+  }
   void RegisterUserMediaPermissionRequestCallback(WebEngineUserMediaPermissionRequestCallback callback) override
   {
   }
@@ -2134,6 +2137,11 @@ public:
     mFileChooserRequestedCallback = callback;
   }
 
+  void RegisterWebProcessCrashedCallback(Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback callback)
+  {
+    mWebProcessCrashedCallback = callback;
+  }
+
   void RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
   {
     mUserMediaPermissionRequestCallback = callback;
@@ -2218,6 +2226,7 @@ public:
   Dali::WebEnginePlugin::WebEngineWebAuthDisplayQRCallback           mWebAuthDisplayQRCallback;
   Dali::WebEnginePlugin::WebEngineWebAuthResponseCallback            mWebAuthResponseCallback;
   Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback       mFileChooserRequestedCallback;
+  Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback          mWebProcessCrashedCallback;
   Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback mUserMediaPermissionRequestCallback;
 };
 
@@ -2361,6 +2370,10 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEngineFileChooserRequest> request(new MockFileChooserRequestRequest());
       gInstance->mFileChooserRequestedCallback(std::move(request));
+    }
+    if(gInstance->mWebProcessCrashedCallback)
+    {
+      gInstance->mWebProcessCrashedCallback();
     }
     if(gInstance->mUserMediaPermissionRequestCallback)
     {
@@ -3172,6 +3185,11 @@ void WebEngine::RegisterWebAuthResponseCallback(Dali::WebEnginePlugin::WebEngine
 void WebEngine::RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback)
 {
   Internal::Adaptor::GetImplementation(*this).RegisterFileChooserRequestedCallback(callback);
+}
+
+void WebEngine::RegisterWebProcessCrashedCallback(Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterWebProcessCrashedCallback(callback);
 }
 
 void WebEngine::RegisterUserMediaPermissionRequestCallback(Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback callback)
