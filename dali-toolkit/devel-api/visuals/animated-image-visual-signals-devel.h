@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
-#define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_SIGNALS_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_SIGNALS_DEVEL_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -18,13 +18,11 @@
  *
  */
 
-#include <dali-toolkit/devel-api/visuals/animated-image-visual-signals-devel.h>
-
 namespace Dali
 {
 namespace Toolkit
 {
-namespace DevelAnimatedVectorImageVisual
+namespace DevelAnimatedImageVisual
 {
 /**
  * @brief Signal that the animated vector image visual can emit.
@@ -36,15 +34,17 @@ namespace Signal
  */
 enum Type
 {
-  ANIMATION_FINISHED = DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED, ///< Animation has finished.
+  ANIMATION_FINISHED = 3000, ///< Animation has finished.
+
+  ANIMATED_IMAGE_VISUAL_SIGNAL_END_INDEX = 3000 + 1000,
 };
 
 } // namespace Signal
 
-} // namespace DevelAnimatedVectorImageVisual
+} // namespace DevelAnimatedImageVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_SIGNALS_DEVEL_H
