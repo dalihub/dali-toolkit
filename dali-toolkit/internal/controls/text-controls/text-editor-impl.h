@@ -171,6 +171,11 @@ private: // From Control
   void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change) override;
 
   /**
+   * @copydoc Control::OnApplyDefaultStyle()
+   */
+  void OnApplyDefaultStyle() override;
+
+  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize() override;

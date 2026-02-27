@@ -8,6 +8,7 @@ SET(CAPI_LIB "dali-toolkit-styling")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
    utc-Dali-StyleManager.cpp
+   utc-Dali-DefaultTheme.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)

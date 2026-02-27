@@ -141,6 +141,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/render-effects/background-blur-effect-impl.cpp
    ${toolkit_src_dir}/render-effects/gaussian-blur-effect-impl.cpp
    ${toolkit_src_dir}/render-effects/offscreen-rendering-impl.cpp
+   ${toolkit_src_dir}/styling/default-theme.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
    ${toolkit_src_dir}/text/abstract-style-character-run.cpp
    ${toolkit_src_dir}/text/bidirectional-support.cpp

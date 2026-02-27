@@ -170,6 +170,11 @@ private: // From Control
   void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change) override;
 
   /**
+   * @copydoc Control::OnApplyDefaultStyle()
+   */
+  void OnApplyDefaultStyle() override;
+
+  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize() override;
@@ -180,7 +185,7 @@ private: // From Control
   float GetHeightForWidth(float width) override;
 
   /**
-   * @copydoc Control::OnInitialize()
+   * @copydoc Control::OnRelayout()
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 

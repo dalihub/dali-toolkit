@@ -131,6 +131,14 @@ public: // Public API
   void ApplyStyle(Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName);
 
   /**
+   * @brief Get the properties for a specific style with Property::Index keys.
+   * @param[in] styleName The name of the style (e.g., "TextLabel").
+   * @param[in] controlType A handle to a control instance to get Property::Index mapping.
+   * @return A map containing the style's properties with Property::Index as keys.
+   */
+  Property::Map GetStyleProperties(const std::string& styleName, const Handle& controlType);
+
+  /**
    * Get the state/style information for the given control
    * @param[in] control The control to get state information for
    * @return The style information (or empty ptr if not found)
