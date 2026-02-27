@@ -108,8 +108,6 @@ typedef Signal<void(Window, bool)>      VisibilityChangedSignalType;
 Dali::Window Get(Actor actor);
 void         SetPositionSize(Window window, PositionSize positionSize);
 int          GetPhysicalOrientation(Window window);
-void         AddFrameRenderedCallback(Window window, std::unique_ptr<CallbackBase> callback, int32_t frameId);
-void         AddFramePresentedCallback(Window window, std::unique_ptr<CallbackBase> callback, int32_t frameId);
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window);
 KeyEventGeneratedSignalType&       KeyEventGeneratedSignal(Dali::Window window);
