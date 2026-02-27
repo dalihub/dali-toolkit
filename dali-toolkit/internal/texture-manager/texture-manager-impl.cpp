@@ -166,11 +166,12 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     if(animatedImageLoading)
     {
       bool loadYuvPlanes = (mLoadYuvPlanes && alphaMaskId == INVALID_TEXTURE_ID);
+      bool planeLoaded   = false;
       if(loadYuvPlanes)
       {
-        animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, desiredSize);
+        planeLoaded = animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, desiredSize);
       }
-      else
+      if(!planeLoaded)
       {
         Devel::PixelBuffer pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, desiredSize, fittingMode, samplingMode);
         if(pixelBuffer)

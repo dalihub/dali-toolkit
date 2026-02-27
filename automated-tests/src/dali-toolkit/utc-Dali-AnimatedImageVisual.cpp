@@ -4079,57 +4079,77 @@ int UtcDaliAnimatedImageVisualLoadImagePlanesYUVA02(void)
   END_TEST;
 }
 
-int UtcDaliAnimatedImageVisualLoadImagePlanesFallback(void)
+int UtcDaliAnimatedImageVisualLoadImagePlanesFallback01(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
   EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
 
   ToolkitTestApplication application;
 
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK(factory);
-
-  Property::Map propertyMap;
-  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
-  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
-
-  Visual::Base visual = factory.CreateVisual(propertyMap);
-  DALI_TEST_CHECK(visual);
-
-  DummyControl      actor     = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  application.GetScene().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
   TestGlAbstraction& gl           = application.GetGlAbstraction();
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  application.SendNotification();
-  application.Render();
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
 
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+  for(int isSynchronousLoading = 0; isSynchronousLoading < 2; ++isSynchronousLoading)
+  {
+    tet_printf("Test to load image image %s\n", (isSynchronousLoading == 1) ? "Synchronously" : "Asynchronously");
+    Property::Map propertyMap;
+    propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+    propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, (isSynchronousLoading == 1));
 
-  // Verify that the visual resource status is READY (not FAILED)
-  DALI_TEST_EQUALS(actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL), Visual::ResourceStatus::READY, TEST_LOCATION);
-  textureTrace.Reset();
+    Visual::Base visual = factory.CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
 
-  Renderer renderer           = actor.GetRendererAt(0);
-  auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+    DummyControl      actor     = DummyControl::New();
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
 
-  // Let we allow to premultiply alpha for YUVA case.
-  DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+    textureTrace.Reset();
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    if(!(isSynchronousLoading == 1))
+    {
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(textureTrace.CountMethod("GenTextures"), 1, TEST_LOCATION);
+
+    // Verify that the visual resource status is READY (not FAILED)
+    DALI_TEST_EQUALS(actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL), Visual::ResourceStatus::READY, TEST_LOCATION);
+    textureTrace.Reset();
+
+    Renderer renderer           = actor.GetRendererAt(0);
+    auto     preMultipliedAlpha = renderer.GetProperty<bool>(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
+
+    // Let we allow to premultiply alpha for YUVA case.
+    DALI_TEST_EQUALS(preMultipliedAlpha, true, TEST_LOCATION);
+
+    actor.Unparent();
+
+    // Remove cached image at TextureManager.
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(20);
+    application.RunIdles();
+    application.SendNotification();
+    application.Render(20);
+  }
 
   END_TEST;
 }
