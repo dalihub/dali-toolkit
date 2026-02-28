@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,6 @@ int UtcDaliSceneViewAccessibleMarkSceneAccessible(void)
   DALI_TEST_EQUALS(ControlAccessible::IsScene3D(controlParent), false, TEST_LOCATION);
   DALI_TEST_EQUALS(ControlAccessible::IsScene3D(sceneParent), true, TEST_LOCATION);
 
-  sceneParent.Unparent();
-
   END_TEST;
 }
 
@@ -98,8 +96,6 @@ int UtcDaliSceneViewAccessibilityRole(void)
   {
     DALI_TEST_EQUALS(modelRole, static_cast<uint32_t>(AccessibilityRole::MODEL), TEST_LOCATION);
   }
-
-  sceneView.Unparent();
 
   END_TEST;
 }
@@ -134,8 +130,6 @@ int UtcDaliSceneViewUpdateOverlay(void)
   DALI_TEST_CHECK(overlay);
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_CHECK(indicator);
-
-  sceneView.Unparent();
   END_TEST;
 }
 
@@ -170,9 +164,6 @@ int UtcDaliSceneViewSetCustomHighlght01(void)
   auto indicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_EQUALS(indicator.GetProperty<Vector2>(Actor::Property::SIZE), Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(indicator.GetProperty<Vector2>(Actor::Property::POSITION), Vector2(10.0f, 10.0f), 0.001f, TEST_LOCATION);
-
-  sceneView.Unparent();
-
   END_TEST;
 }
 
@@ -215,8 +206,6 @@ int UtcDaliSceneViewSetCustomHighlght02(void)
 
   DALI_TEST_CHECK(overlay);
   DALI_TEST_CHECK(indicator);
-
-  sceneView.Unparent();
   END_TEST;
 }
 
@@ -248,9 +237,6 @@ int UtcDaliSceneViewHideOverlay(void)
   application.Render(1);
 
   DALI_TEST_EQUALS(indicator.GetProperty<bool>(Actor::Property::VISIBLE), false, TEST_LOCATION);
-
-  sceneView.Unparent();
-
   END_TEST;
 }
 
@@ -285,7 +271,5 @@ int UtcDaliSceneViewRemoveHighlight(void)
 
   auto newIndicator = overlay.FindChildByName(HIGHLIGHT_NAME);
   DALI_TEST_CHECK(newIndicator);
-
-  sceneView.Unparent();
   END_TEST;
 }

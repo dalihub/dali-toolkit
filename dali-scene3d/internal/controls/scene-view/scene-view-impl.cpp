@@ -786,9 +786,9 @@ void SceneView::RemoveShadow(Scene3D::Light light)
     break;
   }
 
-  if(mSceneHolder && mShadowMapRenderTask)
+  if(mSceneHolder.GetHandle() && mShadowMapRenderTask)
   {
-    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
     taskList.RemoveTask(mShadowMapRenderTask);
     mShadowMapRenderTask.Reset();
   }
@@ -980,7 +980,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     captureData->mCaptureCameraOriginalAspectRatio = captureData->mCaptureCamera.GetAspectRatio();
     captureData->mCaptureCamera.SetAspectRatio((float)width / (float)height);
 
-    RenderTaskList taskList   = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList   = mSceneHolder.GetHandle().GetRenderTaskList();
     captureData->mCaptureTask = taskList.CreateTask();
     captureData->mCaptureTask.SetSourceActor(mRootLayer);
     captureData->mCaptureTask.SetExclusive(true);
@@ -1216,10 +1216,11 @@ void SceneView::OnSceneConnection(int depth)
   }
 
   // On-screen / Off-screen window
-  mSceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  if(mSceneHolder)
+  Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
+  mSceneHolder = sceneHolder;
+  if(mSceneHolder.GetHandle())
   {
-    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
     mRenderTask             = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
@@ -1268,17 +1269,17 @@ void SceneView::OnSceneDisconnection()
 
   ResetCaptureTimer();
 
-  if(mSceneHolder)
+  if(mSceneHolder.GetHandle())
   {
     if(mRenderTask)
     {
-      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+      RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
       taskList.RemoveTask(mRenderTask);
       mRenderTask.Reset();
     }
     if(mShadowMapRenderTask)
     {
-      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+      RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
       taskList.RemoveTask(mShadowMapRenderTask);
       mShadowMapRenderTask.Reset();
     }
@@ -1660,14 +1661,14 @@ void SceneView::NotifyImageBasedLightTextureChange()
 
 void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
 {
-  if(!mShadowLight || !mSceneHolder)
+  if(!mShadowLight || !mSceneHolder.GetHandle())
   {
     return;
   }
 
   if(!mShadowMapRenderTask)
   {
-    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
     mShadowMapRenderTask    = taskList.CreateTask();
     mShadowMapRenderTask.SetSourceActor(mRootLayer);
     mShadowMapRenderTask.SetExclusive(true);
@@ -1933,9 +1934,9 @@ void SceneView::OnTransitionFinished(Animation& animation)
 void SceneView::ResetCaptureData(std::shared_ptr<CaptureData> captureData)
 {
   captureData->mCaptureCamera.SetAspectRatio(captureData->mCaptureCameraOriginalAspectRatio);
-  if(mSceneHolder)
+  if(mSceneHolder.GetHandle())
   {
-    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
     taskList.RemoveTask(captureData->mCaptureTask);
     taskList.RemoveTask(captureData->mCaptureInvertTask);
   }
