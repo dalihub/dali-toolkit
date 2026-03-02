@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_GAUSSIAN_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,6 +252,41 @@ public:
    * @return The background color.
    */
   Vector4 GetBackgroundColor() const;
+
+  /**
+   * @brief Allocates the necessary resources for Gaussian blur rendering.
+   *
+   * This method creates frame buffers, textures, and cameras required for the blur process.
+   * The resources are allocated based on the current size of the GaussianBlurView.
+   * @SINCE_2_5.12
+   * @pre The GaussianBlurView should be added to the stage before calling this method.
+   */
+  void AllocateResources();
+
+  /**
+   * @brief Creates the render tasks for the Gaussian blur process.
+   *
+   * This method sets up the render tasks that perform the horizontal and vertical blur passes,
+   * as well as the compositing task if not in user image mode.
+   * The render tasks are added to the Stage's render task list.
+   * @SINCE_2_5.12
+   * @pre AllocateResources() should be called before this method to ensure frame buffers are ready.
+   * @pre The GaussianBlurView should be added to the stage before calling this method.
+   * @note The render tasks will start processing immediately after creation.
+   */
+  void CreateRenderTasks();
+
+  /**
+   * @brief Removes all render tasks associated with the Gaussian blur process.
+   *
+   * This method cleans up the render tasks created by CreateRenderTasks().
+   * The frame buffers and textures are not automatically freed - they will be freed
+   * when the references are released (typically during Deactivate()).
+   * @SINCE_2_5.12
+   * @pre This method should only be called after CreateRenderTasks() has been used.
+   * @note After calling this method, the blur process will stop.
+   */
+  void RemoveRenderTasks();
 
 public: // Signals
   /**
