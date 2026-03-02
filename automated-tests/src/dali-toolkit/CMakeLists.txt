@@ -11,7 +11,6 @@ SET(TC_SOURCES
   utc-Dali-AnimatedVectorImageVisual.cpp
   utc-Dali-ArcVisual.cpp
   utc-Dali-RenderEffect.cpp
-  utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
   utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
