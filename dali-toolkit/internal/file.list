@@ -68,8 +68,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/visual-string-constants.cpp
    ${toolkit_src_dir}/visuals/visual-url.cpp
    ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
-   ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
-   ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
    ${toolkit_src_dir}/controls/buttons/button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/check-box-button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/push-button-impl.cpp
