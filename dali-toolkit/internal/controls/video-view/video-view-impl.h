@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/adaptor-framework/window.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>

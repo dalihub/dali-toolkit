@@ -22,7 +22,6 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/proxy-accessible.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <memory>
 
