@@ -6640,3 +6640,42 @@ int UtcDaliVisualSetOnScene(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualGetVisualRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetVisualRenderer: Test Visual::Base::GetRenderer() method");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR, Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::SIZE, 5.0f);
+  Visual::Base borderVisual = factory.CreateVisual(propertyMap);
+
+  // Test that visual is created
+  DALI_TEST_CHECK(borderVisual);
+
+  VisualRenderer borderRenderer = borderVisual.GetRenderer();
+  DALI_TEST_CHECK(borderRenderer);
+
+  // Create an actor to attach the visual to
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  // Call SetOnScene() - this should attach the visual to the actor
+  borderVisual.SetOnScene(actor);
+
+  // Render to ensure visual is set on scene
+  application.SendNotification();
+  application.Render();
+
+  // Visual should now be attached and rendering
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // Check attached renderer is same as what we got before.
+  DALI_TEST_EQUALS(actor.GetRendererAt(0u), borderRenderer, TEST_LOCATION);
+
+  END_TEST;
+}

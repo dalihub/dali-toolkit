@@ -208,7 +208,7 @@ public:
   /**
    * Gets currently staged renderer, or an empty handle if not staged
    */
-  Renderer GetRenderer();
+  VisualRenderer GetRenderer() const;
 
   /**
    * Convert all string keys to int keys

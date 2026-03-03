@@ -1089,7 +1089,7 @@ Visual::Base& Visual::Base::GetVisualObject()
   return *this;
 }
 
-Renderer Visual::Base::GetRenderer()
+VisualRenderer Visual::Base::GetRenderer() const
 {
   return mImpl->mRenderer;
 }
