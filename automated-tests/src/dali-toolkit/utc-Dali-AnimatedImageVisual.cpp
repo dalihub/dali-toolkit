@@ -3468,8 +3468,6 @@ int UtcDaliAnimatedImageVisualAnimatePixelArea(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
-
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
@@ -3535,8 +3533,6 @@ int UtcDaliAnimatedImageVisualUpdatePixelAreaByAction(void)
 
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
-
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;

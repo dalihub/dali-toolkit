@@ -151,18 +151,10 @@ static bool                                       gCursorPositionChangedCallback
 static uint32_t                                   oldCursorPos;
 static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
-static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
-{
-  Dali::Integration::Bitmap*         bitmap = Dali::Integration::Bitmap::New(Dali::Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
-  Dali::Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, width, height, width, height);
-}
-
 static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
 {
   int width(40);
   int height(40);
-  LoadBitmapResource(app.GetPlatform(), width, height);
 
   Property::Map propertyMap;
   propertyMap["filename"] = "image.png";

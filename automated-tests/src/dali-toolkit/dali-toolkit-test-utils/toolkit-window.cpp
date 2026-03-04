@@ -280,16 +280,6 @@ int GetPhysicalOrientation(Window window)
   return GetImplementation(window).mRotationAngle;
 }
 
-void AddFrameRenderedCallback(Window window, std::unique_ptr<CallbackBase> callback, int32_t frameId)
-{
-  CallbackBase::Execute(*callback, frameId);
-}
-
-void AddFramePresentedCallback(Window window, std::unique_ptr<CallbackBase> callback, int32_t frameId)
-{
-  CallbackBase::Execute(*callback, frameId);
-}
-
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window)
 {
   return GetImplementation(window).GetScene().EventProcessingFinishedSignal();

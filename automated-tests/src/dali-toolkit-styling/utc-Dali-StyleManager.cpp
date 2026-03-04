@@ -76,36 +76,6 @@ Visual::Base CheckVisual(Impl::DummyControl& dummyImpl, Property::Index visualId
   DALI_TEST_EQUALS(visualType, type, location);
   return visual;
 }
-
-Dali::Integration::Bitmap* CreateBitmap(unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat)
-{
-  Dali::Integration::Bitmap*      bitmap        = Dali::Integration::Bitmap::New(Dali::Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN);
-  Dali::Integration::PixelBuffer* pixbuffer     = bitmap->GetPackedPixelsProfile()->ReserveBuffer(pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight);
-  unsigned int                    bytesPerPixel = GetBytesPerPixel(pixelFormat);
-
-  memset(pixbuffer, initialColor, imageHeight * imageWidth * bytesPerPixel);
-
-  return bitmap;
-}
-
-Dali::Integration::ResourcePointer CustomizeNinePatch(ToolkitTestApplication& application,
-                                                      unsigned int            ninePatchImageWidth,
-                                                      unsigned int            ninePatchImageHeight)
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-
-  Pixel::Format pixelFormat = Pixel::RGBA8888;
-
-  tet_infoline("Create Bitmap");
-  platform.SetClosestImageSize(Vector2(ninePatchImageWidth, ninePatchImageHeight));
-  Dali::Integration::Bitmap* bitmap = CreateBitmap(ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat);
-
-  tet_infoline("Getting resource");
-  Dali::Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetSynchronouslyLoadedResource(resourcePtr);
-
-  return resourcePtr;
-}
 } // anonymous namespace
 
 int UtcDaliStyleManagerConstructorP(void)
@@ -1225,8 +1195,7 @@ int UtcDaliStyleManagerSetState01(void)
   actor.SetStyleName("BasicControl");
   application.GetScene().Add(actor);
 
-  Impl::DummyControl&                dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
   Visual::Base  visual1      = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
@@ -1300,8 +1269,7 @@ int UtcDaliStyleManagerSetState02(void)
   actor.SetStyleName("BasicControl");
   application.GetScene().Add(actor);
 
-  Impl::DummyControl&                dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
   int state = actor.GetProperty<int>(DevelControl::Property::STATE);
   DALI_TEST_EQUALS(state, (int)DevelControl::NORMAL, TEST_LOCATION);
@@ -1475,8 +1443,6 @@ int UtcDaliStyleManagerSetSubState01(void)
   actor.SetStyleName("ComplexControl");
   application.GetScene().Add(actor);
 
-  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
-
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
   CheckVisual(dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
@@ -1517,8 +1483,6 @@ int UtcDaliStyleManagerSetSubState02(void)
 
   actor.SetStyleName("ComplexControl");
   application.GetScene().Add(actor);
-
-  Dali::Integration::ResourcePointer ninePatch = CustomizeNinePatch(application, 30, 30);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
