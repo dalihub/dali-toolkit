@@ -550,6 +550,13 @@ private:
    */
   bool OnInterceptTouched(Actor actor, const TouchEvent& touch);
 
+  /**
+   * @brief Returns the cached effective visibility of the TextLabel.
+   *
+   * @return True if the TextLabel is effectively visible.
+   */
+  bool IsVisible();
+
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
@@ -589,8 +596,10 @@ private: // Data
   bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
   bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
   bool mManualRendered : 1;
-  bool mIsIntercepted : 1; // whether the touch event is intercepted or not.
-  bool mIsHasAnchors : 1;  // whether the text has anchors or not.
+  bool mIsIntercepted : 1;        // whether the touch event is intercepted or not.
+  bool mIsHasAnchors : 1;         // whether the text has anchors or not.
+  bool mIsVisible : 1;            // cached result of IsEffectivelyVisible().
+  bool mIsVisibleInitialized : 1; // whether mIsVisible has been initialized.
 
 protected:
   /**
