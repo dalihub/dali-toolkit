@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.5.11
+Version:    2.5.12
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -27,6 +27,8 @@ BuildRequires:  pkgconfig(dali2-adaptor)
 BuildRequires:  pkgconfig(gles20)
 BuildRequires:  pkgconfig(glesv2)
 BuildRequires:  pkgconfig(egl)
+BuildRequires:  dali2-integration-devel
+BuildRequires:  dali2-adaptor-integration-devel
 
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -119,6 +121,18 @@ Requires:   %{name} = %{version}-%{release}
 
 %description devel
 Application development package for Dali 3D engine toolkit - headers and package config
+
+##############################
+# integration-devel
+##############################
+%package integration-devel
+Summary:    Integration development package for DALi 3D engine toolkit
+Group:      Development/Building
+Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-devel = %{version}-%{release}
+
+%description integration-devel
+Integration development package for DALi 3D engine toolkit - headers for integrating and features still in development
 
 ##############################
 # dali-scene3d
@@ -544,9 +558,15 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
-%{dev_include_path}/dali-toolkit/*
+%{dev_include_path}/dali-toolkit/doc/*
+%{dev_include_path}/dali-toolkit/public-api/*
+%{dev_include_path}/dali-toolkit/dali-toolkit.h
 %{_libdir}/pkgconfig/dali2-toolkit.pc
 %{_bindir}/dali-shader-generator
+
+%files integration-devel
+%defattr(-,root,root,-)
+%{dev_include_path}/dali-toolkit/devel-api/*
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest

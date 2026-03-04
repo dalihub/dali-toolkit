@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,8 +123,6 @@ int UtcDaliSceneViewImplCameraTransitionFail(void)
   CameraActor finalCamera = view.GetSelectedCamera();
   DALI_TEST_EQUALS(finalCamera, camera1, TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -200,8 +198,6 @@ int UtcDaliSceneViewImplCameraChangeDuringTransition(void)
   view.SelectCamera("camera3");
   DALI_TEST_EQUALS(camera3, view.GetSelectedCamera(), TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -258,8 +254,6 @@ int UtcDaliSceneViewImplStartCameraTransitionDuringTransition(void)
 
   CameraActor finalCamera = view.GetSelectedCamera();
   DALI_TEST_EQUALS(finalCamera, camera2, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -355,8 +349,6 @@ int UtcDaliSceneViewImplCameraTransition1(void)
   CameraActor finalCamera = view.GetSelectedCamera();
   DALI_TEST_EQUALS(finalCamera, camera2, TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -451,8 +443,6 @@ int UtcDaliSceneViewImplCameraTransition2(void)
 
   CameraActor finalCamera = view.GetSelectedCamera();
   DALI_TEST_EQUALS(finalCamera, camera2, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }

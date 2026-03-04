@@ -140,39 +140,6 @@ Visual::Base CreateVisualWithPolicy(const char* url, Property::Index key, const 
 
 } // namespace
 
-void TestVisualRender(ToolkitTestApplication&            application,
-                      DummyControl&                      actor,
-                      Visual::Base&                      visual,
-                      std::size_t                        expectedSamplers = 0,
-                      ImageDimensions                    imageDimensions  = ImageDimensions(),
-                      Dali::Integration::ResourcePointer resourcePtr      = Dali::Integration::ResourcePointer())
-{
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
-
-  if(resourcePtr)
-  {
-    // set the image size, for test case, this needs to be set before loading started
-    application.GetPlatform().SetClosestImageSize(Vector2(imageDimensions.GetWidth(), imageDimensions.GetHeight()));
-  }
-
-  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
-
-  application.GetScene().Add(actor);
-
-  application.SendNotification(); // Send messages to update
-  application.Render();           // process update and render
-  application.SendNotification(); // process any signals to event
-
-  if(resourcePtr)
-  {
-    DALI_TEST_EQUALS(application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc), true, TEST_LOCATION);
-  }
-
-  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
-}
-
 static void TestMixColor(Visual::Base visual, Property::Index mixColorIndex, const Vector4& testColor)
 {
   Property::Map map;
@@ -1761,8 +1728,6 @@ int UtcDaliImageVisualAnimateMixColor(void)
   ToolkitTestApplication application;
   tet_infoline("Animate mix color");
 
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
-
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
@@ -1847,8 +1812,6 @@ int UtcDaliImageVisualAnimateOpacity(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Animate image visual opacity");
-
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -1964,8 +1927,6 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   ToolkitTestApplication application;
   tet_infoline("Animate image visual opacity");
 
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
-
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
@@ -2060,8 +2021,6 @@ int UtcDaliImageVisualAnimatePixelArea(void)
 
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
-
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -4899,8 +4858,6 @@ int UtcDaliImageVisualUpdatePixelAreaByAction(void)
 
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
-
-  application.GetPlatform().SetClosestImageSize(Vector2(100, 100));
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;

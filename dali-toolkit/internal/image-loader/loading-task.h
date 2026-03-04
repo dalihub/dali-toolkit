@@ -30,7 +30,6 @@
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/ref-object.h>
 
 namespace Dali

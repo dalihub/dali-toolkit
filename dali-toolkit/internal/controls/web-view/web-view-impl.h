@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/proxy-accessible.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <memory>
 
@@ -486,6 +485,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::RegisterFileChooserRequestCallback()
    */
   void RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterWebProcessCrashedCallback()
+   */
+  void RegisterWebProcessCrashedCallback(Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterUserMediaPermissionRequestCallback()

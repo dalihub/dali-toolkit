@@ -254,23 +254,23 @@ private:
   void UpdateRenderTask();
 
 private:
-  Vector2                        mPanelResolution;
-  Scene3D::ModelNode             mPanelNode;
-  Scene3D::ModelNode             mContentPlaneNode;
-  Scene3D::ModelNode             mBackPlaneNode;
-  Scene3D::ModelNode             mDoubleSidedPlaneNode;
-  Dali::Layer                    mRootLayer;
-  Dali::Integration::SceneHolder mSceneHolder;
-  CameraActor                    mCamera;
-  Dali::FrameBuffer              mFrameBuffer;
-  Dali::Texture                  mTexture;
-  Scene3D::Material              mContentPlaneMaterial;
-  Scene3D::Material              mBackPlaneMaterial;
-  Scene3D::Material              mDoubleSidedPlaneMaterial;
-  Dali::Geometry                 mGeometry;
-  Dali::Geometry                 mDoubleSidedGeometry;
-  Dali::RenderTask               mRenderTask;
-  WeakHandle<Scene3D::SceneView> mParentSceneView;
+  Vector2                              mPanelResolution;
+  Scene3D::ModelNode                   mPanelNode;
+  Scene3D::ModelNode                   mContentPlaneNode;
+  Scene3D::ModelNode                   mBackPlaneNode;
+  Scene3D::ModelNode                   mDoubleSidedPlaneNode;
+  Dali::Layer                          mRootLayer;
+  WeakHandle<Integration::SceneHolder> mSceneHolder;
+  CameraActor                          mCamera;
+  Dali::FrameBuffer                    mFrameBuffer;
+  Dali::Texture                        mTexture;
+  Scene3D::Material                    mContentPlaneMaterial;
+  Scene3D::Material                    mBackPlaneMaterial;
+  Scene3D::Material                    mDoubleSidedPlaneMaterial;
+  Dali::Geometry                       mGeometry;
+  Dali::Geometry                       mDoubleSidedGeometry;
+  Dali::RenderTask                     mRenderTask;
+  WeakHandle<Scene3D::SceneView>       mParentSceneView;
 
   Property::Index mResolutionPropertyIndex;
 

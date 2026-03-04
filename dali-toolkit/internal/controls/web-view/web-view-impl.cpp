@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -997,6 +997,14 @@ void WebView::RegisterFileChooserRequestedCallback(Dali::WebEnginePlugin::WebEng
   if(mWebEngine)
   {
     mWebEngine.RegisterFileChooserRequestedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterWebProcessCrashedCallback(Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterWebProcessCrashedCallback(std::move(callback));
   }
 }
 

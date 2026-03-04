@@ -572,7 +572,7 @@ private: // Implementation of Processor
   /////////////////////////////////////////////////////////////
   // FrameBuffer and Rendertask to render child objects as a 3D Scene
   Dali::WeakHandle<Dali::Window>                      mWindow;
-  Dali::Integration::SceneHolder                      mSceneHolder;
+  Dali::WeakHandle<Dali::Integration::SceneHolder>    mSceneHolder;
   CameraActor                                         mDefaultCamera;
   CameraActor                                         mSelectedCamera;
   std::vector<CameraActor>                            mCameras;

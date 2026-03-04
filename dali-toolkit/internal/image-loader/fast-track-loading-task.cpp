@@ -132,7 +132,7 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
   {
     for(uint32_t index = 0u; index < mImageInformations.size(); ++index)
     {
-      Dali::Integration::SetTextureSize(mTextures[index], Dali::ImageDimensions(mImageInformations[index].width, mImageInformations[index].height));
+      Dali::Integration::SetTextureSize(mTextures[index], mImageInformations[index].width, mImageInformations[index].height);
       Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
@@ -219,7 +219,7 @@ void FastTrackLoadingTask::Load()
       if(pixelBuffers.size() == 3u)
       {
         mPixelData[A_INDEX] = GetDummyAPixelData();
-        mHasAlpha = false;
+        mHasAlpha           = false;
       }
       else
       {

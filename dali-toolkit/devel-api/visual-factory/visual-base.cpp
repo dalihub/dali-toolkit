@@ -119,6 +119,16 @@ void Visual::Base::SetProperties(const Dali::Property::Map& properties)
   GetImplementation(*this).SetProperties(properties);
 }
 
+void Visual::Base::SetOnScene(Actor& actor)
+{
+  GetImplementation(*this).SetOnScene(actor);
+}
+
+Dali::VisualRenderer Visual::Base::GetRenderer() const
+{
+  return GetImplementation(*this).GetRenderer();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

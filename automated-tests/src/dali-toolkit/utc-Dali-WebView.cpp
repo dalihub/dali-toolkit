@@ -114,6 +114,7 @@ static int                                                                gWebAu
 static int                                                                gWebAuthDisplayResponseCalled           = 0;
 static int                                                                gFileChooserRequestCalled               = 0;
 static std::unique_ptr<Dali::WebEngineFileChooserRequest>                 gFileChooserRequestInstance             = nullptr;
+static int                                                                gWebProcessCrashedCalled                = 0;
 static int                                                                gUserMediaPermissionRequestCalled       = 0;
 
 struct CallbackFunctor
@@ -376,6 +377,11 @@ static void OnFileChooserRequested(std::unique_ptr<Dali::WebEngineFileChooserReq
 {
   gFileChooserRequestCalled++;
   gFileChooserRequestInstance = std::move(request);
+}
+
+static void OnWebProcessCrashed()
+{
+  gWebProcessCrashedCalled++;
 }
 
 static void OnUserMediaPermissionRequest(Dali::WebEngineUserMediaPermissionRequest*, const std::string&)
@@ -2699,6 +2705,22 @@ int UtcDaliWebViewRegisterFileChooserRequestedCallback(void)
   DALI_TEST_CHECK(!gFileChooserRequestInstance->ChooseFile(file));
 
   gFileChooserRequestInstance = nullptr;
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterWebProcessCrashedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterWebProcessCrashedCallback(&OnWebProcessCrashed);
+  DALI_TEST_EQUALS(gWebProcessCrashedCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gWebProcessCrashedCalled, 1, TEST_LOCATION);
   END_TEST;
 }
 

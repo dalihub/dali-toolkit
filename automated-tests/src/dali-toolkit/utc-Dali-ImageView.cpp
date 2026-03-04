@@ -131,6 +131,21 @@ void OverwriteImage(const char* overwritableFilename, const char* sourceFilename
   }
 }
 
+void WaitForSyncLoadingAnimatedVectorFrameRendered(Dali::Actor actor, const char* location)
+{
+  // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, location);
+
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
+}
+
 } // namespace
 
 int UtcDaliImageViewNewP(void)
@@ -896,16 +911,7 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
   application.Render(16);
 
   // Trigger count is 2 - render a frame + for discarded tasks at worker thread.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
-
-  // There might be 1 event triggered if render frame spend long time.
-  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
-  // Consume it if required.
-  while(imageView.GetRendererCount() == 0)
-  {
-    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 0);
-  }
+  WaitForSyncLoadingAnimatedVectorFrameRendered(imageView, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);

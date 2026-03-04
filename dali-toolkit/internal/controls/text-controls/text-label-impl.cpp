@@ -33,6 +33,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/render-effects/mask-effect-impl.h>
+#include <dali-toolkit/internal/styling/default-theme.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -1295,6 +1296,11 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
 
   // Up call to Control
   Control::OnStyleChange(styleManager, change);
+}
+
+void TextLabel::OnApplyDefaultStyle()
+{
+  DefaultTheme::Get().ApplyDefaultStyle(Toolkit::TextLabel(GetOwner()));
 }
 
 bool TextLabel::AnchorClicked(uint32_t cursorPosition, std::string& href)

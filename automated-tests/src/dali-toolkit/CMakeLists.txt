@@ -11,14 +11,11 @@ SET(TC_SOURCES
   utc-Dali-AnimatedVectorImageVisual.cpp
   utc-Dali-ArcVisual.cpp
   utc-Dali-RenderEffect.cpp
-  utc-Dali-BloomView.cpp
-  utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
   utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
   utc-Dali-ConfirmationPopup.cpp
   utc-Dali-CubeTransitionEffect.cpp
-  utc-Dali-EffectsView.cpp
   utc-Dali-FadeTransition.cpp
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
@@ -29,13 +26,11 @@ SET(TC_SOURCES
   utc-Dali-ImageUrl.cpp
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
-  utc-Dali-PageTurnView.cpp
   utc-Dali-ParticleSystem.cpp
   utc-Dali-PropertyBridge.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp
   utc-Dali-ShaderEffects.cpp
-  utc-Dali-ShadowView.cpp
   utc-Dali-ScaleTransition.cpp
   utc-Dali-SlideTransition.cpp
   utc-Dali-TableView.cpp
@@ -67,17 +62,16 @@ SET(TC_SOURCES
   utc-Dali-CameraView.cpp
   utc-Dali-Control.cpp
   utc-Dali-ControlImpl.cpp
+  utc-Dali-ControlRenderers.cpp
   utc-Dali-ItemLayout.cpp
   utc-Dali-ItemView.cpp
   utc-Dali-KeyboardFocusManager.cpp
-  utc-Dali-Magnifier.cpp
   utc-Dali-NavigationView.cpp
   utc-Dali-Popup.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
   utc-Dali-ToggleButton.cpp
   utc-Dali-ScrollViewEffect.cpp
-  utc-Dali-SuperBlurView.cpp
   utc-Dali-SvgVisual.cpp
   utc-Dali-Toolkit.cpp
   utc-Dali-Visual.cpp

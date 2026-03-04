@@ -310,8 +310,6 @@ int UtcDaliSceneViewOnScene01(void)
   // CameraActor is added on layer when on scene
   DALI_TEST_EQUALS(1u, layer.GetChildCount(), TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -341,8 +339,6 @@ int UtcDaliSceneViewOnScene02(void)
   DALI_TEST_CHECK(defaultCamera);
   DALI_TEST_EQUALS(camera, defaultCamera, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultCamera, view.GetSelectedCamera(), TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -386,8 +382,6 @@ int UtcDaliSceneViewUserCamera(void)
   DALI_TEST_EQUALS(nearPlain, camera.GetProperty<float>(Dali::CameraActor::Property::NEAR_PLANE_DISTANCE), TEST_LOCATION);
   DALI_TEST_EQUALS(farPlain, camera.GetProperty<float>(Dali::CameraActor::Property::FAR_PLANE_DISTANCE), TEST_LOCATION);
   DALI_TEST_EQUALS(cameraPosition, camera.GetProperty<Vector3>(Dali::Actor::Property::POSITION), TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -439,8 +433,6 @@ int UtcDaliSceneViewAddRemoveCamera(void)
   DALI_TEST_CHECK(defaultCamera);
   DALI_TEST_EQUALS(camera0, defaultCamera, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(camera1, defaultCamera, 0.0f, TEST_LOCATION);
-
-  view.Unparent();
   END_TEST;
 }
 
@@ -524,8 +516,6 @@ int UtcDaliSceneViewImageBasedLight01(void)
   DALI_TEST_EQUALS(GetDiffuseTexture(modelView2), GetDiffuseTexture(modelView3), TEST_LOCATION);
   DALI_TEST_EQUALS(GetSpecularTexture(modelView2), GetSpecularTexture(modelView3), TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -594,8 +584,6 @@ int UtcDaliSceneViewImageBasedLight02(void)
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -650,8 +638,6 @@ int UtcDaliSceneViewImageBasedLight03(void)
   DALI_TEST_NOT_EQUALS(GetDiffuseTexture(modelView1), diffuseTexture, 0.0f, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(GetSpecularTexture(modelView1), specularTexture, 0.0f, TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -676,9 +662,6 @@ int UtcDaliSceneViewImageBasedFactor(void)
   view.SetImageBasedLightScaleFactor(0.5f);
   DALI_TEST_EQUALS(view.GetImageBasedLightScaleFactor(), 0.5f, TEST_LOCATION);
   DALI_TEST_EQUALS(modelView1.GetImageBasedLightScaleFactor(), 1.0f, TEST_LOCATION);
-
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -697,8 +680,6 @@ int UtcDaliSceneViewUseFramebuffer01(void)
   bool useFramebuffer = view.IsUsingFramebuffer();
   view.UseFramebuffer(true);
   DALI_TEST_NOT_EQUALS(useFramebuffer, view.IsUsingFramebuffer(), 0.0f, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -728,8 +709,6 @@ int UtcDaliSceneViewUseFramebuffer02(void)
 
   view.UseFramebuffer(true);
   DALI_TEST_CHECK(renderTask.GetFrameBuffer());
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -767,8 +746,6 @@ int UtcDaliSceneViewFramebufferMultiSamplingLevel(void)
 
   multiSamplingLevel = view.GetFramebufferMultiSamplingLevel();
   DALI_TEST_EQUALS(multiSamplingLevel, expectValue, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -812,8 +789,6 @@ int UtcDaliSceneViewResourceReady(void)
 
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -980,8 +955,6 @@ int UtcDaliSceneViewSetSkyboxIntensity(void)
   view.SetSkyboxIntensity(intensity);
   DALI_TEST_EQUALS(view.GetSkyboxIntensity(), intensity, TEST_LOCATION);
 
-  view.Unparent();
-
   END_TEST;
 }
 
@@ -995,8 +968,6 @@ int UtcDaliSceneViewSetSkyboxOrientation(void)
   Dali::Quaternion orientation = Dali::Quaternion(Radian(0.5f), Vector3::YAXIS);
   view.SetSkyboxOrientation(orientation);
   DALI_TEST_EQUALS(view.GetSkyboxOrientation(), orientation, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -1021,8 +992,6 @@ int UtcDaliSceneViewSetImageBasedLightAndSkybox(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -1066,8 +1035,6 @@ int UtcDaliSceneViewColorMode(void)
   view.UseFramebuffer(false);
 
   DALI_TEST_EQUALS(view.GetChildAt(0u).GetProperty<int>(Dali::Actor::Property::COLOR_MODE), static_cast<int>(ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA), TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -1113,7 +1080,6 @@ int UtcDaliSceneViewSetResolution(void)
   DALI_TEST_EQUALS(view.GetResolutionWidth(), 400u, TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetResolutionHeight(), 400u, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1195,7 +1161,6 @@ int UtcDaliSceneViewSetResolution02(void)
   DALI_TEST_EQUALS(renderTargetTexture.GetWidth(), expectWidth, TEST_LOCATION);
   DALI_TEST_EQUALS(renderTargetTexture.GetHeight(), expectHeight, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1232,7 +1197,6 @@ int UtcDaliSceneViewMasking(void)
   yFlipMaskTextureIndex = view.GetPropertyIndex(std::string(Y_FLIP_MASK_TEXTURE));
   DALI_TEST_EQUALS(view.GetProperty<float>(yFlipMaskTextureIndex), 1.0f, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1330,7 +1294,6 @@ int UtcDaliSceneViewCapture01(void)
   DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(gCapturedImageUrl, tempImageUrl, 0.1f, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1393,7 +1356,6 @@ int UtcDaliSceneViewCapture02(void)
   DALI_TEST_EQUALS(!!gCapturedImageUrls[1], true, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(gCapturedImageUrls[0], gCapturedImageUrls[1], 0.1f, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1514,7 +1476,6 @@ int UtcDaliSceneViewCaptureFailed(void)
 
   DALI_TEST_EQUALS(gCaptureFinishedCalled, false, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1553,7 +1514,6 @@ int UtcDaliSceneViewCaptureFailed2(void)
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, false, TEST_LOCATION);
 
-  view.Unparent();
   END_TEST;
 }
 
@@ -1607,8 +1567,6 @@ int UtcDaliSceneViewSelectCamera(void)
   application.Render(0);
 
   DALI_TEST_NOT_EQUALS(camera1, view.GetSelectedCamera(), 0.01f, TEST_LOCATION);
-
-  view.Unparent();
 
   END_TEST;
 }
@@ -1674,6 +1632,5 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
   DALI_TEST_EQUALS(INT32_MIN + 1, blurHorizontalRenderTask.GetOrderIndex(), TEST_LOCATION);
   DALI_TEST_EQUALS(INT32_MIN + 2, blurVerticalRenderTask.GetOrderIndex(), TEST_LOCATION);
 
-  sceneView.Unparent();
   END_TEST;
 }

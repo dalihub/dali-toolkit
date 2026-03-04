@@ -205,6 +205,23 @@ Vector4 GetAlphaPreMultipliedColor(const Vector4& color)
   return Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a);
 }
 
+void WaitForAsyncLoadingAnimatedVectorFrameRendered(Dali::Actor actor, const char* location)
+{
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, location);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 1 seconds more.
+  Test::WaitForEventThreadTrigger(1, 0);
+
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
+}
 } // namespace
 
 void dali_visual_startup(void)
@@ -3386,16 +3403,7 @@ int UtcDaliVisualRoundedCornerAnimatedVectorImageVisual(void)
     application.Render();
 
     // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-    // There might be 1 event triggered if render frame spend long time.
-    // if ForceRenderOnce triggered before render complete, renderer count could be zero.
-    // Consume it if required.
-    while(dummy.GetRendererCount() == 0)
-    {
-      tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-      Test::WaitForEventThreadTrigger(1, 0);
-    }
+    WaitForAsyncLoadingAnimatedVectorFrameRendered(dummy, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -3923,16 +3931,7 @@ int UtcDaliVisualBorderlineAnimatedVectorImageVisual(void)
     application.Render();
 
     // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-    // There might be 1 event triggered if render frame spend long time.
-    // if ForceRenderOnce triggered before render complete, renderer count could be zero.
-    // Consume it if required.
-    while(dummy.GetRendererCount() == 0)
-    {
-      tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-      Test::WaitForEventThreadTrigger(1, 0);
-    }
+    WaitForAsyncLoadingAnimatedVectorFrameRendered(dummy, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
@@ -5357,16 +5356,7 @@ int UtcDaliVisualGetVisualProperty07(void)
   application.Render();
 
   // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-  // There might be 1 event triggered if render frame spend long time.
-  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
-  // Consume it if required.
-  while(dummyControl.GetRendererCount() == 0)
-  {
-    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 0);
-  }
+  WaitForAsyncLoadingAnimatedVectorFrameRendered(dummyControl, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -6602,6 +6592,80 @@ int UtcDaliVisualSetProperties(void)
   opacityValue = resultMap.Find(Visual::Property::OPACITY, Property::FLOAT);
   DALI_TEST_CHECK(opacityValue);
   DALI_TEST_EQUALS(opacityValue->Get<float>(), 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualSetOnScene(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualSetOnScene: Test Visual::Base::SetOnScene() method");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR, Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::SIZE, 5.0f);
+  Visual::Base borderVisual = factory.CreateVisual(propertyMap);
+
+  DALI_TEST_CHECK(borderVisual);
+
+  // Create an actor to attach the visual to
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  // Test that visual is created
+  DALI_TEST_CHECK(borderVisual);
+
+  // Call SetOnScene() - this should attach the visual to the actor
+  borderVisual.SetOnScene(actor);
+
+  // Render to ensure visual is set on scene
+  application.SendNotification();
+  application.Render();
+
+  // Visual should now be attached and rendering
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualRenderer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualGetVisualRenderer: Test Visual::Base::GetRenderer() method");
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::BORDER);
+  propertyMap.Insert(BorderVisual::Property::COLOR, Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::SIZE, 5.0f);
+  Visual::Base borderVisual = factory.CreateVisual(propertyMap);
+
+  // Test that visual is created
+  DALI_TEST_CHECK(borderVisual);
+
+  VisualRenderer borderRenderer = borderVisual.GetRenderer();
+  DALI_TEST_CHECK(borderRenderer);
+
+  // Create an actor to attach the visual to
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  // Call SetOnScene() - this should attach the visual to the actor
+  borderVisual.SetOnScene(actor);
+
+  // Render to ensure visual is set on scene
+  application.SendNotification();
+  application.Render();
+
+  // Visual should now be attached and rendering
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // Check attached renderer is same as what we got before.
+  DALI_TEST_EQUALS(actor.GetRendererAt(0u), borderRenderer, TEST_LOCATION);
 
   END_TEST;
 }

@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-signals-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-animated-image-cache.h>
@@ -1386,8 +1387,16 @@ bool AnimatedImageVisual::DisplayNextFrame()
         if(mLoopCount >= 0 && mCurrentLoopIndex >= mLoopCount)
         {
           // This will stop timer
-          mActionStatus = DevelAnimatedImageVisual::Action::STOP;
-          return DisplayNextFrame();
+          mActionStatus      = DevelAnimatedImageVisual::Action::STOP;
+          bool continueTimer = DisplayNextFrame();
+
+          // Naturally stoped animation. Send signal.
+          if(mImpl->mEventObserver)
+          {
+            mImpl->mEventObserver->NotifyVisualEvent(*this, DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED);
+          }
+
+          return continueTimer;
         }
       }
     }

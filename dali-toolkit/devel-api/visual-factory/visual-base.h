@@ -21,6 +21,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -231,6 +232,19 @@ public:
    * @param[in] properties The properties to set
    */
   void SetProperties(const Dali::Property::Map& properties);
+
+  /**
+   * @brief Attach the visual to an actor.
+   * @param[in] actor The actor to attach the visual to
+   */
+  void SetOnScene(Actor& actor);
+
+  /**
+   * @brief Get the main renderer of the visual uses.
+   *
+   * @return The visual renderer for the visual.
+   */
+  Dali::VisualRenderer GetRenderer() const;
 
 public: // Not intended for application developers
   explicit DALI_INTERNAL Base(Internal::Visual::Base* impl);

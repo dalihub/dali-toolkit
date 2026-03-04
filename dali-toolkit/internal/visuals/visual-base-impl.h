@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
@@ -208,7 +207,7 @@ public:
   /**
    * Gets currently staged renderer, or an empty handle if not staged
    */
-  Renderer GetRenderer();
+  VisualRenderer GetRenderer() const;
 
   /**
    * Convert all string keys to int keys

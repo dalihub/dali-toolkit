@@ -1053,7 +1053,7 @@ void VideoView::SetFrameRenderCallback()
 {
   mFrameID++;
   DevelWindow::AddFrameRenderedCallback(DevelWindow::Get(Self()),
-                                        std::unique_ptr<CallbackBase>(MakeCallback(this, &VideoView::FrameRenderCallback)),
+                                        MakeCallback(this, &VideoView::FrameRenderCallback),
                                         mFrameID);
 }
 

@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-visual-data.h>
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
+#include <dali-toolkit/internal/styling/default-theme.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -529,6 +530,11 @@ void Control::Initialize()
       styleManagerImpl.ApplyThemeStyleAtInit(Toolkit::Control(GetOwner()));
     }
   }
+  else
+  {
+    // Apply default theme DISABLE_STYLE_CHANGE_SIGNALS case
+    OnApplyDefaultStyle();
+  }
 
   if(mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)
   {
@@ -554,6 +560,10 @@ void Control::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Typ
     GetImpl(styleManager).ApplyThemeStyle(Toolkit::Control(GetOwner()));
     RelayoutRequest();
   }
+}
+
+void Control::OnApplyDefaultStyle()
+{
 }
 
 void Control::OnPinch(const PinchGesture& pinch)

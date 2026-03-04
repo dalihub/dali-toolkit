@@ -506,37 +506,6 @@ int UtcDaliAccessibilityTextSelectionConstructor(void)
   END_TEST;
 }
 
-#include <dali-toolkit/internal/controls/effects-view/effects-view-impl.h>
-int UtcDaliAccessibilityEffectsViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto etype       = Dali::Toolkit::EffectsView::EffectType::DROP_SHADOW;
-  auto effectsview = EffectsView::New(etype);
-  DALI_TEST_CHECK(effectsview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(effectsview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/internal/controls/super-blur-view/super-blur-view-impl.h>
-int UtcDaliAccessibilitySuperBlurViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto superblurview = SuperBlurView::New(1);
-  DALI_TEST_CHECK(superblurview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(superblurview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityImageViewConstructor(void)
 {
   ToolkitTestApplication application;
@@ -551,61 +520,7 @@ int UtcDaliAccessibilityImageViewConstructor(void)
   END_TEST;
 }
 
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
-class TestPageFactory : public PageFactory
-{
-public:
-  TestPageFactory(bool returnValidTexture = true)
-  : mValidTexture(returnValidTexture)
-  {
-    mTotalPageNumber = 100;
-  }
-
-  /**
-   * Query the number of pages available from the factory.
-   * The maximum available page has an ID of GetNumberOfPages()-1.
-   */
-  virtual unsigned int GetNumberOfPages()
-  {
-    return mTotalPageNumber;
-  }
-
-  /**
-   * Create an texture to represent a page content.
-   * @param[in] pageId The ID of the page to create.
-   * @return An image, or an empty handle if the ID is out of range.
-   */
-  virtual Texture NewPage(unsigned int pageId)
-  {
-    if(mValidTexture)
-    {
-      return Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGB888, 100, 100);
-    }
-    return Texture(); // empty handle
-  }
-
-private:
-  unsigned int mTotalPageNumber;
-  bool         mValidTexture;
-};
-
-#include <dali-toolkit/internal/controls/page-turn-view/page-turn-landscape-view-impl.h>
-int UtcDaliAccessibilityPageTurnViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto testpagefactory       = TestPageFactory();
-  auto vector2               = Vector2(1.0, 1.0);
-  auto pageturnlandscapeview = PageTurnLandscapeView::New(testpagefactory, vector2);
-  DALI_TEST_CHECK(pageturnlandscapeview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(pageturnlandscapeview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::PAGE_TAB_LIST, TEST_LOCATION);
-
-  END_TEST;
-}
-
+#include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 int UtcDaliAccessibilityGaussianBlurViewConstructor(void)
 {
   ToolkitTestApplication application;
@@ -614,20 +529,6 @@ int UtcDaliAccessibilityGaussianBlurViewConstructor(void)
   DALI_TEST_CHECK(gaussianblurview);
 
   auto accessible = Dali::Accessibility::Accessible::Get(gaussianblurview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliAccessibilityShadowViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto shadowview = ShadowView::New();
-  DALI_TEST_CHECK(shadowview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(shadowview);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
 
@@ -650,21 +551,6 @@ int UtcDaliAccessibilityScrollableConstructor(void)
   END_TEST;
 }
 
-#include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
-int UtcDaliAccessibilityMagnifierConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto magnifier = Magnifier::New();
-  DALI_TEST_CHECK(magnifier);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(magnifier);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityTableViewConstructor(void)
 {
   ToolkitTestApplication application;
@@ -675,21 +561,6 @@ int UtcDaliAccessibilityTableViewConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(tableview);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::TABLE, TEST_LOCATION);
-
-  END_TEST;
-}
-
-#include <dali-toolkit/internal/controls/bloom-view/bloom-view-impl.h>
-int UtcDaliAccessibilityBloomViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto bloomview = BloomView::New();
-  DALI_TEST_CHECK(bloomview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(bloomview);
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::ANIMATION, TEST_LOCATION);
 
   END_TEST;
 }

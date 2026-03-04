@@ -431,10 +431,11 @@ void Panel::OnSceneConnection(int depth)
   }
 
   // On-screen / Off-screen window
-  mSceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  if(mSceneHolder && !mRenderTask)
+  Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
+  mSceneHolder = sceneHolder;
+  if(mSceneHolder.GetHandle() && !mRenderTask)
   {
-    RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+    RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
     mRenderTask             = taskList.CreateTask();
     mRenderTask.SetSourceActor(mRootLayer);
     mRenderTask.SetExclusive(true);
@@ -461,11 +462,11 @@ void Panel::OnSceneDisconnection()
     mParentSceneView.Reset();
   }
 
-  if(mSceneHolder)
+  if(mSceneHolder.GetHandle())
   {
     if(mRenderTask)
     {
-      RenderTaskList taskList = mSceneHolder.GetRenderTaskList();
+      RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
       taskList.RemoveTask(mRenderTask);
       mRenderTask.Reset();
     }

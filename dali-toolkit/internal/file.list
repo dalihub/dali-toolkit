@@ -68,9 +68,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/visual-string-constants.cpp
    ${toolkit_src_dir}/visuals/visual-url.cpp
    ${toolkit_src_dir}/visuals/wireframe/wireframe-visual.cpp
-   ${toolkit_src_dir}/controls/bloom-view/bloom-view-impl.cpp
-   ${toolkit_src_dir}/controls/bubble-effect/bubble-emitter-impl.cpp
-   ${toolkit_src_dir}/controls/bubble-effect/bubble-renderer.cpp
    ${toolkit_src_dir}/controls/buttons/button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/check-box-button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/push-button-impl.cpp
@@ -83,18 +80,12 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/control/control-visual-data.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
-   ${toolkit_src_dir}/controls/effects-view/effects-view-impl.cpp
    ${toolkit_src_dir}/controls/flex-container/flex-container-impl.cpp
    ${toolkit_src_dir}/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp
    ${toolkit_src_dir}/controls/image-view/image-view-impl.cpp
-   ${toolkit_src_dir}/controls/magnifier/magnifier-impl.cpp
    ${toolkit_src_dir}/controls/navigation-view/navigation-view-impl.cpp
    ${toolkit_src_dir}/controls/popup/confirmation-popup-impl.cpp
    ${toolkit_src_dir}/controls/popup/popup-impl.cpp
-   ${toolkit_src_dir}/controls/page-turn-view/page-turn-portrait-view-impl.cpp
-   ${toolkit_src_dir}/controls/page-turn-view/page-turn-effect.cpp
-   ${toolkit_src_dir}/controls/page-turn-view/page-turn-landscape-view-impl.cpp
-   ${toolkit_src_dir}/controls/page-turn-view/page-turn-view-impl.cpp
    ${toolkit_src_dir}/controls/scroll-bar/scroll-bar-impl.cpp
    ${toolkit_src_dir}/controls/scrollable/bouncing-effect-actor.cpp
    ${toolkit_src_dir}/controls/scrollable/item-view/depth-layout.cpp
@@ -109,8 +100,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-constraints.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-property-handler.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp
-   ${toolkit_src_dir}/controls/shadow-view/shadow-view-impl.cpp
-   ${toolkit_src_dir}/controls/super-blur-view/super-blur-view-impl.cpp
    ${toolkit_src_dir}/controls/table-view/table-view-impl.cpp
    ${toolkit_src_dir}/controls/text-controls/common-text-utils.cpp
    ${toolkit_src_dir}/controls/text-controls/text-anchor-impl.cpp
@@ -131,10 +120,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/focus-manager/keyinput-focus-manager-impl.cpp
    ${toolkit_src_dir}/helpers/color-conversion.cpp
    ${toolkit_src_dir}/helpers/property-helper.cpp
-   ${toolkit_src_dir}/filters/blur-two-pass-filter.cpp
-   ${toolkit_src_dir}/filters/emboss-filter.cpp
-   ${toolkit_src_dir}/filters/image-filter.cpp
-   ${toolkit_src_dir}/filters/spread-filter.cpp
    ${toolkit_src_dir}/image-loader/async-image-loader-impl.cpp
    ${toolkit_src_dir}/image-loader/fast-track-loading-task.cpp
    ${toolkit_src_dir}/image-loader/loading-task.cpp
@@ -146,6 +131,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/render-effects/background-blur-effect-impl.cpp
    ${toolkit_src_dir}/render-effects/gaussian-blur-effect-impl.cpp
    ${toolkit_src_dir}/render-effects/offscreen-rendering-impl.cpp
+   ${toolkit_src_dir}/styling/default-theme.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
    ${toolkit_src_dir}/text/abstract-style-character-run.cpp
    ${toolkit_src_dir}/text/bidirectional-support.cpp
