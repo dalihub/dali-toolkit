@@ -23,7 +23,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/animation/key-frames.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 

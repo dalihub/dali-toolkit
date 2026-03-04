@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 #define DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/rendering/texture.h>
 #include <cmath>
 
 // INTERNAL INCLUDES

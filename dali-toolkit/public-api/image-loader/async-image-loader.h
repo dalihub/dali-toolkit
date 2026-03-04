@@ -18,8 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <string>
 
