@@ -41,6 +41,23 @@ namespace
 const char* TEST_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
 const char* TEST_GIF_FILE_NAME          = TEST_RESOURCE_DIR "/anim.gif";
 
+void WaitForAsyncLoadingAnimatedVectorFrameRendered(Dali::Actor actor, const char* location)
+{
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, location);
+
+  // Async lottie somtimes need one more triggers. (load + discard + rasterize + discard case.) Wait 1 seconds more.
+  Test::WaitForEventThreadTrigger(1, 0);
+
+  // There might be 1 event triggered if start frame is not 0, and render frame spend long time.
+  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
+  // Consume it if required.
+  while(actor.GetRendererCount() == 0)
+  {
+    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
+    Test::WaitForEventThreadTrigger(1, 0);
+  }
+}
 } // namespace
 
 int UtcDaliVisualAction(void)
@@ -323,16 +340,7 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
   application.Render();
 
   // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
-
-  // There might be 1 event triggered if render frame spend long time.
-  // if ForceRenderOnce triggered before render complete, renderer count could be zero.
-  // Consume it if required.
-  while(actor.GetRendererCount() == 0)
-  {
-    tet_printf("Warning! render frame trigger not comes yet. Let we wait one more time.\n");
-    Test::WaitForEventThreadTrigger(1, 0);
-  }
+  WaitForAsyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
 
   // renderer is added to actor
   DALI_TEST_CHECK(actor.GetRendererCount() == 1u);
