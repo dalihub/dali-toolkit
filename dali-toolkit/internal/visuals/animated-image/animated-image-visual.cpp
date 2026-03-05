@@ -1390,7 +1390,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
           mActionStatus      = DevelAnimatedImageVisual::Action::STOP;
           bool continueTimer = DisplayNextFrame();
 
-          // Naturally stoped animation. Send signal.
+          // Naturally stopped animation. Send signal.
           if(mImpl->mEventObserver)
           {
             mImpl->mEventObserver->NotifyVisualEvent(*this, DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED);
