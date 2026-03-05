@@ -66,7 +66,6 @@ SET(TC_SOURCES
   utc-Dali-ItemLayout.cpp
   utc-Dali-ItemView.cpp
   utc-Dali-KeyboardFocusManager.cpp
-  utc-Dali-NavigationView.cpp
   utc-Dali-Popup.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
