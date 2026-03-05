@@ -44,7 +44,7 @@
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"
-#include "test-native-image-source.h"
+#include "toolkit-native-image.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1001,9 +1001,9 @@ int UtcDaliImageVisualWithNativeImage(void)
   ToolkitTestApplication application;
   tet_infoline("Use Native Image as url");
 
-  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
-  std::string          url               = imageUrl.GetUrl();
+  NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
+  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
+  std::string    url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1036,7 +1036,7 @@ int UtcDaliImageVisualWithNativeImage(void)
   const Property::Map* outMap         = value.GetMap();
   std::string          fragmentShader = (*outMap)["fragment"].Get<std::string>();
 
-  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
+  const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
   size_t      pos            = fragmentShader.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
@@ -1053,9 +1053,9 @@ int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
   ToolkitTestApplication application;
   tet_infoline("Use Native Image as url");
 
-  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true);
-  std::string          url               = imageUrl.GetUrl();
+  NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
+  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
+  std::string    url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1088,7 +1088,7 @@ int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
   const Property::Map* outMap         = value.GetMap();
   std::string          fragmentShader = (*outMap)["fragment"].Get<std::string>();
 
-  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
+  const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
   size_t      pos            = fragmentShader.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
@@ -1105,9 +1105,9 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline("Use Native Image as url and Use custom shader");
 
-  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true);
-  std::string          url               = imageUrl.GetUrl();
+  NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
+  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
+  std::string    url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1155,7 +1155,7 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   DALI_TEST_EQUALS(customVertexShaderSource, vertexShaderSource, TEST_LOCATION);
 
   // Check fragment shader changed
-  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
+  const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
   size_t      pos            = fragmentShaderSource.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
@@ -1179,9 +1179,9 @@ int UtcDaliImageVisualWithNativeImageRemoved(void)
   TraceCallStack&    textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  ImageUrl             imageUrl          = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
-  std::string          url               = imageUrl.GetUrl();
+  NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
+  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
+  std::string    url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <cstring>
@@ -139,12 +139,12 @@ void CameraView::SetNativeImageTarget()
   self.RemovePropertyNotification(mSizeUpdateNotification);
   self.RemovePropertyNotification(mScaleUpdateNotification);
 
-  Any                        source;
-  Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New(source);
-  mNativeTexture                                  = Dali::Texture::New(*nativeImageSourcePtr);
+  Any                  source;
+  Dali::NativeImagePtr nativeImagePtr = Dali::NativeImage::New(source);
+  mNativeTexture                      = Dali::Texture::New(*nativeImagePtr);
 
   Dali::Geometry   geometry   = VisualFactoryCache::CreateQuadGeometry();
-  Dali::Shader     shader     = CreateShader(nativeImageSourcePtr);
+  Dali::Shader     shader     = CreateShader(nativeImagePtr);
   Dali::TextureSet textureSet = Dali::TextureSet::New();
   textureSet.SetTexture(0u, mNativeTexture);
 
@@ -154,7 +154,7 @@ void CameraView::SetNativeImageTarget()
   Self().AddRenderer(mTextureRenderer);
 
   // Note CameraPlayer::SetNativeImageRenderingTarget.
-  mCameraPlayer.SetNativeImageRenderingTarget(nativeImageSourcePtr);
+  mCameraPlayer.SetNativeImageRenderingTarget(nativeImagePtr);
 }
 
 void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
@@ -180,12 +180,12 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
   mCameraPlayer.SetDisplayArea(mDisplayArea);
 }
 
-Dali::Shader CameraView::CreateShader(Dali::NativeImageSourcePtr nativeImageSourcePtr)
+Dali::Shader CameraView::CreateShader(Dali::NativeImagePtr nativeImagePtr)
 {
   std::string vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
   std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
 
-  nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader, 1);
+  nativeImagePtr->ApplyNativeFragmentShader(fragmentShader, 1);
 
   Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
   return shader;

@@ -38,7 +38,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
@@ -1210,7 +1210,7 @@ public:
   {
     return Dali::PixelData();
   }
-  NativeImageSourcePtr GetNativeImageSource() override
+  NativeImagePtr GetNativeImage() override
   {
     return nullptr;
   }
@@ -2712,10 +2712,10 @@ Dali::WebEnginePlugin* WebEngine::GetPlugin() const
   return Internal::Adaptor::GetWebEnginePlugin();
 }
 
-NativeImageSourcePtr WebEngine::GetNativeImageSource()
+NativeImagePtr WebEngine::GetNativeImage()
 {
-  Any                        source;
-  Dali::NativeImageSourcePtr sourcePtr = Dali::NativeImageSource::New(source);
+  Any                  source;
+  Dali::NativeImagePtr sourcePtr = Dali::NativeImage::New(source);
   return sourcePtr;
 }
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,13 +103,13 @@ private:
   /**
    * @brief Cached information whether native image should change fragment shader.
    * Default it is ChangeFragmentShader::UNDECIDED.
-   * If we have any chance to check native image source apply fragment shader,
+   * If we have any chance to check native image apply fragment shader,
    * this vaule will be changed one of these : ChangeFragmentShader::DONT_CHANGE or ChangeFragmentShader::NEED_CHANGE
    *
    * After result cached, this value will not be changed.
    *
    * If value is DONT_CHANGE, ImageVisualShaderFactory::GetShader never call ApplyNativeFragmentShader.
-   * Else, ImageVisualShaderFactory::GetShader will call ApplyNativeFragmentShader if native image source texture come.
+   * Else, ImageVisualShaderFactory::GetShader will call ApplyNativeFragmentShader if native image texture come.
    */
   ImageVisualShaderFeature::ChangeFragmentShader::Type mFragmentShaderNeedChange : 3;
 };

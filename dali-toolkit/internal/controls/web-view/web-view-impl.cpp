@@ -37,7 +37,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -1071,12 +1071,12 @@ void WebView::OnFrameRendered()
   // Reset flag
   mVisualChangeRequired = false;
 
-  auto nativeImageSourcePtr = mWebEngine.GetNativeImageSource();
+  auto nativeImagePtr = mWebEngine.GetNativeImage();
 
-  mLastRenderedNativeImageWidth  = nativeImageSourcePtr->GetWidth();
-  mLastRenderedNativeImageHeight = nativeImageSourcePtr->GetHeight();
+  mLastRenderedNativeImageWidth  = nativeImagePtr->GetWidth();
+  mLastRenderedNativeImageHeight = nativeImagePtr->GetHeight();
 
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSourcePtr, true);
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImagePtr, true);
 
   newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
 

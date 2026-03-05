@@ -157,7 +157,7 @@ public:
   {
   }
 
-  void SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+  void SetVideoFrameBuffer(Dali::NativeImagePtr source)
   {
   }
 
@@ -430,12 +430,12 @@ void VideoPlayer::SetFrameInterpolationInterval(float intervalSeconds)
   Internal::Adaptor::GetImplementation(*this).SetFrameInterpolationInterval(intervalSeconds);
 }
 
-void VideoPlayer::EnableOffscreenFrameRendering(bool useOffScreenFrame, Dali::NativeImageSourcePtr previousFrameBufferNativeImageSourcePtr, Dali::NativeImageSourcePtr currentFrameBufferNativeImageSourcePtr)
+void VideoPlayer::EnableOffscreenFrameRendering(bool useOffScreenFrame, Dali::NativeImagePtr previousFrameBufferNativeImagePtr, Dali::NativeImagePtr currentFrameBufferNativeImagePtr)
 {
   Internal::Adaptor::GetImplementation(*this).EnableOffscreenFrameRendering(useOffScreenFrame);
 }
 
-void VideoPlayer::SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+void VideoPlayer::SetVideoFrameBuffer(Dali::NativeImagePtr source)
 {
   Internal::Adaptor::GetImplementation(*this).SetVideoFrameBuffer(source);
 }
