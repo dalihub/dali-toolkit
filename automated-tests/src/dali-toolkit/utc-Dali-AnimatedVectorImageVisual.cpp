@@ -25,7 +25,7 @@
 #include <toolkit-timer.h>
 #include <toolkit-vector-animation-renderer.h>
 #include "dummy-control.h"
-#include "test-native-image-source.h"
+#include "toolkit-native-image.h"
 
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -3442,7 +3442,7 @@ int UtcDaliAnimatedVectorImageNativeTextureChangeShader(void)
   std::string      resultFragmentShader, resultVertexShader;
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
   fragment->Get(resultFragmentShader);
-  DALI_TEST_CHECK(resultFragmentShader.find(NativeImageSourceTest::GetCustomFragmentPrefix()) != std::string::npos);
+  DALI_TEST_CHECK(resultFragmentShader.find(NativeImageTest::GetCustomFragmentPrefix()) != std::string::npos);
 
   // Reset to make we use normal texture again.
   Test::VectorAnimationRenderer::UseNativeImageTexture(false);

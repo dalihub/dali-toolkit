@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>

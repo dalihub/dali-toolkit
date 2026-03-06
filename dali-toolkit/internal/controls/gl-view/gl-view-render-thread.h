@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GL_VIEW_THREAD_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
+#include <dali/devel-api/adaptor-framework/native-image-queue.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/semaphore.h>
 #include <dali/devel-api/threading/thread.h>
@@ -45,9 +45,9 @@ public:
   /**
    * Constructor
    *
-   * @param[in] queue The NativeImageSourceQueue that GL renders onto
+   * @param[in] queue The NativeImageQueue that GL renders onto
    */
-  GlViewRenderThread(Dali::NativeImageSourceQueuePtr queue);
+  GlViewRenderThread(Dali::NativeImageQueuePtr queue);
 
   /**
    * destructor.
@@ -149,10 +149,10 @@ private:
   const Dali::LogFactoryInterface&   mLogFactory;
   const Dali::TraceFactoryInterface& mTraceFactory;
 
-  Dali::Vector2                   mSurfaceSize; ///< The size of mNativeImageQueue
-  Dali::NativeImageSurfacePtr     mNativeImageSurface;
-  Dali::NativeImageSourceQueuePtr mNativeImageQueue;
-  Semaphore<>                     mSurfaceSemaphore; ///< The semaphore to avoid race condition to the render target
+  Dali::Vector2               mSurfaceSize; ///< The size of mNativeImageQueue
+  Dali::NativeImageSurfacePtr mNativeImageSurface;
+  Dali::NativeImageQueuePtr   mNativeImageQueue;
+  Semaphore<>                 mSurfaceSemaphore; ///< The semaphore to avoid race condition to the render target
 
   std::unique_ptr<CallbackBase> mGlInitCallback;
   std::unique_ptr<CallbackBase> mGlRenderFrameCallback;

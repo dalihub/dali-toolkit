@@ -23,7 +23,7 @@
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-map.h>
@@ -333,12 +333,12 @@ public:
   /**
    * @brief Sets the video frame buffer for rendering.
    *
-   * This method sets the native image source that will be used as the frame buffer
+   * This method sets the native image that will be used as the frame buffer
    * for video rendering. The frame buffer contains the surface data for video playback.
    *
-   * @param[in] source The native image source for video frame buffer
+   * @param[in] source The native image for video frame buffer
    */
-  void SetVideoFrameBuffer(Dali::NativeImageSourcePtr source);
+  void SetVideoFrameBuffer(Dali::NativeImagePtr source);
 
 private: // From Control
   /**
@@ -491,8 +491,8 @@ private:
   int                 mSiblingOrder;
 
   // For frame interpolation
-  Texture mPreviousFrameTexture; ///< Texture for mNativeImageSourcePrevious
-  Texture mCurrentFrameTexture;  ///< Texture for mNativeImageSourceCurrent
+  Texture mPreviousFrameTexture; ///< Texture for mNativeImagePrevious
+  Texture mCurrentFrameTexture;  ///< Texture for mNativeImageCurrent
 
   float mInterpolationInterval; ///< Target duration for interpolation in seconds
 };

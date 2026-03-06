@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ constexpr uint64_t DEFAULT_FRAME_DURATION_IN_NANOSECONDS(DEFAULT_FRAME_DURATION_
 
 } // namespace
 
-GlViewRenderThread::GlViewRenderThread(Dali::NativeImageSourceQueuePtr queue)
+GlViewRenderThread::GlViewRenderThread(Dali::NativeImageQueuePtr queue)
 : mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
   mTraceFactory(Dali::Adaptor::Get().GetTraceFactory()),
   mSurfaceSize(1, 1),
