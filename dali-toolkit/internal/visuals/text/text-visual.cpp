@@ -310,7 +310,6 @@ void TextVisual::OnInitialize()
   Shader   shader         = GetTextShader(mFactoryCache, featureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.RegisterVisualTransformUniform();
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mTextRequireRenderPropertyIndex = mImpl->mRenderer.RegisterUniqueProperty("requireRender", mTextRequireRender);
   mHasMultipleTextColorsIndex     = mImpl->mRenderer.RegisterUniqueProperty("uHasMultipleTextColors", static_cast<float>(false));
@@ -1013,7 +1012,6 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       while(verifiedHeight > 0)
       {
         VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
-        tilingRenderer.RegisterVisualTransformUniform();
         tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
         // New offset position of buffer for tiling.
         info.offsetHeight += static_cast<uint32_t>(maxTextureSize);
@@ -1373,7 +1371,6 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     while(verifiedHeight > 0)
     {
       VisualRenderer tilingRenderer = VisualRenderer::New(geometry, shader);
-      tilingRenderer.RegisterVisualTransformUniform();
       tilingRenderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT);
       // New offset position of buffer for tiling.
       info.offsetHeight += maxTextureSize;
