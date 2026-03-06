@@ -1056,22 +1056,6 @@ int UtcDaliAccessibilityTextEditorGetNameRaw(void)
   END_TEST;
 }
 
-#include <dali-toolkit/internal/controls/navigation-view/navigation-view-impl.h>
-int UtcDaliAccessibilityNavigationViewConstructor(void)
-{
-  ToolkitTestApplication application;
-
-  auto navigationview = NavigationView::New();
-  DALI_TEST_CHECK(navigationview);
-
-  auto accessible = Dali::Accessibility::Accessible::Get(navigationview);
-  DALI_TEST_CHECK(accessible);
-
-  DALI_TEST_EQUALS(accessible->GetRole(), Dali::Accessibility::Role::FILLER, TEST_LOCATION);
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityVideoViewConstructor(void)
 {
   ToolkitTestApplication application;
