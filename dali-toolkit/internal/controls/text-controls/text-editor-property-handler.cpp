@@ -778,6 +778,12 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.mController->GetLayoutEngine().SetCursorInsetEnabled(enable);
       break;
     }
+    case Toolkit::DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT:
+    {
+      const bool enable = value.Get<bool>();
+      impl.mDeferredRelayoutEnabled = enable;
+      break;
+    }
   }
 }
 
@@ -1230,6 +1236,12 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       value = impl.mController->IsCursorInsetEnabled();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT:
+    {
+      value = impl.mDeferredRelayoutEnabled;
+      break;
+    }
+
   } //switch
   return value;
 }
