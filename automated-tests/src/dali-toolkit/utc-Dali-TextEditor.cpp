@@ -117,10 +117,11 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP        = "enableGrabHan
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS           = "inputMethodSettings";
 const char* const PROPERTY_NAME_INPUT_FILTER                    = "inputFilter";
 
-const char* const PROPERTY_NAME_REMOVE_FRONT_INSET  = "removeFrontInset";
-const char* const PROPERTY_NAME_REMOVE_BACK_INSET   = "removeBackInset";
-const char* const PROPERTY_NAME_FONT_VARIATIONS     = "fontVariations";
-const char* const PROPERTY_NAME_ENABLE_CURSOR_INSET = "enableCursorInset";
+const char* const PROPERTY_NAME_REMOVE_FRONT_INSET       = "removeFrontInset";
+const char* const PROPERTY_NAME_REMOVE_BACK_INSET        = "removeBackInset";
+const char* const PROPERTY_NAME_FONT_VARIATIONS          = "fontVariations";
+const char* const PROPERTY_NAME_ENABLE_CURSOR_INSET      = "enableCursorInset";
+const char* const PROPERTY_NAME_ENABLE_DEFERRED_RELAYOUT = "enableDeferredRelayout";
 
 const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
@@ -643,6 +644,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_REMOVE_BACK_INSET) == DevelTextEditor::Property::REMOVE_BACK_INSET);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_FONT_VARIATIONS) == DevelTextEditor::Property::FONT_VARIATIONS);
   DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_ENABLE_CURSOR_INSET) == DevelTextEditor::Property::ENABLE_CURSOR_INSET);
+  DALI_TEST_CHECK(editor.GetPropertyIndex(PROPERTY_NAME_ENABLE_DEFERRED_RELAYOUT) == DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT);
 
   END_TEST;
 }
@@ -786,6 +788,11 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_CURSOR_INSET), false, TEST_LOCATION);
   editor.SetProperty(DevelTextEditor::Property::ENABLE_CURSOR_INSET, true);
   DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_CURSOR_INSET), true, TEST_LOCATION);
+
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT, true);
+  DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT), true, TEST_LOCATION);
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT, false);
+  DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT), false, TEST_LOCATION);
 
   // Check handle images
   editor.SetProperty(TextEditor::Property::GRAB_HANDLE_IMAGE, "image1");
@@ -1448,6 +1455,13 @@ int utcDaliTextEditorTextChangedP(void)
   gTextChangedCallBackCalled = false;
   application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
+
+  editor.SetProperty(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT, true);
+  application.SendNotification();
+
+  gTextChangedCallBackCalled = false;
+  application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  DALI_TEST_CHECK(gTextChangedCallBackCalled);
 
   END_TEST;
 }

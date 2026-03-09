@@ -665,6 +665,7 @@ private: // Data
   bool  mScrollAnimationEnabled : 1;
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
+  bool  mDeferredRelayoutEnabled : 1;
   bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
   bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
   bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
