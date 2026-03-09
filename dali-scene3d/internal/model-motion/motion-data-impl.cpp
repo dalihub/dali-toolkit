@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali-scene3d/internal/model-motion/motion-data-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 

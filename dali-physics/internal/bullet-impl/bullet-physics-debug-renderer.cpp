@@ -18,8 +18,8 @@
 #include <dali-physics/internal/bullet-impl/bullet-physics-debug-renderer.h>
 
 // External Includes
+#include <dali/devel-api/adaptor-framework/graphics-backend.h>
 #include <dali/devel-api/common/addon-binder.h>
-#include <dali/public-api/adaptor-framework/graphics-backend.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>

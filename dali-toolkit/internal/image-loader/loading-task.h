@@ -21,13 +21,13 @@
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>

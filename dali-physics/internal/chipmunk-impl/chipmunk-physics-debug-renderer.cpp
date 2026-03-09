@@ -16,8 +16,8 @@
 
 // External Includes
 #include <chipmunk/chipmunk.h>
+#include <dali/devel-api/adaptor-framework/graphics-backend.h>
 #include <dali/devel-api/common/addon-binder.h>
-#include <dali/public-api/adaptor-framework/graphics-backend.h>
 
 // Internal Includes
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-adaptor-impl.h>

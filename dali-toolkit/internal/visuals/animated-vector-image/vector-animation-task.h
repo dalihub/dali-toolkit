@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/mutex.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
