@@ -383,10 +383,12 @@ void GaussianBlurEffectImpl::OnDeactivate()
     return;
   }
 
+  Renderer targetRenderer = GetTargetRenderer();
+  SetRendererTexture(targetRenderer, Dali::Texture());
+
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    Renderer targetRenderer = GetTargetRenderer();
     ownerControl.RemoveCacheRenderer(targetRenderer);
     ownerControl.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }

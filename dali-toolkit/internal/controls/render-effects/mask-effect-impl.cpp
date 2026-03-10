@@ -202,10 +202,12 @@ void MaskEffectImpl::OnActivate()
 
 void MaskEffectImpl::OnDeactivate()
 {
+  Renderer maskRenderer = GetTargetRenderer();
+  SetRendererTexture(maskRenderer, Dali::Texture());
+
   Toolkit::Control control = GetOwnerControl();
   if(DALI_LIKELY(control))
   {
-    Renderer maskRenderer = GetTargetRenderer();
     control.RemoveCacheRenderer(maskRenderer);
     control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }
