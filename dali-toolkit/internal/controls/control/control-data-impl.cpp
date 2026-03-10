@@ -1277,7 +1277,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS);
+            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS, false);
           }
           controlImpl.mImpl->UpdateCornerRadius();
         }
@@ -1291,7 +1291,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
+            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, false);
           }
           controlImpl.mImpl->UpdateCornerRadius();
         }
@@ -1312,7 +1312,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
+            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_SQUARENESS, false);
           }
           controlImpl.mImpl->UpdateCornerRadius();
         }
@@ -1919,9 +1919,9 @@ void Control::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
         previousVisualImplPtr->DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, map);
 
         // Trigger borderline relative constraints once
-        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_WIDTH);
-        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_COLOR);
-        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_OFFSET);
+        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_WIDTH, false);
+        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_COLOR, false);
+        mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::BORDERLINE_OFFSET, false);
         return;
       }
     }

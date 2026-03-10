@@ -2471,6 +2471,71 @@ int UtcDaliControlCornerRadiusAnimation2(void)
   END_TEST;
 }
 
+int UtcDaliControlCornerRadiusAnimation3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlCornerRadiusAnimation3: Animation end with zero also change the shader\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  tet_printf("Add first visual\n");
+  Property::Map background;
+  background.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  background.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::RED);
+  background.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
+
+  tet_printf("Add second visual\n");
+  Property::Value shadow{
+    {Visual::Property::TYPE, Visual::COLOR},
+    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  control.SetProperty(DevelControl::Property::SHADOW, shadow);
+
+  application.GetScene().Add(control);
+
+  DALI_TEST_EQUALS(control.GetRendererCount(), 2u, TEST_LOCATION);
+  Shader shader0 = control.GetRendererAt(0u).GetShader();
+  Shader shader1 = control.GetRendererAt(1u).GetShader();
+
+  tet_printf("Play animation with reverse alpha function\n");
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_RADIUS), radius);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_SQUARENESS), squreness);
+  animation.SetSpeedFactor(-1.0f);
+  animation.Play();
+
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+
+  tet_printf("Test shader be changed well\n");
+  DALI_TEST_CHECK(shader0 != control.GetRendererAt(0u).GetShader());
+  DALI_TEST_CHECK(shader1 != control.GetRendererAt(1u).GetShader());
+
+  application.SendNotification();
+  application.Render(0);
+
+  application.SendNotification();
+  application.Render(250);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), radius * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), squreness * 0.5f, TEST_LOCATION);
+
+  animation.Stop();
+  animation.Clear();
+
+  application.Render();
+  application.SendNotification();
+
+  END_TEST;
+}
+
 // Positive test case for applying a custom corner property constraint via EnableCornerPropertiesOverridden.
 // Tests that a custom constraint with APPLY_ONCE apply rate correctly synchronizes the visual's
 // corner radius property with the control's corner radius property when the override is enabled.
