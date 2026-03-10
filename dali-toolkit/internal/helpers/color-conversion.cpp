@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/color-controller.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-value.h>
 #include <sstream>
 
 using Dali::Vector4;
@@ -60,15 +60,6 @@ bool ConvertStringToColor(const std::string& colorString, Vector4& outColor)
     const char* cString = colorString.c_str();
     outColor            = HexStringToVector4(&cString[1]);
     success             = true;
-  }
-  else
-  {
-    Dali::ColorController controller = Dali::ColorController::Get();
-
-    if(controller)
-    {
-      success = controller.RetrieveColor(colorString, outColor);
-    }
   }
 
   return success;
