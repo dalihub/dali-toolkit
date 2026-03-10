@@ -385,11 +385,12 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   {
     return;
   }
+  Renderer renderer = GetTargetRenderer();
+  SetRendererTexture(renderer, Dali::Texture());
 
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    Renderer renderer = GetTargetRenderer();
     ownerControl.RemoveRenderer(renderer);
     ownerControl.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,27 +34,32 @@ namespace
 {
 Shader CreateShader(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName)
 {
-  if(Dali::Adaptor::IsAvailable() && !shaderName.empty())
+  Dali::Shader shader;
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    auto factory = Dali::Toolkit::VisualFactory::Get();
-    if(DALI_LIKELY(factory))
+    if(!shaderName.empty())
     {
-      thread_local static std::unordered_map<std::string, VisualFactoryCache::ExternalShaderId> gShaderIdMap;
-
-      auto& visualFactoryCache = GetImplementation(factory).GetFactoryCache();
-
-      auto iter = gShaderIdMap.find(shaderName);
-      if(iter != gShaderIdMap.end())
+      auto factory = Dali::Toolkit::VisualFactory::Get();
+      if(DALI_LIKELY(factory))
       {
-        return visualFactoryCache.GetExternalShader(iter->second);
-      }
-      Shader shader            = Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
-      gShaderIdMap[shaderName] = visualFactoryCache.RegisterExternalShader(shader);
-      return shader;
-    }
-  }
+        thread_local static std::unordered_map<std::string, VisualFactoryCache::ExternalShaderId> gShaderIdMap;
 
-  return Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
+        auto& visualFactoryCache = GetImplementation(factory).GetFactoryCache();
+
+        auto iter = gShaderIdMap.find(shaderName);
+        if(iter != gShaderIdMap.end())
+        {
+          return visualFactoryCache.GetExternalShader(iter->second);
+        }
+        Shader shader            = Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
+        gShaderIdMap[shaderName] = visualFactoryCache.RegisterExternalShader(shader);
+        return shader;
+      }
+    }
+
+    shader = Shader::New(vertexSrc, fragmentSrc, hints, shaderName);
+  }
+  return shader;
 }
 } // namespace
 
@@ -65,14 +70,19 @@ Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragm
 
 Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, const std::string& shaderName, Uint16Pair gridSize)
 {
-  Dali::Shader shader = CreateShader(vertexSrc, fragmentSrc, hints, shaderName);
+  Dali::Renderer renderer;
 
-  Dali::Geometry gridGeometry = VisualFactoryCache::CreateGridGeometry(gridSize, true);
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    Dali::Shader shader = CreateShader(vertexSrc, fragmentSrc, hints, shaderName);
 
-  Dali::Renderer renderer = Dali::Renderer::New(gridGeometry, shader);
+    Dali::Geometry gridGeometry = VisualFactoryCache::CreateGridGeometry(gridSize, true);
 
-  Dali::TextureSet textureSet = Dali::TextureSet::New();
-  renderer.SetTextures(textureSet);
+    renderer = Dali::Renderer::New(gridGeometry, shader);
+
+    Dali::TextureSet textureSet = Dali::TextureSet::New();
+    renderer.SetTextures(textureSet);
+  }
 
   return renderer;
 }
@@ -81,8 +91,11 @@ void SetRendererTexture(Dali::Renderer renderer, Dali::Texture texture)
 {
   if(renderer)
   {
-    Dali::TextureSet textureSet = renderer.GetTextures();
-    textureSet.SetTexture(0u, texture);
+    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+    {
+      Dali::TextureSet textureSet = renderer.GetTextures();
+      textureSet.SetTexture(0u, texture);
+    }
   }
 }
 

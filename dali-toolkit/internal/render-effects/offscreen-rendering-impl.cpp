@@ -117,10 +117,12 @@ void OffScreenRenderingImpl::OnActivate()
 
 void OffScreenRenderingImpl::OnDeactivate()
 {
+  Renderer renderer = GetTargetRenderer();
+  SetRendererTexture(renderer, Dali::Texture());
+
   Toolkit::Control control = GetOwnerControl();
   if(DALI_LIKELY(control))
   {
-    Renderer renderer = GetTargetRenderer();
     control.RemoveCacheRenderer(renderer);
     control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
 
