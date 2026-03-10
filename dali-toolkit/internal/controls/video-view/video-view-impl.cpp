@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/native-image-source-devel.h>
+#include <dali/devel-api/adaptor-framework/native-image-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -800,9 +800,9 @@ void VideoView::SetNativeImageTarget()
 
   int curPos = mVideoPlayer.GetPlayPosition();
 
-  Any                        source;
-  Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New(source);
-  mNativeTexture                                  = Dali::Texture::New(*nativeImageSourcePtr);
+  Any                  source;
+  Dali::NativeImagePtr nativeImagePtr = Dali::NativeImage::New(source);
+  mNativeTexture                      = Dali::Texture::New(*nativeImagePtr);
 
   if(!mTextureVisual)
   {
@@ -823,7 +823,7 @@ void VideoView::SetNativeImageTarget()
     }
 
     // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
-    mVideoPlayer.SetRenderingTarget(nativeImageSourcePtr);
+    mVideoPlayer.SetRenderingTarget(nativeImagePtr);
   }
 
   ApplyBackupProperties();
@@ -1194,15 +1194,15 @@ void VideoView::EnableOffscreenFrameRendering(bool useOffScreenFrame)
   mIsUsingOverlayTexture = useOffScreenFrame;
   if(!mOverlayTextureVisual && useOffScreenFrame)
   {
-    NativeImageSourcePtr previousNativeImageSource = Dali::NativeImageSource::New(0, 0, NativeImageSource::ColorDepth::COLOR_DEPTH_DEFAULT);
-    mPreviousFrameTexture                          = Dali::Texture::New(*previousNativeImageSource);
+    NativeImagePtr previousNativeImage = Dali::NativeImage::New(0, 0, NativeImage::ColorDepth::COLOR_DEPTH_DEFAULT);
+    mPreviousFrameTexture              = Dali::Texture::New(*previousNativeImage);
 
-    NativeImageSourcePtr currentNativeImageSource = Dali::NativeImageSource::New(0, 0, NativeImageSource::ColorDepth::COLOR_DEPTH_DEFAULT);
-    mCurrentFrameTexture                          = Dali::Texture::New(*currentNativeImageSource);
+    NativeImagePtr currentNativeImage = Dali::NativeImage::New(0, 0, NativeImage::ColorDepth::COLOR_DEPTH_DEFAULT);
+    mCurrentFrameTexture              = Dali::Texture::New(*currentNativeImage);
 
     CreateOverlayTextureVisual();
 
-    mVideoPlayer.EnableOffscreenFrameRendering(useOffScreenFrame, previousNativeImageSource, currentNativeImageSource);
+    mVideoPlayer.EnableOffscreenFrameRendering(useOffScreenFrame, previousNativeImage, currentNativeImage);
   }
 
   if(mOverlayTextureVisual && !useOffScreenFrame)
@@ -1212,7 +1212,7 @@ void VideoView::EnableOffscreenFrameRendering(bool useOffScreenFrame)
   }
 }
 
-void VideoView::SetVideoFrameBuffer(Dali::NativeImageSourcePtr source)
+void VideoView::SetVideoFrameBuffer(Dali::NativeImagePtr source)
 {
   mVideoPlayer.SetVideoFrameBuffer(source);
 }

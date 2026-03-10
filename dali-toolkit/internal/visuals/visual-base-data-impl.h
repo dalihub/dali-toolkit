@@ -401,7 +401,6 @@ struct Base::Impl
   {
     if(!mTransformMapUsingDefault || direction != Toolkit::Direction::LEFT_TO_RIGHT)
     {
-      renderer.RegisterVisualTransformUniform();
       GetOrCreateTransform().SetUniforms(renderer, direction);
     }
   }

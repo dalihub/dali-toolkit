@@ -159,6 +159,10 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
     if(nullptr != eventData)
     {
       PlaceholderHandler::ShowPlaceholderText(impl);
+      if(!impl.IsShowingPlaceholderText())
+      {
+        impl.mModel->mVisualModel->SetLayoutSize(Size::ZERO);
+      }
     }
     else
     {

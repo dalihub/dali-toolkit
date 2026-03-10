@@ -125,7 +125,6 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     {
       // Unusual case. SetProperty called after OnInitialize().
       // Assume that DoAction call UPDATE_PROPERTY.
-      DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
       mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
 
       // Check whether we must update shader.
@@ -265,7 +264,6 @@ void ColorVisual::OnInitialize()
 
   if(mAlwaysUsingBlurRadius || !EqualsZero(mBlurRadius))
   {
-    DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
     mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
@@ -355,11 +353,6 @@ Shader ColorVisual::GenerateShader() const
     {
       shader = Shader::New(shaderArray);
     }
-
-    if(mImpl->mRenderer)
-    {
-      mImpl->mRenderer.RegisterVisualTransformUniform();
-    }
   }
   return shader;
 }
@@ -385,7 +378,6 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key, bool ch
       if(updateShader)
       {
         // Update each values to renderer
-        DownCast<DecoratedVisualRenderer>(mImpl->mRenderer).RegisterBlurRadiusUniform();
         mImpl->mRenderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, mBlurRadius);
 
         // Change shader

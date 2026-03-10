@@ -351,6 +351,12 @@ enum Type
    * @details Name "enableCursorInset", type Property::BOOLEAN.
    */
   ENABLE_CURSOR_INSET,
+
+  /**
+   * @brief Relayout is deferred by one frame after text changes to stabilize dynamic size updates and prevent flickering.
+   * @details Name "enableDeferredRelayout", type Property::BOOLEAN.
+   */
+  ENABLE_DEFERRED_RELAYOUT,
 };
 
 } // namespace Property

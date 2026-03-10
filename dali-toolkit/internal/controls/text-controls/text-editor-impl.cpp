@@ -167,6 +167,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeFrontInse
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeBackInset",                      BOOLEAN,   REMOVE_BACK_INSET                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontVariations",                       MAP,       FONT_VARIATIONS                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableCursorInset",                    BOOLEAN,   ENABLE_CURSOR_INSET                 )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableDeferredRelayout",               BOOLEAN,   ENABLE_DEFERRED_RELAYOUT            )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
@@ -800,6 +801,11 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mTextChanged)
   {
     EmitTextChangedSignal();
+    if(mDeferredRelayoutEnabled)
+    {
+      RequestTextRelayout();
+      return;
+    }
   }
 
   Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
@@ -1494,6 +1500,7 @@ TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
   mScrollAnimationEnabled(false),
   mScrollBarEnabled(false),
   mScrollStarted(false),
+  mDeferredRelayoutEnabled(false),
   mTextChanged(false),
   mCursorPositionChanged(false),
   mSelectionChanged(false),

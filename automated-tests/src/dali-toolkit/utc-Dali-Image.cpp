@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
-#include <dali/devel-api/adaptor-framework/native-image-source-queue.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
+#include <dali/devel-api/adaptor-framework/native-image-queue.h>
+#include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/texture.h>
@@ -129,18 +129,18 @@ int UtcDaliImageConvertPixelDataToUrl02(void)
   END_TEST;
 }
 
-int UtcDaliImageConvertNativeImageSourceToUrl01(void)
+int UtcDaliImageConvertNativeImageToUrl01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliImageConvertNativeImageSourceToUrl01");
+  tet_infoline("UtcDaliImageConvertNativeImageToUrl01");
 
   unsigned int width(64);
   unsigned int height(64);
   try
   {
-    NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT);
+    NativeImagePtr nativeImage = NativeImage::New(width, height, NativeImage::COLOR_DEPTH_DEFAULT);
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageSource).GetUrl().size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImage).GetUrl().size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -156,18 +156,18 @@ int UtcDaliImageConvertNativeImageSourceToUrl01(void)
   END_TEST;
 }
 
-int UtcDaliImageConvertNativeImageSourceToUrl02(void)
+int UtcDaliImageConvertNativeImageToUrl02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliImageConvertNativeImageSourceToUrl02");
+  tet_infoline("UtcDaliImageConvertNativeImageToUrl02");
 
   unsigned int width(64);
   unsigned int height(64);
   try
   {
-    NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT);
+    NativeImagePtr nativeImage = NativeImage::New(width, height, NativeImage::COLOR_DEPTH_DEFAULT);
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageSource, true).GetUrl().size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImage, true).GetUrl().size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -192,7 +192,7 @@ int UtcDaliImageConvertNativeImageInterfaceToUrl01(void)
   unsigned int height(64);
   try
   {
-    NativeImageSourceQueuePtr nativeImageQueue = NativeImageSourceQueue::New(width, height, (Dali::NativeImageSourceQueue::ColorFormat::BGR888));
+    NativeImageQueuePtr nativeImageQueue = NativeImageQueue::New(width, height, (Dali::NativeImageQueue::ColorFormat::BGR888));
 
     DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue).GetUrl().size() > 0u);
   }
@@ -219,7 +219,7 @@ int UtcDaliImageConvertNativeImageInterfaceToUrl02(void)
   unsigned int height(64);
   try
   {
-    NativeImageSourceQueuePtr nativeImageQueue = NativeImageSourceQueue::New(width, height, (Dali::NativeImageSourceQueue::ColorFormat::BGR888));
+    NativeImageQueuePtr nativeImageQueue = NativeImageQueue::New(width, height, (Dali::NativeImageQueue::ColorFormat::BGR888));
 
     DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue, true).GetUrl().size() > 0u);
   }

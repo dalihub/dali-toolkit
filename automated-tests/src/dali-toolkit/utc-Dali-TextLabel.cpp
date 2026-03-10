@@ -1710,7 +1710,7 @@ int UtcDaliToolkitTextlabelScrollingN(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK(!label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
+    DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
 
     label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, true);
     application.GetScene().Add(label);
@@ -1718,6 +1718,7 @@ int UtcDaliToolkitTextlabelScrollingN(void)
     application.SendNotification();
     application.Render();
 
+    DALI_TEST_CHECK(label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
     DALI_TEST_CHECK(label.GetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL).Get<bool>());
 
     label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, (Toolkit::TextLabel::AutoScrollStopMode::Type)2); // invalid type

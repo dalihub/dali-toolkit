@@ -557,7 +557,6 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, con
     // Set geometry and shader for npatch
     Geometry geometry = GetNPatchGeometry(brokenIndex);
     Shader   shader   = GetNPatchShader(brokenIndex);
-    renderer.RegisterVisualTransformUniform();
     renderer.SetGeometry(geometry);
     renderer.SetShader(shader);
     ApplyTextureAndUniforms(renderer, brokenIndex);
@@ -575,7 +574,6 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, con
         shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
         shader.RegisterProperty(PREMULTIPLIED_ALPHA, ALPHA_VALUE_PREMULTIPLIED);
       }
-      renderer.RegisterVisualTransformUniform();
       renderer.SetGeometry(geometry);
       renderer.SetShader(shader);
     }

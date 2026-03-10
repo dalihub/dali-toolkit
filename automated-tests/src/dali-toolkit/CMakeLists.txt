@@ -66,7 +66,6 @@ SET(TC_SOURCES
   utc-Dali-ItemLayout.cpp
   utc-Dali-ItemView.cpp
   utc-Dali-KeyboardFocusManager.cpp
-  utc-Dali-NavigationView.cpp
   utc-Dali-Popup.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
@@ -109,7 +108,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/toolkit-tts-player.cpp
-  dali-toolkit-test-utils/toolkit-native-image-source.cpp
+  dali-toolkit-test-utils/toolkit-native-image.cpp
   dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
   dali-toolkit-test-utils/toolkit-vector-image-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp

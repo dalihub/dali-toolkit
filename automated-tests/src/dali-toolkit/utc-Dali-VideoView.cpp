@@ -1049,9 +1049,9 @@ int UtcDaliVideoViewPlayWithOverlayTextureVisualSetVideoBuffer(void)
 
   Toolkit::DevelVideoView::GetMediaPlayer(videoView);
 
-  NativeImageSourcePtr nativeImageSource1 = NativeImageSource::New(16, 16, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  DALI_TEST_CHECK(nativeImageSource1);
-  DevelVideoView::SetVideoFrameBuffer(videoView, nativeImageSource1);
+  NativeImagePtr nativeImage = NativeImage::New(16, 16, NativeImage::COLOR_DEPTH_DEFAULT);
+  DALI_TEST_CHECK(nativeImage);
+  DevelVideoView::SetVideoFrameBuffer(videoView, nativeImage);
 
   VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
   DALI_TEST_EQUALS(0, signal.GetConnectionCount(), TEST_LOCATION);

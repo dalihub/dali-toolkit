@@ -839,7 +839,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
-        value = impl.mController->IsAutoScrollEnabled();
+        value = impl.IsVisible() ? impl.mController->IsAutoScrollEnabled() : impl.mLastAutoScrollEnabled;
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_STOP_MODE:
@@ -1233,6 +1233,16 @@ void TextLabel::OnInitialize()
   Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
 }
 
+bool TextLabel::IsVisible()
+{
+  if(!mIsVisibleInitialized)
+  {
+    mIsVisible            = DevelActor::IsEffectivelyVisible(Self());
+    mIsVisibleInitialized = true;
+  }
+  return mIsVisible;
+}
+
 DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
 {
   return new TextLabelAccessible(Self());
@@ -1581,8 +1591,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if(mController->IsTextElideEnabled() && mController->GetEllipsisMode() == DevelText::Ellipsize::AUTO_SCROLL)
   {
-    bool visible = DevelActor::IsEffectivelyVisible(self);
-    if(visible)
+    if(IsVisible())
     {
       bool enableAutoScroll = false;
       if(autoScrollDirection == DevelText::AutoScroll::HORIZONTAL)
@@ -2124,6 +2133,9 @@ void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
 
 void TextLabel::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
 {
+  mIsVisible            = visible;
+  mIsVisibleInitialized = true;
+
   if(visible)
   {
     mIsAsyncRenderNeeded = true;
@@ -2210,7 +2222,9 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mIsManualRendered(false),
   mManualRendered(false),
   mIsIntercepted(false),
-  mIsHasAnchors(false)
+  mIsHasAnchors(false),
+  mIsVisible(false),
+  mIsVisibleInitialized(false)
 {
   mLocale = TextAbstraction::GetLocaleFull();
 }
