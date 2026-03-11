@@ -119,20 +119,28 @@ void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
     {
       OnRefresh();
     }
-
-    if(mBlurOnce)
-    {
-      mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-      mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-      mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-
-      mVerticalBlurTask.FinishedSignal().Connect(this, &GaussianBlurEffectImpl::OnRenderFinished);
-    }
     else
     {
-      mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
-      mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
-      mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+      if(mBlurOnce)
+      {
+        mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        if(mVerticalBlurTask.FinishedSignal().Empty())
+        {
+          mVerticalBlurTask.FinishedSignal().Connect(this, &GaussianBlurEffectImpl::OnRenderFinished);
+        }
+      }
+      else
+      {
+        if(!mVerticalBlurTask.FinishedSignal().Empty())
+        {
+          mVerticalBlurTask.FinishedSignal().Disconnect(this, &GaussianBlurEffectImpl::OnRenderFinished);
+        }
+        mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+        mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+        mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+      }
     }
   }
 }
@@ -562,14 +570,17 @@ void GaussianBlurEffectImpl::DestroyRenderTasks()
 
 void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 {
-  mFinishedSignal.Emit();
+  if(DALI_LIKELY(mVerticalBlurTask == renderTask))
+  {
+    mFinishedSignal.Emit();
 
-  DestroyFrameBuffers();
-  DestroyRenderTasks();
+    DestroyFrameBuffers();
+    DestroyRenderTasks();
 
-  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
-  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
-  mInternalRoot.Unparent();
+    SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
+    SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
+    mInternalRoot.Unparent();
+  }
 }
 
 void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius()

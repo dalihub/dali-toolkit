@@ -239,10 +239,10 @@ void RenderEffectImpl::Deactivate()
 void RenderEffectImpl::Refresh()
 {
   Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] Refresh! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
   if(ownerControl)
   {
     UpdateTargetSize();
-
     if(IsActivateValid())
     {
       if(!IsActivated())
@@ -251,6 +251,7 @@ void RenderEffectImpl::Refresh()
       }
       else
       {
+        DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] OnRefresh()! [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
         OnRefresh();
       }
     }
@@ -306,24 +307,32 @@ bool RenderEffectImpl::IsActivateValid() const
 
 void RenderEffectImpl::UpdateTargetSize()
 {
-  Vector2 size = GetOwnerControl().GetProperty<Vector2>(Actor::Property::SIZE);
-  if(size == Vector2::ZERO)
+  Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
+  Vector2                size         = Vector2::ZERO;
+  if(ownerControl)
   {
-    size = GetOwnerControl().GetNaturalSize();
+    size = ownerControl.GetProperty<Vector2>(Actor::Property::SIZE);
+    if(size == Vector2::ZERO)
+    {
+      size = ownerControl.GetNaturalSize();
+    }
+
+    if(size.x < 0.0f || size.y < 0.0f)
+    {
+      size = Vector2::ZERO;
+    }
+
+    const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
+    if(static_cast<uint32_t>(size.x) > maxTextureSize || static_cast<uint32_t>(size.y) > maxTextureSize)
+    {
+      const uint32_t denominator = static_cast<uint32_t>(std::max(size.x, size.y));
+
+      size.x = (size.x * maxTextureSize / denominator);
+      size.y = (size.y * maxTextureSize / denominator);
+    }
   }
 
-  if(size == Vector2::ZERO || size.x < 0.0f || size.y < 0.0f)
-  {
-    mTargetSize = Vector2::ZERO;
-  }
-
-  const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
-  if(uint32_t(size.x) > maxTextureSize || uint32_t(size.y) > maxTextureSize)
-  {
-    uint32_t denominator = std::max(size.x, size.y);
-    size.x               = (size.x * maxTextureSize / denominator);
-    size.y               = (size.y * maxTextureSize / denominator);
-  }
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Concise, "[RenderEffect:%p] UpdateTargetSize [ID:%d][prev:%fx%f][size:%fx%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, mTargetSize.x, mTargetSize.y, size.x, size.y);
   mTargetSize = size;
 }
 
@@ -343,7 +352,7 @@ void RenderEffectImpl::OnControlInheritedVisibilityChanged(Actor actor, bool vis
 
 void RenderEffectImpl::SetCornerConstants(const Property::Map& map)
 {
-  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[BlurEffect:%p] Set corner radius constants to shader\n", this);
+  DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[RenderEffect:%p] Set corner radius constants to shader\n", this);
 
   Vector4 radius = Vector4::ZERO;
   map[Toolkit::DevelVisual::Property::CORNER_RADIUS].Get(radius);

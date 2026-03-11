@@ -46,6 +46,27 @@ class RenderEffectImpl : public BaseObject, public ConnectionTracker
 {
 public:
   /**
+   * @copydoc Dali::Toolkit::RenderEffect::Activate
+   */
+  void Activate();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Deactivate
+   */
+  void Deactivate();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::Refresh
+   */
+  void Refresh();
+
+  /**
+   * @copydoc Dali::Toolkit::RenderEffect::IsActivated
+   */
+  bool IsActivated() const;
+
+public:
+  /**
    * @brief Gets the value of render pass tag for render effects.
    * @return The render pass tag for render effects.
    */
@@ -91,27 +112,6 @@ public:
    * RenderTasks.
    */
   virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
-
-  /**
-   * @copydoc Dali::Toolkit::RenderEffect::Activate
-   */
-  void Activate();
-
-  /**
-   * @copydoc Dali::Toolkit::RenderEffect::Deactivate
-   */
-  void Deactivate();
-
-  /**
-   * @copydoc Dali::Toolkit::RenderEffect::Refresh
-   */
-  void Refresh();
-
-  /**
-   * @brief Get whether this effect activated or not.
-   * @return True if effect is activated. False otherwise.
-   */
-  bool IsActivated() const;
 
 protected:
   /**
@@ -190,7 +190,6 @@ private:
    */
   bool IsActivateValid() const;
 
-private:
   /**
    * @brief Calculates a valid target size for texture.
    * Invalid cases include: zero vector, minus numbers or large numbers(larger than the maximum).

@@ -349,6 +349,11 @@ protected: // For derived classes to call
    */
   void EmitKeyInputFocusSignal(bool focusGained);
 
+  /**
+   * @brief Refresh render effects
+   */
+  void RefreshRenderEffects();
+
 protected: // From CustomActorImpl
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
