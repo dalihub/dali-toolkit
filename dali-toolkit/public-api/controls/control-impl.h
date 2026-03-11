@@ -298,7 +298,8 @@ public:
 
   /**
    * @brief Get texture output of offscreen rendering.
-   * @note Valid only when OffScreenRenderingType::RENDER_ONCE
+   * @note Valid only if call this API inside of OffScreenRenderingFinishedSignal()
+   *       signal, and OffScreenRenderingType::RENDER_ONCE
    */
   Dali::Texture GetOffScreenRenderingOutput() const;
 

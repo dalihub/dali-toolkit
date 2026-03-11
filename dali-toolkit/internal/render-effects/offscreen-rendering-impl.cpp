@@ -190,9 +190,19 @@ void OffScreenRenderingImpl::DestroyRenderTask()
 
 void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask& task)
 {
-  mTexture = mFrameBuffer.GetColorTexture();
+  if(DALI_LIKELY(mRenderTask == task))
+  {
+    Toolkit::Control control = GetOwnerControl();
+    if(control)
+    {
+      mTexture = mFrameBuffer.GetColorTexture();
 
-  GetOwnerControl().OffScreenRenderingFinishedSignal().Emit();
+      control.OffScreenRenderingFinishedSignal().Emit(control);
+
+      // Reset texture handle after signal completed.
+      mTexture.Reset();
+    }
+  }
 }
 
 } // namespace Internal
