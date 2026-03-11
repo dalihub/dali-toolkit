@@ -202,6 +202,8 @@ void ImageView::SetImage(const Property::Map& map)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
@@ -277,6 +279,8 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
@@ -509,6 +513,9 @@ void ImageView::CreatePlaceholderImage()
   {
     mPlaceholderVisual.SetName("placeholder");
     mPlaceholderVisual.SetDepthIndex(mPlaceholderVisual.GetDepthIndex() + PLACEHOLDER_DEPTH_INDEX);
+
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(mPlaceholderVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
   }
   else
   {

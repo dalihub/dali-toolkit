@@ -138,7 +138,8 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mPixelAreaSetByFittingMode(false),
   mTransformMapSetForFittingMode(false),
   mTransformMapUsingDefault(true),
-  mTransformMapChanged(false)
+  mTransformMapChanged(false),
+  mOffscreenRenderingIgnoreCornerRadius(false)
 {
 }
 

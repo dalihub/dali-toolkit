@@ -19,7 +19,6 @@
 #include "video-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/native-image-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
@@ -32,6 +31,7 @@
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -200,6 +200,8 @@ void VideoView::SetPropertyMap(Property::Map map)
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
+      // Ignore corner radius for offscreen case.
+      Toolkit::GetImplementation(mTextureVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -822,6 +824,8 @@ void VideoView::SetNativeImageTarget()
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
+      // Ignore corner radius for offscreen case.
+      Toolkit::GetImplementation(mTextureVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -1108,6 +1112,9 @@ void VideoView::CreateOverlayTextureVisual()
     }
     Toolkit::Control control     = Toolkit::Control(GetOwner());
     ControlImpl&     controlImpl = GetImplementation(control);
+
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     Toolkit::DevelControl::RegisterVisual(controlImpl, mOverlayTextureVisualIndex, mOverlayTextureVisual);
 
     Dali::TextureSet textures = Dali::TextureSet::New();
