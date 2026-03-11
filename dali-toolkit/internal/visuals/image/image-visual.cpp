@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 
 // EXTERNAL HEADERS
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
@@ -28,7 +29,6 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <cstring> // for strlen()
 

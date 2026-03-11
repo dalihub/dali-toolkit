@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
 #include <dali/integration-api/processor-interface.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>

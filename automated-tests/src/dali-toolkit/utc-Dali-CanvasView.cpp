@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-impl.h>
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-task.h>
+#include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
 #include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/images/pixel-data.h>
 
 using namespace Dali;

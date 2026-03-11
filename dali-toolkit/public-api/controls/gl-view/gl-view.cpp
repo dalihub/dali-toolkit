@@ -22,9 +22,9 @@
 #include <dali-toolkit/internal/controls/gl-view/gl-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/graphics-backend.h>
 #include <dali/devel-api/common/addon-binder.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/graphics-backend.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dlfcn.h>
 
