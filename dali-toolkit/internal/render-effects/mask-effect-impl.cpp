@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -34,8 +35,9 @@
 
 namespace
 {
-const uint32_t        maskSourceIndex            = 0u;
-const uint32_t        maskTargetIndex            = 1u;
+constexpr uint32_t MASK_SOURCE_INDEX = 0u;
+constexpr uint32_t MASK_TARGET_INDEX = 1u;
+
 constexpr const char* UNIFORM_MASK_MODE_NAME     = "uMaskMode";
 constexpr const char* UNIFORM_MASK_POSITION_NAME = "uMaskPosition";
 constexpr const char* UNIFORM_MASK_SCALE_NAME    = "uMaskScale";
@@ -125,13 +127,29 @@ void MaskEffectImpl::SetTargetMaskOnce(bool targetMaskOnce)
   mTargetMaskOnce = targetMaskOnce;
   if(IsActivated())
   {
-    if(targetMaskOnce)
+    if(!mMaskTargetRenderTask || !mMaskTargetRenderTask.GetFrameBuffer())
     {
-      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+      OnRefresh();
     }
     else
     {
-      mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+      if(mTargetMaskOnce)
+      {
+        mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+
+        if(mMaskTargetRenderTask.FinishedSignal().Empty())
+        {
+          mMaskTargetRenderTask.FinishedSignal().Connect(this, &MaskEffectImpl::OnTargetRenderFinished);
+        }
+      }
+      else
+      {
+        if(!mMaskTargetRenderTask.FinishedSignal().Empty())
+        {
+          mMaskTargetRenderTask.FinishedSignal().Disconnect(this, &MaskEffectImpl::OnTargetRenderFinished);
+        }
+        mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+      }
     }
   }
 }
@@ -146,13 +164,28 @@ void MaskEffectImpl::SetSourceMaskOnce(bool sourceMaskOnce)
   mSourceMaskOnce = sourceMaskOnce;
   if(IsActivated())
   {
-    if(sourceMaskOnce)
+    if(!mMaskSourceRenderTask || !mMaskSourceRenderTask.GetFrameBuffer())
     {
-      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+      OnRefresh();
     }
     else
     {
-      mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+      if(mSourceMaskOnce)
+      {
+        mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+        if(mMaskSourceRenderTask.FinishedSignal().Empty())
+        {
+          mMaskSourceRenderTask.FinishedSignal().Connect(this, &MaskEffectImpl::OnSourceRenderFinished);
+        }
+      }
+      else
+      {
+        if(!mMaskSourceRenderTask.FinishedSignal().Empty())
+        {
+          mMaskSourceRenderTask.FinishedSignal().Disconnect(this, &MaskEffectImpl::OnSourceRenderFinished);
+        }
+        mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+      }
     }
   }
 }
@@ -203,7 +236,13 @@ void MaskEffectImpl::OnActivate()
 void MaskEffectImpl::OnDeactivate()
 {
   Renderer maskRenderer = GetTargetRenderer();
-  SetRendererTexture(maskRenderer, Dali::Texture());
+
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    // Remove textures from renderer.
+    auto emptyTextureSet = Dali::TextureSet::New();
+    maskRenderer.SetTextures(emptyTextureSet);
+  }
 
   Toolkit::Control control = GetOwnerControl();
   if(DALI_LIKELY(control))
@@ -225,39 +264,42 @@ void MaskEffectImpl::OnRefresh()
 
 void MaskEffectImpl::CreateMaskData()
 {
-  Toolkit::Control ownerControl = GetOwnerControl();
-  DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
-
-  Vector2 size = GetTargetSize();
-  mCamera.SetPerspectiveProjection(size);
-
-  CreateFrameBuffers(ImageDimensions(size.x, size.y));
-  CreateRenderTasks(ownerControl);
-  SetShaderConstants(ownerControl);
-
-  mMaskTargetRenderTask.SetScreenToFrameBufferMappingActor(ownerControl);
-
-  TextureSet textureSet = GetTargetRenderer().GetTextures();
-  if(textureSet)
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
-    textureSet = TextureSet::New();
-    GetTargetRenderer().SetTextures(textureSet);
-  }
+    Toolkit::Control ownerControl = GetOwnerControl();
+    DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
-  if(mReverseMaskDirection)
-  {
-    textureSet.SetTexture(maskSourceIndex, mMaskTargetTexture);
-    textureSet.SetTexture(maskTargetIndex, mMaskSourceTexture);
-  }
-  else
-  {
-    textureSet.SetTexture(maskSourceIndex, mMaskSourceTexture);
-    textureSet.SetTexture(maskTargetIndex, mMaskTargetTexture);
-  }
+    Vector2 size = GetTargetSize();
+    mCamera.SetPerspectiveProjection(size);
 
-  // Reorder render task
-  // TODO : Can we remove this GetImplementation?
-  GetImplementation(ownerControl).RequestRenderTaskReorder();
+    CreateFrameBuffers(ImageDimensions(size.x, size.y));
+    CreateRenderTasks(ownerControl);
+    SetShaderConstants(ownerControl);
+
+    mMaskTargetRenderTask.SetScreenToFrameBufferMappingActor(ownerControl);
+
+    TextureSet textureSet = GetTargetRenderer().GetTextures();
+    if(textureSet)
+    {
+      textureSet = TextureSet::New();
+      GetTargetRenderer().SetTextures(textureSet);
+    }
+
+    if(mReverseMaskDirection)
+    {
+      textureSet.SetTexture(MASK_SOURCE_INDEX, mMaskTargetTexture);
+      textureSet.SetTexture(MASK_TARGET_INDEX, mMaskSourceTexture);
+    }
+    else
+    {
+      textureSet.SetTexture(MASK_SOURCE_INDEX, mMaskSourceTexture);
+      textureSet.SetTexture(MASK_TARGET_INDEX, mMaskTargetTexture);
+    }
+
+    // Reorder render task
+    // TODO : Can we remove this GetImplementation?
+    GetImplementation(ownerControl).RequestRenderTaskReorder();
+  }
 }
 
 void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
@@ -288,6 +330,17 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   mMaskTargetRenderTask.SetClearColor(Color::TRANSPARENT);
   mMaskTargetRenderTask.SetRenderPassTag(GetRenderPassTag());
 
+  if(mTargetMaskOnce)
+  {
+    mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+
+    mMaskTargetRenderTask.FinishedSignal().Connect(this, &MaskEffectImpl::OnTargetRenderFinished);
+  }
+  else
+  {
+    mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+  }
+
   mMaskSourceRenderTask = taskList.CreateTask();
   mMaskSourceRenderTask.SetCameraActor(mCamera);
   mMaskSourceRenderTask.SetExclusive(true);
@@ -297,6 +350,17 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   mMaskSourceRenderTask.SetClearEnabled(true);
   mMaskSourceRenderTask.SetClearColor(Color::TRANSPARENT);
   mMaskSourceRenderTask.SetRenderPassTag(GetRenderPassTag());
+
+  if(mSourceMaskOnce)
+  {
+    mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ONCE);
+
+    mMaskSourceRenderTask.FinishedSignal().Connect(this, &MaskEffectImpl::OnSourceRenderFinished);
+  }
+  else
+  {
+    mMaskSourceRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
+  }
 }
 
 void MaskEffectImpl::ResetMaskData()
@@ -330,6 +394,46 @@ void MaskEffectImpl::SetShaderConstants(Toolkit::Control ownerControl)
   newMaskScale.y = 1.0f / std::max(Math::MACHINE_EPSILON_100, mMaskScale.y);
 
   ownerControl.RegisterProperty(UNIFORM_MASK_SCALE_NAME, newMaskScale);
+}
+
+void MaskEffectImpl::OnTargetRenderFinished(Dali::RenderTask& renderTask)
+{
+  if(DALI_LIKELY(mMaskTargetRenderTask == renderTask))
+  {
+    // TODO : We need to keep ownerControl as exclusive status.
+    // Need to find good way to remove render task in future.
+
+    // auto sceneHolder = GetSceneHolder();
+    // if(DALI_LIKELY(sceneHolder))
+    // {
+    //   RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+    //   taskList.RemoveTask(mMaskTargetRenderTask);
+    // }
+    // mMaskTargetRenderTask.Reset();
+    mMaskTargetRenderTask.SetFrameBuffer(FrameBuffer());
+    mMaskTargetTexture.Reset();
+    mMaskTargetFrameBuffer.Reset();
+  }
+}
+
+void MaskEffectImpl::OnSourceRenderFinished(Dali::RenderTask& renderTask)
+{
+  if(DALI_LIKELY(mMaskSourceRenderTask == renderTask))
+  {
+    // TODO : We need to keep ownerControl as exclusive status.
+    // Need to find good way to remove render task in future.
+
+    // auto sceneHolder = GetSceneHolder();
+    // if(DALI_LIKELY(sceneHolder))
+    // {
+    //   RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+    //   taskList.RemoveTask(mMaskSourceRenderTask);
+    // }
+    // mMaskSourceRenderTask.Reset();
+    mMaskSourceRenderTask.SetFrameBuffer(FrameBuffer());
+    mMaskSourceTexture.Reset();
+    mMaskSourceFrameBuffer.Reset();
+  }
 }
 
 } // namespace Internal

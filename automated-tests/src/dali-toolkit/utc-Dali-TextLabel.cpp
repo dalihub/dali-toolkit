@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2121,7 +2121,7 @@ int UtcDaliToolkitTextlabelEllipsisMode(void)
     tet_result(TET_FAIL);
   }
   DALI_TEST_CHECK(!label.GetProperty<bool>(DevelTextLabel::Property::IS_SCROLLING));
-  
+
   // Set long text to scroll.
   label.SetProperty(TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world");
   label.SetProperty(TextLabel::Property::ENABLE_AUTO_SCROLL, false);
@@ -4269,19 +4269,33 @@ int utcDaliTextLabelFontVariationsRegister(void)
 int utcDaliTextLabelSetMaskEffect(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextLabelSetMaskEffect");
+  tet_infoline(" utcDaliTextLabelSetMaskEffect01");
 
-  TextLabel label = TextLabel::New();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+
+  TextLabel label = TextLabel::New("text");
   DALI_TEST_CHECK(label);
 
   application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
 
+  // RenderEffect not activated yet.
+  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+
   // Set Mask Effect
   Control maskControl = Toolkit::Control::New();
   DevelTextLabel::SetMaskEffect(label, maskControl);
   DALI_TEST_CHECK(maskControl.GetParent() == label);
+
+  // RenderEffect activated.
+  DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
 
   // Remove Mask Effect
   DevelTextLabel::RemoveMaskEffect(label);

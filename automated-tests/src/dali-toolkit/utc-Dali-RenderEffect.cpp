@@ -278,10 +278,10 @@ int UtcDaliRenderEffectReassign(void)
   END_TEST;
 }
 
-int UtcDaliRenderEffectResize(void)
+int UtcDaliRenderEffectResize01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliRenderEffectResize");
+  tet_infoline("UtcDaliRenderEffectResize01");
 
   Dali::Integration::Scene scene   = application.GetScene();
   Control                  control = Control::New();
@@ -294,88 +294,465 @@ int UtcDaliRenderEffectResize(void)
   DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
 
   ////////////////////////////////////////////
-  tet_infoline("resize test on BackgroundBlurEffect");
-  control.SetRenderEffect(BackgroundBlurEffect::New());
+  {
+    tet_infoline("resize test on BackgroundBlurEffect");
 
-  application.SendNotification();
-  application.Render();
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New();
+    effect.SetBlurOnce(true);
+    control.SetRenderEffect(effect);
 
-  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
-  tet_infoline("size zero owner control's effect is not activated.");
+    application.SendNotification();
+    application.Render();
 
-  control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
+    control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
 
-  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+    application.SendNotification();
+    application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
-  tet_infoline("Background blur effect activated.\n");
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
-  control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect activated.\n");
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
-  tet_infoline("Background blur effect refreshed.\n");
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("Background blur effect once done. RenderTask removed.\n");
 
-  control.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+    control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
+    application.SendNotification();
+    application.Render();
 
-  DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect refreshed.\n");
 
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
-  tet_infoline("Background blur effect deactivated.\n");
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("Background blur effect once done. RenderTask removed.\n");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect deactivated.\n");
+  }
   /////////////////////////////////////////////
-  tet_infoline("resize test on GaussianBlurEffect");
-  GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
-  control.SetRenderEffect(effect);
+  {
+    tet_infoline("resize test on GaussianBlurEffect");
+    GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    effect.SetBlurOnce(true);
+    control.SetRenderEffect(effect);
 
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Blur effect activated.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Blur effect once done. RenderTask removed.\n");
+
+    DALI_TEST_EQUALS(effect.GetBlurRadius(), 20u, TEST_LOCATION);
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Blur effect refreshed.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Blur effect once done. RenderTask removed.\n");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Blur effect deactivated.\n");
+  }
+  /////////////////////////////////////////////
+  {
+    tet_infoline("resize test on MaskEffect");
+    Control source = Control::New();
+    source.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.0f));
+    source.SetBackgroundColor(Vector4(1.0f, 1.0f, 1.0f, 0.5f));
+    scene.Add(source);
+
+    MaskEffect effect = MaskEffect::New(source);
+    effect.SetTargetMaskOnce(true);
+    effect.SetSourceMaskOnce(true);
+    control.SetRenderEffect(effect);
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Mask effect activated.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Mask effect once done. RenderTask removed.\n");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Mask effect refreshed.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Mask effect once done. RenderTask removed.\n");
+
+    control.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Mask effect deactivated.\n");
+
+    source.Unparent();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRenderEffectResize02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectResize02 - Parent size changed if child use FILL_TO_PARENT");
+
+  Dali::Integration::Scene scene  = application.GetScene();
+  Control                  parent = Control::New();
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  scene.Add(parent);
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  parent.Add(control);
+
+  RenderTaskList taskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+  uint32_t count = control.GetRendererCount();
   DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
-  tet_infoline("size zero owner control's effect is not activated.");
 
-  control.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+  ////////////////////////////////////////////
+  {
+    tet_infoline("resize test on BackgroundBlurEffect");
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New();
+    effect.SetBlurOnce(true);
+    control.SetRenderEffect(effect);
 
-  DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    application.SendNotification();
+    application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
-  tet_infoline("Blur effect activated.\n");
-  DALI_TEST_EQUALS(effect.GetBlurRadius(), 20u, TEST_LOCATION);
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
 
-  control.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    parent.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
 
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
+    application.SendNotification();
+    application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
-  tet_infoline("Blur effect refreshed.\n");
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect activated.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("Background blur effect once done. RenderTask removed.\n");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect refreshed.\n");
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("Background blur effect once done. RenderTask removed.\n");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Background blur effect deactivated.\n");
+  }
+  /////////////////////////////////////////////
+  {
+    tet_infoline("resize test on GaussianBlurEffect");
+    GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    effect.SetBlurOnce(true);
+    control.SetRenderEffect(effect);
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Blur effect activated.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Blur effect once done. RenderTask removed.\n");
+
+    DALI_TEST_EQUALS(effect.GetBlurRadius(), 20u, TEST_LOCATION);
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Blur effect refreshed.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Blur effect once done. RenderTask removed.\n");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Blur effect deactivated.\n");
+  }
+  /////////////////////////////////////////////
+  {
+    tet_infoline("resize test on MaskEffect");
+    Control source = Control::New();
+    source.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.0f));
+    source.SetBackgroundColor(Vector4(1.0f, 1.0f, 1.0f, 0.5f));
+    scene.Add(source);
+
+    MaskEffect effect = MaskEffect::New(source);
+    effect.SetTargetMaskOnce(true);
+    effect.SetSourceMaskOnce(true);
+    control.SetRenderEffect(effect);
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+    tet_infoline("size zero owner control's effect is not activated.");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(30.0f, 30.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 30.0f, TEST_LOCATION);
+    tet_infoline("Mask effect activated.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Mask effect once done. RenderTask removed.\n");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
+    tet_infoline("Mask effect refreshed.\n");
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
+    tet_infoline("Mask effect once done. RenderTask removed.\n");
+
+    parent.SetProperty(Actor::Property::SIZE, Vector2(0.0f, 0.0f));
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 0.0f, TEST_LOCATION);
+    DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 0.0f, TEST_LOCATION);
+    tet_infoline("Mask effect deactivated.\n");
+
+    source.Unparent();
+  }
 
   END_TEST;
 }
@@ -1011,36 +1388,9 @@ int UtcDaliBlurEffectBlurOnce(void)
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
     effect.SetBlurOnce(true);
-    effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
-    control.SetRenderEffect(effect);
-    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
-
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-    application.Render();
-
-    RenderTaskList taskList = scene.GetRenderTaskList();
-
-    // Render effect activated.
-    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
-
+    effect.SetBlurOnce(true);
     effect.SetBlurOnce(false);
-    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
-
-    application.SendNotification(); // reordering render tasks
-
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
-    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
-    DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
-  }
-  {
-    // Add render effect during scene on.
-    GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
-    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
-
+    effect.SetBlurOnce(false);
     effect.SetBlurOnce(true);
     effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
     control.SetRenderEffect(effect);
@@ -1058,6 +1408,49 @@ int UtcDaliBlurEffectBlurOnce(void)
     // Render effect activated.
     DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
 
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(true);
+    effect.SetBlurOnce(true);
+    effect.SetBlurOnce(false);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    application.SendNotification(); // reordering render tasks
+
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    tet_printf("order : %d\n", taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex());
+    DALI_TEST_EQUALS(INT32_MIN + 2, taskList.GetTask(taskList.GetTaskCount() - 1).GetOrderIndex(), TEST_LOCATION);
+  }
+  {
+    // Add render effect during scene on.
+    GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    effect.SetBlurOnce(true);
+    effect.SetBlurOnce(true);
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(true);
+    effect.FinishedSignal().Connect(&application, &BlurRenderingFinishedCallback);
+    control.SetRenderEffect(effect);
+    DALI_TEST_EQUALS(effect.GetBlurOnce(), true, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    RenderTaskList taskList = scene.GetRenderTaskList();
+
+    // Render effect activated.
+    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(false);
+    effect.SetBlurOnce(true);
+    effect.SetBlurOnce(true);
     effect.SetBlurOnce(false);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
@@ -1339,13 +1732,17 @@ int UtcDaliMaskEffectMaskOnce(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliMaskEffectMaskOnce");
 
-  Dali::Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
   scene.Add(control);
+
+  application.SendNotification();
+  application.Render();
 
   {
     // Add mask effect before activated.
@@ -1356,14 +1753,32 @@ int UtcDaliMaskEffectMaskOnce(void)
     scene.Add(maskControl);
 
     MaskEffect maskEffect = MaskEffect::New(maskControl);
+
+    DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), false, TEST_LOCATION);
+    DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), false, TEST_LOCATION);
+
     maskEffect.SetTargetMaskOnce(true);
+    DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), true, TEST_LOCATION);
+
     maskEffect.SetSourceMaskOnce(true);
+    DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), true, TEST_LOCATION);
 
     control.SetRenderEffect(maskEffect);
 
     // send notification.
     application.SendNotification();
     application.Render();
+
+    // Render effect activated.
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // Remove tasks after render completed
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
 
     DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), true, TEST_LOCATION);
     DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), true, TEST_LOCATION);
@@ -1379,6 +1794,9 @@ int UtcDaliMaskEffectMaskOnce(void)
 
     scene.Add(maskControl);
 
+    application.SendNotification();
+    application.Render();
+
     MaskEffect maskEffect = MaskEffect::New(maskControl);
     maskEffect.SetTargetMaskOnce(true);
     maskEffect.SetSourceMaskOnce(true);
@@ -1388,20 +1806,99 @@ int UtcDaliMaskEffectMaskOnce(void)
     application.SendNotification();
     application.Render();
 
+    // Render effect activated.
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // Remove tasks after render completed
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+
     maskEffect.SetTargetMaskOnce(false);
+    maskEffect.SetTargetMaskOnce(false);
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetTargetMaskOnce(false);
+
+    application.SendNotification();
+    application.Render();
+
+    // Render effect re-activated.
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // Remove 1 task after render completed
+    // DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+
+    maskEffect.SetSourceMaskOnce(false);
+    maskEffect.SetSourceMaskOnce(false);
+    maskEffect.SetSourceMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(true);
     maskEffect.SetSourceMaskOnce(false);
 
     application.SendNotification();
     application.Render();
 
+    // Render effect re-activated.
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
     DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), false, TEST_LOCATION);
     DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), false, TEST_LOCATION);
 
     maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetTargetMaskOnce(true);
+    maskEffect.SetTargetMaskOnce(false);
+    maskEffect.SetTargetMaskOnce(false);
+    maskEffect.SetTargetMaskOnce(true);
+
+    application.SendNotification();
+    application.Render();
+
+    // Render effect re-activated.
+    DALI_TEST_EQUALS(3u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // Remove 1 task after render completed
+    // DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+
+    maskEffect.SetSourceMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(true);
+    maskEffect.SetSourceMaskOnce(false);
+    maskEffect.SetSourceMaskOnce(false);
     maskEffect.SetSourceMaskOnce(true);
 
     application.SendNotification();
     application.Render();
+
+    // Render effect re-activated.
+    // Note : Target rendertask didn't revive for this case. Keep render task count as 2
+    // DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    // Remove tasks after render completed
+    // DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION); ///< TODO : How can we check the task stopped?
 
     DALI_TEST_EQUALS(maskEffect.GetTargetMaskOnce(), true, TEST_LOCATION);
     DALI_TEST_EQUALS(maskEffect.GetSourceMaskOnce(), true, TEST_LOCATION);

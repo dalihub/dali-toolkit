@@ -477,6 +477,18 @@ bool Control::EmitKeyEventSignal(const KeyEvent& event)
   return consumed;
 }
 
+void Control::RefreshRenderEffects()
+{
+  if(mImpl->mRenderEffect)
+  {
+    mImpl->mRenderEffect->Refresh();
+  }
+  if(mImpl->mOffScreenRenderingImpl)
+  {
+    mImpl->mOffScreenRenderingImpl->Refresh();
+  }
+}
+
 Dali::Texture Control::GetOffScreenRenderingOutput() const
 {
   if(mImpl->mOffScreenRenderingType != DevelControl::OffScreenRenderingType::REFRESH_ONCE)
@@ -703,15 +715,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
   mImpl->RegisterProcessorOnce();
 
   // Refresh render effects
-  if(mImpl->mRenderEffect)
-  {
-    mImpl->mRenderEffect->Refresh();
-  }
-
-  if(mImpl->mOffScreenRenderingImpl)
-  {
-    mImpl->mOffScreenRenderingImpl->Refresh();
-  }
+  RefreshRenderEffects();
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
