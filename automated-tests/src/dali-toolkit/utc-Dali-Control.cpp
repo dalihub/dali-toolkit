@@ -1659,12 +1659,25 @@ int UtcDaliControlOffScreenRenderingSizeSet(void)
   END_TEST;
 }
 
+namespace
+{
+Dali::Texture gOffscreenRenderingOutput;
+void          OnOffscreenRenderingFinished(Toolkit::Control control)
+{
+  tet_printf("Signal emitted\n");
+  gOffscreenRenderingOutput = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+}
+} //namespace
+
 int UtcDaliControlOffScreenRenderingGetOutput(void)
 {
   ToolkitTestApplication application;
 
+  gOffscreenRenderingOutput.Reset();
+
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  control.OffScreenRenderingFinishedSignal().Connect(OnOffscreenRenderingFinished);
   application.GetScene().Add(control);
 
   control.SetBackgroundColor(Color::RED);
@@ -1674,11 +1687,9 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   application.Render();
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails
+  DALI_TEST_CHECK(!gOffscreenRenderingOutput); //fails
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
-  control.OffScreenRenderingFinishedSignal().Connect([]() -> void
-  { tet_printf("Signal emitted\n"); });
 
   DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
 
@@ -1688,8 +1699,9 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   application.Render();
   application.SendNotification();
   application.Render();
+  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails. We don't allow to get texture out of callback.
 
-  Dali::Texture texture = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+  Dali::Texture texture = std::move(gOffscreenRenderingOutput);
   DALI_TEST_EQUALS(texture.GetHeight(), 50.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(texture.GetWidth(), 50.0f, TEST_LOCATION);
 
