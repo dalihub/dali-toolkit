@@ -801,7 +801,7 @@ void TableView::OnSizeSet(const Vector3& size)
   mRowDirty = mColumnDirty = true;
   RelayoutRequest();
 
-  Control::OnSizeSet(size);
+  ControlImpl::OnSizeSet(size);
 }
 
 void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -1087,7 +1087,7 @@ void TableView::OnChildAdd(Actor& child)
     }
   }
 
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void TableView::OnChildRemove(Actor& child)
@@ -1102,11 +1102,11 @@ void TableView::OnChildRemove(Actor& child)
     }
   }
 
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 TableView::TableView(unsigned int initialRows, unsigned int initialColumns)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mCellData(initialRows, initialColumns),
   mPreviousFocusedActor(),
   mLayoutingChild(false),
@@ -1475,8 +1475,8 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
         Toolkit::Control control = Toolkit::Control::DownCast(previousFocusedActor);
         if(control)
         {
-          Internal::Control& controlImpl = static_cast<Internal::Control&>(control.GetImplementation());
-          wasFocusedOnLayoutContainer    = controlImpl.IsKeyboardFocusGroup();
+          ControlImpl& controlImpl    = static_cast<ControlImpl&>(control.GetImplementation());
+          wasFocusedOnLayoutContainer = controlImpl.IsKeyboardFocusGroup();
         }
       }
 
@@ -1555,7 +1555,7 @@ float TableView::CalculateChildSize(const Actor& child, Dimension::Type dimensio
 
 bool TableView::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
-  if(Control::RelayoutDependentOnChildren(dimension))
+  if(ControlImpl::RelayoutDependentOnChildren(dimension))
   {
     return true;
   }

@@ -48,7 +48,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
+class TextField : public ControlImpl, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
 {
 public:
   /**

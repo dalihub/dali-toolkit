@@ -183,7 +183,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"VARIABLE", "FIXED"};
 } // namespace
 
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mIndicatorShowAlpha(1.0f),
   mDirection(direction),
   mScrollableObject(WeakHandle<Handle>()),
@@ -546,7 +546,7 @@ void ScrollBar::OnSizeSet(const Vector3& size)
     mIndicator.SetProperty(Actor::Property::SIZE, Vector2(size.width, mIndicatorFixedHeight));
   }
 
-  Control::OnSizeSet(size);
+  ControlImpl::OnSizeSet(size);
 }
 
 void ScrollBar::SetScrollDirection(Toolkit::ScrollBar::Direction direction)

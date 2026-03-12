@@ -716,8 +716,8 @@ int UtcDaliVideoViewCustomShader(void)
   application.Render();
 
   /* get visual */
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(view);
-  Visual::Base                visual      = DevelControl::GetVisual(controlImpl, VideoView::Property::TEXTURE);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(view);
+  Visual::Base          visual      = DevelControl::GetVisual(controlImpl, VideoView::Property::TEXTURE);
   DALI_TEST_CHECK(visual);
   Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
   Shader                           shader     = visualImpl.GetRenderer().GetShader();

@@ -591,7 +591,7 @@ void TextField::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
   }
 
   // Up call to Control
-  Control::OnStyleChange(styleManager, change);
+  ControlImpl::OnStyleChange(styleManager, change);
 }
 
 void TextField::OnApplyDefaultStyle()
@@ -658,7 +658,7 @@ void TextField::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       else
       {
-        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+        ControlImpl::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
       }
       break;
     }
@@ -1131,7 +1131,7 @@ void TextField::EnableClipping()
   if(!mStencil)
   {
     // Creates an extra control to be used as stencil buffer.
-    mStencil = Control::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+    mStencil = ControlImpl::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
     mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
     mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
@@ -1185,8 +1185,8 @@ void TextField::OnSceneConnection(int depth)
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 
-  // Call the Control::OnSceneConnection() to set the depth of the background.
-  Control::OnSceneConnection(depth);
+  // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
+  ControlImpl::OnSceneConnection(depth);
 }
 
 bool TextField::OnTouched(Actor actor, const TouchEvent& touch)
@@ -1205,7 +1205,7 @@ void TextField::OnLocaleChanged(std::string locale)
 }
 
 TextField::TextField(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mAlignmentOffset(0.f),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),

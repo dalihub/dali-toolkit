@@ -85,7 +85,7 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New(const std::string& typeName, C
 }
 
 ControlWrapper::ControlWrapper(CustomControlBehaviour behaviourFlags)
-: Control(static_cast<ControlBehaviour>(behaviourFlags | DISABLE_STYLE_CHANGE_SIGNALS))
+: ControlImpl(static_cast<ControlBehaviour>(behaviourFlags | DISABLE_STYLE_CHANGE_SIGNALS))
 {
 }
 
@@ -184,7 +184,7 @@ Dali::TypeInfo ControlWrapper::GetTypeInfo()
 
 void ControlWrapper::EmitKeyInputFocusSignal(bool focusGained)
 {
-  Control::EmitKeyInputFocusSignal(focusGained);
+  ControlImpl::EmitKeyInputFocusSignal(focusGained);
 }
 
 } // namespace Internal

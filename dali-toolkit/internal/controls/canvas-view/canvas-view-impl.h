@@ -41,7 +41,7 @@ namespace Internal
 class CanvasView;
 class CanvasViewRasterizeThread;
 
-class CanvasView : public Control, public Dali::Integration::Processor
+class CanvasView : public ControlImpl, public Dali::Integration::Processor
 {
 public:
   /**
@@ -72,7 +72,7 @@ public:
    * @param[in] propertyIndex The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value);
+  static void SetProperty(BaseObject* object, Dali::Property::Index propertyIndex, const Dali::Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -80,7 +80,7 @@ public:
    * @param[in] propertyIndex The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
+  static Property::Value GetProperty(BaseObject* object, Dali::Property::Index propertyIndex);
 
   /**
    * @copydoc Toolkit::Control::CanvasView::RemoveDrawable

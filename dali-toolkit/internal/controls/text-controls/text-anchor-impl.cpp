@@ -161,7 +161,7 @@ DevelControl::ControlAccessible* TextAnchor::CreateAccessibleObject()
 }
 
 TextAnchor::TextAnchor()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mStartCharacterIndex(0),
   mEndCharacterIndex(0),
   mUri()

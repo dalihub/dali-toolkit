@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_ACCESSIBILITY_DATA_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,16 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit
 {
 // private inner class
-class Control::Impl::AccessibilityData : public ConnectionTracker
+class ControlImpl::Impl::AccessibilityData : public ConnectionTracker
 {
   friend class Toolkit::DevelControl::ControlAccessible;
 
 public:
   // Constructor
-  AccessibilityData(Control& controlImpl);
+  AccessibilityData(ControlImpl& controlImpl);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::AppendAccessibilityAttribute()
@@ -130,7 +126,7 @@ public:
   struct AccessibilityProps
   {
     AccessibilityProps()
-    : isHighlightable(TriStateProperty::AUTO),
+    : isHighlightable(Internal::TriStateProperty::AUTO),
       isHidden(false),
       isScrollable(false),
       isModal(false)
@@ -149,10 +145,10 @@ public:
     std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations{};
     Property::Map                                                                     extraAttributes{};
 
-    TriStateProperty isHighlightable : 3;
-    bool             isHidden : 1;
-    bool             isScrollable : 1;
-    bool             isModal : 1;
+    Internal::TriStateProperty isHighlightable : 3;
+    bool                       isHidden : 1;
+    bool                       isScrollable : 1;
+    bool                       isModal : 1;
   } mAccessibilityProps;
 
 private:
@@ -160,12 +156,10 @@ private:
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 
-  Control& mControlImpl;
+  ControlImpl& mControlImpl;
 
   bool mIsAccessibilityPositionPropertyNotificationSet : 1;
   bool mIsAccessibilityPropertySetSignalRegistered : 1;
 };
-} // namespace Internal
-} // namespace Toolkit
-} // namespace Dali
+} // namespace Dali::Toolkit
 #endif // DALI_TOOLKIT_CONTROL_ACCESSIBILITY_DATA_H

@@ -34,7 +34,7 @@ class ImageView;
 
 namespace Internal
 {
-class ImageView : public Control
+class ImageView : public ControlImpl
 {
 protected:
   /**

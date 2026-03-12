@@ -94,7 +94,7 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control(ControlBehaviour()),
+: ControlImpl(ControlBehaviour()),
   mCustomSlot1Called(false)
 {
 }
@@ -294,13 +294,13 @@ void Impl::DummyControl::OnLongPress(const LongPressGesture& longPress)
 }
 void Impl::DummyControl::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
   stageConnectionCalled = true;
 }
 void Impl::DummyControl::OnSceneDisconnection()
 {
   stageDisconnectionCalled = true;
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 void Impl::DummyControl::OnChildAdd(Actor& child)
 {
@@ -312,12 +312,12 @@ void Impl::DummyControl::OnChildRemove(Actor& child)
 }
 void Impl::DummyControl::OnSizeSet(const Vector3& targetSize)
 {
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
   sizeSetCalled = true;
 }
 void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
-  Control::OnSizeAnimation(animation, targetSize);
+  ControlImpl::OnSizeAnimation(animation, targetSize);
   sizeAnimationCalled = true;
 }
 bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event)

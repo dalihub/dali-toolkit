@@ -48,7 +48,7 @@ namespace Internal
  * Padding and struts take size precedence over visuals when available space is limited.
  * Icon/Foreground visuals take size precedence over Labels when available space is limited.
  */
-class Button : public Control
+class Button : public ControlImpl
 {
 public:
   /**
@@ -379,7 +379,7 @@ private:
   /**
    * @copydoc Control::OnTap
    */
-  using Control::OnTap;
+  using ControlImpl::OnTap;
 
   /**
    * Sets up the autorepeating timer.

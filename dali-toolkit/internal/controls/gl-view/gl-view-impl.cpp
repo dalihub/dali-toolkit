@@ -180,7 +180,7 @@ void GlView::OnInitialize()
 
 void GlView::OnSizeSet(const Vector3& targetSize)
 {
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 
   if(mRenderThread)
   {
@@ -228,12 +228,12 @@ void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible
 
 void GlView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void GlView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 Dali::Geometry GlView::CreateTexturedQuad()

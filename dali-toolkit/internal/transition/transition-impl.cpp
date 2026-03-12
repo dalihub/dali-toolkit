@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,8 +152,8 @@ void Transition::OnPlay()
   mOriginalVisualProperties.clear();
   std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>> destinationVisualProperties;
   Dali::Toolkit::Control                                             targetControl   = GetTargetControl();
-  Internal::Control&                                                 internalControl = Toolkit::Internal::GetImplementation(targetControl);
-  Internal::Control::Impl&                                           controlDataImpl = Toolkit::Internal::Control::Impl::Get(internalControl);
+  ControlImpl&                                                       internalControl = Toolkit::GetImplementation(targetControl);
+  ControlImpl::Impl&                                                 controlDataImpl = Toolkit::ControlImpl::Impl::Get(internalControl);
   controlDataImpl.CreateTransitions(mOriginalVisualProperties, destinationVisualProperties, sourceControl, destinationControl);
 
   for(uint32_t index = 0; index < mOriginalVisualProperties.size(); ++index)
@@ -196,9 +196,9 @@ void Transition::OnFinished()
     }
     resetAnimation.Play();
 
-    Dali::Toolkit::Control   targetControl   = GetTargetControl();
-    Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(targetControl);
-    Internal::Control::Impl& controlDataImpl = Toolkit::Internal::Control::Impl::Get(internalControl);
+    Dali::Toolkit::Control targetControl   = GetTargetControl();
+    ControlImpl&           internalControl = Toolkit::GetImplementation(targetControl);
+    ControlImpl::Impl&     controlDataImpl = Toolkit::ControlImpl::Impl::Get(internalControl);
     controlDataImpl.UpdateVisualProperties(mOriginalVisualProperties);
   }
 

@@ -1135,9 +1135,9 @@ void ResourceReadySignal(Control control)
 void OnResourceReadySyncSVGLoading02(Control control)
 {
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1196,8 +1196,8 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 {
   ToolkitTestApplication application;
 
-  ImageView                   imageView   = ImageView::New();
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
+  ImageView             imageView   = ImageView::New();
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
 
   application.GetScene().Add(imageView);
 
@@ -1635,9 +1635,9 @@ int UtcDaliImageViewPaddingProperty(void)
   DALI_TEST_EQUALS(childImage.GetProperty<Vector3>(Dali::Actor::Property::POSITION), Vector3(15, 5, 0), TEST_LOCATION);
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1674,9 +1674,9 @@ int UtcDaliImageViewPaddingProperty02(void)
   DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1722,9 +1722,9 @@ int UtcDaliImageViewPaddingProperty03(void)
   application.Render();
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1770,9 +1770,9 @@ int UtcDaliImageViewPaddingProperty04(void)
   application.Render();
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1813,9 +1813,9 @@ int UtcDaliImageViewTransformTest01(void)
   application.Render();
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-  Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-  Property::Map               resultMap;
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+  Property::Map         resultMap;
   imageVisual.CreatePropertyMap(resultMap);
 
   Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);
@@ -1850,7 +1850,7 @@ int UtcDaliImageViewFillMode(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -1892,7 +1892,7 @@ int UtcDaliImageViewFittingModeFitKeepAspectRatio(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -1939,7 +1939,7 @@ int UtcDaliImageViewFittingModesFill(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -1985,7 +1985,7 @@ int UtcDaliImageViewFittingModesOverfitKeepAspectRatio(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2032,7 +2032,7 @@ int UtcDaliImageViewFittingModesCenter01(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2078,7 +2078,7 @@ int UtcDaliImageViewFittingModesCenter02(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2123,7 +2123,7 @@ int UtcDaliImageViewFittingModesFitHeight01(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2172,7 +2172,7 @@ int UtcDaliImageViewFittingModesFitHeight02(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2217,7 +2217,7 @@ int UtcDaliImageViewFittingModesFitWidth01(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2266,7 +2266,7 @@ int UtcDaliImageViewFittingModesFitWidth02(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2313,7 +2313,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2352,7 +2352,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   application.Render();
 
   returnedMap.Clear();
-  visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
 
   visual.CreatePropertyMap(returnedMap);
 
@@ -2389,7 +2389,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   application.Render();
 
   returnedMap.Clear();
-  visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   visual.CreatePropertyMap(returnedMap);
 
   value = returnedMap.Find(Toolkit::Visual::Property::TRANSFORM);
@@ -2435,7 +2435,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2474,7 +2474,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   application.Render();
 
   returnedMap.Clear();
-  visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
 
   visual.CreatePropertyMap(returnedMap);
 
@@ -2511,7 +2511,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   application.Render();
 
   returnedMap.Clear();
-  visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   visual.CreatePropertyMap(returnedMap);
 
   value = returnedMap.Find(Toolkit::Visual::Property::TRANSFORM);
@@ -2554,7 +2554,7 @@ int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::Internal::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(Toolkit::GetImplementation(imageView), Toolkit::ImageView::Property::IMAGE);
   Property::Map         returnedMap;
   visual.CreatePropertyMap(returnedMap);
 
@@ -2995,9 +2995,9 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     application.Render();
 
     // Check whether Image Visual transforms on ImageView::OnRelayout()
-    Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(imageView);
-    Toolkit::Visual::Base       imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
-    Property::Map               resultMap;
+    Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
+    Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(controlImpl, ImageView::Property::IMAGE);
+    Property::Map         resultMap;
     imageVisual.CreatePropertyMap(resultMap);
 
     Property::Value* transformValue = resultMap.Find(Visual::Property::TRANSFORM);

@@ -913,7 +913,7 @@ int UtcDaliTableViewKeyboardFocus(void)
   application.SendNotification();
   application.Render();
 
-  Actor firstFocusActor = Toolkit::Internal::GetImplementation(tableView).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, true);
+  Actor firstFocusActor = Toolkit::GetImplementation(tableView).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, true);
   DALI_TEST_CHECK(firstFocusActor);
   DALI_TEST_CHECK(firstFocusActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "0-0");
 
@@ -1018,7 +1018,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
   application.SendNotification();
   application.Render();
 
-  Actor firstFocusActor = Toolkit::Internal::GetImplementation(tableView).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, true);
+  Actor firstFocusActor = Toolkit::GetImplementation(tableView).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, true);
   DALI_TEST_CHECK(firstFocusActor);
   DALI_TEST_CHECK(firstFocusActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "0-0");
 

@@ -217,7 +217,7 @@ void ResetResourceTask(IntrusivePtr<AsyncTask>&& asyncTask)
 } // anonymous namespace
 
 Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
-: Control(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),
@@ -890,7 +890,7 @@ void Model::OnSceneConnection(int depth)
 
   mSizeNotification = Self().AddPropertyNotification(Actor::Property::SIZE, StepCondition(SIZE_STEP_CONDITION));
   mSizeNotification.NotifySignal().Connect(this, &Model::OnSizeNotification);
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void Model::OnSceneDisconnection()
@@ -909,7 +909,7 @@ void Model::OnSceneDisconnection()
   Self().RemovePropertyNotification(mSizeNotification);
   mSizeNotification.Reset();
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void Model::OnSizeSet(const Vector3& size)
@@ -932,19 +932,19 @@ float Model::GetHeightForWidth(float width)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
+  return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
 float Model::GetWidthForHeight(float height)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetWidthForHeight(height) + padding.start + padding.end;
+  return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
 }
 
 void Model::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  Control::OnRelayout(size, container);
+  ControlImpl::OnRelayout(size, container);
   ScaleModel(false);
 }
 
@@ -1205,7 +1205,7 @@ void Model::NotifyResourceReady()
   {
     return;
   }
-  Control::SetResourceReady();
+  ControlImpl::SetResourceReady();
 }
 
 void Model::CreateModel()

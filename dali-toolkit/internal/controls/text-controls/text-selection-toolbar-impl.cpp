@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,7 +376,7 @@ const Vector2& TextSelectionToolbar::GetScrollBarPadding() const
 }
 
 TextSelectionToolbar::TextSelectionToolbar()
-: Control(ControlBehaviour(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))),
+: ControlImpl(ControlBehaviour(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))),
   mMaxSize(),
   mScrollBarPadding(DEFAULT_SCROLL_BAR_PADDING),
   mIndexInTable(0),

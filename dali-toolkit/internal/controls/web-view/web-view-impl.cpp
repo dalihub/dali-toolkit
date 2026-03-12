@@ -174,7 +174,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 } // namespace
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -198,7 +198,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 }
 
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -1153,13 +1153,13 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
 
 void WebView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
   EnableBlendMode(!mVideoHoleEnabled);
 }
 
 void WebView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)

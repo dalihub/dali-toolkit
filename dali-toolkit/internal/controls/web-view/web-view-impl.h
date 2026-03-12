@@ -44,7 +44,7 @@ class WebView;
 
 namespace Internal
 {
-class WebView : public Control
+class WebView : public ControlImpl
 {
 protected:
   WebView();

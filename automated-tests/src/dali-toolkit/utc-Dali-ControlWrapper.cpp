@@ -113,7 +113,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
     OnInitialize(name);
   }
 
-  using Control::OnInitialize; ///< To tell the compiler that we really do want to overload OnInitialize in this class & were not trying to override it
+  using ControlImpl::OnInitialize; ///< To tell the compiler that we really do want to overload OnInitialize in this class & were not trying to override it
   virtual void OnInitialize(const char* name)
   {
   }
@@ -122,33 +122,33 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   virtual void OnSceneConnection(int depth)
   {
     mDepth = depth;
-    Control::OnSceneConnection(depth);
+    ControlImpl::OnSceneConnection(depth);
   }
   virtual void OnSceneDisconnection()
   {
-    Control::OnSceneDisconnection();
+    ControlImpl::OnSceneDisconnection();
   }
   virtual void OnChildAdd(Actor& child)
   {
-    Control::OnChildAdd(child);
+    ControlImpl::OnChildAdd(child);
   }
   virtual void OnChildRemove(Actor& child)
   {
-    Control::OnChildRemove(child);
+    ControlImpl::OnChildRemove(child);
   }
   virtual void OnPropertySet(Property::Index index, const Property::Value& propertyValue)
   {
-    Control::OnPropertySet(index, propertyValue);
+    ControlImpl::OnPropertySet(index, propertyValue);
   }
   virtual void OnSizeSet(const Vector3& targetSize)
   {
     mSizeSet = targetSize;
-    Control::OnSizeSet(targetSize);
+    ControlImpl::OnSizeSet(targetSize);
   }
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   {
     mTargetSize = targetSize;
-    Control::OnSizeAnimation(animation, targetSize);
+    ControlImpl::OnSizeAnimation(animation, targetSize);
   }
   virtual bool OnHoverEvent(const HoverEvent& event)
   {

@@ -327,7 +327,7 @@ int UtcDaliControlGetImplementationN(void)
   {
     try
     {
-      Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+      Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -348,8 +348,8 @@ int UtcDaliControlGetImplementationConstN(void)
   {
     try
     {
-      const DummyControl                constControl(control);
-      const Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(constControl);
+      const DummyControl          constControl(control);
+      const Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(constControl);
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -370,7 +370,7 @@ int UtcDaliControlGetImplementationP(void)
   {
     try
     {
-      Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+      Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }
@@ -390,8 +390,8 @@ int UtcDaliControlGetImplementationConstP(void)
   {
     try
     {
-      const DummyControl                constControl(control);
-      const Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(constControl);
+      const DummyControl          constControl(control);
+      const Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(constControl);
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }
@@ -412,8 +412,8 @@ int UtcDaliControlSignalConnectDisconnect(void)
 
     Actor actor = Actor::New();
     DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION);
-    Toolkit::Internal::Control& control   = Toolkit::Internal::GetImplementation(dummy);
-    DummyControlImpl*           dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
+    Toolkit::ControlImpl& control   = Toolkit::GetImplementation(dummy);
+    DummyControlImpl*     dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
 
     if(dummyImpl == NULL)
     {
@@ -445,9 +445,9 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
   Actor actor = Actor::New();
 
   {
-    DummyControl                dummy     = DummyControlImpl::New();
-    Toolkit::Internal::Control& control   = Toolkit::Internal::GetImplementation(dummy);
-    DummyControlImpl*           dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
+    DummyControl          dummy     = DummyControlImpl::New();
+    Toolkit::ControlImpl& control   = Toolkit::GetImplementation(dummy);
+    DummyControlImpl*     dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
 
     if(dummyImpl == NULL)
     {
@@ -873,7 +873,7 @@ int UtcDaliControlImplGetControlExtensionP(void)
   ToolkitTestApplication application;
   Control                control = Control::New();
 
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
 
   DALI_TEST_CHECK(NULL == controlImpl.GetControlExtension());
 
@@ -1667,7 +1667,7 @@ Dali::Texture gOffscreenRenderingOutput;
 void          OnOffscreenRenderingFinished(Toolkit::Control control)
 {
   tet_printf("Signal emitted\n");
-  gOffscreenRenderingOutput = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+  gOffscreenRenderingOutput = Toolkit::GetImplementation(control).GetOffScreenRenderingOutput();
 }
 } //namespace
 
@@ -1701,7 +1701,7 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   application.Render();
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails. We don't allow to get texture out of callback.
+  DALI_TEST_CHECK(!Toolkit::GetImplementation(control).GetOffScreenRenderingOutput()); //fails. We don't allow to get texture out of callback.
 
   Dali::Texture texture = std::move(gOffscreenRenderingOutput);
   DALI_TEST_EQUALS(texture.GetHeight(), 50.0f, TEST_LOCATION);
@@ -2564,7 +2564,7 @@ int UtcDaliControlEnableCornerPropertiesOverriddenWithCustomConstraintP(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Property::Map          visualMap;
@@ -2616,7 +2616,7 @@ int UtcDaliControlEnableCornerPropertiesOverriddenDisableN(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Property::Map          visualMap;
@@ -2674,7 +2674,7 @@ int UtcDaliControlCornerPropertiesWithAnimationBindingP(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
 
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Property::Map          visualMap1, visualMap2;
@@ -2768,7 +2768,7 @@ int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
     application.SendNotification();
     application.Render();
 
-    Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(control);
+    Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(control);
 
     // Create a visual and register it
     Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();

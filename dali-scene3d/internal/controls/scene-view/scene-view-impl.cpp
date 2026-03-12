@@ -339,7 +339,7 @@ void ConvertFovFromHorizontalToVertical(float aspect, float& fov)
 } // anonymous namespace
 
 SceneView::SceneView()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mWindowOrientation(DEFAULT_ORIENTATION),
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
@@ -638,7 +638,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
   // If diffuse and specular textures are already loaded, emits resource ready signal here.
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1222,7 +1222,7 @@ void SceneView::OnSceneConnection(int depth)
 
   // On-screen / Off-screen window
   Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  mSceneHolder = sceneHolder;
+  mSceneHolder                               = sceneHolder;
   if(mSceneHolder.GetHandle())
   {
     RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
@@ -1243,7 +1243,7 @@ void SceneView::OnSceneConnection(int depth)
     UpdateCamera(selectedCamera);
   }
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void SceneView::OnSceneDisconnection()
@@ -1301,7 +1301,7 @@ void SceneView::OnSceneDisconnection()
     ResetTransition();
   }
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void SceneView::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
@@ -1349,32 +1349,32 @@ void SceneView::OnChildAdd(Actor& child)
   {
     mRootLayer.Add(child);
   }
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void SceneView::OnChildRemove(Actor& child)
 {
   mRootLayer.Remove(child);
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 float SceneView::GetHeightForWidth(float width)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
+  return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
 float SceneView::GetWidthForHeight(float height)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetWidthForHeight(height) + padding.start + padding.end;
+  return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
 }
 
 void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  Control::OnRelayout(size, container);
+  ControlImpl::OnRelayout(size, container);
   // Change canvas size of camera actor.
   UpdateRenderTask();
 }
@@ -1575,7 +1575,7 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1617,7 +1617,7 @@ void SceneView::OnSkyboxLoadComplete()
 
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1649,7 +1649,7 @@ void SceneView::OnIblLoadComplete()
   NotifyImageBasedLightTextureChange();
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 

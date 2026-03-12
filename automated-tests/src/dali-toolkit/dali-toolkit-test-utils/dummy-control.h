@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_CONTROL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,10 +76,10 @@ public: // Not intended for application developers
 };
 
 /**
- * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
- * This class does not override any of Internal::Control's behaviour.
+ * Cannot create an instance of ControlImpl, so use this dummy class for the implementation.
+ * This class does not override any of ControlImpl's behaviour.
  */
-class DummyControlImpl : public Toolkit::Internal::Control
+class DummyControlImpl : public Toolkit::ControlImpl
 {
 public:
   static DummyControl New();
@@ -87,27 +87,27 @@ public:
 public:
   inline void EnableGestureDetection(GestureType::Value type)
   {
-    Internal::Control::EnableGestureDetection(type);
+    ControlImpl::EnableGestureDetection(type);
   }
   inline void DisableGestureDetection(GestureType::Value type)
   {
-    Internal::Control::DisableGestureDetection(type);
+    ControlImpl::DisableGestureDetection(type);
   }
   inline PinchGestureDetector GetPinchGestureDetector() const
   {
-    return Internal::Control::GetPinchGestureDetector();
+    return ControlImpl::GetPinchGestureDetector();
   }
   inline PanGestureDetector GetPanGestureDetector() const
   {
-    return Internal::Control::GetPanGestureDetector();
+    return ControlImpl::GetPanGestureDetector();
   }
   inline TapGestureDetector GetTapGestureDetector() const
   {
-    return Internal::Control::GetTapGestureDetector();
+    return ControlImpl::GetTapGestureDetector();
   }
   inline LongPressGestureDetector GetLongPressGestureDetector() const
   {
-    return Internal::Control::GetLongPressGestureDetector();
+    return ControlImpl::GetLongPressGestureDetector();
   }
 
   void                  RegisterVisual(Property::Index index, Toolkit::Visual::Base visual);
@@ -141,8 +141,8 @@ protected:
 namespace Impl
 {
 /**
- * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
- * This class DOES override Internal::Control's behaviour.
+ * Cannot create an instance of ControlImpl, so use this dummy class for the implementation.
+ * This class DOES override ControlImpl's behaviour.
  */
 class DummyControl : public Toolkit::DummyControlImpl
 {
@@ -160,7 +160,7 @@ private:
 
   ~DummyControl() override;
 
-private: // From Internal::Control
+private: // From ControlImpl
   void OnInitialize() override;
   bool OnAccessibilityActivated() override;
   bool OnAccessibilityValueChange(bool isIncrease) override;

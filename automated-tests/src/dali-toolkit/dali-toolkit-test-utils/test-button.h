@@ -60,7 +60,7 @@ public:
 namespace Impl
 {
 
-class TestButton : public Dali::Toolkit::Internal::Control
+class TestButton : public Dali::Toolkit::ControlImpl
 {
 public:
   static Test::TestButton New();

@@ -115,7 +115,7 @@ inline float CalculateGaussianWeight(float localOffset, float sigma)
 } // namespace
 
 GaussianBlurView::GaussianBlurView()
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES),
   mBellCurveWidth(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH),
   mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT),
@@ -141,7 +141,7 @@ GaussianBlurView::GaussianBlurView(const unsigned int  numSamples,
                                    const float         downsampleWidthScale,
                                    const float         downsampleHeightScale,
                                    bool                blurUserImage)
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(numSamples),
   mBellCurveWidth(blurBellCurveWidth),
   mPixelFormat(renderTargetPixelFormat),
@@ -353,7 +353,7 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
     Activate();
   }
 
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 }
 
 void GaussianBlurView::OnChildAdd(Actor& child)
@@ -363,14 +363,14 @@ void GaussianBlurView::OnChildAdd(Actor& child)
     mChildrenRoot.Add(child);
   }
 
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void GaussianBlurView::OnChildRemove(Actor& child)
 {
   mChildrenRoot.Remove(child);
 
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 void GaussianBlurView::AllocateResources()

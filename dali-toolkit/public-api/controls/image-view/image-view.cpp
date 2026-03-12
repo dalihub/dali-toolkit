@@ -66,19 +66,19 @@ ImageView ImageView::New(const Dali::String& url, ImageDimensions size)
 
 ImageView ImageView::New(ControlBehaviour additionalBehaviour)
 {
-  return Toolkit::Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return Toolkit::Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
 ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url)
 {
-  ImageView imageView = Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  ImageView imageView = Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
 ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url, ImageDimensions size)
 {
-  ImageView imageView = Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  ImageView imageView = Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, size);
   return imageView;
 }

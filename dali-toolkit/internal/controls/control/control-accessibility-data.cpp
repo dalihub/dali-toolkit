@@ -29,11 +29,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit
 {
 namespace
 {
@@ -90,7 +86,7 @@ static constexpr uint32_t DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA = 
 
 } // unnamed namespace
 
-Control::Impl::AccessibilityData::AccessibilityData(Control& controlImpl)
+ControlImpl::Impl::AccessibilityData::AccessibilityData(ControlImpl& controlImpl)
 : mAccessibilityGetNameSignal(),
   mAccessibilityGetDescriptionSignal(),
   mAccessibilityDoGestureSignal(),
@@ -101,7 +97,7 @@ Control::Impl::AccessibilityData::AccessibilityData(Control& controlImpl)
   mAccessibilityProps.states = GetDefaultControlAccessibilityStates();
 }
 
-void Control::Impl::AccessibilityData::AppendAccessibilityAttribute(const std::string& key, const std::string value)
+void ControlImpl::Impl::AccessibilityData::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
   Property::Value* checkedValue = mAccessibilityProps.extraAttributes.Find(ToDaliStringView(key));
   if(checkedValue)
@@ -114,7 +110,7 @@ void Control::Impl::AccessibilityData::AppendAccessibilityAttribute(const std::s
   }
 }
 
-void Control::Impl::AccessibilityData::CheckHighlightedObjectGeometry()
+void ControlImpl::Impl::AccessibilityData::CheckHighlightedObjectGeometry()
 {
   auto accessible = GetAccessibleObject();
   if(DALI_LIKELY(accessible))
@@ -173,7 +169,7 @@ void Control::Impl::AccessibilityData::CheckHighlightedObjectGeometry()
   }
 }
 
-void Control::Impl::AccessibilityData::RegisterAccessibilityPositionPropertyNotification()
+void ControlImpl::Impl::AccessibilityData::RegisterAccessibilityPositionPropertyNotification()
 {
   if(mIsAccessibilityPositionPropertyNotificationSet)
   {
@@ -190,33 +186,33 @@ void Control::Impl::AccessibilityData::RegisterAccessibilityPositionPropertyNoti
   mIsAccessibilityPositionPropertyNotificationSet = true;
 }
 
-void Control::Impl::AccessibilityData::UnregisterAccessibilityPositionPropertyNotification()
+void ControlImpl::Impl::AccessibilityData::UnregisterAccessibilityPositionPropertyNotification()
 {
   mControlImpl.Self().RemovePropertyNotification(mAccessibilityPositionNotification);
   mIsAccessibilityPositionPropertyNotificationSet = false;
 }
 
-void Control::Impl::AccessibilityData::RegisterAccessibilityPropertySetSignal()
+void ControlImpl::Impl::AccessibilityData::RegisterAccessibilityPropertySetSignal()
 {
   if(mIsAccessibilityPropertySetSignalRegistered)
   {
     return;
   }
-  mControlImpl.Self().PropertySetSignal().Connect(this, &Control::Impl::AccessibilityData::OnAccessibilityPropertySet);
+  mControlImpl.Self().PropertySetSignal().Connect(this, &ControlImpl::Impl::AccessibilityData::OnAccessibilityPropertySet);
   mIsAccessibilityPropertySetSignalRegistered = true;
 }
 
-void Control::Impl::AccessibilityData::UnregisterAccessibilityPropertySetSignal()
+void ControlImpl::Impl::AccessibilityData::UnregisterAccessibilityPropertySetSignal()
 {
   if(!mIsAccessibilityPropertySetSignalRegistered)
   {
     return;
   }
-  mControlImpl.Self().PropertySetSignal().Disconnect(this, &Control::Impl::AccessibilityData::OnAccessibilityPropertySet);
+  mControlImpl.Self().PropertySetSignal().Disconnect(this, &ControlImpl::Impl::AccessibilityData::OnAccessibilityPropertySet);
   mIsAccessibilityPropertySetSignalRegistered = false;
 }
 
-void Control::Impl::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
+void ControlImpl::Impl::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
 {
   auto accessible = GetAccessibleObject();
   if(DALI_LIKELY(accessible))
@@ -253,7 +249,7 @@ void Control::Impl::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle& 
   }
 }
 
-Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetAccessibilityReadingInfoType() const
+Dali::Accessibility::ReadingInfoTypes ControlImpl::Impl::AccessibilityData::GetAccessibilityReadingInfoType() const
 {
   std::string value{};
   auto        place = mAccessibilityProps.extraAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
@@ -293,7 +289,7 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetAcces
   return types;
 }
 
-void Control::Impl::AccessibilityData::RemoveAccessibilityAttribute(const std::string& key)
+void ControlImpl::Impl::AccessibilityData::RemoveAccessibilityAttribute(const std::string& key)
 {
   Property::Value* value = mAccessibilityProps.extraAttributes.Find(ToDaliStringView(key));
   if(value)
@@ -302,12 +298,12 @@ void Control::Impl::AccessibilityData::RemoveAccessibilityAttribute(const std::s
   }
 }
 
-void Control::Impl::AccessibilityData::ClearAccessibilityAttributes()
+void ControlImpl::Impl::AccessibilityData::ClearAccessibilityAttributes()
 {
   mAccessibilityProps.extraAttributes.Clear();
 }
 
-void Control::Impl::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
+void ControlImpl::Impl::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
 {
   std::string value{};
   if(types[Dali::Accessibility::ReadingInfoType::NAME])
@@ -341,21 +337,19 @@ void Control::Impl::AccessibilityData::SetAccessibilityReadingInfoType(const Dal
   AppendAccessibilityAttribute(READING_INFO_TYPE_ATTRIBUTE_NAME, value);
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::Impl::AccessibilityData::GetAccessibleObject()
+std::shared_ptr<Toolkit::DevelControl::ControlAccessible> ControlImpl::Impl::AccessibilityData::GetAccessibleObject()
 {
   return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
 }
 
-Dali::Accessibility::ReadingInfoTypes Control::Impl::AccessibilityData::GetDefaultReadingInfoTypes()
+Dali::Accessibility::ReadingInfoTypes ControlImpl::Impl::AccessibilityData::GetDefaultReadingInfoTypes()
 {
   return Dali::Accessibility::ReadingInfoTypes{DEFAULT_READING_INFO_TYPES_RAW_DATA};
 }
 
-Toolkit::DevelControl::AccessibilityStates Control::Impl::AccessibilityData::GetDefaultControlAccessibilityStates()
+Toolkit::DevelControl::AccessibilityStates ControlImpl::Impl::AccessibilityData::GetDefaultControlAccessibilityStates()
 {
   return Toolkit::DevelControl::AccessibilityStates{DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA};
 }
 
-} // namespace Internal
-} // namespace Toolkit
-} // namespace Dali
+} // namespace Dali::Toolkit

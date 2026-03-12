@@ -52,7 +52,7 @@ namespace Internal
 /**
  * @brief A control which renders a long text string with styles.
  */
-class TextEditor : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
+class TextEditor : public ControlImpl, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
 {
 public:
   /**

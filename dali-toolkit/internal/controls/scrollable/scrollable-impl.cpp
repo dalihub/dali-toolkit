@@ -76,7 +76,7 @@ const Vector2 OVERSHOOT_DEFAULT_SIZE(720.0f, 42.0f);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Scrollable::Scrollable(ControlBehaviour behaviourFlags)
-: Control(ControlBehaviour(behaviourFlags)),
+: ControlImpl(ControlBehaviour(behaviourFlags)),
   mOvershootEffectColor(DEFAULT_OVERSHOOT_COLOUR),
   mOvershootAnimationSpeed(DEFAULT_OVERSHOOT_ANIMATION_SPEED),
   mOvershootSize(OVERSHOOT_DEFAULT_SIZE),

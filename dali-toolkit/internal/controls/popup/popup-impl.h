@@ -44,7 +44,7 @@ typedef IntrusivePtr<Popup> PopupPtr;
 /**
  * @copydoc Toolkit::Popup
  */
-class Popup : public Control
+class Popup : public ControlImpl
 {
 public:
   /**

@@ -47,7 +47,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface, public Text::AnchorControlInterface, public Text::AsyncTextInterface
+class TextLabel : public ControlImpl, public Text::ControlInterface, public Text::ScrollerInterface, public Text::AnchorControlInterface, public Text::AsyncTextInterface
 {
 public:
   /**

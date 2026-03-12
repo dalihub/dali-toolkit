@@ -47,7 +47,7 @@ typedef IntrusivePtr<ScrollBar> ScrollBarPtr;
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
  */
-class ScrollBar : public Control
+class ScrollBar : public ControlImpl
 {
 public:
   // Signals

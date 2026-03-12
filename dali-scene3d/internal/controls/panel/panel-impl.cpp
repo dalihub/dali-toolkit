@@ -110,7 +110,7 @@ Dali::Geometry CreatePlaneGeometry(bool flip = false)
 } // anonymous namespace
 
 Panel::Panel()
-: Control(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
   mPanelResolution(Vector2::ZERO),
   mResolutionPropertyIndex(Property::INVALID_INDEX),
   mIsTransparent(false),
@@ -432,7 +432,7 @@ void Panel::OnSceneConnection(int depth)
 
   // On-screen / Off-screen window
   Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  mSceneHolder = sceneHolder;
+  mSceneHolder                               = sceneHolder;
   if(mSceneHolder.GetHandle() && !mRenderTask)
   {
     RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
@@ -447,7 +447,7 @@ void Panel::OnSceneConnection(int depth)
     UpdateRenderTask();
   }
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void Panel::OnSceneDisconnection()
@@ -475,7 +475,7 @@ void Panel::OnSceneDisconnection()
   mTexture.Reset();
   mFrameBuffer.Reset();
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void Panel::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)

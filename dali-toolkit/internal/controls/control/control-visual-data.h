@@ -34,13 +34,9 @@
 
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
-namespace Dali
+namespace Dali::Toolkit
 {
-namespace Toolkit
-{
-namespace Internal
-{
-namespace Visual
+namespace Internal::Visual
 {
 class Base;
 }
@@ -72,11 +68,11 @@ struct RegisteredVisual
 typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
 
 // private inner class
-class Control::Impl::VisualData : public Visual::EventObserver, public Visual::ConstraintObserver
+class ControlImpl::Impl::VisualData : public Internal::Visual::EventObserver, public Internal::Visual::ConstraintObserver
 {
 public:
   // Constructor
-  VisualData(Control::Impl& outer);
+  VisualData(ControlImpl::Impl& outer);
 
   // Destructor
   ~VisualData();
@@ -87,7 +83,7 @@ public: // Visual::EventObserver
    * @param[in] object The visual whose resources are ready
    * @note Overriding method in Visual::EventObserver.
    */
-  void ResourceReady(Visual::Base& object) override;
+  void ResourceReady(Internal::Visual::Base& object) override;
 
   /**
    * @brief Called when an event occurs.
@@ -95,13 +91,13 @@ public: // Visual::EventObserver
    * @param[in] signalId The signal to emit. See Visual to find supported signals
    * @note Overriding method in Visual::EventObserver.
    */
-  void NotifyVisualEvent(Visual::Base& object, Property::Index signalId) override;
+  void NotifyVisualEvent(Internal::Visual::Base& object, Property::Index signalId) override;
 
   /**
    * @brief Called when the visual needs relayout request.
    * @param[in] object The visual who requests relayout
    */
-  void RelayoutRequest(Visual::Base& object) override;
+  void RelayoutRequest(Internal::Visual::Base& object) override;
 
 public: // Visual::ConstraintObserver
   /**
@@ -111,22 +107,22 @@ public: // Visual::ConstraintObserver
 
 public:
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::IsResourceReady()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::IsResourceReady()
    */
   bool IsResourceReady() const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableReadyTransitionOverridden()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::EnableReadyTransitionOverridden()
    */
   void EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableCornerPropertiesOverridden()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::EnableCornerPropertiesOverridden()
    */
   void EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualResourceStatus()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::GetVisualResourceStatus()
    */
   Toolkit::Visual::ResourceStatus GetVisualResourceStatus(Property::Index index) const;
 
@@ -135,40 +131,40 @@ public:
    * @param[in] visuals The control's visual container
    * @param[out] instancedProperties The instanced properties are added to this container
    */
-  void CopyInstancedProperties(RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties);
+  void CopyInstancedProperties(RegisteredVisualContainer& visuals, Internal::Dictionary<Property::Map>& instancedProperties);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::RegisterVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::RegisterVisual()
    */
   void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::UnregisterVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::UnregisterVisual()
    */
   void UnregisterVisual(Property::Index index);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::GetVisual()
    */
   Toolkit::Visual::Base GetVisual(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualImplPtr()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::GetVisualImplPtr()
    */
   Toolkit::Internal::Visual::Base* GetVisualImplPtr(Property::Index index) const;
 
@@ -179,17 +175,17 @@ public:
   Toolkit::Visual::Base GetVisual(const std::string& name) const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::GetVisualProperty()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::GetVisualProperty()
    */
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::EnableVisual()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::EnableVisual()
    */
   void EnableVisual(Property::Index index, bool enable);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::IsVisualEnabled()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::IsVisualEnabled()
    */
   bool IsVisualEnabled(Property::Index index) const;
 
@@ -205,7 +201,7 @@ public:
    * @param[in] visuals The container of visuals
    * @param[in] removeVisuals The visuals to remove
    */
-  void RemoveVisuals(RegisteredVisualContainer& visuals, DictionaryKeys& removeVisuals);
+  void RemoveVisuals(RegisteredVisualContainer& visuals, Internal::DictionaryKeys& removeVisuals);
 
   /**
    * @brief On state change, ensures visuals are moved or created appropriately.
@@ -217,7 +213,7 @@ public:
    * @param[in] stateVisualsToChange The visuals to change
    * @param[in] instancedProperties The instanced properties @see CopyInstancedProperties
    */
-  void RecreateChangedVisuals(Dictionary<Property::Map>& stateVisualsToChange, Dictionary<Property::Map>& instancedProperties);
+  void RecreateChangedVisuals(Internal::Dictionary<Property::Map>& stateVisualsToChange, Internal::Dictionary<Property::Map>& instancedProperties);
 
   /**
    * @brief Replaces visuals and properties from the old state to the new state.
@@ -225,20 +221,20 @@ public:
    * @param[in] newState The new state
    * @param[in] subState The current sub state
    */
-  void ReplaceStateVisualsAndProperties(const StylePtr oldState, const StylePtr newState, const std::string& subState);
+  void ReplaceStateVisualsAndProperties(const Internal::StylePtr oldState, const Internal::StylePtr newState, const std::string& subState);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::DoAction()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::DoAction()
    */
   void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::DoActionExtension()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::DoActionExtension()
    */
   void DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::VisualEventSignal()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::VisualEventSignal()
    */
   DevelControl::VisualEventSignalType& VisualEventSignal();
 
@@ -268,7 +264,7 @@ public:
   void ClearVisuals();
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::ApplyFittingMode()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::ApplyFittingMode()
    */
   void ApplyFittingMode(const Vector2& size);
 
@@ -285,17 +281,17 @@ public:
   void StartObservingVisual(Toolkit::Visual::Base& visual);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::UpdateVisualProperties()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::UpdateVisualProperties()
    */
   void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::CreateAnimationConstraints()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::CreateAnimationConstraints()
    */
   void CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::Impl::ClearAnimationConstraints()
+   * @copydoc Dali::Toolkit::ControlImpl::Impl::ClearAnimationConstraints()
    */
   void ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index);
 
@@ -358,7 +354,7 @@ public:
   RegisteredVisualContainer           mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
 
 private:
-  Control::Impl& mOuter;
+  ControlImpl::Impl& mOuter;
 
   // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
   using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;
@@ -368,7 +364,5 @@ private:
   bool mCornerRadiusValueAdded : 1;     ///< True if corner radius value setted at least 1 time. Could not be reset to false.
   bool mCornerSquarenessValueAdded : 1; ///< True if corner squareness value setted at least 1 time. Could not be reset to false.
 };
-} // namespace Internal
-} // namespace Toolkit
-} // namespace Dali
+} // namespace Dali::Toolkit
 #endif // DALI_TOOLKIT_CONTROL_DATA_VISUAL_DATA_H

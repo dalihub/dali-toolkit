@@ -94,7 +94,7 @@ void DiscardImageViewVisual(Dali::Toolkit::Visual::Base& visual)
 using namespace Dali;
 
 ImageView::ImageView(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mImageSize(),
   mTransitionTargetAlpha(FULL_OPACITY),
   mTransitionEffect(false),
@@ -153,7 +153,7 @@ void ImageView::SetImage(const Property::Map& map)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
@@ -204,7 +204,7 @@ void ImageView::SetImage(const Property::Map& map)
 
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
@@ -237,7 +237,7 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
@@ -279,7 +279,7 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
@@ -391,7 +391,7 @@ Vector3 ImageView::GetNaturalSize()
   }
 
   // if no visual then use Control's natural size
-  return Control::GetNaturalSize();
+  return ControlImpl::GetNaturalSize();
 }
 
 float ImageView::GetHeightForWidth(float width)
@@ -405,7 +405,7 @@ float ImageView::GetHeightForWidth(float width)
   }
   else
   {
-    return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
+    return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
   }
 }
 
@@ -420,7 +420,7 @@ float ImageView::GetWidthForHeight(float height)
   }
   else
   {
-    return Control::GetWidthForHeight(height) + padding.start + padding.end;
+    return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
   }
 }
 
@@ -523,7 +523,7 @@ void ImageView::ShowPlaceholderImage()
   {
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
 
     Actor self = Self();
@@ -575,7 +575,7 @@ void ImageView::TransitionImageWithEffect()
       {
         // Set user's transition effect options
         Dali::Toolkit::TransitionData transition      = Toolkit::TransitionData::New(mTransitionEffectOptionMap);
-        Internal::Control::Impl&      controlDataImpl = Internal::Control::Impl::Get(*this);
+        ControlImpl::Impl&            controlDataImpl = ControlImpl::Impl::Get(*this);
         mTransitionAnimation                          = controlDataImpl.CreateTransition(transition);
         if(mTransitionAnimation)
         {
@@ -618,8 +618,8 @@ void ImageView::ClearTransitionAnimation()
   // Clear PreviousVisual
   if(mPreviousVisual)
   {
-    Actor                    self            = Self();
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    Actor              self            = Self();
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
     DiscardImageViewVisual(mPreviousVisual);

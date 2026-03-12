@@ -100,7 +100,7 @@ const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 } // namespace
 
 VideoView::VideoView(Dali::VideoSyncMode syncMode)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mCurrentVideoPlayPosition(0),
   mFrameID(0),
   mIsPlay(false),
@@ -184,7 +184,7 @@ void VideoView::SetPropertyMap(Property::Map map)
   if(mTextureVisual && !mEffectPropertyMap.Empty())
   {
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
 
     Property::Map properties;
     properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
@@ -575,14 +575,14 @@ void VideoView::OnSceneConnection(int depth)
 
   DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneConnection()\n");
   mVideoPlayer.SceneConnection();
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void VideoView::OnSceneDisconnection()
 {
   DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneDisconnection()\n");
   mVideoPlayer.SceneDisconnection();
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void VideoView::OnSizeSet(const Vector3& targetSize)
@@ -596,7 +596,7 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
     // SetFrameRenderCallback();
     mVideoPlayer.StartSynchronization();
   }
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 }
 
 void VideoView::OnChildOrderChanged(Actor actor)
@@ -663,7 +663,7 @@ Vector3 VideoView::GetNaturalSize()
   }
   else
   {
-    return Control::GetNaturalSize();
+    return ControlImpl::GetNaturalSize();
   }
 }
 
@@ -694,8 +694,8 @@ void VideoView::SetWindowSurfaceTarget()
   mSizeUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
   mScaleUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
 
-  Toolkit::Control            control     = Toolkit::Control(GetOwner());
-  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
+  Toolkit::Control      control     = Toolkit::Control(GetOwner());
+  Toolkit::ControlImpl& controlImpl = GetImplementation(control);
 
   if(mTextureVisual)
   {
@@ -782,8 +782,8 @@ void VideoView::SetNativeImageTarget()
 
   Actor self(Self());
 
-  Toolkit::Control            control     = Toolkit::Control(GetOwner());
-  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
+  Toolkit::Control      control     = Toolkit::Control(GetOwner());
+  Toolkit::ControlImpl& controlImpl = GetImplementation(control);
 
   if(mOverlayVisual)
   {
@@ -1107,7 +1107,7 @@ void VideoView::CreateOverlayTextureVisual()
       mOverlayTextureVisualIndex = handle.RegisterProperty("videoViewTextureVisual", "videoViewTextureVisual", Property::AccessMode::READ_WRITE);
     }
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
     Toolkit::DevelControl::RegisterVisual(controlImpl, mOverlayTextureVisualIndex, mOverlayTextureVisual);
 
     Dali::TextureSet textures = Dali::TextureSet::New();
@@ -1124,7 +1124,7 @@ void VideoView::ResetOverlayTextureVisual()
   if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
   {
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
     Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
 
     if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)

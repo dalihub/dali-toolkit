@@ -55,7 +55,7 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 CameraView::CameraView(Dali::Toolkit::CameraView::DisplayType displayType)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mDisplayType(displayType)
 {
 }
@@ -84,7 +84,7 @@ void CameraView::Update()
 
 void CameraView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
   if(mDisplayType == Dali::Toolkit::CameraView::DisplayType::WINDOW)
   {
     SetWindowSurfaceTarget();
@@ -98,7 +98,7 @@ void CameraView::OnSceneConnection(int depth)
 
 void CameraView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
   Actor self = Self();
   if(mTextureRenderer)
   {

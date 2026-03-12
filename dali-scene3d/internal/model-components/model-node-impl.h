@@ -54,7 +54,7 @@ using ColliderMeshUniquePtr = Dali::UniquePtr<Dali::Scene3D::Algorithm::Collider
  *
  * @SINCE_2_2.99
  */
-class DALI_SCENE3D_API ModelNode : public Toolkit::Internal::Control, public ModelPrimitiveModifyObserver
+class DALI_SCENE3D_API ModelNode : public Toolkit::ControlImpl, public ModelPrimitiveModifyObserver
 {
 public:
   using ModelPrimitiveContainer = std::vector<Scene3D::ModelPrimitive>;

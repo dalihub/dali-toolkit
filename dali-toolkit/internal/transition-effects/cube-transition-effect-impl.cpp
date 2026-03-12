@@ -61,7 +61,7 @@ const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS(1.0f, 1.0f, 1.0f, 1.0f);
 const Vector4 CubeTransitionEffect::HALF_BRIGHTNESS(0.5f, 0.5f, 0.5f, 1.0f);
 
 CubeTransitionEffect::CubeTransitionEffect(unsigned int rows, unsigned int columns)
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mRows(rows),
   mColumns(columns),
   mIsAnimating(false),
@@ -229,7 +229,7 @@ void CubeTransitionEffect::OnSceneConnection(int depth)
   mCurrentRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, depth);
   Self().AddRenderer(mCurrentRenderer);
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void CubeTransitionEffect::OnSceneDisconnection()
@@ -254,7 +254,7 @@ void CubeTransitionEffect::OnSceneDisconnection()
     mTargetRenderer.Reset();
   }
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void CubeTransitionEffect::SetTransitionDuration(float duration)

@@ -32,7 +32,7 @@ TextField TextField::New()
 
 TextField TextField::New(ControlBehaviour additionalBehaviour)
 {
-  return Internal::TextField::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return Internal::TextField::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
 TextField::TextField()

@@ -6,16 +6,15 @@
 # Creating Custom UI Controls {#creating-custom-controls}
 
 DALi provides the ability to create custom UI controls.
-This can be done by extending Dali::Toolkit::Control and Dali::Toolkit::Internal::Control classes.
+This can be done by extending Dali::Toolkit::Control and Dali::Toolkit::ControlImpl classes.
  
 Custom controls are created using the [handle/body idiom](@ref handle-body-idiom) used in DALi.
  
 ![ ](creating-custom-controls/control-handle-body.png)
  
 Namespaces are important
-+ The handle & body classes should have the same name but in different namespaces
-+ TypeRegistry relies on this convention
-+ Here our custom control requires
++ The handle & body classes can be in the same namespace with different names but it may be easier to use the same name but in different namespaces
++ Here our custom control can have:
   + MyUIControl
   + Internal::MyUIControl
  
@@ -173,7 +172,7 @@ ________________________________________________________________________________
 
 ### Control Behaviour {#creating-controls-behaviour}
 
-Dali::Toolkit::Internal::Control provides several behaviours which are specified through its constructor (@ref Dali::Toolkit::Internal::Control::Control()).
+Dali::Toolkit::ControlImpl provides several behaviours which are specified through its constructor (@ref Dali::Toolkit::ControlImpl::ControlImpl()).
  
 | Behaviour                            | Description                                                                                                    |
 |--------------------------------------|----------------------------------------------------------------------------------------------------------------|

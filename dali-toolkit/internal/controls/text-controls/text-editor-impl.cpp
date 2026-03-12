@@ -626,7 +626,7 @@ void TextEditor::OnInitialize()
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
   // Creates an extra control to be used as stencil buffer.
-  mStencil = Control::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  mStencil = ControlImpl::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
   mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
@@ -687,7 +687,7 @@ void TextEditor::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::
   }
 
   // Up call to Control
-  Control::OnStyleChange(styleManager, change);
+  ControlImpl::OnStyleChange(styleManager, change);
 }
 
 void TextEditor::OnApplyDefaultStyle()
@@ -754,7 +754,7 @@ void TextEditor::OnPropertySet(Property::Index index, const Property::Value& pro
       }
       else
       {
-        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+        ControlImpl::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
       }
       break;
     }
@@ -1356,8 +1356,8 @@ void TextEditor::OnSceneConnection(int depth)
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 
-  // Call the Control::OnSceneConnection() to set the depth of the background.
-  Control::OnSceneConnection(depth);
+  // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
+  ControlImpl::OnSceneConnection(depth);
 }
 
 bool TextEditor::OnTouched(Actor actor, const TouchEvent& touch)
@@ -1491,7 +1491,7 @@ void TextEditor::OnVariationPropertyNotify(PropertyNotification& source)
 }
 
 TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mAnimationPeriod(0.0f, 0.0f),
   mAlignmentOffset(0.f),
   mScrollAnimationDuration(0.f),

@@ -477,7 +477,7 @@ void FlexContainer::OnChildAdd(Actor& child)
   mChildrenNodes.push_back(childNode);
   YGNodeInsertChild(mRootNode.node, childNode.node, mChildrenNodes.size() - 1);
 
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void FlexContainer::OnChildRemove(Actor& child)
@@ -497,7 +497,7 @@ void FlexContainer::OnChildRemove(Actor& child)
     }
   }
 
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 void FlexContainer::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -573,7 +573,7 @@ void FlexContainer::OnSizeSet(const Vector3& size)
     RelayoutRequest();
   }
 
-  Control::OnSizeSet(size);
+  ControlImpl::OnSizeSet(size);
 }
 
 void FlexContainer::OnLayoutDirectionChanged(Dali::Actor actor, Dali::LayoutDirection::Type type)
@@ -806,7 +806,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
 }
 
 FlexContainer::FlexContainer()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mContentDirection(Toolkit::FlexContainer::INHERIT),
   mFlexDirection(Toolkit::FlexContainer::COLUMN),
   mFlexWrap(Toolkit::FlexContainer::NO_WRAP),

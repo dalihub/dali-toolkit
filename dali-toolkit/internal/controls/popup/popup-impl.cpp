@@ -235,7 +235,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mTouchedOutsideSignal(),
   mShowingSignal(),
   mShownSignal(),
@@ -938,7 +938,7 @@ Toolkit::Popup::ContextualMode Popup::GetContextualMode() const
 
 Toolkit::Control Popup::CreateBacking()
 {
-  Toolkit::Control backing = Control::New();
+  Toolkit::Control backing = ControlImpl::New();
   backing.SetProperty(Toolkit::Control::Property::BACKGROUND,
                       Property::Map().Add(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR).Add(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f)));
   backing.SetProperty(Dali::Actor::Property::NAME, "popupBacking");
@@ -1590,7 +1590,7 @@ void Popup::OnSceneConnection(int depth)
   mLayoutDirty = true;
   RelayoutRequest();
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void Popup::OnChildAdd(Actor& child)
@@ -1606,7 +1606,7 @@ void Popup::OnChildAdd(Actor& child)
     RelayoutRequest();
   }
 
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void Popup::LayoutContext(const Vector2& size)

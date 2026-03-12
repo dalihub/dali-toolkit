@@ -51,7 +51,7 @@ namespace Internal
 /**
  * @brief Impl class for SceneView.
  */
-class SceneView : public Dali::Toolkit::Internal::Control, public Dali::Integration::Processor
+class SceneView : public Dali::Toolkit::ControlImpl, public Dali::Integration::Processor
 {
 private:
   /**

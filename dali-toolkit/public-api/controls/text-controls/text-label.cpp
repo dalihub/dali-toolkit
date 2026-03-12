@@ -43,12 +43,12 @@ TextLabel TextLabel::New(const Dali::String& text)
 
 TextLabel TextLabel::New(ControlBehaviour additionalBehaviour)
 {
-  return Internal::TextLabel::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return Internal::TextLabel::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
 TextLabel TextLabel::New(ControlBehaviour additionalBehaviour, const Dali::String& text)
 {
-  TextLabel label = Internal::TextLabel::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  TextLabel label = Internal::TextLabel::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
   label.SetProperty(TextLabel::Property::TEXT, text);
 
   return label;

@@ -39,7 +39,7 @@ typedef IntrusivePtr<Scrollable> ScrollablePtr;
 /**
  * @copydoc Toolkit::Scrollable
  */
-class Scrollable : public Control
+class Scrollable : public ControlImpl
 {
 public:
   /**

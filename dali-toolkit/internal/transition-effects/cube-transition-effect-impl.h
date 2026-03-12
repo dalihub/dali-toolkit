@@ -37,7 +37,7 @@ namespace Internal
 /**
  * CubeTransitionEffect implementation class
  */
-class CubeTransitionEffect : public Control
+class CubeTransitionEffect : public ControlImpl
 {
 public:
   /**

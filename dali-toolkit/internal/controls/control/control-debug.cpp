@@ -285,9 +285,9 @@ std::ostream& DumpProperties(std::ostream& o, Handle handle)
   return o;
 }
 
-std::string DumpControl(const Internal::Control& control)
+std::string DumpControl(const ControlImpl& control)
 {
-  auto& controlData = Internal::Control::Impl::Get(control);
+  auto& controlData = ControlImpl::Impl::Get(control);
 
   std::ostringstream oss;
   oss << "{\n  ";
@@ -334,7 +334,7 @@ void DumpControlHierarchy(std::ostream& o, Actor actor)
   o << "{\n";
   if(control)
   {
-    o << "\"Control\":" << DumpControl(Toolkit::Internal::GetImplementation(control));
+    o << "\"Control\":" << DumpControl(Toolkit::GetImplementation(control));
   }
   else
   {

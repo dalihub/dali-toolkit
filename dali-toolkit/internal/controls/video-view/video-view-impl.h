@@ -43,7 +43,7 @@ class VideoView;
 
 namespace Internal
 {
-class VideoView : public Control
+class VideoView : public ControlImpl
 {
 protected:
   VideoView(Dali::VideoSyncMode syncMode);

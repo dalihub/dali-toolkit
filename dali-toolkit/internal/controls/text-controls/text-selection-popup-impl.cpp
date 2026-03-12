@@ -780,7 +780,7 @@ void TextSelectionPopup::CreateBackground(Property::Map& propertyMap)
 }
 
 TextSelectionPopup::TextSelectionPopup(TextSelectionPopupCallbackInterface* callbackInterface)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mToolbar(),
   mPopupMaxSize(),
   mOptionMaxSize(),

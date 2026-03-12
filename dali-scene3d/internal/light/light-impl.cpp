@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ Dali::Scene3D::Light Light::New()
 }
 
 Light::Light()
-: Control(static_cast<ControlBehaviour>(ControlBehaviour::DISABLE_VISUALS | ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | ActorFlags::DISABLE_SIZE_NEGOTIATION))
+: ControlImpl(static_cast<ControlBehaviour>(ControlBehaviour::DISABLE_VISUALS | ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | ActorFlags::DISABLE_SIZE_NEGOTIATION))
 {
 }
 

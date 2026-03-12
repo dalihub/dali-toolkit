@@ -58,7 +58,7 @@ Test::TestButton TestButton::New()
 }
 
 TestButton::TestButton()
-: Control(ControlBehaviour())
+: ControlImpl(ControlBehaviour())
 {
 }
 

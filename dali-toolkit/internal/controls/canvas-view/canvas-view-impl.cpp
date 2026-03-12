@@ -68,7 +68,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_VECTOR_ANIMATION_PERFORMANCE_MAR
 using namespace Dali;
 
 CanvasView::CanvasView(const Vector2& viewBox)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mCanvasRenderer(CanvasRenderer::New(viewBox)),
   mTexture(),
   mSize(viewBox),
@@ -138,7 +138,7 @@ void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 void CanvasView::OnSizeSet(const Vector3& targetSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_CANVAS_VIEW_RESIZE");
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 
   if(!(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.SetSize(Vector2(targetSize))))
   {
@@ -155,13 +155,13 @@ void CanvasView::OnSceneConnection(int depth)
   {
     mPlacementWindow = window;
   }
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void CanvasView::OnSceneDisconnection()
 {
   mPlacementWindow.Reset();
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
@@ -328,7 +328,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
           }
           DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
-          Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+          ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
           controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
         }
       }

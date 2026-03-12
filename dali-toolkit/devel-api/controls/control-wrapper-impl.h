@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,17 +42,17 @@ typedef IntrusivePtr<ControlWrapper> ControlWrapperPtr;
 /**
  * @copydoc Toolkit::ControlWrapper
  */
-class DALI_TOOLKIT_API ControlWrapper : public Control
+class DALI_TOOLKIT_API ControlWrapper : public ControlImpl
 {
 public:
   // Flags for the constructor
   enum CustomControlBehaviour
   {
-    CONTROL_BEHAVIOUR_DEFAULT            = Control::CONTROL_BEHAVIOUR_DEFAULT,
+    CONTROL_BEHAVIOUR_DEFAULT            = ControlImpl::CONTROL_BEHAVIOUR_DEFAULT,
     DISABLE_SIZE_NEGOTIATION             = CustomActorImpl::DISABLE_SIZE_NEGOTIATION,
-    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = Control::REQUIRES_KEYBOARD_NAVIGATION_SUPPORT,
-    DISABLE_STYLE_CHANGE_SIGNALS         = Control::DISABLE_STYLE_CHANGE_SIGNALS,
-    DISABLE_VISUALS                      = Control::DISABLE_VISUALS,
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = ControlImpl::REQUIRES_KEYBOARD_NAVIGATION_SUPPORT,
+    DISABLE_STYLE_CHANGE_SIGNALS         = ControlImpl::DISABLE_STYLE_CHANGE_SIGNALS,
+    DISABLE_VISUALS                      = ControlImpl::DISABLE_VISUALS,
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
@@ -151,7 +151,7 @@ public: // From Control
   Dali::Animation CreateTransition(const Toolkit::TransitionData& transitionData);
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::EmitKeyInputFocusSignal()
+   * @copydoc Dali::Toolkit::ControlImpl::EmitKeyInputFocusSignal()
    */
   void EmitKeyInputFocusSignal(bool focusGained);
 

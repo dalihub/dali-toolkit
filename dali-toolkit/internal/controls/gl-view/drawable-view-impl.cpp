@@ -229,7 +229,7 @@ void DrawableView::OnInitialize()
 
 void DrawableView::OnSizeSet(const Vector3& targetSize)
 {
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 
   mSurfaceSize = targetSize;
 
@@ -253,7 +253,7 @@ void DrawableView::OnWindowVisibilityChanged(Window window, bool visible)
 
 void DrawableView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 
   Actor  self   = Self();
   Window window = DevelWindow::Get(self);
@@ -269,7 +269,7 @@ void DrawableView::OnSceneConnection(int depth)
 
 void DrawableView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 
   mNativeRenderer->Terminate();
 

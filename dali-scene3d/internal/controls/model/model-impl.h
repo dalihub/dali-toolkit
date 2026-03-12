@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_MODEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace Internal
 /**
  * @brief Impl class for Model.
  */
-class Model : public Dali::Toolkit::Internal::Control, public LightObserver, public Dali::Scene3D::Collidable
+class Model : public Dali::Toolkit::ControlImpl, public LightObserver, public Dali::Scene3D::Collidable
 {
 public:
   using AnimationData          = std::pair<std::string, Dali::Animation>;

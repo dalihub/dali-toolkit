@@ -1310,7 +1310,7 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
   }
 
   // Up call to Control
-  Control::OnStyleChange(styleManager, change);
+  ControlImpl::OnStyleChange(styleManager, change);
 }
 
 void TextLabel::OnApplyDefaultStyle()
@@ -1463,7 +1463,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       else
       {
-        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+        ControlImpl::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
       }
       break;
     }
@@ -1488,7 +1488,7 @@ void TextLabel::OnAnimateAnimatableProperty(Animation& animation, Property::Inde
 
     TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Control::OnAnimateAnimatableProperty(animation, index, state);
+  ControlImpl::OnAnimateAnimatableProperty(animation, index, state);
 }
 
 void TextLabel::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
@@ -1509,7 +1509,7 @@ void TextLabel::OnConstraintAnimatableProperty(Constraint& constraint, Property:
 
     TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Control::OnConstraintAnimatableProperty(constraint, index, applied);
+  ControlImpl::OnConstraintAnimatableProperty(constraint, index, applied);
 }
 
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -2210,7 +2210,7 @@ void TextLabel::OnAccessibilityStatusChanged()
 }
 
 TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mLocale(std::string()),
   mSize(),
   mTouchPosition(),

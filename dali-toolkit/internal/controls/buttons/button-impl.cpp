@@ -144,7 +144,7 @@ bool MapContainsTextString(Property::Map& map)
 } // unnamed namespace
 
 Button::Button()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mAutoRepeatingTimer(),
   mTextLabelAlignment(END),
   mAutoRepeating(false),
@@ -702,7 +702,7 @@ void Button::OnSceneDisconnection()
 
   mButtonPressedState = UNPRESSED;
 
-  Control::OnSceneDisconnection(); // Visuals will be set off stage
+  ControlImpl::OnSceneDisconnection(); // Visuals will be set off stage
 }
 
 void Button::OnSceneConnection(int depth)
@@ -713,7 +713,7 @@ void Button::OnSceneConnection(int depth)
   SelectRequiredVisual(Toolkit::Button::Property::LABEL);
   SelectRequiredVisual(VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND]);
   SelectRequiredVisual(VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND]);
-  Control::OnSceneConnection(depth); // Enabled visuals will be put on stage
+  ControlImpl::OnSceneConnection(depth); // Enabled visuals will be put on stage
   RelayoutRequest();
 }
 
@@ -802,7 +802,7 @@ Vector3 Button::GetNaturalSize()
   {
     // if no image or label then use Control's natural size
     DALI_LOG_INFO(gLogButtonFilter, Debug::General, "GetNaturalSize Using control natural size\n");
-    size = Control::GetNaturalSize();
+    size = ControlImpl::GetNaturalSize();
   }
 
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "Button GetNaturalSize (%f,%f)\n", size.width, size.height);
