@@ -44,6 +44,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -392,12 +393,12 @@ static void OnUserMediaPermissionRequest(Dali::WebEngineUserMediaPermissionReque
   gUserMediaPermissionRequestCalled++;
 }
 
-//using WebEngineDeviceConnectionChangedCallback = std::function<void(int32_t)>;
+// using WebEngineDeviceConnectionChangedCallback = std::function<void(int32_t)>;
 static void OnDeviceConnectionChanged(int32_t)
 {
 }
 
-//using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
+// using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
 static void OnDeviceListGetCallback(Dali::WebEngineDeviceListGet*, int32_t)
 {
 }
@@ -1568,11 +1569,11 @@ int UtcDaliWebViewMethodsForCoverage(void)
 
   view.SetTtsFocus(true);
 
-  //view.ChangeOrientation(90);
+  // view.ChangeOrientation(90);
 
   DALI_TEST_CHECK(view);
 
-  //view.ExitFullscreen();
+  // view.ExitFullscreen();
 
   END_TEST;
 }
@@ -1690,7 +1691,7 @@ int UtcDaliWebContextGetSetCacheModelEtc(void)
   context->SetProxyBypassRule("", "test");
   DALI_TEST_EQUALS(context->GetProxyBypassRule(), "test", TEST_LOCATION);
 
-  //Notify low memory
+  // Notify low memory
   DALI_TEST_CHECK(context->FreeUnusedMemory());
 
   END_TEST;
@@ -2166,7 +2167,7 @@ int UtcDaliWebSettingsCheckEnableTextSelection(void)
   bool value = settings->IsTextSelectionEnabled();
   DALI_TEST_CHECK(value);
 
-  //Check Set/GetProperty
+  // Check Set/GetProperty
   settings->EnableTextSelection(false);
   value = settings->IsTextSelectionEnabled();
   DALI_TEST_CHECK(!value);

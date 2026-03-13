@@ -19,9 +19,11 @@
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -29,8 +31,6 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <cstring>
 #include <limits>
 
 // INTERNAL INCLUDES

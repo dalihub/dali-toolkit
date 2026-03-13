@@ -18,6 +18,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <stdlib.h>
 #include <iostream>

@@ -26,6 +26,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 
 using namespace Dali;
 using namespace Toolkit;

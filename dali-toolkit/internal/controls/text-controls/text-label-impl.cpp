@@ -23,11 +23,11 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
 
 // INTERNAL INCLUDES

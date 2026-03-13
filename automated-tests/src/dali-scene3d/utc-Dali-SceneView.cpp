@@ -27,6 +27,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

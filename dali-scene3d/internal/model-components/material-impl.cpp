@@ -19,12 +19,12 @@
 #include <dali-scene3d/internal/model-components/material-impl.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>

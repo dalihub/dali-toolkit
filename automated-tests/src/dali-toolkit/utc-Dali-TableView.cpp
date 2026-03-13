@@ -18,6 +18,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
@@ -111,7 +112,7 @@ int UtcDaliTableViewNew(void)
   TableView tableView = TableView::New(10, 10);
   DALI_TEST_CHECK(tableView);
 
-  //Additional check to ensure object is created by checking if it's registered
+  // Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK(registry);
 

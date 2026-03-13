@@ -22,15 +22,15 @@
 #if defined(__GLIBC__)
 #include <libintl.h>
 #endif
+#include <algorithm>
+#include <cfloat>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <string.h>
-#include <algorithm>
-#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>

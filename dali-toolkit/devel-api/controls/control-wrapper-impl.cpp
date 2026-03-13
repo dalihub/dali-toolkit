@@ -21,10 +21,10 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>

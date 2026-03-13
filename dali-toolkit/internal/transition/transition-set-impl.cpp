@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/transition/transition-set-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/object/type-registry.h>
 #include <cstring>
 
 // INTERNAL INCLUDES

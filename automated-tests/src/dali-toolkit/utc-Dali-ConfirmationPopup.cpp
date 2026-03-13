@@ -24,6 +24,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/popup/confirmation-popup.h>
 
+#include <dali/devel-api/object/type-registry.h>
+
 using namespace Dali;
 using namespace Toolkit;
 

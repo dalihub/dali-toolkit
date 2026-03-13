@@ -25,6 +25,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dummy-control.h>

@@ -19,8 +19,8 @@
 #include "radio-button-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/object/type-registry.h>
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gLogButtonFilter;

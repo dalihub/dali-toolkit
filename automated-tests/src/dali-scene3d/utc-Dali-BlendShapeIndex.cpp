@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>

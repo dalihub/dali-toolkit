@@ -19,9 +19,9 @@
 #include "control-accessibility-data.h"
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::InsertToMap;

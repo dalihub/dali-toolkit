@@ -41,6 +41,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 
 using namespace Dali;
@@ -5566,7 +5567,7 @@ int UtcDaliImageViewTransitionEffect03(void)
   imageView.SetProperty(ImageView::Property::ENABLE_TRANSITION_EFFECT, true);
   application.GetScene().Add(imageView);
 
-  //DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);
@@ -5629,8 +5630,8 @@ int UtcDaliImageViewTransitionEffect04(void)
   application.SendNotification();
   application.Render();
 
-  //PLACEHOLDER_IMAGE is not call WaitForEventThreadTrigger because it is not shown url is null.
-  //DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // PLACEHOLDER_IMAGE is not call WaitForEventThreadTrigger because it is not shown url is null.
+  // DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   imageView.SetImage(gImage_600_RGB);
   imageView.SetProperty(ImageView::Property::PLACEHOLDER_IMAGE, gImage_34_RGBA);

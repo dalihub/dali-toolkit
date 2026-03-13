@@ -25,9 +25,9 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/object/type-info.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>

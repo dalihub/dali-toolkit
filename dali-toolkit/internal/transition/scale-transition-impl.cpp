@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

@@ -19,9 +19,9 @@
 #include <dali-scene3d/internal/model-motion/motion-index/blend-shape-index-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/blend-shape-details.h> ///< For BlendShapes::WEIGHTS_UNIFORM

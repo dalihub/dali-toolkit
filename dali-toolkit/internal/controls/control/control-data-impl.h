@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/object/type-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
