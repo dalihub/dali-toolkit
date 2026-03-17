@@ -16,6 +16,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/segmentation.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 
 // INTERNAL INCLUDES
@@ -196,7 +197,7 @@ void CommonTextUtils::RenderText(
       self.Add(*it);
       it->LowerToBottom();
 
-      if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "HighlightActor")
+      if(Dali::Integration::ToStdString(it->GetProperty(Dali::Actor::Property::NAME)) == "HighlightActor")
       {
         highlightActor = *it;
       }

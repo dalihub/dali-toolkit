@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 
 // INTERNAL INCLUDES
@@ -29,6 +30,8 @@
 #include <dali-toolkit/internal/text/controller/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -116,7 +119,7 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
 bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyEvent& keyEvent)
 {
   DALI_ASSERT_DEBUG(controller.mImpl->mEventData && "Unexpected KeyEvent");
-  DALI_LOG_RELEASE_INFO("EventHandler KeyEvent: [%d] [%s]\n", keyEvent.GetKeyCode(), keyEvent.GetKeyString().c_str());
+  DALI_LOG_RELEASE_INFO("EventHandler KeyEvent: [%d] [%s]\n", keyEvent.GetKeyCode(), keyEvent.GetKeyString().CStr());
 
   bool textChanged    = false;
   bool relayoutNeeded = false;
@@ -125,12 +128,12 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
   if((NULL != controller.mImpl->mEventData) &&
      (keyEvent.GetState() == KeyEvent::DOWN))
   {
-    int                keyCode   = keyEvent.GetKeyCode();
-    const std::string& keyString = keyEvent.GetKeyString();
-    const std::string  keyName   = keyEvent.GetKeyName();
+    int               keyCode   = keyEvent.GetKeyCode();
+    const std::string keyString = ToStdString(keyEvent.GetKeyString());
+    const std::string keyName   = ToStdString(keyEvent.GetKeyName());
     // Key will produce same logical-key value when ctrl
     // is down, regardless of language layout
-    const std::string logicalKey = keyEvent.GetLogicalKey();
+    const std::string logicalKey = ToStdString(keyEvent.GetLogicalKey());
 
     const bool isNullKey = (0 == keyCode) && (keyString.empty());
 

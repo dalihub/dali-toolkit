@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,7 @@ int UtcDaliMotionPropertyIndexGetPropertyName(void)
   DALI_TEST_EQUALS(expectPropertyIndex, index.GetPropertyIndex(), TEST_LOCATION);
 
   expectPropertyName = "name";
-  index              = MotionPropertyIndex::New("", expectPropertyName);
+  index              = MotionPropertyIndex::New("", Dali::String(expectPropertyName.c_str()));
   DALI_TEST_EQUALS(expectPropertyName, index.GetPropertyName(), TEST_LOCATION);
 
   END_TEST;
@@ -182,7 +182,7 @@ int UtcDaliMotionPropertyIndexSetGetPropertyId(void)
   DALI_TEST_EQUALS(expectPropertyIndex, index.GetPropertyId().indexKey, TEST_LOCATION);
 
   std::string expectPropertyName = "hello";
-  index.SetPropertyId(expectPropertyName);
+  index.SetPropertyId(Dali::String(expectPropertyName.c_str()));
   DALI_TEST_CHECK(index.GetPropertyId().type == Property::Key::Type::STRING);
   DALI_TEST_EQUALS(expectPropertyName, index.GetPropertyId().stringKey, TEST_LOCATION);
 

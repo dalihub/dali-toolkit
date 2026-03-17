@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -33,6 +34,8 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -182,12 +185,12 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
 
 Dali::Shader CameraView::CreateShader(Dali::NativeImagePtr nativeImagePtr)
 {
-  std::string vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
-  std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+  std::string  vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+  Dali::String fragmentShader(ToDaliStringView(SHADER_VIDEO_VIEW_TEXTURE_FRAG));
 
   nativeImagePtr->ApplyNativeFragmentShader(fragmentShader, 1);
 
-  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
+  Dali::Shader shader = Dali::Shader::New(ToDaliStringView(vertexShader), fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
   return shader;
 }
 

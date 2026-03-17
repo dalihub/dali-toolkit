@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-util.h>
@@ -53,13 +54,15 @@ struct ChunkHeader
 
 } // namespace
 
-bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result)
+bool GlbLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result)
 {
-  Dali::FileStream fileStream(url, FileStream::READ | FileStream::BINARY);
+  using Dali::Integration::ToStdString;
+  std::string      stdUrl = ToStdString(url);
+  Dali::FileStream fileStream(stdUrl, FileStream::READ | FileStream::BINARY);
   auto&            stream = fileStream.GetStream();
   if(!stream.rdbuf()->in_avail())
   {
-    DALI_LOG_ERROR("Load Model file is failed, url : %s\n", url.c_str());
+    DALI_LOG_ERROR("Load Model file is failed, url : %s\n", stdUrl.c_str());
     return false;
   }
 
@@ -70,7 +73,7 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
 
   if(glbHeader.magic != GLB_MAGIC)
   {
-    DALI_LOG_ERROR("Wrong file format, url : %s\n", url.c_str());
+    DALI_LOG_ERROR("Wrong file format, url : %s\n", stdUrl.c_str());
     return false;
   }
 
@@ -108,7 +111,7 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
   json::unique_ptr root(json_parse(gltfText.c_str(), gltfText.size()));
   if(!root)
   {
-    DALI_LOG_ERROR("Failed to parse %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to parse %s\n", stdUrl.c_str());
     return false;
   }
 
@@ -117,11 +120,11 @@ bool GlbLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::Loa
   bool isMRendererModel(false);
   if(!Gltf2Util::GenerateDocument(root, document, isMRendererModel))
   {
-    DALI_LOG_ERROR("Failed to parse %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to parse %s\n", stdUrl.c_str());
     return false;
   }
 
-  auto                         path = url.substr(0, url.rfind('/') + 1);
+  auto                         path = stdUrl.substr(0, stdUrl.rfind('/') + 1);
   Gltf2Util::ConversionContext context{result, path, INVALID_INDEX};
 
   auto& outBuffers = context.mOutput.mResources.mBuffers;

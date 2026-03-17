@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ const Flex::SizeTuple ITEM_SIZE_CALLBACK_TEST = Flex::SizeTuple{15.0f, 15.0f};
 void MeasureChild(Actor child, float width, int measureModeWidth, float height, int measureModeHeight, Flex::SizeTuple* childSize)
 {
   *childSize = ITEM_SIZE;
-  if(child.GetProperty<std::string>(Dali::Actor::Property::NAME) == "callbackTest")
+  if(child.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "callbackTest")
   {
     *childSize = ITEM_SIZE_CALLBACK_TEST;
   }

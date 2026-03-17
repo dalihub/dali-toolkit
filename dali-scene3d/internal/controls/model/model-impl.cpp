@@ -25,6 +25,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -50,6 +51,10 @@
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
+
 using namespace Dali;
 
 namespace Dali
@@ -65,7 +70,7 @@ namespace
  */
 BaseHandle Create()
 {
-  return Scene3D::Model::New(std::string());
+  return Scene3D::Model::New();
 }
 
 // Setup properties, signals and actions using the type-registry.
@@ -190,12 +195,12 @@ void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap
     UpdateBlendShapeNodeMapRecursively(resultMap, Scene3D::ModelNode::DownCast(node.GetChildAt(i)));
   }
 
-  std::vector<std::string> blendShapeNames;
+  std::vector<Dali::String> blendShapeNames;
   node.RetrieveBlendShapeNames(blendShapeNames);
   for(const auto& iter : blendShapeNames)
   {
     // Append or create new list.
-    resultMap[iter].push_back(node);
+    resultMap[ToStdString(iter)].push_back(node);
   }
 }
 
@@ -550,7 +555,7 @@ bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
 
 Scene3D::ModelNode Model::FindChildModelNodeByName(std::string_view nodeName)
 {
-  Actor childActor = Self().FindChildByName(nodeName);
+  Actor childActor = Self().FindChildByName(ToDaliStringView(nodeName));
   return Scene3D::ModelNode::DownCast(childActor);
 }
 
@@ -597,7 +602,7 @@ Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionDat
           Scene3D::ModelNode modelNode;
           if(motionIndex.GetModelNodeId().type == Property::Key::Type::STRING)
           {
-            modelNode = FindChildModelNodeByName(motionIndex.GetModelNodeId().stringKey);
+            modelNode = FindChildModelNodeByName(ToStdStringView(motionIndex.GetModelNodeId().stringKey));
           }
           else if(motionIndex.GetModelNodeId().type == Property::Key::Type::INDEX)
           {
@@ -622,7 +627,7 @@ Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionDat
               }
               else
               {
-                std::string    animatedPropertyName = motionIndex.GetPropertyName(modelNode);
+                Dali::String   animatedPropertyName = motionIndex.GetPropertyName(modelNode);
                 Dali::Property property(modelNode, animatedPropertyName);
                 if(property.propertyIndex != Property::INVALID_INDEX)
                 {
@@ -649,7 +654,7 @@ Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionDat
             if(keyFrames)
             {
               std::vector<Scene3D::ModelNode> modelNodes;
-              RetrieveModelNodesByBlendShapeName(blendShapeIndex.GetBlendShapeId().stringKey, modelNodes);
+              RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeIndex.GetBlendShapeId().stringKey), modelNodes);
 
               for(auto& modelNode : modelNodes)
               {
@@ -665,7 +670,7 @@ Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionDat
                 }
                 else
                 {
-                  std::string    animatedPropertyName = motionIndex.GetPropertyName(modelNode);
+                  Dali::String   animatedPropertyName = motionIndex.GetPropertyName(modelNode);
                   Dali::Property property(modelNode, animatedPropertyName);
 
                   if(property.propertyIndex != Property::INVALID_INDEX)
@@ -706,7 +711,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
           Scene3D::ModelNode modelNode;
           if(motionIndex.GetModelNodeId().type == Property::Key::Type::STRING)
           {
-            modelNode = FindChildModelNodeByName(motionIndex.GetModelNodeId().stringKey);
+            modelNode = FindChildModelNodeByName(ToStdStringView(motionIndex.GetModelNodeId().stringKey));
           }
           else if(motionIndex.GetModelNodeId().type == Property::Key::Type::INDEX)
           {
@@ -727,7 +732,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
               }
               else
               {
-                std::string    propertyName = motionIndex.GetPropertyName(modelNode);
+                Dali::String   propertyName = motionIndex.GetPropertyName(modelNode);
                 Dali::Property property(modelNode, propertyName);
                 if(property.propertyIndex != Property::INVALID_INDEX)
                 {
@@ -750,7 +755,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
             if(value.GetType() != Property::Type::NONE)
             {
               std::vector<Scene3D::ModelNode> modelNodes;
-              RetrieveModelNodesByBlendShapeName(blendShapeIndex.GetBlendShapeId().stringKey, modelNodes);
+              RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeIndex.GetBlendShapeId().stringKey), modelNodes);
 
               for(auto& modelNode : modelNodes)
               {
@@ -762,7 +767,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
                 }
                 else
                 {
-                  std::string    propertyName = motionIndex.GetPropertyName(modelNode);
+                  Dali::String   propertyName = motionIndex.GetPropertyName(modelNode);
                   Dali::Property property(modelNode, propertyName);
                   if(property.propertyIndex != Property::INVALID_INDEX)
                   {
@@ -1266,7 +1271,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
     for(auto&& animation : mModelLoadTask->GetAnimations())
     {
       Dali::Animation anim = animation.ReAnimate(getActor);
-      mAnimations.push_back({animation.GetName(), anim});
+      mAnimations.push_back({ToStdString(animation.GetName()), anim});
     }
   }
 }

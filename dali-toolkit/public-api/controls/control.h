@@ -115,7 +115,7 @@ public:
       /**
        * @brief The background of the control.
        *
-       * @details Name "background", type Property::MAP or std::string for URL or Property::VECTOR4 for Color.
+       * @details Name "background", type Property::MAP or Dali::String for URL or Property::VECTOR4 for Color.
        * @SINCE_1_1.3
        */
       BACKGROUND,
@@ -375,14 +375,14 @@ public:
    * @SINCE_1_0.0
    * @param[in] styleName A string matching a style described in a stylesheet
    */
-  void SetStyleName(const std::string& styleName);
+  void SetStyleName(const Dali::String& styleName);
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
    * @SINCE_1_0.0
    * @return A string matching a style, or an empty string
    */
-  const std::string& GetStyleName() const;
+  const Dali::String& GetStyleName() const;
 
   // Background
 

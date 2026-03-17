@@ -24,6 +24,7 @@
 #include <dali/devel-api/text-abstraction/text-renderer-layout-helper.h>
 #include <dali/devel-api/text-abstraction/text-renderer.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <algorithm>
 #include <cstring>
 #include <limits>
@@ -43,6 +44,8 @@
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-model.h>
+
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -530,17 +533,17 @@ void Align(const RendererParameters& textParameters, TextAbstraction::TextRender
   Layout::Type layout = Layout::SINGLELINE;
 
   // Sets the alignment
-  Property::Value horizontalAlignmentStr(textParameters.horizontalAlignment);
+  Property::Value horizontalAlignmentStr(ToPropertyValue(textParameters.horizontalAlignment));
   GetHorizontalAlignmentEnumeration(horizontalAlignmentStr, horizontalAlignment);
   horizontalCircularAlignment = horizontalAlignment;
 
-  Property::Value verticalAlignmentStr(textParameters.verticalAlignment);
+  Property::Value verticalAlignmentStr(ToPropertyValue(textParameters.verticalAlignment));
   GetVerticalAlignmentEnumeration(verticalAlignmentStr, verticalAlignment);
 
-  Property::Value circularAlignmentStr(textParameters.circularAlignment);
+  Property::Value circularAlignmentStr(ToPropertyValue(textParameters.circularAlignment));
   GetCircularAlignmentEnumeration(circularAlignmentStr, circularAlignment);
 
-  Property::Value layoutStr(textParameters.layout);
+  Property::Value layoutStr(ToPropertyValue(textParameters.layout));
   GetLayoutEnumeration(layoutStr, layout);
 
   // Whether the layout is circular.
@@ -1012,7 +1015,7 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
 
   Layout::Type layout = Layout::SINGLELINE;
 
-  Property::Value layoutStr(textParameters.layout);
+  Property::Value layoutStr(ToPropertyValue(textParameters.layout));
   GetLayoutEnumeration(layoutStr, layout);
 
   // Whether the layout is multi-line.

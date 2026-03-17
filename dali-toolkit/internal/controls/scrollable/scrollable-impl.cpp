@@ -153,22 +153,22 @@ Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSigna
   return mScrollCompletedSignal;
 }
 
-bool Scrollable::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Scrollable::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                connected(true);
   Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_STARTED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_STARTED))
   {
     scrollable.ScrollStartedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_UPDATED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_UPDATED))
   {
     scrollable.ScrollUpdatedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_COMPLETED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_COMPLETED))
   {
     scrollable.ScrollCompletedSignal().Connect(tracker, functor);
   }

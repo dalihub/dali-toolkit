@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@
 #include <dali/graphics-api/graphics-shader.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliStringView;
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
@@ -123,7 +126,7 @@ void ParticleRenderer::CreateShader()
       {
         snprintf(key, sizeof(key), "%s", streamName.c_str());
       }
-      streamAtttributes.Add(key, ATTR_TYPES[dataTypeIndex]);
+      streamAtttributes.Add(Dali::StringView(key), ATTR_TYPES[dataTypeIndex]);
 
       // Add shader attribute line
       ss << "INPUT highp " << ATTR_GLSL_TYPES[dataTypeIndex] << " " << key << ";\n";
@@ -178,13 +181,13 @@ void ParticleRenderer::CreateShader()
         gl_FragColor = col;\n\
       }\n"};
 
-  mShader   = Shader::New(vertexShaderCode, fragmentShaderCode, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PARTICLE_RENDERER");
+  mShader   = Shader::New(Dali::Integration::ToDaliStringView(vertexShaderCode), Dali::Integration::ToDaliStringView(fragmentShaderCode), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PARTICLE_RENDERER");
   mGeometry = Geometry::New();
 
   // Configure geometry attributes
   Property::Map geometryMap;
-  geometryMap.Add("aPosition", Dali::Property::VECTOR2);
-  geometryMap.Add("aTexCoords", Dali::Property::VECTOR2);
+  geometryMap.Add(Dali::StringView("aPosition"), Dali::Property::VECTOR2);
+  geometryMap.Add(Dali::StringView("aTexCoords"), Dali::Property::VECTOR2);
 
   // One vertex buffer with geometry
   VertexBuffer vertexBuffer0 = VertexBuffer::New(geometryMap);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -30,6 +31,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::InsertToMap;
+using Dali::Integration::ToStdString;
 
 using namespace Dali;
 
@@ -63,15 +68,15 @@ void PrintArray(Array2d<Dali::Toolkit::Internal::TableView::CellData>& array)
   {
     for(unsigned int j = 0; j < array.GetColumns(); ++j)
     {
-      Dali::Toolkit::Internal::TableView::CellData data  = array[i][j];
+      Dali::Toolkit::Internal::TableView::CellData data = array[i][j];
+      String                                       actorName;
       char                                         actor = ' ';
-      std::string                                  actorName;
       if(data.actor)
       {
         actor     = 'A';
-        actorName = data.actor.GetProperty<std::string>(Dali::Actor::Property::NAME);
+        actorName = data.actor.GetProperty<String>(Dali::Actor::Property::NAME);
       }
-      TV_LOG("Array[%d,%d]=%c %s %d,%d,%d,%d  ", i, j, actor, actorName.c_str(), data.position.rowIndex, data.position.columnIndex, data.position.rowSpan, data.position.columnSpan);
+      TV_LOG("Array[%d,%d]=%c %s %d,%d,%d,%d  ", i, j, actor, actorName.CStr(), data.position.rowIndex, data.position.columnIndex, data.position.rowSpan, data.position.columnSpan);
     }
     TV_LOG("\n");
   }
@@ -998,7 +1003,7 @@ void TableView::OnChildAdd(Actor& child)
 
     if(child.GetPropertyType(Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT) != Property::NONE)
     {
-      std::string value = child.GetProperty(Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT).Get<std::string>();
+      std::string value = ToStdString(child.GetProperty(Toolkit::TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT));
       Scripting::GetEnumeration<HorizontalAlignment::Type>(value.c_str(),
                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE,
                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
@@ -1007,7 +1012,7 @@ void TableView::OnChildAdd(Actor& child)
 
     if(child.GetPropertyType(Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT) != Property::NONE)
     {
-      std::string value = child.GetProperty(Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT).Get<std::string>();
+      std::string value = ToStdString(child.GetProperty(Toolkit::TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT));
       Scripting::GetEnumeration<VerticalAlignment::Type>(value.c_str(),
                                                          VERTICAL_ALIGNMENT_STRING_TABLE,
                                                          VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
@@ -1221,14 +1226,14 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       Property::Value& item     = map->GetValue(i);
       Property::Map*   childMap = item.GetMap();
 
-      std::istringstream(map->GetKey(i)) >> index;
+      std::istringstream(ToStdString(map->GetKey(i))) >> index;
       if(childMap)
       {
         Property::Value* policy = childMap->Find("policy");
         if(policy)
         {
           std::string policyValue;
-          if(DALI_LIKELY(policy->Get(policyValue)))
+          if(DALI_LIKELY(GetStdString(*policy, policyValue)))
           {
             Toolkit::TableView::LayoutPolicy policy;
             if(Scripting::GetEnumeration<Toolkit::TableView::LayoutPolicy>(policyValue.c_str(),
@@ -1340,7 +1345,7 @@ void TableView::GetMapPropertyValue(const RowColumnArray& data, Property::Map& m
     }
     std::ostringstream ss;
     ss << i;
-    map[ss.str()] = item;
+    InsertToMap(map, ss.str(), Property::Value(item));
   }
 }
 

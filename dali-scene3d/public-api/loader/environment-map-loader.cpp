@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <string.h>
 #include <algorithm>
 #include <cmath>
@@ -30,6 +31,8 @@
 #include <dali-scene3d/public-api/loader/ktx-loader.h>
 
 #include <dali/integration-api/debug.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -225,7 +228,7 @@ bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData
   std::string           extension = modelPath.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-  bool successed = (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(environmentMapUrl, environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
+  bool successed = (extension == KTX_EXTENSION) ? Dali::Scene3D::Loader::LoadKtxData(ToDaliString(environmentMapUrl), environmentMapData) : LoadEnvironmentMapData(environmentMapUrl, environmentMapData);
   return successed;
 }
 

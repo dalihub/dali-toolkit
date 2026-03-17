@@ -35,6 +35,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/string-utils.h>
 #include <toolkit-event-thread-callback.h>
 
 #include "dummy-control.h"
@@ -42,6 +43,8 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 const char* TEST_GIF_FILE_NAME          = TEST_RESOURCE_DIR "/anim.gif";
@@ -89,9 +92,9 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
 
       if(NULL != valueSet)
       {
-        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<std::string>() != valueSet->Get<std::string>()))
+        if(valueSet->GetType() == Dali::Property::STRING && (valueGet.second.Get<Dali::String>() != valueSet->Get<Dali::String>()))
         {
-          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str());
+          tet_printf("Value got : [%s], expected : [%s]", valueGet.second.Get<Dali::String>().CStr(), valueSet->Get<Dali::String>().CStr());
           return false;
         }
         else if(valueSet->GetType() == Dali::Property::BOOLEAN && (valueGet.second.Get<bool>() != valueSet->Get<bool>()))
@@ -132,7 +135,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
         }
         else
         {
-          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.c_str());
+          tet_printf("  The key %s doesn't exist.", valueGet.first.stringKey.CStr());
         }
         return false;
       }
@@ -177,26 +180,26 @@ void TestShaderCodeContainSubstrings(Control control, std::vector<std::pair<std:
   DALI_TEST_CHECK(map);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  std::string      vertexShader;
+  String           vertexShader;
   DALI_TEST_CHECK(vertex->Get(vertexShader));
   for(const auto& checkPair : substringCheckList)
   {
     const auto& keyword = checkPair.first;
     const auto& expect  = checkPair.second.expectVertexResult;
     tet_printf("check [%s] %s exist in vertex shader\n", keyword.c_str(), expect ? "is" : "is not");
-    DALI_TEST_EQUALS((vertexShader.find(keyword.c_str()) != std::string::npos), expect, location);
+    DALI_TEST_EQUALS((ToStdString(vertexShader).find(keyword.c_str()) != std::string::npos), expect, location);
   }
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
   DALI_TEST_CHECK(fragment);
-  std::string fragmentShader;
+  String fragmentShader;
   DALI_TEST_CHECK(fragment->Get(fragmentShader));
   for(const auto& checkPair : substringCheckList)
   {
     const auto& keyword = checkPair.first;
     const auto& expect  = checkPair.second.expectFragmentResult;
     tet_printf("check [%s] %s exist in fragment shader\n", keyword.c_str(), expect ? "is" : "is not");
-    DALI_TEST_EQUALS((fragmentShader.find(keyword.c_str()) != std::string::npos), expect, location);
+    DALI_TEST_EQUALS((ToStdString(fragmentShader).find(keyword.c_str()) != std::string::npos), expect, location);
   }
 }
 
@@ -937,7 +940,7 @@ int UtcDaliVisualGetPropertyMap5(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_IMAGE_FILE_NAME);
 
   value = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
   DALI_TEST_CHECK(value);
@@ -1010,7 +1013,7 @@ int UtcDaliVisualGetPropertyMap6(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_NPATCH_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_NPATCH_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::BORDER_ONLY, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
@@ -1022,7 +1025,7 @@ int UtcDaliVisualGetPropertyMap6(void)
 
   value = resultMap.Find(DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == "application-icon-30.png");
+  DALI_TEST_CHECK(value->Get<Dali::String>() == "application-icon-30.png");
 
   value = resultMap.Find(DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, Property::FLOAT);
   DALI_TEST_CHECK(value);
@@ -1051,7 +1054,7 @@ int UtcDaliVisualGetPropertyMap6(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_NPATCH_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_NPATCH_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::BORDER_ONLY, Property::BOOLEAN);
   DALI_TEST_CHECK(value);
@@ -1086,7 +1089,7 @@ int UtcDaliVisualGetPropertyMap7(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_SVG_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_SVG_FILE_NAME);
 
   // request SvgVisual with a property map 2
   propertyMap.Clear();
@@ -1104,7 +1107,7 @@ int UtcDaliVisualGetPropertyMap7(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_SVG_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_SVG_FILE_NAME);
 
   // request SvgVisual with an URL
   Visual::Base svgVisual2 = factory.CreateVisual(TEST_SVG_FILE_NAME, ImageDimensions());
@@ -1117,7 +1120,7 @@ int UtcDaliVisualGetPropertyMap7(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_SVG_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_SVG_FILE_NAME);
 
   END_TEST;
 }
@@ -1151,15 +1154,15 @@ int UtcDaliVisualGetPropertyMap8(void)
 
   value = resultMap.Find(MeshVisual::Property::OBJECT_URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), TEST_OBJ_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), TEST_OBJ_FILE_NAME, TEST_LOCATION);
 
   value = resultMap.Find(MeshVisual::Property::MATERIAL_URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), TEST_MTL_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), TEST_MTL_FILE_NAME, TEST_LOCATION);
 
   value = resultMap.Find(MeshVisual::Property::TEXTURES_PATH, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), TEST_RESOURCE_LOCATION, TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), TEST_RESOURCE_LOCATION, TEST_LOCATION);
 
   value = resultMap.Find(MeshVisual::Property::SHADING_MODE, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -1341,11 +1344,11 @@ int UtcDaliVisualGetPropertyMap10(void)
 
   value = resultMap.Find(TextVisual::Property::TEXT, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), "Hello world", TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), "Hello world", TEST_LOCATION);
 
   value = resultMap.Find(TextVisual::Property::FONT_FAMILY, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), "TizenSans", TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), "TizenSans", TEST_LOCATION);
 
   value = resultMap.Find(TextVisual::Property::FONT_STYLE, Property::MAP);
   DALI_TEST_CHECK(value);
@@ -2308,11 +2311,11 @@ int UtcDaliNPatchVisualCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline("NPatchVisual with custom shader");
 
-  VisualFactory     factory = VisualFactory::Get();
-  Property::Map     properties;
-  Property::Map     shader;
-  const std::string vertexShader                                   = "Foobar";
-  const std::string fragmentShader                                 = "Foobar";
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+  const String  vertexShader                                       = "Foobar";
+  const String  fragmentShader                                     = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
   shader[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2354,10 +2357,10 @@ int UtcDaliNPatchVisualCustomShader(void)
   DALI_TEST_EQUALS(renderer.GetProperty(index), Property::Value(Vector2(0.5, 0.5)), 0.001, TEST_LOCATION);
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
 
   Vector2 extraSize = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   DALI_TEST_EQUALS(extraSize, Vector2(0.0f, 50.0f), TEST_LOCATION);
@@ -2905,11 +2908,11 @@ int UtcDaliSvgVisualCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline("SvgVisual with custom shader");
 
-  VisualFactory     factory = VisualFactory::Get();
-  Property::Map     properties;
-  Property::Map     shader;
-  const std::string vertexShader                                   = "Foobar";
-  const std::string fragmentShader                                 = "Foobar";
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+  const String  vertexShader                                       = "Foobar";
+  const String  fragmentShader                                     = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
   shader[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -2941,10 +2944,10 @@ int UtcDaliSvgVisualCustomShader(void)
   DALI_TEST_CHECK(map);
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -4260,13 +4263,17 @@ int UtcDaliColorVisualCustomShaderWithDefaultSource(void)
   Property::Map*  map      = value.GetMap();
   DALI_TEST_CHECK(map);
 
-  Property::Value*             fragment              = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  const std::string            fragmentShader        = fragment->Get<std::string>();
+  Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
+  String           fragmentShaderString;
+  fragment->Get(fragmentShaderString);
+  const std::string fragmentShader(fragmentShaderString.CStr(), fragmentShaderString.Size());
+
   const std::string::size_type startOfFragmentShader = fragmentShader.find("//@name");
   DALI_TEST_EQUALS(SHADER_COLOR_VISUAL_SHADER_FRAG, fragmentShader.substr(startOfFragmentShader), TEST_LOCATION);
 
-  Property::Value*             vertex              = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  const std::string            vertexShader        = vertex->Get<std::string>();
+  Property::Value*             vertex             = map->Find("vertex"); // vertex key name from shader-impl.cpp
+  const String                 vertexShaderString = vertex->Get<Dali::String>();
+  const std::string            vertexShader(vertexShaderString.CStr(), vertexShaderString.Size());
   const std::string::size_type startOfVertexShader = vertexShader.find("//@name");
   DALI_TEST_EQUALS(SHADER_COLOR_VISUAL_SHADER_VERT, vertexShader.substr(startOfVertexShader), TEST_LOCATION);
 
@@ -4280,9 +4287,9 @@ int UtcDaliColorVisualCustomShader(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  Property::Map     shader;
-  const std::string vertexShader                                   = "Foobar";
-  const std::string fragmentShader                                 = "Foobar";
+  Property::Map shader;
+  const String  vertexShader                                       = "Foobar";
+  const String  fragmentShader                                     = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
   shader[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -4315,10 +4322,10 @@ int UtcDaliColorVisualCustomShader(void)
   DALI_TEST_CHECK(map);
 
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShader, fragment->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShader, fragment->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShader, vertex->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShader, vertex->Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -4330,17 +4337,17 @@ int UtcDaliColorVisualMultipleCustomShader(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  Property::Array   shaderArray;
-  Property::Map     shaderA;
-  const std::string vertexShaderA                                   = "FoobarA";
-  const std::string fragmentShaderA                                 = "FoobarA";
+  Property::Array shaderArray;
+  Property::Map   shaderA;
+  const String    vertexShaderA                                     = "FoobarA";
+  const String    fragmentShaderA                                   = "FoobarA";
   shaderA[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderA;
   shaderA[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderA;
   shaderA[Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 1;
 
-  Property::Map     shaderB;
-  const std::string vertexShaderB                                   = "FoobarB";
-  const std::string fragmentShaderB                                 = "FoobarB";
+  Property::Map shaderB;
+  const String  vertexShaderB                                       = "FoobarB";
+  const String  fragmentShaderB                                     = "FoobarB";
   shaderB[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShaderB;
   shaderB[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderB;
   shaderB[Dali::Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 2;
@@ -4398,19 +4405,19 @@ int UtcDaliColorVisualMultipleCustomShader(void)
   DALI_TEST_CHECK(shaderMapA != nullptr);
 
   Property::Value* vertexA = shaderMapA->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShaderA, vertexA->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShaderA, vertexA->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* fragmentA = shaderMapA->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShaderA, fragmentA->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShaderA, fragmentA->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Map* shaderMapB = programArray->GetElementAt(1).GetMap();
   DALI_TEST_CHECK(shaderMapB != nullptr);
 
   Property::Value* vertexB = shaderMapB->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(vertexShaderB, vertexB->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vertexShaderB, vertexB->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* fragmentB = shaderMapB->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShaderB, fragmentB->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShaderB, fragmentB->Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -5529,7 +5536,7 @@ int UtcDaliVisualUpdateProperty01(void)
   Property::Value* urlValue = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(urlValue);
   // NOTE : ImageVisual URL must NOT changed.
-  DALI_TEST_EQUALS(urlValue->Get<std::string>(), TEST_IMAGE_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(urlValue->Get<Dali::String>(), TEST_IMAGE_FILE_NAME, TEST_LOCATION);
 
   Property::Value* preMultipliedValue = resultMap.Find(Visual::Property::PREMULTIPLIED_ALPHA, Property::BOOLEAN);
   DALI_TEST_CHECK(preMultipliedValue);
@@ -5537,7 +5544,7 @@ int UtcDaliVisualUpdateProperty01(void)
 
   Property::Value* visualFittingModeValue = resultMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE, Property::STRING);
   DALI_TEST_CHECK(visualFittingModeValue);
-  DALI_TEST_EQUALS(visualFittingModeValue->Get<std::string>(), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(visualFittingModeValue->Get<Dali::String>(), "CENTER", TEST_LOCATION);
 
   Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
@@ -5762,7 +5769,7 @@ int UtcDaliVisualUpdatePropertyInvalidType(void)
   Property::Value* urlValue = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(urlValue);
   // NOTE : NPatchVisual URL must NOT changed.
-  DALI_TEST_EQUALS(urlValue->Get<std::string>(), TEST_NPATCH_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(urlValue->Get<Dali::String>(), TEST_NPATCH_FILE_NAME, TEST_LOCATION);
 
   Property::Value* preMultipliedValue = resultMap.Find(Visual::Property::PREMULTIPLIED_ALPHA, Property::BOOLEAN);
   DALI_TEST_CHECK(preMultipliedValue);
@@ -5770,7 +5777,7 @@ int UtcDaliVisualUpdatePropertyInvalidType(void)
 
   Property::Value* visualFittingModeValue = resultMap.Find(DevelVisual::Property::VISUAL_FITTING_MODE, Property::STRING);
   DALI_TEST_CHECK(visualFittingModeValue);
-  DALI_TEST_EQUALS(visualFittingModeValue->Get<std::string>(), "CENTER", TEST_LOCATION);
+  DALI_TEST_EQUALS(visualFittingModeValue->Get<Dali::String>(), "CENTER", TEST_LOCATION);
 
   // We don't check properties value that N_PATCH visual could not used.
   // It is undefined.

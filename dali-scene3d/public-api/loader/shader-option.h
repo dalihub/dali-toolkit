@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 #define DALI_SCENE3D_LOADER_SHADER_OPTION_H_
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
  *
  */
 
-// EXTERNAL INCLUDER
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 #include <string>
@@ -56,8 +57,8 @@ public:
 
   struct MacroDefinition
   {
-    std::string macro;
-    std::string definition;
+    Dali::String macro;
+    Dali::String definition;
   };
 
   ShaderOption() = default;
@@ -92,7 +93,7 @@ public:
    * @brief Enables empty preprocessor definitions to be defined to a value.
    * @SINCE_2_2.52
    */
-  void AddMacroDefinition(std::string macro, std::string definition);
+  void AddMacroDefinition(Dali::String macro, Dali::String definition);
 
   /**
    * @brief Retrieves current shader option hash
@@ -108,7 +109,7 @@ public:
    * @SINCE_2_2.33
    * @param[out] defines A list of define keywords those are used in this option.
    */
-  void GetDefines(std::vector<std::string>& defines) const;
+  void GetDefines(std::vector<Dali::String>& defines) const;
 
   /**
    * @brief Retrieves a single shader define keyword of input type.
@@ -117,7 +118,7 @@ public:
    * @param[in] shaderOptionType Shader definition option type to know its keyword.
    * @return string keyword of shader define.
    */
-  static std::string_view GetDefineKeyword(Type shaderOptionType);
+  static Dali::StringView GetDefineKeyword(Type shaderOptionType);
 
   /**
    * @brief Get any macro definitions.

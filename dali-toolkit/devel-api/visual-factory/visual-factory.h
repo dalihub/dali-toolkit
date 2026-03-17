@@ -123,7 +123,7 @@ public:
    * @param[in] size The width and height to fit the loaded image to.
    * @return The pointer pointing to the visual
    */
-  Visual::Base CreateVisual(const std::string& url, ImageDimensions size);
+  Visual::Base CreateVisual(const Dali::String& url, ImageDimensions size);
 
   /**
    * @brief Request the visual to render the given resource at the url with some options.
@@ -133,7 +133,7 @@ public:
    * @param[in] creationOptions The creation option.
    * @return The pointer pointing to the visual
    */
-  Visual::Base CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions);
+  Visual::Base CreateVisual(const Dali::String& url, ImageDimensions size, CreationOptions creationOptions);
 
   /**
    * @brief Get the default quad geometry which general visuals be used.

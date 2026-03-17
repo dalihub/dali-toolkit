@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_LOADER_FACIAL_ANIMATION_LOADER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace Dali::Scene3D::Loader
  *
  * @return An animation definition.
  */
-DALI_SCENE3D_API AnimationDefinition LoadFacialAnimation(const std::string& url);
+DALI_SCENE3D_API AnimationDefinition LoadFacialAnimation(const Dali::String& url);
 
 /**
  * @brief Loads a facial animation encoded in a json file in the given data stream.

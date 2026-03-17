@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
 #define DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public:
   /**
    * @copydoc Dali::Scene3D::Loader::ModelLoaderImpl::LoadMode()
    */
-  bool LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result) override;
+  bool LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result) override;
 };
 
 } // namespace Dali::Scene3D::Loader::Internal

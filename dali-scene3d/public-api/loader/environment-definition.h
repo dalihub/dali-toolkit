@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ struct DALI_SCENE3D_API EnvironmentDefinition
    * @return The raw data for the given diffuse and specular maps
    * @note This can be done on any thread.
    */
-  RawData LoadRaw(const std::string& environmentsPath);
+  RawData LoadRaw(const Dali::String& environmentsPath);
 
   /**
    * @brief Creates DALi cubemap Textures from the pixel data in @a raw, then returns them in a Textures object.
@@ -89,8 +89,8 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   static float GetDefaultIntensity();
 
 public: // DATA
-  std::string              mDiffuseMapPath;
-  std::string              mSpecularMapPath;
+  Dali::String             mDiffuseMapPath;
+  Dali::String             mSpecularMapPath;
   std::shared_ptr<RawData> mRawData;
   Quaternion               mCubeOrientation = Quaternion::IDENTITY;
   Vector3                  mYDirection      = Vector3::ONE;

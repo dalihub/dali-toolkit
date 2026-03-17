@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -87,9 +92,9 @@ CameraActor SceneView::GetCamera(uint32_t index) const
   return GetImpl(*this).GetCamera(index);
 }
 
-CameraActor SceneView::GetCamera(const std::string& name) const
+CameraActor SceneView::GetCamera(const Dali::String& name) const
 {
-  return GetImpl(*this).GetCamera(name);
+  return GetImpl(*this).GetCamera(ToStdString(name));
 }
 
 void SceneView::SelectCamera(uint32_t index)
@@ -97,9 +102,9 @@ void SceneView::SelectCamera(uint32_t index)
   GetImpl(*this).SelectCamera(index);
 }
 
-void SceneView::SelectCamera(const std::string& name)
+void SceneView::SelectCamera(const Dali::String& name)
 {
-  GetImpl(*this).SelectCamera(name);
+  GetImpl(*this).SelectCamera(ToStdString(name));
 }
 
 void SceneView::StartCameraTransition(uint32_t index, float durationSeconds, Dali::AlphaFunction alphaFunction)
@@ -107,14 +112,14 @@ void SceneView::StartCameraTransition(uint32_t index, float durationSeconds, Dal
   GetImpl(*this).StartCameraTransition(index, durationSeconds, alphaFunction);
 }
 
-void SceneView::StartCameraTransition(std::string name, float durationSeconds, Dali::AlphaFunction alphaFunction)
+void SceneView::StartCameraTransition(Dali::String name, float durationSeconds, Dali::AlphaFunction alphaFunction)
 {
-  GetImpl(*this).StartCameraTransition(name, durationSeconds, alphaFunction);
+  GetImpl(*this).StartCameraTransition(ToStdString(name), durationSeconds, alphaFunction);
 }
 
-void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
+void SceneView::SetImageBasedLightSource(const Dali::String& diffuseUrl, const Dali::String& specularUrl, float scaleFactor)
 {
-  GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
+  GetImpl(*this).SetImageBasedLightSource(ToStdString(diffuseUrl), ToStdString(specularUrl), scaleFactor);
 }
 
 void SceneView::SetImageBasedLightScaleFactor(float scaleFactor)
@@ -172,9 +177,9 @@ uint8_t SceneView::GetFramebufferMultiSamplingLevel() const
   return GetImpl(*this).GetFramebufferMultiSamplingLevel();
 }
 
-void SceneView::SetSkybox(const std::string& skyboxUrl)
+void SceneView::SetSkybox(const Dali::String& skyboxUrl)
 {
-  GetImpl(*this).SetSkybox(skyboxUrl);
+  GetImpl(*this).SetSkybox(ToStdString(skyboxUrl));
 }
 
 void SceneView::SetSkyboxEnvironmentMapType(Scene3D::EnvironmentMapType skyboxEnvironmentMapType)

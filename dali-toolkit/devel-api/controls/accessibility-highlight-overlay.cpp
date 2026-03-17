@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/rect.h>
@@ -36,6 +37,8 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 #include <dali/devel-api/atspi-interfaces/accessible.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali::Toolkit::DevelControl
 {
@@ -68,7 +71,7 @@ Dali::Actor CreateOverlayHighlightActor()
   std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += FOCUS_IMAGE;
 
-  auto actor = Toolkit::ImageView::New(focusBorderImagePath);
+  auto actor = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   actor.SetProperty(Actor::Property::NAME, HIGHLIGHT_NAME);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);

@@ -24,6 +24,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
@@ -346,26 +347,26 @@ InputMethodContext TextField::GetInputMethodContext()
   return mInputMethodContext;
 }
 
-bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool               connected(true);
   Toolkit::TextField field = Toolkit::TextField::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TEXT_CHANGED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_TEXT_CHANGED))
   {
     field.TextChangedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_MAX_LENGTH_REACHED))
   {
     field.MaxLengthReachedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_INPUT_STYLE_CHANGED))
   {
     field.InputStyleChangedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_ANCHOR_CLICKED))
   {
     if(field)
     {
@@ -373,7 +374,7 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_CURSOR_POSITION_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_CURSOR_POSITION_CHANGED))
   {
     if(field)
     {
@@ -381,7 +382,7 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.CursorPositionChangedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_INPUT_FILTERED))
   {
     if(field)
     {
@@ -389,7 +390,7 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.InputFilteredSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_CHANGED))
   {
     if(field)
     {
@@ -397,7 +398,7 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CLEARED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_CLEARED))
   {
     if(field)
     {
@@ -405,7 +406,7 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.SelectionClearedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_STARTED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_STARTED))
   {
     if(field)
     {
@@ -893,7 +894,7 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
 
     return true;
   }
-  else if((Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && KEY_RETURN_NAME == event.GetKeyName()) ||
+  else if((Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && strcmp(KEY_RETURN_NAME, event.GetKeyName().CStr()) == 0) ||
           Dali::DevelKey::DALI_KEY_KP_ENTER == event.GetKeyCode())
   {
     // Do nothing when enter is comming.
@@ -1119,7 +1120,7 @@ void TextField::GetHandleImagePropertyValue(Property::Value& value, Text::Handle
   if(mDecorator)
   {
     Property::Map map;
-    map[PropertyHandler::IMAGE_MAP_FILENAME_STRING] = mDecorator->GetHandleImage(handleType, handleImageType);
+    Dali::Integration::InsertToMap(map, std::string_view(PropertyHandler::IMAGE_MAP_FILENAME_STRING), mDecorator->GetHandleImage(handleType, handleImageType));
 
     value = map;
   }
@@ -1294,11 +1295,11 @@ Dali::Property::Index TextField::RegisterFontVariationProperty(std::string tag)
   mController->GetVariationsMap(variationsMap);
 
   float variationValue = 0.f;
-  auto  tagPtr         = variationsMap.Find(tag);
+  auto  tagPtr         = variationsMap.Find(Dali::Integration::ToDaliStringView(tag));
 
   if(tagPtr)
   {
-    variationValue = tagPtr->Get<float>();
+    tagPtr->Get(variationValue);
   }
 
   Dali::Property::Index index = self.RegisterProperty(tag.data(), variationValue);

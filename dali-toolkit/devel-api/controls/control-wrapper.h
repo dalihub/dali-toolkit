@@ -46,7 +46,7 @@ public:
    *
    * @return A handle to a new ControlWrapper.
    */
-  static ControlWrapper New(const std::string& typeName, Internal::ControlWrapper& implementation);
+  static ControlWrapper New(const String& typeName, Internal::ControlWrapper& implementation);
 
   /**
    * @brief Creates an empty ControlWrapper handle.

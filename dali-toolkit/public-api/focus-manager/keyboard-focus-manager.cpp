@@ -23,8 +23,8 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali/integration-api/string-utils.h>
 
 namespace Dali
 {
@@ -136,7 +136,7 @@ Control::KeyboardFocus::Device KeyboardFocusManager::GetLastFocusChangeDevice() 
   return internalCtx.device;
 }
 
-const std::string& KeyboardFocusManager::GetLastFocusChangeDeviceName() const
+const Dali::String& KeyboardFocusManager::GetLastFocusChangeDeviceName() const
 {
   const auto& internalCtx = GetImpl(*this).FocusChangedContext();
   return internalCtx.deviceName;

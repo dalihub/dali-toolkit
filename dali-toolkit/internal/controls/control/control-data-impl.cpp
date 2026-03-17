@@ -33,6 +33,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
@@ -57,6 +58,12 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -309,24 +316,26 @@ bool PerformLegacyAccessibilityAction(Toolkit::Control control, const std::strin
   return ret;
 }
 
-bool DoAccessibilityAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool DoAccessibilityAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   Dali::BaseHandle handle(object);
 
   Toolkit::Control control = Toolkit::Control::DownCast(handle);
 
   DALI_ASSERT_ALWAYS(control);
+
+  std::string actionNameStr = ToStdString(actionName);
 
   if(!DevelControl::AccessibilityActionSignal(control).Empty())
   {
-    return PerformAccessibilityAction(control, actionName, attributes);
+    return PerformAccessibilityAction(control, actionNameStr, attributes);
   }
 
   // Fall back to legacy action is no ActionSignal is connected
-  return PerformLegacyAccessibilityAction(control, actionName);
+  return PerformLegacyAccessibilityAction(control, actionNameStr);
 }
 
-bool DoLegacyAccessibilityAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool DoLegacyAccessibilityAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   Dali::BaseHandle handle(object);
 
@@ -334,7 +343,7 @@ bool DoLegacyAccessibilityAction(BaseObject* object, const std::string& actionNa
 
   DALI_ASSERT_ALWAYS(control);
 
-  return PerformLegacyAccessibilityAction(control, actionName);
+  return PerformLegacyAccessibilityAction(control, ToStdString(actionName));
 }
 
 const char* SIGNAL_KEY_EVENT              = "keyEvent";
@@ -357,7 +366,7 @@ const char* SIGNAL_DO_GESTURE             = "doGesture";
  * @return True if the signal was connected.
  * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
  */
-static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
@@ -368,47 +377,47 @@ static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* trac
     Internal::Control& controlImpl(Internal::GetImplementation(control));
     connected = true;
 
-    if(0 == strcmp(signalName.c_str(), SIGNAL_KEY_EVENT))
+    if(0 == strcmp(signalName.CStr(), SIGNAL_KEY_EVENT))
     {
       controlImpl.KeyEventSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_KEY_INPUT_FOCUS_GAINED))
     {
       controlImpl.KeyInputFocusGainedSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_KEY_INPUT_FOCUS_LOST))
     {
       controlImpl.KeyInputFocusLostSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_TAPPED))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_TAPPED))
     {
       controlImpl.EnableGestureDetection(GestureType::TAP);
       controlImpl.GetTapGestureDetector().DetectedSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_PANNED))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_PANNED))
     {
       controlImpl.EnableGestureDetection(GestureType::PAN);
       controlImpl.GetPanGestureDetector().DetectedSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_PINCHED))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_PINCHED))
     {
       controlImpl.EnableGestureDetection(GestureType::PINCH);
       controlImpl.GetPinchGestureDetector().DetectedSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_LONG_PRESSED))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_LONG_PRESSED))
     {
       controlImpl.EnableGestureDetection(GestureType::LONG_PRESS);
       controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_GET_NAME))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_GET_NAME))
     {
       DevelControl::AccessibilityGetNameSignal(control).Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_GET_DESCRIPTION))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_GET_DESCRIPTION))
     {
       DevelControl::AccessibilityGetDescriptionSignal(control).Connect(tracker, functor);
     }
-    else if(0 == strcmp(signalName.c_str(), SIGNAL_DO_GESTURE))
+    else if(0 == strcmp(signalName.CStr(), SIGNAL_DO_GESTURE))
     {
       DevelControl::AccessibilityDoGestureSignal(control).Connect(tracker, functor);
     }
@@ -785,7 +794,7 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
         typeInfo = controlWrapperImpl->GetTypeInfo();
       }
 
-      DALI_LOG_INFO(gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n", visual.GetName().c_str(), typeInfo ? typeInfo.GetName().c_str() : "Unknown");
+      DALI_LOG_INFO(gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n", visual.GetName().c_str(), typeInfo ? typeInfo.GetName().CStr() : "Unknown");
 #endif
       Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
       visualImpl.AnimateProperty(animation, *animator);
@@ -794,7 +803,7 @@ void Control::Impl::AddTransitions(Dali::Animation&               animation,
     {
       DALI_LOG_INFO(gLogFilter, Debug::Concise, "CreateTransition: Could not find visual. Trying actors");
       // Otherwise, try any actor children of control (Including the control)
-      Actor child = mControlImpl.Self().FindChildByName(animator->objectName);
+      Actor child = mControlImpl.Self().FindChildByName(ToDaliStringView(animator->objectName));
       if(child)
       {
         Property::Index propertyIndex = child.GetPropertyIndex(animator->propertyKey);
@@ -872,7 +881,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
     {
       case Toolkit::Control::Property::STYLE_NAME:
       {
-        controlImpl.SetStyleName(value.Get<std::string>());
+        controlImpl.SetStyleName(value.Get<String>());
         break;
       }
 
@@ -906,7 +915,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::SUB_STATE:
       {
         std::string subState;
-        if(value.Get(subState))
+        if(GetStdString(value, subState))
         {
           controlImpl.mImpl->SetSubState(subState);
         }
@@ -975,12 +984,12 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           controlImpl.SetBackground(*map);
         }
-        else if(value.Get(url))
+        else if(GetStdString(value, url))
         {
           if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
           {
             // don't know the size to load
-            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, ImageDimensions());
+            Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(ToDaliString(url), ImageDimensions());
             if(visual)
             {
               controlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
@@ -1049,7 +1058,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
       {
         std::string name;
-        if(value.Get(name))
+        if(GetStdString(value, name))
         {
           if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !name.empty())
           {
@@ -1062,7 +1071,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
         std::string text;
-        if(value.Get(text))
+        if(GetStdString(value, text))
         {
           if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !text.empty())
           {
@@ -1161,7 +1170,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::AUTOMATION_ID:
       {
         std::string automationId;
-        if(value.Get(automationId))
+        if(GetStdString(value, automationId))
         {
           if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !automationId.empty())
           {
@@ -1174,7 +1183,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
       case Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE:
       {
         std::string accessibilityValue;
-        if(value.Get(accessibilityValue))
+        if(GetStdString(value, accessibilityValue))
         {
           if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !accessibilityValue.empty())
           {
@@ -1380,7 +1389,7 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::SUB_STATE:
       {
-        value = controlImpl.mImpl->mSubStateName;
+        value = ToPropertyValue(controlImpl.mImpl->mSubStateName);
         break;
       }
 
@@ -1474,14 +1483,14 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
       {
         const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
-        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.name : "";
+        value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.name : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
         const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
-        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.description : "";
+        value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.description : "");
         break;
       }
 
@@ -1533,14 +1542,14 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::AUTOMATION_ID:
       {
         const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
-        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.automationId : "";
+        value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.automationId : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE:
       {
         const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
-        value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.value : "";
+        value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.value : "");
         break;
       }
 

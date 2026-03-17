@@ -42,7 +42,7 @@ public:
    * @param[in] filename file to load
    * @return Valid NavigationMesh or nullptr
    */
-  static UniquePtr<Algorithm::NavigationMesh> CreateFromFile(std::string filename);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromFile(Dali::String filename);
 
   /**
    * @brief Creates NavigationMesh object from binary buffer

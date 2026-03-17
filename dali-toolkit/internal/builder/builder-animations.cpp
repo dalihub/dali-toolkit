@@ -24,6 +24,10 @@
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace // unnamed namespace
 {
@@ -211,14 +215,14 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
       OptionalString property(constant.IsString(IsChild(pKeyChild.second, "property")));
       DALI_ASSERT_ALWAYS(actorName && "Animation must specify actor name");
 
-      Handle targetHandle = searchActor.FindChildByName(*actorName);
+      Handle targetHandle = searchActor.FindChildByName(ToDaliStringView(*actorName));
       DALI_ASSERT_ALWAYS(targetHandle && "Actor must exist for property");
 
       Property::Value propValue;
       Property::Index propIndex = Property::INVALID_INDEX;
       if(property)
       {
-        propIndex = targetHandle.GetPropertyIndex(*property);
+        propIndex = targetHandle.GetPropertyIndex(Property::Key(ToDaliStringView(*property)));
 
         // if the property is not found from the (actor) handle, try to downcast it to renderable actor
         // to allow animating shader uniforms

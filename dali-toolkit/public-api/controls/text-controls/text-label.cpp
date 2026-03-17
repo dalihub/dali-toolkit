@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
@@ -30,7 +33,7 @@ TextLabel TextLabel::New()
   return Internal::TextLabel::New();
 }
 
-TextLabel TextLabel::New(const std::string& text)
+TextLabel TextLabel::New(const Dali::String& text)
 {
   TextLabel label = Internal::TextLabel::New();
   label.SetProperty(TextLabel::Property::TEXT, text);
@@ -43,7 +46,7 @@ TextLabel TextLabel::New(ControlBehaviour additionalBehaviour)
   return Internal::TextLabel::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
 }
 
-TextLabel TextLabel::New(ControlBehaviour additionalBehaviour, const std::string& text)
+TextLabel TextLabel::New(ControlBehaviour additionalBehaviour, const Dali::String& text)
 {
   TextLabel label = Internal::TextLabel::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
   label.SetProperty(TextLabel::Property::TEXT, text);

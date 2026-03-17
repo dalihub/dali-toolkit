@@ -186,7 +186,7 @@ public:
       UNSELECTED_BACKGROUND_VISUAL,
 
       /**
-       * @brief name "label", type Property::Map or std::string
+       * @brief name "label", type Property::Map or Dali::String
        * @SINCE_1_0.0
        */
       LABEL,

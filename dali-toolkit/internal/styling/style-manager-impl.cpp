@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/application.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
@@ -33,6 +35,11 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
+
+using Dali::Integration::InsertToMap;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -113,9 +120,9 @@ StyleManager::StyleManager()
   mAdaptorInitialized(false)
 {
   // Add theme builder constants
-  const std::string dataReadOnlyDir                     = AssetManager::GetDaliDataReadOnlyPath();
-  mThemeBuilderConstants[PACKAGE_PATH_KEY]              = dataReadOnlyDir + DEFAULT_TOOLKIT_PACKAGE_PATH;
-  mThemeBuilderConstants[APPLICATION_RESOURCE_PATH_KEY] = Application::GetResourcePath();
+  const std::string dataReadOnlyDir = AssetManager::GetDaliDataReadOnlyPath();
+  InsertToMap(mThemeBuilderConstants, std::string_view(PACKAGE_PATH_KEY), dataReadOnlyDir + DEFAULT_TOOLKIT_PACKAGE_PATH);
+  InsertToMap(mThemeBuilderConstants, std::string_view(APPLICATION_RESOURCE_PATH_KEY), ToStdString(Application::GetResourcePath()));
 
   // Set the full path for the default style theme.
   const std::string styleDirPath = AssetManager::GetDaliStylePath();
@@ -207,12 +214,12 @@ const std::string& StyleManager::GetDefaultFontFamily() const
 
 void StyleManager::SetStyleConstant(const std::string& key, const Property::Value& value)
 {
-  mStyleBuilderConstants[key] = value;
+  InsertToMap(mStyleBuilderConstants, key, value);
 }
 
 bool StyleManager::GetStyleConstant(const std::string& key, Property::Value& valueOut)
 {
-  Property::Value* value = mStyleBuilderConstants.Find(key);
+  Property::Value* value = mStyleBuilderConstants.Find(ToDaliStringView(key));
   if(value)
   {
     valueOut = *value;
@@ -487,11 +494,11 @@ static void CollectQualifiers(std::vector<std::string>& qualifiersOut)
  * @param[out] qualifiedStyleOut The qualified style name
  */
 static void BuildQualifiedStyleName(
-  const std::string&              styleName,
+  const Dali::String&             styleName,
   const std::vector<std::string>& qualifiers,
   std::string&                    qualifiedStyleOut)
 {
-  qualifiedStyleOut.append(styleName);
+  qualifiedStyleOut.append(ToStdString(styleName));
 
   for(std::vector<std::string>::const_iterator it    = qualifiers.begin(),
                                                itEnd = qualifiers.end();
@@ -505,11 +512,11 @@ static void BuildQualifiedStyleName(
   }
 }
 
-static bool GetStyleNameForControl(Toolkit::Builder builder, Toolkit::Control control, std::string& styleName)
+static bool GetStyleNameForControl(Toolkit::Builder builder, Toolkit::Control control, Dali::String& styleName)
 {
   styleName = control.GetStyleName();
 
-  if(styleName.empty())
+  if(styleName.Empty())
   {
     styleName = control.GetTypeName();
   }
@@ -541,17 +548,17 @@ static bool GetStyleNameForControl(Toolkit::Builder builder, Toolkit::Control co
 
   if(found)
   {
-    styleName = qualifiedStyleName;
+    styleName = ToDaliString(qualifiedStyleName);
   }
   return found;
 }
 
 void StyleManager::ApplyStyle(Toolkit::Builder builder, Toolkit::Control control)
 {
-  std::string styleName = control.GetStyleName();
+  Dali::String styleName = control.GetStyleName();
   if(GetStyleNameForControl(builder, control, styleName))
   {
-    builder.ApplyStyle(styleName, control);
+    builder.ApplyStyle(ToStdString(styleName), control);
   }
 
   if(mDefaultFontSize == -1 && mStyleMonitor.EnsureFontClientCreated())
@@ -592,11 +599,11 @@ const StylePtr StyleManager::GetRecordedStyle(Toolkit::Control control)
 {
   if(mThemeBuilder)
   {
-    std::string styleName = control.GetStyleName();
+    Dali::String styleName = control.GetStyleName();
 
     if(GetStyleNameForControl(mThemeBuilder, control, styleName))
     {
-      const StylePtr style = GetImpl(mThemeBuilder).GetStyle(styleName);
+      const StylePtr style = GetImpl(mThemeBuilder).GetStyle(ToStdString(styleName));
       return style;
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <cstring> // for strcmp
@@ -28,6 +29,8 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -212,7 +215,7 @@ void CubeTransitionEffect::Initialize()
 void CubeTransitionEffect::OnSceneConnection(int depth)
 {
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader   shader   = Shader::New(SHADER_CUBE_TRANSITION_EFFECT_VERT, SHADER_CUBE_TRANSITION_EFFECT_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CUBE_TRANSITION_EFFECT");
+  Shader   shader   = Shader::New(ToDaliStringView(SHADER_CUBE_TRANSITION_EFFECT_VERT), ToDaliStringView(SHADER_CUBE_TRANSITION_EFFECT_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CUBE_TRANSITION_EFFECT");
 
   TextureSet textureSet = TextureSet::New();
 
@@ -449,14 +452,14 @@ Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffe
   return mTransitionCompletedSignal;
 }
 
-bool CubeTransitionEffect::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool CubeTransitionEffect::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                          connected(true);
   Toolkit::CubeTransitionEffect cubeTransitionEffect = Toolkit::CubeTransitionEffect::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TRANSITION_COMPLETED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_TRANSITION_COMPLETED))
   {
     cubeTransitionEffect.TransitionCompletedSignal().Connect(tracker, functor);
   }

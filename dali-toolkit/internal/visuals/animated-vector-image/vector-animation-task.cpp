@@ -21,11 +21,15 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
+
+using Dali::Integration::ToStdString;
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
 #include <dali-toolkit/internal/visuals/image/image-visual-shader-factory.h>
@@ -409,13 +413,13 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
     }
     else
     {
-      std::string startMarker, endMarker;
+      Dali::String startMarker, endMarker;
       if(playRange.GetElementAt(0).Get(startMarker) && playRange.GetElementAt(1).Get(endMarker))
       {
         if(mVectorRenderer)
         {
           uint32_t frame; // We don't use this later
-          if(mVectorRenderer.GetMarkerInfo(startMarker, startFrame, frame) && mVectorRenderer.GetMarkerInfo(endMarker, frame, endFrame))
+          if(mVectorRenderer.GetMarkerInfo(ToStdString(startMarker), startFrame, frame) && mVectorRenderer.GetMarkerInfo(ToStdString(endMarker), frame, endFrame))
           {
             valid = true;
           }
@@ -425,10 +429,10 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
   }
   else if(count == 1)
   {
-    std::string marker;
+    Dali::String marker;
     if(playRange.GetElementAt(0).Get(marker))
     {
-      if(mVectorRenderer && mVectorRenderer.GetMarkerInfo(marker, startFrame, endFrame))
+      if(mVectorRenderer && mVectorRenderer.GetMarkerInfo(ToStdString(marker), startFrame, endFrame))
       {
         valid = true;
       }

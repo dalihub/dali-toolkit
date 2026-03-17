@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dummy-control.h>
 #include <test-animation-data.h>
 #include <test-button.h>
@@ -34,6 +35,8 @@
 
 using namespace Dali;
 using namespace Toolkit;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace BuilderControlProperty
 {
@@ -1775,8 +1778,8 @@ int UtcDaliBuilderMapping01(void)
   DALI_TEST_CHECK(element.GetType() == Property::MAP);
   Property::Map* map = element.GetMap();
 
-  CHECK_MAP_ELEMENT(map, "target", std::string, Property::STRING, "unselectedBackgroundRenderer", TEST_LOCATION);
-  CHECK_MAP_ELEMENT(map, "property", std::string, Property::STRING, "opacity", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "target", Dali::String, Property::STRING, "unselectedBackgroundRenderer", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "property", Dali::String, Property::STRING, "opacity", TEST_LOCATION);
   CHECK_MAP_ELEMENT(map, "alphaFunction", int, Property::INTEGER, (int)Dali::AlphaFunction::EASE_OUT, TEST_LOCATION);
   CHECK_MAP_ELEMENT(map, "timePeriodDelay", float, Property::FLOAT, 0.0f, TEST_LOCATION);
   CHECK_MAP_ELEMENT(map, "timePeriodDuration", float, Property::FLOAT, 0.4f, TEST_LOCATION);
@@ -1846,8 +1849,8 @@ int UtcDaliBuilderMappingCycleCheck(void)
   DALI_TEST_CHECK(element.GetType() == Property::MAP);
   Property::Map* map = element.GetMap();
 
-  CHECK_MAP_ELEMENT(map, "target", std::string, Property::STRING, "", TEST_LOCATION);
-  CHECK_MAP_ELEMENT(map, "property", std::string, Property::STRING, "", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "target", Dali::String, Property::STRING, "", TEST_LOCATION);
+  CHECK_MAP_ELEMENT(map, "property", Dali::String, Property::STRING, "", TEST_LOCATION);
   CHECK_MAP_ELEMENT(map, "timePeriodDuration", float, Property::FLOAT, 0.6f, TEST_LOCATION);
 
   END_TEST;
@@ -2038,11 +2041,11 @@ int UtcDaliBase64EncodingP(void)
   std::copy(data.begin(), data.end(), out_it);
   std::cout << std::endl;
 
-  std::string output;
+  Dali::String output;
   DALI_TEST_CHECK(value.Get(output));
   DALI_TEST_EQUALS(output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8=", TEST_LOCATION);
 
-  std::cout << "Output data:  " << output << std::endl;
+  std::cout << "Output data:  " << ToStdString(output) << std::endl;
 
   END_TEST;
 }
@@ -2059,7 +2062,7 @@ int UtcDaliBase64EncodingP2(void)
   std::copy(data.begin(), data.end(), out_it);
   std::cout << std::endl;
 
-  std::string output;
+  Dali::String output;
   DALI_TEST_CHECK(value.Get(output));
   DALI_TEST_EQUALS(output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8=", TEST_LOCATION);
 
@@ -2089,7 +2092,7 @@ int UtcDaliBase64EncodingP3(void)
   std::copy(data.begin(), data.end(), out_it);
   std::cout << std::endl;
 
-  std::string           output;
+  Dali::String          output;
   Dali::Property::Array array;
   DALI_TEST_CHECK(value.GetArray());
   array = *value.GetArray();
@@ -2117,15 +2120,15 @@ int UtcDaliBase64EncodingN(void)
   Property::Value value;
   EncodeBase64PropertyData(value, data);
 
-  std::string output;
+  Dali::String output;
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), true, TEST_LOCATION);
 
   std::vector<uint8_t> data2;
   EncodeBase64PropertyData(value, data2);
 
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2151,10 +2154,10 @@ int UtcDaliBase64EncodingP02(void)
   Property::Value value;
   EncodeBase64PropertyData(value, testData);
 
-  std::string output;
+  Dali::String output;
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(output.length(), b64l(testData), TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Size(), b64l(testData), TEST_LOCATION);
 
   std::vector<uint32_t> outData;
   DecodeBase64PropertyData(value, outData);
@@ -2166,8 +2169,8 @@ int UtcDaliBase64EncodingP02(void)
   EncodeBase64PropertyData(value, testData);
 
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(output.length(), b64l(testData), TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Size(), b64l(testData), TEST_LOCATION);
 
   outData.clear();
   DecodeBase64PropertyData(value, outData);
@@ -2179,8 +2182,8 @@ int UtcDaliBase64EncodingP02(void)
   EncodeBase64PropertyData(value, testData);
 
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(output.length(), b64l(testData), TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Size(), b64l(testData), TEST_LOCATION);
 
   outData.clear();
   DecodeBase64PropertyData(value, outData);
@@ -2192,8 +2195,8 @@ int UtcDaliBase64EncodingP02(void)
   EncodeBase64PropertyData(value, testData);
 
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(output.length(), b64l(testData), TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Size(), b64l(testData), TEST_LOCATION);
 
   outData.clear();
   DecodeBase64PropertyData(value, outData);
@@ -2215,10 +2218,10 @@ int UtcDaliBase64EncodingP03(void)
   Property::Value value;
   EncodeBase64PropertyData(value, testData);
 
-  std::string output;
+  Dali::String output;
   DALI_TEST_CHECK(value.Get(output));
-  DALI_TEST_EQUALS(output.empty(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(output.length(), b64l(testData), TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(output.Size(), b64l(testData), TEST_LOCATION);
 
   std::vector<uint32_t> outData;
   DecodeBase64PropertyData(value, outData);
@@ -2340,7 +2343,7 @@ int UtcDaliBase64DecodingP01(void)
   std::vector<uint32_t> expectedResults = {0xffffffff, 0xfefefefe, 0x00010203};
 
   std::vector<uint32_t> outputData;
-  DecodeBase64PropertyData(Property::Value(testInput), outputData);
+  DecodeBase64PropertyData(ToPropertyValue(testInput), outputData);
 
   DALI_TEST_EQUALS(std::equal(expectedResults.begin(), expectedResults.end(), outputData.begin()), true, TEST_LOCATION);
 
@@ -2355,7 +2358,7 @@ int UtcDaliBase64DecodingP02(void)
   std::vector<uint8_t> expectedResults = {0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0x03, 0x02, 0x01, 0x00};
 
   std::vector<uint8_t> outputData;
-  DecodeBase64PropertyData(Property::Value(testInput), outputData);
+  DecodeBase64PropertyData(ToPropertyValue(testInput), outputData);
 
   DALI_TEST_EQUALS(std::equal(expectedResults.begin(), expectedResults.end(), outputData.begin()), true, TEST_LOCATION);
 

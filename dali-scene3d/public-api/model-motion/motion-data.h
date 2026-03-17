@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_MOTION_MOTION_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,7 @@ public: // Public Method
    * @param[in] scale The scale factor to set on the position property manually.
    * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
    */
-  void LoadBvh(const std::string& path, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+  void LoadBvh(const Dali::String& path, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
    * @brief Load MotionData from bvh file.
@@ -271,7 +271,7 @@ public: // Public Method
    * @param[in] useRootTranslationOnly True to use only root translation with rotation animation.
    * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
    */
-  void LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
+  void LoadBvh(const Dali::String& path, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE, bool synchronousLoad = false);
 
   /**
    * @brief Load MotionData from bvh buffer.
@@ -309,7 +309,7 @@ public: // Public Method
    * @param[in] url The file path.
    * @param[in] synchronousLoad True if we want to load result synchronously. Default is false.
    */
-  void LoadFacialAnimation(const std::string& url, bool synchronousLoad = false);
+  void LoadFacialAnimation(const Dali::String& url, bool synchronousLoad = false);
 
   /**
    * @brief Load MotionData from facial defined json file.

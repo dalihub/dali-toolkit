@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1734,14 +1734,14 @@ void ItemView::GetItemsRange(ItemRange& range)
   }
 }
 
-bool ItemView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ItemView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool              connected(true);
   Toolkit::ItemView itemView = Toolkit::ItemView::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), LAYOUT_ACTIVATED_SIGNAL))
+  if(0 == strcmp(signalName.CStr(), LAYOUT_ACTIVATED_SIGNAL))
   {
     itemView.LayoutActivatedSignal().Connect(tracker, functor);
   }
@@ -1941,7 +1941,7 @@ Property::Value ItemView::GetProperty(BaseObject* object, Property::Index index)
   return value;
 }
 
-bool ItemView::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool ItemView::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   Dali::BaseHandle handle(object);
 
@@ -1949,15 +1949,15 @@ bool ItemView::DoAction(BaseObject* object, const std::string& actionName, const
 
   DALI_ASSERT_ALWAYS(itemView);
 
-  if(0 == strcmp(actionName.c_str(), ACTION_STOP_SCROLLING))
+  if(0 == strcmp(actionName.CStr(), ACTION_STOP_SCROLLING))
   {
     GetImpl(itemView).DoStopScrolling();
   }
-  else if(0 == strcmp(actionName.c_str(), ACTION_ENABLE_REFRESH))
+  else if(0 == strcmp(actionName.CStr(), ACTION_ENABLE_REFRESH))
   {
     GetImpl(itemView).SetRefreshNotificationEnabled(true);
   }
-  else if(0 == strcmp(actionName.c_str(), ACTION_DISABLE_REFRESH))
+  else if(0 == strcmp(actionName.CStr(), ACTION_DISABLE_REFRESH))
   {
     GetImpl(itemView).SetRefreshNotificationEnabled(false);
   }

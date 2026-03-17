@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_KTX_LOADER_H
 #define DALI_SCENE3D_LOADER_KTX_LOADER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Dali::Scene3D::Loader
  * @param[out] environmentMapData The data structure with all pixel data objects.
  * @return bool True if the loading is succeded.
  */
-bool LoadKtxData(const std::string& path, EnvironmentMapData& environmentMapData);
+bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapData);
 
 } // namespace Dali::Scene3D::Loader
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D::Material::TextureType::BASE_COLOR, std::move(baseColor));
   DALI_TEST_EQUALS(baseColorTexture, material.GetTexture(Scene3D::Material::TextureType::BASE_COLOR), TEST_LOCATION);
   DALI_TEST_EQUALS(baseColorSampler, material.GetSampler(Scene3D::Material::TextureType::BASE_COLOR), TEST_LOCATION);
-  DALI_TEST_EQUALS("baseColor", material.GetProperty<std::string>(Scene3D::Material::Property::BASE_COLOR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("baseColor", material.GetProperty<Dali::String>(Scene3D::Material::Property::BASE_COLOR_URL), TEST_LOCATION);
 
   Scene3D::Internal::Material::TextureInformation metallicRoughness;
   Dali::Texture                                   metallicRoughnessTexture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
@@ -72,7 +72,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D::Material::TextureType::METALLIC_ROUGHNESS, std::move(metallicRoughness));
   DALI_TEST_EQUALS(metallicRoughnessTexture, material.GetTexture(Scene3D::Material::TextureType::METALLIC_ROUGHNESS), TEST_LOCATION);
   DALI_TEST_EQUALS(metallicRoughnessSampler, material.GetSampler(Scene3D::Material::TextureType::METALLIC_ROUGHNESS), TEST_LOCATION);
-  DALI_TEST_EQUALS("metallicRoughness", material.GetProperty<std::string>(Scene3D::Material::Property::METALLIC_ROUGHNESS_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("metallicRoughness", material.GetProperty<Dali::String>(Scene3D::Material::Property::METALLIC_ROUGHNESS_URL), TEST_LOCATION);
 
   Scene3D::Internal::Material::TextureInformation normal;
   Dali::Texture                                   normalTexture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
@@ -83,7 +83,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D::Material::TextureType::NORMAL, std::move(normal));
   DALI_TEST_EQUALS(normalTexture, material.GetTexture(Scene3D::Material::TextureType::NORMAL), TEST_LOCATION);
   DALI_TEST_EQUALS(normalSampler, material.GetSampler(Scene3D::Material::TextureType::NORMAL), TEST_LOCATION);
-  DALI_TEST_EQUALS("normal", material.GetProperty<std::string>(Scene3D::Material::Property::NORMAL_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("normal", material.GetProperty<Dali::String>(Scene3D::Material::Property::NORMAL_URL), TEST_LOCATION);
 
   Dali::TextureSet textureSet = GetImplementation(material).GetTextureSet();
   DALI_TEST_EQUALS(3, textureSet.GetTextureCount(), TEST_LOCATION);
@@ -114,7 +114,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D ::Material ::TextureType ::OCCLUSION, std ::move(occlusion));
   DALI_TEST_EQUALS(occlusiontexture, material.GetTexture(Scene3D ::Material ::TextureType ::OCCLUSION), TEST_LOCATION);
   DALI_TEST_EQUALS(occlusionSampler, material.GetSampler(Scene3D ::Material ::TextureType ::OCCLUSION), TEST_LOCATION);
-  DALI_TEST_EQUALS("occlusion", material.GetProperty<std ::string>(Scene3D ::Material ::Property ::OCCLUSION_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("occlusion", material.GetProperty<Dali::String>(Scene3D ::Material ::Property ::OCCLUSION_URL), TEST_LOCATION);
 
   Scene3D::Internal::Material::TextureInformation emissive;
   Dali::Texture                                   emissiveTexture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
@@ -125,7 +125,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D::Material::TextureType::EMISSIVE, std::move(emissive));
   DALI_TEST_EQUALS(emissiveTexture, material.GetTexture(Scene3D::Material::TextureType::EMISSIVE), TEST_LOCATION);
   DALI_TEST_EQUALS(emissiveSampler, material.GetSampler(Scene3D::Material::TextureType::EMISSIVE), TEST_LOCATION);
-  DALI_TEST_EQUALS("emissive", material.GetProperty<std::string>(Scene3D::Material::Property::EMISSIVE_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("emissive", material.GetProperty<Dali::String>(Scene3D::Material::Property::EMISSIVE_URL), TEST_LOCATION);
 
   Scene3D ::Internal ::Material ::TextureInformation specular;
   Dali ::Texture                                     specularTexture = Dali ::Texture ::New(TextureType ::TEXTURE_2D, Pixel ::RGBA8888, 100, 100);
@@ -136,7 +136,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D ::Material ::TextureType ::SPECULAR, std ::move(specular));
   DALI_TEST_EQUALS(specularTexture, material.GetTexture(Scene3D ::Material ::TextureType ::SPECULAR), TEST_LOCATION);
   DALI_TEST_EQUALS(specularSampler, material.GetSampler(Scene3D ::Material ::TextureType ::SPECULAR), TEST_LOCATION);
-  DALI_TEST_EQUALS("specular", material.GetProperty<std ::string>(Scene3D ::Material ::Property ::SPECULAR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("specular", material.GetProperty<Dali::String>(Scene3D ::Material ::Property ::SPECULAR_URL), TEST_LOCATION);
 
   Scene3D::Internal::Material::TextureInformation specularColor;
   Dali::Texture                                   specularColorTexture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
@@ -147,7 +147,7 @@ int UtcDaliMaterialImplSetGetTextureInformation(void)
   GetImplementation(material).SetTextureInformation(Scene3D::Material::TextureType::SPECULAR_COLOR, std::move(specularColor));
   DALI_TEST_EQUALS(specularColorTexture, material.GetTexture(Scene3D::Material::TextureType::SPECULAR_COLOR), TEST_LOCATION);
   DALI_TEST_EQUALS(specularColorSampler, material.GetSampler(Scene3D::Material::TextureType::SPECULAR_COLOR), TEST_LOCATION);
-  DALI_TEST_EQUALS("specularColor", material.GetProperty<std::string>(Scene3D::Material::Property::SPECULAR_COLOR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS("specularColor", material.GetProperty<Dali::String>(Scene3D::Material::Property::SPECULAR_COLOR_URL), TEST_LOCATION);
 
   textureSet = GetImplementation(material).GetTextureSet();
   DALI_TEST_EQUALS(7, textureSet.GetTextureCount(), TEST_LOCATION);

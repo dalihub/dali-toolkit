@@ -34,6 +34,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/integration-api/string-utils.h>
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"
@@ -41,6 +42,10 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 void dali_animated_image_visual_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -187,7 +192,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_GIF_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_GIF_FILE_NAME);
 
   value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_U, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -240,7 +245,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_MASK_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_MASK_IMAGE_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::MASK_CONTENT_SCALE, Property::FLOAT);
   DALI_TEST_CHECK(value);
@@ -282,7 +287,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_GIF_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_GIF_FILE_NAME);
 
   // Natural size getted as image size
   animatedImageVisual2.GetNaturalSize(naturalSize);
@@ -414,7 +419,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_MASK_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_MASK_IMAGE_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::MASK_CONTENT_SCALE, "maskContentScale");
   DALI_TEST_CHECK(value);
@@ -538,7 +543,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   // Check mask properties
   value = resultMap.Find(ImageVisual::Property::ALPHA_MASK_URL, "alphaMaskUrl");
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_MASK_IMAGE_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_MASK_IMAGE_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::MASK_CONTENT_SCALE, "maskContentScale");
   DALI_TEST_CHECK(value);
@@ -597,7 +602,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
 
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<std::string>() == TEST_GIF_FILE_NAME);
+  DALI_TEST_CHECK(value->Get<Dali::String>() == TEST_GIF_FILE_NAME);
 
   value = resultMap.Find(ImageVisual::Property::BATCH_SIZE, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -1708,7 +1713,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask05(void)
   {
     EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
     ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
-    std::string        url       = imageUrl.GetUrl();
+    Dali::String       url       = imageUrl.GetUrl();
 
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
@@ -1762,7 +1767,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask06(void)
   {
     EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
     ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
-    std::string        url       = imageUrl.GetUrl();
+    Dali::String       url       = imageUrl.GetUrl();
 
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
@@ -3027,11 +3032,11 @@ int UtcDaliAnimatedImageVisualCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliAnimatedImageVisualCustomShader Test custom shader");
 
-  VisualFactory     factory = VisualFactory::Get();
-  Property::Map     properties;
-  Property::Map     shader;
-  const std::string vertexShader                    = "Foobar";
-  const std::string fragmentShader                  = "Foobar sampler2D Foobar";
+  VisualFactory      factory = VisualFactory::Get();
+  Property::Map      properties;
+  Property::Map      shader;
+  const Dali::String vertexShader                   = "Foobar";
+  const Dali::String fragmentShader                 = "Foobar sampler2D Foobar";
   shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
   shader[Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
 
@@ -3064,12 +3069,12 @@ int UtcDaliAnimatedImageVisualCustomShader(void)
 
   std::string      resultFragmentShader, resultVertexShader;
   Property::Value* fragment = map->Find("fragment"); // fragment key name from shader-impl.cpp
-  fragment->Get(resultFragmentShader);
-  DALI_TEST_CHECK(resultFragmentShader.find(fragmentShader) != std::string::npos);
+  resultFragmentShader      = ToStdString(*fragment);
+  DALI_TEST_CHECK(resultFragmentShader.find(ToStdString(fragmentShader)) != std::string::npos);
 
   Property::Value* vertex = map->Find("vertex"); // vertex key name from shader-impl.cpp
-  vertex->Get(resultVertexShader);
-  DALI_TEST_CHECK(resultVertexShader.find(vertexShader) != std::string::npos);
+  resultVertexShader      = ToStdString(*vertex);
+  DALI_TEST_CHECK(resultVertexShader.find(ToStdString(vertexShader)) != std::string::npos);
 
   END_TEST;
 }
@@ -3437,7 +3442,7 @@ int UtcDaliAnimatedImageVisualLoadNonRegularImage(void)
     tet_printf("Test AnimatedImageVisual with url: %s\n", urlAndExpectVisualTypePair.first.c_str());
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
-    propertyMap.Insert(ImageVisual::Property::URL, urlAndExpectVisualTypePair.first);
+    propertyMap.Insert(ImageVisual::Property::URL, ToPropertyValue(urlAndExpectVisualTypePair.first));
     propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
 
     Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);

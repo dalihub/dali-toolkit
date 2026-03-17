@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -135,7 +136,7 @@ Toolkit::Control Control::New(ControlBehaviour additionalBehaviour)
   return handle;
 }
 
-void Control::SetStyleName(const std::string& styleName)
+void Control::SetStyleName(const Dali::String& styleName)
 {
   if(styleName != mImpl->mStyleName)
   {
@@ -150,7 +151,7 @@ void Control::SetStyleName(const std::string& styleName)
   }
 }
 
-const std::string& Control::GetStyleName() const
+const Dali::String& Control::GetStyleName() const
 {
   return mImpl->mStyleName;
 }
@@ -829,7 +830,7 @@ void Control::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimen
 
 Vector3 Control::GetNaturalSize()
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetProperty<std::string>(Dali::Actor::Property::NAME).c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Dali::Integration::ToStdString(Self().GetProperty(Dali::Actor::Property::NAME)).c_str());
   Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
   if(visualImplPtr)
   {

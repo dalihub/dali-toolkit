@@ -510,11 +510,7 @@ protected:
    * @param[in] key The key of the visual's property.
    * @return The Property object
    */
-  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
-  {
-    Handle handle;
-    return Dali::Property(handle, Property::INVALID_INDEX);
-  }
+  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key, bool changeProperties);
 
 protected:
   /**

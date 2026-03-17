@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,13 @@
 #include <sstream>
 
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali-toolkit/third-party/base-n/basen.hpp>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -35,7 +39,7 @@ const int MAX_PROPERTY_STRING_LENGTH(64); // Cuts larger strings into blocks of 
 bool GetStringFromProperty(const Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if(value.Get(output))
+  if(GetStdString(value, output))
   {
     extracted = true;
   }
@@ -48,7 +52,7 @@ bool GetStringFromProperty(const Property::Value& value, std::string& output)
       for(unsigned int i = 0; i < arraySize; ++i)
       {
         std::string element;
-        if(array->GetElementAt(i).Get(element))
+        if(GetStdString(array->GetElementAt(i), element))
         {
           extracted = true;
           output += element;
@@ -145,13 +149,13 @@ void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint32_t
     Property::Array array;
     for(auto i = 0u; i < numStrings; ++i)
     {
-      array.PushBack(encodedString.substr(i * MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH));
+      array.PushBack(ToPropertyValue(encodedString.substr(i * MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH)));
     }
     value = array;
   }
   else
   {
-    value = encodedString;
+    value = ToPropertyValue(encodedString);
   }
 }
 
@@ -184,13 +188,13 @@ void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint8_t>
     Property::Array array;
     for(auto i = 0u; i < numStrings; ++i)
     {
-      array.PushBack(encodedString.substr(i * MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH));
+      array.PushBack(ToPropertyValue(encodedString.substr(i * MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH)));
     }
     value = array;
   }
   else
   {
-    value = encodedString;
+    value = ToPropertyValue(encodedString);
   }
 }
 

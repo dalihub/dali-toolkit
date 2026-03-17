@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,31 +20,35 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 
+using Dali::Integration::ToStdString;
+
 namespace gt = gltf2;
 namespace js = json;
 
 namespace Dali::Scene3D::Loader::Internal
 {
-bool Gltf2LoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result)
+bool Gltf2LoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result)
 {
-  bool failed   = false;
-  auto gltfText = LoadTextFile(url.c_str(), &failed);
+  std::string stdUrl   = ToStdString(url);
+  bool        failed   = false;
+  auto        gltfText = LoadTextFile(stdUrl.c_str(), &failed);
   if(failed)
   {
-    DALI_LOG_ERROR("Failed to load %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to load %s\n", stdUrl.c_str());
     return false;
   }
 
-  json::unique_ptr root(json_parse(gltfText.c_str(), gltfText.size()));
+  json::unique_ptr root(json_parse(gltfText.CStr(), gltfText.Size()));
   if(!root)
   {
-    DALI_LOG_ERROR("Failed to parse %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to parse %s\n", stdUrl.c_str());
     return false;
   }
 
@@ -56,7 +60,7 @@ bool Gltf2LoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::L
     return false;
   }
 
-  auto                         path = url.substr(0, url.rfind('/') + 1);
+  auto                         path = stdUrl.substr(0, stdUrl.rfind('/') + 1);
   Gltf2Util::ConversionContext context{result, path, INVALID_INDEX};
 
   Gltf2Util::ConvertGltfToContext(document, context, isMRendererModel);

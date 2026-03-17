@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <cstring>
 #include <fstream>
@@ -29,6 +30,7 @@
 namespace Dali
 {
 using namespace Toolkit;
+using Dali::Integration::ToDaliString;
 
 namespace Scene3D
 {
@@ -89,7 +91,7 @@ void ResourceBundle::LoadResources(PathProvider pathProvider, Options::Type opti
   const auto kKeepUnused = MaskMatch(options, Options::KeepUnused);
 
   const auto& refCountEnvMaps  = mReferenceCounts[ResourceType::Environment];
-  auto        environmentsPath = pathProvider(ResourceType::Environment);
+  auto        environmentsPath = ToDaliString(pathProvider(ResourceType::Environment));
   for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
   {
     auto  refCount = refCountEnvMaps[i];
@@ -107,7 +109,7 @@ void ResourceBundle::LoadResources(PathProvider pathProvider, Options::Type opti
   }
 
   const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
-  auto        shadersPath     = pathProvider(ResourceType::Shader);
+  auto        shadersPath     = ToDaliString(pathProvider(ResourceType::Shader));
   for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
   {
     auto  refCount = refCountShaders[i];
@@ -124,7 +126,7 @@ void ResourceBundle::LoadResources(PathProvider pathProvider, Options::Type opti
   }
 
   const auto& refCountMeshes = mReferenceCounts[ResourceType::Mesh];
-  auto        modelsPath     = pathProvider(ResourceType::Mesh);
+  auto        modelsPath     = ToDaliString(pathProvider(ResourceType::Mesh));
   for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
   {
     auto  refCount = refCountMeshes[i];
@@ -141,7 +143,7 @@ void ResourceBundle::LoadResources(PathProvider pathProvider, Options::Type opti
   }
 
   const auto& refCountMaterials = mReferenceCounts[ResourceType::Material];
-  auto        imagesPath        = pathProvider(ResourceType::Material);
+  auto        imagesPath        = ToDaliString(pathProvider(ResourceType::Material));
   for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
   {
     auto  refCount  = refCountMaterials[i];
@@ -173,7 +175,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
     mRawResourcesLoading = true;
 
     const auto& refCountEnvMaps  = mReferenceCounts[ResourceType::Environment];
-    auto        environmentsPath = pathProvider(ResourceType::Environment);
+    auto        environmentsPath = ToDaliString(pathProvider(ResourceType::Environment));
     for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
     {
       auto  refCount = refCountEnvMaps[i];
@@ -185,7 +187,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
     }
 
     const auto& refCountShaders = mReferenceCounts[ResourceType::Shader];
-    auto        shadersPath     = pathProvider(ResourceType::Shader);
+    auto        shadersPath     = ToDaliString(pathProvider(ResourceType::Shader));
     for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
     {
       auto  refCount = refCountShaders[i];
@@ -197,7 +199,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
     }
 
     const auto& refCountMeshes = mReferenceCounts[ResourceType::Mesh];
-    auto        modelsPath     = pathProvider(ResourceType::Mesh);
+    auto        modelsPath     = ToDaliString(pathProvider(ResourceType::Mesh));
     for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
     {
       auto  refCount = refCountMeshes[i];
@@ -209,7 +211,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
     }
 
     const auto& refCountMaterials = mReferenceCounts[ResourceType::Material];
-    auto        imagesPath        = pathProvider(ResourceType::Material);
+    auto        imagesPath        = ToDaliString(pathProvider(ResourceType::Material));
     for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
     {
       auto  refCount  = refCountMaterials[i];

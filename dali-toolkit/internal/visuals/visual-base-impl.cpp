@@ -24,6 +24,7 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/rendering/visual-renderer.h>
 
@@ -919,6 +920,13 @@ void Visual::Base::OnDoActionExtension(const Property::Index actionId, const Dal
   // May be overriden by derived class
 }
 
+Dali::Property Visual::Base::OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
+{
+  // May be overriden by derived class
+  static Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
+}
+
 void Visual::Base::RegisterMixColor()
 {
   if(mImpl->mRenderer)
@@ -1249,7 +1257,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
 
   // Fast-out for invalid key.
   if((key.type == Property::Key::INDEX && key.indexKey == Property::INVALID_KEY) ||
-     (key.type == Property::Key::STRING && key.stringKey.empty()))
+     (key.type == Property::Key::STRING && key.stringKey.Empty()))
   {
     return Property::INVALID_INDEX;
   }
@@ -1265,7 +1273,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
     {
       // Yes - we should register it in the Renderer so it can be set / animated
       // independently, as shaders are shared across multiple renderers.
-      std::string     keyName;
+      Dali::String    keyName;
       Property::Index keyIndex(Property::INVALID_KEY);
       if(key.type == Property::Key::INDEX)
       {
@@ -1280,7 +1288,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       Property::Value value = shader.GetProperty(index);
 
       // We already know that mRenderer didn't have property. So we can assume that it is unique.
-      index = mImpl->mRenderer.RegisterUniqueProperty(keyIndex, keyName, value);
+      index = mImpl->mRenderer.RegisterUniqueProperty(keyIndex, Dali::StringView(keyName.CStr(), keyName.Size()), value);
     }
   }
   return index;
@@ -1482,7 +1490,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key, bool cha
 {
   if(!mImpl->mRenderer)
   {
-    Handle handle;
+    static Handle handle; // Keep the empty handle alive (The property references it)
     return Dali::Property(handle, Property::INVALID_INDEX);
   }
 

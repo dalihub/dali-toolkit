@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H
 #define DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,13 +57,13 @@ struct DALI_SCENE3D_API BlendShapes
 
   struct BlendShapeData
   {
-    std::vector<std::string> names;
-    std::vector<float>       weights;
-    std::vector<float>       unnormalizeFactors;
-    Version                  version{Scene3D::Loader::BlendShapes::Version::INVALID};
-    uint32_t                 bufferOffset{0};
-    int32_t                  components{0x0};
-    Dali::WeakHandle<Actor>  mActor;
+    std::vector<Dali::String> names;
+    std::vector<float>        weights;
+    std::vector<float>        unnormalizeFactors;
+    Version                   version{Scene3D::Loader::BlendShapes::Version::INVALID};
+    uint32_t                  bufferOffset{0};
+    int32_t                   components{0x0};
+    Dali::WeakHandle<Actor>   mActor;
   };
 
   // shader properties - animatable (uniforms)

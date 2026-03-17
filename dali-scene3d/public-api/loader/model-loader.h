@@ -44,7 +44,7 @@ public:
    * @param[in] resourceDirectoryUrl Url of directory that contains resources.
    * @param[out] loadResult Loaded result that includes scene tree and resources.
    */
-  ModelLoader(const std::string& modelUrl, const std::string& resourceDirectoryUrl, Dali::Scene3D::Loader::LoadResult& loadResult);
+  ModelLoader(const Dali::String& modelUrl, const Dali::String& resourceDirectoryUrl, Dali::Scene3D::Loader::LoadResult& loadResult);
 
   /**
    * @brief ModelLoader Destructor
@@ -122,8 +122,8 @@ private:
   void LoadResource(Dali::Scene3D::Loader::ResourceBundle::PathProvider& pathProvider, bool loadOnlyRawResource);
 
 private:
-  std::string mModelUrl;
-  std::string mResourceDirectoryUrl;
+  Dali::String mModelUrl;
+  Dali::String mResourceDirectoryUrl;
 
   Dali::Scene3D::Loader::LoadResult             mLoadResult;
   Dali::Scene3D::Loader::Customization::Choices mResourceChoices;

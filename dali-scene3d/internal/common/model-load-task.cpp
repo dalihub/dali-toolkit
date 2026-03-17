@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <filesystem>
+
+using Dali::Integration::ToDaliString;
 
 #ifdef TRACE_ENABLED
 #include <chrono>
@@ -69,7 +72,7 @@ ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& res
     mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
   }
 
-  mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(mModelUrl, mResourceDirectoryUrl, mLoadResult);
+  mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(ToDaliString(mModelUrl), ToDaliString(mResourceDirectoryUrl), mLoadResult);
 }
 
 ModelLoadTask::~ModelLoadTask()

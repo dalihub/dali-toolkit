@@ -19,12 +19,15 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME = "selection-popup-border.9.png";
@@ -131,7 +134,7 @@ int UtcDaliToolkitTextSelectionPopupBackgroundBorderP(void)
 
   if(returnValue)
   {
-    std::string url;
+    Dali::String url;
     returnValue->Get(url);
     DALI_TEST_EQUALS(TEST_IMAGE_FILE_NAME, url, TEST_LOCATION);
   }
@@ -158,7 +161,7 @@ int UtcDaliToolkitTextSelectionPopupBackgroundP(void)
 
   if(returnValue)
   {
-    std::string url;
+    Dali::String url;
     returnValue->Get(url);
     DALI_TEST_EQUALS(TEST_IMAGE_FILE_NAME, url, TEST_LOCATION);
   }
@@ -267,13 +270,13 @@ int UtcDaliToolkitTextSelectionPopupIconProperties(void)
   popup.SetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE, "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE");
   popup.SetProperty(TextSelectionPopup::Property::POPUP_PRESSED_IMAGE, "POPUP_PRESSED_IMAGE");
 
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CLIPBOARD_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CUT_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_COPY_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_PASTE_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE", TEST_LOCATION);
-  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_IMAGE).Get<std::string>(), "POPUP_PRESSED_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_CLIPBOARD_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_CUT_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_COPY_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_PASTE_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_SELECT_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE).Get<Dali::String>(), "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS(popup.GetProperty(TextSelectionPopup::Property::POPUP_PRESSED_IMAGE).Get<Dali::String>(), "POPUP_PRESSED_IMAGE", TEST_LOCATION);
 
   END_TEST;
 }
@@ -380,7 +383,7 @@ int UtcDaliToolkitTextSelectionPopupLabelTextVisualP(void)
 
   if(returnValue)
   {
-    std::string fontFamily;
+    Dali::String fontFamily;
     returnValue->Get(fontFamily);
     DALI_TEST_EQUALS(fontFamily, TEST_FONT_FAMILY, TEST_LOCATION);
   }

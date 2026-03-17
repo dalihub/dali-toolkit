@@ -20,6 +20,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include <string_view>
 #include "dali-scene3d/public-api/loader/node-definition.h"
 #include "dali-scene3d/public-api/loader/view-projection.h"
@@ -115,7 +116,7 @@ int UtcDaliNodeDefinitionProperties(void)
 
   Context ctx;
   auto    actor = nodeDef.CreateModelNode(ctx.createParams);
-  DALI_TEST_EQUAL(nodeDef.mName, actor.GetProperty(Actor::Property::NAME).Get<std::string>());
+  DALI_TEST_EQUAL(nodeDef.mName, actor.GetProperty(Actor::Property::NAME).Get<Dali::String>());
   DALI_TEST_EQUAL(nodeDef.mPosition, actor.GetProperty(Actor::Property::POSITION).Get<Vector3>());
   DALI_TEST_EQUAL(nodeDef.mOrientation, actor.GetProperty(Actor::Property::ORIENTATION).Get<Quaternion>());
   DALI_TEST_EQUAL(nodeDef.mScale, actor.GetProperty(Actor::Property::SCALE).Get<Vector3>());

@@ -20,9 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/shader-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <cstdint>
 #include <random>
 #include <vector>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace
 {
@@ -243,12 +246,12 @@ Dali::Shader& GaussianBlurAlgorithm::GetGaussianBlurShader(const uint32_t blurRa
         {
           std::stringstream oss;
           oss << "uSampleOffsets[" << i << "]";
-          sharedUBO.RegisterProperty(oss.str(), offsets[i]);
+          sharedUBO.RegisterProperty(ToDaliStringView(oss.str()), offsets[i]);
         }
         {
           std::stringstream oss;
           oss << "uSampleWeights[" << i << "]";
-          sharedUBO.RegisterProperty(oss.str(), weights[i]);
+          sharedUBO.RegisterProperty(ToDaliStringView(oss.str()), weights[i]);
         }
       }
       cachedUniformBlock = sharedUBO;
@@ -262,7 +265,7 @@ Dali::Shader& GaussianBlurAlgorithm::GetGaussianBlurShader(const uint32_t blurRa
     fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
     std::string fragmentSource(fragmentStringStream.str());
 
-    cachedShader = Dali::Integration::ShaderNewWithUniformBlock(BASIC_VERTEX_SOURCE, fragmentSource.c_str(), Dali::Shader::Hint::FILE_CACHE_SUPPORT, shaderNameBuilder.str(), {cachedUniformBlock});
+    cachedShader = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(BASIC_VERTEX_SOURCE), ToDaliStringView(fragmentSource), Dali::Shader::Hint::FILE_CACHE_SUPPORT, ToDaliStringView(shaderNameBuilder.str()), {cachedUniformBlock});
   }
   return cachedShader;
 }

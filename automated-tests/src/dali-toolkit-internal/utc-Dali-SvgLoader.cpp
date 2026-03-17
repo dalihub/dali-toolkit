@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,14 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <test-encoded-image-buffer.h>
 
 #if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #endif
+using Dali::Integration::ToStdString;
 
 using namespace Dali::Toolkit::Internal;
 
@@ -197,7 +199,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
   const std::string fileNames[] = {
     TEST_SVG_FILE_NAME,
     TEST_SVG_INVALID_RASTERIZE_FILE_NAME,
-    imageUrl.GetUrl(),
+    ToStdString(imageUrl.GetUrl()),
     "invalid.svg",
   };
   const int fileNamesCount = sizeof(fileNames) / sizeof(fileNames[0]);

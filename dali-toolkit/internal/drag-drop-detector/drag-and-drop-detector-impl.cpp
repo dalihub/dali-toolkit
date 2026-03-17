@@ -18,6 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/drag-drop-detector/drag-and-drop-detector-impl.h>
 
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/events/touch-event.h>
 #include <algorithm>
@@ -198,7 +199,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data
     {
       SetPosition(data.GetScreenPosition(0));
       ClearContent();
-      SetContent(mDragControl.GetProperty<std::string>(Dali::Actor::Property::NAME));
+      SetContent(Dali::Integration::ToStdString(mDragControl.GetProperty(Dali::Actor::Property::NAME)));
       EmitDroppedSignal(control);
     }
 

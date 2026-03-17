@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,13 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/handle.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -66,10 +72,10 @@ void Style::ApplyVisualsAndPropertiesRecursively(
 
         // Apply substate visuals
         Property::Value value = control.GetProperty(DevelControl::Property::SUB_STATE);
-        std::string     subStateName;
-        if(value.Get(subStateName) && !subStateName.empty())
+        Dali::String    subStateName;
+        if(value.Get(subStateName) && !subStateName.Empty())
         {
-          const StylePtr* stylePtr = statePtr->subStates.FindConst(subStateName);
+          const StylePtr* stylePtr = statePtr->subStates.FindConst(ToStdStringView(subStateName));
           if(stylePtr)
           {
             const StylePtr subStatePtr(*stylePtr);
@@ -111,7 +117,7 @@ void Style::ApplyVisual(
   const Property::Map* instancedProperties)
 {
   // Check if this visual name is a valid property of handle
-  Dali::Property::Index index = handle.GetPropertyIndex(visualName);
+  Dali::Property::Index index = handle.GetPropertyIndex(Property::Key(ToDaliString(visualName)));
   if(index != Property::INVALID_INDEX)
   {
     const Property::Map* applyMap = &visualMap;

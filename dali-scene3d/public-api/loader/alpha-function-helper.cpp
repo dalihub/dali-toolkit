@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
 #include <dali-scene3d/public-api/loader/alpha-function-helper.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <unordered_map>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali::Scene3D::Loader
 {
@@ -54,10 +57,11 @@ std::unordered_map<std::string, AlphaFunction>& GetFunctions()
 
 } // namespace
 
-AlphaFunction GetAlphaFunction(const std::string& name, bool* found)
+AlphaFunction GetAlphaFunction(const Dali::String& name, bool* found)
 {
-  auto iFind   = GetFunctions().find(name);
-  bool success = iFind != GetFunctions().end();
+  std::string stdName = ToStdString(name);
+  auto        iFind   = GetFunctions().find(stdName);
+  bool        success = iFind != GetFunctions().end();
   if(found)
   {
     *found = success;
@@ -65,9 +69,9 @@ AlphaFunction GetAlphaFunction(const std::string& name, bool* found)
   return success ? iFind->second : AlphaFunction(AlphaFunction::DEFAULT);
 }
 
-void RegisterAlphaFunction(const std::string& name, AlphaFunction alphaFn)
+void RegisterAlphaFunction(const Dali::String& name, AlphaFunction alphaFn)
 {
-  DALI_ASSERT_ALWAYS(GetFunctions().insert({name, alphaFn}).second &&
+  DALI_ASSERT_ALWAYS(GetFunctions().insert({ToStdString(name), alphaFn}).second &&
                      "Function with given key already exists.");
 }
 

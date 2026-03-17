@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/key-event.h>
@@ -45,6 +46,11 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 using namespace Dali;
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -321,7 +327,7 @@ void Popup::OnInitialize()
 
   // Adds the default background image.
   const std::string imageDirPath = AssetManager::GetDaliImagePath();
-  SetPopupBackgroundImage(Toolkit::ImageView::New(imageDirPath + DEFAULT_BACKGROUND_IMAGE_FILE_NAME));
+  SetPopupBackgroundImage(Toolkit::ImageView::New(ToDaliString(imageDirPath + DEFAULT_BACKGROUND_IMAGE_FILE_NAME)));
 
   mPopupLayout.SetProperty(Dali::Actor::Property::NAME, "popupLayoutTable");
   mPopupLayout.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -906,7 +912,7 @@ void Popup::LayoutTail()
   if(!image.empty())
   {
     // Adds the tail actor.
-    mTailImage = Toolkit::ImageView::New(image);
+    mTailImage = Toolkit::ImageView::New(ToDaliString(image));
     mTailImage.SetProperty(Dali::Actor::Property::NAME, "tailImage");
     mTailImage.SetProperty(Actor::Property::PARENT_ORIGIN, parentOrigin);
     mTailImage.SetProperty(Actor::Property::ANCHOR_POINT, anchorPoint);
@@ -1181,7 +1187,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::DISPLAY_STATE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           Toolkit::Popup::DisplayState displayState(Toolkit::Popup::HIDDEN);
           if(Scripting::GetEnumeration<Toolkit::Popup::DisplayState>(valueString.c_str(), DisplayStateTable, DisplayStateTableCount, displayState))
@@ -1221,7 +1227,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::CONTEXTUAL_MODE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           Toolkit::Popup::ContextualMode contextualMode(Toolkit::Popup::BELOW);
           if(Scripting::GetEnumeration<Toolkit::Popup::ContextualMode>(valueString.c_str(), ContextualModeTable, ContextualModeTableCount, contextualMode))
@@ -1243,7 +1249,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::ANIMATION_MODE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           Toolkit::Popup::AnimationMode animationMode(Toolkit::Popup::FADE);
           if(Scripting::GetEnumeration<Toolkit::Popup::AnimationMode>(valueString.c_str(), AnimationModeTable, AnimationModeTableCount, animationMode))
@@ -1300,7 +1306,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       }
       case Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE:
       {
-        std::string valueString;
+        Dali::String valueString;
         if(value.Get(valueString))
         {
           Toolkit::ImageView actor = Toolkit::ImageView::New(std::move(valueString));
@@ -1336,7 +1342,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::TAIL_UP_IMAGE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           popupImpl.SetTailUpImage(std::move(valueString));
         }
@@ -1345,7 +1351,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::TAIL_DOWN_IMAGE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           popupImpl.SetTailDownImage(std::move(valueString));
         }
@@ -1354,7 +1360,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::TAIL_LEFT_IMAGE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           popupImpl.SetTailLeftImage(std::move(valueString));
         }
@@ -1363,7 +1369,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       case Toolkit::Popup::Property::TAIL_RIGHT_IMAGE:
       {
         std::string valueString;
-        if(value.Get(valueString))
+        if(GetStdString(value, valueString))
         {
           popupImpl.SetTailRightImage(std::move(valueString));
         }
@@ -1486,22 +1492,22 @@ Property::Value Popup::GetProperty(BaseObject* object, Property::Index propertyI
       }
       case Toolkit::Popup::Property::TAIL_UP_IMAGE:
       {
-        value = popupImpl.GetTailUpImage();
+        value = ToPropertyValue(popupImpl.GetTailUpImage());
         break;
       }
       case Toolkit::Popup::Property::TAIL_DOWN_IMAGE:
       {
-        value = popupImpl.GetTailDownImage();
+        value = ToPropertyValue(popupImpl.GetTailDownImage());
         break;
       }
       case Toolkit::Popup::Property::TAIL_LEFT_IMAGE:
       {
-        value = popupImpl.GetTailLeftImage();
+        value = ToPropertyValue(popupImpl.GetTailLeftImage());
         break;
       }
       case Toolkit::Popup::Property::TAIL_RIGHT_IMAGE:
       {
-        value = popupImpl.GetTailRightImage();
+        value = ToPropertyValue(popupImpl.GetTailRightImage());
         break;
       }
     }
@@ -1510,30 +1516,30 @@ Property::Value Popup::GetProperty(BaseObject* object, Property::Index propertyI
   return value;
 }
 
-bool Popup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Popup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool           connected(true);
   Toolkit::Popup popup = Toolkit::Popup::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TOUCHED_OUTSIDE))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_TOUCHED_OUTSIDE))
   {
     popup.OutsideTouchedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SHOWING))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SHOWING))
   {
     popup.ShowingSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SHOWN))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SHOWN))
   {
     popup.ShownSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_HIDING))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_HIDING))
   {
     popup.HidingSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_HIDDEN))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_HIDDEN))
   {
     popup.HiddenSignal().Connect(tracker, functor);
   }
@@ -1869,7 +1875,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
   std::string currentStr;
   if(currentFocusedActor)
   {
-    currentStr = currentFocusedActor.GetProperty<std::string>(Dali::Actor::Property::NAME);
+    currentStr = ToStdString(currentFocusedActor.GetProperty(Dali::Actor::Property::NAME));
   }
 
   Actor nextFocusableActor(currentFocusedActor);
@@ -1999,7 +2005,7 @@ std::pair<std::string, bool> Popup::PopupAccessible::GetNameRaw() const
   Actor       popupTitle = popup.GetTitle();
   if(popupTitle)
   {
-    std::string titleText = popupTitle.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+    std::string titleText = ToStdString(popupTitle.GetProperty(Toolkit::TextLabel::Property::TEXT));
     title                 = std::move(titleText);
   }
   else
@@ -2007,7 +2013,7 @@ std::pair<std::string, bool> Popup::PopupAccessible::GetNameRaw() const
     Actor popupContent = popup.GetContent();
     if(popupContent)
     {
-      std::string contentText = popupContent.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+      std::string contentText = ToStdString(popupContent.GetProperty(Toolkit::TextLabel::Property::TEXT));
       title                   = std::move(contentText);
     }
   }
@@ -2018,7 +2024,7 @@ Dali::Accessibility::States Popup::PopupAccessible::CalculateStates()
 {
   auto states       = DevelControl::ControlAccessible::CalculateStates();
   auto popup        = Toolkit::Popup::DownCast(Self());
-  auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
+  auto displayState = ToStdString(popup.GetProperty(Toolkit::Popup::Property::DISPLAY_STATE));
 
   states[Dali::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
 

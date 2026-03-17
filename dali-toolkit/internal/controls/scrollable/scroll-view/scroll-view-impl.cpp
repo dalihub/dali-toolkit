@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1379,14 +1379,14 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   mScrollUpdatedSignal.Emit(currentScrollPosition);
 }
 
-bool ScrollView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ScrollView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                connected(true);
   Toolkit::ScrollView view = Toolkit::ScrollView::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_SNAP_STARTED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_SNAP_STARTED))
   {
     view.SnapStartedSignal().Connect(tracker, functor);
   }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <string>
 
 namespace Dali
 {
@@ -245,7 +244,7 @@ public:
    * @return The device name that caused the last focus change
    * @pre The KeyboardFocusManager has been initialized.
    */
-  const std::string& GetLastFocusChangeDeviceName() const;
+  const Dali::String& GetLastFocusChangeDeviceName() const;
 
   /**
    * @brief Sets whether to clear focus when window loses focus.

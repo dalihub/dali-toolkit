@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   // Check that the background is created
   Actor backgroundActor = renderableActor.GetChildAt(0u);
   DALI_TEST_CHECK(backgroundActor);
-  DALI_TEST_CHECK(backgroundActor.GetProperty<std::string>(Dali::Actor::Property::NAME) == "TextBackgroundColorActor");
+  DALI_TEST_CHECK(backgroundActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "TextBackgroundColorActor");
 
   // Change the text to contain more characters
   controller->SetText("Text Multiple Background Test");
@@ -117,7 +117,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   // The background should now be lowered below the highlight
   backgroundActor = stencil.GetChildAt(0u);
   DALI_TEST_CHECK(backgroundActor);
-  DALI_TEST_CHECK(backgroundActor.GetProperty<std::string>(Dali::Actor::Property::NAME) == "TextBackgroundColorActor");
+  DALI_TEST_CHECK(backgroundActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "TextBackgroundColorActor");
 
   END_TEST;
 }
@@ -208,7 +208,7 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText =
+  String testText =
     "start<u>ABC1</u>then"
     "<u type='solid'>ABC2</u>then"
     "<u type='dashed'>ABC3</u>then"
@@ -240,7 +240,7 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -404,7 +404,7 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -422,7 +422,7 @@ int UtcDaliTextFieldMarkupSpanUnderline(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText =
+  String testText =
     "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
     "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>then"
     "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>then"
@@ -452,7 +452,7 @@ int UtcDaliTextFieldMarkupSpanUnderline(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -599,7 +599,7 @@ int UtcDaliTextFieldMarkupSpanUnderline(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -617,7 +617,7 @@ int UtcDaliTextFieldMarkupNestedUnderlineTags(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText = "start<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>end";
+  String testText = "start<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>end";
 
   textField.SetProperty(TextField::Property::TEXT, testText);
   textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
@@ -638,7 +638,7 @@ int UtcDaliTextFieldMarkupNestedUnderlineTags(void)
 
   struct DataOfCase
   {
-    std::string              title;
+    String                   title;
     GlyphIndex               glyphIndex;
     Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
@@ -683,7 +683,7 @@ int UtcDaliTextFieldMarkupNestedUnderlineTags(void)
 
   for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
@@ -701,7 +701,7 @@ int UtcDaliTextFieldMarkupNestedStrikethroughTags(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
+  String testText = "start<s height='5.0f' color='green' >AB<s color='blue' >XYZ</s>CDE</s>end";
 
   textField.SetProperty(TextField::Property::TEXT, testText);
   textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
@@ -722,7 +722,7 @@ int UtcDaliTextFieldMarkupNestedStrikethroughTags(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -755,7 +755,7 @@ int UtcDaliTextFieldMarkupNestedStrikethroughTags(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -773,7 +773,7 @@ int UtcDaliTextFieldMarkupStrikethroughAttributes(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText =
+  String testText =
     "start<s>ABC1</s>then"
     "<s color='green'>ABC2</s>then"
     "<s height='5.0f'>ABC3</s>then"
@@ -798,7 +798,7 @@ int UtcDaliTextFieldMarkupStrikethroughAttributes(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -842,7 +842,7 @@ int UtcDaliTextFieldMarkupStrikethroughAttributes(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -860,7 +860,7 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
 
   application.GetScene().Add(textField);
 
-  std::string testText =
+  String testText =
     "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
     "<span s-color='blue'>ABC2</span>then"
     "<span s-height='2.0f'>ABC3</span>then"
@@ -885,7 +885,7 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
 
   struct DataOfCase
   {
-    std::string                  title;
+    String                       title;
     GlyphIndex                   glyphIndex;
     Length                       numberOfGlyphs;
     StrikethroughStyleProperties properties;
@@ -921,7 +921,7 @@ int UtcDaliTextFieldMarkupSpanStrikethrough(void)
 
   for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
   {
-    tet_infoline(data[i].title.c_str());
+    tet_infoline(data[i].title.CStr());
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
     DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
     DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
@@ -1310,7 +1310,7 @@ int UtcDaliTextFieldMarkupSpanCharacterSpacing(void)
   const float expandedCharSpacing  = 10.0f;
   const float condensedCharSpacing = -5.0f;
 
-  std::string testText =
+  String testText =
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='blue' >ABC EF\n</span>"
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' char-space-value='-5.0f'>ABC EF\n</span>"
     "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='green' char-space-value='10.0f'>ABC EF\n</span>";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,21 +144,21 @@ int UtcDaliMaterialSetGetProperty(void)
 
   Scene3D::Material material = Scene3D::Material::New();
 
-  std::string name = "name";
+  Dali::String name = "name";
   material.SetProperty(Scene3D::Material::Property::NAME, name);
-  DALI_TEST_EQUALS(name, material.GetProperty<std::string>(Scene3D::Material::Property::NAME), TEST_LOCATION);
+  DALI_TEST_EQUALS(name, material.GetProperty<Dali::String>(Scene3D::Material::Property::NAME), TEST_LOCATION);
 
-  std::string baseColorUrl = "baseColorUrl";
+  Dali::String baseColorUrl = "baseColorUrl";
   material.SetProperty(Scene3D::Material::Property::BASE_COLOR_URL, baseColorUrl);
-  DALI_TEST_EQUALS(baseColorUrl, material.GetProperty<std::string>(Scene3D::Material::Property::BASE_COLOR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(baseColorUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::BASE_COLOR_URL), TEST_LOCATION);
 
   Vector4 baseColorFactor(0.1f, 0.2f, 0.3f, 0.4f);
   material.SetProperty(Scene3D::Material::Property::BASE_COLOR_FACTOR, baseColorFactor);
   DALI_TEST_EQUALS(baseColorFactor, material.GetProperty<Vector4>(Scene3D::Material::Property::BASE_COLOR_FACTOR), TEST_LOCATION);
 
-  std::string metallicRoughnessUrl = "metallicRoughnessUrl";
+  Dali::String metallicRoughnessUrl = "metallicRoughnessUrl";
   material.SetProperty(Scene3D::Material::Property::METALLIC_ROUGHNESS_URL, metallicRoughnessUrl);
-  DALI_TEST_EQUALS(metallicRoughnessUrl, material.GetProperty<std::string>(Scene3D::Material::Property::METALLIC_ROUGHNESS_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(metallicRoughnessUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::METALLIC_ROUGHNESS_URL), TEST_LOCATION);
 
   float metallicFactor = 0.5f;
   material.SetProperty(Scene3D::Material::Property::METALLIC_FACTOR, metallicFactor);
@@ -168,25 +168,25 @@ int UtcDaliMaterialSetGetProperty(void)
   material.SetProperty(Scene3D::Material::Property::ROUGHNESS_FACTOR, roughnessFactor);
   DALI_TEST_EQUALS(roughnessFactor, material.GetProperty<float>(Scene3D::Material::Property::ROUGHNESS_FACTOR), TEST_LOCATION);
 
-  std::string normalUrl = "normalUrl";
+  Dali::String normalUrl = "normalUrl";
   material.SetProperty(Scene3D::Material::Property::NORMAL_URL, normalUrl);
-  DALI_TEST_EQUALS(normalUrl, material.GetProperty<std::string>(Scene3D::Material::Property::NORMAL_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(normalUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::NORMAL_URL), TEST_LOCATION);
 
   float normalScale = 0.7f;
   material.SetProperty(Scene3D::Material::Property::NORMAL_SCALE, normalScale);
   DALI_TEST_EQUALS(normalScale, material.GetProperty<float>(Scene3D::Material::Property::NORMAL_SCALE), TEST_LOCATION);
 
-  std::string occlusionUrl = "occlusionUrl";
+  Dali::String occlusionUrl = "occlusionUrl";
   material.SetProperty(Scene3D::Material::Property::OCCLUSION_URL, occlusionUrl);
-  DALI_TEST_EQUALS(occlusionUrl, material.GetProperty<std::string>(Scene3D::Material::Property::OCCLUSION_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(occlusionUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::OCCLUSION_URL), TEST_LOCATION);
 
   float occlusionStrength = 0.8f;
   material.SetProperty(Scene3D::Material::Property::OCCLUSION_STRENGTH, occlusionStrength);
   DALI_TEST_EQUALS(occlusionStrength, material.GetProperty<float>(Scene3D::Material::Property::OCCLUSION_STRENGTH), TEST_LOCATION);
 
-  std::string emissiveUrl = "emissiveUrl";
+  Dali::String emissiveUrl = "emissiveUrl";
   material.SetProperty(Scene3D::Material::Property::EMISSIVE_URL, emissiveUrl);
-  DALI_TEST_EQUALS(emissiveUrl, material.GetProperty<std::string>(Scene3D::Material::Property::EMISSIVE_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(emissiveUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::EMISSIVE_URL), TEST_LOCATION);
 
   Vector3 emissiveFactor(0.9f, 0.1f, 0.2f);
   material.SetProperty(Scene3D::Material::Property::EMISSIVE_FACTOR, emissiveFactor);
@@ -208,17 +208,17 @@ int UtcDaliMaterialSetGetProperty(void)
   material.SetProperty(Scene3D::Material::Property::IOR, ior);
   DALI_TEST_EQUALS(ior, material.GetProperty<float>(Scene3D::Material::Property::IOR), TEST_LOCATION);
 
-  std::string specularUrl = "specularUrl";
+  Dali::String specularUrl = "specularUrl";
   material.SetProperty(Scene3D::Material::Property::SPECULAR_URL, specularUrl);
-  DALI_TEST_EQUALS(specularUrl, material.GetProperty<std::string>(Scene3D::Material::Property::SPECULAR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(specularUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::SPECULAR_URL), TEST_LOCATION);
 
   float specularFactor = 1.0f;
   material.SetProperty(Scene3D::Material::Property::SPECULAR_FACTOR, specularFactor);
   DALI_TEST_EQUALS(specularFactor, material.GetProperty<float>(Scene3D::Material::Property::SPECULAR_FACTOR), TEST_LOCATION);
 
-  std::string specularColorUrl = "specularColorUrl";
+  Dali::String specularColorUrl = "specularColorUrl";
   material.SetProperty(Scene3D::Material::Property::SPECULAR_COLOR_URL, specularColorUrl);
-  DALI_TEST_EQUALS(specularColorUrl, material.GetProperty<std::string>(Scene3D::Material::Property::SPECULAR_COLOR_URL), TEST_LOCATION);
+  DALI_TEST_EQUALS(specularColorUrl, material.GetProperty<Dali::String>(Scene3D::Material::Property::SPECULAR_COLOR_URL), TEST_LOCATION);
 
   Vector3 specularColorFactor(1.0f, 1.0f, 1.0f);
   material.SetProperty(Scene3D::Material::Property::SPECULAR_COLOR_FACTOR, specularColorFactor);

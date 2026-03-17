@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_CAMERA_PARAMETERS_H
 #define DALI_SCENE3D_LOADER_CAMERA_PARAMETERS_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-scene3d/public-api/loader/view-projection.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
@@ -37,7 +38,7 @@ namespace Loader
 {
 struct DALI_SCENE3D_API CameraParameters
 {
-  std::string name;
+  Dali::String name;
 
   // TODO : Is these default value has is meaning?
   Matrix matrix           = Matrix::IDENTITY;

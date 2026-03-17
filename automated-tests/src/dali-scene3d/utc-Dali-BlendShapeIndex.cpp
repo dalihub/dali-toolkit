@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -26,6 +27,7 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 using namespace Dali::Scene3D;
+using Dali::Integration::ToDaliString;
 
 void model_motion_blend_shape_index_startup(void)
 {
@@ -202,7 +204,7 @@ int UtcDaliBlendShapeIndexSetGetBlendShapeId(void)
   DALI_TEST_EQUALS(expectPropertyIndex, index.GetBlendShapeId().indexKey, TEST_LOCATION);
 
   std::string expectPropertyName = "hello";
-  index.SetBlendShapeId(expectPropertyName);
+  index.SetBlendShapeId(ToDaliString(expectPropertyName));
   DALI_TEST_CHECK(index.GetBlendShapeId().type == Property::Key::Type::STRING);
   DALI_TEST_EQUALS(expectPropertyName, index.GetBlendShapeId().stringKey, TEST_LOCATION);
 

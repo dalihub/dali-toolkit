@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -159,10 +160,10 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
     {
       Dali::Scene3D::Loader::AnimatedProperty animatedProperty;
       animatedProperty.mTimePeriod = Dali::TimePeriod(animationDefinition.GetDuration());
-      animatedProperty.mNodeName   = blendShape.mNodeName;
+      animatedProperty.mNodeName   = Dali::Integration::ToDaliString(std::string(blendShape.mNodeName));
       std::stringstream weightPropertyStream;
       weightPropertyStream << Dali::Scene3D::Loader::BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
-      animatedProperty.mPropertyName = weightPropertyStream.str();
+      animatedProperty.mPropertyName = Dali::Integration::ToDaliString(weightPropertyStream.str());
 
       animatedProperty.mKeyFrames = Dali::KeyFrames::New();
       // Make initial progress value follow the first parameter, if their is nothing defined at 0'th duration.
@@ -192,21 +193,23 @@ namespace Scene3D
 {
 namespace Loader
 {
-AnimationDefinition LoadFacialAnimation(const std::string& url)
+AnimationDefinition LoadFacialAnimation(const Dali::String& url)
 {
-  bool failed   = false;
-  auto jsonData = LoadTextFile(url.c_str(), &failed);
+  using Dali::Integration::ToStdString;
+  std::string stdUrl   = ToStdString(url);
+  bool        failed   = false;
+  auto        jsonData = LoadTextFile(stdUrl.c_str(), &failed);
   if(failed)
   {
-    DALI_LOG_ERROR("Failed to load file. url : %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to load file. url : %s\n", stdUrl.c_str());
     AnimationDefinition animationDefinition;
     return animationDefinition;
   }
 
-  json::unique_ptr root(json_parse(jsonData.c_str(), jsonData.size()));
+  json::unique_ptr root(json_parse(jsonData.CStr(), jsonData.Size()));
   if(!root)
   {
-    DALI_LOG_ERROR("Failed to parse json. url : %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to parse json. url : %s\n", stdUrl.c_str());
     AnimationDefinition animationDefinition;
     return animationDefinition;
   }
