@@ -1011,7 +1011,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     window.Add(captureData->mCaptureImageView);
 
     captureData->mCaptureInvertTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-    captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
+    captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::NONE);
     captureData->mCaptureInvertFrameBuffer.AttachColorTexture(captureData->mCaptureInvertTexture);
 
     captureData->mCaptureInvertTask = taskList.CreateTask();
