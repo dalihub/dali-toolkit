@@ -22,8 +22,6 @@
 #if defined(__GLIBC__)
 #include <libintl.h>
 #endif
-#include <algorithm>
-#include <cfloat>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -31,6 +29,8 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <string.h>
+#include <algorithm>
+#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
@@ -39,7 +39,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-property-handler.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>

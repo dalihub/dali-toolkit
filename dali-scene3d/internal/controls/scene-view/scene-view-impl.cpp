@@ -19,12 +19,10 @@
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -41,6 +39,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
+#include <algorithm>
 #include <string_view>
 
 // INTERNAL INCLUDES

@@ -19,9 +19,8 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-renderers.h>
-
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 

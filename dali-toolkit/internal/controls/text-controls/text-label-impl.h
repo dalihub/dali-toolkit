@@ -26,7 +26,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spanned.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>

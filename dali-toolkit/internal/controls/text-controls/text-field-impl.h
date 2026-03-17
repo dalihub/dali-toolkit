@@ -27,7 +27,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>

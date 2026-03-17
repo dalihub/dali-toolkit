@@ -22,8 +22,8 @@
 #include <dali/devel-api/atspi-interfaces/hyperlink.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 

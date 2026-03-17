@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>
@@ -39,7 +40,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali::Toolkit
+namespace Dali::Toolkit::Internal
 {
 namespace
 {
@@ -53,14 +54,14 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CON
 #endif
 
 template<typename T>
-void Remove(Internal::Dictionary<T>& keyValues, const std::string& name)
+void Remove(Dictionary<T>& keyValues, const std::string& name)
 {
   keyValues.Remove(name);
 }
 
-void Remove(Internal::DictionaryKeys& keys, const std::string& name)
+void Remove(DictionaryKeys& keys, const std::string& name)
 {
-  Internal::DictionaryKeys::iterator iter = std::find(keys.begin(), keys.end(), name);
+  DictionaryKeys::iterator iter = std::find(keys.begin(), keys.end(), name);
   if(iter != keys.end())
   {
     keys.erase(iter);
@@ -117,11 +118,11 @@ bool FindVisual(const Toolkit::Visual::Base findVisual, const RegisteredVisualCo
 /**
  *  Finds internal visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
-bool FindVisual(const Internal::Visual::Base& findInternalVisual, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
+bool FindVisual(const Visual::Base& findInternalVisual, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter)
 {
   for(iter = visuals.Begin(); iter != visuals.End(); iter++)
   {
-    Internal::Visual::Base& visual = GetImplementation((*iter)->visual);
+    Visual::Base& visual = GetImplementation((*iter)->visual);
     if((&visual == &findInternalVisual))
     {
       return true;
@@ -130,13 +131,13 @@ bool FindVisual(const Internal::Visual::Base& findInternalVisual, const Register
   return false;
 }
 
-void FindChangableVisuals(Internal::Dictionary<Property::Map>& stateVisualsToAdd,
-                          Internal::Dictionary<Property::Map>& stateVisualsToChange,
-                          Internal::DictionaryKeys&            stateVisualsToRemove)
+void FindChangableVisuals(Dictionary<Property::Map>& stateVisualsToAdd,
+                          Dictionary<Property::Map>& stateVisualsToChange,
+                          DictionaryKeys&            stateVisualsToRemove)
 {
-  Internal::DictionaryKeys copyOfStateVisualsToRemove = stateVisualsToRemove;
+  DictionaryKeys copyOfStateVisualsToRemove = stateVisualsToRemove;
 
-  for(Internal::DictionaryKeys::iterator iter = copyOfStateVisualsToRemove.begin();
+  for(DictionaryKeys::iterator iter = copyOfStateVisualsToRemove.begin();
       iter != copyOfStateVisualsToRemove.end();
       ++iter)
   {
@@ -224,7 +225,7 @@ void DiscardVisual(RegisteredVisualContainer::Iterator sourceIter, RegisteredVis
  * @param[in] controlImpl Actor with renderers
  * @note When offscreen rendering is on, visuals drawn out of control's area(depth index in range of BACKGROUND_EFFECT or FOREGROUND_EFFECT) should swap its renderer to cache renderers. So changing visual's depth index may not apply instantaneously. Turn offscreen rendering off and on again.
  */
-void SetVisualOnScene(Internal::Visual::Base& visualImpl, ControlImpl& controlImpl)
+void SetVisualOnScene(Visual::Base& visualImpl, Toolkit::ControlImpl& controlImpl)
 {
   Actor self = controlImpl.Self();
   visualImpl.SetOnScene(self);
@@ -247,7 +248,7 @@ void SetVisualOnScene(Internal::Visual::Base& visualImpl, ControlImpl& controlIm
  * @param[in] visualImpl The visual
  * @param[in] controlImpl Actor with renderers
  */
-void SetVisualOffScene(Internal::Visual::Base& visualImpl, ControlImpl& controlImpl)
+void SetVisualOffScene(Visual::Base& visualImpl, Toolkit::ControlImpl& controlImpl)
 {
   Actor self = controlImpl.Self();
 
@@ -272,7 +273,7 @@ void SetVisualOffScene(Internal::Visual::Base& visualImpl, ControlImpl& controlI
  * @param[in] container Container of visuals
  * @param[in] controlImpl Actor to remove visuals from
  */
-void SetVisualsOffScene(const RegisteredVisualContainer& container, ControlImpl& controlImpl)
+void SetVisualsOffScene(const RegisteredVisualContainer& container, Toolkit::ControlImpl& controlImpl)
 {
   for(auto iter = container.Begin(), end = container.End(); iter != end; iter++)
   {
@@ -285,7 +286,7 @@ void SetVisualsOffScene(const RegisteredVisualContainer& container, ControlImpl&
 }
 } // unnamed namespace
 
-ControlImpl::Impl::VisualData::VisualData(ControlImpl::Impl& outer)
+Control::VisualData::VisualData(Control& outer)
 : mVisualEventSignal(),
   mOuter(outer),
   mOffscreenRenderingEnabled(false),
@@ -294,24 +295,24 @@ ControlImpl::Impl::VisualData::VisualData(ControlImpl::Impl& outer)
 {
 }
 
-ControlImpl::Impl::VisualData::~VisualData()
+Control::VisualData::~VisualData()
 {
 }
 
-void ControlImpl::Impl::VisualData::ConnectScene(Actor parent)
+void Control::VisualData::ConnectScene(Actor parent)
 {
   for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
   {
     // Check whether the visual is empty and enabled
     if((*iter)->visual && (*iter)->enabled)
     {
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ControlImpl::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index);
       SetVisualOnScene(Toolkit::GetImplementation((*iter)->visual), mOuter.mControlImpl);
     }
   }
 }
 
-void ControlImpl::Impl::VisualData::ClearScene(Actor parent)
+void Control::VisualData::ClearScene(Actor parent)
 {
   SetVisualsOffScene(mVisuals, mOuter.mControlImpl);
 
@@ -336,9 +337,9 @@ void ControlImpl::Impl::VisualData::ClearScene(Actor parent)
 }
 
 // Called by a Visual when it's resource is ready
-void ControlImpl::Impl::VisualData::ResourceReady(Internal::Visual::Base& object)
+void Control::VisualData::ResourceReady(Visual::Base& object)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ControlImpl::Impl::VisualData::ResourceReady() replacements pending[%d]\n", mRemoveVisuals.Count());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::VisualData::ResourceReady() replacements pending[%d]\n", mRemoveVisuals.Count());
 
   RegisteredVisualContainer::Iterator registeredIter;
 
@@ -375,11 +376,11 @@ void ControlImpl::Impl::VisualData::ResourceReady(Internal::Visual::Base& object
   }
 }
 
-void ControlImpl::Impl::VisualData::NotifyVisualEvent(Internal::Visual::Base& object, Property::Index signalId)
+void Control::VisualData::NotifyVisualEvent(Visual::Base& object, Property::Index signalId)
 {
   for(auto registeredIter = mVisuals.Begin(), end = mVisuals.End(); registeredIter != end; ++registeredIter)
   {
-    Internal::Visual::Base& registeredVisualImpl = Toolkit::GetImplementation((*registeredIter)->visual);
+    Visual::Base& registeredVisualImpl = Toolkit::GetImplementation((*registeredIter)->visual);
     if(&object == &registeredVisualImpl)
     {
       Dali::Toolkit::Control handle(mOuter.mControlImpl.GetOwner());
@@ -389,7 +390,7 @@ void ControlImpl::Impl::VisualData::NotifyVisualEvent(Internal::Visual::Base& ob
   }
 }
 
-void ControlImpl::Impl::VisualData::RelayoutRequest(Internal::Visual::Base& object)
+void Control::VisualData::RelayoutRequest(Visual::Base& object)
 {
   if(mOuter.mControlImpl.Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
@@ -398,7 +399,7 @@ void ControlImpl::Impl::VisualData::RelayoutRequest(Internal::Visual::Base& obje
 }
 
 // Called by a Visual
-bool ControlImpl::Impl::VisualData::IsAnyPropertyAnimate(const std::unordered_set<Property::Index>& properties) const
+bool Control::VisualData::IsAnyPropertyAnimate(const std::unordered_set<Property::Index>& properties) const
 {
   for(const auto& index : properties)
   {
@@ -410,15 +411,15 @@ bool ControlImpl::Impl::VisualData::IsAnyPropertyAnimate(const std::unordered_se
   return false;
 }
 
-bool ControlImpl::Impl::VisualData::IsResourceReady() const
+bool Control::VisualData::IsResourceReady() const
 {
   // Iterate through and check all the enabled visuals are ready
   for(auto visualIter = mVisuals.Begin();
       visualIter != mVisuals.End();
       ++visualIter)
   {
-    const Toolkit::Visual::Base   visual     = (*visualIter)->visual;
-    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    const Toolkit::Visual::Base visual     = (*visualIter)->visual;
+    const Visual::Base&         visualImpl = Toolkit::GetImplementation(visual);
 
     // one of the enabled visuals is not ready
     if(!visualImpl.IsResourceReady() && (*visualIter)->enabled)
@@ -429,14 +430,14 @@ bool ControlImpl::Impl::VisualData::IsResourceReady() const
   return true;
 }
 
-Toolkit::Visual::ResourceStatus ControlImpl::Impl::VisualData::GetVisualResourceStatus(Property::Index index) const
+Toolkit::Visual::ResourceStatus Control::VisualData::GetVisualResourceStatus(Property::Index index) const
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
   {
     if((*iter)->visual)
     {
-      const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
+      const Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
       return visualImpl.GetResourceStatus();
     }
   }
@@ -444,7 +445,7 @@ Toolkit::Visual::ResourceStatus ControlImpl::Impl::VisualData::GetVisualResource
   return Toolkit::Visual::ResourceStatus::PREPARING;
 }
 
-void ControlImpl::Impl::VisualData::CopyInstancedProperties(RegisteredVisualContainer& visuals, Internal::Dictionary<Property::Map>& instancedProperties)
+void Control::VisualData::CopyInstancedProperties(RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties)
 {
   for(RegisteredVisualContainer::Iterator iter = visuals.Begin(); iter != visuals.End(); iter++)
   {
@@ -457,27 +458,27 @@ void ControlImpl::Impl::VisualData::CopyInstancedProperties(RegisteredVisualCont
   }
 }
 
-void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
+void Control::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
   RegisterVisual(index, visual, VisualState::ENABLED, DepthIndexValue::NOT_SET);
 }
 
-void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
+void Control::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
 {
   RegisterVisual(index, visual, VisualState::ENABLED, DepthIndexValue::SET, depthIndex);
 }
 
-void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
+void Control::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
 {
   RegisterVisual(index, visual, (enabled ? VisualState::ENABLED : VisualState::DISABLED), DepthIndexValue::NOT_SET);
 }
 
-void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
+void Control::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
 {
   RegisterVisual(index, visual, (enabled ? VisualState::ENABLED : VisualState::DISABLED), DepthIndexValue::SET, depthIndex);
 }
 
-void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex)
+void Control::VisualData::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
@@ -607,7 +608,7 @@ void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolki
     RegisteredVisual* newRegisteredVisual = new RegisteredVisual(index, visual, (enabled == VisualState::ENABLED ? true : false), (visualReplaced && enabled));
     mVisuals.PushBack(newRegisteredVisual);
 
-    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
     // Put on stage if enabled and the control is already on the stage
     if((enabled == VisualState::ENABLED) && self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
     {
@@ -622,7 +623,7 @@ void ControlImpl::Impl::VisualData::RegisterVisual(Property::Index index, Toolki
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n", visual.GetName().c_str(), index, enabled ? "true" : "false");
 }
 
-void ControlImpl::Impl::VisualData::UnregisterVisual(Property::Index index)
+void Control::VisualData::UnregisterVisual(Property::Index index)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
@@ -649,12 +650,12 @@ void ControlImpl::Impl::VisualData::UnregisterVisual(Property::Index index)
   }
 }
 
-Toolkit::Visual::Base ControlImpl::Impl::VisualData::GetVisual(Property::Index index) const
+Toolkit::Visual::Base Control::VisualData::GetVisual(Property::Index index) const
 {
   return Toolkit::Visual::Base(GetVisualImplPtr(index));
 }
 
-Toolkit::Internal::Visual::Base* ControlImpl::Impl::VisualData::GetVisualImplPtr(Property::Index index) const
+Visual::Base* Control::VisualData::GetVisualImplPtr(Property::Index index) const
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
@@ -664,12 +665,12 @@ Toolkit::Internal::Visual::Base* ControlImpl::Impl::VisualData::GetVisualImplPtr
   return nullptr;
 }
 
-Toolkit::Visual::Base ControlImpl::Impl::VisualData::GetVisual(const std::string& name) const
+Toolkit::Visual::Base Control::VisualData::GetVisual(const std::string& name) const
 {
   return GetVisualByName(mVisuals, name);
 }
 
-void ControlImpl::Impl::VisualData::EnableVisual(Property::Index index, bool enable)
+void Control::VisualData::EnableVisual(Property::Index index, bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableVisual(%d, %s)\n", index, enable ? "T" : "F");
 
@@ -704,7 +705,7 @@ void ControlImpl::Impl::VisualData::EnableVisual(Property::Index index, bool ena
   }
 }
 
-void ControlImpl::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
+void Control::VisualData::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableReadyTransitionOverriden(%p, %s)\n", &visual, enable ? "T" : "F");
 
@@ -721,7 +722,7 @@ void ControlImpl::Impl::VisualData::EnableReadyTransitionOverridden(Toolkit::Vis
   }
 }
 
-void ControlImpl::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
+void Control::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Control::EnableCornerPropertiesOverridden(%p, %s)\n", &visual, enable ? "T" : "F");
 
@@ -740,7 +741,7 @@ void ControlImpl::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Vi
     {
       auto self = mOuter.mControlImpl.Self();
 
-      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+      Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
 
       if(mCornerRadiusValueAdded || mCornerSquarenessValueAdded)
       {
@@ -811,14 +812,14 @@ void ControlImpl::Impl::VisualData::EnableCornerPropertiesOverridden(Toolkit::Vi
     }
     else
     {
-      Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+      Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
       visualImpl.RemoveConstraintFeatureByIndex(Toolkit::DevelControl::Property::CORNER_RADIUS);
       visualImpl.RemoveConstraintFeatureByIndex(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
     }
   }
 }
 
-bool ControlImpl::Impl::VisualData::IsVisualEnabled(Property::Index index) const
+bool Control::VisualData::IsVisualEnabled(Property::Index index) const
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(index, mVisuals, iter))
@@ -828,7 +829,7 @@ bool ControlImpl::Impl::VisualData::IsVisualEnabled(Property::Index index) const
   return false;
 }
 
-void ControlImpl::Impl::VisualData::RemoveVisual(RegisteredVisualContainer& visuals, const std::string& visualName)
+void Control::VisualData::RemoveVisual(RegisteredVisualContainer& visuals, const std::string& visualName)
 {
   for(RegisteredVisualContainer::Iterator visualIter = visuals.Begin();
       visualIter != visuals.End();
@@ -846,20 +847,20 @@ void ControlImpl::Impl::VisualData::RemoveVisual(RegisteredVisualContainer& visu
   }
 }
 
-void ControlImpl::Impl::VisualData::RemoveVisuals(RegisteredVisualContainer& visuals, Internal::DictionaryKeys& removeVisuals)
+void Control::VisualData::RemoveVisuals(RegisteredVisualContainer& visuals, DictionaryKeys& removeVisuals)
 {
-  for(Internal::DictionaryKeys::iterator iter = removeVisuals.begin(); iter != removeVisuals.end(); ++iter)
+  for(DictionaryKeys::iterator iter = removeVisuals.begin(); iter != removeVisuals.end(); ++iter)
   {
     const std::string visualName = *iter;
     RemoveVisual(visuals, visualName);
   }
 }
 
-void ControlImpl::Impl::VisualData::RecreateChangedVisuals(Internal::Dictionary<Property::Map>& stateVisualsToChange,
-                                                           Internal::Dictionary<Property::Map>& instancedProperties)
+void Control::VisualData::RecreateChangedVisuals(Dictionary<Property::Map>& stateVisualsToChange,
+                                                 Dictionary<Property::Map>& instancedProperties)
 {
   Dali::CustomActor handle(mOuter.mControlImpl.GetOwner());
-  for(Internal::Dictionary<Property::Map>::iterator iter = stateVisualsToChange.Begin();
+  for(Dictionary<Property::Map>::iterator iter = stateVisualsToChange.Begin();
       iter != stateVisualsToChange.End();
       ++iter)
   {
@@ -907,40 +908,40 @@ void ControlImpl::Impl::VisualData::RecreateChangedVisuals(Internal::Dictionary<
       }
 
       const Property::Map* instancedMap = instancedProperties.FindConst(visualName);
-      Internal::Style::ApplyVisual(handle, visualName, toMap, instancedMap);
+      Style::ApplyVisual(handle, visualName, toMap, instancedMap);
     }
   }
 }
 
-void ControlImpl::Impl::VisualData::ReplaceStateVisualsAndProperties(const Internal::StylePtr oldState, const Internal::StylePtr newState, const std::string& subState)
+void Control::VisualData::ReplaceStateVisualsAndProperties(const StylePtr oldState, const StylePtr newState, const std::string& subState)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
   // Collect all old visual names
-  Internal::DictionaryKeys stateVisualsToRemove;
+  DictionaryKeys stateVisualsToRemove;
   if(oldState)
   {
     oldState->visuals.GetKeys(stateVisualsToRemove);
     if(!subState.empty())
     {
-      const Internal::StylePtr* oldSubState = oldState->subStates.FindConst(subState);
+      const StylePtr* oldSubState = oldState->subStates.FindConst(subState);
       if(oldSubState)
       {
-        Internal::DictionaryKeys subStateVisualsToRemove;
+        DictionaryKeys subStateVisualsToRemove;
         (*oldSubState)->visuals.GetKeys(subStateVisualsToRemove);
-        Internal::Merge(stateVisualsToRemove, subStateVisualsToRemove);
+        Merge(stateVisualsToRemove, subStateVisualsToRemove);
       }
     }
   }
 
   // Collect all new visual properties
-  Internal::Dictionary<Property::Map> stateVisualsToAdd;
+  Dictionary<Property::Map> stateVisualsToAdd;
   if(newState)
   {
     stateVisualsToAdd = newState->visuals;
     if(!subState.empty())
     {
-      const Internal::StylePtr* newSubState = newState->subStates.FindConst(subState);
+      const StylePtr* newSubState = newState->subStates.FindConst(subState);
       if(newSubState)
       {
         stateVisualsToAdd.Merge((*newSubState)->visuals);
@@ -949,11 +950,11 @@ void ControlImpl::Impl::VisualData::ReplaceStateVisualsAndProperties(const Inter
   }
 
   // If a name is in both add/remove, move it to change list.
-  Internal::Dictionary<Property::Map> stateVisualsToChange;
+  Dictionary<Property::Map> stateVisualsToChange;
   FindChangableVisuals(stateVisualsToAdd, stateVisualsToChange, stateVisualsToRemove);
 
   // Copy instanced properties (e.g. text label) of current visuals
-  Internal::Dictionary<Property::Map> instancedProperties;
+  Dictionary<Property::Map> instancedProperties;
   CopyInstancedProperties(mVisuals, instancedProperties);
 
   // For each visual in remove list, remove from mVisuals
@@ -961,19 +962,19 @@ void ControlImpl::Impl::VisualData::ReplaceStateVisualsAndProperties(const Inter
 
   // For each visual in add list, create and add to mVisuals
   Dali::CustomActor handle(mOuter.mControlImpl.GetOwner());
-  Internal::Style::ApplyVisuals(handle, stateVisualsToAdd, instancedProperties);
+  Style::ApplyVisuals(handle, stateVisualsToAdd, instancedProperties);
 
   // For each visual in change list, if it requires a new visual,
   // remove old visual, create and add to mVisuals
   RecreateChangedVisuals(stateVisualsToChange, instancedProperties);
 }
 
-DevelControl::VisualEventSignalType& ControlImpl::Impl::VisualData::VisualEventSignal()
+DevelControl::VisualEventSignalType& Control::VisualData::VisualEventSignal()
 {
   return mVisualEventSignal;
 }
 
-void ControlImpl::Impl::VisualData::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
+void Control::VisualData::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visualIndex, mVisuals, iter))
@@ -982,7 +983,7 @@ void ControlImpl::Impl::VisualData::DoAction(Dali::Property::Index visualIndex, 
   }
 }
 
-void ControlImpl::Impl::VisualData::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
+void Control::VisualData::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   RegisteredVisualContainer::Iterator iter;
   if(FindVisual(visualIndex, mVisuals, iter))
@@ -991,7 +992,7 @@ void ControlImpl::Impl::VisualData::DoActionExtension(Dali::Property::Index visu
   }
 }
 
-void ControlImpl::Impl::VisualData::ClearVisuals()
+void Control::VisualData::ClearVisuals()
 {
   while(!mVisuals.Empty())
   {
@@ -1012,7 +1013,7 @@ void ControlImpl::Impl::VisualData::ClearVisuals()
   }
 }
 
-Dali::Property ControlImpl::Impl::VisualData::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
+Dali::Property Control::VisualData::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
 {
   Toolkit::Visual::Base visual = GetVisualByIndex(mVisuals, index);
   if(visual)
@@ -1024,25 +1025,25 @@ Dali::Property ControlImpl::Impl::VisualData::GetVisualProperty(Dali::Property::
   return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
-void ControlImpl::Impl::VisualData::StopObservingVisual(Toolkit::Visual::Base& visual)
+void Control::VisualData::StopObservingVisual(Toolkit::Visual::Base& visual)
 {
-  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+  Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
 
   // Stop observing the visual
   visualImpl.RemoveEventObserver(*this);
   visualImpl.RemoveConstraintObserver(*this);
 }
 
-void ControlImpl::Impl::VisualData::StartObservingVisual(Toolkit::Visual::Base& visual)
+void Control::VisualData::StartObservingVisual(Toolkit::Visual::Base& visual)
 {
-  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+  Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
 
   // start observing the visual for events
   visualImpl.AddEventObserver(*this);
   visualImpl.AddConstraintObserver(*this);
 }
 
-void ControlImpl::Impl::VisualData::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+void Control::VisualData::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
   for(auto&& data : properties)
   {
@@ -1058,7 +1059,7 @@ void ControlImpl::Impl::VisualData::UpdateVisualProperties(const std::vector<std
   mOuter.mControlImpl.OnUpdateVisualProperties(properties);
 }
 
-void ControlImpl::Impl::VisualData::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
+void Control::VisualData::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(index == DevelControl::Property::CORNER_RADIUS ||
      index == DevelControl::Property::CORNER_SQUARENESS ||
@@ -1098,7 +1099,7 @@ void ControlImpl::Impl::VisualData::CreateAnimationConstraints(const Dali::BaseO
   }
 }
 
-void ControlImpl::Impl::VisualData::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
+void Control::VisualData::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   auto indexIter = mPropertyOnAnimation.find(index);
   if(indexIter != mPropertyOnAnimation.end())
@@ -1125,14 +1126,14 @@ void ControlImpl::Impl::VisualData::ClearAnimationConstraints(const Dali::BaseOb
   }
 }
 
-void ControlImpl::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index index, bool notifyFromAnimation)
+void Control::VisualData::NotifyConstraintPropertyChanged(Property::Index index, bool notifyFromAnimation)
 {
   for(auto registeredVisual : mVisuals)
   {
     if(registeredVisual->visual && registeredVisual->enabled)
     {
       // TODO : Might need to use some flags
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(registeredVisual->visual);
+      Visual::Base& visualImpl = Toolkit::GetImplementation(registeredVisual->visual);
 
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged(%d) Visual %s(%p) notify property changed [%d]\n", notifyFromAnimation, registeredVisual->visual.GetName().c_str(), &visualImpl, index);
       visualImpl.UpdateApplyRate(index);
@@ -1245,7 +1246,7 @@ void ControlImpl::Impl::VisualData::NotifyConstraintPropertyChanged(Property::In
   }
 }
 
-void ControlImpl::Impl::VisualData::OffscreenRenderingEnabled(bool enabled)
+void Control::VisualData::OffscreenRenderingEnabled(bool enabled)
 {
   if(mOffscreenRenderingEnabled == enabled)
   {
@@ -1316,7 +1317,7 @@ void ControlImpl::Impl::VisualData::OffscreenRenderingEnabled(bool enabled)
   mCornerRadiusValueAdded = true;
 }
 
-void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
+void Control::VisualData::ApplyFittingMode(const Vector2& size)
 {
   Actor self;
   for(RegisteredVisualContainer::Iterator iter = mVisuals.Begin(); iter != mVisuals.End(); iter++)
@@ -1324,7 +1325,7 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
     // Check whether the visual is empty and enabled
     if((*iter)->visual && (*iter)->enabled)
     {
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
+      Visual::Base& visualImpl = Toolkit::GetImplementation((*iter)->visual);
 
       // If the current visual is using the transform property map, fittingMode will not be applied.
       if(visualImpl.IsIgnoreFittingMode())
@@ -1332,10 +1333,10 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
         continue;
       }
 
-      Internal::Visual::FittingMode fittingMode = visualImpl.GetFittingMode();
+      Visual::FittingMode fittingMode = visualImpl.GetFittingMode();
 
       // If the fittingMode is DONT_CARE, we don't need to apply fittingMode, just Set the size of control
-      if(fittingMode == Internal::Visual::FittingMode::DONT_CARE)
+      if(fittingMode == Visual::FittingMode::DONT_CARE)
       {
         if(visualImpl.GetType() != Toolkit::Visual::Type::TEXT)
         {
@@ -1373,39 +1374,39 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
       Property::Map transformMap = Property::Map();
 
       if((!zeroPadding) || // If padding is not zero
-         (fittingMode != Internal::Visual::FittingMode::FILL))
+         (fittingMode != Visual::FittingMode::FILL))
       {
         visualImpl.SetTransformMapUsageForFittingMode(true);
 
         Vector2 naturalSize;
         // NaturalSize will not be used for FILL fitting mode, which is default.
         // Skip GetNaturalSize
-        if(fittingMode != Internal::Visual::FittingMode::FILL)
+        if(fittingMode != Visual::FittingMode::FILL)
         {
           visualImpl.GetNaturalSize(naturalSize);
         }
 
         // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
-        if(fittingMode == Internal::Visual::FittingMode::FIT_WIDTH || fittingMode == Internal::Visual::FittingMode::FIT_HEIGHT)
+        if(fittingMode == Visual::FittingMode::FIT_WIDTH || fittingMode == Visual::FittingMode::FIT_HEIGHT)
         {
           const float widthRatio  = !Dali::EqualsZero(naturalSize.width) ? (finalSize.width / naturalSize.width) : 0.0f;
           const float heightRatio = !Dali::EqualsZero(naturalSize.height) ? (finalSize.height / naturalSize.height) : 0.0f;
           if(widthRatio < heightRatio)
           {
             // Final size has taller form than natural size.
-            fittingMode = (fittingMode == Internal::Visual::FittingMode::FIT_WIDTH) ? Internal::Visual::FittingMode::FIT_KEEP_ASPECT_RATIO : Internal::Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO;
+            fittingMode = (fittingMode == Visual::FittingMode::FIT_WIDTH) ? Visual::FittingMode::FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO;
           }
           else
           {
             // Final size has wider form than natural size.
-            fittingMode = (fittingMode == Internal::Visual::FittingMode::FIT_WIDTH) ? Internal::Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO : Internal::Visual::FittingMode::FIT_KEEP_ASPECT_RATIO;
+            fittingMode = (fittingMode == Visual::FittingMode::FIT_WIDTH) ? Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::FIT_KEEP_ASPECT_RATIO;
           }
         }
 
         // Calculate size for fittingMode
         switch(fittingMode)
         {
-          case Internal::Visual::FittingMode::FIT_KEEP_ASPECT_RATIO:
+          case Visual::FittingMode::FIT_KEEP_ASPECT_RATIO:
           {
             auto availableVisualSize = finalSize;
 
@@ -1421,7 +1422,7 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
               .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
             break;
           }
-          case Internal::Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
+          case Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
           {
             auto availableVisualSize = finalSize;
             finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
@@ -1444,7 +1445,7 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
               .Add(Toolkit::Visual::Transform::Property::SIZE, availableVisualSize);
             break;
           }
-          case Internal::Visual::FittingMode::CENTER:
+          case Visual::FittingMode::CENTER:
           {
             auto availableVisualSize = finalSize;
             if(availableVisualSize.width > naturalSize.width && availableVisualSize.height > naturalSize.height)
@@ -1464,15 +1465,15 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
               .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
             break;
           }
-          case Internal::Visual::FittingMode::FILL:
+          case Visual::FittingMode::FILL:
           {
             transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
               .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize);
             break;
           }
-          case Internal::Visual::FittingMode::FIT_WIDTH:
-          case Internal::Visual::FittingMode::FIT_HEIGHT:
-          case Internal::Visual::FittingMode::DONT_CARE:
+          case Visual::FittingMode::FIT_WIDTH:
+          case Visual::FittingMode::FIT_HEIGHT:
+          case Visual::FittingMode::DONT_CARE:
           {
             // This FittingMode already converted
             break;
@@ -1505,4 +1506,4 @@ void ControlImpl::Impl::VisualData::ApplyFittingMode(const Vector2& size)
   }
 }
 
-} // namespace Dali::Toolkit
+} // namespace Dali::Toolkit::Internal

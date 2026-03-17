@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/constants.h>
@@ -29,13 +30,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-
-#include <dali-toolkit/devel-api/controls/control-accessible.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
-
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 
 using Dali::Integration::ToDaliString;

@@ -19,12 +19,11 @@
 #include "confirmation-popup-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali/integration-api/string-utils.h>
 
 using Dali::Integration::ToPropertyValue;

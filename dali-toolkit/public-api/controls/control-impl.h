@@ -47,8 +47,12 @@ class StyleManager;
 namespace DevelControl
 {
 class ControlAccessible;
-
 } // namespace DevelControl
+
+namespace Internal
+{
+class Control;
+} // namespace Internal
 
 /**
  * @brief This is the internal base class for all controls.
@@ -791,11 +795,9 @@ private:
   DALI_INTERNAL ControlImpl& operator=(const ControlImpl&)   = delete; ///< Deleted copy assignment operator.
   DALI_INTERNAL ControlImpl& operator=(ControlImpl&&)        = delete; ///< Deleted move assignment operator.
 
-public:
-  class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
-
 private:
-  Impl* mImpl;
+  Internal::Control* mInternal;
+  friend Internal::Control;
   /// @endcond
 };
 

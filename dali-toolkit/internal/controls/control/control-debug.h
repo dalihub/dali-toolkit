@@ -18,16 +18,15 @@
 
 #if defined(DEBUG_ENABLED)
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <iostream>
 #include <string>
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit::Internal
 {
 /**
  * Convert properties of handle into JSON output, separated into 'normal' and 'child' properties.
@@ -55,11 +54,7 @@ std::string DumpActor(Actor actor);
  */
 void DumpControlHierarchy(std::ostream& outputStream, Actor rootActor);
 
-} // namespace Internal
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit::Internal
 
 #endif
 

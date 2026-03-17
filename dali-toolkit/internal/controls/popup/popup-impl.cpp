@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
 #include <dali/devel-api/common/stage.h>
@@ -33,12 +32,12 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>

@@ -23,7 +23,7 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 using Dali::Integration::ToDaliString;
@@ -141,9 +141,9 @@ bool Control::IsResourceReady() const
 
 Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Dali::Property::Index index)
 {
-  const ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
-  const ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(internalControl);
-  return controlDataImpl.GetVisualResourceStatus(index);
+  const ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  const Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  return internalControl.GetVisualResourceStatus(index);
 }
 
 Control::KeyEventSignalType& Control::KeyEventSignal()
@@ -163,18 +163,18 @@ Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
 
 Control::ResourceReadySignalType& Control::ResourceReadySignal()
 {
-  ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
-  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
 
-  return controlImpl.mResourceReadySignal;
+  return internalControl.mResourceReadySignal;
 }
 
 Control::OffScreenRenderingFinishedSignalType& Control::OffScreenRenderingFinishedSignal()
 {
-  ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
-  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
 
-  return controlImpl.mOffScreenRenderingFinishedSignal;
+  return internalControl.mOffScreenRenderingFinishedSignal;
 }
 
 Control::Control(ControlImpl& implementation)

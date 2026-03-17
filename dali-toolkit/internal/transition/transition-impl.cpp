@@ -27,7 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 
 namespace Dali
 {
@@ -151,10 +151,11 @@ void Transition::OnPlay()
 
   mOriginalVisualProperties.clear();
   std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>> destinationVisualProperties;
-  Dali::Toolkit::Control                                             targetControl   = GetTargetControl();
-  ControlImpl&                                                       internalControl = Toolkit::GetImplementation(targetControl);
-  ControlImpl::Impl&                                                 controlDataImpl = Toolkit::ControlImpl::Impl::Get(internalControl);
-  controlDataImpl.CreateTransitions(mOriginalVisualProperties, destinationVisualProperties, sourceControl, destinationControl);
+
+  Toolkit::Control   targetControl   = GetTargetControl();
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(targetControl);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  internalControl.CreateTransitions(mOriginalVisualProperties, destinationVisualProperties, sourceControl, destinationControl);
 
   for(uint32_t index = 0; index < mOriginalVisualProperties.size(); ++index)
   {
@@ -187,8 +188,8 @@ void Transition::OnFinished()
 
   if(!mUseDestinationTarget)
   {
-    Dali::Toolkit::Control target         = GetTargetControl();
-    Dali::Animation        resetAnimation = Dali::Animation::New(0.0f);
+    Toolkit::Control target         = GetTargetControl();
+    Dali::Animation  resetAnimation = Dali::Animation::New(0.0f);
     if(mOriginalSize != target.GetProperty<Vector3>(Dali::Actor::Property::SIZE))
     {
       // Use Animation not to notify size change and not to change width and height resize policy.
@@ -196,10 +197,10 @@ void Transition::OnFinished()
     }
     resetAnimation.Play();
 
-    Dali::Toolkit::Control targetControl   = GetTargetControl();
-    ControlImpl&           internalControl = Toolkit::GetImplementation(targetControl);
-    ControlImpl::Impl&     controlDataImpl = Toolkit::ControlImpl::Impl::Get(internalControl);
-    controlDataImpl.UpdateVisualProperties(mOriginalVisualProperties);
+    Toolkit::Control      targetControl   = GetTargetControl();
+    Toolkit::ControlImpl& controlImpl     = Toolkit::GetImplementation(targetControl);
+    Internal::Control&    internalControl = Internal::Control::Get(controlImpl);
+    internalControl.UpdateVisualProperties(mOriginalVisualProperties);
   }
 
   if(IsTransitionWithChild())
