@@ -148,7 +148,7 @@ void OffScreenRenderingImpl::CreateFrameBuffer()
 {
   const Size size = GetTargetSize();
 
-  mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::AUTO);
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height);
   mFrameBuffer.AttachColorTexture(texture);
 }
