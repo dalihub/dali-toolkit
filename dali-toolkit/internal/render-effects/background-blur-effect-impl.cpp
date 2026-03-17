@@ -124,20 +124,28 @@ void BackgroundBlurEffectImpl::SetBlurOnce(bool blurOnce)
     {
       OnRefresh();
     }
-
-    if(mBlurOnce)
-    {
-      mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-      mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-      mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
-
-      mVerticalBlurTask.FinishedSignal().Connect(this, &BackgroundBlurEffectImpl::OnRenderFinished);
-    }
     else
     {
-      mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
-      mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
-      mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+      if(mBlurOnce)
+      {
+        mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+        if(mVerticalBlurTask.FinishedSignal().Empty())
+        {
+          mVerticalBlurTask.FinishedSignal().Connect(this, &BackgroundBlurEffectImpl::OnRenderFinished);
+        }
+      }
+      else
+      {
+        if(!mVerticalBlurTask.FinishedSignal().Empty())
+        {
+          mVerticalBlurTask.FinishedSignal().Disconnect(this, &BackgroundBlurEffectImpl::OnRenderFinished);
+        }
+        mSourceRenderTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+        mHorizontalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+        mVerticalBlurTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+      }
     }
   }
 }
@@ -385,11 +393,12 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   {
     return;
   }
+  Renderer renderer = GetTargetRenderer();
+  SetRendererTexture(renderer, Dali::Texture());
 
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
   {
-    Renderer renderer = GetTargetRenderer();
     ownerControl.RemoveRenderer(renderer);
     ownerControl.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }
@@ -562,14 +571,17 @@ void BackgroundBlurEffectImpl::DestroyRenderTasks()
 
 void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 {
-  mFinishedSignal.Emit();
+  if(DALI_LIKELY(mVerticalBlurTask == renderTask))
+  {
+    mFinishedSignal.Emit();
 
-  DestroyFrameBuffers();
-  DestroyRenderTasks();
+    DestroyFrameBuffers();
+    DestroyRenderTasks();
 
-  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
-  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
-  mInternalRoot.Unparent();
+    SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
+    SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
+    mInternalRoot.Unparent();
+  }
 }
 
 void BackgroundBlurEffectImpl::UpdateDownscaledBlurRadius()

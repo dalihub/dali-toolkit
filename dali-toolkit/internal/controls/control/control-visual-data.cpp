@@ -1096,7 +1096,7 @@ void Control::Impl::VisualData::CreateAnimationConstraints(const Dali::BaseObjec
 
     if(notifyConstraints)
     {
-      NotifyConstraintPropertyChanged(index);
+      NotifyConstraintPropertyChanged(index, true);
     }
   }
 }
@@ -1121,14 +1121,14 @@ void Control::Impl::VisualData::ClearAnimationConstraints(const Dali::BaseObject
           DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::ClearAnimationConstraints property not animated anymore [%d]\n", index);
 
           mPropertyOnAnimation.erase(index);
-          NotifyConstraintPropertyChanged(index);
+          NotifyConstraintPropertyChanged(index, false);
         }
       }
     }
   }
 }
 
-void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index index)
+void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index index, bool notifyFromAnimation)
 {
   for(auto registeredVisual : mVisuals)
   {
@@ -1137,7 +1137,7 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
       // TODO : Might need to use some flags
       Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(registeredVisual->visual);
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged Visual %s(%p) notify property changed [%d]\n", registeredVisual->visual.GetName().c_str(), &visualImpl, index);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged(%d) Visual %s(%p) notify property changed [%d]\n", notifyFromAnimation, registeredVisual->visual.GetName().c_str(), &visualImpl, index);
       visualImpl.UpdateApplyRate(index);
     }
   }
@@ -1148,7 +1148,7 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
     {
       const Vector4 cornerRadius = mOuter.mControlImpl.Self().GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_RADIUS);
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged set CornerRadius Value: %f, %f, %f, %f\n", cornerRadius.x, cornerRadius.y, cornerRadius.z, cornerRadius.w);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged(%d) set CornerRadius Value: %f, %f, %f, %f\n", notifyFromAnimation, cornerRadius.x, cornerRadius.y, cornerRadius.z, cornerRadius.w);
 
       for(auto registeredVisual : mVisuals)
       {
@@ -1162,6 +1162,12 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
           }
 
           // Ensure to add uniforms
+          if(notifyFromAnimation)
+          {
+            // Need to make ensure that we are using corner radius now.
+            // It will change shader if need.
+            [[maybe_unused]] auto visualCornerRadiusProperty = visualImpl.GetPropertyObject(DevelVisual::Property::CORNER_RADIUS, true);
+          }
           visualImpl.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY,
                               Property::Map().Add(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius));
 
@@ -1186,7 +1192,7 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
     {
       const int cornerRadiusPolicy = mOuter.mControlImpl.Self().GetProperty<int>(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY);
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged set CornerRadiusPolicy Value: %d\n", cornerRadiusPolicy);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged(%d) set CornerRadiusPolicy Value: %d\n", notifyFromAnimation, cornerRadiusPolicy);
 
       for(auto registeredVisual : mVisuals)
       {
@@ -1204,7 +1210,7 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
     {
       Vector4 cornerSquareness = mOuter.mControlImpl.Self().GetProperty<Vector4>(Toolkit::DevelControl::Property::CORNER_SQUARENESS);
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged set CornerSquareness Value: %f, %f, %f, %f\n", cornerSquareness.x, cornerSquareness.y, cornerSquareness.z, cornerSquareness.w);
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::NotifyConstraintPropertyChanged(%d) set CornerSquareness Value: %f, %f, %f, %f\n", notifyFromAnimation, cornerSquareness.x, cornerSquareness.y, cornerSquareness.z, cornerSquareness.w);
 
       for(auto registeredVisual : mVisuals)
       {
@@ -1213,6 +1219,12 @@ void Control::Impl::VisualData::NotifyConstraintPropertyChanged(Property::Index 
           auto& visualImpl = Toolkit::GetImplementation(registeredVisual->visual);
 
           // Ensure to add uniforms
+          if(notifyFromAnimation)
+          {
+            // Need to make ensure that we are using corner squreness now.
+            // It will change shader if need.
+            [[maybe_unused]] auto visualCornerSqurenessProperty = visualImpl.GetPropertyObject(DevelVisual::Property::CORNER_SQUARENESS, true);
+          }
           visualImpl.DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY,
                               Property::Map().Add(Toolkit::DevelVisual::Property::CORNER_SQUARENESS, cornerSquareness));
 

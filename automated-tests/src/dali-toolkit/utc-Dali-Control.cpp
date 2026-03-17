@@ -1658,12 +1658,25 @@ int UtcDaliControlOffScreenRenderingSizeSet(void)
   END_TEST;
 }
 
+namespace
+{
+Dali::Texture gOffscreenRenderingOutput;
+void          OnOffscreenRenderingFinished(Toolkit::Control control)
+{
+  tet_printf("Signal emitted\n");
+  gOffscreenRenderingOutput = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+}
+} //namespace
+
 int UtcDaliControlOffScreenRenderingGetOutput(void)
 {
   ToolkitTestApplication application;
 
+  gOffscreenRenderingOutput.Reset();
+
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  control.OffScreenRenderingFinishedSignal().Connect(OnOffscreenRenderingFinished);
   application.GetScene().Add(control);
 
   control.SetBackgroundColor(Color::RED);
@@ -1673,11 +1686,9 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   application.Render();
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails
+  DALI_TEST_CHECK(!gOffscreenRenderingOutput); //fails
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
-  control.OffScreenRenderingFinishedSignal().Connect([]() -> void
-  { tet_printf("Signal emitted\n"); });
 
   DALI_TEST_EQUALS(control.GetProperty(Actor::Property::SIZE).Get<Vector2>(), Vector2(50.0f, 50.0f), TEST_LOCATION);
 
@@ -1687,8 +1698,9 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   application.Render();
   application.SendNotification();
   application.Render();
+  DALI_TEST_CHECK(!Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput()); //fails. We don't allow to get texture out of callback.
 
-  Dali::Texture texture = Toolkit::Internal::GetImplementation(control).GetOffScreenRenderingOutput();
+  Dali::Texture texture = std::move(gOffscreenRenderingOutput);
   DALI_TEST_EQUALS(texture.GetHeight(), 50.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(texture.GetWidth(), 50.0f, TEST_LOCATION);
 
@@ -2467,6 +2479,71 @@ int UtcDaliControlCornerRadiusAnimation2(void)
   application.Render();
 
   DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelVisual::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliControlCornerRadiusAnimation3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliControlCornerRadiusAnimation3: Animation end with zero also change the shader\n");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  tet_printf("Add first visual\n");
+  Property::Map background;
+  background.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  background.Insert(Toolkit::Visual::Property::MIX_COLOR, Color::RED);
+  background.Insert(Toolkit::Visual::Property::OPACITY, 0.2f);
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
+
+  tet_printf("Add second visual\n");
+  Property::Value shadow{
+    {Visual::Property::TYPE, Visual::COLOR},
+    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  control.SetProperty(DevelControl::Property::SHADOW, shadow);
+
+  application.GetScene().Add(control);
+
+  DALI_TEST_EQUALS(control.GetRendererCount(), 2u, TEST_LOCATION);
+  Shader shader0 = control.GetRendererAt(0u).GetShader();
+  Shader shader1 = control.GetRendererAt(1u).GetShader();
+
+  tet_printf("Play animation with reverse alpha function\n");
+  Vector4 radius    = Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+  Vector4 squreness = Vector4(0.3f, 0.3f, 0.3f, 0.3f);
+
+  Animation animation = Animation::New(0.5f);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_RADIUS), radius);
+  animation.AnimateTo(Property(control, DevelControl::Property::CORNER_SQUARENESS), squreness);
+  animation.SetSpeedFactor(-1.0f);
+  animation.Play();
+
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+
+  tet_printf("Test shader be changed well\n");
+  DALI_TEST_CHECK(shader0 != control.GetRendererAt(0u).GetShader());
+  DALI_TEST_CHECK(shader1 != control.GetRendererAt(1u).GetShader());
+
+  application.SendNotification();
+  application.Render(0);
+
+  application.SendNotification();
+  application.Render(250);
+
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_RADIUS), radius * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetCurrentProperty<Vector4>(DevelControl::Property::CORNER_SQUARENESS), squreness * 0.5f, TEST_LOCATION);
+
+  animation.Stop();
+  animation.Clear();
+
+  application.Render();
+  application.SendNotification();
 
   END_TEST;
 }

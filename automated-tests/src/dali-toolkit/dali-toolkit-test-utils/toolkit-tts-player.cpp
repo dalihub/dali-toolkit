@@ -17,6 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/devel-api/adaptor-framework/tts-player.h>
 
 namespace Dali
 {

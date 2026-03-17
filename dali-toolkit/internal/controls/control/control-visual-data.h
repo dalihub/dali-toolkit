@@ -302,8 +302,9 @@ public:
   /**
    * @brief Notify to visual added constraint that control's animatable property updated.
    * @param[in] index Animatable property index from Control
+   * @param[in] notifyFromAnimation True if this API comes from Animation or Constraint started
    */
-  void NotifyConstraintPropertyChanged(Property::Index index);
+  void NotifyConstraintPropertyChanged(Property::Index index, bool notifyFromAnimation);
 
   /**
    * @brief Notify to visual that offscreen rendering is enabled or not.
