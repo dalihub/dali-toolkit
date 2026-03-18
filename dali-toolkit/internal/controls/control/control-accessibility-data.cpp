@@ -253,16 +253,13 @@ Dali::Accessibility::ReadingInfoTypes ControlImpl::Impl::AccessibilityData::GetA
 {
   std::string value{};
   auto        place = mAccessibilityProps.extraAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
-  if(place)
-  {
-    GetStdString(*place, value);
-  }
-  else
+
+  if(!place)
   {
     return GetDefaultReadingInfoTypes();
   }
 
-  if(value.empty())
+  if(!GetStdString(*place, value))
   {
     return {};
   }

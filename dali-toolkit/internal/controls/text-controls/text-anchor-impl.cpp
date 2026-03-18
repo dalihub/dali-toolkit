@@ -140,7 +140,7 @@ void TextAnchor::SetProperty(BaseObject* object, Property::Index index, const Pr
 
       case Toolkit::TextAnchor::Property::URI:
       {
-        GetStdString(value, impl.mUri);
+        impl.mUri = ToStdString(value);
         break;
       }
     }
