@@ -16,9 +16,17 @@
  * limitations under the License.
  */
 
-// External includes
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/signals/render-callback.h>
+
+#include <vector>
+
 #include <LinearMath/btIDebugDraw.h>
-#include <dali/dali.h>
 
 using Dali::Actor;
 using Dali::CameraActor;

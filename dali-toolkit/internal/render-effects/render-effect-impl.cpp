@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraints.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>

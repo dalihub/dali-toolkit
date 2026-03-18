@@ -18,7 +18,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/math/uint-16-pair.h>
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture.h>
+#include <string_view>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
