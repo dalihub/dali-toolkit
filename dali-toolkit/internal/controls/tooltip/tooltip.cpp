@@ -38,6 +38,7 @@
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -312,7 +313,7 @@ void Tooltip::SetBackground(const Property::Value& value)
 
         if(key == Toolkit::Tooltip::Background::Property::VISUAL || key == PROPERTY_BACKGROUND_VISUAL)
         {
-          GetStdString(value, mBackgroundImage);
+          mBackgroundImage = ToStdString(value);
         }
         else if(key == Toolkit::Tooltip::Background::Property::BORDER || key == PROPERTY_BACKGROUND_BORDER)
         {

@@ -50,7 +50,7 @@ std::string TextEditor::PropertyHandler::GetImageFileNameFromPropertyValue(const
     const Property::Value* filenameValue = map->Find(TextEditor::PropertyHandler::IMAGE_MAP_FILENAME_STRING);
     if(filenameValue)
     {
-      GetStdString(*filenameValue, filename);
+      filename = ToStdString(*filenameValue);
     }
   }
   return filename;
@@ -785,7 +785,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT:
     {
-      const bool enable = value.Get<bool>();
+      const bool enable             = value.Get<bool>();
       impl.mDeferredRelayoutEnabled = enable;
       break;
     }

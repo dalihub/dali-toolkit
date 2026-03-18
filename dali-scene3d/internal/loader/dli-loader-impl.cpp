@@ -1102,7 +1102,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
       }
 
       const auto semantic = MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(texturePath)}});
       materialDef.mFlags |= semantic;
     }
 
@@ -1126,7 +1126,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
         texturePath = ToStdString(tmp);
       }
       const auto semantic = MaterialDefinition::OCCLUSION;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(texturePath)}});
       materialDef.mFlags |= semantic;
     }
 

@@ -55,7 +55,7 @@ void InputFilter::SetProperties(const Property::Map& map)
     }
     else if(key == Toolkit::InputFilter::Property::REJECTED || key == PROPERTY_REJECTED)
     {
-      Dali::Integration::GetStdString(value, mRejected);
+      mRejected = Dali::Integration::ToStdString(value);
     }
   }
 }

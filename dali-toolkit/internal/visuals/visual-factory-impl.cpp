@@ -501,7 +501,7 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
     const auto brokenImageUrlValue = Toolkit::DevelStyleManager::GetConfigurations(styleManager).Find("brokenImageUrl", Property::Type::STRING);
     if(brokenImageUrlValue)
     {
-      GetStdString(*brokenImageUrlValue, brokenImageUrl);
+      brokenImageUrl = ToStdString(*brokenImageUrlValue);
     }
   }
 

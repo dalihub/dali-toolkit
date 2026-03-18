@@ -239,14 +239,20 @@ void UsdTextureConverter::ProcessTextureFallback(const UsdShadeInput& input)
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "fallback: %.7f, %.7f, %.7f, %.7f, ", fallback[0], fallback[1], fallback[2], fallback[3]);
 }
 
-bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer, const ImageMetadataMap& imageMetaDataMap)
+bool UsdTextureConverter::ProcessImageBuffer(
+  MaterialDefinition&     materialDefinition,
+  uint32_t                semantic,
+  const std::string&      imagePath,
+  UsdAssetBuffer&         imageBuffer,
+  const ImageMetadataMap& imageMetaDataMap)
 {
   std::string imageFileName = std::filesystem::path(imagePath).filename().string();
 
   ImageMetadata metaData;
   if(!imageFileName.empty())
   {
-    if(auto search = imageMetaDataMap.find(ToDaliString(imageFileName)); search != imageMetaDataMap.end())
+    String fileNameStr = ToDaliString(imageFileName);
+    if(auto search = imageMetaDataMap.find(fileNameStr); search != imageMetaDataMap.end())
     {
       metaData = search->second;
     }
@@ -266,7 +272,8 @@ bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinit
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Path Processed: semantic: %u, imagePath: %s", semantic, imagePath.c_str());
 
     // If we have a valid image path, push it to the material definition
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(imagePath)), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
+    String imagePathStr = ToDaliString(imagePath); // copy.
+    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{imagePathStr, SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
     return true;
   }

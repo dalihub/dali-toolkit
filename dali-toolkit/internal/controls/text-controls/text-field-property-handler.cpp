@@ -51,7 +51,7 @@ std::string TextField::PropertyHandler::GetImageFileNameFromPropertyValue(const 
     const Property::Value* filenameValue = map->Find(TextField::PropertyHandler::IMAGE_MAP_FILENAME_STRING);
     if(filenameValue)
     {
-      GetStdString(*filenameValue, filename);
+      filename = ToStdString(*filenameValue);
     }
   }
   return filename;

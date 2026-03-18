@@ -46,6 +46,7 @@
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
@@ -132,11 +133,7 @@ bool MapContainsTextString(Property::Map& map)
   if(value)
   {
     std::string textString;
-    GetStdString(*value, textString);
-    if(!textString.empty())
-    {
-      result = true;
-    }
+    result = GetStdString(*value, textString);
   }
   return result;
 }
@@ -1321,9 +1318,8 @@ std::pair<std::string, bool> Button::ButtonAccessible::GetNameRaw() const
   Property::Value* textPropertyPtr = labelMap.Find(Toolkit::TextVisual::Property::TEXT);
   if(textPropertyPtr)
   {
-    GetStdString(*textPropertyPtr, labelText);
+    labelText = ToStdString(*textPropertyPtr);
   }
-
   return {labelText, false};
 }
 
