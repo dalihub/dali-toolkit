@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 
@@ -326,6 +327,9 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
           {
             mCanvasVisualIndex = Self().RegisterProperty(ToDaliStringView(CANVAS_VISUAL_INDEX_PROPERTY_NAME), Dali::Integration::ToPropertyValue(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
           }
+
+          // Ignore corner radius for offscreen case.
+          Toolkit::GetImplementation(visual).CornerRadiusIgnoredAtOffscreenRendering(true);
           DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
           ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);

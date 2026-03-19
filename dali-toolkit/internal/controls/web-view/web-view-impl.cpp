@@ -319,6 +319,8 @@ void WebView::OnInitialize()
   Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(EMPTY_VISUAL_PROPERTIES);
   if(webVisual)
   {
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(webVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
     Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
     Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(*this, webVisual, true);
   }

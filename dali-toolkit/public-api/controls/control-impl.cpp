@@ -179,6 +179,9 @@ void ControlImpl::SetBackground(const Property::Map& map)
   visual.SetName("background");
   if(visual)
   {
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(visual).CornerRadiusIgnoredAtOffscreenRendering(true);
+
     mImpl->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
     mImpl->EnableCornerPropertiesOverridden(visual, true);
 
