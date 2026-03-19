@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/integration-api/debug.h>
 
@@ -3061,43 +3062,43 @@ int UtcDaliVisualFactoryCreateGridGeometry(void)
   // Test 1: Create normalized grid geometry
   {
     Uint16Pair gridSize(10, 10);
-    Geometry geometry = factory.CreateGridGeometry(gridSize, true);
+    Geometry   geometry = factory.CreateGridGeometry(gridSize, true);
     DALI_TEST_CHECK(geometry);
   }
 
   // Test 2: Create non-normalized grid geometry (integer values, for NPatch images)
   {
     Uint16Pair gridSize(5, 5);
-    Geometry geometry = factory.CreateGridGeometry(gridSize, false);
+    Geometry   geometry = factory.CreateGridGeometry(gridSize, false);
     DALI_TEST_CHECK(geometry);
   }
 
   // Test 3: Create grid geometry with larger dimensions
   {
     Uint16Pair gridSize(100, 100);
-    Geometry geometry = factory.CreateGridGeometry(gridSize, true);
+    Geometry   geometry = factory.CreateGridGeometry(gridSize, true);
     DALI_TEST_CHECK(geometry);
   }
 
   // Test 4: Test edge case - small grid
   {
     Uint16Pair gridSize(2, 2);
-    Geometry geometry = factory.CreateGridGeometry(gridSize, true);
+    Geometry   geometry = factory.CreateGridGeometry(gridSize, true);
     DALI_TEST_CHECK(geometry);
   }
 
   // Test 5: Test edge case - 1x1 grid
   {
     Uint16Pair gridSize(1, 1);
-    Geometry geometry = factory.CreateGridGeometry(gridSize, false);
+    Geometry   geometry = factory.CreateGridGeometry(gridSize, false);
     DALI_TEST_CHECK(geometry);
   }
 
   // Test 6: Test that creating same grid multiple times returns same cached geometry
   {
     Uint16Pair gridSize(5, 5);
-    Geometry geometry1 = factory.CreateGridGeometry(gridSize, true);
-    Geometry geometry2 = factory.CreateGridGeometry(gridSize, true);
+    Geometry   geometry1 = factory.CreateGridGeometry(gridSize, true);
+    Geometry   geometry2 = factory.CreateGridGeometry(gridSize, true);
     DALI_TEST_EQUALS(geometry1, geometry2, TEST_LOCATION);
   }
 

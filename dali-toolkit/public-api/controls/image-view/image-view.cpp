@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,14 @@ ImageView ImageView::New()
   return Toolkit::Internal::ImageView::New();
 }
 
-ImageView ImageView::New(const std::string& url)
+ImageView ImageView::New(const Dali::String& url)
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
-ImageView ImageView::New(const std::string& url, ImageDimensions size)
+ImageView ImageView::New(const Dali::String& url, ImageDimensions size)
 {
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage(url, size);
@@ -66,19 +66,19 @@ ImageView ImageView::New(const std::string& url, ImageDimensions size)
 
 ImageView ImageView::New(ControlBehaviour additionalBehaviour)
 {
-  return Toolkit::Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return Toolkit::Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
-ImageView ImageView::New(ControlBehaviour additionalBehaviour, const std::string& url)
+ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url)
 {
-  ImageView imageView = Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  ImageView imageView = Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
-ImageView ImageView::New(ControlBehaviour additionalBehaviour, const std::string& url, ImageDimensions size)
+ImageView ImageView::New(ControlBehaviour additionalBehaviour, const Dali::String& url, ImageDimensions size)
 {
-  ImageView imageView = Internal::ImageView::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  ImageView imageView = Internal::ImageView::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
   imageView.SetImage(url, size);
   return imageView;
 }
@@ -88,12 +88,12 @@ ImageView ImageView::DownCast(BaseHandle handle)
   return Control::DownCast<ImageView, Internal::ImageView>(handle);
 }
 
-void ImageView::SetImage(const std::string& url)
+void ImageView::SetImage(const Dali::String& url)
 {
   Dali::Toolkit::GetImpl(*this).SetImage(url, ImageDimensions());
 }
 
-void ImageView::SetImage(const std::string& url, ImageDimensions size)
+void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 {
   Dali::Toolkit::GetImpl(*this).SetImage(url, size);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,9 +116,9 @@ void CHECK_MAP_EQUALS(Property::Map test, Property::Map result)
       else if(keyValue.second.GetType() == Property::STRING)
       {
         DALI_TEST_EQUALS(keyValue.second.GetType(), value->GetType(), TEST_LOCATION);
-        std::string str;
+        String str;
         value->Get(str);
-        DALI_TEST_EQUALS(keyValue.second, str.c_str(), TEST_LOCATION);
+        DALI_TEST_EQUALS(keyValue.second, str.CStr(), TEST_LOCATION);
       }
       else
       {

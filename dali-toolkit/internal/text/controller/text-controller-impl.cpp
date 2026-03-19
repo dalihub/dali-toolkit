@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <cmath>
@@ -1755,8 +1756,8 @@ Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
   }
   DALI_LOG_INFO(gLogFilter, Debug::General, "CreateAnchorActor NAME:%s, URI:%s\n", anchorText.c_str(), anchorHref.c_str());
 
-  actor.SetProperty(Actor::Property::NAME, anchorText);
-  actor.SetProperty(Toolkit::TextAnchor::Property::URI, anchorHref);
+  actor.SetProperty(Actor::Property::NAME, Dali::Integration::ToPropertyValue(anchorText));
+  actor.SetProperty(Toolkit::TextAnchor::Property::URI, Dali::Integration::ToPropertyValue(anchorHref));
   actor.SetProperty(Toolkit::TextAnchor::Property::START_CHARACTER_INDEX, static_cast<int>(anchor.startIndex));
   actor.SetProperty(Toolkit::TextAnchor::Property::END_CHARACTER_INDEX, static_cast<int>(anchor.endIndex));
   return actor;

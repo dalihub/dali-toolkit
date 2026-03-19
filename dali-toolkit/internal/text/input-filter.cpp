@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/input-filter.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali::Toolkit;
 
@@ -50,11 +51,11 @@ void InputFilter::SetProperties(const Property::Map& map)
 
     if(key == Toolkit::InputFilter::Property::ACCEPTED || key == PROPERTY_ACCEPTED)
     {
-      value.Get(mAccepted);
+      Dali::Integration::GetStdString(value, mAccepted);
     }
     else if(key == Toolkit::InputFilter::Property::REJECTED || key == PROPERTY_REJECTED)
     {
-      value.Get(mRejected);
+      mRejected = Dali::Integration::ToStdString(value);
     }
   }
 }

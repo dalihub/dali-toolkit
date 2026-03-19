@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <cstdint> ///< for uint32_t
@@ -36,7 +37,7 @@ namespace Dali::Scene3D::Loader
  */
 struct DALI_SCENE3D_API Customization
 {
-  using Tag        = std::string;
+  using Tag        = Dali::String;
   using OptionType = uint32_t;
 
   /**

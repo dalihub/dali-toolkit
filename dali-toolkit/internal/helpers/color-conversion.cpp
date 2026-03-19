@@ -18,6 +18,7 @@
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-value.h>
 #include <sstream>
@@ -76,7 +77,7 @@ bool ConvertPropertyToColor(const Property::Value& colorValue, Vector4& outColor
   else if(Property::STRING == colorValue.GetType())
   {
     std::string colorString;
-    if(colorValue.Get(colorString))
+    if(Dali::Integration::GetStdString(colorValue, colorString))
     {
       success = ConvertStringToColor(colorString, outColor);
     }

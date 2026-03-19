@@ -155,7 +155,7 @@ Source file: <b>image-view.h</b>:
 Source file: <b>image-view-impl.cpp</b>, within an unnamed namespace:
 
 @code
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 @endcode
 
 @clip{"image-view-impl.cpp",DALI_TYPE_REGISTRATION_BEGIN,DALI_TYPE_REGISTRATION_END}

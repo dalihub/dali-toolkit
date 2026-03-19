@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/rendering/texture.h>
-#include <string>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -54,7 +54,7 @@ struct ImageMetadata
  */
 struct SceneMetadata
 {
-  std::unordered_map<std::string, ImageMetadata> mImageMetadata{}; ///< The container of image metadata (i.e. the pairs of image URI and image metadata)
+  std::unordered_map<Dali::String, ImageMetadata> mImageMetadata{}; ///< The container of image metadata (i.e. the pairs of image URI and image metadata)
 };
 
 /**
@@ -64,7 +64,7 @@ struct SceneMetadata
  * @SINCE_2_2.5
  * @note Will fail quietly if the file is not present.
  */
-DALI_SCENE3D_API void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata);
+DALI_SCENE3D_API void LoadSceneMetadata(const Dali::String& url, SceneMetadata& sceneMetadata);
 
 } // namespace Dali::Scene3D::Loader
 

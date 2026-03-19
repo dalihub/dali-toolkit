@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-scene3d/public-api/loader/alpha-function-helper.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 #define ALPHA_FN_PAIR(x) {#x, AlphaFunction::x}
 
@@ -48,13 +50,13 @@ int UtcDaliAlphaFunctionHelperGet(void)
   bool found;
   for(auto& a : BUILTIN_FUNCTIONS)
   {
-    auto result = GetAlphaFunction(a.first, &found);
+    auto result = GetAlphaFunction(ToDaliString(a.first), &found);
     DALI_TEST_EQUAL(result.GetBuiltinFunction(), a.second);
     DALI_TEST_EQUAL(result.GetMode(), AlphaFunction::BUILTIN_FUNCTION);
     DALI_TEST_CHECK(found);
   }
 
-  auto result = GetAlphaFunction("made up function", &found);
+  auto result = GetAlphaFunction(Dali::String("made up function"), &found);
   DALI_TEST_EQUAL(result.GetBuiltinFunction(), AlphaFunction::DEFAULT);
   DALI_TEST_EQUAL(result.GetMode(), AlphaFunction::BUILTIN_FUNCTION);
   DALI_TEST_CHECK(!found);
@@ -66,17 +68,17 @@ int UtcDaliAlphaFunctionHelperRegister(void)
 {
   for(auto& a : BUILTIN_FUNCTIONS)
   {
-    DALI_TEST_ASSERTION(RegisterAlphaFunction(a.first, AlphaFunction()), "given key already exists");
+    DALI_TEST_ASSERTION(RegisterAlphaFunction(ToDaliString(a.first), AlphaFunction()), "given key already exists");
   }
 
   AlphaFunctionPrototype testFn = [](float f)
   {
     return f > .5f ? 1.f : 0.f;
   };
-  RegisterAlphaFunction("step", AlphaFunction(testFn));
+  RegisterAlphaFunction(Dali::String("step"), AlphaFunction(testFn));
 
   bool found;
-  auto result = GetAlphaFunction("step", &found);
+  auto result = GetAlphaFunction(Dali::String("step"), &found);
   DALI_TEST_EQUAL(result.GetMode(), AlphaFunction::CUSTOM_FUNCTION);
   DALI_TEST_EQUAL(result.GetCustomFunction(), testFn);
 

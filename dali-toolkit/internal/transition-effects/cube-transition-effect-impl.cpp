@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,18 @@
 #include "cube-transition-effect-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/string-utils.h>
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -58,7 +61,7 @@ const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS(1.0f, 1.0f, 1.0f, 1.0f);
 const Vector4 CubeTransitionEffect::HALF_BRIGHTNESS(0.5f, 0.5f, 0.5f, 1.0f);
 
 CubeTransitionEffect::CubeTransitionEffect(unsigned int rows, unsigned int columns)
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mRows(rows),
   mColumns(columns),
   mIsAnimating(false),
@@ -212,7 +215,7 @@ void CubeTransitionEffect::Initialize()
 void CubeTransitionEffect::OnSceneConnection(int depth)
 {
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader   shader   = Shader::New(SHADER_CUBE_TRANSITION_EFFECT_VERT, SHADER_CUBE_TRANSITION_EFFECT_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CUBE_TRANSITION_EFFECT");
+  Shader   shader   = Shader::New(ToDaliStringView(SHADER_CUBE_TRANSITION_EFFECT_VERT), ToDaliStringView(SHADER_CUBE_TRANSITION_EFFECT_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CUBE_TRANSITION_EFFECT");
 
   TextureSet textureSet = TextureSet::New();
 
@@ -226,7 +229,7 @@ void CubeTransitionEffect::OnSceneConnection(int depth)
   mCurrentRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, depth);
   Self().AddRenderer(mCurrentRenderer);
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void CubeTransitionEffect::OnSceneDisconnection()
@@ -251,7 +254,7 @@ void CubeTransitionEffect::OnSceneDisconnection()
     mTargetRenderer.Reset();
   }
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void CubeTransitionEffect::SetTransitionDuration(float duration)
@@ -449,14 +452,14 @@ Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffe
   return mTransitionCompletedSignal;
 }
 
-bool CubeTransitionEffect::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool CubeTransitionEffect::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                          connected(true);
   Toolkit::CubeTransitionEffect cubeTransitionEffect = Toolkit::CubeTransitionEffect::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TRANSITION_COMPLETED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_TRANSITION_COMPLETED))
   {
     cubeTransitionEffect.TransitionCompletedSignal().Connect(tracker, functor);
   }

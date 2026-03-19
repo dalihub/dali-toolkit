@@ -640,7 +640,7 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_CHECK(textfield);
 
   textfield.SetProperty(Actor::Property::NAME, "test");
-  DALI_TEST_EQUALS(textfield.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION);
+  DALI_TEST_EQUALS(textfield.GetProperty<Dali::String>(Actor::Property::NAME), "test", TEST_LOCATION);
 
   auto accessible = Dali::Accessibility::Accessible::Get(textfield);
   DALI_TEST_CHECK(accessible);
@@ -751,7 +751,7 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_CHECK(texteditor);
 
   texteditor.SetProperty(Actor::Property::NAME, "test");
-  DALI_TEST_EQUALS(texteditor.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION);
+  DALI_TEST_EQUALS(texteditor.GetProperty<Dali::String>(Actor::Property::NAME), "test", TEST_LOCATION);
 
   auto accessible = Dali::Accessibility::Accessible::Get(texteditor);
   DALI_TEST_CHECK(accessible);
@@ -864,7 +864,7 @@ int UtcDaliAccessibilityTextLabel(void)
   application.SendNotification();
 
   textlabel.SetProperty(Actor::Property::NAME, "test");
-  DALI_TEST_EQUALS(textlabel.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION);
+  DALI_TEST_EQUALS(textlabel.GetProperty<Dali::String>(Actor::Property::NAME), "test", TEST_LOCATION);
 
   auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(textlabel));
   DALI_TEST_CHECK(accessible);

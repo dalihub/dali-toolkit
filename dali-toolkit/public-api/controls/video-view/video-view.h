@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,7 +212,7 @@ public:
    * @param[in] url The url of the video resource to display
    * @return A handle to a newly allocated Dali VideoView
    */
-  static VideoView New(const std::string& url);
+  static VideoView New(const Dali::String& url);
 
   /**
    * @brief Creates an initialized VideoView.
@@ -237,7 +237,7 @@ public:
    *
    * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
    */
-  static VideoView New(const std::string& url, bool swCodec);
+  static VideoView New(const Dali::String& url, bool swCodec);
 
   /**
    * @brief Creates an uninitialized VideoView.

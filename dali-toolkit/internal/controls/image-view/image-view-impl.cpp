@@ -20,11 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -37,6 +38,11 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -88,7 +94,7 @@ void DiscardImageViewVisual(Dali::Toolkit::Visual::Base& visual)
 using namespace Dali;
 
 ImageView::ImageView(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mImageSize(),
   mTransitionTargetAlpha(FULL_OPACITY),
   mTransitionEffect(false),
@@ -147,7 +153,7 @@ void ImageView::SetImage(const Property::Map& map)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
@@ -196,9 +202,11 @@ void ImageView::SetImage(const Property::Map& map)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
@@ -212,7 +220,7 @@ void ImageView::SetImage(const Property::Map& map)
   // Signal that a Relayout may be needed
 }
 
-void ImageView::SetImage(const std::string& url, ImageDimensions size)
+void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 {
   if(mTransitionEffect && mVisual)
   {
@@ -231,7 +239,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
@@ -239,7 +247,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
   }
 
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
-  mUrl       = url;
+  mUrl       = ToStdString(url);
   mImageSize = size;
   mPropertyMap.Clear();
 
@@ -271,9 +279,11 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
@@ -385,7 +395,7 @@ Vector3 ImageView::GetNaturalSize()
   }
 
   // if no visual then use Control's natural size
-  return Control::GetNaturalSize();
+  return ControlImpl::GetNaturalSize();
 }
 
 float ImageView::GetHeightForWidth(float width)
@@ -399,7 +409,7 @@ float ImageView::GetHeightForWidth(float width)
   }
   else
   {
-    return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
+    return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
   }
 }
 
@@ -414,7 +424,7 @@ float ImageView::GetWidthForHeight(float height)
   }
   else
   {
-    return Control::GetWidthForHeight(height) + padding.start + padding.end;
+    return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
   }
 }
 
@@ -494,7 +504,7 @@ void ImageView::CreatePlaceholderImage()
 {
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
-  propertyMap.Insert(Toolkit::ImageVisual::Property::URL, mPlaceholderUrl);
+  propertyMap.Insert(Toolkit::ImageVisual::Property::URL, ToPropertyValue(mPlaceholderUrl));
   //propertyMap.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, Toolkit::ImageVisual::LoadPolicy::IMMEDIATE); // TODO: need to enable this property
   propertyMap.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, Toolkit::ImageVisual::ReleasePolicy::DESTROYED);
   propertyMap.Insert(Toolkit::DevelImageVisual::Property::ENABLE_BROKEN_IMAGE, false);
@@ -503,6 +513,9 @@ void ImageView::CreatePlaceholderImage()
   {
     mPlaceholderVisual.SetName("placeholder");
     mPlaceholderVisual.SetDepthIndex(mPlaceholderVisual.GetDepthIndex() + PLACEHOLDER_DEPTH_INDEX);
+
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(mPlaceholderVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
   }
   else
   {
@@ -517,7 +530,7 @@ void ImageView::ShowPlaceholderImage()
   {
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
 
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
 
     Actor self = Self();
@@ -569,7 +582,7 @@ void ImageView::TransitionImageWithEffect()
       {
         // Set user's transition effect options
         Dali::Toolkit::TransitionData transition      = Toolkit::TransitionData::New(mTransitionEffectOptionMap);
-        Internal::Control::Impl&      controlDataImpl = Internal::Control::Impl::Get(*this);
+        ControlImpl::Impl&            controlDataImpl = ControlImpl::Impl::Get(*this);
         mTransitionAnimation                          = controlDataImpl.CreateTransition(transition);
         if(mTransitionAnimation)
         {
@@ -612,8 +625,8 @@ void ImageView::ClearTransitionAnimation()
   // Clear PreviousVisual
   if(mPreviousVisual)
   {
-    Actor                    self            = Self();
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+    Actor              self            = Self();
+    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
     controlDataImpl.EnableReadyTransitionOverridden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
     DiscardImageViewVisual(mPreviousVisual);
@@ -652,9 +665,9 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
       {
         std::string          imageUrl;
         const Property::Map* map;
-        if(value.Get(imageUrl))
+        if(GetStdString(value, imageUrl))
         {
-          impl.SetImage(imageUrl, ImageDimensions());
+          impl.SetImage(ToDaliString(imageUrl), ImageDimensions());
         }
         // if its not a string then get a Property::Map from the property if possible.
         else
@@ -685,7 +698,7 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
 
                   if(!impl.mUrl.empty())
                   {
-                    impl.SetImage(impl.mUrl, impl.mImageSize);
+                    impl.SetImage(ToDaliString(impl.mUrl), impl.mImageSize);
                   }
                   else if(!impl.mPropertyMap.Empty())
                   {
@@ -717,7 +730,7 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::ImageView::Property::PLACEHOLDER_IMAGE:
       {
         std::string placeholderUrl;
-        if(value.Get(placeholderUrl))
+        if(GetStdString(value, placeholderUrl))
         {
           impl.SetPlaceholderUrl(placeholderUrl);
         }
@@ -760,7 +773,7 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
       {
         if(!impl.mUrl.empty())
         {
-          value = impl.mUrl;
+          value = ToPropertyValue(impl.mUrl);
         }
         else
         {
@@ -783,7 +796,7 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
 
       case Toolkit::ImageView::Property::PLACEHOLDER_IMAGE:
       {
-        value = impl.GetPlaceholderUrl();
+        value = ToPropertyValue(impl.GetPlaceholderUrl());
         break;
       }
 

@@ -19,6 +19,9 @@
 
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/radio-button-impl.h>
@@ -60,7 +63,7 @@ RadioButton RadioButton::New()
   return Internal::RadioButton::New();
 }
 
-RadioButton RadioButton::New(const std::string& label)
+RadioButton RadioButton::New(const Dali::String& label)
 {
   RadioButton radioButton = Internal::RadioButton::New();
   radioButton.SetProperty(Toolkit::Button::Property::LABEL, label);

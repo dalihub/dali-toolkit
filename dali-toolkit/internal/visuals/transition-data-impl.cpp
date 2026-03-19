@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,13 @@
 #include <dali/dali.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-string.h>
 #include <sstream>
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -56,6 +60,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(ALPHA_FUNCTION_BUILTIN)
   DALI_ENUM_TO_STRING_WITH_SCOPE(AlphaFunction, BOUNCE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(AlphaFunction, SIN)
 DALI_ENUM_TO_STRING_TABLE_END(ALPHA_FUNCTION_BUILTIN)
+
 } // namespace
 
 namespace Dali
@@ -71,6 +76,7 @@ void ParseArray(TransitionData::Animator* animator, const Property::Array* array
 {
   bool    valid = true;
   Vector4 controlPoints;
+
   if(array && array->Count() >= 4)
   {
     for(size_t vecIdx = 0; vecIdx < 4; ++vecIdx)
@@ -169,6 +175,7 @@ void ParseString(TransitionData::Animator* animator, std::string alphaFunctionVa
     animator->alphaFunction = AlphaFunction(AlphaFunction::SIN);
   }
 }
+
 } // unnamed namespace
 
 TransitionData::TransitionData()
@@ -204,8 +211,8 @@ void TransitionData::Initialize(const Property::Array& array)
   for(unsigned int arrayIdx = 0, transitionArrayCount = array.Count(); arrayIdx < transitionArrayCount; ++arrayIdx)
   {
     const Property::Value& element = array.GetElementAt(arrayIdx);
-    // Expect each child to be an object representing an animator:
 
+    // Expect each child to be an object representing an animator:
     const Property::Map* map = element.GetMap();
     if(map != NULL)
     {
@@ -218,9 +225,10 @@ void TransitionData::Initialize(const Property::Array& array)
 TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
 {
   TransitionData::Animator* animator = new TransitionData::Animator();
-  animator->alphaFunction            = AlphaFunction::LINEAR;
-  animator->timePeriodDelay          = 0.0f;
-  animator->timePeriodDuration       = 1.0f;
+
+  animator->alphaFunction      = AlphaFunction::LINEAR;
+  animator->timePeriodDelay    = 0.0f;
+  animator->timePeriodDuration = 1.0f;
 
   for(unsigned int mapIdx = 0; mapIdx < map.Count(); ++mapIdx)
   {
@@ -230,18 +238,26 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
       continue; // We don't consider index keys.
     }
 
-    const std::string&     key(pair.first.stringKey);
+    std::string            key = ToStdString(pair.first.stringKey);
     const Property::Value& value(pair.second);
 
     if(key == TOKEN_TARGET)
     {
-      animator->objectName = value.Get<std::string>();
+      Dali::String daliStr;
+      if(value.Get(daliStr))
+      {
+        animator->objectName = ToStdString(daliStr);
+      }
     }
     else if(key == TOKEN_PROPERTY)
     {
       if(value.GetType() == Property::STRING)
       {
-        animator->propertyKey = Property::Key(value.Get<std::string>());
+        Dali::String daliStr;
+        if(value.Get(daliStr))
+        {
+          animator->propertyKey = Property::Key(daliStr);
+        }
       }
       else
       {
@@ -260,16 +276,16 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
     {
       animator->animate         = true;
       Property::Map animatorMap = value.Get<Property::Map>();
+
       for(size_t animatorMapIdx = 0; animatorMapIdx < animatorMap.Count(); ++animatorMapIdx)
       {
         const KeyValuePair pair(animatorMap.GetKeyValue(animatorMapIdx));
-
         if(pair.first.type == Property::Key::INDEX)
         {
           continue; // We don't consider index keys.
         }
 
-        const std::string&     key(pair.first.stringKey);
+        std::string            key = ToStdString(pair.first.stringKey);
         const Property::Value& value(pair.second);
 
         if(key == TOKEN_ALPHA_FUNCTION)
@@ -287,7 +303,11 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
           }
           else if(value.GetType() == Property::STRING)
           {
-            ParseString(animator, value.Get<std::string>());
+            Dali::String daliStr;
+            if(value.Get(daliStr))
+            {
+              ParseString(animator, ToStdString(daliStr));
+            }
           }
           else
           {
@@ -304,8 +324,7 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
             {
               continue;
             }
-            const std::string& key(pair.first.stringKey);
-
+            std::string key = ToStdString(pair.first.stringKey);
             if(key == TOKEN_DELAY)
             {
               animator->timePeriodDelay = pair.second.Get<float>();
@@ -320,23 +339,29 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
         {
           if((value.GetType() == Property::STRING))
           {
-            if(value.Get<std::string>() == "TO")
+            Dali::String daliStr;
+            if(value.Get(daliStr))
             {
-              animator->animationType = AnimationType::TO;
-            }
-            else if(value.Get<std::string>() == "BETWEEN")
-            {
-              animator->animationType = AnimationType::BETWEEN;
-            }
-            else if(value.Get<std::string>() == "BY")
-            {
-              animator->animationType = AnimationType::BY;
+              std::string animType = ToStdString(daliStr);
+              if(animType == "TO")
+              {
+                animator->animationType = AnimationType::TO;
+              }
+              else if(animType == "BETWEEN")
+              {
+                animator->animationType = AnimationType::BETWEEN;
+              }
+              else if(animType == "BY")
+              {
+                animator->animationType = AnimationType::BY;
+              }
             }
           }
         }
       }
     }
   }
+
   return animator;
 }
 
@@ -363,10 +388,11 @@ size_t TransitionData::Count() const
 Property::Map TransitionData::GetAnimatorAt(size_t index)
 {
   DALI_ASSERT_ALWAYS(index < Count() && "index exceeds bounds");
-
   Animator*     animator = mAnimators[index];
   Property::Map map;
-  map[TOKEN_TARGET] = animator->objectName;
+
+  map[TOKEN_TARGET] = Property::Value(ToDaliString(animator->objectName));
+
   if(animator->propertyKey.type == Property::Key::INDEX)
   {
     map[TOKEN_PROPERTY] = animator->propertyKey.indexKey;
@@ -375,29 +401,30 @@ Property::Map TransitionData::GetAnimatorAt(size_t index)
   {
     map[TOKEN_PROPERTY] = animator->propertyKey.stringKey;
   }
+
   if(animator->initialValue.GetType() != Property::NONE)
   {
     map[TOKEN_INITIAL_VALUE] = animator->initialValue;
   }
+
   if(animator->targetValue.GetType() != Property::NONE)
   {
     map[TOKEN_TARGET_VALUE] = animator->targetValue;
   }
+
   if(animator->animate)
   {
     Property::Map animateMap;
-
     if(animator->alphaFunction.GetMode() == AlphaFunction::BUILTIN_FUNCTION)
     {
-      animateMap.Add(TOKEN_ALPHA_FUNCTION, GetEnumerationName(animator->alphaFunction.GetBuiltinFunction(), ALPHA_FUNCTION_BUILTIN_TABLE, ALPHA_FUNCTION_BUILTIN_TABLE_COUNT));
+      animateMap.Add(Dali::String(TOKEN_ALPHA_FUNCTION), GetEnumerationName(animator->alphaFunction.GetBuiltinFunction(), ALPHA_FUNCTION_BUILTIN_TABLE, ALPHA_FUNCTION_BUILTIN_TABLE_COUNT));
     }
     else if(animator->alphaFunction.GetMode() == AlphaFunction::BEZIER)
     {
       Vector4 controlPoints = animator->alphaFunction.GetBezierControlPoints();
-      animateMap.Add(TOKEN_ALPHA_FUNCTION, controlPoints);
+      animateMap.Add(Dali::String(TOKEN_ALPHA_FUNCTION), controlPoints);
     }
-    animateMap.Add(TOKEN_TIME_PERIOD, Property::Map().Add(TOKEN_DELAY, animator->timePeriodDelay).Add(TOKEN_DURATION, animator->timePeriodDuration));
-
+    animateMap.Add(Dali::String(TOKEN_TIME_PERIOD), Property::Map().Add(Dali::String(TOKEN_DELAY), animator->timePeriodDelay).Add(Dali::String(TOKEN_DURATION), animator->timePeriodDuration));
     map[TOKEN_ANIMATOR] = animateMap;
   }
 
@@ -405,5 +432,7 @@ Property::Map TransitionData::GetAnimatorAt(size_t index)
 }
 
 } // namespace Internal
+
 } // namespace Toolkit
+
 } // namespace Dali

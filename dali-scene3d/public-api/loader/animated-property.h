@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/unique-ptr.h>
@@ -85,9 +86,9 @@ public: // DATA
     bool            mIsRelative;
   };
 
-  Index       mNodeIndex = INVALID_INDEX;
-  std::string mNodeName;
-  std::string mPropertyName;
+  Index        mNodeIndex = INVALID_INDEX;
+  Dali::String mNodeName;
+  Dali::String mPropertyName;
 
   KeyFrames        mKeyFrames;
   UniquePtr<Value> mValue;

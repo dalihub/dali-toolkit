@@ -19,18 +19,19 @@
 #include <dali-toolkit/internal/builder/builder-impl.h>
 
 // EXTERNAL INCLUDES
-#include <sys/stat.h>
 #include <sstream>
+#include <sys/stat.h>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-info.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/object/type-info.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/signals/functor-delegate.h>
@@ -47,6 +48,10 @@
 #include <dali-toolkit/internal/builder/builder-set-property.h>
 #include <dali-toolkit/internal/builder/replacement.h>
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -150,10 +155,10 @@ Builder::Builder()
   mParser = Dali::Toolkit::JsonParser::New();
 
   Property::Map defaultConstants;
-  defaultConstants[TOKEN_STRING(DALI_IMAGE_DIR)]       = AssetManager::GetDaliImagePath();
-  defaultConstants[TOKEN_STRING(DALI_SOUND_DIR)]       = AssetManager::GetDaliSoundPath();
-  defaultConstants[TOKEN_STRING(DALI_STYLE_DIR)]       = AssetManager::GetDaliStylePath();
-  defaultConstants[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)] = AssetManager::GetDaliStyleImagePath();
+  defaultConstants[TOKEN_STRING(DALI_IMAGE_DIR)]       = Property::Value(ToDaliStringView(AssetManager::GetDaliImagePath()));
+  defaultConstants[TOKEN_STRING(DALI_SOUND_DIR)]       = Property::Value(ToDaliStringView(AssetManager::GetDaliSoundPath()));
+  defaultConstants[TOKEN_STRING(DALI_STYLE_DIR)]       = Property::Value(ToDaliStringView(AssetManager::GetDaliStylePath()));
+  defaultConstants[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)] = Property::Value(ToDaliStringView(AssetManager::GetDaliStyleImagePath()));
 
   AddConstants(defaultConstants);
 }
@@ -226,7 +231,7 @@ void Builder::AddConstants(const Property::Map& map)
 
 void Builder::AddConstant(const std::string& key, const Property::Value& value)
 {
-  mReplacementMap[key] = value;
+  mReplacementMap.Insert(ToDaliStringView(key), value);
 }
 
 const Property::Map& Builder::GetConfigurations() const
@@ -241,7 +246,7 @@ const Property::Map& Builder::GetConstants() const
 
 const Property::Value& Builder::GetConstant(const std::string& key) const
 {
-  Property::Value* match = mReplacementMap.Find(key);
+  Property::Value* match = mReplacementMap.Find(ToDaliStringView(key));
   if(match)
   {
     return (*match);
@@ -383,13 +388,13 @@ bool Builder::GetStyleProperties(const std::string& styleName, const Handle& con
     return false;
   }
 
-  Replacement replacement(mReplacementMap);
+  Replacement     replacement(mReplacementMap);
   const TreeNode& node = *style;
 
   for(TreeNode::ConstIterator iter = node.CBegin(); iter != node.CEnd(); ++iter)
   {
     const TreeNode::KeyNodePair& keyChild = *iter;
-    std::string key(keyChild.first);
+    Dali::String                 key      = keyChild.first;
 
     // Skip special keywords, we only want properties
     if(key == KEYNAME_TYPE || key == KEYNAME_ACTORS || key == KEYNAME_SIGNALS ||
@@ -410,16 +415,16 @@ bool Builder::GetStyleProperties(const std::string& styleName, const Handle& con
         Property::Index index = controlType.GetPropertyIndex(key);
         if(index != Property::INVALID_INDEX)
         {
-          result.Insert(index, value);  // Use Property::Index as key
+          result.Insert(index, value); // Use Property::Index as key
         }
         else
         {
-          result.Insert(key, value);    // Fallback to string key
+          result.Insert(key, value); // Fallback to string key
         }
       }
       else
       {
-        result.Insert(key, value);      // No controlType, use string key
+        result.Insert(key, value); // No controlType, use string key
       }
     }
   }
@@ -816,38 +821,36 @@ void Builder::LoadConfiguration(const TreeNode& root, Property::Map& intoMap)
         // If config is string, find constant and replace it to original value.
         if((*iter).second.GetType() == TreeNode::STRING)
         {
-          std::string stringConfigValue;
+          Dali::String stringConfigValue;
           if(property.Get(stringConfigValue))
           {
-            std::size_t pos = 0;
-
-            while(pos < stringConfigValue.size())
+            std::string stdStringValue = ToStdString(stringConfigValue);
+            std::size_t pos            = 0;
+            while(pos < stdStringValue.size())
             {
               // If we can't find "{","}" pair in stringConfigValue, will out loop.
-              std::size_t leftPos = stringConfigValue.find("{", pos);
+              std::size_t leftPos = stdStringValue.find("{", pos);
               if(leftPos != std::string::npos)
               {
-                std::size_t rightPos = stringConfigValue.find("}", pos + 1);
-
+                std::size_t rightPos = stdStringValue.find("}", pos + 1);
                 if(rightPos != std::string::npos)
                 {
                   // If we find "{","}" pair but can't find matched constant
                   // try to find other "{","}" pair after current left position.
                   pos = rightPos + 1;
-
                   for(uint32_t i = 0; i < mReplacementMap.Count(); i++)
                   {
-                    Property::Key constant = mReplacementMap.GetKeyAt(i);
-
+                    Property::Key constant       = mReplacementMap.GetKeyAt(i);
+                    std::string   stdConstantKey = ToStdString(constant.stringKey);
                     // Compare string which is between "{" and "}" with constant string
                     // If they are same, change string in stringConfigValue to mapped constant value.
-                    if(0 == stringConfigValue.compare(leftPos + 1, rightPos - leftPos - 1, constant.stringKey))
+                    if(0 == stdStringValue.compare(leftPos + 1, rightPos - leftPos - 1, stdConstantKey))
                     {
-                      std::string replaceString;
+                      Dali::String replaceString;
                       if(DALI_LIKELY(mReplacementMap.GetValue(i).Get(replaceString)))
                       {
-                        stringConfigValue.replace(leftPos, rightPos - leftPos + 1, replaceString);
-                        pos = leftPos + replaceString.size();
+                        stdStringValue.replace(leftPos, rightPos - leftPos + 1, ToStdString(replaceString));
+                        pos = leftPos + replaceString.Size();
                         break;
                       }
                     }
@@ -856,19 +859,19 @@ void Builder::LoadConfiguration(const TreeNode& root, Property::Map& intoMap)
                 else
                 {
                   // If we cannot find constant in const value, will out loop.
-                  pos = stringConfigValue.size();
+                  pos = stdStringValue.size();
                 }
               }
               else
               {
                 // If we cannot find constant in const value, will out loop.
-                pos = stringConfigValue.size();
+                pos = stdStringValue.size();
               }
             }
-            property = Property::Value(stringConfigValue);
+            property = Dali::Property::Value(ToDaliStringView(stdStringValue));
           }
         }
-        intoMap[(*iter).second.GetName()] = property;
+        intoMap.Insert((*iter).second.GetName(), property);
       }
     }
   }
@@ -891,7 +894,7 @@ void Builder::LoadConstants(const TreeNode& root, Property::Map& intoMap)
         DALI_SCRIPT_VERBOSE("Constant set from json '%s'\n", (*iter).second.GetName());
 #endif
         DeterminePropertyFromNode((*iter).second, property, replacer);
-        intoMap[(*iter).second.GetName()] = property;
+        intoMap.Insert(ToDaliStringView(std::string((*iter).second.GetName())), property);
       }
     }
   }
@@ -900,20 +903,22 @@ void Builder::LoadConstants(const TreeNode& root, Property::Map& intoMap)
   Property::Value* iter = intoMap.Find("CONFIG_SCRIPT_LOG_LEVEL");
   if(iter && iter->GetType() == Property::STRING)
   {
-    std::string logLevel(iter->Get<std::string>());
-    if(logLevel == "NoLogging")
+    Dali::String logLevel;
+    iter->Get(logLevel);
+    std::string stdLogLevel = ToStdString(logLevel);
+    if(stdLogLevel == "NoLogging")
     {
       gFilterScript->SetLogLevel(Dali::Integration::Log::NoLogging);
     }
-    else if(logLevel == "Concise")
+    else if(stdLogLevel == "Concise")
     {
       gFilterScript->SetLogLevel(Dali::Integration::Log::Concise);
     }
-    else if(logLevel == "General")
+    else if(stdLogLevel == "General")
     {
       gFilterScript->SetLogLevel(Dali::Integration::Log::General);
     }
-    else if(logLevel == "Verbose")
+    else if(stdLogLevel == "Verbose")
     {
       gFilterScript->SetLogLevel(Dali::Integration::Log::Verbose);
     }
@@ -996,7 +1001,7 @@ BaseHandle Builder::DoCreate(const TreeNode& root, const TreeNode& node, Actor p
 
   if(OptionalString typeName = IsString(node, KEYNAME_TYPE))
   {
-    typeInfo = TypeRegistry::Get().GetTypeInfo(*typeName);
+    typeInfo = TypeRegistry::Get().GetTypeInfo(ToDaliStringView(*typeName));
 
     if(!typeInfo)
     {
@@ -1011,7 +1016,7 @@ BaseHandle Builder::DoCreate(const TreeNode& root, const TreeNode& node, Actor p
 
           if(OptionalString templateTypeName = IsString(*templateNode, KEYNAME_TYPE))
           {
-            typeInfo = TypeRegistry::Get().GetTypeInfo(*templateTypeName);
+            typeInfo = TypeRegistry::Get().GetTypeInfo(ToDaliStringView(*templateTypeName));
           }
         }
       }
@@ -1030,7 +1035,8 @@ BaseHandle Builder::DoCreate(const TreeNode& root, const TreeNode& node, Actor p
 
     if(handle)
     {
-      DALI_SCRIPT_VERBOSE("Create:%s\n", typeInfo.GetName().c_str());
+      std::string typeName = ToStdString(typeInfo.GetName());
+      DALI_SCRIPT_VERBOSE("Create:%s\n", typeName.c_str());
 
 #if defined(DEBUG_ENABLED)
       if(handle)
@@ -1091,7 +1097,8 @@ BaseHandle Builder::DoCreate(const TreeNode& root, const TreeNode& node, Actor p
     }
     else
     {
-      DALI_SCRIPT_WARNING("Cannot create handle from type '%s'\n", typeInfo.GetName().c_str());
+      std::string typeName2 = ToStdString(typeInfo.GetName());
+      DALI_SCRIPT_WARNING("Cannot create handle from type '%s'\n", typeName2.c_str());
     }
   }
 
@@ -1105,7 +1112,7 @@ void Builder::SetupTask(RenderTask& task, const TreeNode& node, const Replacemen
 
   if(OptionalString s = constant.IsString(IsChild(node, "sourceActor")))
   {
-    Actor actor = root.FindChildByName(*s);
+    Actor actor = root.FindChildByName(ToDaliStringView(*s));
     if(actor)
     {
       task.SetSourceActor(actor);
@@ -1118,7 +1125,7 @@ void Builder::SetupTask(RenderTask& task, const TreeNode& node, const Replacemen
 
   if(OptionalString s = constant.IsString(IsChild(node, "cameraActor")))
   {
-    CameraActor actor = CameraActor::DownCast(root.FindChildByName(*s));
+    CameraActor actor = CameraActor::DownCast(root.FindChildByName(ToDaliStringView(*s)));
     if(actor)
     {
       task.SetCameraActor(actor);
@@ -1517,7 +1524,7 @@ bool Builder::MapToTargetProperty(
 {
   bool mapped = false;
 
-  index = propertyObject.GetPropertyIndex(key);
+  index = propertyObject.GetPropertyIndex(ToDaliStringView(key));
   if(Property::INVALID_INDEX != index)
   {
     Property::Type type = propertyObject.GetPropertyType(index);
@@ -1598,33 +1605,35 @@ bool Builder::ConvertChildValue(const TreeNode& mappingRoot, KeyStack& keyStack,
   {
     case Property::STRING:
     {
-      std::string value;
-      if(child.Get(value))
+      std::string  value;
+      Dali::String daliString;
+      if(child.Get(daliString))
       {
-        std::string key;
-        if(GetMappingKey(value, key))
+        value = ToStdString(daliString);
+      }
+      std::string key;
+      if(GetMappingKey(value, key))
+      {
+        // Check key for cycles:
+        result = true;
+        for(KeyStack::iterator iter = keyStack.begin(); iter != keyStack.end(); ++iter)
         {
-          // Check key for cycles:
-          result = true;
-          for(KeyStack::iterator iter = keyStack.begin(); iter != keyStack.end(); ++iter)
+          if(key.compare(*iter) == 0)
           {
-            if(key.compare(*iter) == 0)
-            {
-              // key is already in stack; stop.
-              DALI_LOG_WARNING("Detected cycle in stylesheet mapping table:%s\n", key.c_str());
-              child  = Property::Value("");
-              result = false;
-              break;
-            }
+            // key is already in stack; stop.
+            DALI_LOG_WARNING("Detected cycle in stylesheet mapping table:%s\n", key.c_str());
+            child  = Property::Value("");
+            result = false;
+            break;
           }
+        }
 
-          if(result)
-          {
-            // The following call will overwrite the child with the value
-            // from the mapping.
-            RecursePropertyMap(mappingRoot, keyStack, key.c_str(), Property::NONE, child);
-            result = true;
-          }
+        if(result)
+        {
+          // The following call will overwrite the child with the value
+          // from the mapping.
+          RecursePropertyMap(mappingRoot, keyStack, key.c_str(), Property::NONE, child);
+          result = true;
         }
       }
       break;
@@ -1681,7 +1690,7 @@ void Builder::SetCustomProperties(const TreeNode& node, Handle& handle, const Re
       DeterminePropertyFromNode(keyChild.second, value, constant);
 
       // Register/Set property.
-      handle.RegisterProperty(key, value, accessMode);
+      handle.RegisterProperty(ToDaliStringView(key), value, accessMode);
     }
   }
 }

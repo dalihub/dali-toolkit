@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-motion/motion-data-impl.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -104,14 +109,14 @@ float MotionData::GetDuration() const
   return GetImplementation(*this).GetDuration();
 }
 
-void MotionData::LoadBvh(const std::string& path, const Vector3& scale, bool synchronousLoad)
+void MotionData::LoadBvh(const Dali::String& path, const Vector3& scale, bool synchronousLoad)
 {
-  GetImplementation(*this).LoadBvh(path, false, scale, synchronousLoad);
+  GetImplementation(*this).LoadBvh(ToStdString(path), false, scale, synchronousLoad);
 }
 
-void MotionData::LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
+void MotionData::LoadBvh(const Dali::String& path, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
 {
-  GetImplementation(*this).LoadBvh(path, useRootTranslationOnly, scale, synchronousLoad);
+  GetImplementation(*this).LoadBvh(ToStdString(path), useRootTranslationOnly, scale, synchronousLoad);
 }
 
 void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Vector3& scale, bool synchronousLoad)
@@ -124,9 +129,9 @@ void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength
   GetImplementation(*this).LoadBvhFromBuffer(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, synchronousLoad);
 }
 
-void MotionData::LoadFacialAnimation(const std::string& url, bool synchronousLoad)
+void MotionData::LoadFacialAnimation(const Dali::String& url, bool synchronousLoad)
 {
-  GetImplementation(*this).LoadFacialAnimation(url, synchronousLoad);
+  GetImplementation(*this).LoadFacialAnimation(ToStdString(url), synchronousLoad);
 }
 
 void MotionData::LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool synchronousLoad)

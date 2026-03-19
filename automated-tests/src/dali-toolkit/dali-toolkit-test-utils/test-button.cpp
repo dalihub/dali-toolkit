@@ -16,6 +16,7 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/dali.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <test-button.h>
 
 using namespace Dali;
@@ -41,7 +42,7 @@ Property::Value ConvertAnimationMap(const Test::TestAnimationData& animationMap)
   Property::Value animation(animators);
   return animation;
 }
-} //namespace
+} // namespace
 
 namespace Test
 {
@@ -57,7 +58,7 @@ Test::TestButton TestButton::New()
 }
 
 TestButton::TestButton()
-: Control(ControlBehaviour())
+: ControlImpl(ControlBehaviour())
 {
 }
 
@@ -162,7 +163,7 @@ DALI_PROPERTY_REGISTRATION(Test, TestButton, "foregroundColor", VECTOR4, FOREGRO
 
 DALI_TYPE_REGISTRATION_END()
 
-} //namespace Impl
+} // namespace Impl
 
 TestButton::TestButton()
 : Control()

@@ -179,13 +179,13 @@ int utcDaliAccessibilityAutomationId(void)
   ToolkitTestApplication application;
   Dali::Property::Index  automationIdIndex = Toolkit::DevelControl::Property::AUTOMATION_ID;
   std::string            automationIdKey   = "automationId";
-  std::string            automationIdValue = "test123";
+  String                 automationIdValue = "test123";
 
   auto  control           = Toolkit::Control::New();
   auto* controlAccessible = Accessibility::Accessible::Get(control);
 
   // Check that there is no automationId initially
-  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex).empty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Dali::String>(automationIdIndex).Empty(), true, TEST_LOCATION);
   auto attributes = controlAccessible->GetAttributes();
   DALI_TEST_EQUALS(attributes.find(automationIdKey) == attributes.end(), true, TEST_LOCATION);
 
@@ -193,7 +193,7 @@ int utcDaliAccessibilityAutomationId(void)
   control.SetProperty(automationIdIndex, automationIdValue);
 
   // Check that automationId is set
-  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex), automationIdValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Dali::String>(automationIdIndex), automationIdValue, TEST_LOCATION);
   attributes = controlAccessible->GetAttributes();
   DALI_TEST_EQUALS(attributes.find(automationIdKey) != attributes.end(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(attributes[automationIdKey], automationIdValue, TEST_LOCATION);
@@ -202,7 +202,7 @@ int utcDaliAccessibilityAutomationId(void)
   control.SetProperty(automationIdIndex, "");
 
   // Check that there is no automationId
-  DALI_TEST_EQUALS(control.GetProperty<std::string>(automationIdIndex).empty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<Dali::String>(automationIdIndex).Empty(), true, TEST_LOCATION);
   attributes = controlAccessible->GetAttributes();
   DALI_TEST_EQUALS(attributes.find(automationIdKey) == attributes.end(), true, TEST_LOCATION);
 
@@ -231,18 +231,18 @@ int utcDaliAccessibilityImgSrc(void)
 
   // Check that imgSrc is added for image view w/ Url
   {
-    const std::string imagePath         = "gallery-small-1.jpg";
-    const auto        imageView         = Toolkit::ImageView::New(imagePath);
-    const auto        controlAccessible = Dali::Accessibility::Accessible::Get(imageView);
-    auto              attributes        = controlAccessible->GetAttributes();
+    const String imagePath         = "gallery-small-1.jpg";
+    const auto   imageView         = Toolkit::ImageView::New(imagePath);
+    const auto   controlAccessible = Dali::Accessibility::Accessible::Get(imageView);
+    auto         attributes        = controlAccessible->GetAttributes();
     DALI_TEST_CHECK(attributes.find(imageSrcKey) != attributes.end());
     DALI_TEST_EQUALS(attributes[imageSrcKey], imagePath, TEST_LOCATION);
   }
 
   // Check that imgSrc is added for image view w/ imageMap; single url case
   {
-    const std::string imagePathForImageMap = "icon-edit.png";
-    Property::Map     imageMap;
+    const String  imagePathForImageMap = "icon-edit.png";
+    Property::Map imageMap;
     imageMap[Toolkit::ImageVisual::Property::URL]            = imagePathForImageMap;
     imageMap[Toolkit::ImageVisual::Property::RELEASE_POLICY] = Toolkit::ImageVisual::ReleasePolicy::DETACHED;
 
@@ -257,10 +257,10 @@ int utcDaliAccessibilityImgSrc(void)
 
   // Check that imgSrc is added for image view w/ imageMap; url array returns first element
   {
-    const std::string image1 = "application-icon-20.png";
-    const std::string image2 = "application-icon-21.png";
-    Property::Map     imageMap;
-    Property::Array   urls{image1, image2};
+    const String    image1 = "application-icon-20.png";
+    const String    image2 = "application-icon-21.png";
+    Property::Map   imageMap;
+    Property::Array urls{image1, image2};
     imageMap[Toolkit::ImageVisual::Property::URL]            = urls;
     imageMap[Toolkit::ImageVisual::Property::RELEASE_POLICY] = Toolkit::ImageVisual::ReleasePolicy::DETACHED;
 

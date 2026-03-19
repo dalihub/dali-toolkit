@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <stdlib.h>
@@ -379,7 +380,7 @@ int UtcDaliToolkitScrollViewNewP1(void)
 
   DALI_TEST_CHECK(scrollView2 == scrollView);
 
-  //Additional check to ensure object is created by checking if it's registered
+  // Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK(registry);
 
@@ -3046,7 +3047,7 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
 
   application.GetScene().Add(scrollView);
 
-  //Connect to wheel event signal
+  // Connect to wheel event signal
   scrollView.WheelEventSignal().Connect(&OnWheelEvent);
 
   DALI_TEST_CHECK(!gOnWheelEventCalled);

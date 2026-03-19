@@ -22,14 +22,15 @@
 #if defined(__GLIBC__)
 #include <libintl.h>
 #endif
+#include <algorithm>
+#include <cfloat>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <string.h>
-#include <algorithm>
-#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
@@ -45,6 +46,8 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -562,7 +565,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextSelectionPopup::AddOption\n");
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
-  option.SetProperty(Dali::Actor::Property::NAME, button.name);
+  option.SetProperty(Dali::Actor::Property::NAME, ToPropertyValue(button.name));
   option.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   option.SetProperty(Actor::Property::MINIMUM_SIZE, mLabelMinimumSize);
 
@@ -614,7 +617,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
 
     // Label properties.
     Property::Map buttonLabelProperties;
-    buttonLabelProperties.Insert(Toolkit::TextVisual::Property::TEXT, button.caption);
+    buttonLabelProperties.Insert(Toolkit::TextVisual::Property::TEXT, ToPropertyValue(button.caption));
     buttonLabelProperties.Merge(mLabelTextVisual);
 
     option.SetProperty(Toolkit::Button::Property::LABEL, buttonLabelProperties);
@@ -633,7 +636,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   option.SetProperty(Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, "");
 
   // 4. Set the pressed option image.
-  Property::Value selectedBackgroundValue(mPressedImage);
+  Property::Value selectedBackgroundValue(ToPropertyValue(mPressedImage));
   if(mPressedImage.empty())
   {
     // The image can be blank, the color can be used in that case.
@@ -777,7 +780,7 @@ void TextSelectionPopup::CreateBackground(Property::Map& propertyMap)
 }
 
 TextSelectionPopup::TextSelectionPopup(TextSelectionPopupCallbackInterface* callbackInterface)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mToolbar(),
   mPopupMaxSize(),
   mOptionMaxSize(),

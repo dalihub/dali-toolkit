@@ -39,13 +39,13 @@ bool        CheckBoxButtonClicked(Button button)
 static const char* TEST_IMAGE_ONE  = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 const Vector2      TEST_IMAGE_SIZE = Vector2(66.0f, 66.0f);
 
-static std::string GetButtonText(Button button)
+static Dali::String GetButtonText(Button button)
 {
   Property::Value value = button.GetProperty(Toolkit::Button::Property::LABEL);
 
   Property::Map* labelProperty = value.GetMap();
 
-  std::string textLabel;
+  Dali::String textLabel;
 
   if(labelProperty)
   {

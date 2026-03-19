@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/popup/confirmation-popup.h>
+
+#include <dali/devel-api/object/type-registry.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -173,7 +175,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 
   // Tell the confirmation popup to connect to the signal in our button called "onScene".
   popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene");
-  std::string resultProperty;
+  Dali::String resultProperty;
   DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED).Get(resultProperty));
   DALI_TEST_EQUALS(resultProperty, "onScene", TEST_LOCATION);
 

@@ -23,8 +23,10 @@
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dummy-control.h>
 #include <stdlib.h>
 #include <test-animation-data.h>
@@ -39,6 +41,8 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -220,8 +224,8 @@ int UtcDaliStyleManagerApplyTheme(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), json1);
   StyleManager::Get().ApplyTheme(themeFile);
 
   Property::Value bgColor(testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR));
@@ -261,8 +265,8 @@ int UtcDaliStyleManagerApplyTheme(void)
   tet_infoline("Load a different stylesheet");
 
   tet_infoline("Apply the new style");
-  std::string themeFile2("ThemeTwo");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile2, json2);
+  Dali::String themeFile2("ThemeTwo");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile2), json2);
 
   styleChangedSignalHandler.signalCount = 0;
   StyleManager::Get().ApplyTheme(themeFile2);
@@ -335,8 +339,8 @@ int UtcDaliStyleManagerApplyThemeN(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), json1);
   StyleManager::Get().ApplyTheme(themeFile);
 
   Property::Value bgColor(testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR));
@@ -376,8 +380,8 @@ int UtcDaliStyleManagerApplyThemeN(void)
   tet_infoline("Load a different stylesheet, with broken json file");
 
   tet_infoline("Apply the new style");
-  std::string themeFile2("ThemeTwo");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile2, jsonInvalid);
+  Dali::String themeFile2("ThemeTwo");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile2), jsonInvalid);
 
   styleChangedSignalHandler.signalCount = 0;
   StyleManager::Get().ApplyTheme(themeFile2);
@@ -471,8 +475,8 @@ int UtcDaliStyleManagerApplyDefaultTheme(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, appTheme);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), appTheme);
   StyleManager::Get().ApplyTheme(themeFile);
 
   Property::Value bgColor(testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR));
@@ -510,7 +514,7 @@ int UtcDaliStyleManagerSetStyleConstantP(void)
 
   StyleManager manager = StyleManager::Get();
 
-  std::string     key("key");
+  Dali::String    key("key");
   Property::Value value(100);
 
   manager.SetStyleConstant(key, value);
@@ -530,7 +534,7 @@ int UtcDaliStyleManagerGetStyleConstantP(void)
 
   StyleManager manager = StyleManager::Get();
 
-  std::string     key("key");
+  Dali::String    key("key");
   Property::Value value(100);
 
   manager.SetStyleConstant(key, value);
@@ -550,7 +554,7 @@ int UtcDaliStyleManagerGetStyleConstantN(void)
 
   StyleManager manager = StyleManager::Get();
 
-  std::string     key2("key2");
+  Dali::String    key2("key2");
   Property::Value returnedValue2;
   DALI_TEST_CHECK(!manager.GetStyleConstant(key2, returnedValue2));
 
@@ -603,8 +607,8 @@ int UtcDaliStyleManagerApplyStyle(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), json1);
   styleManager.ApplyTheme(themeFile);
 
   // Render and notify
@@ -615,8 +619,8 @@ int UtcDaliStyleManagerApplyStyle(void)
   Property::Value themedFgColor(testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR));
 
   // Apply the style to the test button:
-  std::string themeFile2("ThemeTwo");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile2, json2);
+  Dali::String themeFile2("ThemeTwo");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile2), json2);
   styleManager.ApplyStyle(testButton, themeFile2, "testbutton");
 
   tet_infoline("Check that the properties change for the first button");
@@ -805,8 +809,8 @@ int UtcDaliStyleManagerIncludeStyleP(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), json1);
 
   styleManager.ApplyTheme(themeFile);
 
@@ -861,8 +865,8 @@ int UtcDaliStyleManagerIncludeStyleN(void)
 
   tet_infoline("Apply the style");
 
-  std::string themeFile("ThemeOne");
-  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+  Dali::String themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(ToStdString(themeFile), json1);
 
   styleManager.ApplyTheme(themeFile);
 
@@ -889,7 +893,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
 
   ToolkitTestApplication application;
 
-  std::string        labelStr("Label");
+  String             labelStr("Label");
   Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
   application.GetScene().Add(label);
 
@@ -915,7 +919,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
 
   // Check that the label's font style has been altered
   Property::Value family = label.GetProperty(TextLabel::Property::FONT_FAMILY);
-  std::string     familyStr;
+  String          familyStr;
   family.Get(familyStr);
 
   DALI_TEST_EQUALS(familyStr, "Times New Roman", TEST_LOCATION);
@@ -970,7 +974,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontSize(void)
 
   ToolkitTestApplication application;
 
-  std::string        labelStr("Label");
+  String             labelStr("Label");
   Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
   application.GetScene().Add(label);
 
@@ -1050,7 +1054,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextField(void)
 
   ToolkitTestApplication application;
 
-  std::string        fieldStr("Field");
+  String             fieldStr("Field");
   Toolkit::TextField field = Toolkit::TextField::New();
   field.SetProperty(Toolkit::TextField::Property::TEXT, fieldStr);
   application.GetScene().Add(field);
@@ -1132,7 +1136,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextEditor(void)
 
   ToolkitTestApplication application;
 
-  std::string         editorStr("Editor");
+  String              editorStr("Editor");
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
   editor.SetProperty(Toolkit::TextEditor::Property::TEXT, editorStr);
   application.GetScene().Add(editor);
@@ -1224,7 +1228,7 @@ int UtcDaliStyleManagerSetState01(void)
   DALI_TEST_CHECK(textValue);
   Property::Value* pointSizeValue = labelMap.Find(Toolkit::TextVisual::Property::POINT_SIZE, "pointSize");
   tet_infoline("Check that the instance data has been copied to the new text visual\n");
-  DALI_TEST_EQUALS(textValue->Get<std::string>(), "New text", TEST_LOCATION);
+  DALI_TEST_EQUALS(textValue->Get<String>(), "New text", TEST_LOCATION);
   DALI_TEST_EQUALS(pointSizeValue->Get<int>(), 10, TEST_LOCATION);
 
   actor.SetProperty(DevelControl::Property::STATE, DevelControl::DISABLED);
@@ -1247,7 +1251,7 @@ int UtcDaliStyleManagerSetState01(void)
   DALI_TEST_CHECK(textValue);
   pointSizeValue = labelMap.Find(Toolkit::TextVisual::Property::POINT_SIZE, "pointSize");
   tet_infoline("Check that the instance data has been copied to the new text visual\n");
-  DALI_TEST_EQUALS(textValue->Get<std::string>(), "New text", TEST_LOCATION);
+  DALI_TEST_EQUALS(textValue->Get<String>(), "New text", TEST_LOCATION);
   DALI_TEST_EQUALS(pointSizeValue->Get<int>(), 10, TEST_LOCATION);
 
   END_TEST;
@@ -1567,9 +1571,9 @@ int UtcDaliStyleManagerConfigSectionTestP(void)
   bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
   tet_printf("clearFocusOnEscape : %d\n", clearFocusOnEscape);
   DALI_TEST_CHECK(!clearFocusOnEscape);
-  std::string brokenImageUrl = config["brokenImageUrl"].Get<std::string>();
-  tet_printf("broken image url : %s\n", brokenImageUrl.c_str());
-  DALI_TEST_CHECK(brokenImageUrl.compare("broken|broken|{TEST|TEST.png") == 0);
+  String brokenImageUrl = config["brokenImageUrl"].Get<String>();
+  tet_printf("broken image url : %s\n", brokenImageUrl.CStr());
+  DALI_TEST_CHECK(ToStdString(brokenImageUrl).compare("broken|broken|{TEST|TEST.png") == 0);
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();

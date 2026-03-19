@@ -34,12 +34,8 @@ namespace Dali
 namespace Toolkit
 {
 class RenderEffect;
-//Forward declarations.
+class ControlImpl;
 
-namespace Internal
-{
-class Control;
-}
 /**
  * @addtogroup dali_toolkit_controls
  * @{
@@ -48,9 +44,9 @@ class Control;
 /**
  * @brief Control is the base class for all controls.
  *
- * The implementation of the control must be supplied; see Internal::Control for more details.
+ * The implementation of the control must be supplied; see ControlImpl for more details.
  * @SINCE_1_0.0
- * @see Internal::Control
+ * @see ControlImpl
  *
  * Signals
  * | %Signal Name           | Method                                              |
@@ -115,7 +111,7 @@ public:
       /**
        * @brief The background of the control.
        *
-       * @details Name "background", type Property::MAP or std::string for URL or Property::VECTOR4 for Color.
+       * @details Name "background", type Property::MAP or Dali::String for URL or Property::VECTOR4 for Color.
        * @SINCE_1_1.3
        */
       BACKGROUND,
@@ -197,7 +193,7 @@ public: // Creation & Destruction
   /**
    * @brief Additional control behaviour flags for the control constructor.
    * @note TODO : Currunt code is hard-coded. We Should sync type values as
-   * CustomActorImpl::ActorFlag and Internal::Control::ControlBehaviour in future.
+   * CustomActorImpl::ActorFlag and ControlImpl::ControlBehaviour in future.
    * @SINCE_2_1.8
    */
   enum ControlBehaviour
@@ -375,14 +371,14 @@ public:
    * @SINCE_1_0.0
    * @param[in] styleName A string matching a style described in a stylesheet
    */
-  void SetStyleName(const std::string& styleName);
+  void SetStyleName(const Dali::String& styleName);
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
    * @SINCE_1_0.0
    * @return A string matching a style, or an empty string
    */
-  const std::string& GetStyleName() const;
+  const Dali::String& GetStyleName() const;
 
   // Background
 
@@ -554,7 +550,7 @@ public: // Intended for control developers
    * @param[in] implementation The implementation for this control
    * @note Should NOT be called to create a handle from the implementation. As stated, this allocates a NEW Dali resource.
    */
-  explicit Control(Internal::Control& implementation);
+  explicit Control(ControlImpl& implementation);
 
   /**
    * @brief This constructor is used by CustomActor within Dali core to create additional Control handles

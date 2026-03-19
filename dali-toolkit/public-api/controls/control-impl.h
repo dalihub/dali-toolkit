@@ -22,12 +22,12 @@
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/property-index-ranges.h>
-#include <dali/public-api/object/type-info.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
@@ -50,8 +50,6 @@ class ControlAccessible;
 
 } // namespace DevelControl
 
-namespace Internal
-{
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -60,7 +58,7 @@ namespace Internal
  * be disconnected automatically when the control is destroyed.
  * @SINCE_1_0.0
  */
-class DALI_TOOLKIT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
+class DALI_TOOLKIT_API ControlImpl : public CustomActorImpl, public ConnectionTrackerInterface
 {
 public:
   class Extension; ///< Forward declare future extension interface
@@ -80,7 +78,7 @@ protected:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~Control();
+  virtual ~ControlImpl();
 
 public:
   // Styling
@@ -88,12 +86,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::Control::SetStyleName
    */
-  void SetStyleName(const std::string& styleName);
+  void SetStyleName(const Dali::String& styleName);
 
   /**
    * @copydoc Dali::Toolkit::Control::GetStyleName
    */
-  const std::string& GetStyleName() const;
+  const Dali::String& GetStyleName() const;
 
   // Background
 
@@ -492,12 +490,12 @@ protected:
   // Construction
 
   /**
-   * @brief Control constructor.
+   * @brief ControlImpl constructor.
    *
    * @SINCE_1_0.0
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
-  Control(ControlBehaviour behaviourFlags);
+  ControlImpl(ControlBehaviour behaviourFlags);
 
   /**
    * @brief Second phase initialization.
@@ -506,6 +504,7 @@ protected:
   void Initialize();
 
 public: // API for derived classes to override
+  // Lifecycle
   // Lifecycle
 
   /**
@@ -787,10 +786,10 @@ private:
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL          Control(const Control&)   = delete; ///< Deleted copy constructor.
-  DALI_INTERNAL          Control(Control&&)        = delete; ///< Deleted move constructor.
-  DALI_INTERNAL Control& operator=(const Control&) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Control& operator=(Control&&)      = delete; ///< Deleted move assignment operator.
+  DALI_INTERNAL              ControlImpl(const ControlImpl&) = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL              ControlImpl(ControlImpl&&)      = delete; ///< Deleted move constructor.
+  DALI_INTERNAL ControlImpl& operator=(const ControlImpl&)   = delete; ///< Deleted copy assignment operator.
+  DALI_INTERNAL ControlImpl& operator=(ControlImpl&&)        = delete; ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
@@ -808,7 +807,7 @@ private:
  * @return Implementation
  * @pre handle is initialized and points to a control
  */
-DALI_TOOLKIT_API Internal::Control& GetImplementation(Dali::Toolkit::Control& handle);
+DALI_TOOLKIT_API Toolkit::ControlImpl& GetImplementation(Dali::Toolkit::Control& handle);
 
 /**
  * @brief Gets implementation from the handle.
@@ -818,9 +817,7 @@ DALI_TOOLKIT_API Internal::Control& GetImplementation(Dali::Toolkit::Control& ha
  * @return Implementation
  * @pre Handle is initialized and points to a control.
  */
-DALI_TOOLKIT_API const Internal::Control& GetImplementation(const Dali::Toolkit::Control& handle);
-
-} // namespace Internal
+DALI_TOOLKIT_API const Toolkit::ControlImpl& GetImplementation(const Dali::Toolkit::Control& handle);
 
 /**
  * @}

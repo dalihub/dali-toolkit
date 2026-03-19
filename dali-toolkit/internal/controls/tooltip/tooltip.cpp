@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/events/hover-event.h>
 
@@ -34,6 +35,10 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -159,7 +164,7 @@ void Tooltip::CreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Tooltip::Property::LAYOUT, mLayout);
   map.Insert(Toolkit::Tooltip::Property::WAIT_TIME, static_cast<float>(mWaitTime) / MILLISECONDS_PER_SECOND);
   map.Insert(Toolkit::Tooltip::Property::BACKGROUND,
-             Property::Map().Add(Toolkit::Tooltip::Background::Property::VISUAL, mBackgroundImage).Add(Toolkit::Tooltip::Background::Property::BORDER, mBackgroundBorder));
+             Property::Map().Add(Toolkit::Tooltip::Background::Property::VISUAL, ToPropertyValue(mBackgroundImage)).Add(Toolkit::Tooltip::Background::Property::BORDER, mBackgroundBorder));
   map.Insert(Toolkit::Tooltip::Property::TAIL,
              Property::Map().Add(Toolkit::Tooltip::Tail::Property::VISIBILITY, mTailVisibility).Add(Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL, mTailImages[Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL]).Add(Toolkit::Tooltip::Tail::Property::BELOW_VISUAL, mTailImages[Toolkit::Tooltip::Tail::Property::BELOW_VISUAL]));
   map.Insert(Toolkit::Tooltip::Property::POSITION, mPositionType);
@@ -266,9 +271,9 @@ void Tooltip::SetContent(Toolkit::Control& control, const Property::Value& value
   else if(type == Property::STRING)
   {
     std::string text;
-    if(value.Get(text))
+    if(GetStdString(value, text))
     {
-      mContentTextVisual[Toolkit::TextVisual::Property::TEXT] = text;
+      mContentTextVisual[Toolkit::TextVisual::Property::TEXT] = ToPropertyValue(text);
       mContentTextVisual[Toolkit::Visual::Property::TYPE]     = Toolkit::Visual::TEXT;
       mContentArray.Clear();
       connectSignals = true;
@@ -289,7 +294,7 @@ void Tooltip::SetBackground(const Property::Value& value)
 
   if(type == Property::STRING)
   {
-    if(DALI_LIKELY(value.Get(mBackgroundImage)))
+    if(DALI_LIKELY(GetStdString(value, mBackgroundImage)))
     {
       mBackgroundBorder.Set(0, 0, 0, 0);
     }
@@ -308,7 +313,7 @@ void Tooltip::SetBackground(const Property::Value& value)
 
         if(key == Toolkit::Tooltip::Background::Property::VISUAL || key == PROPERTY_BACKGROUND_VISUAL)
         {
-          value.Get(mBackgroundImage);
+          mBackgroundImage = ToStdString(value);
         }
         else if(key == Toolkit::Tooltip::Background::Property::BORDER || key == PROPERTY_BACKGROUND_BORDER)
         {
@@ -359,17 +364,17 @@ void Tooltip::SetTail(const Property::Value& value)
         else if(key == Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL || key == PROPERTY_TAIL_ABOVE_VISUAL)
         {
           std::string path;
-          if(value.Get(path))
+          if(GetStdString(value, path))
           {
-            mTailImages[Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL] = path;
+            mTailImages[Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL] = ToPropertyValue(path);
           }
         }
         else if(key == Toolkit::Tooltip::Tail::Property::BELOW_VISUAL || key == PROPERTY_TAIL_BELOW_VISUAL)
         {
           std::string path;
-          if(value.Get(path))
+          if(GetStdString(value, path))
           {
-            mTailImages[Toolkit::Tooltip::Tail::Property::BELOW_VISUAL] = path;
+            mTailImages[Toolkit::Tooltip::Tail::Property::BELOW_VISUAL] = ToPropertyValue(path);
           }
         }
       }
@@ -475,7 +480,7 @@ bool Tooltip::OnTimeout()
     mPopup.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
     // Background
-    mPopup.SetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, mBackgroundImage);
+    mPopup.SetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, ToPropertyValue(mBackgroundImage));
     mPopup.SetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_BORDER, mBackgroundBorder);
 
     // Tail

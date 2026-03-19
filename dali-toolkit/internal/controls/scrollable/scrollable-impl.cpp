@@ -16,9 +16,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <cstring> // for strcmp
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -76,7 +76,7 @@ const Vector2 OVERSHOOT_DEFAULT_SIZE(720.0f, 42.0f);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Scrollable::Scrollable(ControlBehaviour behaviourFlags)
-: Control(ControlBehaviour(behaviourFlags)),
+: ControlImpl(ControlBehaviour(behaviourFlags)),
   mOvershootEffectColor(DEFAULT_OVERSHOOT_COLOUR),
   mOvershootAnimationSpeed(DEFAULT_OVERSHOOT_ANIMATION_SPEED),
   mOvershootSize(OVERSHOOT_DEFAULT_SIZE),
@@ -153,22 +153,22 @@ Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSigna
   return mScrollCompletedSignal;
 }
 
-bool Scrollable::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Scrollable::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                connected(true);
   Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_STARTED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_STARTED))
   {
     scrollable.ScrollStartedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_UPDATED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_UPDATED))
   {
     scrollable.ScrollUpdatedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_COMPLETED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SCROLL_COMPLETED))
   {
     scrollable.ScrollCompletedSignal().Connect(tracker, functor);
   }

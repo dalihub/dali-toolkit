@@ -27,6 +27,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1178,7 +1179,7 @@ int UtcDaliSceneViewMasking(void)
   Scene3D::SceneView view = Scene3D::SceneView::New();
   application.GetScene().Add(view);
 
-  DALI_TEST_EQUALS(view.GetProperty<std::string>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Dali::String>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), Dali::String(""), TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetProperty<bool>(Dali::Scene3D::SceneView::Property::CROP_TO_MASK), true, TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE), 1.0f, TEST_LOCATION);
 
@@ -1190,11 +1191,11 @@ int UtcDaliSceneViewMasking(void)
   view.SetProperty(Dali::Scene3D::SceneView::Property::CROP_TO_MASK, false);
   view.SetProperty(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE, 0.5f);
 
-  DALI_TEST_EQUALS(view.GetProperty<std::string>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), TEST_MASK_IMAGE_FILE_NAME, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<Dali::String>(Dali::Scene3D::SceneView::Property::ALPHA_MASK_URL), Dali::String(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetProperty<bool>(Dali::Scene3D::SceneView::Property::CROP_TO_MASK), false, TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetProperty<float>(Dali::Scene3D::SceneView::Property::MASK_CONTENT_SCALE), 0.5f, TEST_LOCATION);
 
-  yFlipMaskTextureIndex = view.GetPropertyIndex(std::string(Y_FLIP_MASK_TEXTURE));
+  yFlipMaskTextureIndex = view.GetPropertyIndex(Dali::String(Y_FLIP_MASK_TEXTURE.data()));
   DALI_TEST_EQUALS(view.GetProperty<float>(yFlipMaskTextureIndex), 1.0f, TEST_LOCATION);
 
   END_TEST;
@@ -1272,7 +1273,7 @@ int UtcDaliSceneViewCapture01(void)
   DALI_TEST_EQUALS(gCaptureFinishedCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().Empty(), false, TEST_LOCATION);
 
   Toolkit::ImageUrl tempImageUrl = gCapturedImageUrl;
 
@@ -1291,7 +1292,7 @@ int UtcDaliSceneViewCapture01(void)
   DALI_TEST_NOT_EQUALS(captureId, captureId2, 0.1f, TEST_LOCATION);
   DALI_TEST_EQUALS(gCaptureId, captureId2, TEST_LOCATION);
   DALI_TEST_EQUALS(!!gCapturedImageUrl, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gCapturedImageUrl.GetUrl().Empty(), false, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(gCapturedImageUrl, tempImageUrl, 0.1f, TEST_LOCATION);
 
   END_TEST;

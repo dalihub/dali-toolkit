@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 #include "toggle-button-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -34,6 +35,10 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gLogButtonFilter;
@@ -148,7 +153,7 @@ void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex
           bool valid = true;
           for(size_t i = 0; i != tipsCount; ++i)
           {
-            if(DALI_UNLIKELY(!tipArray->GetElementAt(i).Get(tips[i])))
+            if(DALI_UNLIKELY(!GetStdString(tipArray->GetElementAt(i), tips[i])))
             {
               // Given array is invalid. Fast out.
               valid = false;
@@ -201,7 +206,7 @@ Property::Value ToggleButton::GetProperty(BaseObject* object, Property::Index pr
           size_t                   tipsCount(tips.size());
           for(size_t i(0); i != tipsCount; ++i)
           {
-            tipArray->PushBack(tips[i]);
+            tipArray->PushBack(ToPropertyValue(tips[i]));
           }
         }
         value = value1;
@@ -242,9 +247,9 @@ void ToggleButton::CreateVisualsForAllStates(const Property::Array& states, std:
     }
     else if(value.GetType() == Property::STRING)
     {
-      std::string imageUrl = value.Get<std::string>();
+      Dali::String imageUrl = value.Get<String>();
       DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals Using image URL\n");
-      if(!imageUrl.empty())
+      if(!imageUrl.Empty())
       {
         stateVisual = visualFactory.CreateVisual(imageUrl, ImageDimensions());
       }
@@ -302,7 +307,7 @@ void ToggleButton::SetToggleTooltips(std::vector<std::string>& tips)
 
   if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
   {
-    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex]);
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, ToPropertyValue(mToggleTooltips[mCurrentToggleIndex]));
   }
 
   RelayoutRequest();
@@ -378,7 +383,7 @@ void ToggleButton::OnPressed()
   //Need to check mCurrentToggleIndex, it must less than the size of mToggleTooltips.
   if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
   {
-    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex]);
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, ToPropertyValue(mToggleTooltips[mCurrentToggleIndex]));
   }
 
   RelayoutRequest();
@@ -401,7 +406,7 @@ std::string ToggleButton::ToggleButtonAccessible::GetDescriptionRaw() const
   auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
   auto tooltips = button.GetProperty<Property::Array>(Toolkit::ToggleButton::Property::TOOLTIPS);
 
-  return tooltips[index].Get<std::string>();
+  return ToStdString(tooltips[index]);
 }
 
 Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyIndex()

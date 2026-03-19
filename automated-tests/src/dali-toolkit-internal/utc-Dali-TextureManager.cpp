@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,17 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <test-encoded-image-buffer.h>
 
 #if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #endif
+
+using Dali::Integration::ToStdString;
 
 using namespace Dali::Toolkit::Internal;
 
@@ -524,9 +528,9 @@ int UtcTextureManagerExternalTexture(void)
   DALI_TEST_CHECK(pixelData);
 
   Dali::Toolkit::ImageUrl imageUrl          = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  std::string             externalImageUrl  = imageUrl.GetUrl();
+  String                  externalImageUrl  = imageUrl.GetUrl();
   Dali::Toolkit::ImageUrl imageUrl2         = Dali::Toolkit::Image::GenerateUrl(pixelData, false);
-  std::string             externalImageUrl2 = imageUrl2.GetUrl();
+  String                  externalImageUrl2 = imageUrl2.GetUrl();
 
   for(int testCase = 0; testCase < 6; testCase++)
   {
@@ -548,10 +552,10 @@ int UtcTextureManagerExternalTexture(void)
     TestObserver observer1;
     TestObserver observer2;
 
-    std::string                        maskname(testExternalMask ? externalImageUrl2 : TEST_MASK_FILE_NAME);
+    String                             maskname(testExternalMask ? externalImageUrl2 : TEST_MASK_FILE_NAME);
     TextureManager::MaskingDataPointer maskInfo = nullptr;
     maskInfo.reset(new TextureManager::MaskingData());
-    maskInfo->mAlphaMaskUrl       = maskname;
+    maskInfo->mAlphaMaskUrl       = ToStdString(maskname);
     maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
     maskInfo->mCropToMask         = true;
     maskInfo->mContentScaleFactor = 1.0f;
@@ -561,10 +565,10 @@ int UtcTextureManagerExternalTexture(void)
     bool loadingStatus(false);
     auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    std::string url(testExternalTexture ? externalImageUrl : TEST_IMAGE_FILE_NAME);
+    String url(testExternalTexture ? externalImageUrl : TEST_IMAGE_FILE_NAME);
 
     TextureSet texture1 = textureManager.LoadTexture(
-      url,
+      ToStdString(url),
       ImageDimensions(),
       FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
@@ -580,7 +584,7 @@ int UtcTextureManagerExternalTexture(void)
     DALI_TEST_EQUALS(!!texture1, expectTextureLoadedResult, TEST_LOCATION);
 
     TextureSet texture2 = textureManager.LoadTexture(
-      url,
+      ToStdString(url),
       ImageDimensions(),
       FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
@@ -625,7 +629,7 @@ int UtcTextureManagerExternalTexture(void)
     application.Render();
 
     texture1 = textureManager.LoadTexture(
-      url,
+      ToStdString(url),
       ImageDimensions(),
       FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
@@ -641,7 +645,7 @@ int UtcTextureManagerExternalTexture(void)
     DALI_TEST_CHECK(texture1); // texture is loaded.
 
     texture2 = textureManager.LoadTexture(
-      url,
+      ToStdString(url),
       ImageDimensions(),
       FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
@@ -706,12 +710,12 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
   DALI_TEST_CHECK(pixelData);
 
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  std::string             url1     = imageUrl.GetUrl();
-  std::string             url2     = TEST_IMAGE_FILE_NAME;
+  String                  url1     = imageUrl.GetUrl();
+  String                  url2     = TEST_IMAGE_FILE_NAME;
 
   // Step 1 : Load request for external url
   TextureSet texture1 = textureManager.LoadTexture(
-    url1,
+    ToStdString(url1),
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
@@ -742,7 +746,7 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
 
   // Step 4 : Request new load by normal image.
   TextureSet texture2 = textureManager.LoadTexture(
-    url2,
+    ToStdString(url2),
     ImageDimensions(),
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
@@ -2359,7 +2363,7 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   TextureManager::MaskingDataPointer maskInfo = nullptr;
 
   maskInfo.reset(new TextureManager::MaskingData());
-  maskInfo->mAlphaMaskUrl       = imageUrl.GetUrl();
+  maskInfo->mAlphaMaskUrl       = ToStdString(imageUrl.GetUrl());
   maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
@@ -2483,7 +2487,7 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   TextureManager::MaskingDataPointer maskInfo = nullptr;
 
   maskInfo.reset(new TextureManager::MaskingData());
-  maskInfo->mAlphaMaskUrl       = imageUrl.GetUrl();
+  maskInfo->mAlphaMaskUrl       = ToStdString(imageUrl.GetUrl());
   maskInfo->mAlphaMaskId        = TextureManager::INVALID_TEXTURE_ID;
   maskInfo->mCropToMask         = true;
   maskInfo->mContentScaleFactor = 1.0f;
@@ -2495,7 +2499,7 @@ int UtcTextureManagerMaskByExternalTexture02(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  std::string url = imageUrl2.GetUrl();
+  std::string url = ToStdString(imageUrl2.GetUrl());
 
   TextureSet texture1 = textureManager.LoadTexture(
     url,

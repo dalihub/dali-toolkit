@@ -34,12 +34,13 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -59,6 +60,9 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -170,7 +174,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 } // namespace
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -194,7 +198,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 }
 
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -315,6 +319,8 @@ void WebView::OnInitialize()
   Toolkit::Visual::Base webVisual = Toolkit::VisualFactory::Get().CreateVisual(EMPTY_VISUAL_PROPERTIES);
   if(webVisual)
   {
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(webVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
     Dali::Toolkit::DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, webVisual);
     Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(*this, webVisual, true);
   }
@@ -1149,13 +1155,13 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
 
 void WebView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
   EnableBlendMode(!mVideoHoleEnabled);
 }
 
 void WebView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)
@@ -1244,7 +1250,7 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::WebView::Property::URL:
       {
         std::string url;
-        if(value.Get(url))
+        if(GetStdString(value, url))
         {
           impl.LoadUrl(url);
         }
@@ -1253,7 +1259,7 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::WebView::Property::USER_AGENT:
       {
         std::string input;
-        if(value.Get(input))
+        if(GetStdString(value, input))
         {
           impl.SetUserAgent(input);
         }
@@ -1368,12 +1374,12 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
     {
       case Toolkit::WebView::Property::URL:
       {
-        value = impl.GetUrl();
+        value = ToPropertyValue(impl.GetUrl());
         break;
       }
       case Toolkit::WebView::Property::USER_AGENT:
       {
-        value = impl.GetUserAgent();
+        value = ToPropertyValue(impl.GetUserAgent());
         break;
       }
       case Toolkit::WebView::Property::SCROLL_POSITION:
@@ -1393,7 +1399,7 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       }
       case Toolkit::WebView::Property::TITLE:
       {
-        value = impl.GetTitle();
+        value = ToPropertyValue(impl.GetTitle());
         break;
       }
       case Toolkit::WebView::Property::VIDEO_HOLE_ENABLED:
@@ -1413,7 +1419,7 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       }
       case Toolkit::WebView::Property::SELECTED_TEXT:
       {
-        value = impl.GetSelectedText();
+        value = ToPropertyValue(impl.GetSelectedText());
         break;
       }
       case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:

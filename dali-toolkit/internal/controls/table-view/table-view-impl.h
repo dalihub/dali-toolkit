@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TABLE_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace Internal
  * TableView is a custom control for laying out actors in a table layout
  * @see Dali::Toolkit:TableView for more details
  */
-class TableView : public Control
+class TableView : public ControlImpl
 {
 public:
   /**

@@ -43,7 +43,7 @@ class VideoView;
 
 namespace Internal
 {
-class VideoView : public Control
+class VideoView : public ControlImpl
 {
 protected:
   VideoView(Dali::VideoSyncMode syncMode);
@@ -195,7 +195,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return True if action has been accepted by this control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
+  static bool DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes);
 
   /**
    * Connects a callback function with the object's signals.
@@ -206,7 +206,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
   /**
    * @brief Updates video display area for window rendering target

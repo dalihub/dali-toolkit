@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,16 @@
 #include <dali-toolkit/internal/transition/transition-set-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/string-utils.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/transition/transition-lifecycle-controller.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -51,7 +55,7 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::Toolkit::TransitionSet), typeid(Dali::BaseHandle), Create);
 
-SignalConnectorType signalConnector1(mType, std::string(SIGNAL_FINISHED), &TransitionSet::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, ToDaliStringView(SIGNAL_FINISHED), &TransitionSet::DoConnectSignal);
 
 } // anonymous namespace
 
@@ -197,12 +201,12 @@ void TransitionSet::EmitFinishedSignal()
   }
 }
 
-bool TransitionSet::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool TransitionSet::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool           connected(false);
   TransitionSet* transitionSet = static_cast<TransitionSet*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(SIGNAL_FINISHED == signalName)
+  if(strcmp(SIGNAL_FINISHED.data(), signalName.CStr()) == 0)
   {
     transitionSet->FinishedSignal().Connect(tracker, functor);
     connected = true;

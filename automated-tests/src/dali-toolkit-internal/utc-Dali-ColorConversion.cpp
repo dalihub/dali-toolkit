@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,8 @@ int UtcDaliPropertyHelperConvertStringPropertyToColor(void)
 {
   tet_infoline("Test to check whether A Property value containing a string can be converted");
 
-  const std::string stringColor("#00FF00");
-  Property::Value   colorProperty(stringColor);
+  const String    stringColor("#00FF00");
+  Property::Value colorProperty(stringColor);
 
   Vector4 result;
   DALI_TEST_CHECK(Toolkit::Internal::ConvertPropertyToColor(colorProperty, result));

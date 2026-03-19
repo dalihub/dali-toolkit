@@ -22,14 +22,15 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/native-image-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -43,6 +44,9 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
 
 namespace Dali
 {
@@ -96,7 +100,7 @@ const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 } // namespace
 
 VideoView::VideoView(Dali::VideoSyncMode syncMode)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mCurrentVideoPlayPosition(0),
   mFrameID(0),
   mIsPlay(false),
@@ -150,12 +154,12 @@ void VideoView::SetPropertyMap(Property::Map map)
   Property::Value* target = map.Find(RENDERING_TARGET);
   std::string      targetType;
 
-  if(target && target->Get(targetType) && targetType == WINDOW_SURFACE_TARGET)
+  if(target && GetStdString(*target, targetType) && targetType == WINDOW_SURFACE_TARGET)
   {
     mIsUnderlay = true;
     SetWindowSurfaceTarget();
   }
-  else if(target && target->Get(targetType) && targetType == NATIVE_IMAGE_TARGET)
+  else if(target && GetStdString(*target, targetType) && targetType == NATIVE_IMAGE_TARGET)
   {
     mIsUnderlay = false;
     SetNativeImageTarget();
@@ -180,7 +184,7 @@ void VideoView::SetPropertyMap(Property::Map map)
   if(mTextureVisual && !mEffectPropertyMap.Empty())
   {
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
 
     Property::Map properties;
     properties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
@@ -196,6 +200,8 @@ void VideoView::SetPropertyMap(Property::Map map)
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
+      // Ignore corner radius for offscreen case.
+      Toolkit::GetImplementation(mTextureVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -314,7 +320,7 @@ void VideoView::EmitSignalFinish()
   }
 }
 
-bool VideoView::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool VideoView::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   bool ret = false;
 
@@ -328,22 +334,22 @@ bool VideoView::DoAction(BaseObject* object, const std::string& actionName, cons
 
   VideoView& impl = GetImpl(videoView);
 
-  if(strcmp(actionName.c_str(), ACTION_VIDEOVIEW_PLAY) == 0)
+  if(strcmp(actionName.CStr(), ACTION_VIDEOVIEW_PLAY) == 0)
   {
     impl.Play();
     ret = true;
   }
-  else if(strcmp(actionName.c_str(), ACTION_VIDEOVIEW_PAUSE) == 0)
+  else if(strcmp(actionName.CStr(), ACTION_VIDEOVIEW_PAUSE) == 0)
   {
     impl.Pause();
     ret = true;
   }
-  else if(strcmp(actionName.c_str(), ACTION_VIDEOVIEW_STOP) == 0)
+  else if(strcmp(actionName.CStr(), ACTION_VIDEOVIEW_STOP) == 0)
   {
     impl.Stop();
     ret = true;
   }
-  else if(strcmp(actionName.c_str(), ACTION_VIDEOVIEW_FORWARD) == 0)
+  else if(strcmp(actionName.CStr(), ACTION_VIDEOVIEW_FORWARD) == 0)
   {
     int millisecond = 0;
     if(attributes["videoForward"].Get(millisecond))
@@ -352,7 +358,7 @@ bool VideoView::DoAction(BaseObject* object, const std::string& actionName, cons
       ret = true;
     }
   }
-  else if(strcmp(actionName.c_str(), ACTION_VIDEOVIEW_BACKWARD) == 0)
+  else if(strcmp(actionName.CStr(), ACTION_VIDEOVIEW_BACKWARD) == 0)
   {
     int millisecond = 0;
     if(attributes["videoBackward"].Get(millisecond))
@@ -365,14 +371,14 @@ bool VideoView::DoAction(BaseObject* object, const std::string& actionName, cons
   return ret;
 }
 
-bool VideoView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool VideoView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool               connected(true);
   Toolkit::VideoView videoView = Toolkit::VideoView::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), FINISHED_SIGNAL))
+  if(0 == strcmp(signalName.CStr(), FINISHED_SIGNAL))
   {
     videoView.FinishedSignal().Connect(tracker, functor);
   }
@@ -394,7 +400,7 @@ void VideoView::SetPropertyInternal(Property::Index index, const Property::Value
       std::string   videoUrl;
       Property::Map map;
 
-      if(value.Get(videoUrl))
+      if(GetStdString(value, videoUrl))
       {
         SetUrl(videoUrl);
       }
@@ -501,7 +507,7 @@ Property::Value VideoView::GetProperty(BaseObject* object, Property::Index prope
       {
         if(!impl.mUrl.empty())
         {
-          value = impl.mUrl;
+          value = ToPropertyValue(impl.mUrl);
         }
         else if(!impl.mPropertyMap.Empty())
         {
@@ -525,8 +531,8 @@ Property::Value VideoView::GetProperty(BaseObject* object, Property::Index prope
         float         left, right;
 
         impl.GetVolume(left, right);
-        map.Insert(VOLUME_LEFT, left);
-        map.Insert(VOLUME_RIGHT, right);
+        map.Insert(Dali::String(VOLUME_LEFT), left);
+        map.Insert(Dali::String(VOLUME_RIGHT), right);
         value = map;
         break;
       }
@@ -571,14 +577,14 @@ void VideoView::OnSceneConnection(int depth)
 
   DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneConnection()\n");
   mVideoPlayer.SceneConnection();
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void VideoView::OnSceneDisconnection()
 {
   DALI_LOG_RELEASE_INFO("Calls mVideoPlayer.SceneDisconnection()\n");
   mVideoPlayer.SceneDisconnection();
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void VideoView::OnSizeSet(const Vector3& targetSize)
@@ -592,7 +598,7 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
     // SetFrameRenderCallback();
     mVideoPlayer.StartSynchronization();
   }
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 }
 
 void VideoView::OnChildOrderChanged(Actor actor)
@@ -659,7 +665,7 @@ Vector3 VideoView::GetNaturalSize()
   }
   else
   {
-    return Control::GetNaturalSize();
+    return ControlImpl::GetNaturalSize();
   }
 }
 
@@ -690,8 +696,8 @@ void VideoView::SetWindowSurfaceTarget()
   mSizeUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
   mScaleUpdateNotification.NotifySignal().Connect(this, &VideoView::UpdateDisplayArea);
 
-  Toolkit::Control            control     = Toolkit::Control(GetOwner());
-  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
+  Toolkit::Control      control     = Toolkit::Control(GetOwner());
+  Toolkit::ControlImpl& controlImpl = GetImplementation(control);
 
   if(mTextureVisual)
   {
@@ -778,8 +784,8 @@ void VideoView::SetNativeImageTarget()
 
   Actor self(Self());
 
-  Toolkit::Control            control     = Toolkit::Control(GetOwner());
-  Toolkit::Internal::Control& controlImpl = GetImplementation(control);
+  Toolkit::Control      control     = Toolkit::Control(GetOwner());
+  Toolkit::ControlImpl& controlImpl = GetImplementation(control);
 
   if(mOverlayVisual)
   {
@@ -818,6 +824,8 @@ void VideoView::SetNativeImageTarget()
     mTextureVisual = Toolkit::VisualFactory::Get().CreateVisual(properties);
     if(mTextureVisual)
     {
+      // Ignore corner radius for offscreen case.
+      Toolkit::GetImplementation(mTextureVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
       Toolkit::DevelControl::RegisterVisual(controlImpl, Toolkit::VideoView::Property::TEXTURE, mTextureVisual);
       Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mTextureVisual, true);
     }
@@ -1007,8 +1015,8 @@ Property::Map VideoView::CreateShader()
   }
 
   Property::Map shader;
-  shader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = vertexShader;
-  shader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = ToPropertyValue(vertexShader);
+  shader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = ToPropertyValue(fragmentShader);
   shader[Toolkit::Visual::Shader::Property::HINTS]           = Shader::Hint::NONE;
   shader[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW";
 
@@ -1018,7 +1026,7 @@ Property::Map VideoView::CreateShader()
 bool VideoView::GetStringFromProperty(const Dali::Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if(value.Get(output))
+  if(GetStdString(value, output))
   {
     extracted = true;
   }
@@ -1070,7 +1078,7 @@ void VideoView::CreateOverlayTextureVisual()
   //// For underlay rendering mode, video display area have to be transparent.
   Property::Map shaderMap;
   shaderMap[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = SHADER_VIDEO_VIEW_SOURCE_VERT.data();
-  shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShaderString;
+  shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = ToPropertyValue(fragmentShaderString);
   shaderMap[Toolkit::Visual::Shader::Property::RENDER_PASS_TAG] = 11;
   shaderMap[Toolkit::Visual::Shader::Property::HINTS]           = static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL);
   shaderMap[Toolkit::Visual::Shader::Property::NAME]            = "VIDEO_VIEW_OVERLAY_SOURCE_TEXTURE";
@@ -1103,7 +1111,10 @@ void VideoView::CreateOverlayTextureVisual()
       mOverlayTextureVisualIndex = handle.RegisterProperty("videoViewTextureVisual", "videoViewTextureVisual", Property::AccessMode::READ_WRITE);
     }
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
+
+    // Ignore corner radius for offscreen case.
+    visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     Toolkit::DevelControl::RegisterVisual(controlImpl, mOverlayTextureVisualIndex, mOverlayTextureVisual);
 
     Dali::TextureSet textures = Dali::TextureSet::New();
@@ -1120,7 +1131,7 @@ void VideoView::ResetOverlayTextureVisual()
   if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
   {
     Toolkit::Control control     = Toolkit::Control(GetOwner());
-    Control&         controlImpl = GetImplementation(control);
+    ControlImpl&     controlImpl = GetImplementation(control);
     Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
 
     if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)

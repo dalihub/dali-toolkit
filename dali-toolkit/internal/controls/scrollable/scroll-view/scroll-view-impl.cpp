@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,18 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
-#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
@@ -1379,14 +1379,14 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   mScrollUpdatedSignal.Emit(currentScrollPosition);
 }
 
-bool ScrollView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ScrollView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                connected(true);
   Toolkit::ScrollView view = Toolkit::ScrollView::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_SNAP_STARTED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_SNAP_STARTED))
   {
     view.SnapStartedSignal().Connect(tracker, functor);
   }

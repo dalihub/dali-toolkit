@@ -360,6 +360,20 @@ public:
   bool IsOffscreenRenderingCaptureEnabled() const;
 
   /**
+   * @brief Query whether this visual could not apply control's corner radius during control's offscreen-rendering result
+   *
+   * @return True if this visual ignore corner radius rendered at offscreen-rendering render task. False otherwise.
+   */
+  bool IsCornerRadiusIgnoredAtOffscreenRendering() const;
+
+  /**
+   * @brief Set whether this visual could not apply control's corner radius during control's offscreen-rendering result
+   *
+   * @param[in] ignored True if this visual ignore corner radius rendered at offscreen-rendering render task. False otherwise.
+   */
+  void CornerRadiusIgnoredAtOffscreenRendering(bool ignored);
+
+  /**
    * @brief Add an observer to watch for when the Visuals have constraint to notify
    * Currently only supports a single observer
    */
@@ -510,11 +524,7 @@ protected:
    * @param[in] key The key of the visual's property.
    * @return The Property object
    */
-  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key, bool changeProperties)
-  {
-    Handle handle;
-    return Dali::Property(handle, Property::INVALID_INDEX);
-  }
+  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key, bool changeProperties);
 
 protected:
   /**

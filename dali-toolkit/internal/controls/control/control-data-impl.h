@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/object/type-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -37,28 +37,27 @@
 #include <memory>
 #include <set>
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit
 {
 namespace Visual
 {
 class Base;
 }
 
+namespace Internal
+{
 enum class TriStateProperty
 {
   AUTO = 0,
   TRUE,
   FALSE
 };
+} // namespace Internal
 
 /**
  * @brief Holds the Implementation for the internal control class
  */
-class Control::Impl : public ConnectionTracker, public Dali::Integration::Processor
+class ControlImpl::Impl : public ConnectionTracker, public Dali::Integration::Processor
 {
 private:
   class AccessibilityData;
@@ -70,18 +69,18 @@ public:
    * @param[in] internalControl A ref to the control whose internal implementation is required
    * @return The internal implementation
    */
-  static Control::Impl& Get(Internal::Control& internalControl);
+  static Impl& Get(ControlImpl& internalControl);
 
   /**
-   * @copydoc Get( Internal::Control& )
+   * @copydoc Get(ControlImpl&)
    */
-  static const Control::Impl& Get(const Internal::Control& internalControl);
+  static const Impl& Get(const ControlImpl& internalControl);
 
   /**
    * @brief Constructor.
    * @param[in] controlImpl The control which owns this implementation
    */
-  Impl(Control& controlImpl);
+  Impl(ControlImpl& controlImpl);
 
   /**
    * @brief Destructor.
@@ -518,7 +517,7 @@ private:
   void UpdateBorderline();
 
 public:
-  Control&            mControlImpl;
+  ControlImpl&        mControlImpl;
   DevelControl::State mState;
   std::string         mSubStateName;
 
@@ -532,9 +531,9 @@ public:
   int mClockwiseFocusableActorId;        ///< Actor ID of Clockwise focusable control.
   int mCounterClockwiseFocusableActorId; ///< Actor ID of Counter clockwise focusable control.
 
-  std::string                               mStyleName;
+  Dali::String                              mStyleName;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
-  RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
+  Internal::RenderEffectImplPtr             mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
   Extents                                   mMargin;             ///< The margin values
   Extents                                   mPadding;            ///< The padding values
@@ -551,12 +550,12 @@ public:
   LongPressGestureDetector mLongPressGestureDetector;
 
   // Off screen rendering context
-  std::unique_ptr<OffScreenRenderingImpl>                mOffScreenRenderingImpl;
+  std::unique_ptr<Internal::OffScreenRenderingImpl>      mOffScreenRenderingImpl;
   DevelControl::OffScreenRenderingType                   mOffScreenRenderingType;
   Toolkit::Control::OffScreenRenderingFinishedSignalType mOffScreenRenderingFinishedSignal; ///< Emits only when type is REFRESH_ONCE
 
   // Tooltip
-  TooltipPtr mTooltip;
+  Internal::TooltipPtr mTooltip;
 
   InputMethodContext mInputMethodContext;
   CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
@@ -618,10 +617,6 @@ public:
   static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_6;
 };
 
-} // namespace Internal
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit
 
 #endif // DALI_TOOLKIT_CONTROL_DATA_IMPL_H

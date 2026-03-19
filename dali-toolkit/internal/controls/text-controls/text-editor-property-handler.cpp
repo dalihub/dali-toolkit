@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,15 @@
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gTextEditorLogFilter;
 #endif
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Toolkit::Internal
 {
@@ -45,7 +50,7 @@ std::string TextEditor::PropertyHandler::GetImageFileNameFromPropertyValue(const
     const Property::Value* filenameValue = map->Find(TextEditor::PropertyHandler::IMAGE_MAP_FILENAME_STRING);
     if(filenameValue)
     {
-      filenameValue->Get(filename);
+      filename = ToStdString(*filenameValue);
     }
   }
   return filename;
@@ -74,7 +79,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::TEXT:
     {
-      const std::string& text = value.Get<std::string>();
+      const std::string text = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p TEXT %s\n", impl.mController.Get(), text.c_str());
 
       impl.mController->SetText(text);
@@ -95,7 +100,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::FONT_FAMILY:
     {
-      const std::string& fontFamily = value.Get<std::string>();
+      const std::string fontFamily = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str());
       impl.mController->SetDefaultFontFamily(fontFamily);
       break;
@@ -206,7 +211,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
     {
-      const std::string imageFileName = value.Get<std::string>();
+      const std::string imageFileName = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str());
 
       if(imageFileName.size())
@@ -218,7 +223,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
     {
-      const std::string imageFileName = value.Get<std::string>();
+      const std::string imageFileName = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str());
 
       if(imageFileName.size())
@@ -335,7 +340,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::INPUT_FONT_FAMILY:
     {
-      const std::string& fontFamily = value.Get<std::string>();
+      const std::string fontFamily = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str());
       impl.mController->SetInputFontFamily(fontFamily);
       break;
@@ -495,7 +500,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
     {
-      const std::string& text = value.Get<std::string>();
+      const std::string text = ToStdString(value);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str());
 
       impl.mController->SetPlaceholderText(Text::Controller::PLACEHOLDER_TYPE_INACTIVE, text);
@@ -780,7 +785,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT:
     {
-      const bool enable = value.Get<bool>();
+      const bool enable             = value.Get<bool>();
       impl.mDeferredRelayoutEnabled = enable;
       break;
     }
@@ -806,7 +811,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       std::string text;
       impl.mController->GetText(text);
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p returning text: %s\n", impl.mController.Get(), text.c_str());
-      value = text;
+      value = ToPropertyValue(text);
       break;
     }
     case Toolkit::TextEditor::Property::TEXT_COLOR:
@@ -816,7 +821,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     }
     case Toolkit::TextEditor::Property::FONT_FAMILY:
     {
-      value = impl.mController->GetDefaultFontFamily();
+      value = ToPropertyValue(impl.mController->GetDefaultFontFamily());
       break;
     }
     case Toolkit::TextEditor::Property::FONT_STYLE:
@@ -834,7 +839,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       const char* name = Text::GetHorizontalAlignmentString(impl.mController->GetHorizontalAlignment());
       if(name)
       {
-        value = std::string(name);
+        value = ToPropertyValue(std::string(name));
       }
       break;
     }
@@ -844,7 +849,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
 
       if(name)
       {
-        value = std::string(name);
+        value = ToPropertyValue(std::string(name));
       }
       break;
     }
@@ -890,12 +895,12 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     }
     case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
     {
-      value = impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_RELEASED);
+      value = ToPropertyValue(impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_RELEASED));
       break;
     }
     case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
     {
-      value = impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_PRESSED);
+      value = ToPropertyValue(impl.mDecorator->GetHandleImage(Text::GRAB_HANDLE, Text::HANDLE_IMAGE_PRESSED));
       break;
     }
     case Toolkit::TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT:
@@ -952,7 +957,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     }
     case Toolkit::TextEditor::Property::INPUT_FONT_FAMILY:
     {
-      value = impl.mController->GetInputFontFamily();
+      value = ToPropertyValue(impl.mController->GetInputFontFamily());
       break;
     }
     case Toolkit::TextEditor::Property::INPUT_FONT_STYLE:
@@ -1055,7 +1060,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     {
       std::string text;
       impl.mController->GetPlaceholderText(Text::Controller::PLACEHOLDER_TYPE_INACTIVE, text);
-      value = text;
+      value = ToPropertyValue(text);
       break;
     }
     case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
@@ -1112,7 +1117,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     }
     case Toolkit::DevelTextEditor::Property::SELECTED_TEXT:
     {
-      value = impl.mController->GetSelectedText();
+      value = ToPropertyValue(impl.mController->GetSelectedText());
       break;
     }
     case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:

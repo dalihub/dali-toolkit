@@ -36,7 +36,7 @@ class CameraView;
 
 namespace Internal
 {
-class CameraView : public Control
+class CameraView : public ControlImpl
 {
 protected:
   /**

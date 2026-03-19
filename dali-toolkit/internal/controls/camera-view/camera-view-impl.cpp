@@ -19,13 +19,14 @@
 #include "camera-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
-#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -33,6 +34,8 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -52,7 +55,7 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 CameraView::CameraView(Dali::Toolkit::CameraView::DisplayType displayType)
-: Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mDisplayType(displayType)
 {
 }
@@ -81,7 +84,7 @@ void CameraView::Update()
 
 void CameraView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
   if(mDisplayType == Dali::Toolkit::CameraView::DisplayType::WINDOW)
   {
     SetWindowSurfaceTarget();
@@ -95,7 +98,7 @@ void CameraView::OnSceneConnection(int depth)
 
 void CameraView::OnSceneDisconnection()
 {
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
   Actor self = Self();
   if(mTextureRenderer)
   {
@@ -182,12 +185,12 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
 
 Dali::Shader CameraView::CreateShader(Dali::NativeImagePtr nativeImagePtr)
 {
-  std::string vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
-  std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+  std::string  vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+  Dali::String fragmentShader(ToDaliStringView(SHADER_VIDEO_VIEW_TEXTURE_FRAG));
 
   nativeImagePtr->ApplyNativeFragmentShader(fragmentShader, 1);
 
-  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
+  Dali::Shader shader = Dali::Shader::New(ToDaliStringView(vertexShader), fragmentShader, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW");
   return shader;
 }
 

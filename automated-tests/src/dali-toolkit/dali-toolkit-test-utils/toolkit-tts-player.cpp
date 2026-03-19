@@ -113,7 +113,7 @@ TtsPlayer& TtsPlayer::operator=(const TtsPlayer& rhs)
   return *this;
 }
 
-void TtsPlayer::Play(const std::string& text)
+void TtsPlayer::Play(const String& text)
 {
   // GetImplementation(*this).Play(text);
 }

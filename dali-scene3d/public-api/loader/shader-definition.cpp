@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/shader-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 #include <regex>
 
@@ -28,6 +29,10 @@
 #include <dali-scene3d/public-api/loader/utils.h>
 
 #include <dali/integration-api/debug.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace
 {
@@ -126,51 +131,72 @@ void RedefineMacro(std::string& shaderCode, const std::string& macro, const std:
 }
 
 ShaderDefinition::RawData
-ShaderDefinition::LoadRaw(const std::string& shadersPath) const
+ShaderDefinition::LoadRaw(const Dali::String& shadersPath) const
 {
-  RawData raw;
+  RawData     raw;
+  std::string stdShadersPath = ToStdString(shadersPath);
+
+  // Use std::string internally for string manipulation (find/replace/insert)
+  std::string vertSrc, fragSrc, shadowVertSrc, shadowFragSrc;
 
   bool fail = false;
   if(!mUseBuiltInShader)
   {
-    raw.mVertexShaderSource = LoadTextFile((shadersPath + mVertexShaderPath).c_str(), &fail);
+    std::string vertPath    = stdShadersPath + ToStdString(mVertexShaderPath);
+    std::string fragPath    = stdShadersPath + ToStdString(mFragmentShaderPath);
+    raw.mVertexShaderSource = LoadTextFile(vertPath.c_str(), &fail);
     if(!fail)
     {
-      raw.mFragmentShaderSource = LoadTextFile((shadersPath + mFragmentShaderPath).c_str(), &fail);
+      raw.mFragmentShaderSource = LoadTextFile(fragPath.c_str(), &fail);
       if(fail)
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mFragmentShaderPath << "'.";
+        ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << fragPath << "'.";
       }
     }
     else
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mVertexShaderPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << vertPath << "'.";
     }
   }
   else
   {
-    raw.mVertexShaderSource         = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data();
-    raw.mFragmentShaderSource       = SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data();
-    raw.mShadowVertexShaderSource   = SHADER_SHADOW_MAP_SHADER_VERT.data();
-    raw.mShadowFragmentShaderSource = SHADER_SHADOW_MAP_SHADER_FRAG.data();
+    raw.mVertexShaderSource         = ToDaliString(std::string(SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_VERT.data()));
+    raw.mFragmentShaderSource       = ToDaliString(std::string(SHADER_DEFAULT_PHYSICALLY_BASED_SHADER_FRAG.data()));
+    raw.mShadowVertexShaderSource   = ToDaliString(std::string(SHADER_SHADOW_MAP_SHADER_VERT.data()));
+    raw.mShadowFragmentShaderSource = ToDaliString(std::string(SHADER_SHADOW_MAP_SHADER_FRAG.data()));
   }
 
   if(!fail)
   {
+    // Convert to std::string for manipulation by ApplyDefine/RedefineMacro
+    vertSrc       = ToStdString(raw.mVertexShaderSource);
+    fragSrc       = ToStdString(raw.mFragmentShaderSource);
+    shadowVertSrc = ToStdString(raw.mShadowVertexShaderSource);
+    shadowFragSrc = ToStdString(raw.mShadowFragmentShaderSource);
+
     for(const auto& definevar : mDefines)
     {
-      ApplyDefine(raw.mVertexShaderSource, definevar);
-      ApplyDefine(raw.mFragmentShaderSource, definevar);
-      ApplyDefine(raw.mShadowVertexShaderSource, definevar);
-      ApplyDefine(raw.mShadowFragmentShaderSource, definevar);
+      std::string stdDefine = ToStdString(definevar);
+      ApplyDefine(vertSrc, stdDefine);
+      ApplyDefine(fragSrc, stdDefine);
+      ApplyDefine(shadowVertSrc, stdDefine);
+      ApplyDefine(shadowFragSrc, stdDefine);
     }
     for(const auto& macroDef : mMacros)
     {
-      RedefineMacro(raw.mVertexShaderSource, macroDef.macro, macroDef.definition);
-      RedefineMacro(raw.mFragmentShaderSource, macroDef.macro, macroDef.definition);
-      RedefineMacro(raw.mShadowVertexShaderSource, macroDef.macro, macroDef.definition);
-      RedefineMacro(raw.mShadowFragmentShaderSource, macroDef.macro, macroDef.definition);
+      std::string stdMacro = ToStdString(macroDef.macro);
+      std::string stdDef   = ToStdString(macroDef.definition);
+      RedefineMacro(vertSrc, stdMacro, stdDef);
+      RedefineMacro(fragSrc, stdMacro, stdDef);
+      RedefineMacro(shadowVertSrc, stdMacro, stdDef);
+      RedefineMacro(shadowFragSrc, stdMacro, stdDef);
     }
+
+    // Convert back to Dali::String
+    raw.mVertexShaderSource         = ToDaliString(vertSrc);
+    raw.mFragmentShaderSource       = ToDaliString(fragSrc);
+    raw.mShadowVertexShaderSource   = ToDaliString(shadowVertSrc);
+    raw.mShadowFragmentShaderSource = ToDaliString(shadowFragSrc);
   }
 
   return raw;
@@ -192,21 +218,21 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   }
 
   Property::Map map[2];
-  map[0]["vertex"]        = raw.mVertexShaderSource;
-  map[0]["fragment"]      = raw.mFragmentShaderSource;
+  map[0]["vertex"]        = ToPropertyValue(ToStdString(raw.mVertexShaderSource));
+  map[0]["fragment"]      = ToPropertyValue(ToStdString(raw.mFragmentShaderSource));
   map[0]["renderPassTag"] = 0;
   map[0]["hints"]         = static_cast<Shader::Hint::Value>(hints);
 
-  map[1]["vertex"]        = raw.mShadowVertexShaderSource;
-  map[1]["fragment"]      = raw.mShadowFragmentShaderSource;
+  map[1]["vertex"]        = ToPropertyValue(ToStdString(raw.mShadowVertexShaderSource));
+  map[1]["fragment"]      = ToPropertyValue(ToStdString(raw.mShadowFragmentShaderSource));
   map[1]["renderPassTag"] = 10;
 
   if(mUseBuiltInShader)
   {
     std::ostringstream oss;
     oss << "_0x" << std::hex << mShadowOptionHash;
-    map[0]["name"] = std::string("SCENE3D_PBR") + oss.str();
-    map[1]["name"] = std::string("SCENE3D_SHADOW_MAP") + oss.str();
+    map[0]["name"] = ToPropertyValue(std::string("SCENE3D_PBR") + oss.str());
+    map[1]["name"] = ToPropertyValue(std::string("SCENE3D_SHADOW_MAP") + oss.str());
   }
   else
   {
@@ -218,7 +244,7 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   array.PushBack(map[0]);
   array.PushBack(map[1]);
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.CStr());
 
   // Create strong-connected ubo shader since shader definition could be removed after scene load completed.
   Shader shader = Dali::Integration::ShaderNewWithUniformBlock(array, mUniformBlocks, true);

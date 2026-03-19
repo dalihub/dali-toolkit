@@ -21,15 +21,20 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 
 // DEVEL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 using namespace Dali::Toolkit::Text;
 
@@ -103,7 +108,7 @@ Property::Value TextAnchor::GetProperty(BaseObject* object, Property::Index inde
       }
       case Toolkit::TextAnchor::Property::URI:
       {
-        value = impl.mUri;
+        value = ToPropertyValue(impl.mUri);
         break;
       }
     }
@@ -135,7 +140,7 @@ void TextAnchor::SetProperty(BaseObject* object, Property::Index index, const Pr
 
       case Toolkit::TextAnchor::Property::URI:
       {
-        value.Get(impl.mUri);
+        impl.mUri = ToStdString(value);
         break;
       }
     }
@@ -156,7 +161,7 @@ DevelControl::ControlAccessible* TextAnchor::CreateAccessibleObject()
 }
 
 TextAnchor::TextAnchor()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mStartCharacterIndex(0),
   mEndCharacterIndex(0),
   mUri()
@@ -198,7 +203,7 @@ Dali::Accessibility::Accessible* TextAnchor::TextAnchorAccessible::GetAnchorAcce
 std::string TextAnchor::TextAnchorAccessible::GetAnchorUri(int32_t anchorIndex) const
 {
   auto self = Toolkit::TextAnchor::DownCast(Self());
-  return self.GetProperty(Toolkit::TextAnchor::Property::URI).Get<std::string>();
+  return ToStdString(self.GetProperty(Toolkit::TextAnchor::Property::URI));
 }
 
 bool TextAnchor::TextAnchorAccessible::IsValid() const
@@ -222,7 +227,7 @@ bool TextAnchor::OnAccessibilityActivated()
   if(parentImplementationAnchorInterface)
   {
     std::string href;
-    std::string uri = Self().GetProperty(Toolkit::TextAnchor::Property::URI).Get<std::string>();
+    std::string uri = ToStdString(Self().GetProperty(Toolkit::TextAnchor::Property::URI));
     parentImplementationAnchorInterface->AnchorClicked(mStartCharacterIndex, href);
     parentImplementationAnchorInterface->EmitAnchorClickedSignal(uri);
     return true;

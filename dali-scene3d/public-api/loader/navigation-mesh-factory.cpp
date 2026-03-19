@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
@@ -26,13 +27,16 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <stdlib.h>
 
+using Dali::Integration::ToStdString;
+
 namespace Dali::Scene3D::Loader
 {
-UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::string filename)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali::String filename)
 {
+  std::string          stdFilename = ToStdString(filename);
   std::vector<uint8_t> buffer;
 
-  Dali::FileStream fileStream(filename, Dali::FileStream::READ | Dali::FileStream::BINARY);
+  Dali::FileStream fileStream(stdFilename, Dali::FileStream::READ | Dali::FileStream::BINARY);
   auto             fin = fileStream.GetFile();
 
   if(DALI_UNLIKELY(!fin))
@@ -43,27 +47,27 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::
     // Return type of stderror_r is different between system type. We should not use return value.
     [[maybe_unused]] auto ret = strerror_r(errno, buffer, bufferLength - 1);
 
-    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", filename.c_str(), buffer);
+    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", stdFilename.c_str(), buffer);
     return {};
   }
 
   if(DALI_UNLIKELY(fseek(fin, 0, SEEK_END)))
   {
-    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", stdFilename.c_str());
     return {};
   }
 
   auto size = ftell(fin);
   if(DALI_UNLIKELY(size < 0))
   {
-    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", stdFilename.c_str());
     return {};
   }
 
   auto fileSize = size_t(size);
   if(DALI_UNLIKELY(fseek(fin, 0, SEEK_SET)))
   {
-    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", stdFilename.c_str());
     return {};
   }
 
@@ -71,7 +75,7 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(std::
   auto count = fread(buffer.data(), 1, fileSize, fin);
   if(DALI_UNLIKELY(count != fileSize))
   {
-    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", filename.c_str());
+    DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", stdFilename.c_str());
     return {};
   }
   return CreateFromBuffer(buffer);

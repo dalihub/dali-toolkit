@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_INTERNAL_CONTROL_DEBUG_H
 #define DALI_TOOLKIT_INTERNAL_CONTROL_DEBUG_H
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ std::ostream& DumpProperties(std::ostream& outputStream, Handle handle);
 /**
  * Dumps control internals, visuals and properties to a string in JSON format
  */
-std::string DumpControl(const Internal::Control& control);
+std::string DumpControl(const ControlImpl& control);
 
 /**
  * Dumps actor internals and properties to a string in JSON format

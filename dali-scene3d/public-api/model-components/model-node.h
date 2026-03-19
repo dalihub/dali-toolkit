@@ -185,7 +185,7 @@ public: // Public Method
    * @param[in] nodeName The name of the child ModelNode object you want to find.
    * @return Returns a child ModelNode object with a name that matches nodeName. If there is no corresponding child ModelNode object, it returns an empty ModelNode object.
    */
-  ModelNode FindChildModelNodeByName(std::string_view nodeName);
+  ModelNode FindChildModelNodeByName(Dali::StringView nodeName);
 
   /**
    * @brief Retrieve the list of blendshape name that current ModelNode hold.
@@ -194,7 +194,7 @@ public: // Public Method
    * @SINCE_2_2.34
    * @param[in, out] blendShapeNames The name of blendShape list collected.
    */
-  void RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const;
+  void RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const;
 
   /**
    * @brief Get the index of blend shape by given name.
@@ -203,7 +203,7 @@ public: // Public Method
    * @param[in] blendShapeName The name of blendshape that is not empty.
    * @return Index of blendshape, or return invalid if there is no blendshape with given name.
    */
-  Loader::BlendShapes::Index GetBlendShapeIndexByName(std::string_view blendShapeName) const;
+  Loader::BlendShapes::Index GetBlendShapeIndexByName(Dali::StringView blendShapeName) const;
 
   /**
    * @brief Sets collider mesh on the ModelNode

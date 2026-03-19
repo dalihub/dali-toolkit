@@ -562,6 +562,8 @@ struct Base::Impl
   bool mTransformMapUsingDefault : 1;      ///< Whether we are using the default transformMap not. We'll be false after SetTransform called, or animated.
                                            ///< Note : If it change to false, never be true again.
   bool mTransformMapChanged : 1;           ///< Whether the transformMap is changed or not. We'll be false after SetTransform called.
+
+  bool mOffscreenRenderingIgnoreCornerRadius : 1; ///< Whether we need to ignore the corner radius during offscreen rendering case.
 };
 
 } // namespace Visual

@@ -36,7 +36,7 @@ namespace Internal
 /**
  * @brief A control which renders anchor (hyperlink) in hypertext.
  */
-class TextAnchor : public Control
+class TextAnchor : public ControlImpl
 {
 public:
   /**

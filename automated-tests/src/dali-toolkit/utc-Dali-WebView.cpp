@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
@@ -43,6 +44,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-security-origin.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-user-media-permission-request.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -52,6 +54,8 @@
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 const char* const TEST_URL1("http://www.somewhere.valid1.com");
@@ -389,12 +393,12 @@ static void OnUserMediaPermissionRequest(Dali::WebEngineUserMediaPermissionReque
   gUserMediaPermissionRequestCalled++;
 }
 
-//using WebEngineDeviceConnectionChangedCallback = std::function<void(int32_t)>;
+// using WebEngineDeviceConnectionChangedCallback = std::function<void(int32_t)>;
 static void OnDeviceConnectionChanged(int32_t)
 {
 }
 
-//using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
+// using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
 static void OnDeviceListGetCallback(Dali::WebEngineDeviceListGet*, int32_t)
 {
 }
@@ -1010,7 +1014,7 @@ int UtcDaliWebViewProperty1(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  std::string local;
+  String local;
   view.SetProperty(WebView::Property::URL, TEST_URL1);
   Property::Value val = view.GetProperty(WebView::Property::URL);
   DALI_TEST_CHECK(val.Get(local));
@@ -1027,11 +1031,11 @@ int UtcDaliWebViewProperty4(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  const std::string kDefaultValue;
-  const std::string kTestValue = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
+  const String kDefaultValue;
+  const String kTestValue = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
 
   // Check default value
-  std::string     output;
+  String          output;
   Property::Value value = view.GetProperty(WebView::Property::USER_AGENT);
   DALI_TEST_CHECK(value.Get(output));
   DALI_TEST_EQUALS(output, kDefaultValue, TEST_LOCATION);
@@ -1091,8 +1095,8 @@ int UtcDaliWebViewPropertyBackgroundColorSelectedTextEtc(void)
   view.SetProperty(WebView::Property::CURSOR_ENABLED_BY_CLIENT, true);
 
   // Check default value
-  std::string testText("test");
-  std::string output;
+  String testText("test");
+  String output;
   view.GetProperty(WebView::Property::SELECTED_TEXT).Get(output);
   DALI_TEST_EQUALS(output, testText, TEST_LOCATION);
 
@@ -1111,8 +1115,8 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   view.ClearAllTilesResources();
 
   // Check default value of title
-  std::string testValue("title");
-  std::string output;
+  String testValue("title");
+  String output;
   view.GetProperty(WebView::Property::TITLE).Get(output);
   DALI_TEST_EQUALS(output, testValue, TEST_LOCATION);
 
@@ -1565,11 +1569,11 @@ int UtcDaliWebViewMethodsForCoverage(void)
 
   view.SetTtsFocus(true);
 
-  //view.ChangeOrientation(90);
+  // view.ChangeOrientation(90);
 
   DALI_TEST_CHECK(view);
 
-  //view.ExitFullscreen();
+  // view.ExitFullscreen();
 
   END_TEST;
 }
@@ -1687,7 +1691,7 @@ int UtcDaliWebContextGetSetCacheModelEtc(void)
   context->SetProxyBypassRule("", "test");
   DALI_TEST_EQUALS(context->GetProxyBypassRule(), "test", TEST_LOCATION);
 
-  //Notify low memory
+  // Notify low memory
   DALI_TEST_CHECK(context->FreeUnusedMemory());
 
   END_TEST;
@@ -2163,7 +2167,7 @@ int UtcDaliWebSettingsCheckEnableTextSelection(void)
   bool value = settings->IsTextSelectionEnabled();
   DALI_TEST_CHECK(value);
 
-  //Check Set/GetProperty
+  // Check Set/GetProperty
   settings->EnableTextSelection(false);
   value = settings->IsTextSelectionEnabled();
   DALI_TEST_CHECK(!value);

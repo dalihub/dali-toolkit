@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,16 @@
 #include <string_view>
 
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/builder/json-parser.h>
+
+using Dali::Integration::InsertToMap;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -237,7 +243,7 @@ bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentR
 
     if(!oss.str().empty())
     {
-      result.Insert(std::string(macroKey), oss.str());
+      InsertToMap(result, macroKey, oss.str());
     }
   };
 
@@ -291,16 +297,16 @@ const std::vector<Property::Map>& GetScriptInfomation()
       vertexShaderResult.Clear();
       fragmentShaderResult.Clear();
 
-      vertexShaderResult.Insert(std::string(DEBUG_APPLY_VARYINGS_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_APPLY_VARYINGS_CODE_MACRO_VALUE));
+      InsertToMap(vertexShaderResult, DEBUG_APPLY_VARYINGS_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_APPLY_VARYINGS_CODE_MACRO_VALUE));
 
-      fragmentShaderResult.Insert(std::string(MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY), std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_RED_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_GREEN_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
-      fragmentShaderResult.Insert(std::string(DEBUG_RATIO_BLUE_CODE_MACRO_KEY), std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, MINIMUM_DEBUG_COLOR_RATE_MACRO_KEY, std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, MAXIMUM_DEBUG_COLOR_RATE_MACRO_KEY, std::string(DEFAULT_DEBUG_COLOR_RATE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_TRIGGER_RED_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_TRIGGER_GREEN_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_TRIGGER_BLUE_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_TRIGGER_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_RATIO_RED_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_RATIO_GREEN_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
+      InsertToMap(fragmentShaderResult, DEBUG_RATIO_BLUE_CODE_MACRO_KEY, std::string(DEFAULT_DEBUG_RATIO_CODE_MACRO_VALUE));
     }
   }
 
@@ -343,16 +349,18 @@ void ApplyImageVisualShaderDebugScriptCode(std::string& vertexShader, std::strin
   {
     auto        key   = resultMaps[0].GetKeyAt(i);
     const auto& value = resultMaps[0].GetValue(i);
-
-    RedefineMacro(vertexShader, std::move(key.stringKey), value.Get<std::string>());
+    String      valueString;
+    value.Get(valueString);
+    RedefineMacro(vertexShader, ToStdString(std::move(key.stringKey)), ToStdString(valueString));
   }
 
   for(std::size_t i = 0u; i < resultMaps[1].Count(); ++i)
   {
     auto        key   = resultMaps[1].GetKeyAt(i);
     const auto& value = resultMaps[1].GetValue(i);
-
-    RedefineMacro(fragmentShader, std::move(key.stringKey), value.Get<std::string>());
+    String      valueString;
+    value.Get(valueString);
+    RedefineMacro(fragmentShader, ToStdString(std::move(key.stringKey)), ToStdString(valueString));
   }
 }
 } // namespace ImageVisualShaderDebug

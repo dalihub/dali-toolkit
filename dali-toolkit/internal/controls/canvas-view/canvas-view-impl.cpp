@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -35,8 +36,11 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -65,7 +69,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_VECTOR_ANIMATION_PERFORMANCE_MAR
 using namespace Dali;
 
 CanvasView::CanvasView(const Vector2& viewBox)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mCanvasRenderer(CanvasRenderer::New(viewBox)),
   mTexture(),
   mSize(viewBox),
@@ -135,7 +139,7 @@ void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 void CanvasView::OnSizeSet(const Vector3& targetSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_CANVAS_VIEW_RESIZE");
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 
   if(!(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.SetSize(Vector2(targetSize))))
   {
@@ -152,13 +156,13 @@ void CanvasView::OnSceneConnection(int depth)
   {
     mPlacementWindow = window;
   }
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void CanvasView::OnSceneDisconnection()
 {
   mPlacementWindow.Reset();
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
@@ -321,11 +325,14 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
         {
           if(mCanvasVisualIndex == Property::INVALID_INDEX)
           {
-            mCanvasVisualIndex = Self().RegisterProperty(CANVAS_VISUAL_INDEX_PROPERTY_NAME, Property::Value(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
+            mCanvasVisualIndex = Self().RegisterProperty(ToDaliStringView(CANVAS_VISUAL_INDEX_PROPERTY_NAME), Dali::Integration::ToPropertyValue(std::string(CANVAS_VISUAL_INDEX_PROPERTY_NAME)), Property::AccessMode::READ_WRITE);
           }
+
+          // Ignore corner radius for offscreen case.
+          Toolkit::GetImplementation(visual).CornerRadiusIgnoredAtOffscreenRendering(true);
           DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
-          Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+          ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
           controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
         }
       }

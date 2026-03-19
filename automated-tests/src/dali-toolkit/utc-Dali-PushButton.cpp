@@ -143,13 +143,13 @@ void SetupButtonForTestTouchEvents(ToolkitTestApplication& application, Button& 
   }
 }
 
-static std::string GetButtonText(Button button)
+static String GetButtonText(Button button)
 {
   Property::Value value = button.GetProperty(Toolkit::Button::Property::LABEL);
 
   Property::Map* labelProperty = value.GetMap();
 
-  std::string textLabel;
+  String textLabel;
 
   if(labelProperty)
   {
@@ -474,7 +474,7 @@ int UtcDaliPushButtonLabelProperty(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliPushButtonSetLabelText");
 
-  const std::string STR("Hola!");
+  const String STR("Hola!");
 
   PushButton pushButton = PushButton::New();
 
@@ -1384,7 +1384,7 @@ int UtcDaliPushButtonSetLabelText(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliPushButtonSetLabelText");
 
-  const std::string STR("Hola!");
+  const String STR("Hola!");
 
   PushButton pushButton = PushButton::New();
 

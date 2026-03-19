@@ -19,17 +19,18 @@
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <cstring>
 #include <limits>
 
 // INTERNAL INCLUDES
@@ -451,22 +452,22 @@ Text::ControllerPtr TextEditor::GetTextController()
   return mController;
 }
 
-bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool                connected(true);
   Toolkit::TextEditor editor = Toolkit::TextEditor::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TEXT_CHANGED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_TEXT_CHANGED))
   {
     editor.TextChangedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_INPUT_STYLE_CHANGED))
   {
     editor.InputStyleChangedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_MAX_LENGTH_REACHED))
   {
     if(editor)
     {
@@ -474,7 +475,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.MaxLengthReachedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_ANCHOR_CLICKED))
   {
     if(editor)
     {
@@ -482,7 +483,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_CURSOR_POSITION_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_CURSOR_POSITION_CHANGED))
   {
     if(editor)
     {
@@ -490,7 +491,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.CursorPositionChangedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_INPUT_FILTERED))
   {
     if(editor)
     {
@@ -498,7 +499,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.InputFilteredSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_CHANGED))
   {
     if(editor)
     {
@@ -506,7 +507,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CLEARED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_CLEARED))
   {
     if(editor)
     {
@@ -514,7 +515,7 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.SelectionClearedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_STARTED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_SELECTION_STARTED))
   {
     if(editor)
     {
@@ -625,7 +626,7 @@ void TextEditor::OnInitialize()
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
   // Creates an extra control to be used as stencil buffer.
-  mStencil = Control::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  mStencil = ControlImpl::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
   mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
@@ -686,7 +687,7 @@ void TextEditor::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::
   }
 
   // Up call to Control
-  Control::OnStyleChange(styleManager, change);
+  ControlImpl::OnStyleChange(styleManager, change);
 }
 
 void TextEditor::OnApplyDefaultStyle()
@@ -753,7 +754,7 @@ void TextEditor::OnPropertySet(Property::Index index, const Property::Value& pro
       }
       else
       {
-        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+        ControlImpl::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
       }
       break;
     }
@@ -1316,7 +1317,7 @@ void TextEditor::GetHandleImagePropertyValue(Property::Value& value, Text::Handl
   if(mDecorator)
   {
     Property::Map map;
-    map[TextEditor::PropertyHandler::IMAGE_MAP_FILENAME_STRING] = mDecorator->GetHandleImage(handleType, handleImageType);
+    Dali::Integration::InsertToMap(map, std::string_view(TextEditor::PropertyHandler::IMAGE_MAP_FILENAME_STRING), mDecorator->GetHandleImage(handleType, handleImageType));
 
     value = map;
   }
@@ -1355,8 +1356,8 @@ void TextEditor::OnSceneConnection(int depth)
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 
-  // Call the Control::OnSceneConnection() to set the depth of the background.
-  Control::OnSceneConnection(depth);
+  // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
+  ControlImpl::OnSceneConnection(depth);
 }
 
 bool TextEditor::OnTouched(Actor actor, const TouchEvent& touch)
@@ -1450,11 +1451,11 @@ Dali::Property::Index TextEditor::RegisterFontVariationProperty(std::string tag)
   mController->GetVariationsMap(variationsMap);
 
   float variationValue = 0.f;
-  auto  tagPtr         = variationsMap.Find(tag);
+  auto  tagPtr         = variationsMap.Find(Dali::Integration::ToDaliStringView(tag));
 
   if(tagPtr)
   {
-    variationValue = tagPtr->Get<float>();
+    tagPtr->Get(variationValue);
   }
 
   Dali::Property::Index index = self.RegisterProperty(tag.data(), variationValue);
@@ -1490,7 +1491,7 @@ void TextEditor::OnVariationPropertyNotify(PropertyNotification& source)
 }
 
 TextEditor::TextEditor(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mAnimationPeriod(0.0f, 0.0f),
   mAlignmentOffset(0.f),
   mScrollAnimationDuration(0.f),

@@ -23,11 +23,11 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <filesystem>
 
 // INTERNAL INCLUDES
@@ -110,7 +110,7 @@ Dali::Geometry CreatePlaneGeometry(bool flip = false)
 } // anonymous namespace
 
 Panel::Panel()
-: Control(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
   mPanelResolution(Vector2::ZERO),
   mResolutionPropertyIndex(Property::INVALID_INDEX),
   mIsTransparent(false),
@@ -432,7 +432,7 @@ void Panel::OnSceneConnection(int depth)
 
   // On-screen / Off-screen window
   Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  mSceneHolder = sceneHolder;
+  mSceneHolder                               = sceneHolder;
   if(mSceneHolder.GetHandle() && !mRenderTask)
   {
     RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
@@ -447,7 +447,7 @@ void Panel::OnSceneConnection(int depth)
     UpdateRenderTask();
   }
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void Panel::OnSceneDisconnection()
@@ -475,7 +475,7 @@ void Panel::OnSceneDisconnection()
   mTexture.Reset();
   mFrameBuffer.Reset();
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void Panel::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)

@@ -39,7 +39,7 @@ namespace Internal
 /**
  * GaussianBlurView implementation class
  */
-class GaussianBlurView : public Control
+class GaussianBlurView : public ControlImpl
 {
 public:
   /**

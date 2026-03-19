@@ -47,7 +47,7 @@ typedef IntrusivePtr<ScrollBar> ScrollBarPtr;
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
  */
-class ScrollBar : public Control
+class ScrollBar : public ControlImpl
 {
 public:
   // Signals
@@ -175,7 +175,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
   // Properties
 
@@ -202,7 +202,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
+  static bool DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes);
 
 private: // from Control
   /**

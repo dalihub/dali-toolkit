@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,14 +136,14 @@ int UtcDaliMotionIndexMoveAssignment(void)
 
 int UtcDaliMotionIndexSetGetModelNodeId(void)
 {
-  std::string expectModelNodeStringId = "nodeId";
-  MotionIndex index                   = MotionTransformIndex::New(expectModelNodeStringId, MotionTransformIndex::TransformType::POSITION);
+  Dali::String expectModelNodeStringId("nodeId");
+  MotionIndex  index = MotionTransformIndex::New(expectModelNodeStringId, MotionTransformIndex::TransformType::POSITION);
 
   auto propertyKey = index.GetModelNodeId();
   DALI_TEST_CHECK(propertyKey.type == Property::Key::Type::STRING);
   DALI_TEST_EQUALS(expectModelNodeStringId, propertyKey.stringKey, TEST_LOCATION);
 
-  expectModelNodeStringId = "anotherId";
+  expectModelNodeStringId = Dali::String("anotherId");
   index.SetModelNodeId(expectModelNodeStringId);
 
   propertyKey = index.GetModelNodeId();

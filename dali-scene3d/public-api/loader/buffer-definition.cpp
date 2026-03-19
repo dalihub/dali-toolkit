@@ -22,6 +22,10 @@
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Scene3D::Loader
 {
@@ -68,9 +72,10 @@ std::iostream& BufferDefinition::GetBufferStream()
   return mImpl->stream.get()->GetStream();
 }
 
-std::string BufferDefinition::GetUri()
+Dali::String BufferDefinition::GetUri()
 {
-  return mResourcePath + ((mIsEmbedded) ? std::string() : mUri);
+  std::string result = ToStdString(mResourcePath) + ((mIsEmbedded) ? std::string() : ToStdString(mUri));
+  return ToDaliString(result);
 }
 
 bool BufferDefinition::IsAvailable()
@@ -83,13 +88,14 @@ void BufferDefinition::LoadBuffer()
 {
   if(mImpl->stream == nullptr)
   {
-    if(mUri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && mUri.find(EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
+    std::string uri = ToStdString(mUri);
+    if(uri.find(EMBEDDED_DATA_PREFIX.data()) == 0 && uri.find(EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.data(), EMBEDDED_DATA_PREFIX.length()) == EMBEDDED_DATA_PREFIX.length())
     {
-      auto position = mUri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.length());
+      auto position = uri.find(EMBEDDED_DATA_BASE64_ENCODING_TYPE.data(), EMBEDDED_DATA_PREFIX.length() + EMBEDDED_DATA_APPLICATION_MEDIA_TYPE.length());
       if(position != std::string::npos)
       {
         position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
-        std::string_view data = std::string_view(mUri).substr(position);
+        std::string_view data = std::string_view(uri).substr(position);
         mImpl->buffer.clear();
         Dali::Toolkit::DecodeBase64FromString(data, mImpl->buffer);
         mImpl->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl->buffer.data()), mByteLength, FileStream::READ | FileStream::BINARY);
@@ -98,10 +104,11 @@ void BufferDefinition::LoadBuffer()
     }
     else
     {
-      mImpl->stream = std::make_shared<Dali::FileStream>(mResourcePath + mUri, FileStream::READ | FileStream::BINARY);
+      std::string fullPath = ToStdString(mResourcePath) + uri;
+      mImpl->stream        = std::make_shared<Dali::FileStream>(fullPath, FileStream::READ | FileStream::BINARY);
       if(mImpl->stream == nullptr)
       {
-        DALI_LOG_ERROR("Failed to load %s\n", (mResourcePath + mUri).c_str());
+        DALI_LOG_ERROR("Failed to load %s\n", fullPath.c_str());
       }
     }
   }

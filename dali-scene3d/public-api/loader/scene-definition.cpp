@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <algorithm>
 
@@ -29,6 +30,10 @@
 #include <dali-scene3d/public-api/loader/blend-shape-details.h>
 #include <dali-scene3d/public-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 // #define DEBUG_SCENE_DEFINITION
 // #define DEBUG_JOINTS
@@ -436,7 +441,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
     {
       if(n.mCustomization)
       {
-        const std::string& tag = n.mCustomization->mTag;
+        const auto& tag = n.mCustomization->mTag;
         if(missingChoices != nullptr && choices->Get(tag) == Customization::NONE)
         {
           missingChoices->Set(tag, 0);
@@ -447,7 +452,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
         {
           customization = options->Set(tag, {});
         }
-        customization->nodes.push_back(n.mName);
+        customization->nodes.push_back(ToStdString(n.mName));
         customization->numOptions = std::max(customization->numOptions,
                                              static_cast<uint32_t>(n.mChildren.size()));
       }
@@ -481,9 +486,9 @@ NodeDefinition* SceneDefinition::AddNode(UniquePtr<NodeDefinition>&& nodeDef)
   return mNodes.back().Get();
 }
 
-bool SceneDefinition::ReparentNode(const std::string& name, const std::string& newParentName, Index siblingOrder)
+bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String& newParentName, Index siblingOrder)
 {
-  LOGD(("reparenting %s to %s @ %d", name.c_str(), newParentName.c_str(), siblingOrder));
+  LOGD(("reparenting %s to %s @ %d", name.CStr(), newParentName.CStr(), siblingOrder));
 
   UniquePtr<NodeDefinition>* nodePtr      = nullptr;
   UniquePtr<NodeDefinition>* newParentPtr = nullptr;
@@ -498,7 +503,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
   DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n)
   {
     std::ostringstream stream;
-    stream << n.mName << " (" << n.mParentIdx << "):";
+    stream << n.mName.CStr() << " (" << n.mParentIdx << "):";
     for(auto i : n.mChildren)
     {
       stream << i << ", ";
@@ -537,7 +542,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
   return true;
 }
 
-bool SceneDefinition::RemoveNode(const std::string& name)
+bool SceneDefinition::RemoveNode(const Dali::String& name)
 {
   UniquePtr<NodeDefinition>* node = nullptr;
   if(!FindNode(name, &node))
@@ -634,7 +639,7 @@ void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
   buildStack(index);
 }
 
-NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outIndex)
+NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index* outIndex)
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
@@ -649,7 +654,7 @@ NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outInd
   return result;
 }
 
-const NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outIndex) const
+const NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index* outIndex) const
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
@@ -714,7 +719,7 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
   for(auto& cr : constrainables)
   {
     auto&           nodeDef    = mNodes[cr.mConstraint->mSourceIdx];
-    auto            sourceName = nodeDef->mName.c_str();
+    auto            sourceName = nodeDef->mName.CStr();
     Property::Index iTarget    = cr.mTarget.GetPropertyIndex(cr.mConstraint->mProperty);
     if(iTarget != Property::INVALID_INDEX)
     {
@@ -722,10 +727,10 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
       auto iFind        = GetConstraintFactory().find(propertyType);
       if(iFind == GetConstraintFactory().end())
       {
-        onError(FormatString("node '%s': Property '%s' has unsupported type '%s'; ignored.",
-                             sourceName,
-                             cr.mConstraint->mProperty.c_str(),
-                             PropertyTypes::GetName(propertyType)));
+        onError(ToStdString(FormatString("node '%s': Property '%s' has unsupported type '%s'; ignored.",
+                                         sourceName,
+                                         cr.mConstraint->mProperty.CStr(),
+                                         PropertyTypes::GetName(propertyType))));
         continue;
       }
 
@@ -734,18 +739,18 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
       Actor source = root.FindChildByName(nodeDef->mName);
       if(!source)
       {
-        auto targetName = cr.mTarget.GetProperty(Actor::Property::NAME).Get<std::string>();
-        onError(FormatString("node '%s': Failed to locate constraint source %s@%s; ignored.",
-                             sourceName,
-                             cr.mConstraint->mProperty.c_str(),
-                             targetName.c_str()));
+        auto targetName = ToStdString(cr.mTarget.GetProperty(Actor::Property::NAME));
+        onError(ToStdString(FormatString("node '%s': Failed to locate constraint source %s@%s; ignored.",
+                                         sourceName,
+                                         cr.mConstraint->mProperty.CStr(),
+                                         targetName.c_str())));
         continue;
       }
       else if(source == cr.mTarget)
       {
-        onError(FormatString("node '%s': Cyclic constraint definition for property '%s'; ignored.",
-                             sourceName,
-                             cr.mConstraint->mProperty.c_str()));
+        onError(ToStdString(FormatString("node '%s': Cyclic constraint definition for property '%s'; ignored.",
+                                         sourceName,
+                                         cr.mConstraint->mProperty.CStr())));
         continue;
       }
 
@@ -755,11 +760,11 @@ void SceneDefinition::ApplyConstraints(Actor&                           root,
     }
     else
     {
-      auto targetName = cr.mTarget.GetProperty(Actor::Property::NAME).Get<std::string>();
-      onError(FormatString("node '%s': Failed to create constraint for property %s@%s; ignored.",
-                           sourceName,
-                           cr.mConstraint->mProperty.c_str(),
-                           targetName.c_str()));
+      auto targetName = ToStdString(cr.mTarget.GetProperty(Actor::Property::NAME));
+      onError(ToStdString(FormatString("node '%s': Failed to create constraint for property %s@%s; ignored.",
+                                       sourceName,
+                                       cr.mConstraint->mProperty.CStr(),
+                                       targetName.c_str())));
     }
   }
 }
@@ -904,7 +909,7 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
 
 void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources)
 {
-  std::map<Index, std::map<std::string, std::vector<Index*>>> blendShapeShaderUsers;
+  std::map<Index, std::map<Dali::String, std::vector<Index*>>> blendShapeShaderUsers;
   for(auto& node : mNodes)
   {
     for(auto& renderable : node->mRenderables)
@@ -955,7 +960,7 @@ SceneDefinition& SceneDefinition::operator=(SceneDefinition&& other)
   return *this;
 }
 
-bool SceneDefinition::FindNode(const std::string& name, UniquePtr<NodeDefinition>** result)
+bool SceneDefinition::FindNode(const Dali::String& name, UniquePtr<NodeDefinition>** result)
 {
   // We're searching from the end assuming a higher probability of operations targeting
   // recently added nodes. (conf.: root, which is immovable, cannot be removed, and was

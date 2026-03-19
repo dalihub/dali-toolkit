@@ -23,10 +23,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

@@ -21,10 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -102,14 +106,14 @@ Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap, Creat
   return GetImplementation(*this).CreateVisual(propertyMap, creationOptions);
 }
 
-Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size)
+Visual::Base VisualFactory::CreateVisual(const Dali::String& url, ImageDimensions size)
 {
-  return GetImplementation(*this).CreateVisual(url, size);
+  return GetImplementation(*this).CreateVisual(ToStdString(url), size);
 }
 
-Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size, CreationOptions creationOptions)
+Visual::Base VisualFactory::CreateVisual(const Dali::String& url, ImageDimensions size, CreationOptions creationOptions)
 {
-  return GetImplementation(*this).CreateVisual(url, size, creationOptions);
+  return GetImplementation(*this).CreateVisual(ToStdString(url), size, creationOptions);
 }
 
 Dali::Geometry VisualFactory::GetDefaultQuadGeometry()

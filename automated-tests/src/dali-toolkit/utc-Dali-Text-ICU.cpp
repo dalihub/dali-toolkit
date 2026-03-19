@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,15 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali/integration-api/string-utils.h>
 #include <locale.h>
 #include <iostream>
 
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 static int   ASYNC_TEXT_THREAD_TIMEOUT = 5;

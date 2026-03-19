@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
+#include <dali/integration-api/string-utils.h>
 
 namespace Dali
 {
@@ -29,9 +30,9 @@ namespace Toolkit
 // ControlWrapper
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ControlWrapper ControlWrapper::New(const std::string& typeName, Internal::ControlWrapper& implementation)
+ControlWrapper ControlWrapper::New(const String& typeName, Internal::ControlWrapper& implementation)
 {
-  return Internal::ControlWrapper::New(typeName, &implementation);
+  return Internal::ControlWrapper::New(Dali::Integration::ToStdString(typeName), &implementation);
 }
 
 ControlWrapper::ControlWrapper()

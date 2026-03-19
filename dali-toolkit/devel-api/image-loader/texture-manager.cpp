@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -26,25 +30,25 @@ namespace Toolkit
 {
 namespace TextureManager
 {
-std::string AddTexture(Texture& texture, bool preMultiplied)
+String AddTexture(Texture& texture, bool preMultiplied)
 {
   TextureSet set = TextureSet::New();
   set.SetTexture(0u, texture);
   return AddTexture(set, preMultiplied);
 }
 
-std::string AddTexture(TextureSet& textureSet, bool preMultiplied)
+String AddTexture(TextureSet& textureSet, bool preMultiplied)
 {
   auto  visualFactory = Toolkit::VisualFactory::Get();
   auto& textureMgr    = GetImplementation(visualFactory).GetTextureManager();
-  return textureMgr.AddExternalTexture(textureSet, preMultiplied);
+  return ToDaliString(textureMgr.AddExternalTexture(textureSet, preMultiplied));
 }
 
-TextureSet RemoveTexture(const std::string& textureUrl)
+TextureSet RemoveTexture(const String& textureUrl)
 {
   auto  visualFactory = Toolkit::VisualFactory::Get();
   auto& textureMgr    = GetImplementation(visualFactory).GetTextureManager();
-  return textureMgr.RemoveExternalTextureByUrl(textureUrl);
+  return textureMgr.RemoveExternalTextureByUrl(ToStdString(textureUrl));
 }
 
 } // namespace TextureManager

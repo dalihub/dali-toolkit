@@ -19,22 +19,25 @@
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
-#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+
+using Dali::Integration::ToDaliString;
 
 using namespace Dali;
 
@@ -180,7 +183,7 @@ const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"VARIABLE", "FIXED"};
 } // namespace
 
 ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mIndicatorShowAlpha(1.0f),
   mDirection(direction),
   mScrollableObject(WeakHandle<Handle>()),
@@ -244,7 +247,7 @@ void ScrollBar::SetScrollPropertySource(Handle handle, Property::Index propertyS
 void ScrollBar::CreateDefaultIndicatorActor()
 {
   const std::string  imageDirPath = AssetManager::GetDaliImagePath();
-  Toolkit::ImageView indicator    = Toolkit::ImageView::New(imageDirPath + DEFAULT_INDICATOR_IMAGE_FILE_NAME);
+  Toolkit::ImageView indicator    = Toolkit::ImageView::New(ToDaliString(imageDirPath + DEFAULT_INDICATOR_IMAGE_FILE_NAME));
   indicator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   indicator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   indicator.SetStyleName("ScrollBarIndicator");
@@ -543,7 +546,7 @@ void ScrollBar::OnSizeSet(const Vector3& size)
     mIndicator.SetProperty(Actor::Property::SIZE, Vector2(size.width, mIndicatorFixedHeight));
   }
 
-  Control::OnSizeSet(size);
+  ControlImpl::OnSizeSet(size);
 }
 
 void ScrollBar::SetScrollDirection(Toolkit::ScrollBar::Direction direction)
@@ -607,7 +610,9 @@ float ScrollBar::GetIndicatorHideDuration() const
 
 void ScrollBar::OnScrollDirectionPropertySet(Property::Value propertyValue)
 {
-  std::string directionName(propertyValue.Get<std::string>());
+  Dali::String directionName;
+  propertyValue.Get(directionName);
+
   if(directionName == "VERTICAL")
   {
     SetScrollDirection(Toolkit::ScrollBar::VERTICAL);
@@ -624,7 +629,9 @@ void ScrollBar::OnScrollDirectionPropertySet(Property::Value propertyValue)
 
 void ScrollBar::OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue)
 {
-  std::string policyName(propertyValue.Get<std::string>());
+  Dali::String policyName;
+  propertyValue.Get(policyName);
+
   if(policyName == "VARIABLE")
   {
     SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
@@ -639,18 +646,18 @@ void ScrollBar::OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue
   }
 }
 
-bool ScrollBar::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ScrollBar::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool               connected(true);
   Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), PAN_FINISHED_SIGNAL))
+  if(0 == strcmp(signalName.CStr(), PAN_FINISHED_SIGNAL))
   {
     scrollBar.PanFinishedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SCROLL_POSITION_INTERVAL_REACHED_SIGNAL))
+  else if(0 == strcmp(signalName.CStr(), SCROLL_POSITION_INTERVAL_REACHED_SIGNAL))
   {
     scrollBar.ScrollPositionIntervalReachedSignal().Connect(tracker, functor);
   }
@@ -831,7 +838,7 @@ Property::Value ScrollBar::GetProperty(BaseObject* object, Property::Index index
   return value;
 }
 
-bool ScrollBar::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool ScrollBar::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   bool ret = false;
 
@@ -843,17 +850,17 @@ bool ScrollBar::DoAction(BaseObject* object, const std::string& actionName, cons
 
   if(scrollBar)
   {
-    if(0 == strcmp(actionName.c_str(), ACTION_SHOW_INDICATOR))
+    if(0 == strcmp(actionName.CStr(), ACTION_SHOW_INDICATOR))
     {
       GetImpl(scrollBar).ShowIndicator();
       ret = true;
     }
-    else if(0 == strcmp(actionName.c_str(), ACTION_HIDE_INDICATOR))
+    else if(0 == strcmp(actionName.CStr(), ACTION_HIDE_INDICATOR))
     {
       GetImpl(scrollBar).HideIndicator();
       ret = true;
     }
-    else if(0 == strcmp(actionName.c_str(), ACTION_SHOW_TRANSIENT_INDICATOR))
+    else if(0 == strcmp(actionName.CStr(), ACTION_SHOW_TRANSIENT_INDICATOR))
     {
       GetImpl(scrollBar).ShowTransientIndicator();
       ret = true;

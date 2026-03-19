@@ -25,8 +25,9 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/object/type-info.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
@@ -37,6 +38,10 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Toolkit::DevelControl
 {
@@ -66,7 +71,7 @@ Dali::Actor CreateHighlightIndicatorActor()
 
   // Create the default if it hasn't been set and one that's shared by all the
   // keyboard focusable actors
-  auto actor = Toolkit::ImageView::New(focusBorderImagePath);
+  auto actor = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
@@ -82,7 +87,7 @@ std::string FetchImageSrcFromMap(const Dali::Property::Map& imageMap)
   {
     if(urlVal->GetType() == Dali::Property::STRING)
     {
-      return urlVal->Get<std::string>();
+      return ToStdString(*urlVal);
     }
     else if(urlVal->GetType() == Dali::Property::ARRAY)
     {
@@ -90,7 +95,7 @@ std::string FetchImageSrcFromMap(const Dali::Property::Map& imageMap)
       if(urlArray && !urlArray->Empty())
       {
         // Returns first element if url is an array
-        return (*urlArray)[0].Get<std::string>();
+        return ToStdString((*urlArray)[0].Get<Dali::String>());
       }
     }
   }
@@ -99,10 +104,11 @@ std::string FetchImageSrcFromMap(const Dali::Property::Map& imageMap)
 
 std::string FetchImageSrc(const Toolkit::ImageView& imageView)
 {
-  const auto imageUrl = imageView.GetProperty<std::string>(Toolkit::ImageView::Property::IMAGE);
-  if(!imageUrl.empty())
+  Dali::Property::Value urlValue = imageView.GetProperty(Toolkit::ImageView::Property::IMAGE);
+  std::string           url;
+  if(GetStdString(urlValue, url))
   {
-    return imageUrl;
+    return url;
   }
 
   const auto imageMap = imageView.GetProperty<Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE);
@@ -241,9 +247,9 @@ std::string ControlAccessible::GetName() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-  std::string              name;
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
+  std::string        name;
 
   auto* accessibilityData = controlImpl.GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData) && !accessibilityData->mAccessibilityGetNameSignal.Empty())
@@ -260,7 +266,7 @@ std::string ControlAccessible::GetName() const
   }
   else
   {
-    name = Self().GetProperty<std::string>(Actor::Property::NAME);
+    name = Dali::Integration::ToStdString(Self().GetProperty(Actor::Property::NAME));
   }
 
   return GetLocaleText(name);
@@ -275,9 +281,9 @@ std::string ControlAccessible::GetDescription() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
-  std::string              description;
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
+  std::string        description;
 
   auto* accessibilityData = controlImpl.GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData) && !accessibilityData->mAccessibilityGetDescriptionSignal.Empty())
@@ -303,7 +309,7 @@ std::string ControlAccessible::GetDescriptionRaw() const
 
 std::string ControlAccessible::GetValue() const
 {
-  return Self().GetProperty<std::string>(Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE);
+  return Dali::Integration::ToStdString(Self().GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE));
 }
 
 Dali::Accessibility::Role ControlAccessible::GetRole() const
@@ -333,8 +339,8 @@ void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& sta
   using Dali::Accessibility::State;
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   DevelControl::AccessibilityStates controlStates;
 
@@ -355,7 +361,7 @@ void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& sta
   else
   {
     // Default states
-    // TODO : Couldn't we get this value from Internal::Control::Impl::AccessibilityData::GetDefaultControlAccessibilityStates();
+    // TODO : Couldn't we get this value from ControlImpl::Impl::AccessibilityData::GetDefaultControlAccessibilityStates();
     controlStates[AccessibilityState::ENABLED] = true;
   }
 
@@ -412,13 +418,13 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
     Dali::Property::Key mapKey = attributeMap->GetKeyAt(i);
     std::string         mapValue;
 
-    if(mapKey.type == Dali::Property::Key::STRING && attributeMap->GetValue(i).Get(mapValue))
+    if(mapKey.type == Dali::Property::Key::STRING && Dali::Integration::GetStdString(attributeMap->GetValue(i), mapValue))
     {
-      result.emplace(std::move(mapKey.stringKey), std::move(mapValue));
+      result.emplace(Dali::Integration::ToStdString(mapKey.stringKey), std::move(mapValue));
     }
   }
 
-  auto automationId = control.GetProperty<std::string>(DevelControl::Property::AUTOMATION_ID);
+  auto automationId = Dali::Integration::ToStdString(control.GetProperty(DevelControl::Property::AUTOMATION_ID));
   if(!automationId.empty())
   {
     result.emplace(automationIdKey, std::move(automationId));
@@ -440,7 +446,7 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
     Self().GetTypeInfo(typeInfo);
     if(typeInfo)
     {
-      const std::string& typeName = typeInfo.GetName();
+      std::string typeName = Dali::Integration::ToStdString(typeInfo.GetName());
 
       result.emplace(classKey, typeName);
 
@@ -462,8 +468,8 @@ bool ControlAccessible::IsHidden() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   const auto* accessibilityData = controlImpl.GetAccessibilityData();
   return DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isHidden : false;
@@ -492,27 +498,27 @@ void ControlAccessible::ScrollToSelf()
 
 void ControlAccessible::RegisterPositionPropertyNotification()
 {
-  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  auto               control         = Dali::Toolkit::Control::DownCast(Self());
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   controlImpl.GetOrCreateAccessibilityData().RegisterAccessibilityPositionPropertyNotification();
 }
 
 void ControlAccessible::UnregisterPositionPropertyNotification()
 {
-  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  auto               control         = Dali::Toolkit::Control::DownCast(Self());
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   controlImpl.GetOrCreateAccessibilityData().UnregisterAccessibilityPositionPropertyNotification();
 }
 
 void ControlAccessible::RegisterPropertySetSignal()
 {
-  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  auto               control         = Dali::Toolkit::Control::DownCast(Self());
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   auto& accessibilityData = controlImpl.GetOrCreateAccessibilityData();
   accessibilityData.RegisterAccessibilityPropertySetSignal();
@@ -522,9 +528,9 @@ void ControlAccessible::RegisterPropertySetSignal()
 
 void ControlAccessible::UnregisterPropertySetSignal()
 {
-  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  auto               control         = Dali::Toolkit::Control::DownCast(Self());
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   controlImpl.GetOrCreateAccessibilityData().UnregisterAccessibilityPropertySetSignal();
 
@@ -630,7 +636,7 @@ std::string ControlAccessible::GetActionName(size_t index) const
   Dali::TypeInfo type;
   Self().GetTypeInfo(type);
   DALI_ASSERT_ALWAYS(type && "no TypeInfo object");
-  return type.GetActionName(index);
+  return Dali::Integration::ToStdString(type.GetActionName(index));
 }
 
 std::string ControlAccessible::GetLocalizedActionName(size_t index) const
@@ -659,20 +665,20 @@ std::string ControlAccessible::GetActionKeyBinding(size_t index) const
 bool ControlAccessible::DoAction(size_t index)
 {
   std::string actionName = GetActionName(index);
-  return Self().DoAction(actionName, {});
+  return Self().DoAction(Dali::Integration::ToDaliStringView(actionName), {});
 }
 
 bool ControlAccessible::DoAction(const std::string& name)
 {
-  return Self().DoAction(name, {});
+  return Self().DoAction(Dali::Integration::ToDaliStringView(name), {});
 }
 
 bool ControlAccessible::DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo)
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  ControlImpl&       internalControl = GetImplementation(control);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   auto* accessibilityData = controlImpl.GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData) && !accessibilityData->mAccessibilityDoGestureSignal.Empty())

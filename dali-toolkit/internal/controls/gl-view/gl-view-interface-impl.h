@@ -35,7 +35,7 @@ class GlView;
 
 namespace Internal
 {
-class GlViewImpl : public Dali::Toolkit::Internal::Control
+class GlViewImpl : public Dali::Toolkit::ControlImpl
 {
 protected:
   virtual ~GlViewImpl() = default;
@@ -45,7 +45,7 @@ public:
    * Construct a new GlView.
    */
   explicit GlViewImpl(GlView::BackendMode backendMode)
-  : Control(ControlBehaviour(0u | ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+  : ControlImpl(ControlBehaviour(0u | ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
     mBackendMode(backendMode)
   {
   }

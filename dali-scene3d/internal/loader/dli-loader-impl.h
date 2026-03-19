@@ -59,7 +59,7 @@ public:
   /**
    * @copydoc Dali::Scene3D::Loader::ModelLoaderImpl::LoadMode()
    */
-  bool LoadModel(const std::string& uri, Dali::Scene3D::Loader::LoadResult& result) override;
+  bool LoadModel(const Dali::String& uri, Dali::Scene3D::Loader::LoadResult& result) override;
 
   /**
    * @return The error string describing how the parse has failed, if any.

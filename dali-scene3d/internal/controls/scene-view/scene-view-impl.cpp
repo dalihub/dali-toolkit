@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <algorithm>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -32,14 +33,14 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
-#include <algorithm>
 #include <string_view>
 
 // INTERNAL INCLUDES
@@ -48,6 +49,10 @@
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 using namespace Dali;
 
@@ -334,7 +339,7 @@ void ConvertFovFromHorizontalToVertical(float aspect, float& fov)
 } // anonymous namespace
 
 SceneView::SceneView()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mWindowOrientation(DEFAULT_ORIENTATION),
   mSkybox(),
   mSkyboxOrientation(Quaternion()),
@@ -469,7 +474,7 @@ CameraActor SceneView::GetCamera(const std::string& name) const
   CameraActor returnCamera;
   for(auto&& camera : mCameras)
   {
-    if(camera.GetProperty<std::string>(Actor::Property::NAME) == name)
+    if(ToStdString(camera.GetProperty(Actor::Property::NAME)) == name)
     {
       returnCamera = camera;
       break;
@@ -633,7 +638,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
   // If diffuse and specular textures are already loaded, emits resource ready signal here.
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1127,7 +1132,7 @@ void SceneView::SetProperty(BaseObject* object, Property::Index index, const Pro
     {
       case Scene3D::SceneView::Property::ALPHA_MASK_URL:
       {
-        std::string alphaMaskUrl = value.Get<std::string>();
+        std::string alphaMaskUrl = ToStdString(value);
         sceneViewImpl.SetAlphaMaskUrl(alphaMaskUrl);
         break;
       }
@@ -1159,7 +1164,7 @@ Property::Value SceneView::GetProperty(BaseObject* object, Property::Index index
     {
       case Scene3D::SceneView::Property::ALPHA_MASK_URL:
       {
-        value = sceneViewImpl.GetAlphaMaskUrl();
+        value = ToPropertyValue(sceneViewImpl.GetAlphaMaskUrl());
         break;
       }
       case Scene3D::SceneView::Property::MASK_CONTENT_SCALE:
@@ -1217,7 +1222,7 @@ void SceneView::OnSceneConnection(int depth)
 
   // On-screen / Off-screen window
   Dali::Integration::SceneHolder sceneHolder = Dali::Integration::SceneHolder::Get(Self());
-  mSceneHolder = sceneHolder;
+  mSceneHolder                               = sceneHolder;
   if(mSceneHolder.GetHandle())
   {
     RenderTaskList taskList = mSceneHolder.GetHandle().GetRenderTaskList();
@@ -1238,7 +1243,7 @@ void SceneView::OnSceneConnection(int depth)
     UpdateCamera(selectedCamera);
   }
 
-  Control::OnSceneConnection(depth);
+  ControlImpl::OnSceneConnection(depth);
 }
 
 void SceneView::OnSceneDisconnection()
@@ -1296,7 +1301,7 @@ void SceneView::OnSceneDisconnection()
     ResetTransition();
   }
 
-  Control::OnSceneDisconnection();
+  ControlImpl::OnSceneDisconnection();
 }
 
 void SceneView::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
@@ -1344,32 +1349,32 @@ void SceneView::OnChildAdd(Actor& child)
   {
     mRootLayer.Add(child);
   }
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void SceneView::OnChildRemove(Actor& child)
 {
   mRootLayer.Remove(child);
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 float SceneView::GetHeightForWidth(float width)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetHeightForWidth(width) + padding.top + padding.bottom;
+  return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
 float SceneView::GetWidthForHeight(float height)
 {
   Extents padding;
   padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-  return Control::GetWidthForHeight(height) + padding.start + padding.end;
+  return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
 }
 
 void SceneView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  Control::OnRelayout(size, container);
+  ControlImpl::OnRelayout(size, container);
   // Change canvas size of camera actor.
   UpdateRenderTask();
 }
@@ -1449,12 +1454,12 @@ void SceneView::UpdateRenderTask()
         imagePropertyMap.Insert(Toolkit::ImageVisual::Property::PIXEL_AREA, Vector4(0.0f, 1.0f, 1.0f, -1.0f));
         if(!mAlphaMaskUrl.empty())
         {
-          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl);
+          imagePropertyMap.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, ToPropertyValue(mAlphaMaskUrl));
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskContentScaleFactor);
           imagePropertyMap.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mCropToMask);
           imagePropertyMap.Insert(Toolkit::DevelImageVisual::Property::MASKING_TYPE, Toolkit::DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
-          Self().RegisterProperty(Y_FLIP_MASK_TEXTURE, FLIP_MASK_TEXTURE);
+          Self().RegisterProperty(ToDaliString(Y_FLIP_MASK_TEXTURE), FLIP_MASK_TEXTURE);
         }
 
         mVisual = Toolkit::VisualFactory::Get().CreateVisual(imagePropertyMap);
@@ -1570,7 +1575,7 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
 
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1612,7 +1617,7 @@ void SceneView::OnSkyboxLoadComplete()
 
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 
@@ -1644,7 +1649,7 @@ void SceneView::OnIblLoadComplete()
   NotifyImageBasedLightTextureChange();
   if(IsResourceReady())
   {
-    Control::SetResourceReady();
+    ControlImpl::SetResourceReady();
   }
 }
 

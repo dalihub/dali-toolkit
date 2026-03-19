@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace Internal
  * FlexContainer is a custom control for laying out actors in a Flexbox layout
  * @see Dali::Toolkit:FlexContainer for more details
  */
-class FlexContainer : public Control
+class FlexContainer : public ControlImpl
 {
 public:
   /**

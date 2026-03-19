@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -74,7 +75,7 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New(const std::string& typeName, C
   // Therefore, we have to link each instance with its correct type info if already
   // pre-registered.
 
-  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo(typeName);
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo(Dali::Integration::ToDaliStringView(typeName));
   if(typeInfo)
   {
     Dali::DevelHandle::SetTypeInfo(handle, typeInfo);
@@ -84,7 +85,7 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New(const std::string& typeName, C
 }
 
 ControlWrapper::ControlWrapper(CustomControlBehaviour behaviourFlags)
-: Control(static_cast<ControlBehaviour>(behaviourFlags | DISABLE_STYLE_CHANGE_SIGNALS))
+: ControlImpl(static_cast<ControlBehaviour>(behaviourFlags | DISABLE_STYLE_CHANGE_SIGNALS))
 {
 }
 
@@ -183,7 +184,7 @@ Dali::TypeInfo ControlWrapper::GetTypeInfo()
 
 void ControlWrapper::EmitKeyInputFocusSignal(bool focusGained)
 {
-  Control::EmitKeyInputFocusSignal(focusGained);
+  ControlImpl::EmitKeyInputFocusSignal(focusGained);
 }
 
 } // namespace Internal

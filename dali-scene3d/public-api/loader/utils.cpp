@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <stdarg.h>
@@ -62,8 +63,10 @@ char* ExceptionFlinger::GetMessageBuffer() noexcept(true)
   return sExceptionFlingerMessageBuffer;
 }
 
-std::string FormatString(const char* format, ...)
+Dali::String FormatString(const char* format, ...)
 {
+  using Dali::Integration::ToDaliString;
+
   va_list vl;
   va_start(vl, format);
   va_list vl2;
@@ -82,23 +85,25 @@ std::string FormatString(const char* format, ...)
     result = formatString;
   }
   va_end(vl2);
-  return result;
+  return ToDaliString(result);
 }
 
-std::string LoadTextFile(const char* path, bool* fail)
+Dali::String LoadTextFile(const char* path, bool* fail)
 {
+  using Dali::Integration::ToDaliString;
+
   std::streampos     fileSize;
   Dali::Vector<char> fileContent;
 
   if(FileLoader::ReadFile(path, fileSize, fileContent, FileLoader::TEXT))
   {
-    return std::string(fileContent.Begin(), fileSize);
+    return ToDaliString(std::string(fileContent.Begin(), fileSize));
   }
   else if(fail)
   {
     *fail = true;
   }
-  return std::string();
+  return Dali::String();
 }
 
 Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type options)
@@ -145,9 +150,13 @@ Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type options)
   return geometry;
 }
 
-void ToUnixFileSeparators(std::string& path)
+void ToUnixFileSeparators(Dali::String& path)
 {
-  std::replace(path.begin(), path.end(), '\\', '/');
+  using Dali::Integration::ToDaliString;
+  using Dali::Integration::ToStdString;
+  std::string stdPath = ToStdString(path);
+  std::replace(stdPath.begin(), stdPath.end(), '\\', '/');
+  path = ToDaliString(stdPath);
 }
 
 } // namespace Dali::Scene3D::Loader

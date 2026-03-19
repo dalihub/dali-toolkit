@@ -19,6 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/string-utils.h>
 #include "dali-scene3d/public-api/loader/scene-definition.h"
 #include "dali-scene3d/public-api/loader/utils.h"
 
@@ -289,7 +290,7 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
 
   struct TestOption
   {
-    std::string               name;
+    Dali::String              name;
     Customization             customization;
     Customization::OptionType choice;
   };
@@ -397,7 +398,7 @@ int UtcDaliSceneDefinitionFindNodes(void)
 
   auto nodePredicate = [](const NodeDefinition& nd)
   {
-    return nd.mName.length() == 1;
+    return nd.mName.Size() == 1;
   };
 
   ctx.sceneDef.FindNodes(nodePredicate, nodeConsumer, 1);

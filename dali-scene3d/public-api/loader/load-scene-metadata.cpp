@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,17 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
 #include <dali-scene3d/internal/loader/json-reader.h>
 #include <dali-scene3d/public-api/loader/load-scene-metadata.h>
 #include <dali-scene3d/public-api/loader/utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace js = json;
 namespace gt = gltf2;
@@ -97,19 +103,21 @@ const js::Reader<MetaData>& GetMetaDataReader()
 }
 } // namespace
 
-void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata)
+void LoadSceneMetadata(const Dali::String& url, SceneMetadata& sceneMetadata)
 {
-  bool failed = false;
-  auto js     = LoadTextFile(url.c_str(), &failed);
+  bool        failed     = false;
+  std::string stdUrl     = ToStdString(url);
+  auto        daliBuffer = LoadTextFile(stdUrl.c_str(), &failed);
   if(failed)
   {
     return;
   }
 
-  json::unique_ptr root(json_parse(js.c_str(), js.size()));
+  std::string      jsBuffer = ToStdString(daliBuffer);
+  json::unique_ptr root(json_parse(jsBuffer.c_str(), jsBuffer.size()));
   if(!root)
   {
-    throw std::runtime_error("Failed to parse " + url);
+    throw std::runtime_error("Failed to parse " + stdUrl);
   }
   auto& rootObj = js::Cast<json_object_s>(*root);
 
@@ -124,7 +132,6 @@ void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata)
   MetaData metaData;
   GetMetaDataReader().Read(rootObj, metaData);
 
-  sceneMetadata.mImageMetadata.reserve(metaData.mImageData.size() + metaData.mImageData.size());
   for(auto&& data : metaData.mImageData)
   {
     if(data.mSamplingMode == ImageData::SamplingMode::INVALID)
@@ -133,7 +140,7 @@ void LoadSceneMetadata(const std::string& url, SceneMetadata& sceneMetadata)
     }
     else
     {
-      sceneMetadata.mImageMetadata.insert({data.mImageUri, ImageMetadata{ImageDimensions(data.mMinWidth, data.mMinHeight), static_cast<Dali::SamplingMode::Type>(data.mSamplingMode)}});
+      sceneMetadata.mImageMetadata.insert({ToDaliString(data.mImageUri), ImageMetadata{ImageDimensions(data.mMinWidth, data.mMinHeight), static_cast<Dali::SamplingMode::Type>(data.mSamplingMode)}});
     }
   }
 }

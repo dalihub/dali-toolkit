@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -31,12 +35,12 @@ namespace Toolkit
 {
 Control Control::New()
 {
-  return Toolkit::Internal::Control::New();
+  return ControlImpl::New();
 }
 
 Control Control::New(ControlBehaviour additionalBehaviour)
 {
-  return Toolkit::Internal::Control::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return ControlImpl::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
 Control::Control()
@@ -57,123 +61,123 @@ Control& Control::operator=(Control&& rhs) noexcept = default;
 
 Control Control::DownCast(BaseHandle handle)
 {
-  return DownCast<Control, Internal::Control>(handle);
+  return DownCast<Control, ControlImpl>(handle);
 }
 
 void Control::SetKeyInputFocus()
 {
-  Internal::GetImplementation(*this).SetKeyInputFocus();
+  Toolkit::GetImplementation(*this).SetKeyInputFocus();
 }
 
 bool Control::HasKeyInputFocus()
 {
-  return Internal::GetImplementation(*this).HasKeyInputFocus();
+  return Toolkit::GetImplementation(*this).HasKeyInputFocus();
 }
 
 void Control::ClearKeyInputFocus()
 {
-  Internal::GetImplementation(*this).ClearKeyInputFocus();
+  Toolkit::GetImplementation(*this).ClearKeyInputFocus();
 }
 
 PinchGestureDetector Control::GetPinchGestureDetector() const
 {
-  return Internal::GetImplementation(*this).GetPinchGestureDetector();
+  return Toolkit::GetImplementation(*this).GetPinchGestureDetector();
 }
 
 PanGestureDetector Control::GetPanGestureDetector() const
 {
-  return Internal::GetImplementation(*this).GetPanGestureDetector();
+  return Toolkit::GetImplementation(*this).GetPanGestureDetector();
 }
 
 TapGestureDetector Control::GetTapGestureDetector() const
 {
-  return Internal::GetImplementation(*this).GetTapGestureDetector();
+  return Toolkit::GetImplementation(*this).GetTapGestureDetector();
 }
 
 LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
-  return Internal::GetImplementation(*this).GetLongPressGestureDetector();
+  return Toolkit::GetImplementation(*this).GetLongPressGestureDetector();
 }
 
-void Control::SetStyleName(const std::string& styleName)
+void Control::SetStyleName(const Dali::String& styleName)
 {
-  Internal::GetImplementation(*this).SetStyleName(styleName);
+  Toolkit::GetImplementation(*this).SetStyleName(styleName);
 }
 
-const std::string& Control::GetStyleName() const
+const Dali::String& Control::GetStyleName() const
 {
-  return Internal::GetImplementation(*this).GetStyleName();
+  return Toolkit::GetImplementation(*this).GetStyleName();
 }
 
 void Control::SetBackgroundColor(const Vector4& color)
 {
-  Internal::GetImplementation(*this).SetBackgroundColor(color);
+  Toolkit::GetImplementation(*this).SetBackgroundColor(color);
 }
 
 void Control::ClearBackground()
 {
-  Internal::GetImplementation(*this).ClearBackground();
+  Toolkit::GetImplementation(*this).ClearBackground();
 }
 
 void Control::SetRenderEffect(Toolkit::RenderEffect effect)
 {
-  Internal::GetImplementation(*this).SetRenderEffect(effect);
+  Toolkit::GetImplementation(*this).SetRenderEffect(effect);
 }
 
 Toolkit::RenderEffect Control::GetRenderEffect() const
 {
-  return Internal::GetImplementation(*this).GetRenderEffect();
+  return Toolkit::GetImplementation(*this).GetRenderEffect();
 }
 
 void Control::ClearRenderEffect()
 {
-  Internal::GetImplementation(*this).ClearRenderEffect();
+  Toolkit::GetImplementation(*this).ClearRenderEffect();
 }
 
 bool Control::IsResourceReady() const
 {
-  return Internal::GetImplementation(*this).IsResourceReady();
+  return Toolkit::GetImplementation(*this).IsResourceReady();
 }
 
 Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Dali::Property::Index index)
 {
-  const Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
+  const ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
+  const ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(internalControl);
   return controlDataImpl.GetVisualResourceStatus(index);
 }
 
 Control::KeyEventSignalType& Control::KeyEventSignal()
 {
-  return Internal::GetImplementation(*this).KeyEventSignal();
+  return Toolkit::GetImplementation(*this).KeyEventSignal();
 }
 
 Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
 {
-  return Internal::GetImplementation(*this).KeyInputFocusGainedSignal();
+  return Toolkit::GetImplementation(*this).KeyInputFocusGainedSignal();
 }
 
 Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
 {
-  return Internal::GetImplementation(*this).KeyInputFocusLostSignal();
+  return Toolkit::GetImplementation(*this).KeyInputFocusLostSignal();
 }
 
 Control::ResourceReadySignalType& Control::ResourceReadySignal()
 {
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   return controlImpl.mResourceReadySignal;
 }
 
 Control::OffScreenRenderingFinishedSignalType& Control::OffScreenRenderingFinishedSignal()
 {
-  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
-  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  ControlImpl&       internalControl = Toolkit::GetImplementation(*this);
+  ControlImpl::Impl& controlImpl     = ControlImpl::Impl::Get(internalControl);
 
   return controlImpl.mOffScreenRenderingFinishedSignal;
 }
 
-Control::Control(Internal::Control& implementation)
+Control::Control(ControlImpl& implementation)
 : CustomActor(implementation)
 {
 }
@@ -181,7 +185,7 @@ Control::Control(Internal::Control& implementation)
 Control::Control(Dali::Internal::CustomActor* internal)
 : CustomActor(internal)
 {
-  VerifyCustomActorPointer<Internal::Control>(internal);
+  VerifyCustomActorPointer<ControlImpl>(internal);
 }
 
 } // namespace Toolkit

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace Internal
 /**
  * CubeTransitionEffect implementation class
  */
-class CubeTransitionEffect : public Control
+class CubeTransitionEffect : public ControlImpl
 {
 public:
   /**
@@ -120,7 +120,7 @@ public: //Signal
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
   /**

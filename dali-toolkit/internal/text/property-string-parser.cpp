@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ void CreatePropertyMap(const TreeNode* const node, Property::Map& map)
     }
     case TreeNode::STRING:
     {
-      map.Insert(node->GetName(), Property::Value(node->GetString()));
+      map.Insert(Dali::String(node->GetName()), Property::Value(Dali::StringView(node->GetString())));
       break;
     }
     case TreeNode::INTEGER:

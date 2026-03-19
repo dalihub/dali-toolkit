@@ -21,6 +21,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dlfcn.h>
 #include <algorithm>
 #include <filesystem>
@@ -79,7 +80,7 @@ extern "C" void* DlsymProxy(void* handle, const char* name)
 
 } // namespace
 
-ModelLoader::ModelLoader(const std::string& modelUrl, const std::string& resourceDirectoryUrl, Dali::Scene3D::Loader::LoadResult& loadResult)
+ModelLoader::ModelLoader(const Dali::String& modelUrl, const Dali::String& resourceDirectoryUrl, Dali::Scene3D::Loader::LoadResult& loadResult)
 : mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mLoadResult(loadResult)
@@ -101,7 +102,7 @@ bool ModelLoader::LoadModel(Dali::Scene3D::Loader::ResourceBundle::PathProvider&
   bool loadSucceeded = false;
 
   mLoadResult.mAnimationDefinitions.clear();
-  std::filesystem::path metaDataUrl(mModelUrl);
+  std::filesystem::path metaDataUrl(Dali::Integration::ToStdString(mModelUrl));
   metaDataUrl.replace_extension(METADATA_EXTENSION.data());
 
   Dali::Scene3D::Loader::LoadSceneMetadata(metaDataUrl.c_str(), mLoadResult.mSceneMetadata);
@@ -143,10 +144,10 @@ Dali::Scene3D::Loader::Customization::Choices& ModelLoader::GetResourceChoices()
 
 void ModelLoader::CreateModelLoader()
 {
-  std::filesystem::path modelPath(mModelUrl);
-  if(mResourceDirectoryUrl.empty())
+  std::filesystem::path modelPath(Dali::Integration::ToStdString(mModelUrl));
+  if(mResourceDirectoryUrl.Empty())
   {
-    mResourceDirectoryUrl = std::string(modelPath.parent_path()) + "/";
+    mResourceDirectoryUrl = Dali::Integration::ToDaliString(std::string(modelPath.parent_path()) + "/");
   }
   std::string extension = modelPath.extension();
   std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);

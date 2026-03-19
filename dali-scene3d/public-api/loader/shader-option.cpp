@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,20 @@
 #include <dali-scene3d/public-api/loader/shader-option.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <algorithm>
 #include <ostream>
 #include <sstream>
 #include <string>
 
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
+
 namespace Dali::Scene3D::Loader
 {
 namespace
 {
-static constexpr std::string_view OPTION_KEYWORD[] =
+static const Dali::StringView OPTION_KEYWORD[] =
   {
     "GLTF_CHANNELS",
     "THREE_TEX",
@@ -50,9 +54,9 @@ static constexpr std::string_view OPTION_KEYWORD[] =
     "MORPH_TANGENT",
     "MORPH_VERSION_2_0",
 };
-static constexpr uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
-static const char*        ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
-static const char*        ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
+static const uint32_t NUMBER_OF_OPTIONS = sizeof(OPTION_KEYWORD) / sizeof(OPTION_KEYWORD[0]);
+static const char*    ADD_EXTRA_SKINNING_ATTRIBUTES{"ADD_EXTRA_SKINNING_ATTRIBUTES"};
+static const char*    ADD_EXTRA_WEIGHTS{"ADD_EXTRA_WEIGHTS"};
 
 inline void HashString(uint64_t& hash, const char* string)
 {
@@ -114,19 +118,19 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
               << "uBone[int(aJoints" << i << ".z)] * aWeights" << i << ".z +\n"
               << "uBone[int(aJoints" << i << ".w)] * aWeights" << i << ".w;\n";
     }
-    AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, attributes.str());
-    AddMacroDefinition(ADD_EXTRA_WEIGHTS, weights.str());
+    AddMacroDefinition(Dali::String(ADD_EXTRA_SKINNING_ATTRIBUTES), ToDaliString(attributes.str()));
+    AddMacroDefinition(Dali::String(ADD_EXTRA_WEIGHTS), ToDaliString(weights.str()));
   }
   else
   {
-    AddMacroDefinition(ADD_EXTRA_SKINNING_ATTRIBUTES, std::string{});
-    AddMacroDefinition(ADD_EXTRA_WEIGHTS, std::string{});
+    AddMacroDefinition(Dali::String(ADD_EXTRA_SKINNING_ATTRIBUTES), Dali::String{});
+    AddMacroDefinition(Dali::String(ADD_EXTRA_WEIGHTS), Dali::String{});
   }
 }
 
-void ShaderOption::AddMacroDefinition(std::string macro, std::string definition)
+void ShaderOption::AddMacroDefinition(Dali::String macro, Dali::String definition)
 {
-  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [macro](ShaderOption::MacroDefinition& md)
+  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [&macro](ShaderOption::MacroDefinition& md)
   { return md.macro == macro; });
   if(iter != mMacros.end())
   {
@@ -151,27 +155,27 @@ uint64_t ShaderOption::GetOptionHash() const
     uint64_t hash = 5381;
     for(auto& macroDef : mMacros)
     {
-      HashString(hash, macroDef.macro.c_str());
-      HashString(hash, macroDef.definition.c_str());
+      HashString(hash, macroDef.macro.CStr());
+      HashString(hash, macroDef.definition.CStr());
     }
     optionHash |= ((hash << 32) & 0xFFFFFFFF00000000);
   }
   return optionHash;
 }
 
-void ShaderOption::GetDefines(std::vector<std::string>& defines) const
+void ShaderOption::GetDefines(std::vector<Dali::String>& defines) const
 {
   defines.clear();
   for(uint32_t i = 0; i < NUMBER_OF_OPTIONS; ++i)
   {
     if(mOptionHash & (1 << i))
     {
-      defines.push_back(OPTION_KEYWORD[i].data());
+      defines.push_back(ToDaliString(std::string(OPTION_KEYWORD[i].Data(), OPTION_KEYWORD[i].Size())));
     }
   }
 }
 
-std::string_view ShaderOption::GetDefineKeyword(Type shaderOptionType)
+Dali::StringView ShaderOption::GetDefineKeyword(Type shaderOptionType)
 {
   return OPTION_KEYWORD[static_cast<uint32_t>(shaderOptionType)];
 }

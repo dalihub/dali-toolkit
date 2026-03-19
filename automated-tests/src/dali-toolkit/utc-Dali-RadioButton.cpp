@@ -18,12 +18,15 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_radio_button_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -43,13 +46,13 @@ static void TestCallback(BaseHandle handle)
   gObjectCreatedCallBackCalled = true;
 }
 
-static std::string GetButtonText(Button button)
+static String GetButtonText(Button button)
 {
   Property::Value value = button.GetProperty(Toolkit::Button::Property::LABEL);
 
   Property::Map* labelProperty = value.GetMap();
 
-  std::string textLabel;
+  String textLabel;
 
   if(labelProperty)
   {
@@ -194,7 +197,7 @@ int UtcDaliRadioButtonLabelProperty(void)
 {
   ToolkitTestApplication application;
 
-  const std::string labelText = "test actor 1";
+  const String labelText = "test actor 1";
 
   RadioButton radioButton = RadioButton::New();
 
@@ -204,7 +207,7 @@ int UtcDaliRadioButtonLabelProperty(void)
   radioButton.SetProperty(Toolkit::Button::Property::LABEL, labelText);
   DALI_TEST_EQUALS(GetButtonText(radioButton), labelText, TEST_LOCATION);
 
-  std::string labelText2 = "test actor 2";
+  String labelText2 = "test actor 2";
   radioButton.SetProperty(Toolkit::Button::Property::LABEL, labelText2);
 
   DALI_TEST_EQUALS(GetButtonText(radioButton), labelText2, TEST_LOCATION);

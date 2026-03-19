@@ -26,13 +26,17 @@
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void utc_dali_toolkit_keyboard_focus_manager_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -45,7 +49,7 @@ void utc_dali_toolkit_keyboard_focus_manager_cleanup(void)
 
 namespace
 {
-const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+const String DEFAULT_DEVICE_NAME("hwKeyboard");
 
 // Functors to test whether GetNextFocusableActor() method of CustomAlgorithmInterface is called when the keyboard focus is about to change
 class CustomAlgorithm : public Dali::Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface

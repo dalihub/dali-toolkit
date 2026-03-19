@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace Internal
  * Padding and struts take size precedence over visuals when available space is limited.
  * Icon/Foreground visuals take size precedence over Labels when available space is limited.
  */
-class Button : public Control
+class Button : public ControlImpl
 {
 public:
   /**
@@ -127,7 +127,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
+  static bool DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes);
 
 public:
   /**
@@ -289,7 +289,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
   // Properties
 
@@ -379,7 +379,7 @@ private:
   /**
    * @copydoc Control::OnTap
    */
-  using Control::OnTap;
+  using ControlImpl::OnTap;
 
   /**
    * Sets up the autorepeating timer.

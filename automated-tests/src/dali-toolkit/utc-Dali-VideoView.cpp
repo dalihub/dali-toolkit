@@ -24,12 +24,16 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 #include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 namespace
 {
 const char* const TEST_FILE("test.mp4");
@@ -112,7 +116,7 @@ int UtcDaliVideoViewNew(void)
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK(view);
 
-  const std::string  url(DUMMY_STRING);
+  const String       url(DUMMY_STRING);
   Toolkit::VideoView view2 = Toolkit::VideoView::New(url);
   DALI_TEST_CHECK(view2);
   END_TEST;
@@ -143,7 +147,7 @@ int UtcDaliVideoViewProperty1(void)
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK(view);
 
-  std::string file;
+  String file;
   view.SetProperty(VideoView::Property::VIDEO, TEST_FILE);
   Property::Value val = view.GetProperty(VideoView::Property::VIDEO);
   DALI_TEST_CHECK(val.Get(file));
@@ -161,7 +165,7 @@ int UtcDaliVideoViewProperty1b(void)
   DALI_TEST_CHECK(view);
   Dali::Integration::Scene stage = application.GetScene();
 
-  std::string   file;
+  String        file;
   Property::Map map;
 
   view.SetProperty(VideoView::Property::VIDEO,
@@ -180,7 +184,7 @@ int UtcDaliVideoViewProperty1b(void)
   DALI_TEST_CHECK(resultMap);
   Property::Value* value = resultMap->Find("url");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS(value->Get<std::string>(), "video.mpg", TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<Dali::String>(), "video.mpg", TEST_LOCATION);
 
   stage.Remove(view);
 
@@ -377,7 +381,7 @@ int UtcDaliVideoViewMethodsForRenderType(void)
 
   Property::Value* type = map.Find(RENDERING_TYPE);
   DALI_TEST_CHECK(type);
-  DALI_TEST_EQUALS("windowSurfaceTarget", type->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("windowSurfaceTarget", type->Get<Dali::String>(), TEST_LOCATION);
 
   videoView.SetProperty(VideoView::Property::VIDEO, nativeImageTarget);
 
@@ -386,7 +390,7 @@ int UtcDaliVideoViewMethodsForRenderType(void)
   type = map.Find(RENDERING_TYPE);
 
   DALI_TEST_CHECK(type);
-  DALI_TEST_EQUALS("nativeImageTarget", type->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("nativeImageTarget", type->Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -446,7 +450,7 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 
   Property::Value* type = map.Find(RENDERING_TYPE);
   DALI_TEST_CHECK(type);
-  DALI_TEST_EQUALS("windowSurfaceTarget", type->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("windowSurfaceTarget", type->Get<Dali::String>(), TEST_LOCATION);
 
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
@@ -697,7 +701,7 @@ int UtcDaliVideoViewCustomShader(void)
   fragmentShaderString.append(fragmentShaderPrefix);
   fragmentShaderString.append(FRAGMENT_SHADER);
   customShader.Insert("vertexShader", VERTEX_SHADER);
-  customShader.Insert("fragmentShader", fragmentShaderString);
+  customShader.Insert("fragmentShader", String(StringView(fragmentShaderString.data(), fragmentShaderString.size())));
 
   Property::Map map;
   map.Insert("shader", customShader);
@@ -712,8 +716,8 @@ int UtcDaliVideoViewCustomShader(void)
   application.Render();
 
   /* get visual */
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation(view);
-  Visual::Base                visual      = DevelControl::GetVisual(controlImpl, VideoView::Property::TEXTURE);
+  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(view);
+  Visual::Base          visual      = DevelControl::GetVisual(controlImpl, VideoView::Property::TEXTURE);
   DALI_TEST_CHECK(visual);
   Toolkit::Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
   Shader                           shader     = visualImpl.GetRenderer().GetShader();
@@ -724,10 +728,10 @@ int UtcDaliVideoViewCustomShader(void)
   DALI_TEST_CHECK(shaderMap);
 
   Property::Value* fragment = shaderMap->Find("fragment"); // fragment key name from shader-impl.cpp
-  DALI_TEST_EQUALS(fragmentShaderString, fragment->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentShaderString, fragment->Get<Dali::String>(), TEST_LOCATION);
 
   Property::Value* vertex = shaderMap->Find("vertex"); // vertex key name from shader-impl.cpp
-  DALI_TEST_EQUALS(VERTEX_SHADER, vertex->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(VERTEX_SHADER, vertex->Get<Dali::String>(), TEST_LOCATION);
 
   END_TEST;
 }

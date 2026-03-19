@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,15 @@
 // CLASS HEADER
 #include <dali-scene3d/public-api/controls/model/model.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
+
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali::Scene3D
 {
@@ -36,9 +42,9 @@ Model& Model::operator=(Model&& rhs) noexcept = default;
 
 Model::~Model() = default;
 
-Model Model::New(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
+Model Model::New(const Dali::String& modelUrl, const Dali::String& resourceDirectoryUrl)
 {
-  return Internal::Model::New(modelUrl, resourceDirectoryUrl);
+  return Internal::Model::New(ToStdString(modelUrl), ToStdString(resourceDirectoryUrl));
 }
 
 Model Model::DownCast(BaseHandle handle)
@@ -92,9 +98,9 @@ bool Model::GetChildrenFocusable() const
   return GetImpl(*this).GetChildrenFocusable();
 }
 
-void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::string& specularUrl, float scaleFactor)
+void Model::SetImageBasedLightSource(const Dali::String& diffuseUrl, const Dali::String& specularUrl, float scaleFactor)
 {
-  GetImpl(*this).SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
+  GetImpl(*this).SetImageBasedLightSource(ToStdString(diffuseUrl), ToStdString(specularUrl), scaleFactor);
 }
 
 void Model::SetImageBasedLightScaleFactor(float scaleFactor)
@@ -117,9 +123,9 @@ Dali::Animation Model::GetAnimation(uint32_t index) const
   return GetImpl(*this).GetAnimation(index);
 }
 
-Dali::Animation Model::GetAnimation(const std::string& name) const
+Dali::Animation Model::GetAnimation(const Dali::String& name) const
 {
-  return GetImpl(*this).GetAnimation(name);
+  return GetImpl(*this).GetAnimation(ToStdString(name));
 }
 
 uint32_t Model::GetCameraCount() const
@@ -137,19 +143,25 @@ bool Model::ApplyCamera(uint32_t index, Dali::CameraActor camera) const
   return GetImpl(*this).ApplyCamera(index, camera);
 }
 
-ModelNode Model::FindChildModelNodeByName(std::string_view nodeName)
+ModelNode Model::FindChildModelNodeByName(Dali::StringView nodeName)
 {
-  return GetImpl(*this).FindChildModelNodeByName(nodeName);
+  return GetImpl(*this).FindChildModelNodeByName(ToStdStringView(nodeName));
 }
 
-void Model::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) const
+void Model::RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const
 {
-  GetImpl(*this).RetrieveBlendShapeNames(blendShapeNames);
+  std::vector<std::string> stdNames;
+  GetImpl(*this).RetrieveBlendShapeNames(stdNames);
+  blendShapeNames.reserve(stdNames.size());
+  for(auto& name : stdNames)
+  {
+    blendShapeNames.emplace_back(name.c_str());
+  }
 }
 
-void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<ModelNode>& modelNodes) const
+void Model::RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, std::vector<ModelNode>& modelNodes) const
 {
-  GetImpl(*this).RetrieveModelNodesByBlendShapeName(blendShapeName, modelNodes);
+  GetImpl(*this).RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeName), modelNodes);
 }
 
 Dali::Animation Model::GenerateMotionDataAnimation(MotionData motionData)

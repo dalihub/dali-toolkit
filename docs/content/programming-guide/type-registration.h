@@ -29,8 +29,8 @@ A type can be registered using Dali::TypeRegistration. This is normally done in 
 within the source file of the deriving control as shown in the code below.
 
 <b>Please note:</b> This snippet assumes knowledge of the \link Dali::Toolkit::Control Control
-\endlink / \link Dali::Toolkit::Internal::Control Internal::Control \endlink creation process where
-<i><b>MyControl</b></i> derives from a Control and <i><b>MyControlImpl</b></i> derives from Internal::Control.
+\endlink / \link Dali::Toolkit::ControlImpl ControlImpl \endlink creation process where
+<i><b>MyControl</b></i> derives from a Control and <i><b>MyControlImpl</b></i> derives from ControlImpl.
 
 @code
 namespace

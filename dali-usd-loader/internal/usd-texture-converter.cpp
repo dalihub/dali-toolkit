@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/material-definition.h>
 #include <dali-usd-loader/internal/utils.h>
+#include <dali/integration-api/string-utils.h>
 
 using namespace Dali;
 using namespace pxr;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToDaliString;
 
 namespace Dali::Scene3D::Loader
 {
@@ -237,14 +239,20 @@ void UsdTextureConverter::ProcessTextureFallback(const UsdShadeInput& input)
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "fallback: %.7f, %.7f, %.7f, %.7f, ", fallback[0], fallback[1], fallback[2], fallback[3]);
 }
 
-bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer, const ImageMetadataMap& imageMetaDataMap)
+bool UsdTextureConverter::ProcessImageBuffer(
+  MaterialDefinition&     materialDefinition,
+  uint32_t                semantic,
+  const std::string&      imagePath,
+  UsdAssetBuffer&         imageBuffer,
+  const ImageMetadataMap& imageMetaDataMap)
 {
   std::string imageFileName = std::filesystem::path(imagePath).filename().string();
 
   ImageMetadata metaData;
   if(!imageFileName.empty())
   {
-    if(auto search = imageMetaDataMap.find(imageFileName); search != imageMetaDataMap.end())
+    String fileNameStr = ToDaliString(imageFileName);
+    if(auto search = imageMetaDataMap.find(fileNameStr); search != imageMetaDataMap.end())
     {
       metaData = search->second;
     }
@@ -264,7 +272,8 @@ bool UsdTextureConverter::ProcessImageBuffer(MaterialDefinition& materialDefinit
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Path Processed: semantic: %u, imagePath: %s", semantic, imagePath.c_str());
 
     // If we have a valid image path, push it to the material definition
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imagePath), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
+    String imagePathStr = ToDaliString(imagePath); // copy.
+    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{imagePathStr, SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
     return true;
   }

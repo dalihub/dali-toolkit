@@ -23,10 +23,12 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -57,6 +59,9 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 using namespace Dali::Toolkit::Text;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -199,32 +204,32 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
     {
       const KeyValuePair& valueGet = propertiesMap->GetKeyValue(index);
 
-      if((Controller::TextFitInfo::Property::TEXT_FIT_ENABLE == valueGet.first.indexKey) || (TEXT_FIT_ENABLE_KEY == valueGet.first.stringKey))
+      if((Controller::TextFitInfo::Property::TEXT_FIT_ENABLE == valueGet.first.indexKey) || (strcmp(TEXT_FIT_ENABLE_KEY, valueGet.first.stringKey.CStr()) == 0))
       {
         /// Enable key.
         enabled = valueGet.second.Get<bool>();
       }
-      else if((Controller::TextFitInfo::Property::TEXT_FIT_MIN_SIZE == valueGet.first.indexKey) || (TEXT_FIT_MIN_SIZE_KEY == valueGet.first.stringKey))
+      else if((Controller::TextFitInfo::Property::TEXT_FIT_MIN_SIZE == valueGet.first.indexKey) || (strcmp(TEXT_FIT_MIN_SIZE_KEY, valueGet.first.stringKey.CStr()) == 0))
       {
         /// min size.
         minSize      = valueGet.second.Get<float>();
         isMinSizeSet = true;
       }
-      else if((Controller::TextFitInfo::Property::TEXT_FIT_MAX_SIZE == valueGet.first.indexKey) || (TEXT_FIT_MAX_SIZE_KEY == valueGet.first.stringKey))
+      else if((Controller::TextFitInfo::Property::TEXT_FIT_MAX_SIZE == valueGet.first.indexKey) || (strcmp(TEXT_FIT_MAX_SIZE_KEY, valueGet.first.stringKey.CStr()) == 0))
       {
         /// max size.
         maxSize      = valueGet.second.Get<float>();
         isMaxSizeSet = true;
       }
-      else if((Controller::TextFitInfo::Property::TEXT_FIT_STEP_SIZE == valueGet.first.indexKey) || (TEXT_FIT_STEP_SIZE_KEY == valueGet.first.stringKey))
+      else if((Controller::TextFitInfo::Property::TEXT_FIT_STEP_SIZE == valueGet.first.indexKey) || (strcmp(TEXT_FIT_STEP_SIZE_KEY, valueGet.first.stringKey.CStr()) == 0))
       {
         /// step size.
         stepSize      = valueGet.second.Get<float>();
         isStepSizeSet = true;
       }
-      else if((Controller::TextFitInfo::Property::TEXT_FIT_FONT_SIZE_TYPE == valueGet.first.indexKey) || (TEXT_FIT_FONT_SIZE_TYPE_KEY == valueGet.first.stringKey))
+      else if((Controller::TextFitInfo::Property::TEXT_FIT_FONT_SIZE_TYPE == valueGet.first.indexKey) || (strcmp(TEXT_FIT_FONT_SIZE_TYPE_KEY, valueGet.first.stringKey.CStr()) == 0))
       {
-        if("pixelSize" == valueGet.second.Get<std::string>())
+        if("pixelSize" == ToStdString(valueGet.second))
         {
           type = Controller::FontSizeType::PIXEL_SIZE;
         }
@@ -316,12 +321,12 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::TextLabel::Property::TEXT:
       {
-        impl.UpdateText(value.Get<std::string>());
+        impl.UpdateText(ToStdString(value));
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
       {
-        const std::string& fontFamily = value.Get<std::string>();
+        const std::string fontFamily = ToStdString(value);
 
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str());
         impl.mController->SetDefaultFontFamily(fontFamily);
@@ -790,12 +795,12 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       {
         std::string text;
         impl.mController->GetText(text);
-        value = text;
+        value = ToPropertyValue(text);
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
       {
-        value = impl.mController->GetDefaultFontFamily();
+        value = ToPropertyValue(impl.mController->GetDefaultFontFamily());
         break;
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
@@ -819,7 +824,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
 
         if(name)
         {
-          value = std::string(name);
+          value = ToPropertyValue(std::string(name));
         }
         break;
       }
@@ -828,7 +833,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         const char* name = Text::GetVerticalAlignmentString(impl.mController->GetVerticalAlignment());
         if(name)
         {
-          value = std::string(name);
+          value = ToPropertyValue(std::string(name));
         }
         break;
       }
@@ -851,7 +856,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
                                                                                                          AUTO_SCROLL_STOP_MODE_TABLE_COUNT);
           if(mode)
           {
-            value = std::string(mode);
+            value = ToPropertyValue(std::string(mode));
           }
         }
         break;
@@ -976,12 +981,12 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         const float pointSize = impl.mController->GetTextFitPointSize();
 
         Property::Map map;
-        map.Insert(TEXT_FIT_ENABLE_KEY, enabled);
-        map.Insert(TEXT_FIT_MIN_SIZE_KEY, minSize);
-        map.Insert(TEXT_FIT_MAX_SIZE_KEY, maxSize);
-        map.Insert(TEXT_FIT_STEP_SIZE_KEY, stepSize);
-        map.Insert(TEXT_FIT_FONT_SIZE_KEY, pointSize);
-        map.Insert(TEXT_FIT_FONT_SIZE_TYPE_KEY, "pointSize");
+        map.Insert(TEXT_FIT_ENABLE_KEY, Property::Value(enabled));
+        map.Insert(TEXT_FIT_MIN_SIZE_KEY, Property::Value(minSize));
+        map.Insert(TEXT_FIT_MAX_SIZE_KEY, Property::Value(maxSize));
+        map.Insert(TEXT_FIT_STEP_SIZE_KEY, Property::Value(stepSize));
+        map.Insert(TEXT_FIT_FONT_SIZE_KEY, Property::Value(pointSize));
+        map.Insert(TEXT_FIT_FONT_SIZE_TYPE_KEY, Property::Value("pointSize"));
 
         value = map;
         break;
@@ -1101,14 +1106,14 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
   return value;
 }
 
-bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
   bool               connected(true);
   Toolkit::TextLabel label = Toolkit::TextLabel::DownCast(handle);
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  if(0 == strcmp(signalName.CStr(), SIGNAL_ANCHOR_CLICKED))
   {
     if(label)
     {
@@ -1116,7 +1121,7 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       labelImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_TEXT_FIT_CHANGED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_TEXT_FIT_CHANGED))
   {
     if(label)
     {
@@ -1124,7 +1129,7 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       labelImpl.TextFitChangedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_ASYNC_TEXT_RENDERED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_ASYNC_TEXT_RENDERED))
   {
     if(label)
     {
@@ -1132,7 +1137,7 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       labelImpl.AsyncTextRenderedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_ASYNC_NATURAL_SIZE_COMPUTED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_ASYNC_NATURAL_SIZE_COMPUTED))
   {
     if(label)
     {
@@ -1140,7 +1145,7 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       labelImpl.AsyncNaturalSizeComputedSignal().Connect(tracker, functor);
     }
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_ASYNC_HEIGHT_FOR_WIDTH_COMPUTED))
+  else if(0 == strcmp(signalName.CStr(), SIGNAL_ASYNC_HEIGHT_FOR_WIDTH_COMPUTED))
   {
     if(label)
     {
@@ -1305,7 +1310,7 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
   }
 
   // Up call to Control
-  Control::OnStyleChange(styleManager, change);
+  ControlImpl::OnStyleChange(styleManager, change);
 }
 
 void TextLabel::OnApplyDefaultStyle()
@@ -1458,7 +1463,7 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       }
       else
       {
-        Control::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
+        ControlImpl::OnPropertySet(index, propertyValue); // up call to control for non-handled properties
       }
       break;
     }
@@ -1483,7 +1488,7 @@ void TextLabel::OnAnimateAnimatableProperty(Animation& animation, Property::Inde
 
     TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Control::OnAnimateAnimatableProperty(animation, index, state);
+  ControlImpl::OnAnimateAnimatableProperty(animation, index, state);
 }
 
 void TextLabel::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
@@ -1504,7 +1509,7 @@ void TextLabel::OnConstraintAnimatableProperty(Constraint& constraint, Property:
 
     TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Control::OnConstraintAnimatableProperty(constraint, index, applied);
+  ControlImpl::OnConstraintAnimatableProperty(constraint, index, applied);
 }
 
 void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
@@ -2205,7 +2210,7 @@ void TextLabel::OnAccessibilityStatusChanged()
 }
 
 TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
+: ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mLocale(std::string()),
   mSize(),
   mTouchPosition(),
@@ -2499,11 +2504,11 @@ Dali::Property::Index TextLabel::RegisterFontVariationProperty(std::string tag)
   mController->GetVariationsMap(variationsMap);
 
   float variationValue = 0.f;
-  auto  tagPtr         = variationsMap.Find(tag);
+  auto  tagPtr         = variationsMap.Find(ToDaliStringView(tag));
 
   if(tagPtr)
   {
-    variationValue = tagPtr->Get<float>();
+    tagPtr->Get(variationValue);
   }
 
   Dali::Property::Index index = self.RegisterProperty(tag.data(), variationValue);
@@ -2529,8 +2534,9 @@ void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
   {
     if(Self().DoesCustomPropertyExist(index))
     {
-      float value     = Self().GetCurrentProperty(index).Get<float>();
-      map[tag.data()] = std::round(value);
+      float floatVal = 0.f;
+      Self().GetCurrentProperty(index).Get(floatVal);
+      map[ToDaliStringView(tag)] = std::round(floatVal);
     }
   }
 

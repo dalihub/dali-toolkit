@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_DLI_INPUT_PARAMETER_H
 #define DALI_SCENE3D_LOADER_DLI_INPUT_PARAMETER_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ namespace Dali::Scene3D::Loader
 class DliInputParameter : public ModelLoader::InputParameter
 {
 public:
-  using ConvertFontCode         = void (*)(const std::string& code, std::string& fontFamily, std::string& slant, std::string& weight, float& size);
-  using ConvertColorCode        = Vector4 (*)(const std::string& code);
+  using ConvertFontCode         = void (*)(const Dali::String& code, Dali::String& fontFamily, Dali::String& slant, Dali::String& weight, float& size);
+  using ConvertColorCode        = Vector4 (*)(const Dali::String& code);
   using CategoryProcessor       = std::function<void(Property::Array&& categoryData, StringCallback onError)>;
-  using CategoryProcessorVector = std::vector<std::pair<std::string /*name*/, CategoryProcessor>>;
+  using CategoryProcessorVector = std::vector<std::pair<Dali::String /*name*/, CategoryProcessor>>;
   using NodeProcessor           = std::function<void(const Dali::Scene3D::Loader::NodeDefinition& nodeDef,
                                            Property::Map&&                              nodeData,
                                            StringCallback                               onError)>;
@@ -45,7 +45,7 @@ public:
    * @brief The absolute path of animation binaries referenced in the .dli.
    * @SINCE_2_2.17
    */
-  std::string mAnimationsPath;
+  Dali::String mAnimationsPath;
 
   /**
    * @brief Provides a facility to determine a color from a code instead of RGB(A) values.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -351,7 +351,7 @@ enum
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
  * @note depth-index be used to Dali::Toolkit::DepthIndex::Ranges::AUTO_INDEX.
  */
-DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual);
+DALI_TOOLKIT_API void RegisterVisual(Toolkit::ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual);
 
 /**
  * @brief Register a visual by Property Index with a depth index.
@@ -369,7 +369,7 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex);
+DALI_TOOLKIT_API void RegisterVisual(Toolkit::ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex);
 
 /**
  * @brief Register a visual by Property Index with the option of enabling/disabling it.
@@ -383,7 +383,7 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  *
  * @see EnableVisual()
  */
-DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled);
+DALI_TOOLKIT_API void RegisterVisual(Toolkit::ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled);
 
 /**
  * @brief Register a visual by Property Index with a depth index with the option of enabling/disabling it.
@@ -400,7 +400,7 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex);
+DALI_TOOLKIT_API void RegisterVisual(Toolkit::ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex);
 
 /**
  * @brief Erase the entry matching the given index from the list of registered visuals
@@ -408,7 +408,7 @@ DALI_TOOLKIT_API void RegisterVisual(Internal::Control& control, Dali::Property:
  * @param[in] control The control
  * @param[in] index The Property index of the visual, used to reference visual
  */
-DALI_TOOLKIT_API void UnregisterVisual(Internal::Control& control, Dali::Property::Index index);
+DALI_TOOLKIT_API void UnregisterVisual(Toolkit::ControlImpl& control, Dali::Property::Index index);
 
 /**
  * @brief Retrieve the visual associated with the given property index.
@@ -418,7 +418,7 @@ DALI_TOOLKIT_API void UnregisterVisual(Internal::Control& control, Dali::Propert
  * @return The registered visual if exist, otherwise empty handle.
  * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
  */
-DALI_TOOLKIT_API Toolkit::Visual::Base GetVisual(const Internal::Control& control, Dali::Property::Index index);
+DALI_TOOLKIT_API Toolkit::Visual::Base GetVisual(const Toolkit::ControlImpl& control, Dali::Property::Index index);
 
 /**
  * @brief Sets the given visual to be displayed or not when parent staged.
@@ -427,7 +427,7 @@ DALI_TOOLKIT_API Toolkit::Visual::Base GetVisual(const Internal::Control& contro
  * @param[in] index The Property index of the visual
  * @param[in] enable flag to set enabled or disabled.
  */
-DALI_TOOLKIT_API void EnableVisual(Internal::Control& control, Dali::Property::Index index, bool enable);
+DALI_TOOLKIT_API void EnableVisual(Toolkit::ControlImpl& control, Dali::Property::Index index, bool enable);
 
 /**
  * @brief Queries if the given visual is to be displayed when parent staged.
@@ -436,7 +436,7 @@ DALI_TOOLKIT_API void EnableVisual(Internal::Control& control, Dali::Property::I
  * @param[in] index The Property index of the visual
  * @return bool whether visual is enabled or not
  */
-DALI_TOOLKIT_API bool IsVisualEnabled(const Internal::Control& control, Dali::Property::Index index);
+DALI_TOOLKIT_API bool IsVisualEnabled(const Toolkit::ControlImpl& control, Dali::Property::Index index);
 
 /**
  * @brief Add a transition effect on the control to the given animation
@@ -450,7 +450,7 @@ DALI_TOOLKIT_API bool IsVisualEnabled(const Internal::Control& control, Dali::Pr
  * @param[in] animation The Animation to add valid transitions to
  * @param[in] transitionData The transition data describing the effect to create
  */
-DALI_TOOLKIT_API void AddTransitions(Internal::Control&             control,
+DALI_TOOLKIT_API void AddTransitions(Toolkit::ControlImpl&          control,
                                      Dali::Animation                animation,
                                      const Toolkit::TransitionData& transitionData);
 
@@ -467,7 +467,7 @@ DALI_TOOLKIT_API void AddTransitions(Internal::Control&             control,
  * @return A handle to an animation defined with the given effect, or an empty
  * handle if no properties match.
  */
-DALI_TOOLKIT_API Dali::Animation CreateTransition(Internal::Control&             control,
+DALI_TOOLKIT_API Dali::Animation CreateTransition(Toolkit::ControlImpl&          control,
                                                   const Toolkit::TransitionData& transitionData);
 
 /**
@@ -517,7 +517,7 @@ DALI_TOOLKIT_API void DoActionExtension(Control& control, Dali::Property::Index 
  *                            are mapped to the visual's corner radius property.
  *                            If empty, a default equality constraint might be used if applicable.
  */
-DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& control, Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint = Dali::Constraint());
+DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Toolkit::ControlImpl& control, Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint = Dali::Constraint());
 
 /**
  * @brief Set input method context.
@@ -525,7 +525,7 @@ DALI_TOOLKIT_API void EnableCornerPropertiesOverridden(Internal::Control& contro
  * @param[in] control The control.
  * @param[in] inputMethodContext The input method context.
  */
-DALI_TOOLKIT_API void SetInputMethodContext(Internal::Control& control, InputMethodContext& inputMethodContext);
+DALI_TOOLKIT_API void SetInputMethodContext(Toolkit::ControlImpl& control, InputMethodContext& inputMethodContext);
 
 /**
  * @brief Visual Event signal type

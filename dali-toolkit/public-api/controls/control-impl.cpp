@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -57,8 +58,6 @@ namespace Dali
 {
 namespace Toolkit
 {
-namespace Internal
-{
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -70,14 +69,14 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CON
  * (EG. If no renders exist and clipping is enabled).
  * @param[in] controlImpl The control implementation.
  */
-void CreateClippingRenderer(Control& controlImpl)
+void CreateClippingRenderer(ControlImpl& controlImpl)
 {
   // We want to add a transparent background if we do not have one for clipping.
   Actor self(controlImpl.Self());
   int   clippingMode = ClippingMode::DISABLED;
   if(self.GetProperty(Actor::Property::CLIPPING_MODE).Get(clippingMode))
   {
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
+    Toolkit::ControlImpl::Impl& controlDataImpl = Toolkit::ControlImpl::Impl::Get(controlImpl);
 
     if(clippingMode == ClippingMode::CLIP_CHILDREN && (DALI_UNLIKELY(!controlDataImpl.mVisualData) || controlDataImpl.mVisualData->mVisuals.Empty()) && self.GetRendererCount() == 0u)
     {
@@ -106,7 +105,7 @@ void RegisterControlAccessibleGetter()
 
       if(Toolkit::DevelControl::IsCreateAccessibleEnabled(control))
       {
-        auto& controlImpl = Toolkit::Internal::GetImplementation(control);
+        auto& controlImpl = Toolkit::GetImplementation(control);
         return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
       }
 
@@ -115,15 +114,15 @@ void RegisterControlAccessibleGetter()
 }
 } // unnamed namespace
 
-Toolkit::Control Control::New()
+Toolkit::Control ControlImpl::New()
 {
   return New(ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
 }
 
-Toolkit::Control Control::New(ControlBehaviour additionalBehaviour)
+Toolkit::Control ControlImpl::New(ControlBehaviour additionalBehaviour)
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour));
+  IntrusivePtr<ControlImpl> controlImpl = new ControlImpl(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour));
 
   // Pass ownership to handle
   Toolkit::Control handle(*controlImpl);
@@ -135,7 +134,7 @@ Toolkit::Control Control::New(ControlBehaviour additionalBehaviour)
   return handle;
 }
 
-void Control::SetStyleName(const std::string& styleName)
+void ControlImpl::SetStyleName(const Dali::String& styleName)
 {
   if(styleName != mImpl->mStyleName)
   {
@@ -150,12 +149,12 @@ void Control::SetStyleName(const std::string& styleName)
   }
 }
 
-const std::string& Control::GetStyleName() const
+const Dali::String& ControlImpl::GetStyleName() const
 {
   return mImpl->mStyleName;
 }
 
-void Control::SetBackgroundColor(const Vector4& color)
+void ControlImpl::SetBackgroundColor(const Vector4& color)
 {
   mImpl->mBackgroundColor = color;
 
@@ -174,12 +173,15 @@ void Control::SetBackgroundColor(const Vector4& color)
   SetBackground(map);
 }
 
-void Control::SetBackground(const Property::Map& map)
+void ControlImpl::SetBackground(const Property::Map& map)
 {
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(map);
   visual.SetName("background");
   if(visual)
   {
+    // Ignore corner radius for offscreen case.
+    Toolkit::GetImplementation(visual).CornerRadiusIgnoredAtOffscreenRendering(true);
+
     mImpl->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
     mImpl->EnableCornerPropertiesOverridden(visual, true);
 
@@ -188,7 +190,7 @@ void Control::SetBackground(const Property::Map& map)
   }
 }
 
-void Control::ClearBackground()
+void ControlImpl::ClearBackground()
 {
   mImpl->UnregisterVisual(Toolkit::Control::Property::BACKGROUND);
   mImpl->mBackgroundColor = Color::TRANSPARENT;
@@ -197,7 +199,7 @@ void Control::ClearBackground()
   RelayoutRequest();
 }
 
-void Control::SetRenderEffect(Toolkit::RenderEffect effect)
+void ControlImpl::SetRenderEffect(Toolkit::RenderEffect effect)
 {
   ClearRenderEffect();
 
@@ -217,16 +219,16 @@ void Control::SetRenderEffect(Toolkit::RenderEffect effect)
   }
 }
 
-RenderEffect Control::GetRenderEffect() const
+RenderEffect ControlImpl::GetRenderEffect() const
 {
   return RenderEffect(mImpl->mRenderEffect.Get());
 }
 
-void Control::ClearRenderEffect()
+void ControlImpl::ClearRenderEffect()
 {
   if(mImpl->mRenderEffect)
   {
-    RenderEffectImplPtr effectImpl = std::move(mImpl->mRenderEffect);
+    Internal::RenderEffectImplPtr effectImpl = std::move(mImpl->mRenderEffect);
 
     // Reset handle first to avoid circular reference
     mImpl->mRenderEffect.Reset();
@@ -235,29 +237,29 @@ void Control::ClearRenderEffect()
   }
 }
 
-void Control::SetResourceReady()
+void ControlImpl::SetResourceReady()
 {
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+  Toolkit::ControlImpl::Impl& controlDataImpl = Toolkit::ControlImpl::Impl::Get(*this);
   controlDataImpl.ResourceReady();
 }
 
-Dali::Actor Control::GetOffScreenRenderableSourceActor()
+Dali::Actor ControlImpl::GetOffScreenRenderableSourceActor()
 {
   // Need to override this in FORWARD OffScreenRenderable
   return Dali::Actor();
 }
 
-bool Control::IsOffScreenRenderTaskExclusive()
+bool ControlImpl::IsOffScreenRenderTaskExclusive()
 {
   return false;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
+std::shared_ptr<Toolkit::DevelControl::ControlAccessible> ControlImpl::GetAccessibleObject()
 {
   return mImpl->GetAccessibleObject();
 }
 
-void Control::EnableGestureDetection(GestureType::Value type)
+void ControlImpl::EnableGestureDetection(GestureType::Value type)
 {
   if((type & GestureType::PINCH) && !mImpl->mPinchGestureDetector)
   {
@@ -289,7 +291,7 @@ void Control::EnableGestureDetection(GestureType::Value type)
   }
 }
 
-void Control::DisableGestureDetection(GestureType::Value type)
+void ControlImpl::DisableGestureDetection(GestureType::Value type)
 {
   if((type & GestureType::PINCH) && mImpl->mPinchGestureDetector)
   {
@@ -316,37 +318,37 @@ void Control::DisableGestureDetection(GestureType::Value type)
   }
 }
 
-PinchGestureDetector Control::GetPinchGestureDetector() const
+PinchGestureDetector ControlImpl::GetPinchGestureDetector() const
 {
   return mImpl->mPinchGestureDetector;
 }
 
-PanGestureDetector Control::GetPanGestureDetector() const
+PanGestureDetector ControlImpl::GetPanGestureDetector() const
 {
   return mImpl->mPanGestureDetector;
 }
 
-TapGestureDetector Control::GetTapGestureDetector() const
+TapGestureDetector ControlImpl::GetTapGestureDetector() const
 {
   return mImpl->mTapGestureDetector;
 }
 
-LongPressGestureDetector Control::GetLongPressGestureDetector() const
+LongPressGestureDetector ControlImpl::GetLongPressGestureDetector() const
 {
   return mImpl->mLongPressGestureDetector;
 }
 
-void Control::SetKeyboardNavigationSupport(bool isSupported)
+void ControlImpl::SetKeyboardNavigationSupport(bool isSupported)
 {
   mImpl->mIsKeyboardNavigationSupported = isSupported;
 }
 
-bool Control::IsKeyboardNavigationSupported()
+bool ControlImpl::IsKeyboardNavigationSupported()
 {
   return mImpl->mIsKeyboardNavigationSupported;
 }
 
-void Control::SetKeyInputFocus()
+void ControlImpl::SetKeyInputFocus()
 {
   if(Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
@@ -354,7 +356,7 @@ void Control::SetKeyInputFocus()
   }
 }
 
-bool Control::HasKeyInputFocus()
+bool ControlImpl::HasKeyInputFocus()
 {
   bool result = false;
   if(Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
@@ -368,7 +370,7 @@ bool Control::HasKeyInputFocus()
   return result;
 }
 
-void Control::ClearKeyInputFocus()
+void ControlImpl::ClearKeyInputFocus()
 {
   if(Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
@@ -376,7 +378,7 @@ void Control::ClearKeyInputFocus()
   }
 }
 
-void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
+void ControlImpl::SetAsKeyboardFocusGroup(bool isFocusGroup)
 {
   mImpl->mIsKeyboardFocusGroup = isFocusGroup;
 
@@ -384,18 +386,18 @@ void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
   Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
 }
 
-bool Control::IsKeyboardFocusGroup()
+bool ControlImpl::IsKeyboardFocusGroup()
 {
   return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
 }
 
-void Control::KeyboardEnter()
+void ControlImpl::KeyboardEnter()
 {
   // Inform deriving classes
   OnKeyboardEnter();
 }
 
-bool Control::OnAccessibilityActivated()
+bool ControlImpl::OnAccessibilityActivated()
 {
   if(Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
   {
@@ -404,56 +406,56 @@ bool Control::OnAccessibilityActivated()
   return false;
 }
 
-bool Control::OnKeyboardEnter()
+bool ControlImpl::OnKeyboardEnter()
 {
   return false; // Keyboard enter is not handled by default
 }
 
-bool Control::OnAccessibilityPan(PanGesture gesture)
+bool ControlImpl::OnAccessibilityPan(PanGesture gesture)
 {
   return false; // Accessibility pan gesture is not handled by default
 }
 
-bool Control::OnAccessibilityValueChange(bool isIncrease)
+bool ControlImpl::OnAccessibilityValueChange(bool isIncrease)
 {
   return false; // Accessibility value change action is not handled by default
 }
 
-bool Control::OnAccessibilityZoom()
+bool ControlImpl::OnAccessibilityZoom()
 {
   return false; // Accessibility zoom action is not handled by default
 }
 
-DevelControl::ControlAccessible* Control::CreateAccessibleObject()
+DevelControl::ControlAccessible* ControlImpl::CreateAccessibleObject()
 {
   return new DevelControl::ControlAccessible(Self());
 }
 
-Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
+Actor ControlImpl::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   return Actor();
 }
 
-void Control::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
+void ControlImpl::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
 {
 }
 
-Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
+Toolkit::Control::KeyEventSignalType& ControlImpl::KeyEventSignal()
 {
   return mImpl->mKeyEventSignal;
 }
 
-Toolkit::Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
+Toolkit::Control::KeyInputFocusSignalType& ControlImpl::KeyInputFocusGainedSignal()
 {
   return mImpl->mKeyInputFocusGainedSignal;
 }
 
-Toolkit::Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
+Toolkit::Control::KeyInputFocusSignalType& ControlImpl::KeyInputFocusLostSignal()
 {
   return mImpl->mKeyInputFocusLostSignal;
 }
 
-bool Control::EmitKeyEventSignal(const KeyEvent& event)
+bool ControlImpl::EmitKeyEventSignal(const KeyEvent& event)
 {
   // Guard against destruction during signal emission
   Dali::Toolkit::Control handle(GetOwner());
@@ -477,7 +479,7 @@ bool Control::EmitKeyEventSignal(const KeyEvent& event)
   return consumed;
 }
 
-void Control::RefreshRenderEffects()
+void ControlImpl::RefreshRenderEffects()
 {
   if(mImpl->mRenderEffect)
   {
@@ -489,7 +491,7 @@ void Control::RefreshRenderEffects()
   }
 }
 
-Dali::Texture Control::GetOffScreenRenderingOutput() const
+Dali::Texture ControlImpl::GetOffScreenRenderingOutput() const
 {
   if(mImpl->mOffScreenRenderingType != DevelControl::OffScreenRenderingType::REFRESH_ONCE)
   {
@@ -499,14 +501,14 @@ Dali::Texture Control::GetOffScreenRenderingOutput() const
   return mImpl->mOffScreenRenderingImpl->GetTexture();
 }
 
-Control::Control(ControlBehaviour behaviourFlags)
+ControlImpl::ControlImpl(ControlBehaviour behaviourFlags)
 : CustomActorImpl(static_cast<ActorFlags>(behaviourFlags)),
   mImpl(new Impl(*this))
 {
   mImpl->mFlags = behaviourFlags;
 }
 
-Control::~Control()
+ControlImpl::~ControlImpl()
 {
   // Deactivate render effect before destroying the control impl
   ClearRenderEffect();
@@ -514,7 +516,7 @@ Control::~Control()
   delete mImpl;
 }
 
-void Control::Initialize()
+void ControlImpl::Initialize()
 {
   if(!(mImpl->mFlags & DISABLE_VISUALS))
   {
@@ -533,10 +535,10 @@ void Control::Initialize()
     // if stylemanager is available
     if(styleManager)
     {
-      StyleManager& styleManagerImpl = GetImpl(styleManager);
+      Internal::StyleManager& styleManagerImpl = GetImpl(styleManager);
 
       // Register for style changes
-      styleManagerImpl.ControlStyleChangeSignal().Connect(this, &Control::OnStyleChange);
+      styleManagerImpl.ControlStyleChangeSignal().Connect(this, &ControlImpl::OnStyleChange);
 
       // Apply the current style
       styleManagerImpl.ApplyThemeStyleAtInit(Toolkit::Control(GetOwner()));
@@ -554,17 +556,17 @@ void Control::Initialize()
   }
 }
 
-void Control::OnInitialize()
+void ControlImpl::OnInitialize()
 {
 }
 
-bool Control::IsResourceReady() const
+bool ControlImpl::IsResourceReady() const
 {
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+  const Toolkit::ControlImpl::Impl& controlDataImpl = Toolkit::ControlImpl::Impl::Get(*this);
   return controlDataImpl.IsResourceReady();
 }
 
-void Control::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
+void ControlImpl::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
 {
   // By default the control is only interested in theme (not font) changes
   if(styleManager && change == StyleChange::THEME_CHANGE)
@@ -574,11 +576,11 @@ void Control::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Typ
   }
 }
 
-void Control::OnApplyDefaultStyle()
+void ControlImpl::OnApplyDefaultStyle()
 {
 }
 
-void Control::OnPinch(const PinchGesture& pinch)
+void ControlImpl::OnPinch(const PinchGesture& pinch)
 {
   if(!(mImpl->mStartingPinchScale))
   {
@@ -594,19 +596,19 @@ void Control::OnPinch(const PinchGesture& pinch)
   Self().SetProperty(Actor::Property::SCALE, *(mImpl->mStartingPinchScale) * pinch.GetScale());
 }
 
-void Control::OnPan(const PanGesture& pan)
+void ControlImpl::OnPan(const PanGesture& pan)
 {
 }
 
-void Control::OnTap(const TapGesture& tap)
+void ControlImpl::OnTap(const TapGesture& tap)
 {
 }
 
-void Control::OnLongPress(const LongPressGesture& longPress)
+void ControlImpl::OnLongPress(const LongPressGesture& longPress)
 {
 }
 
-void Control::EmitKeyInputFocusSignal(bool focusGained)
+void ControlImpl::EmitKeyInputFocusSignal(bool focusGained)
 {
   Dali::Toolkit::Control handle(GetOwner());
 
@@ -642,7 +644,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
   }
 }
 
-void Control::OnSceneConnection(int depth)
+void ControlImpl::OnSceneConnection(int depth)
 {
   mImpl->OnSceneConnection();
 
@@ -650,30 +652,30 @@ void Control::OnSceneConnection(int depth)
   CreateClippingRenderer(*this);
 }
 
-void Control::OnSceneDisconnection()
+void ControlImpl::OnSceneDisconnection()
 {
   mImpl->OnSceneDisconnection();
 }
 
-void Control::OnKeyInputFocusGained()
+void ControlImpl::OnKeyInputFocusGained()
 {
   EmitKeyInputFocusSignal(true);
 }
 
-void Control::OnKeyInputFocusLost()
+void ControlImpl::OnKeyInputFocusLost()
 {
   EmitKeyInputFocusSignal(false);
 }
 
-void Control::OnChildAdd(Actor& child)
+void ControlImpl::OnChildAdd(Actor& child)
 {
 }
 
-void Control::OnChildRemove(Actor& child)
+void ControlImpl::OnChildRemove(Actor& child)
 {
 }
 
-void Control::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
+void ControlImpl::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
@@ -700,7 +702,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
   }
 }
 
-void Control::OnSizeSet(const Vector3& targetSize)
+void ControlImpl::OnSizeSet(const Vector3& targetSize)
 {
   Vector2 size(targetSize);
 
@@ -718,7 +720,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
   RefreshRenderEffects();
 }
 
-void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+void ControlImpl::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // @todo size negotiate background to new size, animate as well?
 
@@ -726,7 +728,7 @@ void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   mImpl->CreateAnimationConstraints(animation.GetBaseObject(), Dali::Actor::Property::SIZE);
 }
 
-void Control::OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Animation::State state)
+void ControlImpl::OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state)
 {
   if(state == Animation::State::PLAYING)
   {
@@ -738,7 +740,7 @@ void Control::OnAnimateAnimatableProperty(Animation& animation, Property::Index 
   }
 }
 
-void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+void ControlImpl::OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
 {
   if(applied)
   {
@@ -750,7 +752,7 @@ void Control::OnConstraintAnimatableProperty(Constraint& constraint, Property::I
   }
 }
 
-void Control::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
+void ControlImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
   if(mImpl->mRenderEffect)
   {
@@ -762,12 +764,12 @@ void Control::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, boo
   }
 }
 
-bool Control::OnKeyEvent(const KeyEvent& event)
+bool ControlImpl::OnKeyEvent(const KeyEvent& event)
 {
   return false; // Do not consume
 }
 
-void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
+void ControlImpl::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   // When set the padding or margin on the control, child should be resized and repositioned.
   if((mImpl->mPadding.start != 0) || (mImpl->mPadding.end != 0) || (mImpl->mPadding.top != 0) || (mImpl->mPadding.bottom != 0) ||
@@ -823,13 +825,13 @@ void Control::OnRelayout(const Vector2& size, RelayoutContainer& container)
   mImpl->ApplyFittingMode(size);
 }
 
-void Control::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
+void ControlImpl::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
 {
 }
 
-Vector3 Control::GetNaturalSize()
+Vector3 ControlImpl::GetNaturalSize()
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetProperty<std::string>(Dali::Actor::Property::NAME).c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ControlImpl::GetNaturalSize for %s\n", Dali::Integration::ToStdString(Self().GetProperty(Dali::Actor::Property::NAME)).c_str());
   Toolkit::Internal::Visual::Base* visualImplPtr = mImpl->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
   if(visualImplPtr)
   {
@@ -842,45 +844,45 @@ Vector3 Control::GetNaturalSize()
   return Vector3::ZERO;
 }
 
-float Control::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
+float ControlImpl::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
   return CalculateChildSizeBase(child, dimension);
 }
 
-float Control::GetHeightForWidth(float width)
+float ControlImpl::GetHeightForWidth(float width)
 {
   return GetHeightForWidthBase(width);
 }
 
-float Control::GetWidthForHeight(float height)
+float ControlImpl::GetWidthForHeight(float height)
 {
   return GetWidthForHeightBase(height);
 }
 
-bool Control::RelayoutDependentOnChildren(Dimension::Type dimension)
+bool ControlImpl::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
   return RelayoutDependentOnChildrenBase(dimension);
 }
 
-void Control::OnCalculateRelayoutSize(Dimension::Type dimension)
+void ControlImpl::OnCalculateRelayoutSize(Dimension::Type dimension)
 {
 }
 
-void Control::OnLayoutNegotiated(float size, Dimension::Type dimension)
+void ControlImpl::OnLayoutNegotiated(float size, Dimension::Type dimension)
 {
 }
 
-void Control::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
+void ControlImpl::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
   mImpl->SignalConnected(slotObserver, callback);
 }
 
-void Control::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback)
+void ControlImpl::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
   mImpl->SignalDisconnected(slotObserver, callback);
 }
 
-void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap, Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
+void ControlImpl::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap, Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
 {
   sourcePropertyMap.Clear();
   destinationPropertyMap.Clear();
@@ -978,23 +980,21 @@ void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali:
   }
 }
 
-Control& GetImplementation(Dali::Toolkit::Control& handle)
+ControlImpl& GetImplementation(Dali::Toolkit::Control& handle)
 {
   CustomActorImpl& customInterface = handle.GetImplementation();
   // downcast to control
-  Control& impl = dynamic_cast<Internal::Control&>(customInterface);
+  ControlImpl& impl = dynamic_cast<Toolkit::ControlImpl&>(customInterface);
   return impl;
 }
 
-const Control& GetImplementation(const Dali::Toolkit::Control& handle)
+const ControlImpl& GetImplementation(const Dali::Toolkit::Control& handle)
 {
   const CustomActorImpl& customInterface = handle.GetImplementation();
   // downcast to control
-  const Control& impl = dynamic_cast<const Internal::Control&>(customInterface);
+  const ControlImpl& impl = dynamic_cast<const Toolkit::ControlImpl&>(customInterface);
   return impl;
 }
-
-} // namespace Internal
 
 } // namespace Toolkit
 

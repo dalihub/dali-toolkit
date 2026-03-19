@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch/npatch-data.h>
@@ -238,7 +239,7 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
 
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    renderer.RegisterProperty(uniform.str(), Vector2(fix, stretch));
+    renderer.RegisterProperty(Dali::Integration::ToDaliStringView(uniform.str()), Vector2(fix, stretch));
 
     prevEnd     = end;
     prevFix     = fix;
@@ -249,7 +250,7 @@ void RegisterStretchProperties(Renderer& renderer, const char* uniformName, cons
     prevFix += imageExtent - prevEnd;
     std::stringstream uniform;
     uniform << uniformName << "[" << i << "]";
-    renderer.RegisterProperty(uniform.str(), Vector2(prevFix, prevStretch));
+    renderer.RegisterProperty(Dali::Integration::ToDaliStringView(uniform.str()), Vector2(prevFix, prevStretch));
   }
 }
 

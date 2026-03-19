@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cfloat>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -376,7 +376,7 @@ const Vector2& TextSelectionToolbar::GetScrollBarPadding() const
 }
 
 TextSelectionToolbar::TextSelectionToolbar()
-: Control(ControlBehaviour(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))),
+: ControlImpl(ControlBehaviour(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))),
   mMaxSize(),
   mScrollBarPadding(DEFAULT_SCROLL_BAR_PADDING),
   mIndexInTable(0),

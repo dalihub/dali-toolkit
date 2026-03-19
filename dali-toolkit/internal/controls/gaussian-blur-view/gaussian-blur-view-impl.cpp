@@ -21,11 +21,12 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -39,6 +40,8 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::ToDaliStringView;
 
 // TODO:
 // pixel format / size - set from JSON
@@ -112,7 +115,7 @@ inline float CalculateGaussianWeight(float localOffset, float sigma)
 } // namespace
 
 GaussianBlurView::GaussianBlurView()
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES),
   mBellCurveWidth(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH),
   mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT),
@@ -138,7 +141,7 @@ GaussianBlurView::GaussianBlurView(const unsigned int  numSamples,
                                    const float         downsampleWidthScale,
                                    const float         downsampleHeightScale,
                                    bool                blurUserImage)
-: Control(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(DISABLE_STYLE_CHANGE_SIGNALS)),
   mPixelRadius(numSamples),
   mBellCurveWidth(blurBellCurveWidth),
   mPixelFormat(renderTargetPixelFormat),
@@ -350,7 +353,7 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
     Activate();
   }
 
-  Control::OnSizeSet(targetSize);
+  ControlImpl::OnSizeSet(targetSize);
 }
 
 void GaussianBlurView::OnChildAdd(Actor& child)
@@ -360,14 +363,14 @@ void GaussianBlurView::OnChildAdd(Actor& child)
     mChildrenRoot.Add(child);
   }
 
-  Control::OnChildAdd(child);
+  ControlImpl::OnChildAdd(child);
 }
 
 void GaussianBlurView::OnChildRemove(Actor& child)
 {
   mChildrenRoot.Remove(child);
 
-  Control::OnChildRemove(child);
+  ControlImpl::OnChildRemove(child);
 }
 
 void GaussianBlurView::AllocateResources()
@@ -600,11 +603,11 @@ void GaussianBlurView::SetShaderConstants()
   // set shader constants
   for(unsigned int i = 0; i < numSamples; ++i)
   {
-    mHorizontalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(uvOffsets[i] / mDownsampledWidth, 0.0f));
-    mHorizontalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);
+    mHorizontalBlurActor.RegisterProperty(ToDaliStringView(GetSampleOffsetsPropertyName(i)), Vector2(uvOffsets[i] / mDownsampledWidth, 0.0f));
+    mHorizontalBlurActor.RegisterProperty(ToDaliStringView(GetSampleWeightsPropertyName(i)), weights[i]);
 
-    mVerticalBlurActor.RegisterProperty(GetSampleOffsetsPropertyName(i), Vector2(0.0f, uvOffsets[i] / mDownsampledHeight));
-    mVerticalBlurActor.RegisterProperty(GetSampleWeightsPropertyName(i), weights[i]);
+    mVerticalBlurActor.RegisterProperty(ToDaliStringView(GetSampleOffsetsPropertyName(i)), Vector2(0.0f, uvOffsets[i] / mDownsampledHeight));
+    mVerticalBlurActor.RegisterProperty(ToDaliStringView(GetSampleWeightsPropertyName(i)), weights[i]);
   }
 }
 

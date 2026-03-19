@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,14 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/string-utils.h>
 #include "test-text-geometry-utils.h"
 
 using namespace Dali;
 using namespace Toolkit;
 
+using Dali::Integration::GetStdString;
+using Dali::Integration::ToStdString;
 void dali_textlabel_async_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -1460,7 +1463,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit03(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.0f);
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
 
-  std::string longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
+  Dali::String longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
   label.SetProperty(TextLabel::Property::TEXT, longText);
 
   // Text fit
@@ -1713,7 +1716,7 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll02(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 100);
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
+  Dali::String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
   label.SetProperty(TextLabel::Property::TEXT, text);
 
   // Auto scroll
@@ -1928,7 +1931,7 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll04(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 50);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
+  Dali::String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper.";
   label.SetProperty(TextLabel::Property::TEXT, text);
 
   // Auto scroll
@@ -2205,7 +2208,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup01(void)
   asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
 
-  const std::string emojis = "<font family='BreezeColorEmoji' size='20'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
+  const Dali::String emojis = "<font family='BreezeColorEmoji' size='20'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
   label.SetProperty(TextLabel::Property::TEXT, emojis);
 
   // Request render automatically.
@@ -2221,7 +2224,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup01(void)
   asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
 
-  std::string emojiSequences =
+  Dali::String emojiSequences =
     "Glyphs not included in the font &#xf01a;&#xf01b;&#xf01c;&#xf01d;&#xf01e;&#xf01f;\n"   // case for coverage when glyph is not included in the font
     "Text VS15 &#x262a;&#xfe0e;\n"                                                         // text presentation sequence and selector
     "Color VS16 &#x262a;&#xfe0f;\n"                                                        // emoji presentation sequence and selector
@@ -2302,7 +2305,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup02(void)
   gAsyncTextRenderedCalled = false;
 
   // underline
-  std::string underlineText = "start<u height='5.0f' color='green' >underline<u color='blue'>markup text</u>CDE</u>end";
+  Dali::String underlineText = "start<u height='5.0f' color='green' >underline<u color='blue'>markup text</u>CDE</u>end";
   label.SetProperty(TextLabel::Property::TEXT, underlineText);
 
   // Request render automatically.
@@ -2318,7 +2321,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup02(void)
   asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
 
-  std::string strikethroughText = "start<s height='5.0f' color='green' >strikethrough<s color='blue' >markup text</s>CDE</s>end";
+  Dali::String strikethroughText = "start<s height='5.0f' color='green' >strikethrough<s color='blue' >markup text</s>CDE</s>end";
   label.SetProperty(TextLabel::Property::TEXT, strikethroughText);
 
   // Request render automatically.
@@ -2334,7 +2337,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup02(void)
   asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
 
-  std::string charspacingText = "start\n<char-spacing value='5.0f'>CHAR\n</char-spacing><char-spacing value='10.0f'>SPACING\n</char-spacing>end";
+  String charspacingText = "start\n<char-spacing value='5.0f'>CHAR\n</char-spacing><char-spacing value='10.0f'>SPACING\n</char-spacing>end";
   label.SetProperty(TextLabel::Property::TEXT, charspacingText);
 
   // Request render automatically.
@@ -2353,7 +2356,7 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup02(void)
   asyncTextRendered        = false;
   gAsyncTextRenderedCalled = false;
 
-  std::string emojiText = "Color VS16 \u262a\ufe0f";
+  String emojiText = "Color VS16 \u262a\ufe0f";
   label.SetProperty(TextLabel::Property::TEXT, emojiText);
 
   // Request render automatically.
@@ -2391,7 +2394,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 20);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
-  std::string longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
+  Dali::String longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
   label.SetProperty(TextLabel::Property::TEXT, longText);
   application.GetScene().Add(label);
 
@@ -2545,7 +2548,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   float expectedHeight = 200.0f;
   float dummySize      = 100.0f;
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
   dummy1.SetProperty(TextLabel::Property::TEXT, text);
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
@@ -2632,7 +2635,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
 
   float dummySize = 100.0f;
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
   dummy1.SetProperty(TextLabel::Property::TEXT, text);
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
@@ -2724,7 +2727,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
 
   float dummySize = 100.0f;
 
-  std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
   dummy1.SetProperty(TextLabel::Property::TEXT, text);
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
@@ -3021,12 +3024,12 @@ int UtcDaliToolkitTextLabelAsyncSetText(void)
   float expectedHeight = 300.0f;
 
   // Request render.
-  std::string text = "Hello, world!";
+  String text = "Hello, world!";
   label.SetProperty(TextLabel::Property::TEXT, text);
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
 
   // Request render.
-  std::string emptyText = "";
+  String emptyText = "";
   label.SetProperty(TextLabel::Property::TEXT, emptyText);
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
 
@@ -3127,7 +3130,7 @@ int UtcDaliToolkitTextLabelAsyncTextMultiline(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
 
-  std::string longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
+  Dali::String longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Vestibulum volutpat pretium libero. Vivamus at augue. In hac habitasse platea dictumst. Pellentesque eu metus. Etiam vitae tortor. Morbi vestibulum volutpat enim. Fusce vel dui. Sed vulputate odio vel purus. Aliquam at lorem. \U0001F31F";
   label.SetProperty(TextLabel::Property::TEXT, longText);
 
   application.GetScene().Add(label);
@@ -3409,7 +3412,7 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   tet_infoline(" UtcDaliToolkitTextLabelAsyncRenderScale");
 
   // Include glyphs with advance of 0 for testing.
-  std::string text = "Hello World Render SCA̧LE Test!";
+  String text = "Hello World Render SCA̧LE Test!";
 
   TextLabel label = TextLabel::New(text);
   DALI_TEST_CHECK(label);

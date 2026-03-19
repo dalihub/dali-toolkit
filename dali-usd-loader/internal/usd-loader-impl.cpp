@@ -20,6 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
 
 // Some TBB/USD headers produce compile warnings
 #pragma GCC diagnostic push
@@ -48,6 +52,7 @@
 using namespace Dali;
 using namespace pxr;
 using namespace Dali::Scene3D::Loader;
+using Dali::Integration::ToStdString;
 
 namespace Dali::Scene3D::Loader
 {
@@ -293,13 +298,13 @@ UsdLoaderImpl::UsdLoaderImpl()
 
 UsdLoaderImpl::~UsdLoaderImpl() = default;
 
-bool UsdLoaderImpl::LoadModel(const std::string& url, Dali::Scene3D::Loader::LoadResult& result)
+bool UsdLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result)
 {
   // Open the stage of the USD scene from the specified URL
-  mImpl->mUsdStage = UsdStage::Open(url);
+  mImpl->mUsdStage = UsdStage::Open(ToStdString(url));
   if(!mImpl->mUsdStage)
   {
-    DALI_LOG_ERROR("Failed to open %s\n", url.c_str());
+    DALI_LOG_ERROR("Failed to open %s\n", url.CStr());
     return false;
   }
 
@@ -427,13 +432,13 @@ NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, cons
     UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
-    nodeDefinition->mName      = nodeName;
-    if(nodeDefinition->mName.empty())
+    nodeDefinition->mName      = ToDaliStringView(nodeName);
+    if(nodeDefinition->mName.Empty())
     {
-      nodeDefinition->mName = std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get()));
+      nodeDefinition->mName = ToDaliStringView(std::to_string(reinterpret_cast<uintptr_t>(nodeDefinition.Get())));
     }
 
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "scene.AddNode (ConvertNode): %s, parentIndex: %d\n", nodeDefinition->mName.c_str(), parentIndex);
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "scene.AddNode (ConvertNode): %s, parentIndex: %d\n", ToStdString(nodeDefinition->mName).c_str(), parentIndex);
 
     if(setTransformation)
     {
@@ -1241,7 +1246,7 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
       renderable.Reset(modelRenderable);
       weakNode->mRenderables.push_back(std::move(renderable));
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "weakNode %s->mRenderables.push_back, ", weakNode->mName.c_str());
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "weakNode %s->mRenderables.push_back, ", ToStdString(weakNode->mName).c_str());
     }
   }
 
@@ -1447,7 +1452,7 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
     oss << prim.GetName() << "_xform_anim";
     std::string animationName = oss.str();
 
-    animationDefinition.SetName(animationName);
+    animationDefinition.SetName(ToDaliStringView(animationName));
 
     output.mAnimationDefinitions.push_back(std::move(animationDefinition));
   }

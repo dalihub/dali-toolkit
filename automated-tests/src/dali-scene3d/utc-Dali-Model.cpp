@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <stdlib.h>
 #include <iostream>
@@ -75,7 +76,7 @@ const char* TEST_DLI_EXERCISE_FILE_NAME            = TEST_RESOURCE_DIR "/exercis
  * These textures are based off version of Wave engine sample
  * Take from https://github.com/WaveEngine/Samples
  *
- * Copyright (c) 2025 Wave Coorporation
+ * Copyright (c) 2026 Wave Coorporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1757,19 +1758,19 @@ int UtcDaliModelRetrieveBlendShapeNames(void)
   Scene3D::ModelNode expectNode = model.FindChildModelNodeByName("AnimatedMorphCube");
 
   // Pair of expected blend shape index from expectNode.
-  std::map<std::string, Scene3D::Loader::BlendShapes::Index> expectBlendShapeNames = {
-    {"Target_0", 0u},
-    {"Target_1", 1u},
+  std::map<Dali::String, Scene3D::Loader::BlendShapes::Index> expectBlendShapeNames = {
+    {Dali::String("Target_0"), 0u},
+    {Dali::String("Target_1"), 1u},
   };
 
-  std::vector<std::string> blendShapeNameList;
+  std::vector<Dali::String> blendShapeNameList;
   model.RetrieveBlendShapeNames(blendShapeNameList);
 
   DALI_TEST_EQUALS(blendShapeNameList.size(), expectBlendShapeNames.size(), TEST_LOCATION);
   for(auto i = 0u; i < blendShapeNameList.size(); ++i)
   {
     const auto& name = blendShapeNameList[i];
-    tet_printf("Check retrieved blendshape name : %s\n", name.c_str());
+    tet_printf("Check retrieved blendshape name : %s\n", name.CStr());
 
     const auto& iter = expectBlendShapeNames.find(name);
     DALI_TEST_CHECK(iter != expectBlendShapeNames.end());
@@ -1935,8 +1936,8 @@ int UtcDaliModelMaterialUniformChange(void)
     {
       UniformData("uColorFactor", Property::Type::VECTOR4),
       UniformData("uBaseColorTextureTransformAvailable", Property::Type::FLOAT),
-      UniformData(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), Property::Type::FLOAT),
-      UniformData(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), Property::Type::FLOAT),
+      UniformData(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().Data(), Property::Type::FLOAT),
+      UniformData(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().Data(), Property::Type::FLOAT),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -1975,8 +1976,8 @@ int UtcDaliModelMaterialUniformChange(void)
   tet_printf("Check uniform value result\n");
   DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColorFactor", expectBaseColorFactor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gl.CheckUniformValue<float>("uBaseColorTextureTransformAvailable", expectTransformValid), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), expectMaxLOD), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), expectIblFactor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().Data(), expectMaxLOD), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().Data(), expectIblFactor), true, TEST_LOCATION);
 
   // Change all materials in Model.
   expectBaseColorFactor = Color::BLUE;
@@ -1991,8 +1992,8 @@ int UtcDaliModelMaterialUniformChange(void)
   tet_printf("Check whether uniform values are not changed instead what we change now\n");
   DALI_TEST_EQUALS(gl.CheckUniformValue<Vector4>("uColorFactor", expectBaseColorFactor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gl.CheckUniformValue<float>("uBaseColorTextureTransformAvailable", expectTransformValid), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().data(), expectMaxLOD), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().data(), expectIblFactor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblMaxLodUniformName().Data(), expectMaxLOD), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.CheckUniformValue<float>(Scene3D::Loader::NodeDefinition::GetIblScaleFactorUniformName().Data(), expectIblFactor), true, TEST_LOCATION);
 
   END_TEST;
 }

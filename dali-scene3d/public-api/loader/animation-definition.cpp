@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,12 +83,12 @@ Animation AnimationDefinition::ReAnimate(AnimatedProperty::GetActor getActor)
   return animation;
 }
 
-void AnimationDefinition::SetName(const std::string& name)
+void AnimationDefinition::SetName(const Dali::String& name)
 {
   mName = name;
 }
 
-const std::string& AnimationDefinition::GetName() const
+const Dali::String& AnimationDefinition::GetName() const
 {
   return mName;
 }

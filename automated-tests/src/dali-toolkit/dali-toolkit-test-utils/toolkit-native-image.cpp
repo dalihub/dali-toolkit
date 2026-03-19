@@ -56,7 +56,7 @@ bool NativeImage::GetPixels(Dali::Vector<unsigned char>& pixbuf, unsigned int& w
   return false;
 }
 
-bool NativeImage::EncodeToFile(const std::string& filename) const
+bool NativeImage::EncodeToFile(const String& filename) const
 {
   return false;
 }
@@ -109,14 +109,14 @@ int NativeImage::GetTextureTarget() const
   return 0;
 }
 
-bool NativeImage::ApplyNativeFragmentShader(std::string& shader)
+bool NativeImage::ApplyNativeFragmentShader(String& shader)
 {
   return ApplyNativeFragmentShader(shader, 1);
 }
 
-bool NativeImage::ApplyNativeFragmentShader(std::string& shader, int mask)
+bool NativeImage::ApplyNativeFragmentShader(String& shader, int mask)
 {
-  shader = Dali::NativeImageTest::GetCustomFragmentPrefix() + shader;
+  shader = String(Dali::NativeImageTest::GetCustomFragmentPrefix()) + shader;
   return true;
 }
 

@@ -32,7 +32,7 @@ TextEditor TextEditor::New()
 
 TextEditor TextEditor::New(ControlBehaviour additionalBehaviour)
 {
-  return Internal::TextEditor::New(static_cast<Toolkit::Internal::Control::ControlBehaviour>(additionalBehaviour));
+  return Internal::TextEditor::New(static_cast<ControlImpl::ControlBehaviour>(additionalBehaviour));
 }
 
 TextEditor::TextEditor()

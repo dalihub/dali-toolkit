@@ -110,7 +110,7 @@ public:
    * @param[in] themeFile If a relative path is specified, then this is relative
    * to the directory returned by Application::GetResourcePath()
    */
-  void ApplyTheme(const std::string& themeFile);
+  void ApplyTheme(const Dali::String& themeFile);
 
   /**
    * @brief Applies the default Toolkit theme.
@@ -132,7 +132,7 @@ public:
    * @param[in] key The key of the constant
    * @param[in] value The value of the constant
    */
-  void SetStyleConstant(const std::string& key, const Property::Value& value);
+  void SetStyleConstant(const Dali::String& key, const Property::Value& value);
 
   /**
    * @brief Returns the style constant set for a specific key.
@@ -143,7 +143,7 @@ public:
    *
    * @return If the constant for key exists, then return the constant in valueOut and return true
    */
-  bool GetStyleConstant(const std::string& key, Property::Value& valueOut);
+  bool GetStyleConstant(const Dali::String& key, Property::Value& valueOut);
 
   /**
    * @brief Applies the specified style to the control.
@@ -155,7 +155,7 @@ public:
    * returned by Application::GetResourcePath()
    * @param[in] styleName The name of the style within the JSON file to apply
    */
-  void ApplyStyle(Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName);
+  void ApplyStyle(Toolkit::Control control, const Dali::String& jsonFileName, const Dali::String& styleName);
 
 public: // Signals
   /**

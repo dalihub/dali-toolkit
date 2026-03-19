@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -253,8 +256,8 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = isHorizontal ? Shader::New(SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER")
-                               : Shader::New(SHADER_TEXT_SCROLLER_VERTICAL_SHADER_VERT, SHADER_TEXT_SCROLLER_VERTICAL_SHADER_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER_VERTICAL");
+  Shader shader = isHorizontal ? Shader::New(ToDaliStringView(SHADER_TEXT_SCROLLER_SHADER_VERT), ToDaliStringView(SHADER_TEXT_SCROLLER_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER")
+                               : Shader::New(ToDaliStringView(SHADER_TEXT_SCROLLER_VERTICAL_SHADER_VERT), ToDaliStringView(SHADER_TEXT_SCROLLER_VERTICAL_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_SCROLLER_VERTICAL");
 
   mRenderer.SetShader(shader);
   mRenderer.SetTextures(textureSet);

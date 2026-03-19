@@ -49,7 +49,7 @@ namespace Internal
 /**
  * @brief Impl class for Panel.
  */
-class Panel : public Dali::Toolkit::Internal::Control, public LightObserver
+class Panel : public Dali::Toolkit::ControlImpl, public LightObserver
 {
 public:
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/bvh-loader.h>
 #include <dali-scene3d/public-api/loader/facial-animation-loader.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -99,17 +102,17 @@ void MotionDataLoadTask::Process()
   {
     case LoadMethod::BVH_FILE:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvh(mFileUrl, "LoadedBvhMotionData", mUseRootTranslationOnly, mScale));
+      mAnimationDefinition = std::move(Loader::LoadBvh(ToDaliString(mFileUrl), Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale));
       break;
     }
     case LoadMethod::BVH_BUFFER:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, "LoadedBvhMotionData", mUseRootTranslationOnly, mScale));
+      mAnimationDefinition = std::move(Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale));
       break;
     }
     case LoadMethod::FACIAL_FILE:
     {
-      mAnimationDefinition = std::move(Loader::LoadFacialAnimation(mFileUrl));
+      mAnimationDefinition = std::move(Loader::LoadFacialAnimation(ToDaliString(mFileUrl)));
       break;
     }
     case LoadMethod::FACIAL_BUFFER:
