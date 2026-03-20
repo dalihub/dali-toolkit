@@ -161,6 +161,11 @@ Dali::Geometry VisualFactory::CreateGridGeometry(Dali::Uint16Pair gridSize, bool
   return Internal::VisualFactoryCache::CreateGridGeometry(gridSize, normalized);
 }
 
+Dali::Geometry VisualFactory::CreateQuadGeometry()
+{
+  return Internal::VisualFactoryCache::CreateQuadGeometry();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

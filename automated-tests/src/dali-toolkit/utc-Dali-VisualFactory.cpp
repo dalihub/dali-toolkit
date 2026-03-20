@@ -3104,3 +3104,17 @@ int UtcDaliVisualFactoryCreateGridGeometry(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualFactoryCreateQuadGeometry(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryCreateQuadGeometry: Test CreateQuadGeometry function");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Geometry geometry = factory.CreateQuadGeometry();
+  DALI_TEST_CHECK(geometry);
+
+  END_TEST;
+}
