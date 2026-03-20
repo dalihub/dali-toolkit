@@ -261,6 +261,16 @@ public:
    */
   Dali::Geometry CreateGridGeometry(Dali::Uint16Pair gridSize, bool normalized);
 
+  /**
+   * @brief Create the quad geometry.
+   *
+   * This function creates a basic quad geometry for use in custom controls and visuals.
+   * The quad geometry is a simple 2-triangle rectangle with position and texture coordinates.
+   *
+   * @return The created quad geometry.
+   */
+  Dali::Geometry CreateQuadGeometry();
+
 private:
   explicit DALI_INTERNAL VisualFactory(Internal::VisualFactory* impl);
 };
