@@ -45,6 +45,30 @@
       "environment" : 1
     },
     {
+      "name": "albedoMetallicMap",
+      "color": [ 1, 1, 1, 1 ],
+      "albedoMetallicMap": "exercise/Icons/Icon_Lunge.png",
+      "mipmap": true
+    },
+    {
+      "name": "metallicRoughnessMap",
+      "color": [ 1, 1, 1, 1 ],
+      "metallicRoughnessMap": "exercise/Icons/Icon_JJ.png",
+      "mipmap": true
+    },
+    {
+      "name": "normalMap",
+      "color": [ 1, 1, 1, 1 ],
+      "normalMap": "exercise/Icons/Icon_Squat.png",
+      "mipmap": true
+    },
+    {
+      "name": "normalRoughnessMap",
+      "color": [ 1, 1, 1, 1 ],
+      "normalRoughnessMap": "exercise/Icons/Icon_Idle.png",
+      "mipmap": true
+    },
+    {
       "name": "",
       "color": [ 1, 1, 1, 1 ],
       "roughness": 1,

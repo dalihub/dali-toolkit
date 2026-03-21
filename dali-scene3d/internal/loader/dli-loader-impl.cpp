@@ -1013,102 +1013,118 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
 
     // TODO : need to consider AGIF
     std::vector<std::string> texturePaths;
-    std::string              texturePath;
-    if(ReadString(node.GetChild("albedoMap"), texturePath))
     {
+      std::string texturePath;
+      if(ReadString(node.GetChild("albedoMap"), texturePath))
       {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
+        const auto semantic = MaterialDefinition::ALBEDO;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic | MaterialDefinition::TRANSPARENCY; // NOTE: only in dli does single / separate ALBEDO texture mean TRANSPARENCY.
       }
-      const auto semantic = MaterialDefinition::ALBEDO;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
-      materialDef.mFlags |= semantic | MaterialDefinition::TRANSPARENCY; // NOTE: only in dli does single / separate ALBEDO texture mean TRANSPARENCY.
     }
-    if(ReadString(node.GetChild("albedoMetallicMap"), texturePath))
     {
+      std::string texturePath;
+      if(ReadString(node.GetChild("albedoMetallicMap"), texturePath))
       {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
+
+        if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
+        {
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "albedo")));
+        }
+
+        const auto semantic = MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic;
       }
-
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
-      {
-        mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "albedo")));
-      }
-
-      const auto semantic = MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
-      materialDef.mFlags |= semantic;
-    }
-
-    if(ReadString(node.GetChild("metallicRoughnessMap"), texturePath))
-    {
-      {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
-      }
-
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::METALLIC))
-      {
-        mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "metallic")));
-      }
-
-      const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
-      materialDef.mFlags |= semantic |
-                            // We have a metallic-roughhness map and the first texture did not have albedo semantics - we're in the transparency workflow.
-                            (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
     }
 
-    if(ReadString(node.GetChild("normalMap"), texturePath))
     {
+      std::string texturePath;
+      if(ReadString(node.GetChild("metallicRoughnessMap"), texturePath))
       {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
-      }
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
 
-      const auto semantic = MaterialDefinition::NORMAL;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
-      materialDef.mFlags |= semantic |
-                            // We have a standalone normal map and the first texture did not have albedo semantics - we're in the transparency workflow.
-                            (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
+        if(MaskMatch(materialDef.mFlags, MaterialDefinition::METALLIC))
+        {
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "metallic")));
+        }
+
+        const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic |
+                              // We have a metallic-roughhness map and the first texture did not have albedo semantics - we're in the transparency workflow.
+                              (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
+      }
     }
 
-    if(ReadString(node.GetChild("normalRoughnessMap"), texturePath))
     {
+      std::string texturePath;
+      if(ReadString(node.GetChild("normalMap"), texturePath))
       {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
-      }
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
 
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
+        const auto semantic = MaterialDefinition::NORMAL;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic |
+                              // We have a standalone normal map and the first texture did not have albedo semantics - we're in the transparency workflow.
+                              (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
+      }
+    }
+
+    {
+      std::string texturePath;
+      if(ReadString(node.GetChild("normalRoughnessMap"), texturePath))
       {
-        mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "normal")));
-      }
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
 
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::ROUGHNESS))
-      {
-        mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "roughness")));
-      }
+        if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
+        {
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "normal")));
+        }
 
-      if(MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY))
-      {
-        mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "transparency")));
-      }
+        if(MaskMatch(materialDef.mFlags, MaterialDefinition::ROUGHNESS))
+        {
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "roughness")));
+        }
 
-      const auto semantic = MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(texturePath)}});
-      materialDef.mFlags |= semantic;
+        if(MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY))
+        {
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "transparency")));
+        }
+
+        const auto semantic = MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic;
+      }
     }
 
     /// @TODO : Some dli shader don't implement this subsurfaceMp usage.
     ///         To make visual test pass, Skip subsurfaceMap texture using
     ///         until dli shaders are support it.
+    //  {
+    //    std::string texturePath;
     //    if(ReadString(node.GetChild("subsurfaceMap"), texturePath))
     //    {
     //      { Dali::String tmp = ToDaliString(texturePath); ToUnixFileSeparators(tmp); texturePath = ToStdString(tmp); }
@@ -1117,17 +1133,21 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
     //      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
     //      materialDef.mFlags |= semantic;
     //    }
+    //  }
 
-    if(ReadString(node.GetChild("occlusionMap"), texturePath))
     {
+      std::string texturePath;
+      if(ReadString(node.GetChild("occlusionMap"), texturePath))
       {
-        Dali::String tmp = ToDaliString(texturePath);
-        ToUnixFileSeparators(tmp);
-        texturePath = ToStdString(tmp);
+        {
+          Dali::String tmp = ToDaliString(texturePath);
+          ToUnixFileSeparators(tmp);
+          texturePath = ToStdString(tmp);
+        }
+        const auto semantic = MaterialDefinition::OCCLUSION;
+        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mFlags |= semantic;
       }
-      const auto semantic = MaterialDefinition::OCCLUSION;
-      materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(texturePath)}});
-      materialDef.mFlags |= semantic;
     }
 
     if(ReadColorCodeOrColor(&node, materialDef.mColor, convertColorCode) &&
@@ -1233,7 +1253,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
     {
       std::string nodeNameStd;
       ReadString(node->GetChild(NAME), nodeNameStd);
-      nodeDef.mName = ToDaliString(nodeNameStd);
+      nodeDef.mName = ToDaliString(std::move(nodeNameStd));
     }
 
     // transform
@@ -1260,7 +1280,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
       std::string tag;
       if(ReadString(eCustomization->GetChild("tag"), tag))
       {
-        nodeDef.mCustomization.Reset(new Dali::Scene3D::Loader::NodeDefinition::CustomizationDefinition{ToDaliString(tag)});
+        nodeDef.mCustomization.Reset(new Dali::Scene3D::Loader::NodeDefinition::CustomizationDefinition{ToDaliString(std::move(tag))});
       }
     }
     else // something renderable maybe
@@ -1532,9 +1552,11 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     const TreeNode&     tnAnim                 = (*iAnim).second;
     uint32_t            animationPropertyIndex = 0;
     AnimationDefinition animDef;
-    std::string         animationName;
-    ReadString(tnAnim.GetChild(NAME), animationName);
-    animDef.SetName(ToDaliString(animationName));
+    {
+      std::string animationName;
+      ReadString(tnAnim.GetChild(NAME), animationName);
+      animDef.SetName(ToDaliString(std::move(animationName)));
+    }
 
     auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1)
               { return ad0.GetName() < ad1.GetName(); });
@@ -1619,7 +1641,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
             mOnError(ToStdString(FormatString("Animation '%s': Failed to read the 'node' tag.", animDef.GetName().CStr())));
             continue;
           }
-          animProp.mNodeName = ToDaliString(nodeName);
+          animProp.mNodeName = ToDaliString(std::move(nodeName));
         }
 
         {
@@ -1629,7 +1651,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
             mOnError(ToStdString(FormatString("Animation '%s': Failed to read the 'property' tag", animDef.GetName().CStr())));
             continue;
           }
-          animProp.mPropertyName = ToDaliString(propertyName);
+          animProp.mPropertyName = ToDaliString(std::move(propertyName));
         }
 
         // these are the defaults
@@ -1643,10 +1665,12 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
                                             animProp.mTimePeriod.durationSeconds)));
         }
 
-        std::string alphaFunctionValue;
-        if(ReadString(tnProperty.GetChild("alphaFunction"), alphaFunctionValue))
         {
-          animProp.mAlphaFunction = GetAlphaFunction(ToDaliString(alphaFunctionValue));
+          std::string alphaFunctionValue;
+          if(ReadString(tnProperty.GetChild("alphaFunction"), alphaFunctionValue))
+          {
+            animProp.mAlphaFunction = GetAlphaFunction(ToDaliString(std::move(alphaFunctionValue)));
+          }
         }
 
         if(const TreeNode* tnKeyFramesBin = tnProperty.GetChild("keyFramesBin"))
@@ -1808,12 +1832,12 @@ void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimat
       continue;
     }
 
-    Dali::String daliGroupName = ToDaliString(groupName);
+    Dali::String daliGroupName = ToDaliString(std::move(groupName));
     auto         iFind         = std::lower_bound(animGroups.begin(), animGroups.end(), daliGroupName, [](const AnimationGroupDefinition& group, const Dali::String& name)
                     { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == daliGroupName)
     {
-      mOnError(ToStdString(FormatString("Animation group with name '%s' already exists; new entries will be merged.", groupName.c_str())));
+      mOnError(ToStdString(FormatString("Animation group with name '%s' already exists; new entries will be merged.", daliGroupName.CStr())));
     }
     else
     {
