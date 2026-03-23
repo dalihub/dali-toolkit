@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ const char* const OPTION_CLIPBOARD("optionClipboard");    // "Clipboard" popup o
 const Size CONTROL_SIZE(300.f, 60.f);
 
 // Generate a KeyEvent to send to Core.
-Dali::KeyEvent GenerateKey(const std::string&           keyName,
-                           const std::string&           keyString,
+Dali::KeyEvent GenerateKey(const Dali::String&          keyName,
+                           const Dali::String&          keyString,
                            int                          keyCode,
                            int                          keyModifier,
                            unsigned long                timeStamp,
