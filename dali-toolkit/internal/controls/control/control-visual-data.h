@@ -282,7 +282,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::UpdateVisualProperties()
    */
-  void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
+  void UpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::CreateAnimationConstraints()

@@ -409,10 +409,10 @@ public:
    *
    * This method triggers Control::OnCreateTransition().
    */
-  void CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                         std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                         Dali::Toolkit::Control                                              source,
-                         Dali::Toolkit::Control                                              destination);
+  void CreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                         Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                         Dali::Toolkit::Control                                                source,
+                         Dali::Toolkit::Control                                                destination);
 
   /**
    * @brief Create constraints to animate animatable properties.
@@ -434,7 +434,7 @@ public:
    *
    * @note This method triggers Control::OnUpdateVisualProperties().
    */
-  void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
+  void UpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()

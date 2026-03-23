@@ -172,15 +172,15 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnCreateTransitions()
    */
-  virtual void OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                   std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                   Dali::Toolkit::Control                                              source,
-                                   Dali::Toolkit::Control                                              destination) override;
+  virtual void OnCreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                   Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                   Dali::Toolkit::Control                                                source,
+                                   Dali::Toolkit::Control                                                destination) override;
 
   /**
    * @copydoc Toolkit::Control::OnUpdateVisualProperties()
    */
-  virtual void OnUpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties) override;
+  virtual void OnUpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties) override;
 
 private:
   /**

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TRANSITION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali-toolkit/public-api/transition/transition.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/weak-handle.h>
 
 namespace Dali
@@ -85,11 +85,11 @@ private:
   Dali::Toolkit::Control GetWaitingControl();
 
 private:
-  bool                                                               mUseDestinationTarget;
-  Vector3                                                            mOriginalSize;
-  std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>> mOriginalVisualProperties;
-  WeakHandle<Dali::Toolkit::Control>                                 mSourceControl;
-  WeakHandle<Dali::Toolkit::Control>                                 mDestinationControl;
+  bool                                                                 mUseDestinationTarget;
+  Vector3                                                              mOriginalSize;
+  Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>> mOriginalVisualProperties;
+  WeakHandle<Dali::Toolkit::Control>                                   mSourceControl;
+  WeakHandle<Dali::Toolkit::Control>                                   mDestinationControl;
 };
 
 } // namespace Internal

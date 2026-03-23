@@ -22,12 +22,14 @@
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
@@ -771,10 +773,10 @@ public: // API for derived classes to override
    * @note This method do not handle Actor properties.
    * And the size and order of the sourceProperties and destinationProperties must be synchronized.
    */
-  virtual void OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                   std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                   Dali::Toolkit::Control                                              source,
-                                   Dali::Toolkit::Control                                              destination)
+  virtual void OnCreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                   Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                   Dali::Toolkit::Control                                                source,
+                                   Dali::Toolkit::Control                                                destination)
   {
   }
 
@@ -782,7 +784,7 @@ public: // API for derived classes to override
    * @brief Update visual properties.
    * @param[in] properties Property list to be used to update visual properties of this Control.
    */
-  virtual void OnUpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+  virtual void OnUpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
   {
   }
 
