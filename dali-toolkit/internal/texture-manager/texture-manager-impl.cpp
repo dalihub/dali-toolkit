@@ -251,7 +251,12 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
         PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffers[i]); // takes ownership of buffer
         Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-        texture.Upload(pixelData, ToDaliString(url.GetUrl()), textureId);
+        std::string stdUrl = url.GetUrl();
+        if(pixelBuffers.size() >= 3)
+        {
+          stdUrl += std::string("(") + ("YUVA"[i]) + ")";
+        }
+        texture.Upload(pixelData, ToDaliString(std::move(stdUrl)), textureId);
 #else
         texture.Upload(pixelData);
 #endif
@@ -1233,7 +1238,12 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
       Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-      texture.Upload(pixelData, ToDaliString(textureInfo.url.GetUrl()), textureInfo.textureId);
+      std::string stdUrl = textureInfo.url.GetUrl();
+      if(pixelBuffers.size() >= 3)
+      {
+        stdUrl += std::string("(") + ("YUVA"[textureInfo.textures.size()]) + ")";
+      }
+      texture.Upload(pixelData, ToDaliString(std::move(stdUrl)), textureInfo.textureId);
 #else
       texture.Upload(pixelData);
 #endif
