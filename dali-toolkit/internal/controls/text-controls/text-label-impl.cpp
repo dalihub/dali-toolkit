@@ -59,6 +59,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 using namespace Dali::Toolkit::Text;
+using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
@@ -1974,7 +1975,7 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   std::string text;
   mController->GetText(text);
-  texture.Upload(data, text + std::string("(TextScroll)"));
+  texture.Upload(data, ToDaliString(text + std::string("(TextScroll)")));
 #else
   texture.Upload(data);
 #endif
@@ -2030,7 +2031,7 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   std::string text;
   mController->GetText(text);
-  texture.Upload(data, text + std::string("(TextScroll)"));
+  texture.Upload(data, ToDaliString(text + std::string("(TextScroll)")));
 #else
   texture.Upload(data);
 #endif
