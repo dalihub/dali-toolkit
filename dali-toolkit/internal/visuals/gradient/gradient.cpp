@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "gradient.h"
 
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/math/vector4.h>
 #include <algorithm> // std::sort
 
@@ -165,7 +166,7 @@ Dali::Texture Gradient::GenerateLookupTexture()
 
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, resolution, 1u);
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
-  texture.Upload(pixelData, "gradient");
+  Dali::Integration::TextureUploadWithContent(texture, pixelData, "gradient", Dali::Integration::TextureContextTypeHint::GRADIENT_TEXTURE);
 #else
   texture.Upload(pixelData);
 #endif

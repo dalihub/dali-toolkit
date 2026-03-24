@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/integration-api/texture-integ.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -700,10 +701,12 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
                                  data.GetPixelFormat(),
                                  data.GetWidth(),
                                  data.GetHeight());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  std::string text;
-  mController->GetText(text);
-  texture.Upload(data, text + std::string("(TextVisual)"));
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::string text;
+    mController->GetText(text);
+    Dali::Integration::TextureUploadWithContent(texture, data, std::move(text), Dali::Integration::TextureContextTypeHint::TEXT_SIMPLE_LABEL);
+  }
 #else
   texture.Upload(data);
 #endif

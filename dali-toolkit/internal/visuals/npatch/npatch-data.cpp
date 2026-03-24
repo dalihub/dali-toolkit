@@ -23,6 +23,8 @@
 
 // EXTERNAL HEADERS
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
+#include <algorithm>
 
 namespace Dali
 {
@@ -231,8 +233,8 @@ void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMu
   PixelData pixels = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
 
   Texture texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(pixels, mUrl.GetUrl());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  Dali::Integration::TextureUploadWithContent(texture, pixels, mUrl.GetUrl(), Dali::Integration::TextureContextTypeHint::NPATCH_IMAGE);
 #else
   texture.Upload(pixels);
 #endif

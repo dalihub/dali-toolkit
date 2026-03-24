@@ -286,7 +286,7 @@ public:
    */
   struct SvgRasterizeInfo
   {
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
     SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing, VisualUrl imageUrl)
 #else
     SvgRasterizeInfo(SvgRasterizeId rasterizeId, SvgLoadId loadId, uint32_t width, uint32_t height, bool attemptAtlasing)
@@ -297,7 +297,7 @@ public:
       mWidth(width),
       mHeight(height),
       mAttemptAtlasing(attemptAtlasing),
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
       mImageUrl(std::move(imageUrl)),
 #endif
       mRasterizeState(RasterizeState::NOT_STARTED),
@@ -318,7 +318,7 @@ public:
       mWidth(info.mWidth),
       mHeight(info.mHeight),
       mAttemptAtlasing(info.mAttemptAtlasing),
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
       mImageUrl(std::move(info.mImageUrl)),
 #endif
       mRasterizeState(info.mRasterizeState),
@@ -344,7 +344,7 @@ public:
         mHeight          = info.mHeight;
         mAttemptAtlasing = info.mAttemptAtlasing;
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
         mImageUrl = std::move(info.mImageUrl);
 #endif
 
@@ -378,7 +378,7 @@ public:
     uint32_t  mHeight;
     bool      mAttemptAtlasing; ///< True if atlas requested.
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
     VisualUrl mImageUrl;
 #endif
 
