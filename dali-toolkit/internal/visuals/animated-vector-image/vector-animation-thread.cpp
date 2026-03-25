@@ -24,6 +24,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/trace.h>
 #include <algorithm>
 #include <thread>
