@@ -19,13 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/video-player-plugin.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/any.h>
 
 namespace Dali
 {
@@ -33,6 +33,7 @@ namespace Toolkit
 {
 namespace DevelVideoView
 {
+
 /**
  * @brief Returns the internal media player.
  * @param[in] videoView The current VideoView
@@ -49,6 +50,18 @@ DALI_TOOLKIT_API Any GetMediaPlayer(VideoView videoView);
  * @return A handle to a newly allocated Dali VideoView
  */
 DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
+
+/**
+ * @brief Creates an initialized VideoView wrapper using an externally created native player handle with type information.
+ *
+ * This overload allows specifying the player type explicitly, which is needed to distinguish between
+ * different player implementations
+ *
+ * @param[in] playerHandle The externally created player handle with type information.
+ * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer.
+ * @return A handle to a newly allocated Dali VideoView
+ */
+DALI_TOOLKIT_API VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
 
 /**
  * @brief Play the resize or move animation with synchronization between UI(transparent hole) and video player

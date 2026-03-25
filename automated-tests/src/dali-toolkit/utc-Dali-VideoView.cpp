@@ -346,16 +346,16 @@ int UtcDaliVideoViewMethodsForCoverage(void)
   VideoView videoView = VideoView::New();
   DALI_TEST_CHECK(videoView);
 
+  Toolkit::DevelVideoView::GetMediaPlayer(videoView);
+
+  VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
+  DALI_TEST_EQUALS(0, signal.GetConnectionCount(), TEST_LOCATION);
+
   videoView.Play();
   videoView.Pause();
   videoView.Stop();
   videoView.Forward(10);
   videoView.Backward(10);
-
-  Toolkit::DevelVideoView::GetMediaPlayer(videoView);
-
-  VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
-  DALI_TEST_EQUALS(0, signal.GetConnectionCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1059,6 +1059,32 @@ int UtcDaliVideoViewPlayWithOverlayTextureVisualSetVideoBuffer(void)
 
   VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
   DALI_TEST_EQUALS(0, signal.GetConnectionCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewWithPlayerHandle(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewWithPlayerHandle");
+
+  // Create a dummy player handle with type (nullptr for test purposes)
+  Dali::VideoPlayerPlugin::PlayerHandle playerHandle;
+  playerHandle.handle = nullptr;
+  playerHandle.playerType = Dali::VideoPlayerPlugin::PlayerHandleType::DEFAULT;
+
+  VideoView videoView = DevelVideoView::New(playerHandle);
+  DALI_TEST_CHECK(videoView);
+
+  application.GetScene().Add(videoView);
+
+  Vector3 vector(50.0f, 200.0f, 0.0f);
+  videoView.SetProperty(Actor::Property::SIZE, vector);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(vector == videoView.GetCurrentProperty<Vector3>(Actor::Property::SIZE));
 
   END_TEST;
 }
