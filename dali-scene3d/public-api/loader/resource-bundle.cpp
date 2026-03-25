@@ -182,7 +182,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
       auto& iEnvMap  = mEnvironmentMaps[i];
       if(refCount > 0 && (kForceLoad || (!iEnvMap.first.mRawData && !iEnvMap.second.IsLoaded())))
       {
-        iEnvMap.first.mRawData = std::make_shared<EnvironmentDefinition::RawData>(iEnvMap.first.LoadRaw(environmentsPath));
+        iEnvMap.first.mRawData = MakeShared<EnvironmentDefinition::RawData>(iEnvMap.first.LoadRaw(environmentsPath));
       }
     }
 
@@ -194,7 +194,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
       auto& iShader  = mShaders[i];
       if(refCount > 0 && (kForceLoad || !iShader.second))
       {
-        iShader.first.mRawData = std::make_shared<ShaderDefinition::RawData>(iShader.first.LoadRaw(shadersPath));
+        iShader.first.mRawData = MakeShared<ShaderDefinition::RawData>(iShader.first.LoadRaw(shadersPath));
       }
     }
 
@@ -206,7 +206,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
       auto& iMesh    = mMeshes[i];
       if(refCount > 0 && (kForceLoad || (!iMesh.first.mRawData && !iMesh.second.geometry)))
       {
-        iMesh.first.mRawData = std::make_shared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath, mBuffers));
+        iMesh.first.mRawData = MakeShared<MeshDefinition::RawData>(iMesh.first.LoadRaw(modelsPath, mBuffers));
       }
     }
 
@@ -218,7 +218,7 @@ void ResourceBundle::LoadRawResources(PathProvider pathProvider, Options::Type o
       auto& iMaterial = mMaterials[i];
       if(refCount > 0 && (kForceLoad || (!iMaterial.first.mRawData && !iMaterial.second)))
       {
-        iMaterial.first.mRawData = std::make_shared<MaterialDefinition::RawData>(iMaterial.first.LoadRaw(imagesPath));
+        iMaterial.first.mRawData = MakeShared<MaterialDefinition::RawData>(iMaterial.first.LoadRaw(imagesPath));
       }
     }
 

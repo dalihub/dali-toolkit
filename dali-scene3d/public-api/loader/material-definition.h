@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/texture.h>
@@ -245,8 +246,8 @@ struct DALI_SCENE3D_API MaterialDefinition
   }
 
 public: // DATA
-  std::shared_ptr<RawData> mRawData;
-  uint32_t                 mFlags = 0x0;
+  SharedPtr<RawData> mRawData;
+  uint32_t           mFlags = 0x0;
 
   Index   mEnvironmentIdx      = 0;
   Vector4 mColor               = Color::WHITE;
