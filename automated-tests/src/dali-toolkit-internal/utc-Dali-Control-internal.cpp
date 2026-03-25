@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/internal/controls/control/control-debug.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dummy-visual.h>
 #include <toolkit-text-utils.h>
 
@@ -38,7 +39,7 @@ int UtcDaliControlActionOnVisual(void)
   tet_infoline("Register an ImageVisual and perform image reload Action on it. Tests Actions are completed.");
   Vector2 controlSize(20.f, 30.f);
 
-  //Created DummyVisual
+  // Created DummyVisual
   Property::Map                     settings;
   Toolkit::Internal::DummyVisualPtr dummyVisualPtr = Toolkit::Internal::DummyVisual::New(settings);
 
@@ -139,6 +140,81 @@ int UtcDaliControlOverrideCornerProperties(void)
   DALI_TEST_EQUALS(cornerRadius, visualCornerRadius, TEST_LOCATION);
   DALI_TEST_EQUALS(cornerRadiusPolicy, visualCornerRadiusPolicy, TEST_LOCATION);
   DALI_TEST_EQUALS(cornerSquareness, visualCornerSquareness, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliControlCreateTransitionsWithShadow(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Test CreateTransitions method with shadow properties to cover shadow transition code block.");
+
+  // Create source control with shadow
+  Property::Map shadowPropertyMapSource;
+  shadowPropertyMapSource[Visual::Property::TYPE]              = Visual::COLOR;
+  shadowPropertyMapSource[ColorVisual::Property::MIX_COLOR]    = Color::RED;
+  shadowPropertyMapSource[Visual::Transform::Property::OFFSET] = Vector2(5.0f, 5.0f);
+
+  Control sourceControl = Control::New();
+  sourceControl.SetProperty(Control::Property::BACKGROUND, Color::BLUE);
+  sourceControl.SetProperty(DevelControl::Property::SHADOW, shadowPropertyMapSource);
+  sourceControl.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  application.GetScene().Add(sourceControl);
+
+  // Create destination control with different shadow
+  Property::Map shadowPropertyMapDest;
+  shadowPropertyMapDest[Visual::Property::TYPE]              = Visual::COLOR;
+  shadowPropertyMapDest[ColorVisual::Property::MIX_COLOR]    = Color::GREEN;
+  shadowPropertyMapDest[Visual::Transform::Property::OFFSET] = Vector2(10.0f, 10.0f);
+
+  Control destControl = Control::New();
+  destControl.SetProperty(Control::Property::BACKGROUND, Color::YELLOW);
+  destControl.SetProperty(DevelControl::Property::SHADOW, shadowPropertyMapDest);
+  destControl.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  application.GetScene().Add(destControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Access the internal Control class to call CreateTransitions
+  Toolkit::Internal::Control& sourceInternal = Dali::Toolkit::Internal::Control::Get(Dali::Toolkit::GetImplementation(sourceControl));
+
+  Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>> sourceProperties;
+  Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>> destinationProperties;
+
+  // Call CreateTransitions which should add shadow properties
+  sourceInternal.CreateTransitions(sourceProperties, destinationProperties, sourceControl, destControl);
+
+  // Verify that shadow properties were added to the vectors
+  bool shadowSourceFound = false;
+  bool shadowDestFound   = false;
+
+  for(const auto& property : sourceProperties)
+  {
+    if(property.first == Toolkit::DevelControl::Property::SHADOW)
+    {
+      shadowSourceFound = true;
+      // Verify the shadow property map is not empty
+      DALI_TEST_CHECK(property.second.Count() > 0);
+      break;
+    }
+  }
+
+  for(const auto& property : destinationProperties)
+  {
+    if(property.first == Toolkit::DevelControl::Property::SHADOW)
+    {
+      shadowDestFound = true;
+      // Verify the shadow property map is not empty
+      DALI_TEST_CHECK(property.second.Count() > 0);
+      break;
+    }
+  }
+
+  DALI_TEST_CHECK(shadowSourceFound);
+  DALI_TEST_CHECK(shadowDestFound);
 
   END_TEST;
 }

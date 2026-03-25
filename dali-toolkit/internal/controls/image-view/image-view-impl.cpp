@@ -429,22 +429,22 @@ float ImageView::GetWidthForHeight(float height)
   }
 }
 
-void ImageView::OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                    std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                    Dali::Toolkit::Control                                              source,
-                                    Dali::Toolkit::Control                                              destination)
+void ImageView::OnCreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                    Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                    Dali::Toolkit::Control                                                source,
+                                    Dali::Toolkit::Control                                                destination)
 {
   // Retrieves image properties to be transitioned.
   Dali::Property::Map imageSourcePropertyMap, imageDestinationPropertyMap;
   MakeVisualTransition(imageSourcePropertyMap, imageDestinationPropertyMap, source, destination, Toolkit::ImageView::Property::IMAGE);
   if(imageSourcePropertyMap.Count() > 0)
   {
-    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageSourcePropertyMap));
-    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageDestinationPropertyMap));
+    sourceProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageSourcePropertyMap));
+    destinationProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageDestinationPropertyMap));
   }
 }
 
-void ImageView::OnUpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+void ImageView::OnUpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
   Toolkit::Visual::Base visual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
   if(visual)

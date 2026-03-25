@@ -2018,18 +2018,18 @@ Dali::Property Control::GetVisualProperty(Dali::Property::Index index, Dali::Pro
   return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
-void Control::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                Dali::Toolkit::Control                                              source,
-                                Dali::Toolkit::Control                                              destination)
+void Control::CreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                Dali::Toolkit::Control                                                source,
+                                Dali::Toolkit::Control                                                destination)
 {
   // Retrieves background properties to be transitioned.
   Dali::Property::Map backgroundSourcePropertyMap, backgroundDestinationPropertyMap;
   mControlImpl.MakeVisualTransition(backgroundSourcePropertyMap, backgroundDestinationPropertyMap, source, destination, Toolkit::Control::Property::BACKGROUND);
   if(backgroundSourcePropertyMap.Count() > 0)
   {
-    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundSourcePropertyMap));
-    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundDestinationPropertyMap));
+    sourceProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundSourcePropertyMap));
+    destinationProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundDestinationPropertyMap));
   }
 
   // Retrieves shadow properties to be transitioned.
@@ -2037,15 +2037,15 @@ void Control::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dal
   mControlImpl.MakeVisualTransition(shadowSourcePropertyMap, shadowDestinationPropertyMap, source, destination, Toolkit::DevelControl::Property::SHADOW);
   if(shadowSourcePropertyMap.Count() > 0)
   {
-    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowSourcePropertyMap));
-    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowDestinationPropertyMap));
+    sourceProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowSourcePropertyMap));
+    destinationProperties.PushBack(Dali::Pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowDestinationPropertyMap));
   }
 
   // Retrieves transition from inherited class.
   mControlImpl.OnCreateTransitions(sourceProperties, destinationProperties, source, destination);
 }
 
-void Control::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+void Control::UpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
   if(DALI_LIKELY(mVisualData))
   {

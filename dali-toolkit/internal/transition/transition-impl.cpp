@@ -149,15 +149,15 @@ void Transition::OnPlay()
     return;
   }
 
-  mOriginalVisualProperties.clear();
-  std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>> destinationVisualProperties;
+  mOriginalVisualProperties.Clear();
+  Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>> destinationVisualProperties;
 
   Toolkit::Control   targetControl   = GetTargetControl();
   ControlImpl&       controlImpl     = Toolkit::GetImplementation(targetControl);
   Internal::Control& internalControl = Internal::Control::Get(controlImpl);
   internalControl.CreateTransitions(mOriginalVisualProperties, destinationVisualProperties, sourceControl, destinationControl);
 
-  for(uint32_t index = 0; index < mOriginalVisualProperties.size(); ++index)
+  for(uint32_t index = 0; index < mOriginalVisualProperties.Count(); ++index)
   {
     Dali::Property::Map source      = mOriginalVisualProperties[index].second;
     Dali::Property::Map destination = destinationVisualProperties[index].second;
