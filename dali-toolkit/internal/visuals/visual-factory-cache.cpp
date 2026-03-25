@@ -39,6 +39,9 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+
 namespace Dali
 {
 namespace Toolkit
@@ -362,7 +365,7 @@ Texture VisualFactoryCache::GetBrokenVisualImage(uint32_t brokenIndex)
       pixelData                                      = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
       mBrokenImageInfoContainer[brokenIndex].texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-      mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData, mBrokenImageInfoContainer[brokenIndex].url.c_str());
+      mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData, ToDaliString(mBrokenImageInfoContainer[brokenIndex].url));
 #else
       mBrokenImageInfoContainer[brokenIndex].texture.Upload(pixelData);
 #endif
