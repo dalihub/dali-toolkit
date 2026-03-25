@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-debug.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dali-toolkit/internal/controls/control/control-visual-data.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+// EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-index-ranges.h>
@@ -31,11 +34,7 @@ using Dali::Integration::ToStdString;
 
 #if defined(DEBUG_ENABLED)
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit::Internal
 {
 class JsonWriter
 {
@@ -285,28 +284,28 @@ std::ostream& DumpProperties(std::ostream& o, Handle handle)
   return o;
 }
 
-std::string DumpControl(const ControlImpl& control)
+std::string DumpControl(const ControlImpl& controlImpl)
 {
-  auto& controlData = ControlImpl::Impl::Get(control);
+  auto& internalControl = Control::Get(controlImpl);
 
   std::ostringstream oss;
   oss << "{\n  ";
-  const std::string name = ToStdString(control.Self().GetProperty(Dali::Actor::Property::NAME));
+  const std::string name = ToStdString(controlImpl.Self().GetProperty(Dali::Actor::Property::NAME));
   if(!name.empty())
   {
     oss << "\"name\":\"" << name << "\",\n";
   }
-  oss << "\"id\":\"" << control.Self().GetProperty<int>(Actor::Property::ID) << "\",\n";
-  if(DALI_LIKELY(controlData.mVisualData))
+  oss << "\"id\":\"" << controlImpl.Self().GetProperty<int>(Actor::Property::ID) << "\",\n";
+  if(DALI_LIKELY(internalControl.mVisualData))
   {
     oss << "\"registeredVisuals\":\n"
-        << controlData.mVisualData->mVisuals << ",\n";
+        << internalControl.mVisualData->mVisuals << ",\n";
     oss << "\"removeVisuals\":\n"
-        << controlData.mVisualData->mRemoveVisuals << ",\n";
+        << internalControl.mVisualData->mRemoveVisuals << ",\n";
   }
-  oss << "\"rendererCount\":" << control.Self().GetRendererCount() << ",\n";
+  oss << "\"rendererCount\":" << controlImpl.Self().GetRendererCount() << ",\n";
   oss << "\"properties\":\n{\n";
-  DumpProperties(oss, control.Self()) << "}\n";
+  DumpProperties(oss, controlImpl.Self()) << "}\n";
   oss << "}\n";
   return oss.str();
 }
@@ -355,8 +354,6 @@ void DumpControlHierarchy(std::ostream& o, Actor actor)
   o << "]}\n";
 }
 
-} // namespace Internal
-} // namespace Toolkit
-} // namespace Dali
+} // namespace Dali::Toolkit::Internal
 
 #endif

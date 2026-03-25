@@ -19,9 +19,7 @@
 #include <dali-scene3d/internal/controls/model/model-impl.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -30,6 +28,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
+#include <algorithm>
 #include <filesystem>
 
 // INTERNAL INCLUDES

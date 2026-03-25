@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_ADAPTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
-#include <functional> ///< for std::function
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <functional> ///< for std::function
 
 namespace Dali::Toolkit::Physics
 {

@@ -1,51 +1,144 @@
-set(scene3d_public_api_dir "${scene3d_dir}/public-api")
+SET(scene3d_public_api_dir "${scene3d_dir}/public-api")
 
-set(scene3d_src_files ${scene3d_src_files}
-	${scene3d_public_api_dir}/algorithm/navigation-mesh.cpp
-	${scene3d_public_api_dir}/algorithm/path-finder.cpp
-	${scene3d_public_api_dir}/algorithm/path-finder-waypoint.cpp
-	${scene3d_public_api_dir}/controls/model/model.cpp
-	${scene3d_public_api_dir}/controls/panel/panel.cpp
-	${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
-	${scene3d_public_api_dir}/light/light.cpp
-	${scene3d_public_api_dir}/loader/alpha-function-helper.cpp
-	${scene3d_public_api_dir}/loader/animated-property.cpp
-	${scene3d_public_api_dir}/loader/animation-definition.cpp
-	${scene3d_public_api_dir}/loader/blend-shape-details.cpp
-	${scene3d_public_api_dir}/loader/buffer-definition.cpp
-	${scene3d_public_api_dir}/loader/bvh-loader.cpp
-	${scene3d_public_api_dir}/loader/camera-parameters.cpp
-	${scene3d_public_api_dir}/loader/environment-map-data.cpp
-	${scene3d_public_api_dir}/loader/environment-map-loader.cpp
-	${scene3d_public_api_dir}/loader/customization.cpp
-	${scene3d_public_api_dir}/loader/environment-definition.cpp
-	${scene3d_public_api_dir}/loader/facial-animation-loader.cpp
-	${scene3d_public_api_dir}/loader/ktx-loader.cpp
-	${scene3d_public_api_dir}/loader/load-scene-metadata.cpp
-	${scene3d_public_api_dir}/loader/material-definition.cpp
-	${scene3d_public_api_dir}/loader/matrix-stack.cpp
-	${scene3d_public_api_dir}/loader/mesh-definition.cpp
-	${scene3d_public_api_dir}/loader/model-loader.cpp
-	${scene3d_public_api_dir}/loader/navigation-mesh-factory.cpp
-	${scene3d_public_api_dir}/loader/node-definition.cpp
-	${scene3d_public_api_dir}/loader/parse-renderer-state.cpp
-	${scene3d_public_api_dir}/loader/renderer-state.cpp
-	${scene3d_public_api_dir}/loader/resource-bundle.cpp
-	${scene3d_public_api_dir}/loader/scene-definition.cpp
-	${scene3d_public_api_dir}/loader/shader-definition.cpp
-	${scene3d_public_api_dir}/loader/shader-manager.cpp
-	${scene3d_public_api_dir}/loader/shader-option.cpp
-	${scene3d_public_api_dir}/loader/skinning-details.cpp
-	${scene3d_public_api_dir}/loader/string-callback.cpp
-	${scene3d_public_api_dir}/loader/utils.cpp
-	${scene3d_public_api_dir}/loader/view-projection.cpp
-	${scene3d_public_api_dir}/model-components/material.cpp
-	${scene3d_public_api_dir}/model-components/model-node.cpp
-	${scene3d_public_api_dir}/model-components/model-primitive.cpp
-	${scene3d_public_api_dir}/model-motion/motion-data.cpp
-	${scene3d_public_api_dir}/model-motion/motion-index/blend-shape-index.cpp
-	${scene3d_public_api_dir}/model-motion/motion-index/motion-index.cpp
-	${scene3d_public_api_dir}/model-motion/motion-index/motion-property-index.cpp
-	${scene3d_public_api_dir}/model-motion/motion-index/motion-transform-index.cpp
-	${scene3d_public_api_dir}/model-motion/motion-value.cpp
+SET(scene3d_src_files ${scene3d_src_files}
+  ${scene3d_public_api_dir}/algorithm/navigation-mesh.cpp
+  ${scene3d_public_api_dir}/algorithm/path-finder.cpp
+  ${scene3d_public_api_dir}/algorithm/path-finder-waypoint.cpp
+  ${scene3d_public_api_dir}/controls/model/model.cpp
+  ${scene3d_public_api_dir}/controls/panel/panel.cpp
+  ${scene3d_public_api_dir}/controls/scene-view/scene-view.cpp
+  ${scene3d_public_api_dir}/light/light.cpp
+  ${scene3d_public_api_dir}/loader/alpha-function-helper.cpp
+  ${scene3d_public_api_dir}/loader/animated-property.cpp
+  ${scene3d_public_api_dir}/loader/animation-definition.cpp
+  ${scene3d_public_api_dir}/loader/blend-shape-details.cpp
+  ${scene3d_public_api_dir}/loader/buffer-definition.cpp
+  ${scene3d_public_api_dir}/loader/bvh-loader.cpp
+  ${scene3d_public_api_dir}/loader/camera-parameters.cpp
+  ${scene3d_public_api_dir}/loader/environment-map-data.cpp
+  ${scene3d_public_api_dir}/loader/environment-map-loader.cpp
+  ${scene3d_public_api_dir}/loader/customization.cpp
+  ${scene3d_public_api_dir}/loader/environment-definition.cpp
+  ${scene3d_public_api_dir}/loader/facial-animation-loader.cpp
+  ${scene3d_public_api_dir}/loader/ktx-loader.cpp
+  ${scene3d_public_api_dir}/loader/load-scene-metadata.cpp
+  ${scene3d_public_api_dir}/loader/material-definition.cpp
+  ${scene3d_public_api_dir}/loader/matrix-stack.cpp
+  ${scene3d_public_api_dir}/loader/mesh-definition.cpp
+  ${scene3d_public_api_dir}/loader/model-loader.cpp
+  ${scene3d_public_api_dir}/loader/navigation-mesh-factory.cpp
+  ${scene3d_public_api_dir}/loader/node-definition.cpp
+  ${scene3d_public_api_dir}/loader/parse-renderer-state.cpp
+  ${scene3d_public_api_dir}/loader/renderer-state.cpp
+  ${scene3d_public_api_dir}/loader/resource-bundle.cpp
+  ${scene3d_public_api_dir}/loader/scene-definition.cpp
+  ${scene3d_public_api_dir}/loader/shader-definition.cpp
+  ${scene3d_public_api_dir}/loader/shader-manager.cpp
+  ${scene3d_public_api_dir}/loader/shader-option.cpp
+  ${scene3d_public_api_dir}/loader/skinning-details.cpp
+  ${scene3d_public_api_dir}/loader/string-callback.cpp
+  ${scene3d_public_api_dir}/loader/utils.cpp
+  ${scene3d_public_api_dir}/loader/view-projection.cpp
+  ${scene3d_public_api_dir}/model-components/material.cpp
+  ${scene3d_public_api_dir}/model-components/model-node.cpp
+  ${scene3d_public_api_dir}/model-components/model-primitive.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-data.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-index/blend-shape-index.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-index.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-property-index.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-transform-index.cpp
+  ${scene3d_public_api_dir}/model-motion/motion-value.cpp
+)
+
+SET(scene3d_root_public_api_headers ${scene3d_root_public_api_headers}
+  ${scene3d_public_api_dir}/api.h
+)
+
+SET(scene3d_algorithm_public_api_headers ${scene3d_algorithm_public_api_headers}
+  ${scene3d_public_api_dir}/algorithm/navigation-mesh.h
+  ${scene3d_public_api_dir}/algorithm/path-finder.h
+  ${scene3d_public_api_dir}/algorithm/path-finder-waypoint.h
+)
+
+SET(scene3d_common_public_api_headers ${scene3d_common_public_api_headers}
+  ${scene3d_public_api_dir}/common/environment-map.h
+  ${scene3d_public_api_dir}/common/scene-depth-index-ranges.h
+  ${scene3d_public_api_dir}/common/scene3d-constraint-tag-ranges.h
+)
+
+SET(scene3d_controls_public_api_headers ${scene3d_controls_public_api_headers}
+  ${scene3d_public_api_dir}/controls/model/model.h
+  ${scene3d_public_api_dir}/controls/panel/panel.h
+  ${scene3d_public_api_dir}/controls/scene-view/scene-view.h
+)
+
+SET(scene3d_light_public_api_headers ${scene3d_light_public_api_headers}
+  ${scene3d_public_api_dir}/light/light.h
+)
+
+SET(scene3d_loader_public_api_headers ${scene3d_loader_public_api_headers}
+  ${scene3d_public_api_dir}/loader/alpha-function-helper.h
+  ${scene3d_public_api_dir}/loader/animated-property.h
+  ${scene3d_public_api_dir}/loader/animation-definition.h
+  ${scene3d_public_api_dir}/loader/blend-shape-details.h
+  ${scene3d_public_api_dir}/loader/buffer-definition.h
+  ${scene3d_public_api_dir}/loader/bvh-loader.h
+  ${scene3d_public_api_dir}/loader/camera-parameters.h
+  ${scene3d_public_api_dir}/loader/environment-map-data.h
+  ${scene3d_public_api_dir}/loader/environment-map-loader.h
+  ${scene3d_public_api_dir}/loader/customization.h
+  ${scene3d_public_api_dir}/loader/environment-definition.h
+  ${scene3d_public_api_dir}/loader/facial-animation-loader.h
+  ${scene3d_public_api_dir}/loader/ktx-loader.h
+  ${scene3d_public_api_dir}/loader/load-scene-metadata.h
+  ${scene3d_public_api_dir}/loader/material-definition.h
+  ${scene3d_public_api_dir}/loader/matrix-stack.h
+  ${scene3d_public_api_dir}/loader/mesh-definition.h
+  ${scene3d_public_api_dir}/loader/model-loader.h
+  ${scene3d_public_api_dir}/loader/navigation-mesh-factory.h
+  ${scene3d_public_api_dir}/loader/node-definition.h
+  ${scene3d_public_api_dir}/loader/parse-renderer-state.h
+  ${scene3d_public_api_dir}/loader/renderer-state.h
+  ${scene3d_public_api_dir}/loader/resource-bundle.h
+  ${scene3d_public_api_dir}/loader/scene-definition.h
+  ${scene3d_public_api_dir}/loader/shader-definition.h
+  ${scene3d_public_api_dir}/loader/shader-manager.h
+  ${scene3d_public_api_dir}/loader/shader-option.h
+  ${scene3d_public_api_dir}/loader/skinning-details.h
+  ${scene3d_public_api_dir}/loader/string-callback.h
+  ${scene3d_public_api_dir}/loader/utils.h
+  ${scene3d_public_api_dir}/loader/view-projection.h
+  ${scene3d_public_api_dir}/loader/load-result.h
+  ${scene3d_public_api_dir}/loader/model-loader-impl.h
+  ${scene3d_public_api_dir}/loader/index.h
+  ${scene3d_public_api_dir}/loader/light-parameters.h
+  ${scene3d_public_api_dir}/loader/mesh-geometry.h
+  ${scene3d_public_api_dir}/loader/dli-input-parameter.h
+  ${scene3d_public_api_dir}/loader/skeleton-definition.h
+)
+
+SET(scene3d_model_components_public_api_headers ${scene3d_model_components_public_api_headers}
+  ${scene3d_public_api_dir}/model-components/material.h
+  ${scene3d_public_api_dir}/model-components/model-node.h
+  ${scene3d_public_api_dir}/model-components/model-primitive.h
+)
+
+SET(scene3d_model_motion_public_api_headers ${scene3d_model_motion_public_api_headers}
+  ${scene3d_public_api_dir}/model-motion/motion-data.h
+  ${scene3d_public_api_dir}/model-motion/motion-index/blend-shape-index.h
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-index.h
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-property-index.h
+  ${scene3d_public_api_dir}/model-motion/motion-index/motion-transform-index.h
+  ${scene3d_public_api_dir}/model-motion/motion-value.h
+)
+
+SET(SCENE3D_PUBLIC_API_HEADERS ${SCENE3D_PUBLIC_API_HEADERS}
+  ${scene3d_root_public_api_headers}
+  ${scene3d_algorithm_public_api_headers}
+  ${scene3d_common_public_api_headers}
+  ${scene3d_controls_public_api_headers}
+  ${scene3d_light_public_api_headers}
+  ${scene3d_loader_public_api_headers}
+  ${scene3d_model_components_public_api_headers}
+  ${scene3d_model_motion_public_api_headers}
 )

@@ -28,9 +28,12 @@
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <algorithm>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -74,7 +77,7 @@ void SetTextureSetToRasterizeInfo(const Dali::PixelData rasterizedPixelData, Svg
   // Convert pixelData to texture.
   Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(rasterizedPixelData, rasterizeInfo.mImageUrl.GetUrl(), rasterizeInfo.mId + 1000'000'000); ///< Add some number to avoid conflict with TextureManager ID.
+  texture.Upload(rasterizedPixelData, ToDaliString(rasterizeInfo.mImageUrl.GetUrl()), rasterizeInfo.mId + 1000'000'000); ///< Add some number to avoid conflict with TextureManager ID.
 #else
   texture.Upload(rasterizedPixelData);
 #endif

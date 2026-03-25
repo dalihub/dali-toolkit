@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
  * limitations under the License.
  */
 
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/devel-api/update/update-proxy.h>
-
-#include <dali-physics/internal/physics-world-impl.h>
-#include <dali-physics/public-api/physics-adaptor.h>
+#include <dali/public-api/actors/actor.h>
 
 #include <btBulletDynamicsCommon.h>
+
+// INTERNAL INCLUDES
+#include <dali-physics/internal/physics-world-impl.h>
+#include <dali-physics/public-api/physics-adaptor.h>
 
 namespace Dali::Toolkit::Physics::Internal
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-#include <dali-physics/internal/physics-world-impl.h>
-
+// EXTERNAL INCLUDES
 #include <chipmunk/chipmunk.h>
-#include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
 #include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
+#include <dali-physics/internal/physics-world-impl.h>
 
 namespace Dali::Toolkit::Physics::Internal
 {

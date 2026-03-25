@@ -34,6 +34,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${extra_flags}")
 set(prefix ${CMAKE_INSTALL_PREFIX})
 
 set(repo_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../../")
+
+# Make sure the path is absolute
+GET_FILENAME_COMPONENT(repo_root_dir ${repo_root_dir} ABSOLUTE)
+
 set(scene3d_dir "${repo_root_dir}/dali-scene3d")
 
 option(ENABLE_PKG_CONFIGURE "Use pkgconfig" ON)
@@ -161,12 +165,19 @@ ELSE()
 	INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 ENDIF()
 
-file(GLOB scene3d_include_files ${scene3d_public_api_dir})
+# macro for installing headers by replacing prefix. (TODO, investigate
+# if there is a CMAKE way of doing this automatically)
+MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST STRIP_PREFIX REPLACE_PREFIX)
+  GET_FILENAME_COMPONENT( SPREFIX ${STRIP_PREFIX} ABSOLUTE )
+  FOREACH(HEADER ${${HEADER_LIST}})
+    STRING(REGEX MATCH "(.*)[/]" DIR ${HEADER})
+    STRING(REPLACE ${SPREFIX} ${REPLACE_PREFIX} NEWDIR ${DIR})
+    INSTALL(FILES ${HEADER} DESTINATION ${INCLUDE_DIR}/${NEWDIR})
+  ENDFOREACH(HEADER)
+ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 
-install(DIRECTORY ${scene3d_include_files}
-	DESTINATION "${INCLUDE_DIR}/dali-scene3d"
-	FILES_MATCHING PATTERN "*.h"
-)
+# Install headers using lists defined by ADD_SUBDIRECTORY
+INSTALL_HEADERS_WITH_DIRECTORY(SCENE3D_PUBLIC_API_HEADERS ${repo_root_dir}/dali-scene3d "dali-scene3d")
 
 # Install dali-scene3d.h
 INSTALL( FILES ${scene3d_dir}/dali-scene3d.h DESTINATION ${INCLUDE_DIR}/dali-scene3d )

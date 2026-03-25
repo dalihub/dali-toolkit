@@ -36,6 +36,12 @@ VideoView New(VideoSyncMode syncMode)
   return videoView;
 }
 
+VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode)
+{
+  VideoView videoView = Internal::VideoView::New(playerHandle, syncMode);
+  return videoView;
+}
+
 void PlayAnimation(VideoView videoView, Animation animation)
 {
   Dali::Toolkit::GetImpl(videoView).PlayAnimation(animation);

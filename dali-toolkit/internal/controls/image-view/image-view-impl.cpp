@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 
@@ -32,7 +33,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -153,8 +154,8 @@ void ImageView::SetImage(const Property::Map& map)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -185,7 +186,7 @@ void ImageView::SetImage(const Property::Map& map)
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(mPropertyMap);
   if(visual)
   {
-    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
     if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
     {
       visualImpl.SetFittingMode(Visual::FittingMode::FILL);
@@ -206,8 +207,8 @@ void ImageView::SetImage(const Property::Map& map)
     visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
   {
@@ -239,8 +240,8 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 
     // Enable transition effect for previous visual.
     // This previous visual will be deleted when transition effect is done.
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverridden(mVisual, true);
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableReadyTransitionOverridden(mVisual, true);
 
     DiscardImageViewVisual(mPreviousVisual);
     mPreviousVisual = mVisual;
@@ -262,7 +263,7 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(url, size);
   if(visual)
   {
-    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
     if(visualImpl.GetFittingMode() == Visual::FittingMode::DONT_CARE)
     {
       visualImpl.SetFittingMode(Visual::FittingMode::FILL);
@@ -283,8 +284,8 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
     visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableCornerPropertiesOverridden(visual, true);
   }
   else
   {
@@ -530,8 +531,8 @@ void ImageView::ShowPlaceholderImage()
   {
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::PLACEHOLDER_IMAGE, mPlaceholderVisual, false);
 
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableCornerPropertiesOverridden(mPlaceholderVisual, true);
 
     Actor self = Self();
     Toolkit::GetImplementation(mPlaceholderVisual).SetOnScene(self);
@@ -581,9 +582,9 @@ void ImageView::TransitionImageWithEffect()
       if(!mTransitionEffectOptionMap.Empty())
       {
         // Set user's transition effect options
-        Dali::Toolkit::TransitionData transition      = Toolkit::TransitionData::New(mTransitionEffectOptionMap);
-        ControlImpl::Impl&            controlDataImpl = ControlImpl::Impl::Get(*this);
-        mTransitionAnimation                          = controlDataImpl.CreateTransition(transition);
+        Toolkit::TransitionData transition      = Toolkit::TransitionData::New(mTransitionEffectOptionMap);
+        Control&                internalControl = Control::Get(*this);
+        mTransitionAnimation                    = internalControl.CreateTransition(transition);
         if(mTransitionAnimation)
         {
           mTransitionAnimation.SetEndAction(Animation::EndAction::DISCARD);
@@ -625,9 +626,9 @@ void ImageView::ClearTransitionAnimation()
   // Clear PreviousVisual
   if(mPreviousVisual)
   {
-    Actor              self            = Self();
-    ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-    controlDataImpl.EnableReadyTransitionOverridden(mVisual, false);
+    Actor    self            = Self();
+    Control& internalControl = Control::Get(*this);
+    internalControl.EnableReadyTransitionOverridden(mVisual, false);
     Toolkit::GetImplementation(mPreviousVisual).SetOffScene(self);
     DiscardImageViewVisual(mPreviousVisual);
   }

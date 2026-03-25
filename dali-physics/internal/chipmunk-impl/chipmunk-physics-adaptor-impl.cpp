@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-// Class Header
+// CLASS HEADER
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-adaptor-impl.h>
 
-// External Headers
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/drawable-actor.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/render-tasks/render-task.h>
 #include <utility>
 
-// Internal Headers
+// INTERNAL INCLUDES
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-world-impl.h>
-#include <dali/dali.h>
-#include <dali/integration-api/debug.h>
 
 namespace
 {

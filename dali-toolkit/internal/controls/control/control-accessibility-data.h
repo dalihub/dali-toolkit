@@ -18,20 +18,23 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <set>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 
-namespace Dali::Toolkit
+namespace Dali::Toolkit::Internal
 {
 // private inner class
-class ControlImpl::Impl::AccessibilityData : public ConnectionTracker
+class Control::AccessibilityData : public ConnectionTracker
 {
   friend class Toolkit::DevelControl::ControlAccessible;
 
 public:
   // Constructor
-  AccessibilityData(ControlImpl& controlImpl);
+  AccessibilityData(Toolkit::ControlImpl& controlImpl);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::AppendAccessibilityAttribute()
@@ -156,10 +159,10 @@ private:
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
   Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 
-  ControlImpl& mControlImpl;
+  Toolkit::ControlImpl& mControlImpl;
 
   bool mIsAccessibilityPositionPropertyNotificationSet : 1;
   bool mIsAccessibilityPropertySetSignalRegistered : 1;
 };
-} // namespace Dali::Toolkit
+} // namespace Dali::Toolkit::Internal
 #endif // DALI_TOOLKIT_CONTROL_ACCESSIBILITY_DATA_H

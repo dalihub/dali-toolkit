@@ -15,7 +15,6 @@ SET(TC_SOURCES
   utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
   utc-Dali-ConfirmationPopup.cpp
-  utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-FadeTransition.cpp
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp

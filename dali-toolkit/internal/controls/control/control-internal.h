@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_CONTROL_DATA_IMPL_H
-#define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
+#ifndef DALI_TOOLKIT_INTERNAL_CONTROL_H
+#define DALI_TOOLKIT_INTERNAL_CONTROL_H
 
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
@@ -32,10 +32,6 @@
 #include <dali-toolkit/internal/render-effects/offscreen-rendering-impl.h>
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/integration-api/debug.h>
-#include <map>
-#include <memory>
-#include <set>
 
 namespace Dali::Toolkit
 {
@@ -52,12 +48,11 @@ enum class TriStateProperty
   TRUE,
   FALSE
 };
-} // namespace Internal
 
 /**
  * @brief Holds the Implementation for the internal control class
  */
-class ControlImpl::Impl : public ConnectionTracker, public Dali::Integration::Processor
+class Control : public ConnectionTracker, public Dali::Integration::Processor
 {
 private:
   class AccessibilityData;
@@ -69,23 +64,23 @@ public:
    * @param[in] internalControl A ref to the control whose internal implementation is required
    * @return The internal implementation
    */
-  static Impl& Get(ControlImpl& internalControl);
+  static Control& Get(ControlImpl& internalControl);
 
   /**
    * @copydoc Get(ControlImpl&)
    */
-  static const Impl& Get(const ControlImpl& internalControl);
+  static const Control& Get(const ControlImpl& internalControl);
 
   /**
    * @brief Constructor.
    * @param[in] controlImpl The control which owns this implementation
    */
-  Impl(ControlImpl& controlImpl);
+  Control(ControlImpl& controlImpl);
 
   /**
    * @brief Destructor.
    */
-  ~Impl();
+  ~Control();
 
   /**
    * @brief Initialize private VisualData context for this impl.
@@ -560,7 +555,8 @@ public:
   InputMethodContext mInputMethodContext;
   CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
 
-  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
+  using ControlBehaviour = ControlImpl::ControlBehaviour;
+  ControlBehaviour mFlags : ControlImpl::CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
 
   // Frequencly touched accessibility relative values.
   // Keep it on Impl to avoid AccessibilityData creation.
@@ -617,6 +613,7 @@ public:
   static const AnimatablePropertyRegistration ANIMATABLE_PROPERTY_6;
 };
 
+} // namespace Internal
 } // namespace Dali::Toolkit
 
-#endif // DALI_TOOLKIT_CONTROL_DATA_IMPL_H
+#endif // DALI_TOOLKIT_INTERNAL_CONTROL_H

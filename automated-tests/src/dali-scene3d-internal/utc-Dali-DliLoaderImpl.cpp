@@ -657,7 +657,7 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   DALI_TEST_EQUAL(resources.mSkeletons.size(), 0u);
 
   auto& materials = ctx.resources.mMaterials;
-  DALI_TEST_EQUAL(2u, materials.size());
+  DALI_TEST_EQUAL(6u, materials.size());
 
   auto  iMaterial = materials.begin();
   auto& md        = iMaterial->first;
@@ -666,7 +666,22 @@ int UtcDaliDliLoaderLoadCoverageTest(void)
   auto iTexture = md.mTextureStages.begin();
   DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::OCCLUSION));
   DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_Idle.png");
-  ++iTexture;
+  ++iMaterial;
+  iTexture = iMaterial->first.mTextureStages.begin();
+  DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC));
+  DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_Lunge.png");
+  ++iMaterial;
+  iTexture = iMaterial->first.mTextureStages.begin();
+  DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS));
+  DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_JJ.png");
+  ++iMaterial;
+  iTexture = iMaterial->first.mTextureStages.begin();
+  DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::NORMAL));
+  DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_Squat.png");
+  ++iMaterial;
+  iTexture = iMaterial->first.mTextureStages.begin();
+  DALI_TEST_CHECK(MaskMatch(iTexture->mSemantic, MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS));
+  DALI_TEST_EQUAL(iTexture->mTexture.mImageUri, "exercise/Icons/Icon_Idle.png");
 
   DALI_TEST_EQUAL(ctx.cameraParameters.size(), 1u);
   DALI_TEST_EQUAL(ctx.lights.size(), 1u);

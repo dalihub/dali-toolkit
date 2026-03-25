@@ -34,7 +34,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -332,8 +332,8 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
           Toolkit::GetImplementation(visual).CornerRadiusIgnoredAtOffscreenRendering(true);
           DevelControl::RegisterVisual(*this, mCanvasVisualIndex, visual, Toolkit::DepthIndex::CONTENT);
 
-          ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(*this);
-          controlDataImpl.EnableCornerPropertiesOverridden(visual, true);
+          Internal::Control& internalControl = Internal::Control::Get(*this);
+          internalControl.EnableCornerPropertiesOverridden(visual, true);
         }
       }
       else

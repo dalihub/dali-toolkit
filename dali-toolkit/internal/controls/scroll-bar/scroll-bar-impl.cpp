@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -30,10 +29,10 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 

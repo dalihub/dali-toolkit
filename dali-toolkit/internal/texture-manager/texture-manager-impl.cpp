@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <algorithm>
@@ -31,6 +32,8 @@
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace
 {
@@ -215,7 +218,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
                 PixelData maskPixelData = Devel::PixelBuffer::Convert(maskPixelBuffer); // takes ownership of buffer
                 maskTexture             = Texture::New(Dali::TextureType::TEXTURE_2D, maskPixelData.GetPixelFormat(), maskPixelData.GetWidth(), maskPixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-                maskTexture.Upload(maskPixelData, maskTextureInfo.url.GetUrl(), maskTextureInfo.textureId);
+                maskTexture.Upload(maskPixelData, ToDaliString(maskTextureInfo.url.GetUrl()), maskTextureInfo.textureId);
 #else
                 maskTexture.Upload(maskPixelData);
 #endif
@@ -248,7 +251,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
         PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffers[i]); // takes ownership of buffer
         Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-        texture.Upload(pixelData, url.GetUrl(), textureId);
+        texture.Upload(pixelData, ToDaliString(url.GetUrl()), textureId);
 #else
         texture.Upload(pixelData);
 #endif
@@ -1230,7 +1233,7 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
       Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-      texture.Upload(pixelData, textureInfo.url.GetUrl(), textureInfo.textureId);
+      texture.Upload(pixelData, ToDaliString(textureInfo.url.GetUrl()), textureInfo.textureId);
 #else
       texture.Upload(pixelData);
 #endif

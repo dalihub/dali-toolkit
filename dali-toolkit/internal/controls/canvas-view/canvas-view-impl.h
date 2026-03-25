@@ -41,7 +41,7 @@ namespace Internal
 class CanvasView;
 class CanvasViewRasterizeThread;
 
-class CanvasView : public ControlImpl, public Dali::Integration::Processor
+class CanvasView : public ControlImpl, public Integration::Processor
 {
 public:
   /**

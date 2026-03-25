@@ -75,11 +75,11 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/buttons/toggle-button-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-impl.cpp
    ${toolkit_src_dir}/controls/canvas-view/canvas-view-rasterize-task.cpp
-   ${toolkit_src_dir}/controls/control/control-data-impl.cpp
    ${toolkit_src_dir}/controls/control/control-accessibility-data.cpp
-   ${toolkit_src_dir}/controls/control/control-visual-data.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
+   ${toolkit_src_dir}/controls/control/control-internal.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
+   ${toolkit_src_dir}/controls/control/control-visual-data.cpp
    ${toolkit_src_dir}/controls/flex-container/flex-container-impl.cpp
    ${toolkit_src_dir}/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp
    ${toolkit_src_dir}/controls/image-view/image-view-impl.cpp
@@ -112,6 +112,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
    ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
+   ${toolkit_src_dir}/controls/video-view/video-view-rendering-strategy.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
    ${toolkit_src_dir}/controls/camera-view/camera-view-impl.cpp
    ${toolkit_src_dir}/feedback/feedback-style.cpp
@@ -236,10 +237,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/transition/transition-impl.cpp
    ${toolkit_src_dir}/transition/transition-lifecycle-controller.cpp
    ${toolkit_src_dir}/transition/transition-set-impl.cpp
-   ${toolkit_src_dir}/transition-effects/cube-transition-effect-impl.cpp
-   ${toolkit_src_dir}/transition-effects/cube-transition-cross-effect-impl.cpp
-   ${toolkit_src_dir}/transition-effects/cube-transition-fold-effect-impl.cpp
-   ${toolkit_src_dir}/transition-effects/cube-transition-wave-effect-impl.cpp
    ${toolkit_src_dir}/text/xhtml-entities.cpp
    ${toolkit_src_dir}/drag-drop-detector/drag-and-drop-detector-impl.cpp
    ${toolkit_src_dir}/text/emoji-helper.cpp

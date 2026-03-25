@@ -28,7 +28,6 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali

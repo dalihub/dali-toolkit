@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -31,12 +30,12 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
+#include <cstring>
 #include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>

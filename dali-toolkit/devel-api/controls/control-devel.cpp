@@ -30,11 +30,11 @@
 
 namespace
 {
-Dali::Toolkit::ControlImpl::Impl& GetControlImplementation(Dali::Toolkit::Control control)
+Dali::Toolkit::Internal::Control& GetControlImplementation(Dali::Toolkit::Control control)
 {
   auto& internalControl = Dali::Toolkit::GetImplementation(control);
 
-  return Dali::Toolkit::ControlImpl::Impl::Get(internalControl);
+  return Dali::Toolkit::Internal::Control::Get(internalControl);
 }
 
 } // unnamed namespace
@@ -47,55 +47,55 @@ namespace DevelControl
 {
 void RegisterVisual(ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.RegisterVisual(index, visual);
 }
 
 void RegisterVisual(ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.RegisterVisual(index, visual, depthIndex);
 }
 
 void RegisterVisual(ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.RegisterVisual(index, visual, enabled);
 }
 
 void RegisterVisual(ControlImpl& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.RegisterVisual(index, visual, enabled, depthIndex);
 }
 
 void UnregisterVisual(ControlImpl& control, Dali::Property::Index index)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.UnregisterVisual(index);
 }
 
 Toolkit::Visual::Base GetVisual(const ControlImpl& control, Dali::Property::Index index)
 {
-  const ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  const auto& controlDataImpl = Internal::Control::Get(control);
   return controlDataImpl.GetVisual(index);
 }
 
 void EnableVisual(ControlImpl& control, Dali::Property::Index index, bool enable)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.EnableVisual(index, enable);
 }
 
 bool IsVisualEnabled(const ControlImpl& control, Dali::Property::Index index)
 {
-  const ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  const auto& controlDataImpl = Internal::Control::Get(control);
   return controlDataImpl.IsVisualEnabled(index);
 }
 
 Dali::Animation CreateTransition(ControlImpl& control, const Toolkit::TransitionData& handle)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   return controlDataImpl.CreateTransition(handle);
 }
 
@@ -103,45 +103,45 @@ void AddTransitions(ControlImpl&                   control,
                     Dali::Animation                animation,
                     const Toolkit::TransitionData& transitionData)
 {
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(control);
+  auto& controlDataImpl = Internal::Control::Get(control);
   controlDataImpl.AddTransitions(animation, transitionData);
 }
 
 void DoAction(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
-  ControlImpl&       controlInternal = Toolkit::GetImplementation(control);
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(controlInternal);
+  ControlImpl& controlInternal = Toolkit::GetImplementation(control);
+  auto&        controlDataImpl = Internal::Control::Get(controlInternal);
   controlDataImpl.DoAction(visualIndex, actionId, attributes);
 }
 
 void DoActionExtension(Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
 {
-  ControlImpl&       controlInternal = Toolkit::GetImplementation(control);
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(controlInternal);
+  ControlImpl& controlInternal = Toolkit::GetImplementation(control);
+  auto&        controlDataImpl = Internal::Control::Get(controlInternal);
   controlDataImpl.DoActionExtension(visualIndex, actionId, attributes);
 }
 
 void EnableCornerPropertiesOverridden(ControlImpl& control, Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
-  ControlImpl::Impl::Get(control).EnableCornerPropertiesOverridden(visual, enable, cornerRadiusConstraint);
+  Internal::Control::Get(control).EnableCornerPropertiesOverridden(visual, enable, cornerRadiusConstraint);
 }
 
 void SetInputMethodContext(ControlImpl& control, InputMethodContext& inputMethodContext)
 {
-  ControlImpl::Impl::Get(control).SetInputMethodContext(inputMethodContext);
+  Internal::Control::Get(control).SetInputMethodContext(inputMethodContext);
 }
 
 VisualEventSignalType& VisualEventSignal(Control control)
 {
-  ControlImpl&       internalControl = Toolkit::GetImplementation(control);
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(internalControl);
+  ControlImpl& internalControl = Toolkit::GetImplementation(control);
+  auto&        controlDataImpl = Internal::Control::Get(internalControl);
   return controlDataImpl.VisualEventSignal();
 }
 
 Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
 {
-  ControlImpl&       internalControl = Toolkit::GetImplementation(control);
-  ControlImpl::Impl& controlDataImpl = ControlImpl::Impl::Get(internalControl);
+  ControlImpl& internalControl = Toolkit::GetImplementation(control);
+  auto&        controlDataImpl = Internal::Control::Get(internalControl);
   return controlDataImpl.GetVisualProperty(index, visualPropertyKey);
 }
 

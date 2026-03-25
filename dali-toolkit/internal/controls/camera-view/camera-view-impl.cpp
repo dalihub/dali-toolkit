@@ -19,7 +19,6 @@
 #include "camera-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -27,9 +26,9 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>

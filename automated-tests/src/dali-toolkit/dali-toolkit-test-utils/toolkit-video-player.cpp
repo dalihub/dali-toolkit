@@ -38,6 +38,7 @@ public:
     mVolumeLeft(0.0f),
     mVolumeRight(0.0f),
     mFinishedSignal(),
+    mEventSignal(),
     mMuted(false),
     mLooping(false),
     mPlayPosition(0),
@@ -70,6 +71,10 @@ public:
     if(!mFinishedSignal.Empty())
     {
       mFinishedSignal.Emit();
+    }
+    if(!mEventSignal.Empty())
+    {
+      mEventSignal.Emit(Dali::VideoPlayerPlugin::PlayerEventType::PLAYBACK_FINISHED);
     }
   }
 
@@ -162,10 +167,11 @@ public:
   }
 
 public:
-  std::string                                    mUrl;
-  float                                          mVolumeLeft;
-  float                                          mVolumeRight;
-  Dali::VideoPlayerPlugin::VideoPlayerSignalType mFinishedSignal;
+  std::string                                         mUrl;
+  float                                               mVolumeLeft;
+  float                                               mVolumeRight;
+  Dali::VideoPlayerPlugin::VideoPlayerSignalType      mFinishedSignal;
+  Dali::VideoPlayerPlugin::VideoPlayerEventSignalType mEventSignal;
 
 private:
   float                                      mIntervalSeconds{0.0f};
@@ -218,6 +224,13 @@ VideoPlayer VideoPlayer::New()
 }
 
 VideoPlayer VideoPlayer::New(Dali::Actor actor, Dali::VideoSyncMode syncMode)
+{
+  Internal::Adaptor::VideoPlayer* player = new Internal::Adaptor::VideoPlayer();
+
+  return VideoPlayer(player);
+}
+
+VideoPlayer VideoPlayer::New(Dali::Actor actor, Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode)
 {
   Internal::Adaptor::VideoPlayer* player = new Internal::Adaptor::VideoPlayer();
 
@@ -326,6 +339,11 @@ Dali::VideoPlayerPlugin::DisplayRotation VideoPlayer::GetDisplayRotation()
 Dali::VideoPlayerPlugin::VideoPlayerSignalType& VideoPlayer::FinishedSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).mFinishedSignal;
+}
+
+Dali::VideoPlayerPlugin::VideoPlayerEventSignalType& VideoPlayer::EventSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).mEventSignal;
 }
 
 void VideoPlayer::Forward(int millisecond)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-// Class Header
+// CLASS HEADER
 #include <dali-physics/internal/physics-world-impl.h>
 
-// External Headers
-
-// Internal Headers
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 

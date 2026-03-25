@@ -21,7 +21,6 @@
 // EXTERNAL HEADERS
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali/dali.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>

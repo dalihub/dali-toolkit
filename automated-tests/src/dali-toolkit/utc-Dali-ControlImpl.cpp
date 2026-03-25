@@ -55,7 +55,7 @@ int UtcDaliControlImplNew(void)
 
   DALI_TEST_CHECK(!Control::DownCast(control));
 
-  control = Toolkit::ControlImpl::New();
+  control = ControlImpl::New();
 
   DALI_TEST_CHECK(Control::DownCast(control));
   END_TEST;
@@ -617,7 +617,7 @@ int UtcDaliControlImplOnStyleChangeN(void)
 {
   ToolkitTestApplication application;
   Control                dummy       = Control::New();
-  Toolkit::ControlImpl&  controlImpl = Toolkit::GetImplementation(dummy);
+  ControlImpl&           controlImpl = Toolkit::GetImplementation(dummy);
 
   // test that style manager is being used, passing an empty handle does nothing but does not crash either
   Dali::Toolkit::StyleManager styleManager;
@@ -632,7 +632,7 @@ int UtcDaliControlImplOnAccessibilityPanP(void)
 {
   ToolkitTestApplication application;
   Control                dummy       = Control::New();
-  Toolkit::ControlImpl&  controlImpl = Toolkit::GetImplementation(dummy);
+  ControlImpl&           controlImpl = Toolkit::GetImplementation(dummy);
 
   PanGesture pan;
   DALI_TEST_EQUALS(false, controlImpl.OnAccessibilityPan(pan), TEST_LOCATION);
@@ -644,8 +644,8 @@ int UtcDaliControlImplOnAccessibilityActivatedP(void)
 {
   ToolkitTestApplication application;
 
-  Control               dummy       = Control::New();
-  Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(dummy);
+  Control      dummy       = Control::New();
+  ControlImpl& controlImpl = Toolkit::GetImplementation(dummy);
   DALI_TEST_EQUALS(false, controlImpl.OnAccessibilityActivated(), TEST_LOCATION);
 
   // Invoke the control's activate action
@@ -665,7 +665,7 @@ int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
 {
   ToolkitTestApplication application;
   Control                dummy       = Control::New();
-  Toolkit::ControlImpl&  controlImpl = Toolkit::GetImplementation(dummy);
+  ControlImpl&           controlImpl = Toolkit::GetImplementation(dummy);
 
   Actor currentFocusedActor;
   Actor result = controlImpl.GetNextKeyboardFocusableActor(currentFocusedActor, Control::KeyboardFocus::LEFT, false);
@@ -1158,7 +1158,7 @@ int UtcDaliControlImplOnPinch(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::ControlImpl& impl = Toolkit::GetImplementation(control);
+  ControlImpl& impl = Toolkit::GetImplementation(control);
   impl.EnableGestureDetection(GestureType::PINCH);
 
   // Scale becomes 0.6666666
@@ -1212,8 +1212,8 @@ int UtcDaliControlImplResourceReady(void)
   application.Render();
 
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
-  Toolkit::ControlImpl& impl = Toolkit::GetImplementation(control);
-  // ResourceReady is true when there is no visual in the default Toolkit::ControlImpl.
+  ControlImpl& impl = Toolkit::GetImplementation(control);
+  // ResourceReady is true when there is no visual in the default ControlImpl.
   DALI_TEST_EQUALS(impl.IsResourceReady(), true, TEST_LOCATION);
   DALI_TEST_EQUALS(gResourceReadyCalled, false, TEST_LOCATION);
   impl.SetResourceReady();

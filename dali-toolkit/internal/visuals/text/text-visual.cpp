@@ -46,6 +46,7 @@
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
+using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
@@ -714,7 +715,7 @@ void TextVisual::AddTexture(TextureSet& textureSet, PixelData& data, Sampler& sa
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   std::string text;
   mController->GetText(text);
-  texture.Upload(data, text + std::string("(TextVisual)"));
+  texture.Upload(data, ToDaliString(text + std::string("(TextVisual)")));
 #else
   texture.Upload(data);
 #endif

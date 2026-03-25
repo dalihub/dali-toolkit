@@ -16,15 +16,9 @@
  */
 
 // CLASS HEADER
-#include "control-data-impl.h"
-#include "control-accessibility-data.h"
-#include "control-visual-data.h"
+#include <dali-toolkit/internal/controls/control/control-internal.h>
 
 // EXTERNAL INCLUDES
-#include <cstring>
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/common/stage.h>
@@ -40,6 +34,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/rendering/visual-renderer.h>
+#include <cstring>
 #include <limits>
 
 // INTERNAL INCLUDES
@@ -49,10 +44,15 @@
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/internal/controls/control/control-accessibility-data.h>
+#include <dali-toolkit/internal/controls/control/control-visual-data.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
@@ -65,9 +65,7 @@ using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Toolkit
-{
-namespace Internal
+namespace Dali::Toolkit::Internal
 {
 extern const Dali::Scripting::StringEnum ControlStateTable[];
 extern const unsigned int                ControlStateTableCount;
@@ -79,10 +77,6 @@ const Scripting::StringEnum ControlStateTable[] = {
   {"DISABLED", Toolkit::DevelControl::DISABLED},
 };
 const unsigned int ControlStateTableCount = sizeof(ControlStateTable) / sizeof(ControlStateTable[0]);
-} //namespace Internal
-
-using Internal::ControlStateTable;
-using Internal::ControlStateTableCount;
 
 namespace
 {
@@ -471,48 +465,48 @@ DALI_TYPE_REGISTRATION_END()
 
 // clang-format off
 // Properties registered without macro to use specific member variables.
-const PropertyRegistration ControlImpl::Impl::PROPERTY_1(typeRegistration,  "styleName",                      Toolkit::Control::Property::STYLE_NAME,                            Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_4(typeRegistration,  "keyInputFocus",                  Toolkit::Control::Property::KEY_INPUT_FOCUS,                       Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_5(typeRegistration,  "background",                     Toolkit::Control::Property::BACKGROUND,                            Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_6(typeRegistration,  "margin",                         Toolkit::Control::Property::MARGIN,                                Property::EXTENTS, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_7(typeRegistration,  "padding",                        Toolkit::Control::Property::PADDING,                               Property::EXTENTS, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_8(typeRegistration,  "tooltip",                        Toolkit::DevelControl::Property::TOOLTIP,                          Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_9(typeRegistration,  "state",                          Toolkit::DevelControl::Property::STATE,                            Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_10(typeRegistration, "subState",                       Toolkit::DevelControl::Property::SUB_STATE,                        Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_11(typeRegistration, "leftFocusableActorId",           Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID,          Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_12(typeRegistration, "rightFocusableActorId",          Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,         Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_13(typeRegistration, "upFocusableActorId",             Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,            Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_14(typeRegistration, "downFocusableActorId",           Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID,          Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_15(typeRegistration, "shadow",                         Toolkit::DevelControl::Property::SHADOW,                           Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_16(typeRegistration, "accessibilityName",              Toolkit::DevelControl::Property::ACCESSIBILITY_NAME,               Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_17(typeRegistration, "accessibilityDescription",       Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION,        Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_18(typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_19(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_20(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,              Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",      Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,     Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_26(typeRegistration, "automationId",                   Toolkit::DevelControl::Property::AUTOMATION_ID,                    Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_27(typeRegistration, "accessibilityValue",             Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,              Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_28(typeRegistration, "accessibilityScrollable",        Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,         Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_29(typeRegistration, "accessibilityStates",            Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,             Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_30(typeRegistration, "accessibilityIsModal",           Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,           Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_31(typeRegistration, "offScreenRendering",             Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,              Property::INTEGER, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_32(typeRegistration, "innerShadow",                    Toolkit::DevelControl::Property::INNER_SHADOW,                     Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
-const PropertyRegistration ControlImpl::Impl::PROPERTY_33(typeRegistration, "borderline",                     Toolkit::DevelControl::Property::BORDERLINE,                       Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty);
+const PropertyRegistration Control::PROPERTY_1(typeRegistration,  "styleName",                        Toolkit::Control::Property::STYLE_NAME,                                Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_4(typeRegistration,  "keyInputFocus",                    Toolkit::Control::Property::KEY_INPUT_FOCUS,                           Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_5(typeRegistration,  "background",                       Toolkit::Control::Property::BACKGROUND,                                Property::MAP,     &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_6(typeRegistration,  "margin",                           Toolkit::Control::Property::MARGIN,                                    Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_7(typeRegistration,  "padding",                          Toolkit::Control::Property::PADDING,                                   Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_8(typeRegistration,  "tooltip",                          Toolkit::DevelControl::Property::TOOLTIP,                              Property::MAP,     &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_9(typeRegistration,  "state",                            Toolkit::DevelControl::Property::STATE,                                Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_10(typeRegistration, "subState",                         Toolkit::DevelControl::Property::SUB_STATE,                            Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_11(typeRegistration, "leftFocusableActorId",             Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID,              Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_12(typeRegistration, "rightFocusableActorId",            Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,             Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_13(typeRegistration, "upFocusableActorId",               Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,                Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_14(typeRegistration, "downFocusableActorId",             Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID,              Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_15(typeRegistration, "shadow",                           Toolkit::DevelControl::Property::SHADOW,                               Property::MAP,     &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_16(typeRegistration, "accessibilityName",                Toolkit::DevelControl::Property::ACCESSIBILITY_NAME,                   Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_17(typeRegistration, "accessibilityDescription",         Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION,            Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_18(typeRegistration, "accessibilityTranslationDomain",   Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN,     Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_19(typeRegistration, "accessibilityRole",                Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,                   Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_20(typeRegistration, "accessibilityHighlightable",       Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,          Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_21(typeRegistration, "accessibilityAttributes",          Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,             Property::MAP,     &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_22(typeRegistration, "dispatchKeyEvents",                Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,                  Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_23(typeRegistration, "accessibilityHidden",              Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,                 Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_24(typeRegistration, "clockwiseFocusableActorId",        Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID,         Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_25(typeRegistration, "counterClockwiseFocusableActorId", Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_26(typeRegistration, "automationId",                     Toolkit::DevelControl::Property::AUTOMATION_ID,                        Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_27(typeRegistration, "accessibilityValue",               Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,                  Property::STRING,  &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_28(typeRegistration, "accessibilityScrollable",          Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,             Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_29(typeRegistration, "accessibilityStates",              Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,                 Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_30(typeRegistration, "accessibilityIsModal",             Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,               Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_31(typeRegistration, "offScreenRendering",               Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,                  Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_32(typeRegistration, "innerShadow",                      Toolkit::DevelControl::Property::INNER_SHADOW,                         Property::MAP,     &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_33(typeRegistration, "borderline",                       Toolkit::DevelControl::Property::BORDERLINE,                           Property::MAP,     &Control::SetProperty, &Control::GetProperty);
 
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &ControlImpl::Impl::SetProperty, nullptr);
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::Value(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)), &ControlImpl::Impl::SetProperty, nullptr); ///< Make animatable, for constarint-input
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &ControlImpl::Impl::SetProperty, nullptr);
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &ControlImpl::Impl::SetProperty, nullptr);
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::Value(Color::BLACK), &ControlImpl::Impl::SetProperty, nullptr);
-const AnimatablePropertyRegistration ControlImpl::Impl::ANIMATABLE_PROPERTY_6(typeRegistration, "viewBorderlineOffset",   Toolkit::DevelControl::Property::BORDERLINE_OFFSET,    Property::FLOAT,   &ControlImpl::Impl::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_1(typeRegistration, "viewCornerRadius",       Toolkit::DevelControl::Property::CORNER_RADIUS,        Property::VECTOR4, &Control::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_2(typeRegistration, "viewCornerRadiusPolicy", Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, Property::Value(static_cast<int>(Toolkit::Visual::Transform::Policy::ABSOLUTE)), &Control::SetProperty, nullptr); ///< Make animatable, for constarint-input
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_3(typeRegistration, "viewCornerSquareness",   Toolkit::DevelControl::Property::CORNER_SQUARENESS,    Property::VECTOR4, &Control::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_4(typeRegistration, "viewBorderlineWidth",    Toolkit::DevelControl::Property::BORDERLINE_WIDTH,     Property::FLOAT,   &Control::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_5(typeRegistration, "viewBorderlineColor",    Toolkit::DevelControl::Property::BORDERLINE_COLOR,     Property::Value(Color::BLACK), &Control::SetProperty, nullptr);
+const AnimatablePropertyRegistration Control::ANIMATABLE_PROPERTY_6(typeRegistration, "viewBorderlineOffset",   Toolkit::DevelControl::Property::BORDERLINE_OFFSET,    Property::FLOAT,   &Control::SetProperty, nullptr);
 
 // clang-format on
 
-ControlImpl::Impl::Impl(ControlImpl& controlImpl)
+Control::Control(ControlImpl& controlImpl)
 : mControlImpl(controlImpl),
   mState(Toolkit::DevelControl::NORMAL),
   mSubStateName(""),
@@ -544,7 +538,7 @@ ControlImpl::Impl::Impl(ControlImpl& controlImpl)
   mTooltip(NULL),
   mInputMethodContext(),
   mIdleCallback(nullptr),
-  mFlags(ControlImpl::ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+  mFlags(ControlBehaviour(ControlImpl::CONTROL_BEHAVIOUR_DEFAULT)),
   mAccessibilityRole{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)},
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
@@ -556,7 +550,7 @@ ControlImpl::Impl::Impl(ControlImpl& controlImpl)
 {
 }
 
-ControlImpl::Impl::~Impl()
+Control::~Control()
 {
   if(mVisualData)
   {
@@ -579,47 +573,47 @@ ControlImpl::Impl::~Impl()
   }
 }
 
-void ControlImpl::Impl::InitializeVisualData()
+void Control::InitializeVisualData()
 {
-  mVisualData = std::make_unique<ControlImpl::Impl::VisualData>(*this);
+  mVisualData = std::make_unique<VisualData>(*this);
 }
 
-ControlImpl::Impl& ControlImpl::Impl::Get(ControlImpl& internalControl)
+Control& Control::Get(ControlImpl& controlImpl)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
-  return *internalControl.mImpl;
+  return *controlImpl.mInternal;
 }
 
-const ControlImpl::Impl& ControlImpl::Impl::Get(const ControlImpl& internalControl)
+const Control& Control::Get(const ControlImpl& controlImpl)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
-  return *internalControl.mImpl;
+  return *controlImpl.mInternal;
 }
 
 // Gesture Detection Methods
-void ControlImpl::Impl::PinchDetected(Actor actor, const PinchGesture& pinch)
+void Control::PinchDetected(Actor actor, const PinchGesture& pinch)
 {
   mControlImpl.OnPinch(pinch);
 }
 
-void ControlImpl::Impl::PanDetected(Actor actor, const PanGesture& pan)
+void Control::PanDetected(Actor actor, const PanGesture& pan)
 {
   mControlImpl.OnPan(pan);
 }
 
-void ControlImpl::Impl::TapDetected(Actor actor, const TapGesture& tap)
+void Control::TapDetected(Actor actor, const TapGesture& tap)
 {
   mControlImpl.OnTap(tap);
 }
 
-void ControlImpl::Impl::LongPressDetected(Actor actor, const LongPressGesture& longPress)
+void Control::LongPressDetected(Actor actor, const LongPressGesture& longPress)
 {
   mControlImpl.OnLongPress(longPress);
 }
 
-void ControlImpl::Impl::ResourceReady()
+void Control::ResourceReady()
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
@@ -630,7 +624,7 @@ void ControlImpl::Impl::ResourceReady()
   }
 }
 
-void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
+void Control::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -638,7 +632,7 @@ void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::B
   }
 }
 
-void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
+void Control::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -646,7 +640,7 @@ void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::B
   }
 }
 
-void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
+void Control::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -654,7 +648,7 @@ void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::B
   }
 }
 
-void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
+void Control::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -662,7 +656,7 @@ void ControlImpl::Impl::RegisterVisual(Property::Index index, Toolkit::Visual::B
   }
 }
 
-void ControlImpl::Impl::UnregisterVisual(Property::Index index)
+void Control::UnregisterVisual(Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -670,12 +664,12 @@ void ControlImpl::Impl::UnregisterVisual(Property::Index index)
   }
 }
 
-Toolkit::Visual::Base ControlImpl::Impl::GetVisual(Property::Index index) const
+Toolkit::Visual::Base Control::GetVisual(Property::Index index) const
 {
   return Toolkit::Visual::Base(GetVisualImplPtr(index));
 }
 
-Toolkit::Internal::Visual::Base* ControlImpl::Impl::GetVisualImplPtr(Property::Index index) const
+Toolkit::Internal::Visual::Base* Control::GetVisualImplPtr(Property::Index index) const
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -684,7 +678,7 @@ Toolkit::Internal::Visual::Base* ControlImpl::Impl::GetVisualImplPtr(Property::I
   return nullptr;
 }
 
-bool ControlImpl::Impl::IsResourceReady() const
+bool Control::IsResourceReady() const
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -693,9 +687,9 @@ bool ControlImpl::Impl::IsResourceReady() const
   return true;
 }
 
-void ControlImpl::Impl::OnSceneConnection()
+void Control::OnSceneConnection()
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ControlImpl::OnSceneConnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
 
   if(DALI_LIKELY(mVisualData))
   {
@@ -709,9 +703,9 @@ void ControlImpl::Impl::OnSceneConnection()
   }
 }
 
-void ControlImpl::Impl::OnSceneDisconnection()
+void Control::OnSceneDisconnection()
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ControlImpl::OnSceneDisconnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Control::OnSceneDisconnection number of registered visuals(%d)\n", mVisualData ? mVisualData->mVisuals.Size() : 0u);
 
   if(DALI_LIKELY(mVisualData))
   {
@@ -725,7 +719,7 @@ void ControlImpl::Impl::OnSceneDisconnection()
   }
 }
 
-void ControlImpl::Impl::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
+void Control::EnableReadyTransitionOverridden(Toolkit::Visual::Base& visual, bool enable)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -733,7 +727,7 @@ void ControlImpl::Impl::EnableReadyTransitionOverridden(Toolkit::Visual::Base& v
   }
 }
 
-void ControlImpl::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
+void Control::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& visual, bool enable, Dali::Constraint cornerRadiusConstraint)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -741,7 +735,7 @@ void ControlImpl::Impl::EnableCornerPropertiesOverridden(Toolkit::Visual::Base& 
   }
 }
 
-void ControlImpl::Impl::EnableVisual(Property::Index index, bool enable)
+void Control::EnableVisual(Property::Index index, bool enable)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -749,7 +743,7 @@ void ControlImpl::Impl::EnableVisual(Property::Index index, bool enable)
   }
 }
 
-bool ControlImpl::Impl::IsVisualEnabled(Property::Index index) const
+bool Control::IsVisualEnabled(Property::Index index) const
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -758,7 +752,7 @@ bool ControlImpl::Impl::IsVisualEnabled(Property::Index index) const
   return false;
 }
 
-Toolkit::Visual::ResourceStatus ControlImpl::Impl::GetVisualResourceStatus(Property::Index index) const
+Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Property::Index index) const
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -767,9 +761,9 @@ Toolkit::Visual::ResourceStatus ControlImpl::Impl::GetVisualResourceStatus(Prope
   return Toolkit::Visual::ResourceStatus::READY;
 }
 
-void ControlImpl::Impl::AddTransitions(Dali::Animation&               animation,
-                                       const Toolkit::TransitionData& handle,
-                                       bool                           createAnimation)
+void Control::AddTransitions(Dali::Animation&               animation,
+                             const Toolkit::TransitionData& handle,
+                             bool                           createAnimation)
 {
   if(DALI_UNLIKELY(!mVisualData))
   {
@@ -843,7 +837,7 @@ void ControlImpl::Impl::AddTransitions(Dali::Animation&               animation,
   }
 }
 
-void ControlImpl::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
+void Control::DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -851,7 +845,7 @@ void ControlImpl::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Proper
   }
 }
 
-void ControlImpl::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
+void Control::DoActionExtension(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Any& attributes)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -859,7 +853,7 @@ void ControlImpl::Impl::DoActionExtension(Dali::Property::Index visualIndex, Dal
   }
 }
 
-Dali::Animation ControlImpl::Impl::CreateTransition(const Toolkit::TransitionData& transitionData)
+Dali::Animation Control::CreateTransition(const Toolkit::TransitionData& transitionData)
 {
   Dali::Animation transition;
 
@@ -870,7 +864,7 @@ Dali::Animation ControlImpl::Impl::CreateTransition(const Toolkit::TransitionDat
   return transition;
 }
 
-void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
+void Control::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
@@ -906,10 +900,10 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
 
         if(valuePtr)
         {
-          Toolkit::DevelControl::State state(controlImpl.mImpl->mState);
+          Toolkit::DevelControl::State state(controlImpl.mInternal->mState);
           if(Scripting::GetEnumerationProperty<Toolkit::DevelControl::State>(*valuePtr, ControlStateTable, ControlStateTableCount, state))
           {
-            controlImpl.mImpl->SetState(state, withTransitions);
+            controlImpl.mInternal->SetState(state, withTransitions);
           }
         }
       }
@@ -920,7 +914,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         std::string subState;
         if(GetStdString(value, subState))
         {
-          controlImpl.mImpl->SetSubState(subState);
+          controlImpl.mInternal->SetSubState(subState);
         }
       }
       break;
@@ -930,7 +924,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mLeftFocusableActorId = focusId;
+          controlImpl.mInternal->mLeftFocusableActorId = focusId;
         }
       }
       break;
@@ -940,7 +934,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mRightFocusableActorId = focusId;
+          controlImpl.mInternal->mRightFocusableActorId = focusId;
         }
       }
       break;
@@ -950,7 +944,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mUpFocusableActorId = focusId;
+          controlImpl.mInternal->mUpFocusableActorId = focusId;
         }
       }
       break;
@@ -960,7 +954,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mDownFocusableActorId = focusId;
+          controlImpl.mInternal->mDownFocusableActorId = focusId;
         }
       }
       break;
@@ -989,14 +983,14 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         }
         else if(GetStdString(value, url))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+          if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
           {
             // don't know the size to load
             Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual(ToDaliString(url), ImageDimensions());
             if(visual)
             {
-              controlImpl.mImpl->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
-              controlImpl.mImpl->EnableCornerPropertiesOverridden(visual, true);
+              controlImpl.mInternal->mVisualData->RegisterVisual(Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND);
+              controlImpl.mInternal->EnableCornerPropertiesOverridden(visual, true);
             }
           }
         }
@@ -1017,7 +1011,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         Extents margin;
         if(value.Get(margin))
         {
-          controlImpl.mImpl->SetMargin(margin);
+          controlImpl.mInternal->SetMargin(margin);
         }
         break;
       }
@@ -1027,14 +1021,14 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         Extents padding;
         if(value.Get(padding))
         {
-          controlImpl.mImpl->SetPadding(padding);
+          controlImpl.mInternal->SetPadding(padding);
         }
         break;
       }
 
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
-        Internal::TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
+        Internal::TooltipPtr& tooltipPtr = controlImpl.mInternal->mTooltip;
         if(!tooltipPtr)
         {
           tooltipPtr = Internal::Tooltip::New(control);
@@ -1048,12 +1042,12 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         const Property::Map* map = value.GetMap();
         if(map && !map->Empty())
         {
-          controlImpl.mImpl->SetShadow(*map);
+          controlImpl.mInternal->SetShadow(*map);
         }
         else
         {
           // The shadow is an empty property map, so we should clear the shadow
-          controlImpl.mImpl->ClearShadow();
+          controlImpl.mInternal->ClearShadow();
         }
         break;
       }
@@ -1063,9 +1057,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         std::string name;
         if(GetStdString(value, name))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !name.empty())
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || !name.empty())
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.name = std::move(name);
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.name = std::move(name);
           }
         }
         break;
@@ -1076,9 +1070,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         std::string text;
         if(GetStdString(value, text))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !text.empty())
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || !text.empty())
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.description = std::move(text);
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.description = std::move(text);
           }
         }
         break;
@@ -1089,7 +1083,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int32_t role;
         if(value.Get(role))
         {
-          controlImpl.mImpl->mAccessibilityRole = role;
+          controlImpl.mInternal->mAccessibilityRole = role;
         }
         break;
       }
@@ -1099,7 +1093,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         bool highlightable;
         if(value.Get(highlightable))
         {
-          controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isHighlightable = highlightable ? Internal::TriStateProperty::TRUE : Internal::TriStateProperty::FALSE;
+          controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.isHighlightable = highlightable ? Internal::TriStateProperty::TRUE : Internal::TriStateProperty::FALSE;
         }
         break;
       }
@@ -1109,9 +1103,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         const Property::Map* map = value.GetMap();
         if(map)
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !map->Empty())
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || !map->Empty())
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.extraAttributes = *map;
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.extraAttributes = *map;
           }
         }
         break;
@@ -1122,7 +1116,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         bool dispatch;
         if(value.Get(dispatch))
         {
-          controlImpl.mImpl->mDispatchKeyEvents = dispatch;
+          controlImpl.mInternal->mDispatchKeyEvents = dispatch;
         }
         break;
       }
@@ -1132,11 +1126,11 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         bool hidden;
         if(value.Get(hidden))
         {
-          const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+          const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
           const bool  originalHidden    = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isHidden : false;
           if(originalHidden != hidden)
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isHidden = hidden;
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.isHidden = hidden;
 
             auto accessible = controlImpl.GetAccessibleObject();
             if(DALI_LIKELY(accessible))
@@ -1156,7 +1150,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mClockwiseFocusableActorId = focusId;
+          controlImpl.mInternal->mClockwiseFocusableActorId = focusId;
         }
         break;
       }
@@ -1165,7 +1159,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mCounterClockwiseFocusableActorId = focusId;
+          controlImpl.mInternal->mCounterClockwiseFocusableActorId = focusId;
         }
         break;
       }
@@ -1175,9 +1169,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         std::string automationId;
         if(GetStdString(value, automationId))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !automationId.empty())
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || !automationId.empty())
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.automationId = std::move(automationId);
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.automationId = std::move(automationId);
           }
         }
         break;
@@ -1188,9 +1182,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         std::string accessibilityValue;
         if(GetStdString(value, accessibilityValue))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || !accessibilityValue.empty())
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || !accessibilityValue.empty())
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.value = std::move(accessibilityValue);
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.value = std::move(accessibilityValue);
           }
         }
         break;
@@ -1201,9 +1195,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         bool isScrollable;
         if(value.Get(isScrollable))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || isScrollable)
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || isScrollable)
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isScrollable = isScrollable;
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.isScrollable = isScrollable;
           }
         }
         break;
@@ -1214,9 +1208,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int32_t states;
         if(value.Get(states))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || states != static_cast<int32_t>(AccessibilityData::GetDefaultControlAccessibilityStates().GetRawData32()))
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || states != static_cast<int32_t>(AccessibilityData::GetDefaultControlAccessibilityStates().GetRawData32()))
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
           }
         }
         break;
@@ -1227,9 +1221,9 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         bool isModal;
         if(value.Get(isModal))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->GetAccessibilityData()) || isModal)
+          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || isModal)
           {
-            controlImpl.mImpl->GetOrCreateAccessibilityData().mAccessibilityProps.isModal = isModal;
+            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.isModal = isModal;
           }
         }
         break;
@@ -1240,7 +1234,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int32_t offscreenRenderingType;
         if(value.Get(offscreenRenderingType))
         {
-          controlImpl.mImpl->SetOffScreenRendering(offscreenRenderingType);
+          controlImpl.mInternal->SetOffScreenRendering(offscreenRenderingType);
         }
         break;
       }
@@ -1250,12 +1244,12 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         const Property::Map* map = value.GetMap();
         if(map && !map->Empty())
         {
-          controlImpl.mImpl->SetInnerShadow(*map);
+          controlImpl.mInternal->SetInnerShadow(*map);
         }
         else
         {
           // The shadow is an empty property map, so we should clear the inner shadow
-          controlImpl.mImpl->ClearInnerShadow();
+          controlImpl.mInternal->ClearInnerShadow();
         }
         break;
       }
@@ -1265,12 +1259,12 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         const Property::Map* map = value.GetMap();
         if(map && !map->Empty())
         {
-          controlImpl.mImpl->SetBorderline(*map, true);
+          controlImpl.mInternal->SetBorderline(*map, true);
         }
         else
         {
           // The shadow is an empty property map, so we should clear the inner shadow
-          controlImpl.mImpl->ClearBorderline();
+          controlImpl.mInternal->ClearBorderline();
         }
         break;
       }
@@ -1287,11 +1281,11 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         Vector4 radius;
         if(value.Get(radius))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+          if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS, false);
+            controlImpl.mInternal->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS, false);
           }
-          controlImpl.mImpl->UpdateCornerRadius();
+          controlImpl.mInternal->UpdateCornerRadius();
         }
         break;
       }
@@ -1301,11 +1295,11 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         int policy;
         if(value.Get(policy))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+          if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, false);
+            controlImpl.mInternal->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_RADIUS_POLICY, false);
           }
-          controlImpl.mImpl->UpdateCornerRadius();
+          controlImpl.mInternal->UpdateCornerRadius();
         }
         break;
       }
@@ -1322,11 +1316,11 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         Vector4 squareness;
         if(value.Get(squareness))
         {
-          if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+          if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
           {
-            controlImpl.mImpl->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_SQUARENESS, false);
+            controlImpl.mInternal->mVisualData->NotifyConstraintPropertyChanged(Toolkit::DevelControl::Property::CORNER_SQUARENESS, false);
           }
-          controlImpl.mImpl->UpdateCornerRadius();
+          controlImpl.mInternal->UpdateCornerRadius();
         }
         break;
       }
@@ -1336,7 +1330,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         float width;
         if(value.Get(width))
         {
-          controlImpl.mImpl->UpdateBorderline();
+          controlImpl.mInternal->UpdateBorderline();
         }
         break;
       }
@@ -1346,7 +1340,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         Vector4 color;
         if(value.Get(color))
         {
-          controlImpl.mImpl->UpdateBorderline();
+          controlImpl.mInternal->UpdateBorderline();
         }
         break;
       }
@@ -1356,7 +1350,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
         float offset;
         if(value.Get(offset))
         {
-          controlImpl.mImpl->UpdateBorderline();
+          controlImpl.mInternal->UpdateBorderline();
         }
         break;
       }
@@ -1364,7 +1358,7 @@ void ControlImpl::Impl::SetProperty(BaseObject* object, Property::Index index, c
   }
 }
 
-Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Index index)
+Property::Value Control::GetProperty(BaseObject* object, Property::Index index)
 {
   DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
 
@@ -1386,37 +1380,37 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
 
       case Toolkit::DevelControl::Property::STATE:
       {
-        value = controlImpl.mImpl->mState;
+        value = controlImpl.mInternal->mState;
         break;
       }
 
       case Toolkit::DevelControl::Property::SUB_STATE:
       {
-        value = ToPropertyValue(controlImpl.mImpl->mSubStateName);
+        value = ToPropertyValue(controlImpl.mInternal->mSubStateName);
         break;
       }
 
       case Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mLeftFocusableActorId;
+        value = controlImpl.mInternal->mLeftFocusableActorId;
         break;
       }
 
       case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mRightFocusableActorId;
+        value = controlImpl.mInternal->mRightFocusableActorId;
         break;
       }
 
       case Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mUpFocusableActorId;
+        value = controlImpl.mInternal->mUpFocusableActorId;
         break;
       }
 
       case Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mDownFocusableActorId;
+        value = controlImpl.mInternal->mDownFocusableActorId;
         break;
       }
 
@@ -1430,9 +1424,9 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
       {
         Property::Map map;
 
-        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
         {
-          const Toolkit::Internal::Visual::Base* visualImplPtr = controlImpl.mImpl->mVisualData->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
+          const Toolkit::Internal::Visual::Base* visualImplPtr = controlImpl.mInternal->mVisualData->GetVisualImplPtr(Toolkit::Control::Property::BACKGROUND);
           if(visualImplPtr)
           {
             visualImplPtr->CreatePropertyMap(map);
@@ -1445,22 +1439,22 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
 
       case Toolkit::Control::Property::MARGIN:
       {
-        value = controlImpl.mImpl->GetMargin();
+        value = controlImpl.mInternal->GetMargin();
         break;
       }
 
       case Toolkit::Control::Property::PADDING:
       {
-        value = controlImpl.mImpl->GetPadding();
+        value = controlImpl.mInternal->GetPadding();
         break;
       }
 
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         Property::Map map;
-        if(controlImpl.mImpl->mTooltip)
+        if(controlImpl.mInternal->mTooltip)
         {
-          controlImpl.mImpl->mTooltip->CreatePropertyMap(map);
+          controlImpl.mInternal->mTooltip->CreatePropertyMap(map);
         }
         value = map;
         break;
@@ -1470,9 +1464,9 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
       {
         Property::Map map;
 
-        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
         {
-          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::SHADOW);
+          Toolkit::Visual::Base visual = controlImpl.mInternal->mVisualData->GetVisual(Toolkit::DevelControl::Property::SHADOW);
           if(visual)
           {
             visual.CreatePropertyMap(map);
@@ -1485,101 +1479,101 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.name : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.description : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
       {
-        value = controlImpl.mImpl->mAccessibilityRole;
+        value = controlImpl.mInternal->mAccessibilityRole;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = (DALI_LIKELY(accessibilityData) && accessibilityData->mAccessibilityProps.isHighlightable == Internal::TriStateProperty::TRUE) ? true : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.extraAttributes : Property::Map();
         break;
       }
 
       case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
       {
-        value = controlImpl.mImpl->mDispatchKeyEvents;
+        value = controlImpl.mInternal->mDispatchKeyEvents;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isHidden : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mClockwiseFocusableActorId;
+        value = controlImpl.mInternal->mClockwiseFocusableActorId;
         break;
       }
 
       case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mCounterClockwiseFocusableActorId;
+        value = controlImpl.mInternal->mCounterClockwiseFocusableActorId;
         break;
       }
 
       case Toolkit::DevelControl::Property::AUTOMATION_ID:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.automationId : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = ToPropertyValue(DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.value : "");
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isScrollable : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = static_cast<int32_t>((DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.states : AccessibilityData::GetDefaultControlAccessibilityStates()).GetRawData32());
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
       {
-        const auto* accessibilityData = controlImpl.mImpl->GetAccessibilityData();
+        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
         value                         = DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.isModal : false;
         break;
       }
 
       case Toolkit::DevelControl::Property::OFFSCREEN_RENDERING:
       {
-        value = controlImpl.mImpl->mOffScreenRenderingType;
+        value = controlImpl.mInternal->mOffScreenRenderingType;
         break;
       }
 
@@ -1587,9 +1581,9 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
       {
         Property::Map map;
 
-        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
         {
-          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::INNER_SHADOW);
+          Toolkit::Visual::Base visual = controlImpl.mInternal->mVisualData->GetVisual(Toolkit::DevelControl::Property::INNER_SHADOW);
           if(visual)
           {
             visual.CreatePropertyMap(map);
@@ -1604,9 +1598,9 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
       {
         Property::Map map;
 
-        if(DALI_LIKELY(controlImpl.mImpl->mVisualData))
+        if(DALI_LIKELY(controlImpl.mInternal->mVisualData))
         {
-          Toolkit::Visual::Base visual = controlImpl.mImpl->mVisualData->GetVisual(Toolkit::DevelControl::Property::BORDERLINE);
+          Toolkit::Visual::Base visual = controlImpl.mInternal->mVisualData->GetVisual(Toolkit::DevelControl::Property::BORDERLINE);
           if(visual)
           {
             visual.CreatePropertyMap(map);
@@ -1634,11 +1628,11 @@ Property::Value ControlImpl::Impl::GetProperty(BaseObject* object, Property::Ind
   return value;
 }
 
-void ControlImpl::Impl::SetState(DevelControl::State newState, bool withTransitions)
+void Control::SetState(DevelControl::State newState, bool withTransitions)
 {
   DevelControl::State oldState = mState;
   Dali::CustomActor   handle(mControlImpl.GetOwner());
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "ControlImpl::Impl::SetState: %s\n", (mState == DevelControl::NORMAL ? "NORMAL" : (mState == DevelControl::FOCUSED ? "FOCUSED" : (mState == DevelControl::DISABLED ? "DISABLED" : "NONE"))));
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Control::SetState: %s\n", (mState == DevelControl::NORMAL ? "NORMAL" : (mState == DevelControl::FOCUSED ? "FOCUSED" : (mState == DevelControl::DISABLED ? "DISABLED" : "NONE"))));
 
   if(mState != newState)
   {
@@ -1674,7 +1668,7 @@ void ControlImpl::Impl::SetState(DevelControl::State newState, bool withTransiti
   }
 }
 
-void ControlImpl::Impl::SetSubState(const std::string& subStateName, bool withTransitions)
+void Control::SetSubState(const std::string& subStateName, bool withTransitions)
 {
   if(mSubStateName != subStateName)
   {
@@ -1714,44 +1708,44 @@ void ControlImpl::Impl::SetSubState(const std::string& subStateName, bool withTr
   }
 }
 
-void ControlImpl::Impl::SetMargin(Extents margin)
+void Control::SetMargin(Extents margin)
 {
-  mControlImpl.mImpl->mMargin = margin;
+  mControlImpl.mInternal->mMargin = margin;
 
   // Trigger a size negotiation request that may be needed when setting a margin.
   mControlImpl.RelayoutRequest();
 }
 
-Extents ControlImpl::Impl::GetMargin() const
+Extents Control::GetMargin() const
 {
-  return mControlImpl.mImpl->mMargin;
+  return mControlImpl.mInternal->mMargin;
 }
 
-void ControlImpl::Impl::SetPadding(Extents padding)
+void Control::SetPadding(Extents padding)
 {
-  mControlImpl.mImpl->mPadding = padding;
+  mControlImpl.mInternal->mPadding = padding;
 
   // Trigger a size negotiation request that may be needed when setting a padding.
   mControlImpl.RelayoutRequest();
 }
 
-Extents ControlImpl::Impl::GetPadding() const
+Extents Control::GetPadding() const
 {
-  return mControlImpl.mImpl->mPadding;
+  return mControlImpl.mInternal->mPadding;
 }
 
-DevelControl::VisualEventSignalType& ControlImpl::Impl::VisualEventSignal()
+DevelControl::VisualEventSignalType& Control::VisualEventSignal()
 {
   DALI_ASSERT_ALWAYS(mVisualData && "Visual Disabled control cannot use VisualEventSignal!!");
   return mVisualData->VisualEventSignal();
 }
 
-void ControlImpl::Impl::SetInputMethodContext(InputMethodContext& inputMethodContext)
+void Control::SetInputMethodContext(InputMethodContext& inputMethodContext)
 {
   mInputMethodContext = inputMethodContext;
 }
 
-bool ControlImpl::Impl::FilterKeyEvent(const KeyEvent& event)
+bool Control::FilterKeyEvent(const KeyEvent& event)
 {
   bool consumed(false);
 
@@ -1762,7 +1756,7 @@ bool ControlImpl::Impl::FilterKeyEvent(const KeyEvent& event)
   return consumed;
 }
 
-ControlImpl::Impl::AccessibilityData& ControlImpl::Impl::GetOrCreateAccessibilityData()
+Control::AccessibilityData& Control::GetOrCreateAccessibilityData()
 {
   if(DALI_UNLIKELY(!mAccessibilityData))
   {
@@ -1773,17 +1767,17 @@ ControlImpl::Impl::AccessibilityData& ControlImpl::Impl::GetOrCreateAccessibilit
   return *mAccessibilityData;
 }
 
-ControlImpl::Impl::AccessibilityData* ControlImpl::Impl::GetAccessibilityData() const
+Control::AccessibilityData* Control::GetAccessibilityData() const
 {
   return mAccessibilityData.get();
 }
 
-void ControlImpl::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
+void Control::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
   GetOrCreateAccessibilityData().AppendAccessibilityAttribute(key, value);
 }
 
-void ControlImpl::Impl::RemoveAccessibilityAttribute(const std::string& key)
+void Control::RemoveAccessibilityAttribute(const std::string& key)
 {
   auto* accessibilityData = GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData))
@@ -1792,7 +1786,7 @@ void ControlImpl::Impl::RemoveAccessibilityAttribute(const std::string& key)
   }
 }
 
-void ControlImpl::Impl::ClearAccessibilityAttributes()
+void Control::ClearAccessibilityAttributes()
 {
   auto* accessibilityData = GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData))
@@ -1801,12 +1795,12 @@ void ControlImpl::Impl::ClearAccessibilityAttributes()
   }
 }
 
-void ControlImpl::Impl::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
+void Control::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
 {
   GetOrCreateAccessibilityData().SetAccessibilityReadingInfoType(types);
 }
 
-Dali::Accessibility::ReadingInfoTypes ControlImpl::Impl::GetAccessibilityReadingInfoType() const
+Dali::Accessibility::ReadingInfoTypes Control::GetAccessibilityReadingInfoType() const
 {
   const auto* accessibilityData = GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData))
@@ -1820,23 +1814,23 @@ Dali::Accessibility::ReadingInfoTypes ControlImpl::Impl::GetAccessibilityReading
   }
 }
 
-bool ControlImpl::Impl::IsAccessibleCreated() const
+bool Control::IsAccessibleCreated() const
 {
   auto bridge = Accessibility::Bridge::GetCurrentBridge();
   return DALI_LIKELY(bridge) ? !!bridge->GetAccessible(mControlImpl.Self()) : false;
 }
 
-void ControlImpl::Impl::EnableCreateAccessible(bool enable)
+void Control::EnableCreateAccessible(bool enable)
 {
   mAccessibleCreatable = enable;
 }
 
-bool ControlImpl::Impl::IsCreateAccessibleEnabled() const
+bool Control::IsCreateAccessibleEnabled() const
 {
   return mAccessibleCreatable;
 }
 
-void ControlImpl::Impl::ApplyFittingMode(const Vector2& size)
+void Control::ApplyFittingMode(const Vector2& size)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -1844,7 +1838,7 @@ void ControlImpl::Impl::ApplyFittingMode(const Vector2& size)
   }
 }
 
-void ControlImpl::Impl::SetShadow(const Property::Map& map)
+void Control::SetShadow(const Property::Map& map)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -1861,7 +1855,7 @@ void ControlImpl::Impl::SetShadow(const Property::Map& map)
   }
 }
 
-void ControlImpl::Impl::ClearShadow()
+void Control::ClearShadow()
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -1872,7 +1866,7 @@ void ControlImpl::Impl::ClearShadow()
   }
 }
 
-void ControlImpl::Impl::SetInnerShadow(const Property::Map& map)
+void Control::SetInnerShadow(const Property::Map& map)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -1910,7 +1904,7 @@ void ControlImpl::Impl::SetInnerShadow(const Property::Map& map)
   }
 }
 
-void ControlImpl::Impl::ClearInnerShadow()
+void Control::ClearInnerShadow()
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -1921,7 +1915,7 @@ void ControlImpl::Impl::ClearInnerShadow()
   }
 }
 
-void ControlImpl::Impl::SetBorderline(const Property::Map& map, bool forciblyCreate)
+void Control::SetBorderline(const Property::Map& map, bool forciblyCreate)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2003,7 +1997,7 @@ void ControlImpl::Impl::SetBorderline(const Property::Map& map, bool forciblyCre
   }
 }
 
-void ControlImpl::Impl::ClearBorderline()
+void Control::ClearBorderline()
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2014,7 +2008,7 @@ void ControlImpl::Impl::ClearBorderline()
   }
 }
 
-Dali::Property ControlImpl::Impl::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
+Dali::Property Control::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2024,10 +2018,10 @@ Dali::Property ControlImpl::Impl::GetVisualProperty(Dali::Property::Index index,
   return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
-void ControlImpl::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                          std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                          Dali::Toolkit::Control                                              source,
-                                          Dali::Toolkit::Control                                              destination)
+void Control::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                Dali::Toolkit::Control                                              source,
+                                Dali::Toolkit::Control                                              destination)
 {
   // Retrieves background properties to be transitioned.
   Dali::Property::Map backgroundSourcePropertyMap, backgroundDestinationPropertyMap;
@@ -2051,7 +2045,7 @@ void ControlImpl::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::
   mControlImpl.OnCreateTransitions(sourceProperties, destinationProperties, source, destination);
 }
 
-void ControlImpl::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+void Control::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2059,7 +2053,7 @@ void ControlImpl::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali:
   }
 }
 
-void ControlImpl::Impl::EmitResourceReadySignal()
+void Control::EmitResourceReadySignal()
 {
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable())) ///< Avoid resource ready callback during shutting down
   {
@@ -2086,7 +2080,7 @@ void ControlImpl::Impl::EmitResourceReadySignal()
         if(!mIdleCallback)
         {
           // The callback manager takes the ownership of the callback object.
-          mIdleCallback = MakeCallback(this, &ControlImpl::Impl::OnIdleCallback);
+          mIdleCallback = MakeCallback(this, &Control::OnIdleCallback);
           if(DALI_UNLIKELY(!Adaptor::Get().AddIdle(mIdleCallback, true)))
           {
             DALI_LOG_ERROR("Fail to add idle callback for control resource ready. Skip this callback.\n");
@@ -2099,7 +2093,7 @@ void ControlImpl::Impl::EmitResourceReadySignal()
   }
 }
 
-bool ControlImpl::Impl::OnIdleCallback()
+bool Control::OnIdleCallback()
 {
   // Reset the flag
   mIdleCallbackRegistered = false;
@@ -2122,12 +2116,12 @@ bool ControlImpl::Impl::OnIdleCallback()
   return mIdleCallbackRegistered;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> ControlImpl::Impl::GetAccessibleObject()
+std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
 {
   return GetOrCreateAccessibilityData().GetAccessibleObject();
 }
 
-void ControlImpl::Impl::RegisterProcessorOnce()
+void Control::RegisterProcessorOnce()
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2139,7 +2133,7 @@ void ControlImpl::Impl::RegisterProcessorOnce()
   }
 }
 
-void ControlImpl::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
+void Control::SetOffScreenRendering(int32_t offScreenRenderingType)
 {
   // Validate input
   {
@@ -2185,7 +2179,7 @@ void ControlImpl::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
   mOffScreenRenderingType = newType;
 }
 
-void ControlImpl::Impl::UpdateCornerRadius()
+void Control::UpdateCornerRadius()
 {
   // TODO : Need to make constriant for RenderEffect corner radius update
   if(mRenderEffect || mOffScreenRenderingImpl)
@@ -2209,7 +2203,7 @@ void ControlImpl::Impl::UpdateCornerRadius()
   }
 }
 
-void ControlImpl::Impl::UpdateBorderline()
+void Control::UpdateBorderline()
 {
   Actor self = mControlImpl.Self();
 
@@ -2223,7 +2217,7 @@ void ControlImpl::Impl::UpdateBorderline()
   SetBorderline(map, false);
 }
 
-void ControlImpl::Impl::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
+void Control::CreateAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2242,7 +2236,7 @@ void ControlImpl::Impl::CreateAnimationConstraints(const Dali::BaseObject& anima
   }
 }
 
-void ControlImpl::Impl::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
+void Control::ClearAnimationConstraints(const Dali::BaseObject& animationObject, Property::Index index)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2250,7 +2244,7 @@ void ControlImpl::Impl::ClearAnimationConstraints(const Dali::BaseObject& animat
   }
 }
 
-void ControlImpl::Impl::Process(bool postProcessor)
+void Control::Process(bool postProcessor)
 {
   if(DALI_LIKELY(mVisualData))
   {
@@ -2260,4 +2254,4 @@ void ControlImpl::Impl::Process(bool postProcessor)
   mProcessorRegistered = false;
 }
 
-} // namespace Dali::Toolkit
+} // namespace Dali::Toolkit::Internal
