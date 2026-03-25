@@ -24,6 +24,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 
 using Dali::Integration::ToDaliString;
 
@@ -54,8 +55,8 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMul
 {
   Texture                 texture  = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  texture.Upload(pixelData, imageUrl.GetUrl());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  Dali::Integration::TextureUploadWithContent(texture, pixelData, imageUrl.GetUrl(), Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE);
 #else
   texture.Upload(pixelData);
 #endif

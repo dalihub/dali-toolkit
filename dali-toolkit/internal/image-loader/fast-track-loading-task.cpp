@@ -34,7 +34,7 @@
 #include <thread>
 #endif
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
 #include <unordered_map>
 #endif
 
@@ -82,7 +82,7 @@ Dali::PixelData GetDummyAPixelData()
   return pixelDataA;
 }
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
 Dali::PixelData GetDummyPixelDataByFormat(Pixel::Format format)
 {
   static std::unordered_map<Pixel::Format, Dali::PixelData> gPixelDataCache;
@@ -158,9 +158,9 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
       Dali::Integration::SetTextureSize(mTextures[index], mImageInformations[index].width, mImageInformations[index].height);
       Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
       // Call Upload API, only for add informations of GPU memory usage.
-      mTextures[index].Upload(GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(mUrl.GetUrl() + "(" + ("YUVA"[index]) + ")"), mImageInformations[index].resourceId + 500'000'000); ///< Add some number to avoid conflict with TextureManager ID.
+      Dali::Integration::TextureUploadWithContent(mTextures[index], GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(mUrl.GetUrl() + "(" + ("YUVA"[index]) + ")"), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE);
 #endif
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
