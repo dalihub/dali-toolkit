@@ -106,6 +106,7 @@ VideoView::VideoView(Dali::VideoSyncMode syncMode)
   mFrameID(0),
   mIsPlay(false),
   mIsUnderlay(true),
+  mSettingUnderlay(false),
   mSyncMode(syncMode),
   mSiblingOrder(0),
   // For frame interpolation
@@ -508,14 +509,14 @@ void VideoView::SetProperty(BaseObject* object, Property::Index index, const Pro
   {
     VideoView& impl = GetImpl(videoView);
 
-    impl.SetPropertyInternal(index, value);
-
     if(index != Toolkit::VideoView::Property::UNDERLAY)
     {
       // Backup values.
       // These values will be used when underlay mode is changed.
       impl.mPropertyBackup[index] = value;
     }
+
+    impl.SetPropertyInternal(index, value);
   }
 }
 
@@ -741,12 +742,17 @@ Vector3 VideoView::GetNaturalSize()
   }
 }
 
-
-
 void VideoView::SetUnderlay(bool isUnderlay)
 {
+  if(mSettingUnderlay)
+  {
+    return;
+  }
+
   if(isUnderlay != mIsUnderlay || !mRenderingStrategy)
   {
+    mSettingUnderlay = true;
+    mIsUnderlay      = isUnderlay;
     int curPos = mVideoPlayer.GetPlayPosition();
     bool wasPlaying = IsPlay();
 
@@ -768,14 +774,14 @@ void VideoView::SetUnderlay(bool isUnderlay)
 
     if(!mRenderingStrategy->Initialize())
     {
-      if(wasPlaying)
+      if(!mIsUnderlay)
       {
-        Play();
+        mIsUnderlay = true;
+        Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(Self());
+        mRenderingStrategy = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+        mRenderingStrategy->Initialize();
       }
-      return;
     }
-
-    mIsUnderlay = isUnderlay;
 
     ApplyBackupProperties();
 
@@ -790,6 +796,8 @@ void VideoView::SetUnderlay(bool isUnderlay)
     }
 
     RelayoutRequest();
+
+    mSettingUnderlay = false;
   }
 }
 
