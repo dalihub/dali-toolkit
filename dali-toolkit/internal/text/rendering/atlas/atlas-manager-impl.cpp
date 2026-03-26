@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 #include <string.h>
 
 // INTERNAL INCLUDES
@@ -92,7 +93,12 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas(const Toolkit::AtlasMan
   unsigned char* background = new unsigned char[bufferSize];
   memset(background, 0, bufferSize);
   PixelData backgroundPixels = PixelData::New(background, bufferSize, width, height, pixelformat, PixelData::DELETE_ARRAY);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  Dali::Integration::TextureUploadWithContent(atlas, backgroundPixels, "(TextAtlas)", Dali::Integration::TextureContextTypeHint::TEXT_ATLAS);
+#else
   atlas.Upload(backgroundPixels, 0u, 0u, 0u, 0u, width, height);
+#endif
 
   AtlasDescriptor atlasDescriptor;
   atlasDescriptor.mAtlas           = atlas;
