@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -32,6 +33,12 @@
 #include <sstream>
 #include <thread>
 #endif
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+#include <unordered_map>
+#endif
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -74,6 +81,22 @@ Dali::PixelData GetDummyAPixelData()
   static Dali::PixelData pixelDataA = PixelData::New(new uint8_t[1]{0xFF}, 1, 1, 1, Pixel::A8, PixelData::DELETE_ARRAY);
   return pixelDataA;
 }
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+Dali::PixelData GetDummyPixelDataByFormat(Pixel::Format format)
+{
+  static std::unordered_map<Pixel::Format, Dali::PixelData> gPixelDataCache;
+
+  auto& pixelData = gPixelDataCache[format];
+  if(!pixelData)
+  {
+    uint32_t bpp  = Pixel::GetBytesPerPixel(format);
+    uint8_t* data = new uint8_t[bpp];
+    pixelData     = PixelData::New(data, bpp, 1, 1, format, PixelData::DELETE_ARRAY);
+  }
+  return pixelData;
+}
+#endif
 
 } // namespace
 
@@ -134,6 +157,11 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
     {
       Dali::Integration::SetTextureSize(mTextures[index], mImageInformations[index].width, mImageInformations[index].height);
       Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      // Call Upload API, only for add informations of GPU memory usage.
+      Dali::Integration::TextureUploadWithContent(mTextures[index], GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(mUrl.GetUrl() + "(" + ("YUVA"[index]) + ")"), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE);
+#endif
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
     {

@@ -218,7 +218,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.size());
   const MaterialDefinition materialGroundTruth[]{
-    {nullptr,
+    {{},
      MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
        MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
        MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
@@ -302,7 +302,7 @@ int UtcDaliGltfLoaderSuccess1(void)
      },
      nullptr},
     {
-      nullptr,
+      {},
       MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
         MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION | MaterialDefinition::NORMAL |
         MaterialDefinition::GLTF_CHANNELS,
@@ -431,7 +431,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   using Accessor = MeshDefinition::Accessor;
   MeshDefinition meshGroundTruth[]{
     {
-      nullptr,
+      {},
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",
@@ -441,7 +441,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       Accessor{Blob{0, 0}, {}},
     },
     {
-      nullptr,
+      {},
       0,
       Geometry::TRIANGLES,
       "AnimatedCube.bin",

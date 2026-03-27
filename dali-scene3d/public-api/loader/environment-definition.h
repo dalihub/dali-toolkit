@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/rendering/texture.h>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -89,13 +89,13 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   static float GetDefaultIntensity();
 
 public: // DATA
-  Dali::String             mDiffuseMapPath;
-  Dali::String             mSpecularMapPath;
-  std::shared_ptr<RawData> mRawData;
-  Quaternion               mCubeOrientation = Quaternion::IDENTITY;
-  Vector3                  mYDirection      = Vector3::ONE;
-  float                    mIblIntensity    = 1.0f;
-  bool                     mUseBrdfTexture  = false;
+  Dali::String       mDiffuseMapPath;
+  Dali::String       mSpecularMapPath;
+  SharedPtr<RawData> mRawData;
+  Quaternion         mCubeOrientation = Quaternion::IDENTITY;
+  Vector3            mYDirection      = Vector3::ONE;
+  float              mIblIntensity    = 1.0f;
+  bool               mUseBrdfTexture  = false;
 };
 
 } // namespace Dali::Scene3D::Loader

@@ -95,8 +95,7 @@ void RegisterControlAccessibleGetter()
   if(DALI_UNLIKELY(!onceFlag))
   {
     onceFlag = true;
-    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool>
-    {
+    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool> {
       auto control = Toolkit::Control::DownCast(actor);
       if(!control)
       {
@@ -901,8 +900,7 @@ void ControlImpl::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, D
   sourceVisual.CreatePropertyMap(sourceMap);
   destinationVisual.CreatePropertyMap(destinationMap);
 
-  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4
-  {
+  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
@@ -911,8 +909,7 @@ void ControlImpl::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, D
     return defaultValue;
   };
 
-  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float
-  {
+  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {

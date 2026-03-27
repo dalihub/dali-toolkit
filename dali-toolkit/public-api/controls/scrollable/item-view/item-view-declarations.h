@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_VIEW_DECLARATIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <utility> // std::pair
 
 namespace Dali
 {
@@ -38,7 +38,7 @@ typedef std::vector<ItemId>             ItemIdContainer; ///< Item id container 
 typedef ItemIdContainer::iterator       ItemIdIter;      ///< Item id iterator type @SINCE_1_0.0
 typedef ItemIdContainer::const_iterator ConstItemIdIter; ///< Item id const iterator type @SINCE_1_0.0
 
-typedef std::pair<ItemId, Actor> Item; ///< Item type @SINCE_1_0.0
+typedef Dali::Pair<ItemId, Actor> Item; ///< Item type @SINCE_1_0.0
 
 typedef std::vector<Item>             ItemContainer; ///< Item container type @SINCE_1_0.0
 typedef ItemContainer::iterator       ItemIter;      ///< Item iterator type @SINCE_1_0.0

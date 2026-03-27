@@ -27,6 +27,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/common/dali-common.h>
 #include <cstring>
 
@@ -1972,10 +1973,12 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
   PixelData           data       = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, isHorizontal, Pixel::RGBA8888, originSize);
   Texture             texture    = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  std::string text;
-  mController->GetText(text);
-  texture.Upload(data, ToDaliString(text + std::string("(TextScroll)")));
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::string text;
+    mController->GetText(text);
+    Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+  }
 #else
   texture.Upload(data);
 #endif
@@ -2028,10 +2031,12 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  std::string text;
-  mController->GetText(text);
-  texture.Upload(data, ToDaliString(text + std::string("(TextScroll)")));
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::string text;
+    mController->GetText(text);
+    Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+  }
 #else
   texture.Upload(data);
 #endif

@@ -1192,7 +1192,7 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
     {
       // Initialize a mesh definition for each subset
       MeshDefinition meshDefinition;
-      meshDefinition.mRawData = std::make_shared<MeshDefinition::RawData>();
+      meshDefinition.mRawData = MakeShared<MeshDefinition::RawData>();
       meshDefinition.mFlags |= MeshDefinition::U32_INDICES;
       meshDefinition.mSkeletonIdx = INVALID_INDEX;
 

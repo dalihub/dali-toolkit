@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -345,19 +346,19 @@ struct DALI_SCENE3D_API MeshDefinition
   void RetrieveBlendShapeComponents(bool& hasPositions, bool& hasNormals, bool& hasTangents) const;
 
 public: // DATA
-  std::shared_ptr<RawData> mRawData;
-  uint32_t                 mFlags         = 0x0;
-  Geometry::Type           mPrimitiveType = Geometry::TRIANGLES;
-  Dali::String             mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
-  Accessor                 mIndices;
-  Accessor                 mPositions;
-  Accessor                 mNormals;  // data can be generated based on positions
-  Accessor                 mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  std::vector<Accessor>    mTexCoords;
-  std::vector<Accessor>    mColors;
-  std::vector<Accessor>    mJoints;
-  std::vector<Accessor>    mWeights;
-  Property::Type           mTangentType{Property::VECTOR3};
+  SharedPtr<RawData>    mRawData;
+  uint32_t              mFlags         = 0x0;
+  Geometry::Type        mPrimitiveType = Geometry::TRIANGLES;
+  Dali::String          mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
+  Accessor              mIndices;
+  Accessor              mPositions;
+  Accessor              mNormals;  // data can be generated based on positions
+  Accessor              mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
+  std::vector<Accessor> mTexCoords;
+  std::vector<Accessor> mColors;
+  std::vector<Accessor> mJoints;
+  std::vector<Accessor> mWeights;
+  Property::Type        mTangentType{Property::VECTOR3};
 
   Blob                    mBlendShapeHeader;
   std::vector<BlendShape> mBlendShapes;

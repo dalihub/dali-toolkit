@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/uniform-block.h>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/renderer-state.h>
@@ -73,8 +73,8 @@ struct DALI_SCENE3D_API ShaderDefinition
   Shader Load(RawData&& raw) const;
 
 public: // DATA
-  std::shared_ptr<RawData> mRawData;
-  RendererState::Type      mRendererState = RendererState::NONE;
+  SharedPtr<RawData>  mRawData;
+  RendererState::Type mRendererState = RendererState::NONE;
 
   Dali::String                               mVertexShaderPath;
   Dali::String                               mFragmentShaderPath;

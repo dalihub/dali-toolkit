@@ -1043,7 +1043,7 @@ void Control::VisualData::StartObservingVisual(Toolkit::Visual::Base& visual)
   visualImpl.AddConstraintObserver(*this);
 }
 
-void Control::VisualData::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+void Control::VisualData::UpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
 {
   for(auto&& data : properties)
   {
@@ -1426,7 +1426,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
           {
             auto availableVisualSize = finalSize;
             finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                                              (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
             auto originalOffset = finalOffset;
 

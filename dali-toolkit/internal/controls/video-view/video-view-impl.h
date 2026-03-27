@@ -535,6 +535,7 @@ private:
 
   bool mIsPlay;
   bool mIsUnderlay;
+  bool mSettingUnderlay;
 
   Dali::VideoSyncMode mSyncMode;
   int                 mSiblingOrder;
