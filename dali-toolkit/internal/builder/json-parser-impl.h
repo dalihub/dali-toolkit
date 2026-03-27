@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
-#include <list>
 #include <string>
 
 // INTERNAL INCLUDES

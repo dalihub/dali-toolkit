@@ -28,6 +28,7 @@
 #include <Eldbus.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/dali-adaptor-common.h>
 
 #define DBUS_INTERFACE_PROPERTIES "org.freedesktop.DBus.Properties"
