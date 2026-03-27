@@ -2229,7 +2229,7 @@ class TestMatcheableView
 private:
   Actor MakeClickableActor()
   {
-    auto actor = Control::New();
+    auto actor = Control::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
     actor.SetProperty(Actor::Property::SENSITIVE, true);
     actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
     actor.TouchedSignal().Connect(TestTouchCallback);
@@ -2238,14 +2238,14 @@ private:
 
   Actor MakeNonClickableActor()
   {
-    auto actor = Control::New();
+    auto actor = Control::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
     actor.SetProperty(Actor::Property::SENSITIVE, false);
     return actor;
   }
 
   Actor MakeInvisibleActor()
   {
-    auto actor = Control::New();
+    auto actor = Control::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
     actor.SetProperty(Actor::Property::VISIBLE, false);
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
     return actor;
@@ -2270,7 +2270,7 @@ private:
     container.Add(button);
 
     // text label
-    auto text = TextLabel::New(ToDaliString(label));
+    auto text = TextLabel::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, ToDaliString(label));
     text.SetProperty(Actor::Property::VISIBLE, true);
     text.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     text.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
