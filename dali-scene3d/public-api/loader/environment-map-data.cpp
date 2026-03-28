@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <dali-scene3d/public-api/loader/environment-map-data.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
@@ -53,7 +55,22 @@ Texture EnvironmentMapData::GetTexture()
             auto& side = mPixelData[iSide];
             for(size_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
             {
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+              if(iSide == 0u && iMipLevel == 0u)
+              {
+                // Their is no good way to get url here. Just notify it is environment image.
+                Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
+                                                            side[iMipLevel],
+                                                            "Scene3D::EnvironmentMapData(CUBEMAP)",
+                                                            static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1100));
+              }
+              else
+              {
+                mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
+              }
+#else
               mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
+#endif
             }
           }
         }
@@ -62,7 +79,15 @@ Texture EnvironmentMapData::GetTexture()
     else
     {
       mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_2D, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      // Their is no good way to get url here. Just notify it is environment image.
+      Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
+                                                  mPixelData[0][0],
+                                                  "Scene3D::EnvironmentMapData(EQUIRECTANGULAR)",
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1101));
+#else
       mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+#endif
     }
 
     // If mipmap is not defined explicitly, use GenerateMipmaps.
