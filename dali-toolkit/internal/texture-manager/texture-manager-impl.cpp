@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/rendering/geometry.h>
 
@@ -164,18 +165,34 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     // Since we don't cache sync loaded texture.
     // But cannot remove it since AnimatedImageVisual didn't consider sync load cached case.
     // It should be fixed soon.
-    Devel::PixelBuffer pixelBuffer;
+    std::vector<Devel::PixelBuffer> pixelBuffers;
     if(animatedImageLoading)
     {
-      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, desiredSize, fittingMode, samplingMode);
+      bool loadYuvPlanes = (mLoadYuvPlanes && alphaMaskId == INVALID_TEXTURE_ID);
+      bool planeLoaded   = false;
+      if(loadYuvPlanes)
+      {
+        planeLoaded = animatedImageLoading.LoadFramePlanes(frameIndex, pixelBuffers, desiredSize);
+      }
+      if(!planeLoaded)
+      {
+        Devel::PixelBuffer pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, desiredSize, fittingMode, samplingMode);
+        if(pixelBuffer)
+        {
+          pixelBuffers.push_back(pixelBuffer);
+        }
+      }
     }
-    if(!pixelBuffer)
+    if(pixelBuffers.empty())
     {
       DALI_LOG_ERROR("TextureManager::LoadAnimatedImageTexture: Synchronous loading is failed\n");
     }
     else
     {
       Texture maskTexture;
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      bool maskApplied = false;
+#endif
       if(alphaMaskId != INVALID_TEXTURE_ID)
       {
         TextureCacheIndex maskCacheIndex = mTextureCacheManager.GetCacheIndexFromId(alphaMaskId);
@@ -203,15 +220,19 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
               {
                 PixelData maskPixelData = Devel::PixelBuffer::Convert(maskPixelBuffer); // takes ownership of buffer
                 maskTexture             = Texture::New(Dali::TextureType::TEXTURE_2D, maskPixelData.GetPixelFormat(), maskPixelData.GetWidth(), maskPixelData.GetHeight());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-                maskTexture.Upload(maskPixelData, maskTextureInfo.url.GetUrl(), maskTextureInfo.textureId);
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+                Dali::Integration::TextureUploadWithContent(maskTexture, maskPixelData, maskTextureInfo.url.GetUrl(), Dali::Integration::TextureContextTypeHint::MASKING_IMAGE);
 #else
                 maskTexture.Upload(maskPixelData);
 #endif
               }
               else
               {
-                pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
+                DALI_ASSERT_DEBUG(pixelBuffers.size() == 1u && "Always has a single pixel buffer");
+                pixelBuffers[0].ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+                maskApplied = true;
+#endif
               }
             }
             else
@@ -224,21 +245,28 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
 
       if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
       {
-        PreMultiply(pixelBuffer, preMultiplyOnLoad);
+        PreMultiply(pixelBuffers[0], preMultiplyOnLoad);
       }
-
-      PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-      Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-      texture.Upload(pixelData, url.GetUrl(), textureId);
-#else
-      texture.Upload(pixelData);
-#endif
       textureSet = TextureSet::New();
-      textureSet.SetTexture(TEXTURE_INDEX, texture);
       if(maskTexture)
       {
         textureSet.SetTexture(MASK_TEXTURE_INDEX, maskTexture);
+      }
+      for(uint32_t i = 0u; i < pixelBuffers.size(); ++i)
+      {
+        PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffers[i]); // takes ownership of buffer
+        Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+        std::string stdUrl = url.GetUrl();
+        if(pixelBuffers.size() >= 3)
+        {
+          stdUrl += std::string("(") + ("YUVA"[i]) + ")";
+        }
+        Dali::Integration::TextureUploadWithContent(texture, pixelData, std::move(stdUrl), maskApplied ? Dali::Integration::TextureContextTypeHint::CPU_MASKED_IMAGE : Dali::Integration::TextureContextTypeHint::STANDARD_IMAGE);
+#else
+        texture.Upload(pixelData);
+#endif
+        textureSet.SetTexture(i, texture);
       }
     }
   }
@@ -585,7 +613,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     UpdateExternalTextureInfo(textureInfo, preMultiplyOnLoad);
   }
 
-  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureInfo loadState:%s, storageType:%s preMultiplyOnLoad:%d\n", GET_LOAD_STATE_STRING(textureInfo.loadState), GET_STORAGE_TYPE_STRING(textureInfo.storageType), (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD));
+  DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureInfo loadState:%s, storageType:%s preMultiplyOnLoad:%d, loadYuvPlanes:%d\n", GET_LOAD_STATE_STRING(textureInfo.loadState), GET_STORAGE_TYPE_STRING(textureInfo.storageType), (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD), textureInfo.loadYuvPlanes);
 
   // Force reloading of texture by setting loadState unless already loading or cancelled.
   if(TextureManager::ReloadPolicy::FORCED == reloadPolicy &&
@@ -951,7 +979,7 @@ void TextureManager::LoadTexture(TextureManager::TextureInfo& textureInfo, Textu
     auto premultiplyOnLoad = (textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID) ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     if(textureInfo.animatedImageLoading)
     {
-      mAsyncLoader->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, premultiplyOnLoad);
+      mAsyncLoader->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, premultiplyOnLoad, textureInfo.loadYuvPlanes);
     }
     else
     {
@@ -1306,8 +1334,13 @@ void TextureManager::UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffer
     {
       Texture   texture   = Texture::New(Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-      texture.Upload(pixelData, textureInfo.url.GetUrl(), textureInfo.textureId);
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      std::string stdUrl = textureInfo.url.GetUrl();
+      if(pixelBuffers.size() >= 3)
+      {
+        stdUrl += std::string("(") + ("YUVA"[textureInfo.textures.size()]) + ")";
+      }
+      Dali::Integration::TextureUploadWithContent(texture, pixelData, std::move(stdUrl), (textureInfo.loadState == TextureManager::LoadState::MASK_APPLIED) ? Dali::Integration::TextureContextTypeHint::CPU_MASKED_IMAGE : Dali::Integration::TextureContextTypeHint::STANDARD_IMAGE);
 #else
       texture.Upload(pixelData);
 #endif

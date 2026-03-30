@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/rendering/sampler.h>
+#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
@@ -846,7 +848,14 @@ void Material::TextureLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
     if(pixelData)
     {
       textureInformation.mTexture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      Dali::Integration::TextureUploadWithContent(textureInformation.mTexture,
+                                                  pixelData,
+                                                  textureInformation.mUrl,
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1200));
+#else
       textureInformation.mTexture.Upload(pixelData);
+#endif
     }
     textureInformation.mLoadingTaskId = INVALID_INDEX;
     break;

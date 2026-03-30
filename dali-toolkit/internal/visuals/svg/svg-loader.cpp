@@ -29,6 +29,7 @@
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
@@ -101,8 +102,8 @@ void SetTextureSetToRasterizeInfo(VisualFactoryCache* visualFactoryCache, const 
   {
     // Atlas failed. Convert pixelData to texture.
     Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-    texture.Upload(rasterizedPixelData, rasterizeInfo.mImageUrl.GetUrl(), rasterizeInfo.mId + 1000'000'000); ///< Add some number to avoid conflict with TextureManager ID.
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+    Dali::Integration::TextureUploadWithContent(texture, rasterizedPixelData, rasterizeInfo.mImageUrl.GetUrl(), Dali::Integration::TextureContextTypeHint::SVG_IMAGE);
 #else
     texture.Upload(rasterizedPixelData);
 #endif
@@ -300,7 +301,7 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
   {
     // Increase loadId reference first
     // It would be decreased at rasterizate removal.
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
     VisualUrl imageUrl;
 #endif
     {
@@ -308,7 +309,7 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
       DALI_ASSERT_ALWAYS(loadCacheIndex != SvgLoader::INVALID_SVG_CACHE_INDEX && "Invalid cache index");
       ++mLoadCache[loadCacheIndex].mReferenceCount;
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
       imageUrl = mLoadCache[loadCacheIndex].mImageUrl;
 #endif
       DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u atlas=%d observer=%p ) Increase loadId loadState:%s, refCount=%d\n", loadId, width, height, attemptAtlasing, svgObserver, GET_LOAD_STATE_STRING(mLoadCache[loadCacheIndex].mLoadState), static_cast<int>(mLoadCache[loadCacheIndex].mReferenceCount));
@@ -316,7 +317,7 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
 
     rasterizeId = GenerateUniqueSvgRasterizeId();
     cacheIndex  = static_cast<SvgCacheIndex>(mRasterizeCache.size());
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
     mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height, attemptAtlasing, std::move(imageUrl)));
 #else
     mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height, attemptAtlasing));

@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <cstring>
 #include <fstream>
@@ -1579,7 +1580,14 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
                                                      raw.mBlendShapeData.GetPixelFormat(),
                                                      raw.mBlendShapeData.GetWidth(),
                                                      raw.mBlendShapeData.GetHeight());
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+      Dali::Integration::TextureUploadWithContent(meshGeometry.blendShapeGeometry,
+                                                  raw.mBlendShapeData,
+                                                  "Scene3D::BlendShapeData",
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1500));
+#else
       meshGeometry.blendShapeGeometry.Upload(raw.mBlendShapeData);
+#endif
     }
   }
 

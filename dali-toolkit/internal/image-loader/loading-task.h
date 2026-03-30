@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOADING_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ public:
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param [in] loadPlanes true to load image planes or false to load bitmap image.
    * @param [in] callback The callback that is called when the operation is completed.
    */
   LoadingTask(uint32_t                                 id,
@@ -80,6 +81,7 @@ public:
               Dali::FittingMode::Type                  fittingMode,
               Dali::SamplingMode::Type                 samplingMode,
               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+              bool                                     loadPlanes,
               CallbackBase*                            callback);
 
   /**

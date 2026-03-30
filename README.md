@@ -115,7 +115,7 @@ vcpkg-script folder in the windows-dependencies repository.
     - INSTALL_CMAKE_MODULES      ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG               ---> Whether to build with debug enabled.
     - USE_DEFAULT_RESOURCE_DIR   ---> Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR
-    - ENABLE_GPU_MEMORY_PROFILER ---> Whether to build with GPU memory profiler enabled.
+    - ENABLE_GPU_MEMORY_PROFILE  ---> Whether to build with GPU memory profiler enabled.
 
 ## 4. Building for MacOS
 
