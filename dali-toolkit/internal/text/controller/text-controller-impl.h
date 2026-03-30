@@ -467,7 +467,6 @@ public:
   void ResetFontAndStyleData()
   {
     ClearFontData();
-    mModel->mLogicalModel->ClearFontDescriptionRuns();
     UpdateAnchorColor();
     RequestRelayout();
   }
