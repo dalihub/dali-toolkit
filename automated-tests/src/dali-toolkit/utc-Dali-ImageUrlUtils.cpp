@@ -19,8 +19,8 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/adaptor-framework/native-image-queue.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -54,7 +54,7 @@ int UtcDaliImageConvertFrameBufferToUrl1(void)
   FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   DALI_TEST_CHECK(frameBuffer);
-  ImageUrl url = Dali::Toolkit::Image::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
+  ImageUrl url = Dali::Toolkit::ImageUrlUtils::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
 
   DALI_TEST_CHECK(url.GetUrl().Size() > 0u);
 
@@ -73,7 +73,7 @@ int UtcDaliImageConvertFrameBufferToUrl2(void)
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   frameBuffer.AttachColorTexture(texture);
 
-  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(frameBuffer, 0).GetUrl().Size() > 0u);
+  DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(frameBuffer, 0).GetUrl().Size() > 0u);
 
   END_TEST;
 }
@@ -90,7 +90,7 @@ int UtcDaliImageConvertDepthTextureFrameBufferToUrl(void)
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::DEPTH_UNSIGNED_INT, width, height);
   DevelFrameBuffer::AttachDepthTexture(frameBuffer, texture);
 
-  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateDepthUrl(frameBuffer).GetUrl().Size() > 0u);
+  DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateDepthUrl(frameBuffer).GetUrl().Size() > 0u);
 
   END_TEST;
 }
@@ -107,7 +107,7 @@ int UtcDaliImageConvertPixelDataToUrl01(void)
   unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
   PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGB888, PixelData::FREE);
 
-  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(pixelData).GetUrl().Size() > 0u);
+  DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData).GetUrl().Size() > 0u);
 
   END_TEST;
 }
@@ -124,7 +124,7 @@ int UtcDaliImageConvertPixelDataToUrl02(void)
   unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
   PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
 
-  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(pixelData, true).GetUrl().Size() > 0u);
+  DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true).GetUrl().Size() > 0u);
 
   END_TEST;
 }
@@ -140,7 +140,7 @@ int UtcDaliImageConvertNativeImageToUrl01(void)
   {
     NativeImagePtr nativeImage = NativeImage::New(width, height, NativeImage::COLOR_DEPTH_DEFAULT);
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImage).GetUrl().Size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage).GetUrl().Size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -167,7 +167,7 @@ int UtcDaliImageConvertNativeImageToUrl02(void)
   {
     NativeImagePtr nativeImage = NativeImage::New(width, height, NativeImage::COLOR_DEPTH_DEFAULT);
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImage, true).GetUrl().Size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage, true).GetUrl().Size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -194,7 +194,7 @@ int UtcDaliImageConvertNativeImageInterfaceToUrl01(void)
   {
     NativeImageQueuePtr nativeImageQueue = NativeImageQueue::New(width, height, (Dali::NativeImageQueue::ColorFormat::BGR888));
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue).GetUrl().Size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImageQueue).GetUrl().Size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -221,7 +221,7 @@ int UtcDaliImageConvertNativeImageInterfaceToUrl02(void)
   {
     NativeImageQueuePtr nativeImageQueue = NativeImageQueue::New(width, height, (Dali::NativeImageQueue::ColorFormat::BGR888));
 
-    DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(nativeImageQueue, true).GetUrl().Size() > 0u);
+    DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImageQueue, true).GetUrl().Size() > 0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -247,7 +247,7 @@ int UtcDaliImageConvertEncodedImageBufferToUrl(void)
   buffer.PushBack(0x22);
   buffer.PushBack(0x33);
 
-  DALI_TEST_CHECK(Dali::Toolkit::Image::GenerateUrl(EncodedImageBuffer::New(buffer)).GetUrl().Size() > 0u);
+  DALI_TEST_CHECK(Dali::Toolkit::ImageUrlUtils::GenerateUrl(EncodedImageBuffer::New(buffer)).GetUrl().Size() > 0u);
 
   END_TEST;
 }

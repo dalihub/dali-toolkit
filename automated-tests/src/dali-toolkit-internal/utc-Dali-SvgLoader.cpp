@@ -29,8 +29,8 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/svg/svg-loader-observer.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member SvgLoader.
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
 
@@ -193,7 +193,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
   auto       visualFactory = Toolkit::VisualFactory::Get();
   SvgLoader& svgLoader     = GetImplementation(visualFactory).GetSvgLoader(); // Use VisualFactory's svg loader
 
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(svgBuffer);
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(svgBuffer);
   svgBuffer.Reset();
 
   const std::string fileNames[] = {

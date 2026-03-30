@@ -52,8 +52,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali/integration-api/debug.h>
 
@@ -787,7 +787,7 @@ Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
     return Dali::Toolkit::ImageView();
   }
 
-  Dali::Toolkit::ImageUrl  url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageUrl  url       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixel);
   Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url.GetUrl());
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
   return imageView;
@@ -1082,7 +1082,7 @@ void WebView::OnFrameRendered()
   mLastRenderedNativeImageWidth  = nativeImagePtr->GetWidth();
   mLastRenderedNativeImageHeight = nativeImagePtr->GetHeight();
 
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImagePtr, true);
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImagePtr, true);
 
   newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
 

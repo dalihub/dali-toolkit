@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@ namespace Dali
 namespace Toolkit
 {
 /**
- * API to interface with the toolkit image
+ * API to interface with the toolkit image url
  * Allows developers to add FrameBuffer, PixelData and NativeImageInterface to toolkit so that visuals can use them to render
  */
-namespace Image
+namespace ImageUrlUtils
 {
 /**
  * @brief Generate a Url from frame buffer.
@@ -99,7 +99,7 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuf
  */
 DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer);
 
-} // namespace Image
+} //namespace ImageUrlUtils
 
 } // namespace Toolkit
 
