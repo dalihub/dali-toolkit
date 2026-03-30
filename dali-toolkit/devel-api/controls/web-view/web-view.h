@@ -233,12 +233,12 @@ public:
   /**
    * @brief Get context of web engine.
    */
-  static Dali::WebEngineContext* GetContext();
+  static Dali::WebEngineContext* GetContext(bool isIncognito);
 
   /**
    * @brief Get cookie manager of web engine.
    */
-  static Dali::WebEngineCookieManager* GetCookieManager();
+  static Dali::WebEngineCookieManager* GetCookieManager(bool isIncognito);
 
   /**
    * @brief Create an uninitialized WebView.
@@ -277,6 +277,11 @@ public:
    * @return Handle to a WebView or an uninitialized handle
    */
   static WebView DownCast(BaseHandle handle);
+
+  /**
+   * @brief Check if WebEngine is in incognito mode.
+   */
+  bool IsIncognito() const;
 
   /**
    * @brief Change orientation.

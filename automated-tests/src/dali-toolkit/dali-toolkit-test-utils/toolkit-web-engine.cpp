@@ -343,7 +343,7 @@ private:
   float                              mockZoomFactor;
 };
 
-Dali::WebEngineContext* GetContext()
+Dali::WebEngineContext* GetContext(bool isIncognito)
 {
   if(!gWebEngineContextInstance)
   {
@@ -394,7 +394,7 @@ private:
   Dali::WebEngineCookieManager::CookieAcceptPolicy mockCookieAcceptPolicy;
 };
 
-Dali::WebEngineCookieManager* GetCookieManager()
+Dali::WebEngineCookieManager* GetCookieManager(bool isIncognito)
 {
   if(!gMockWebEngineCookieManager)
   {
@@ -1213,6 +1213,10 @@ public:
   NativeImageSourcePtr GetNativeImageSource() override
   {
     return nullptr;
+  }
+  bool IsIncognito() const override
+  {
+    return false;
   }
   void ChangeOrientation(int orientation) override
   {
@@ -2639,14 +2643,14 @@ WebEngine WebEngine::New(int32_t type)
   return WebEngine(baseObject);
 }
 
-Dali::WebEngineContext* WebEngine::GetContext()
+Dali::WebEngineContext* WebEngine::GetContext(bool isIncognito)
 {
-  return Internal::Adaptor::GetContext();
+  return Internal::Adaptor::GetContext(isIncognito);
 }
 
-Dali::WebEngineCookieManager* WebEngine::GetCookieManager()
+Dali::WebEngineCookieManager* WebEngine::GetCookieManager(bool isIncognito)
 {
-  return Internal::Adaptor::GetCookieManager();
+  return Internal::Adaptor::GetCookieManager(isIncognito);
 }
 
 WebEngine::WebEngine(const WebEngine& WebEngine)
@@ -2717,6 +2721,11 @@ NativeImageSourcePtr WebEngine::GetNativeImageSource()
   Any                        source;
   Dali::NativeImageSourcePtr sourcePtr = Dali::NativeImageSource::New(source);
   return sourcePtr;
+}
+
+bool WebEngine::IsIncognito() const
+{
+  return false;
 }
 
 void WebEngine::ChangeOrientation(int orientation)

@@ -74,19 +74,24 @@ Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
   return Internal::WebView::FindWebView(plugin);
 }
 
-Dali::WebEngineContext* WebView::GetContext()
+Dali::WebEngineContext* WebView::GetContext(bool isIncognito)
 {
-  return Internal::WebView::GetContext();
+  return Internal::WebView::GetContext(isIncognito);
 }
 
-Dali::WebEngineCookieManager* WebView::GetCookieManager()
+Dali::WebEngineCookieManager* WebView::GetCookieManager(bool isIncognito)
 {
-  return Internal::WebView::GetCookieManager();
+  return Internal::WebView::GetCookieManager(isIncognito);
 }
 
 WebView WebView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<WebView, Internal::WebView>(handle);
+}
+
+bool WebView::IsIncognito() const
+{
+  return Dali::Toolkit::GetImpl(*this).IsIncognito();
 }
 
 void WebView::ChangeOrientation(int orientation)

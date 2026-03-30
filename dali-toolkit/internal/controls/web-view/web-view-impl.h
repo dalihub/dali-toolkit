@@ -80,17 +80,22 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetContext()
    */
-  static Dali::WebEngineContext* GetContext();
+  static Dali::WebEngineContext* GetContext(bool isIncognito);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetCookieManager()
    */
-  static Dali::WebEngineCookieManager* GetCookieManager();
+  static Dali::WebEngineCookieManager* GetCookieManager(bool isIncognito);
 
   /**
    * @copydoc Dali::Toolkit::WebView::ChangeOrientation()
    */
   void ChangeOrientation(int orientation);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::IsIncognito()
+   */
+  bool IsIncognito() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetSettings()
