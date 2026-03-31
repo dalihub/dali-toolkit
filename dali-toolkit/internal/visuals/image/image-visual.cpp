@@ -55,7 +55,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, atlas, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
+const int CUSTOM_PROPERTY_COUNT(0);
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)

@@ -49,7 +49,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // fixed(3),stretch,aux,pre-muliplied alpha
+const int CUSTOM_PROPERTY_COUNT(0); // fixed(3),stretch,aux,pre-muliplied alpha
 }
 
 /////////////////NPatchVisual////////////////

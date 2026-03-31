@@ -49,7 +49,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(1); // PixelArea
+const int CUSTOM_PROPERTY_COUNT(0); // PixelArea
 
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
