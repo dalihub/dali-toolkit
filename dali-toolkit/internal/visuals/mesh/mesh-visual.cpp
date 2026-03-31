@@ -40,7 +40,7 @@ namespace Dali
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(5); // 5 transform properties
+const int CUSTOM_PROPERTY_COUNT(0);
 
 /**
  * @brief Loads a texture from a file

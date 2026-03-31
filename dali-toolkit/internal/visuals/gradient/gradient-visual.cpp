@@ -52,7 +52,7 @@ namespace Internal
 {
 namespace
 {
-static constexpr int32_t CUSTOM_PROPERTY_COUNT(1); // alignment
+static constexpr int32_t CUSTOM_PROPERTY_COUNT(3); // alignment, scalefactor, offset
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)
