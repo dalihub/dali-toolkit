@@ -667,7 +667,7 @@ void Panel::UpdateRenderTask()
     mRootLayer.SetProperty(Dali::Actor::Property::SIZE, mPanelResolution);
 
     mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, mPanelResolution.width, mPanelResolution.height);
-    mFrameBuffer = Dali::FrameBuffer::New(mTexture.GetWidth(), mTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
+    mFrameBuffer = Dali::FrameBuffer::New(mTexture.GetWidth(), mTexture.GetHeight(), Dali::FrameBuffer::Attachment::AUTO);
     mFrameBuffer.AttachColorTexture(mTexture);
 
     mRenderTask.SetCameraActor(mCamera);
