@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ASYNC_TEXT_LOADER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 // DEVEL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>

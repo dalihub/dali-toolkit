@@ -23,10 +23,10 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 using Dali::Integration::ToDaliStringView;
 
