@@ -28,9 +28,9 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS

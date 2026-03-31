@@ -23,8 +23,8 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
 
 using Dali::Integration::ToDaliStringView;

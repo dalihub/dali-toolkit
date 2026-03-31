@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 #include <memory> ///< for std::unique_ptr
 #include <unordered_set>

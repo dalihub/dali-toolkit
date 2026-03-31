@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h> // for Renderer Property Index.
+#include <dali/integration-api/rendering/decorated-visual-renderer.h> // for Renderer Property Index.
 #include <stdlib.h>
 #include <iostream>
 

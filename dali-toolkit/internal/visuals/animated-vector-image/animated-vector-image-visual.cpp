@@ -24,10 +24,10 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>

@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>

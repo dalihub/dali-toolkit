@@ -23,9 +23,9 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <typeinfo>
 
 // INTERNAL INCLUDES
