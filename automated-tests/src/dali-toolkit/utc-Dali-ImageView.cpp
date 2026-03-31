@@ -39,8 +39,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 
@@ -788,7 +788,7 @@ int UtcDaliImageViewAsyncLoadingEncodedBuffer(void)
 
   // Get encoded raw-buffer image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading, big size image
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -818,7 +818,7 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
 
   // Get encoded raw-buffer image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Sync loading, small size image
   {
@@ -861,7 +861,7 @@ int UtcDaliImageViewEncodedBufferWithSvg(void)
 
   // Get encoded raw-buffer svg image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -901,7 +901,7 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
 
   // Get encoded raw-buffer lottie image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -941,7 +941,7 @@ int UtcDaliImageViewEncodedBufferWithInvalidImageType(void)
 
   // Get encoded raw-buffer jpg image with invalid image type, and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA, static_cast<EncodedImageBuffer::ImageType>(-1));
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());

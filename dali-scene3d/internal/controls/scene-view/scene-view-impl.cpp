@@ -23,8 +23,8 @@
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
@@ -1002,7 +1002,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
 
-    captureData->mCaptureUrl       = Dali::Toolkit::Image::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
+    captureData->mCaptureUrl       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
     captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
     captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
     captureData->mCaptureImageView.Add(captureData->mCaptureInvertCamera);
@@ -1444,7 +1444,7 @@ void SceneView::UpdateRenderTask()
         mFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
         DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
-        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
+        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(mFrameBuffer, 0u);
 
         Property::Map imagePropertyMap;
         imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);

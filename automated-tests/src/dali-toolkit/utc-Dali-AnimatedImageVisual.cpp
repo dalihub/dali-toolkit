@@ -107,13 +107,13 @@ ImageUrl ConvertFileToImageUrl(const char* url, ExternalUrlType type)
     Devel::PixelBuffer pixelBuffer = LoadImageFromFile(url);
     PixelData          pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
 
-    imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+    imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   }
   else // ENCODED_IMAGE_BUFFER
   {
     EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(url);
 
-    imageUrl = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+    imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(rawBuffer);
   }
 
   return imageUrl;
@@ -1712,7 +1712,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask05(void)
 
   {
     EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
-    ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+    ImageUrl           imageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(rawBuffer);
     Dali::String       url       = imageUrl.GetUrl();
 
     Property::Map propertyMap;
@@ -1766,7 +1766,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask06(void)
 
   {
     EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_MASK_IMAGE_FILE_NAME);
-    ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+    ImageUrl           imageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(rawBuffer);
     Dali::String       url       = imageUrl.GetUrl();
 
     Property::Map propertyMap;

@@ -52,8 +52,8 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
 #include <dali-toolkit/public-api/styling/style-manager.h>

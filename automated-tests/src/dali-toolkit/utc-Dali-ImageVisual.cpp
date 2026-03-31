@@ -37,8 +37,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/integration-api/string-utils.h>
@@ -429,7 +429,7 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha01(void)
   FrameBuffer frameBuffer = Dali::FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
 
   DALI_TEST_CHECK(frameBuffer);
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(frameBuffer, Pixel::Format::RGBA8888, width, height);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -478,7 +478,7 @@ int UtcDaliImageVisualWithFrameBufferPreMultipliedAlpha02(void)
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
   frameBuffer.AttachColorTexture(texture);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(frameBuffer, 0u);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(frameBuffer, 0u);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -527,7 +527,7 @@ int UtcDaliImageVisualWithPixelData(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -576,7 +576,7 @@ int UtcDaliImageVisualWithPixelDataPreMultipliedAlpha(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl     imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  ImageUrl     imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
   Dali::String url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -629,7 +629,7 @@ int UtcDaliImageVisualWithPixelDataMasking01(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -698,7 +698,7 @@ int UtcDaliImageVisualWithPixelDataMasking02(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -767,7 +767,7 @@ int UtcDaliImageVisualWithPixelDataMasking03(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -836,12 +836,12 @@ int UtcDaliImageVisualWithPixelDataMasking04(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   uint8_t*  anotherBuffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
   PixelData maskPixelData = PixelData::New(anotherBuffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
-  ImageUrl  maskImageUrl  = Dali::Toolkit::Image::GenerateUrl(maskPixelData);
+  ImageUrl  maskImageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(maskPixelData);
   String    maskUrl       = maskImageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -909,7 +909,7 @@ int UtcDaliImageVisualWithPixelDataMasking05(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -962,7 +962,7 @@ int UtcDaliImageVisualWithPixelDataMaskingSynchronously(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData);
+  ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   String   url      = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
@@ -1003,8 +1003,8 @@ int UtcDaliImageVisualWithNativeImage(void)
   tet_infoline("Use Native Image as url");
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
-  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
-  String               url               = imageUrl.GetUrl();
+  ImageUrl       imageUrl    = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage);
+  String         url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1037,7 +1037,7 @@ int UtcDaliImageVisualWithNativeImage(void)
   const Property::Map* outMap         = value.GetMap();
   String               fragmentShader = (*outMap)["fragment"].Get<Dali::String>();
   std::string          fragmentShaderString(fragmentShader.CStr(), fragmentShader.Size());
-  const char* fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
+  const char*          fragmentPrefix = Dali::NativeImageTest::GetCustomFragmentPrefix();
   size_t               pos            = fragmentShaderString.find(fragmentPrefix);
 
   DALI_TEST_EQUALS(pos != std::string::npos, true, TEST_LOCATION);
@@ -1055,8 +1055,8 @@ int UtcDaliImageVisualWithNativeImagePreMultipliedAlpha(void)
   tet_infoline("Use Native Image as url");
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
-  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
-  String               url               = imageUrl.GetUrl();
+  ImageUrl       imageUrl    = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage, true);
+  String         url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1108,8 +1108,8 @@ int UtcDaliImageVisualWithNativeImageCustomShader(void)
   tet_infoline("Use Native Image as url and Use custom shader");
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
-  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage, true);
-  String               url               = imageUrl.GetUrl();
+  ImageUrl       imageUrl    = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage, true);
+  String         url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1184,8 +1184,8 @@ int UtcDaliImageVisualWithNativeImageRemoved(void)
   textureTrace.Enable(true);
 
   NativeImagePtr nativeImage = NativeImage::New(500, 500, NativeImage::COLOR_DEPTH_DEFAULT);
-  ImageUrl       imageUrl    = Dali::Toolkit::Image::GenerateUrl(nativeImage);
-  String               url               = imageUrl.GetUrl();
+  ImageUrl       imageUrl    = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImage);
+  String         url         = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1236,7 +1236,7 @@ int UtcDaliImageVisualWithEncodedImageBuffer(void)
   tet_infoline("Use Encoded Image Buffer as url");
 
   EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_LARGE_IMAGE_FILE_NAME);
-  ImageUrl           url       = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+  ImageUrl           url       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(rawBuffer);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK(factory);
@@ -1286,7 +1286,7 @@ int UtcDaliImageVisualWithEncodedImageBufferRemoved(void)
   textureTrace.Enable(true);
 
   EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_LARGE_IMAGE_FILE_NAME);
-  ImageUrl           imageUrl  = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
+  ImageUrl           imageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(rawBuffer);
   String             url       = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();

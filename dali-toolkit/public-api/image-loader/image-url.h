@@ -35,7 +35,7 @@ class ImageUrl;
 /**
  * @brief ImageUrl can be used to wrap an external buffer.
  *
- * An instance of ImageUrl can be created from Image::GenerateUrl().
+ * An instance of ImageUrl can be created from ImageUrlUtils::GenerateUrl().
  * Application can get url from ImageUrl.
  * When application does not use this anymore, the destructor of the ImageUrl is called.
  * At this time, the buffer is deleted from the texture manager.
