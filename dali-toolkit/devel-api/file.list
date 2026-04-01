@@ -3,6 +3,7 @@ SET( devel_api_src_dir ${ROOT_SRC_DIR}/dali-toolkit/devel-api )
 
 # Add local source files here
 SET( devel_api_src_files
+  ${devel_api_src_dir}/toolkit-pre-initialize.cpp
   ${devel_api_src_dir}/asset-manager/asset-manager.cpp
   ${devel_api_src_dir}/builder/base64-encoding.cpp
   ${devel_api_src_dir}/builder/builder.cpp
@@ -16,7 +17,8 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/control-wrapper-impl.cpp
   ${devel_api_src_dir}/controls/control-renderers.cpp
   ${devel_api_src_dir}/controls/buttons/toggle-button.cpp
-    ${devel_api_src_dir}/controls/popup/confirmation-popup.cpp
+  ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
+  ${devel_api_src_dir}/controls/popup/confirmation-popup.cpp
   ${devel_api_src_dir}/controls/popup/popup.cpp
   ${devel_api_src_dir}/controls/scroll-bar/scroll-bar.cpp
   ${devel_api_src_dir}/controls/table-view/table-view.cpp
@@ -31,6 +33,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/web-view/web-back-forward-list.cpp
   ${devel_api_src_dir}/controls/web-view/web-settings.cpp
   ${devel_api_src_dir}/controls/web-view/web-view.cpp
+  ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
   ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
   ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.cpp
   ${devel_api_src_dir}/focus-manager/focus-finder.cpp
@@ -48,6 +51,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/text/bitmap-font.cpp
   ${devel_api_src_dir}/text/text-utils-devel.cpp
   ${devel_api_src_dir}/text/character-sequence.cpp
+  ${devel_api_src_dir}/text/text-geometry-devel.cpp
   ${devel_api_src_dir}/text/range.cpp
   ${devel_api_src_dir}/text/spanned.cpp
   ${devel_api_src_dir}/text/spannable.cpp
@@ -67,9 +71,6 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/visual-factory/visual-factory.cpp
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
   ${devel_api_src_dir}/visual-factory/precompile-shader-option.cpp
-  ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.cpp
-  ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.cpp
-  ${devel_api_src_dir}/text/text-geometry-devel.cpp
 )
 
 # Add devel header files here
@@ -77,6 +78,7 @@ SET( devel_api_header_files
   ${devel_api_src_dir}/direction-enums.h
   ${devel_api_src_dir}/toolkit-property-index-ranges.h
   ${devel_api_src_dir}/toolkit-action-index-ranges.h
+  ${devel_api_src_dir}/toolkit-pre-initialize.h
 )
 
 SET( devel_api_asset-manager_header_files

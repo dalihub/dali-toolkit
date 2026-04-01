@@ -21,6 +21,7 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
+#include <dali-toolkit/devel-api/toolkit-pre-initialize.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -720,15 +721,9 @@ int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized02(void)
     "  }\n"
     "}\n";
 
-  ToolkitTestApplication application(TestApplication::DEFAULT_SURFACE_WIDTH,
-                                     TestApplication::DEFAULT_SURFACE_HEIGHT,
-                                     TestApplication::DEFAULT_HORIZONTAL_DPI,
-                                     TestApplication::DEFAULT_VERTICAL_DPI,
-                                     true); // For simulate pre-initialized application
-
-  // pre-initialize the application
-  application.InitializeAdaptor();
-  application.CreateCore();
+  // pre-initialized application
+  ToolkitTestApplication::PREINITIALIZE_ADAPTOR_CREATION_ENABLED = false;
+  DaliToolkitPreInitialize(nullptr, nullptr, nullptr);
 
   tet_infoline("Create Controls after core and adaptor created");
   Test::TestButton testButton1 = Test::TestButton::New();
@@ -753,9 +748,9 @@ int UtcDaliStyleManagerApplyStyleBeforeAdaptorInitialized02(void)
   testButton2.Reset();
 
   // complete initialization of the application
-  application.CreateSceneFromMainWindow();
-  application.InitializeCore();
-  application.EmitApplicationInitialize();
+  ToolkitTestApplication& application = Test::ToolkitTestApplication::GetPreInitializedApplication();
+
+  ToolkitTestApplication::PREINITIALIZE_ADAPTOR_CREATION_ENABLED = true;
 
   // Reset global variable for next test
   Test::StyleMonitor::SetThemeChangedBeforeAdaptorInit(false);

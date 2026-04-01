@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <toolkit-test-application.h>
 
+// EXTERNAL INCLUDES
+#include <memory>
+#include <utility>
+
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
@@ -29,7 +33,17 @@
 
 namespace Dali
 {
+bool ToolkitTestApplication::DECODED_IMAGES_SUPPORTED;
+bool ToolkitTestApplication::ADD_IDLE_SUCCESS                       = true;
+bool ToolkitTestApplication::PREINITIALIZE_ADAPTOR_CREATION_ENABLED = true;
+
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
+
+namespace
+{
+std::unique_ptr<ToolkitTestApplication> gPreInitializedApplication;
+bool                                    gPreInitializedApplicationGetted = false;
+} //namespace
 
 ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfaceHeight, float horizontalDpi, float verticalDpi, bool preInitialize)
 : TestApplication(surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi, false /* Do not Initialize Core */),
@@ -54,28 +68,63 @@ ToolkitTestApplication::ToolkitTestApplication(size_t surfaceWidth, size_t surfa
     // This will also emit the window created signals
     EmitApplicationInitialize();
   }
+  else
+  {
+    InitializeAdaptor(); // Need to create Adaptor first as many singletons in dali-adaptor need it
+    // Note : real-world application don't create adaptor if PREINITIALIZE_ADAPTOR_CREATION_ENABLED == false.
+
+    // Create Core next
+    // Note : real-world application don't create core if PREINITIALIZE_ADAPTOR_CREATION_ENABLED == false.
+    CreateCore();
+
+    // Create Scene from main window
+    // Must not call TestApplication::CreateScene().
+    CreateSceneFromMainWindow();
+
+    if(PREINITIALIZE_ADAPTOR_CREATION_ENABLED)
+    {
+      // Core needs to be initialized next before we start the adaptor
+      // Note : real-world application don't call ProcessCoreEvents() at pre-initialize time.
+      InitializeCore();
+    }
+    else
+    {
+      // Make Dali::Adaptor::IsAvailable() return false forcibly.
+      Test::ToolkitAdaptor::SetAdaptorAvailableForce(false);
+    }
+  }
 }
 
 ToolkitTestApplication::~ToolkitTestApplication()
 {
-  auto bridge = Dali::Accessibility::Bridge::GetCurrentBridge();
-  if(bridge)
+  if(!mPreInitialized)
   {
-    bridge->Terminate();
+    auto bridge = Dali::Accessibility::Bridge::GetCurrentBridge();
+    if(bridge)
+    {
+      bridge->Terminate();
+    }
+
+    Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
+    lifecycleController.TerminateSignal().Emit();
+
+    // Stop adaptor after terminate signal emit
+    if(Dali::Adaptor::IsAvailable() && mAdaptor)
+    {
+      mAdaptor->Stop();
+    }
+
+    // Need to delete core before we delete the adaptor.
+    delete mCore;
+    mCore = NULL;
   }
-
-  Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-  lifecycleController.TerminateSignal().Emit();
-
-  // Stop adaptor after terminate signal emit
-  if(Dali::Adaptor::IsAvailable() && mAdaptor)
+  else
   {
-    mAdaptor->Stop();
+    if(DALI_UNLIKELY(!gPreInitializedApplicationGetted))
+    {
+      tet_printf("If ApplicationPreInitialize() called, We must get application by GetPreInitializedApplication()");
+    }
   }
-
-  // Need to delete core before we delete the adaptor.
-  delete mCore;
-  mCore = NULL;
 }
 
 void ToolkitTestApplication::InitializeAdaptor()
@@ -117,9 +166,58 @@ void ToolkitTestApplication::EmitApplicationInitialize()
   }
 }
 
+void ToolkitTestApplication::PreInitializeCompleted()
+{
+  if(mPreInitialized)
+  {
+    tet_printf("PreInitializeCompleted for UTC!\n");
+    if(ToolkitTestApplication::PREINITIALIZE_ADAPTOR_CREATION_ENABLED)
+    {
+      mCore->PreInitializeCompleted();
+    }
+    else
+    {
+      // Restore adaptor validatatoin.
+      Test::ToolkitAdaptor::SetAdaptorAvailableForce(true);
+      InitializeCore();
+    }
+
+    // This will also emit the window created signals
+    EmitApplicationInitialize();
+  }
+}
+
 void ToolkitTestApplication::RunIdles()
 {
   AdaptorImpl::GetImpl(*mAdaptor.get()).RunIdles();
 }
 
 } // namespace Dali
+
+namespace Test::ToolkitTestApplication
+{
+Dali::ToolkitTestApplication& GetPreInitializedApplication()
+{
+  auto& application = *gPreInitializedApplication;
+
+  if(!gPreInitializedApplicationGetted)
+  {
+    gPreInitializedApplicationGetted = true;
+    application.PreInitializeCompleted();
+  }
+
+  return application;
+}
+} // namespace Test::ToolkitTestApplication
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+extern "C" void ApplicationPreInitialize(int* argc, char** argv[])
+{
+  tet_printf("ApplicationPreInitialize for UTC!\n");
+  gPreInitializedApplication.reset(new Dali::ToolkitTestApplication(Dali::TestApplication::DEFAULT_SURFACE_WIDTH,
+                                                                    Dali::TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                                                    Dali::TestApplication::DEFAULT_HORIZONTAL_DPI,
+                                                                    Dali::TestApplication::DEFAULT_VERTICAL_DPI,
+                                                                    true)); ///< Mark as this application is for pre-initialized
+}

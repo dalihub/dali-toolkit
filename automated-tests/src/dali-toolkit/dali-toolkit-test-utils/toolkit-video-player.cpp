@@ -19,7 +19,7 @@
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
-#include <toolkit-application.h>
+#include <toolkit-test-application.h>
 
 namespace Dali
 {
@@ -356,7 +356,7 @@ void VideoPlayer::Backward(int millisecond)
 
 bool VideoPlayer::IsVideoTextureSupported()
 {
-  return ToolkitApplication::DECODED_IMAGES_SUPPORTED;
+  return ToolkitTestApplication::DECODED_IMAGES_SUPPORTED;
 }
 
 void VideoPlayer::SetCodecType(Dali::VideoPlayerPlugin::CodecType type)

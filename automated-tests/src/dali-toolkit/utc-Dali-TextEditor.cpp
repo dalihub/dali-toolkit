@@ -2166,7 +2166,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Make AddIdle return false.
-  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = false;
 
   // Create a tap event to touch the text editor.
   TestGenerateTap(application, 88.0f, 25.0f);
@@ -2205,7 +2205,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Revert AddIdle return true.
-  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = true;
 
   // Create a tap event to touch the text editor.
   TestGenerateTap(application, 164.0f, 25.0f);

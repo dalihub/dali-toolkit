@@ -32,9 +32,9 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDE
-#include <toolkit-application.h>
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-test-application.h>
 #include "dali-test-suite-utils.h"
 
 namespace Dali

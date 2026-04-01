@@ -4864,7 +4864,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
   application.Render();
 
   // Make AddIdle failed.
-  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = false;
 
   try
   {
@@ -4898,7 +4898,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
     DALI_TEST_CHECK(false);
   }
 
-  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = true;
 
   // Clear cache.
   application.SendNotification();

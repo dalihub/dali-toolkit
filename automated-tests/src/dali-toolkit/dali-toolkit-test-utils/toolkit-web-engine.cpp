@@ -46,7 +46,7 @@
 #include <string.h>
 #include <memory>
 
-#include <toolkit-application.h>
+#include <toolkit-test-application.h>
 #include <toolkit-timer.h>
 #include <toolkit-web-engine.h>
 
@@ -1476,11 +1476,11 @@ public:
   void EnableVideoHole(bool enabled) override
   {
   }
-  bool SendHoverEvent(const HoverEvent& event) override
+  bool SendHoverEvent(const Dali::HoverEvent& event) override
   {
     return false;
   }
-  bool SendWheelEvent(const WheelEvent& event) override
+  bool SendWheelEvent(const Dali::WheelEvent& event) override
   {
     return false;
   }

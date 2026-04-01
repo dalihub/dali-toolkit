@@ -28,7 +28,6 @@ std::ostream& operator<<(std::ostream& ostream, Dali::Toolkit::Visual::ResourceS
 // INTERNAL INCLUDES
 
 #include <dali-test-suite-utils.h>
-#include "toolkit-application.h"
 #include "toolkit-input-method-context.h"
 #include "toolkit-test-application.h"
 

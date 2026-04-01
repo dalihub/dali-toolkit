@@ -126,4 +126,13 @@ private:
 } // namespace Internal
 } // namespace Dali
 
+namespace Test::ToolkitAdaptor
+{
+/**
+ * @brief To make Dali::Adaptor::IsAvailable() return false forcibly.
+ * @param[in] available False if we want to make Dali::Adaptor::IsAvailable() return false forcibly. True to restore.
+ */
+void SetAdaptorAvailableForce(bool available);
+} //namespace Test::ToolkitAdaptor
+
 #endif // DALI_TOOLKIT_ADAPTOR_IMPL_H

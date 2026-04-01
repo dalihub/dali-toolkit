@@ -28,7 +28,6 @@
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
 #include <toolkit-adaptor-impl.h>
-#include <toolkit-application.h>
 #include <toolkit-async-task-manager.h>
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
@@ -46,7 +45,8 @@ namespace Adaptor
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Dali::Adaptor* gAdaptor = nullptr;
+Dali::Adaptor* gAdaptor       = nullptr;
+bool           gAvailableFlag = true; ///< Only for UTC
 
 Dali::Adaptor& Adaptor::New()
 {
@@ -109,7 +109,7 @@ Dali::Integration::Scene Adaptor::GetScene(Dali::Window window)
 
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
-  if(ToolkitApplication::ADD_IDLE_SUCCESS)
+  if(ToolkitTestApplication::ADD_IDLE_SUCCESS)
   {
     if(hasReturnValue)
     {
@@ -125,7 +125,7 @@ bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
     // Delete callback
     delete callback;
   }
-  return ToolkitApplication::ADD_IDLE_SUCCESS;
+  return ToolkitTestApplication::ADD_IDLE_SUCCESS;
 }
 
 void Adaptor::RemoveIdle(CallbackBase* callback)
@@ -436,7 +436,7 @@ Adaptor& Adaptor::Get()
 
 bool Adaptor::IsAvailable()
 {
-  return Internal::Adaptor::gAdaptor && (!Internal::Adaptor::Adaptor::GetImpl(*Internal::Adaptor::gAdaptor).IsStopped());
+  return Internal::Adaptor::gAdaptor && (!Internal::Adaptor::Adaptor::GetImpl(*Internal::Adaptor::gAdaptor).IsStopped()) && Dali::Internal::Adaptor::gAvailableFlag;
 }
 
 void Adaptor::NotifySceneCreated()
@@ -543,3 +543,11 @@ void Adaptor::UnregisterProcessorOnce(Dali::Integration::Processor& processor, b
 }
 
 } // namespace Dali
+
+namespace Test::ToolkitAdaptor
+{
+void SetAdaptorAvailableForce(bool available)
+{
+  Dali::Internal::Adaptor::gAvailableFlag = available;
+}
+} // namespace Test::ToolkitAdaptor

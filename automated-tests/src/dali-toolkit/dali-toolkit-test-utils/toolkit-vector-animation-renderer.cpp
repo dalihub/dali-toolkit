@@ -22,8 +22,8 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
-#include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-test-application.h>
 #include <toolkit-vector-animation-renderer.h>
 #include <chrono>
 #include <memory>
