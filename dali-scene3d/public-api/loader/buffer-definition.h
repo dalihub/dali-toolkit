@@ -21,8 +21,8 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <fstream>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

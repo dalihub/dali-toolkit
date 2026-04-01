@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 // TODO - Replace list with dali-vector.h
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/list-wrapper.h>
 
 // INTERNAL INCLUDES
 

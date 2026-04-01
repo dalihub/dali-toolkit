@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_DATA_H
 #define DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_DATA_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture.h>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

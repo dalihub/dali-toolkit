@@ -31,6 +31,7 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/rendering/texture.h>
+#include <memory> // for std::shared_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>

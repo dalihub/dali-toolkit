@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>

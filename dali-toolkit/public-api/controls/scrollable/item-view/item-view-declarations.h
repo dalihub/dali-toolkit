@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-pair.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <vector>
 
 namespace Dali
 {

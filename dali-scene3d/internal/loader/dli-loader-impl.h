@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/unique-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

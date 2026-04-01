@@ -26,6 +26,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -34,7 +35,6 @@
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 

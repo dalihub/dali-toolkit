@@ -21,9 +21,9 @@
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
 #include <memory>

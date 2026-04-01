@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/integration-api/processor-interface.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/signals/callback.h>
 #include <memory>
 
