@@ -166,7 +166,7 @@ void Controller::PlaceholderHandler::SetPlaceholderFontFamily(Controller& contro
     // if mPlaceholderFont is null, create an instance.
     CreatePlaceholderFont(controller);
 
-    controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.family = placeholderTextFontFamily;
+    controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().family = placeholderTextFontFamily;
     DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetPlaceholderFontFamily %s\n", placeholderTextFontFamily.c_str());
     controller.mImpl->mEventData->mPlaceholderFont->familyDefined = !placeholderTextFontFamily.empty();
 
@@ -178,7 +178,7 @@ std::string Controller::PlaceholderHandler::GetPlaceholderFontFamily(const Contr
 {
   if((NULL != controller.mImpl->mEventData) && (NULL != controller.mImpl->mEventData->mPlaceholderFont))
   {
-    return controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.family;
+    return controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().family;
   }
 
   return EMPTY_STRING;
@@ -191,8 +191,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontWeight(Controller& co
     // if mPlaceholderFont is null, create an instance.
     CreatePlaceholderFont(controller);
 
-    controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.weight = weight;
-    controller.mImpl->mEventData->mPlaceholderFont->weightDefined           = true;
+    controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().weight = weight;
+    controller.mImpl->mEventData->mPlaceholderFont->weightDefined               = true;
 
     controller.mImpl->RequestRelayout();
   }
@@ -211,7 +211,7 @@ FontWeight Controller::PlaceholderHandler::GetPlaceholderTextFontWeight(const Co
 {
   if((NULL != controller.mImpl->mEventData) && (NULL != controller.mImpl->mEventData->mPlaceholderFont))
   {
-    return controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.weight;
+    return controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().weight;
   }
 
   return TextAbstraction::FontWeight::NORMAL;
@@ -224,8 +224,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontWidth(Controller& con
     // if mPlaceholderFont is null, create an instance.
     CreatePlaceholderFont(controller);
 
-    controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.width = width;
-    controller.mImpl->mEventData->mPlaceholderFont->widthDefined           = true;
+    controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().width = width;
+    controller.mImpl->mEventData->mPlaceholderFont->widthDefined               = true;
 
     controller.mImpl->RequestRelayout();
   }
@@ -244,7 +244,7 @@ FontWidth Controller::PlaceholderHandler::GetPlaceholderTextFontWidth(const Cont
 {
   if((NULL != controller.mImpl->mEventData) && (NULL != controller.mImpl->mEventData->mPlaceholderFont))
   {
-    return controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.width;
+    return controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().width;
   }
 
   return TextAbstraction::FontWidth::NORMAL;
@@ -257,8 +257,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontSlant(Controller& con
     // if mPlaceholderFont is null, create an instance.
     CreatePlaceholderFont(controller);
 
-    controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.slant = slant;
-    controller.mImpl->mEventData->mPlaceholderFont->slantDefined           = true;
+    controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().slant = slant;
+    controller.mImpl->mEventData->mPlaceholderFont->slantDefined               = true;
 
     controller.mImpl->RequestRelayout();
   }
@@ -277,7 +277,7 @@ FontSlant Controller::PlaceholderHandler::GetPlaceholderTextFontSlant(const Cont
 {
   if((NULL != controller.mImpl->mEventData) && (NULL != controller.mImpl->mEventData->mPlaceholderFont))
   {
-    return controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.slant;
+    return controller.mImpl->mEventData->mPlaceholderFont->GetFontDescription().slant;
   }
 
   return TextAbstraction::FontSlant::NORMAL;

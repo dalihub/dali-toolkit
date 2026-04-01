@@ -684,9 +684,9 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  if(mImpl->mFontDefaults->mFontDescription.family != defaultFontFamily)
+  if(mImpl->mFontDefaults->GetFontDescription().family != defaultFontFamily)
   {
-    mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
+    mImpl->mFontDefaults->GetFontDescription().family = defaultFontFamily;
     DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
     mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
 
@@ -702,7 +702,7 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 
 std::string Controller::GetDefaultFontFamily() const
 {
-  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.family : EMPTY_STRING;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->GetFontDescription().family : EMPTY_STRING;
 }
 
 void Controller::SetPlaceholderFontFamily(const std::string& placeholderTextFontFamily)
@@ -719,8 +719,8 @@ void Controller::SetDefaultFontWeight(FontWeight weight)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  mImpl->mFontDefaults->mFontDescription.weight = weight;
-  mImpl->mFontDefaults->weightDefined           = true;
+  mImpl->mFontDefaults->GetFontDescription().weight = weight;
+  mImpl->mFontDefaults->weightDefined               = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -738,7 +738,7 @@ bool Controller::IsDefaultFontWeightDefined() const
 
 FontWeight Controller::GetDefaultFontWeight() const
 {
-  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.weight : TextAbstraction::FontWeight::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->GetFontDescription().weight : TextAbstraction::FontWeight::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontWeight(FontWeight weight)
@@ -760,8 +760,8 @@ void Controller::SetDefaultFontWidth(FontWidth width)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  mImpl->mFontDefaults->mFontDescription.width = width;
-  mImpl->mFontDefaults->widthDefined           = true;
+  mImpl->mFontDefaults->GetFontDescription().width = width;
+  mImpl->mFontDefaults->widthDefined               = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -779,7 +779,7 @@ bool Controller::IsDefaultFontWidthDefined() const
 
 FontWidth Controller::GetDefaultFontWidth() const
 {
-  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.width : TextAbstraction::FontWidth::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->GetFontDescription().width : TextAbstraction::FontWidth::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontWidth(FontWidth width)
@@ -801,8 +801,8 @@ void Controller::SetDefaultFontSlant(FontSlant slant)
 {
   EnsureCreated(mImpl->mFontDefaults);
 
-  mImpl->mFontDefaults->mFontDescription.slant = slant;
-  mImpl->mFontDefaults->slantDefined           = true;
+  mImpl->mFontDefaults->GetFontDescription().slant = slant;
+  mImpl->mFontDefaults->slantDefined               = true;
 
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
@@ -820,7 +820,7 @@ bool Controller::IsDefaultFontSlantDefined() const
 
 FontSlant Controller::GetDefaultFontSlant() const
 {
-  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.slant : TextAbstraction::FontSlant::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->GetFontDescription().slant : TextAbstraction::FontSlant::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontSlant(FontSlant slant)
