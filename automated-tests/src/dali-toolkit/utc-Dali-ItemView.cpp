@@ -776,10 +776,10 @@ int UtcDaliItemViewInsertItemsP(void)
     Actor child    = view.GetChildAt(i);
     Actor newActor = Actor::New();
     newActor.SetProperty(Dali::Actor::Property::NAME, "Inserted");
-    insertList.push_back(Item(view.GetItemId(child), newActor));
+    insertList.PushBack(Item(view.GetItemId(child), newActor));
   }
 
-  if(!insertList.empty())
+  if(!insertList.Empty())
   {
     view.InsertItems(insertList, 0.5f);
   }
@@ -798,11 +798,11 @@ int UtcDaliItemViewInsertItemsP(void)
 
     if(child.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "Inserted")
     {
-      removeList.push_back(view.GetItemId(child));
+      removeList.PushBack(view.GetItemId(child));
     }
   }
 
-  if(!removeList.empty())
+  if(!removeList.Empty())
   {
     view.RemoveItems(removeList, 0.5f);
   }
@@ -866,10 +866,10 @@ int UtcDaliItemViewReplaceItemsP(void)
     Actor newActor = Actor::New();
     newActor.SetProperty(Dali::Actor::Property::NAME, "Replaced");
 
-    replaceList.push_back(Item(i, newActor));
+    replaceList.PushBack(Item(i, newActor));
   }
 
-  if(!replaceList.empty())
+  if(!replaceList.Empty())
   {
     view.ReplaceItems(replaceList, 0.5f);
   }
