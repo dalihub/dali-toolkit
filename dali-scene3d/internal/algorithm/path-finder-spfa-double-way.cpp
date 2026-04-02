@@ -18,8 +18,8 @@
 #include <dali-scene3d/internal/algorithm/path-finder-spfa-double-way.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/list-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/list-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <limits>
 #include <unordered_set>
 

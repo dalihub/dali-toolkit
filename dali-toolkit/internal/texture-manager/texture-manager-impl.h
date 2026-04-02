@@ -24,6 +24,7 @@
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-cache-manager.h>

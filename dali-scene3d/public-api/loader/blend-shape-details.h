@@ -19,11 +19,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/shader.h>
 #include <limits> ///< for std::numeric_limits
 #include <string>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/rendering/texture.h>

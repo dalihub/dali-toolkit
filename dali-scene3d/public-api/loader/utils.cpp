@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <stdarg.h>
 #include <algorithm>
 #include <cstring>

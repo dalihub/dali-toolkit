@@ -21,8 +21,8 @@
 #include <dali/devel-api/atspi-interfaces/editable-text.h>
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-accessible.h>

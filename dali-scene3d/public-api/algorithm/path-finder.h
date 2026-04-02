@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <vector>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/algorithm/path-finder-waypoint.h>

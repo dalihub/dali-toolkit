@@ -17,9 +17,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-notification.h>
 
 #include <dali/integration-api/debug.h>

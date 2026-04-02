@@ -18,8 +18,8 @@
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/common/list-wrapper.h>
 
 #include <algorithm>
 #include <filesystem>

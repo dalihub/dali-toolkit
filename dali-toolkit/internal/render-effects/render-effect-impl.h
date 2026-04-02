@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDE
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-notification.h>
