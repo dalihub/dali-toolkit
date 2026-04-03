@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public:
    * @param[in] deviceName The name of the device where the key event occurred.
    * @return A handle to the next focusable actor
    */
-  virtual Actor GetNextFocusableActor(Actor current, Actor proposed, Control::KeyboardFocus::Direction direction, const std::string& deviceName = "") = 0;
+  virtual Actor GetNextFocusableActor(Actor current, Actor proposed, Control::KeyboardFocus::Direction direction, const Dali::String& deviceName = "") = 0;
 };
 
 /**
@@ -112,7 +112,7 @@ DALI_TOOLKIT_API bool IsDefaultAlgorithmEnabled(KeyboardFocusManager keyboardFoc
  * @return true if the movement was successful
  * @pre The KeyboardFocusManager has been initialized.
  */
-DALI_TOOLKIT_API bool MoveFocus(KeyboardFocusManager keyboardFocusManager, Control::KeyboardFocus::Direction direction, const std::string& deviceName);
+DALI_TOOLKIT_API bool MoveFocus(KeyboardFocusManager keyboardFocusManager, Control::KeyboardFocus::Direction direction, const Dali::String& deviceName);
 
 /**
  * @brief Sets the root actor to start moving focus when DefaultAlgorithm is enabled.

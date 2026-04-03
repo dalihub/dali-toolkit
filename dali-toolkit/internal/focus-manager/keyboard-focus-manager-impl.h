@@ -98,7 +98,7 @@ public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::MoveFocus
    */
-  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const std::string& deviceName = "");
+  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction, const Dali::String& deviceName = "");
 
   /**
    * @brief Move the focus with device information
