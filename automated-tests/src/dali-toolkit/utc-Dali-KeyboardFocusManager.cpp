@@ -64,7 +64,7 @@ public:
   {
   }
 
-  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction, const std::string& deviceName)
+  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction, const Dali::String& deviceName)
   {
     tet_infoline("Verifying CustomAlgorithm()");
 
@@ -91,7 +91,7 @@ public:
   Actor                             mCurrentFocusedActor;
   Actor                             mProposedActorToFocus;
   Control::KeyboardFocus::Direction mDirection;
-  std::string                       mDeviceName;
+  Dali::String                      mDeviceName;
 };
 
 // Functors to test whether PreFocusChange signal is emitted when the keyboard focus is about to change
@@ -802,7 +802,7 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
   preFocusChangeCallback.Reset();
 
   bool            customAlgorithmInterfaceVerified = false;
-  std::string     deviceName                       = "deviceName";
+  Dali::String    deviceName                       = "deviceName";
   CustomAlgorithm customAlgorithm(customAlgorithmInterfaceVerified);
   Toolkit::DevelKeyboardFocusManager::SetCustomAlgorithm(manager, customAlgorithm);
 
