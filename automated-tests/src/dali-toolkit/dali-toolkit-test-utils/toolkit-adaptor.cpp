@@ -31,6 +31,7 @@
 #include <toolkit-async-task-manager.h>
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-test-application.h>
+#include <toolkit-window.h>
 #include "dali-test-suite-utils.h"
 
 namespace Dali
@@ -321,6 +322,11 @@ Dali::Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
   return mWindowCreatedSignal;
 }
 
+Dali::Adaptor::LocaleChangedSignalType& Adaptor::LocaleChangedSignal()
+{
+  return mLocaleChangedSignal;
+}
+
 } // namespace Adaptor
 } // namespace Internal
 
@@ -358,18 +364,33 @@ void Adaptor::Stop()
   mImpl->Stop();
 }
 
-void Adaptor::RenderOnce()
-{
-}
-
 bool Adaptor::AddIdle(CallbackBase* callback, bool hasReturnValue)
 {
   return mImpl->AddIdle(callback, hasReturnValue);
 }
 
+bool Adaptor::AddWindow(Dali::Integration::SceneHolder childWindow)
+{
+  if(IsAvailable())
+  {
+    mImpl->AddWindow(&GetImplementation(childWindow));
+    return true;
+  }
+  else
+  {
+    DALI_LOG_ERROR("Adaptor not instantiated");
+    return false;
+  }
+}
+
 void Adaptor::RemoveIdle(CallbackBase* callback)
 {
   mImpl->RemoveIdle(callback);
+}
+
+void Adaptor::ProcessIdle()
+{
+  mImpl->RunIdles();
 }
 
 void Adaptor::ReplaceSurface(Window window, Dali::Integration::RenderSurfaceInterface& surface)
@@ -380,34 +401,9 @@ void Adaptor::ReplaceSurface(Dali::Integration::SceneHolder window, Dali::Integr
 {
 }
 
-Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
-{
-  return mImpl->ResizedSignal();
-}
-
-Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
-{
-  return mImpl->LanguageChangedSignal();
-}
-
-Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
-{
-  return mImpl->WindowCreatedSignal();
-}
-
 Dali::Integration::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   return mImpl->GetSurface();
-}
-
-Dali::WindowContainer Adaptor::GetWindows() const
-{
-  return mImpl->GetWindows();
-}
-
-Dali::SceneHolderList Adaptor::GetSceneHolders() const
-{
-  return mImpl->GetSceneHolders();
 }
 
 Any Adaptor::GetNativeWindowHandle()
@@ -421,11 +417,24 @@ Any Adaptor::GetNativeWindowHandle(Actor actor)
   return GetNativeWindowHandle();
 }
 
+Any Adaptor::GetGraphicsDisplay()
+{
+  return Any();
+}
+
 void Adaptor::ReleaseSurfaceLock()
 {
 }
 
 void Adaptor::SetRenderRefreshRate(unsigned int numberOfVSyncsPerRender)
+{
+}
+
+void Adaptor::SetMaximumRenderFrameRate(float maximumRenderFrameRate)
+{
+}
+
+void Adaptor::SetPreRenderCallback(CallbackBase* callback)
 {
 }
 
@@ -460,6 +469,26 @@ void Adaptor::FeedKeyEvent(KeyEvent& keyEvent)
 }
 
 void Adaptor::SceneCreated()
+{
+}
+
+void Adaptor::SurfaceResizePrepare(Dali::Integration::RenderSurfaceInterface* surface, SurfaceSize surfaceSize)
+{
+}
+
+void Adaptor::SurfaceResizeComplete(Dali::Integration::RenderSurfaceInterface* surface, SurfaceSize surfaceSize)
+{
+}
+
+void Adaptor::UpdateOnce()
+{
+}
+
+void Adaptor::RenderOnce()
+{
+}
+
+void Adaptor::FlushUpdateMessages()
 {
 }
 
@@ -540,6 +569,50 @@ void Adaptor::RegisterProcessorOnce(Dali::Integration::Processor& processor, boo
 void Adaptor::UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessorOnce(processor, postProcessor);
+}
+
+Dali::WindowContainer Adaptor::GetWindows() const
+{
+  return mImpl->GetWindows();
+}
+
+Dali::SceneHolderList Adaptor::GetSceneHolders() const
+{
+  return mImpl->GetSceneHolders();
+}
+
+Dali::ObjectRegistry Adaptor::GetObjectRegistry() const
+{
+  // TODO : implement this function if needed
+  return Dali::ObjectRegistry();
+}
+
+void Adaptor::OnWindowShown()
+{
+}
+
+void Adaptor::OnWindowHidden()
+{
+}
+
+Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
+{
+  return mImpl->ResizedSignal();
+}
+
+Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
+{
+  return mImpl->LanguageChangedSignal();
+}
+
+Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
+{
+  return mImpl->WindowCreatedSignal();
+}
+
+Adaptor::LocaleChangedSignalType& Adaptor::LocaleChangedSignal()
+{
+  return mImpl->LocaleChangedSignal();
 }
 
 } // namespace Dali
