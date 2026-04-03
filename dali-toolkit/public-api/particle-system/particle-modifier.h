@@ -21,6 +21,7 @@
 #include <dali-toolkit/public-api/particle-system/particle-types.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
 

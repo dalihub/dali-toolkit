@@ -706,11 +706,9 @@ void ItemView::InsertItem(Item newItem, float durationSeconds)
     }
 
     // Create last item
-    ItemIter lastIter = mItemPool.End();
-    if(lastIter != mItemPool.Begin())
+    if(!mItemPool.Empty())
     {
-      --lastIter;
-      ItemId lastId = lastIter->first;
+      ItemId lastId = mItemPool.Back().first;
       Item   lastItem(lastId + 1, displacedActor);
       InsertToItemContainer(mItemPool, lastItem);
 
@@ -752,11 +750,9 @@ void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
       }
 
       // Create last item
-      ItemIter lastIter = mItemPool.End();
-      if(lastIter != mItemPool.Begin())
+      if(!mItemPool.Empty())
       {
-        --lastIter;
-        ItemId lastId = lastIter->first;
+        ItemId lastId = mItemPool.Back().first;
         Item   lastItem(lastId + 1, moveMe);
         InsertToItemContainer(mItemPool, lastItem);
       }
@@ -858,7 +854,7 @@ bool ItemView::RemoveActor(unsigned int itemId)
     //     ID 4 - ActorD
     if(!mItemPool.Empty())
     {
-      const ItemId lastItemId = (mItemPool.End() - 1)->first;
+      const ItemId lastItemId = mItemPool.Back().first;
       for(ItemIter iter = removeIter; iter != mItemPool.End(); ++iter)
       {
         if(iter->first < lastItemId)
@@ -1735,8 +1731,8 @@ void ItemView::GetItemsRange(ItemRange& range)
 {
   if(!mItemPool.Empty())
   {
-    range.begin = mItemPool.Begin()->first;
-    range.end   = (mItemPool.End() - 1)->first + 1;
+    range.begin = mItemPool.Front().first;
+    range.end   = mItemPool.Back().first + 1;
   }
   else
   {

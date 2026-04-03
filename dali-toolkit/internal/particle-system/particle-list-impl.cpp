@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ uint32_t ParticleList::GetParticleCount() const
 
 uint32_t ParticleList::GetActiveParticleCount() const
 {
-  return mParticles.size();
+  return static_cast<uint32_t>(mParticles.Count());
 }
 
 ParticleStream::StreamDataType ParticleList::GetStreamDataType(uint32_t streamIndex)
@@ -163,17 +163,17 @@ ParticleSystem::Particle ParticleList::NewParticle(float lifetime)
 
     // Add particle
     // TODO : Could we use a pool allocator here?
-    mParticles.emplace_back(new Internal::Particle(*this, newIndex));
+    mParticles.PushBack(new Internal::Particle(*this, newIndex));
 
     // Set particle lifetime
-    auto& particle = mParticles.back();
+    auto& particle = mParticles.Back();
 
     particle.Get<float>(ParticleStream::LIFETIME_STREAM_BIT) = lifetime;
 
     // Store initial lifetime
     particle.Get<float>(ParticleStream::LIFETIME_BASE_STREAM_BIT) = lifetime;
 
-    return mParticles.back();
+    return mParticles.Back();
   }
   return {nullptr};
 }
@@ -192,7 +192,7 @@ uint32_t ParticleList::GetStreamElementSize(bool includeLocalStream)
 
 void ParticleList::ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndices)
 {
-  auto it = mParticles.begin();
+  auto it = mParticles.Begin();
 
   mAliveParticleCount -= sortedEraseIndices.size();
 
@@ -213,7 +213,8 @@ void ParticleList::ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndi
     mFreeIndex               = p.GetIndex();
 
     // Remove particle from the list
-    it = mParticles.erase(it);
+    // TODO : Optimize here! For now, it spend O(N) per each erase.
+    it = mParticles.Erase(it);
     ++particleIndex;
   }
 }
@@ -228,7 +229,7 @@ uint32_t ParticleList::GetDefaultStreamIndex(ParticleStreamTypeFlagBit streamBit
   return mBuiltInStreamMap[uint32_t(streamBit)];
 }
 
-std::list<ParticleSystem::Particle>& ParticleList::GetParticles()
+Dali::Vector<ParticleSystem::Particle>& ParticleList::GetParticles()
 {
   return mParticles;
 }

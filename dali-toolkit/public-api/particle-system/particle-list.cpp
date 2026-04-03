@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ int ParticleList::GetDefaultStreamIndex(ParticleStreamTypeFlagBit defaultStreamB
   return GetImplementation(*this).GetDefaultStreamIndex(defaultStreamBit);
 }
 
-std::list<Particle>& ParticleList::GetActiveParticles()
+Dali::Vector<Particle>& ParticleList::GetActiveParticles()
 {
   return GetImplementation(*this).GetParticles();
 }

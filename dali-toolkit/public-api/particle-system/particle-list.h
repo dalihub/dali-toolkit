@@ -21,9 +21,8 @@
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
-#include <cinttypes>
-#include <list>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -232,7 +231,7 @@ public:
    * @brief Returns raw data container of the particle list
    * @return list of particles
    */
-  std::list<Particle>& GetActiveParticles();
+  Dali::Vector<Particle>& GetActiveParticles();
 
 private:
   /// @cond internal

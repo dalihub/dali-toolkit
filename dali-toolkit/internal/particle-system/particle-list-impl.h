@@ -150,7 +150,7 @@ public:
 
   uint32_t GetDefaultStreamIndex(ParticleStreamTypeFlagBit streamBit);
 
-  std::list<ParticleSystem::Particle>& GetParticles();
+  Dali::Vector<ParticleSystem::Particle>& GetParticles();
 
   void ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndices);
 
@@ -183,7 +183,7 @@ private:
 
   std::map<uint32_t, uint32_t> mBuiltInStreamMap;
 
-  std::list<ParticleSystem::Particle> mParticles;
+  Dali::Vector<ParticleSystem::Particle> mParticles;
 
   uint32_t mParticleStreamElementSizeWithLocal{0u};
   uint32_t mParticleStreamElementSize{0u};
