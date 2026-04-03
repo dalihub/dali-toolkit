@@ -25,7 +25,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/public-api/signals/render-callback.h>
+#include <dali/devel-api/signals/render-callback.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

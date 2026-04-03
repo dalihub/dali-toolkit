@@ -23,12 +23,12 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Toolkit::Internal
 {

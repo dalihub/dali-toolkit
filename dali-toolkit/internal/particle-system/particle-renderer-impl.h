@@ -23,11 +23,13 @@
 #include <dali-toolkit/public-api/particle-system/particle-renderer.h>
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
+#include <dali/devel-api/rendering/vertex-buffer-devel.h>
+#include <dali/devel-api/signals/render-callback.h>
+#include <dali/devel-api/signals/vertex-buffer-update-callback.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
-#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Graphics
 {

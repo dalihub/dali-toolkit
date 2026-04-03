@@ -18,9 +18,9 @@
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/drawable-actor.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/actors/drawable-actor.h>
 
 #include <memory>
 #include <utility>

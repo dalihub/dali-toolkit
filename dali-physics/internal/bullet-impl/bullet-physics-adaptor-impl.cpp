@@ -18,9 +18,9 @@
 #include <dali-physics/internal/bullet-impl/bullet-physics-adaptor-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/drawable-actor.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/actors/drawable-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
