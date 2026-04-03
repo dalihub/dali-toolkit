@@ -16,7 +16,7 @@
  */
 
 #include "drawable-view-native-renderer.h"
-#include <dali/public-api/signals/render-callback.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <atomic>
 #include <deque>
 #include <mutex>

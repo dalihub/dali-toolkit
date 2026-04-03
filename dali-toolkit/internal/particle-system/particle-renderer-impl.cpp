@@ -245,7 +245,7 @@ void ParticleRenderer::CreateShader()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     // Note : MUST NOT call this API during app terminating
-    mStreamBuffer.SetVertexBufferUpdateCallback(std::move(mStreamBufferUpdateCallback));
+    DevelVertexBuffer::SetVertexBufferUpdateCallback(mStreamBuffer, std::move(mStreamBufferUpdateCallback));
   }
 
   mRenderer = Renderer::New(mGeometry, mShader);
@@ -446,7 +446,7 @@ void ParticleRenderer::PrepareToDie()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mStreamBuffer)
   {
     // Note : MUST NOT call this API during app terminating
-    mStreamBuffer.ClearVertexBufferUpdateCallback();
+    DevelVertexBuffer::ClearVertexBufferUpdateCallback(mStreamBuffer);
   }
 }
 

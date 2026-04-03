@@ -21,12 +21,12 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/signals/render-callback.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/drawable-view-native-renderer.h>
