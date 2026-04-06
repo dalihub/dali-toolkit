@@ -256,7 +256,7 @@ public:
   bool widthDefined : 1;          ///< Whether the default font's width is defined.
   bool slantDefined : 1;          ///< Whether the default font's slant is defined.
   bool sizeDefined : 1;           ///< Whether the default font's point size is defined.
-  bool fontDescriptionGetted : 1; ///< Wether the default font's description getted from default platform font.
+  bool fontDescriptionGetted : 1; ///< Whether the default font's description getted from default platform font.
 
 private:
   TextAbstraction::FontDescription mFontDescription; ///< The default font's description. Make it private to ensure to get
