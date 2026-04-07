@@ -15,7 +15,7 @@ namespace Toolkit
 class TriggerEvent : public Dali::TriggerEventInterface
 {
 public:
-  TriggerEvent(Dali::CallbackBase* callback, Dali::TriggerEventInterface::Options Options);
+  TriggerEvent(Dali::CallbackBase* callback);
   ~TriggerEvent()
   {
   }
@@ -26,7 +26,7 @@ private:
   Dali::CallbackBase* mCallback;
 };
 
-TriggerEvent::TriggerEvent(Dali::CallbackBase* callback, Dali::TriggerEventInterface::Options Options)
+TriggerEvent::TriggerEvent(Dali::CallbackBase* callback)
 : mCallback(callback)
 {
 }
@@ -42,9 +42,9 @@ void TriggerEvent::Trigger()
 
 } // namespace Dali
 
-Dali::TriggerEventFactory::TriggerEventPtr Dali::TriggerEventFactory::CreateTriggerEvent(Dali::CallbackBase* callback, Dali::TriggerEventInterface::Options options)
+Dali::TriggerEventFactory::TriggerEventPtr Dali::TriggerEventFactory::CreateTriggerEvent(Dali::CallbackBase* callback)
 {
-  return TriggerEventFactory::TriggerEventPtr(new Dali::Internal::Toolkit::TriggerEvent(callback, options));
+  return TriggerEventFactory::TriggerEventPtr(new Dali::Internal::Toolkit::TriggerEvent(callback));
 }
 
 void Dali::TriggerEventFactory::DestroyTriggerEvent(Dali::TriggerEventInterface* triggerEventInterface)
