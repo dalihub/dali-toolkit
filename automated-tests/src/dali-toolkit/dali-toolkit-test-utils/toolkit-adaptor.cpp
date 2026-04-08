@@ -34,6 +34,12 @@
 #include <toolkit-window.h>
 #include "dali-test-suite-utils.h"
 
+#include <sys/prctl.h> ///< for syscall(SYS_gettid)
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstdint>
+
 namespace Dali
 {
 namespace Internal
@@ -593,6 +599,23 @@ void Adaptor::OnWindowShown()
 
 void Adaptor::OnWindowHidden()
 {
+}
+
+int32_t Adaptor::GetRenderThreadId() const
+{
+  // We use the same thread for both render and UI in toolkit-adaptor, so return the same thread id as GetRenderThreadId().
+  return static_cast<int32_t>(syscall(SYS_gettid));
+}
+
+int32_t Adaptor::GetUiThreadId() const
+{
+  // We use the same thread for both render and UI in toolkit-adaptor, so return the same thread id as GetRenderThreadId().
+  return static_cast<int32_t>(syscall(SYS_gettid));
+}
+
+int32_t Adaptor::GetMainThreadId() const
+{
+  return static_cast<int32_t>(getpid());
 }
 
 Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
