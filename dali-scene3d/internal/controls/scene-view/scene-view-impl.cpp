@@ -165,7 +165,7 @@ Dali::Actor CreateSkybox()
   Dali::Actor skyboxActor = Actor::New();
   skyboxActor.SetProperty(Dali::Actor::Property::NAME, "SkyBox");
   skyboxActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  skyboxActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  skyboxActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   skyboxActor.AddRenderer(skyboxRenderer);
   return skyboxActor;
 }
@@ -998,7 +998,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
 
     captureData->mCaptureInvertCamera = Dali::CameraActor::New(size);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
 
@@ -1335,7 +1335,7 @@ void SceneView::OnInitialize()
 
   mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mDefaultCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
 
@@ -1841,7 +1841,7 @@ void SceneView::RequestCameraTransition()
 
     mTransitionCamera = Dali::CameraActor::New3DCamera();
     mTransitionCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mTransitionCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mTransitionCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
     mRootLayer.Add(mTransitionCamera);
 
     mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::Actor::Property::POSITION), positionKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);

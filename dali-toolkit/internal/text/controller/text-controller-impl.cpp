@@ -1740,7 +1740,7 @@ Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
 {
   auto actor = Toolkit::TextAnchor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   auto    rect   = Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
   Vector2 offset = mModel->mLayoutOffsetWithPadding;

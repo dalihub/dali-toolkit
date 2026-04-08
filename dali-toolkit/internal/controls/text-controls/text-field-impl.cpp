@@ -1080,7 +1080,7 @@ void TextField::AddDecoration(Actor& actor, DecorationType type, bool needsClipp
 void TextField::AddLayer(Actor& layer, Actor& actor)
 {
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   Self().Add(actor);
   layer = actor;
 }
@@ -1132,7 +1132,7 @@ void TextField::EnableClipping()
   {
     // Creates an extra control to be used as stencil buffer.
     mStencil = ControlImpl::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
-    mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    mStencil.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
 

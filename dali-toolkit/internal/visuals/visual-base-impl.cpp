@@ -1102,9 +1102,9 @@ Property::Index Visual::Base::GetIntKey(Property::Key key)
     return key.indexKey;
   }
 
-  if(key.stringKey == ANCHOR_POINT)
+  if(key.stringKey == PIVOT)
   {
-    return Toolkit::Visual::Transform::Property::ANCHOR_POINT;
+    return Toolkit::Visual::Transform::Property::PIVOT;
   }
   else if(key.stringKey == EXTRA_SIZE)
   {
@@ -1198,9 +1198,9 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
     {
       return VisualRenderer::Property::TRANSFORM_ORIGIN;
     }
-    case Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT:
+    case Dali::Toolkit::Visual::Transform::Property::PIVOT:
     {
-      return VisualRenderer::Property::TRANSFORM_ANCHOR_POINT;
+      return VisualRenderer::Property::TRANSFORM_PIVOT;
     }
     case Dali::Toolkit::Visual::Property::MIX_COLOR:
     {
@@ -1410,7 +1410,7 @@ void Visual::Base::AnimateRendererProperty(
       case VisualRenderer::Property::TRANSFORM_OFFSET:
       case VisualRenderer::Property::TRANSFORM_SIZE:
       case VisualRenderer::Property::TRANSFORM_ORIGIN:
-      case VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      case VisualRenderer::Property::TRANSFORM_PIVOT:
       {
         // Need to change visual transform is not default anymore.
         if(mImpl->mTransformMapUsingDefault)

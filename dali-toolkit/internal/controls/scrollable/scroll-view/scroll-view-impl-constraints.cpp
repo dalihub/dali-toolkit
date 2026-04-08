@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -550,7 +550,7 @@ void ScrollViewConstraints::SetInternalConstraints(ScrollView& scrollView)
   // WrapActor (wrap functionality)
   constraint = Constraint::New<Vector3>(scrollViewActor, Actor::Property::POSITION, WrapActorConstraint);
   constraint.AddSource(LocalSource(Actor::Property::SCALE));
-  constraint.AddSource(LocalSource(Actor::Property::ANCHOR_POINT));
+  constraint.AddSource(LocalSource(Actor::Property::PIVOT));
   constraint.AddSource(LocalSource(Actor::Property::SIZE));
   constraint.AddSource(Source(scrollViewActor, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN));
   constraint.AddSource(Source(scrollViewActor, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));

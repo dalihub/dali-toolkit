@@ -241,13 +241,13 @@ ImageView footer = ImageView::New( DEFAULT_CONTROL_AREA_IMAGE_PATH );
 footer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 footer.SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
 footer.SetProperty( Actor::Property::SIZE, Vector2( 0.0f, 80.0f ) );
-footer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+footer.SetProperty( Actor::Property::PIVOT, Pivot::CENTER );
 footer.SetParentOrigin( ParentOrigin::CENTER );
 
 Toolkit::PushButton okButton = Toolkit::PushButton::New();
 okButton.SetLabelText( "OK" );
 okButton.SetParentOrigin( ParentOrigin::CENTER );
-okButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+okButton.SetProperty( Actor::Property::PIVOT, Pivot::CENTER );
 okButton.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
 okButton.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( -20.0f, -20.0f, 0.0 ) );
 okButton.ClickedSignal().Connect( this, &MyExample::OnOKButtonClicked );
@@ -255,7 +255,7 @@ okButton.ClickedSignal().Connect( this, &MyExample::OnOKButtonClicked );
 Toolkit::PushButton cancelButton = Toolkit::PushButton::New();
 cancelButton.SetLabelText( "Cancel" );
 cancelButton.SetParentOrigin( ParentOrigin::CENTER );
-cancelButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+cancelButton.SetProperty( Actor::Property::PIVOT, Pivot::CENTER );
 cancelButton.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
 cancelButton.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( -20.0f, -20.0f, 0.0 ) );
 cancelButton.ClickedSignal().Connect( this, &MyExample::OnCancelButtonClicked );
@@ -263,7 +263,7 @@ cancelButton.ClickedSignal().Connect( this, &MyExample::OnCancelButtonClicked );
 // Set up the footer's layout.
 Toolkit::TableView controlLayout = Toolkit::TableView::New( 1, 2 );
 controlLayout.SetParentOrigin( ParentOrigin::CENTER );
-controlLayout.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+controlLayout.SetProperty( Actor::Property::PIVOT, Pivot::CENTER );
 controlLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 controlLayout.SetCellPadding( Size( 10.0f, 10.0f ) );
 controlLayout.SetRelativeWidth( 0, 0.5f );
@@ -309,7 +309,7 @@ This time without an image around the buttons. This could be added in the same w
       "type": "ConfirmationPopup",
       "name": "confirmationPopup",
       "parentOrigin": [0.5, 0.55, 0.5],
-      "anchorPoint": "CENTER",
+      "pivot": "CENTER",
       "widthResizePolicy": "SIZE_RELATIVE_TO_PARENT",
       "heightResizePolicy": "USE_NATURAL_SIZE",
       "sizeModeFactor": [0.65, 1.0, 1.0],
@@ -336,13 +336,13 @@ This time without an image around the buttons. This could be added in the same w
         "widthResizePolicy": "FILL_TO_PARENT",
         "heightResizePolicy": "FIXED",
         "parentOrigin": "CENTER",
-        "anchorPoint": "CENTER",
+        "pivot": "CENTER",
         "actors": [
           {
             "type": "PushButton",
             "name": "controlOk",
             "parentOrigin": "CENTER_LEFT",
-            "anchorPoint": "CENTER_LEFT",
+            "pivot": "CENTER_LEFT",
             "position": [20, 0, 0],
             "size": [0, 0, 0],
             "labelText": "OK"
@@ -351,7 +351,7 @@ This time without an image around the buttons. This could be added in the same w
             "type": "PushButton",
             "name": "controlCancel",
             "parentOrigin": "CENTER_RIGHT",
-            "anchorPoint": "CENTER_RIGHT",
+            "pivot": "CENTER_RIGHT",
             "position": [-20, 0, 0],
             "size": [0, 0, 0],
             "labelText": "Cancel"

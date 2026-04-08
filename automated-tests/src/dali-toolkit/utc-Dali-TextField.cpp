@@ -1382,7 +1382,7 @@ int utcDaliTextFieldAnchorClicked01(void)
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -1428,7 +1428,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -2196,7 +2196,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
@@ -2404,7 +2404,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>");
@@ -2609,7 +2609,7 @@ int utcDaliTextFieldInputStyleChanged03(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
@@ -2798,7 +2798,7 @@ int utcDaliTextFieldEvent01(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Render and notify
   application.SendNotification();
@@ -2847,7 +2847,7 @@ int utcDaliTextFieldEvent01(void)
   TextField field2 = TextField::New();
 
   field2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field2.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   field2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
 
@@ -2894,7 +2894,7 @@ int utcDaliTextFieldEvent02(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3044,7 +3044,7 @@ int utcDaliTextFieldEvent03(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(30.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3105,7 +3105,7 @@ int utcDaliTextFieldEvent04(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3161,7 +3161,7 @@ int utcDaliTextFieldEvent05(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3212,7 +3212,7 @@ int utcDaliTextFieldEvent06(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3262,7 +3262,7 @@ int utcDaliTextFieldEvent07(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   Property::Map propertyMap;
   propertyMap["PANEL_LAYOUT"] = InputMethod::PanelLayout::PASSWORD;
   field.SetProperty(TextField::Property::INPUT_METHOD_SETTINGS, propertyMap);
@@ -3306,7 +3306,7 @@ int utcDaliTextFieldEvent08(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3424,7 +3424,7 @@ int utcDaliTextFieldEvent09(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3516,7 +3516,7 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3617,7 +3617,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3699,7 +3699,7 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3787,7 +3787,7 @@ int utcDaliTextFieldSizeUpdate(void)
 
   field.SetProperty(TextField::Property::TEXT, "ኢ");
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   field.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   KeyboardFocusManager::Get().SetCurrentFocusActor(field);
@@ -3822,7 +3822,7 @@ int utcDaliTextFieldExtremlyLargePointSize(void)
   field.SetProperty(TextField::Property::TEXT, "Text");
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(field);
 
   try
@@ -4016,7 +4016,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   DALI_TEST_CHECK(field);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(field);
 
   application.SendNotification();
@@ -4049,7 +4049,7 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
   DALI_TEST_CHECK(field);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(field);
 
   application.SendNotification();
@@ -4077,7 +4077,7 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
   DALI_TEST_CHECK(field);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(field);
 
   application.SendNotification();
@@ -4105,7 +4105,7 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
   DALI_TEST_CHECK(field);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(field);
 
   application.SendNotification();
@@ -4138,7 +4138,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4227,7 +4227,7 @@ int UtcDaliTextFieldSelectWholeText(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4286,7 +4286,7 @@ int UtcDaliTextFieldSelectText(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4346,7 +4346,7 @@ int UtcDaliTextFieldSelectNone(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4395,7 +4395,7 @@ int UtcDaliTextFieldSelectRange(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4442,7 +4442,7 @@ int UtcDaliTextFieldEnableEditing(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4540,7 +4540,7 @@ int UtcDaliTextFieldPrimaryCursorPosition(void)
   textField.SetProperty(TextField::Property::TEXT, "ABCEF");
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4738,7 +4738,7 @@ int UtcDaliTextFieldCopyText(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4815,7 +4815,7 @@ int UtcDaliTextFieldCutText(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4926,7 +4926,7 @@ int UtcDaliTextFieldPasteText(void)
 
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5025,7 +5025,7 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5120,7 +5120,7 @@ int utcDaliTextFieldGeometryEllipsisStart(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(250.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
@@ -5169,7 +5169,7 @@ int utcDaliTextFieldGeometryEllipsisEnd(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(250.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
   field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
@@ -5218,7 +5218,7 @@ int utcDaliTextFieldGeometryRTL(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "السطر الاخير");
 
@@ -5263,7 +5263,7 @@ int utcDaliTextFieldGeometryGlyphMiddle(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(150.f, 200.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "لا تحتوي على لا");
 
@@ -5308,7 +5308,7 @@ int utcDaliTextFieldGeometryNullPtr(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   field.SetProperty(TextField::Property::TEXT, "");
 
@@ -5352,7 +5352,7 @@ int utcDaliTextFieldSelectionClearedSignal(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5486,7 +5486,7 @@ int utcDaliTextFieldSelectionStartedSignal(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5552,7 +5552,7 @@ int utcDaliTextFieldSelectionChangedSignal(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5974,13 +5974,13 @@ int UtcDaliToolkitTextfieldParagraphTag(void)
   fieldNewlineSeparator.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   fieldNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   fieldNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  fieldNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldNewlineSeparator.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   fieldNewlineSeparator.SetProperty(TextField::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
 
   fieldParagraphTag.SetProperty(TextField::Property::ENABLE_MARKUP, true);
   fieldParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   fieldParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  fieldParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldParagraphTag.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   fieldParagraphTag.SetProperty(TextField::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
 
   application.SendNotification();
@@ -6083,7 +6083,7 @@ int utcDaliTextFieldPanGesturePropagation(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   TextField field = TextField::New();
@@ -6094,7 +6094,7 @@ int utcDaliTextFieldPanGesturePropagation(void)
 
   field.SetProperty(Actor::Property::SIZE, Vector2(50.f, 100.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   actor.Add(field);
 
@@ -6160,7 +6160,7 @@ int utcDaliTextFieldGetTextBoundingRectangle(void)
   field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
   field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   field.SetProperty(TextField::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
 
   // Avoid a crash when core load gl resources.
@@ -6198,7 +6198,7 @@ int utcDaliTextFieldDecoratorColor(void)
   textField.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);

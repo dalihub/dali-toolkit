@@ -133,7 +133,7 @@ Dali::Integration::Point GetPointUpOutside()
 // Set up the position of the button for the default test events
 void SetupButtonForTestTouchEvents(ToolkitTestApplication& application, Button& button, bool useDefaultImages)
 {
-  button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS);
   if(useDefaultImages)
@@ -497,7 +497,7 @@ int UtcDaliPushButtonPressed(void)
   tet_infoline(" UtcDaliPushButtonPressed");
 
   PushButton pushButton = PushButton::New();
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS);
   pushButton.SetProperty(Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS);
@@ -530,7 +530,7 @@ int UtcDaliPushButtonReleased(void)
   tet_infoline(" UtcDaliPushButtonReleased");
 
   PushButton pushButton = PushButton::New();
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS);
   pushButton.SetProperty(Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS);
@@ -613,7 +613,7 @@ int UtcDaliPushButtonSelected(void)
   tet_infoline(" UtcDaliPushButtonSelected");
 
   PushButton pushButton = PushButton::New();
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS);
   pushButton.SetProperty(Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS);
@@ -765,7 +765,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   ImageDimensions testImageSize = Dali::GetClosestImageSize(TEST_IMAGE_ONE);
   const Vector2   TEST_IMAGE_SIZE(testImageSize.GetWidth(), testImageSize.GetHeight());
 
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
@@ -814,7 +814,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   pushButton.Unparent();
   pushButton = PushButton::New();
 
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
@@ -911,7 +911,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
@@ -1129,7 +1129,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 

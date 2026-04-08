@@ -34,7 +34,7 @@ namespace Toolkit
 namespace Align
 {
 /**
- * @brief Describes anchor point and parent origin of visuals
+ * @brief Describes pivot and parent origin of visuals
  * @SINCE_1_2.60
  */
 enum Type

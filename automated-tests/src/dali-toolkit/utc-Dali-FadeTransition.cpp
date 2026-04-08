@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ int UtcDaliFadeTransitionWithOffScene(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);
@@ -155,7 +155,7 @@ int UtcDaliFadeTransitionDisappearing(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);
@@ -214,7 +214,7 @@ int UtcDaliFadeTransitionAppearing(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);
@@ -272,7 +272,7 @@ int UtcDaliFadeTransitionAppearingWithDelay(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);

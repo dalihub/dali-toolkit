@@ -18,21 +18,21 @@
 // CLASS HEADER
 #include "video-view-rendering-strategy.h"
 // EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
-#include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
@@ -72,11 +72,11 @@ WindowSurfaceStrategy::WindowSurfaceStrategy(Toolkit::VideoView videoViewHandle)
 WindowSurfaceStrategy::~WindowSurfaceStrategy()
 {
   Toolkit::VideoView videoViewHandle = GetVideoView();
-  Toolkit::Control control = Toolkit::Control::DownCast(videoViewHandle);
+  Toolkit::Control   control         = Toolkit::Control::DownCast(videoViewHandle);
   if(control)
   {
     VideoView* videoView = GetVideoViewImpl();
-    Actor self = videoView->Self();
+    Actor      self      = videoView->Self();
     if(self)
     {
       self.RemovePropertyNotification(mPositionUpdateNotification);
@@ -123,9 +123,9 @@ bool WindowSurfaceStrategy::Initialize()
   mSizeUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
   mScaleUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
 
-  Toolkit::VideoView videoViewHandle = GetVideoView();
-  Toolkit::Control      control     = Toolkit::Control::DownCast(videoViewHandle);
-  Toolkit::ControlImpl& controlImpl = GetImplementation(control);
+  Toolkit::VideoView    videoViewHandle = GetVideoView();
+  Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
+  Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
 
   if(!videoView->GetOverlayVisual())
   {
@@ -138,7 +138,7 @@ bool WindowSurfaceStrategy::Initialize()
     if(videoView->GetOverlayVisual())
     {
       Dali::Toolkit::Visual::Base overlayVisual = videoView->GetOverlayVisual();
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(overlayVisual);
+      Internal::Visual::Base&     visualImpl    = Toolkit::GetImplementation(overlayVisual);
 
       Renderer renderer = visualImpl.GetRenderer();
 
@@ -185,15 +185,15 @@ void WindowSurfaceStrategy::UpdateDisplayArea(Dali::PropertyNotification& source
 
   Actor self(videoView->Self());
 
-  bool    positionUsesAnchorPoint = self.GetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>();
-  Vector3 actorSize               = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  bool    positionUsesPivot = self.GetProperty(Actor::Property::POSITION_USES_PIVOT).Get<bool>();
+  Vector3 actorSize         = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 pivotOffSet       = actorSize * (positionUsesPivot ? self.GetCurrentProperty<Vector3>(Actor::Property::PIVOT) : Pivot::TOP_LEFT);
 
   Vector2 screenPosition = self.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
   Dali::DisplayArea displayArea;
-  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
-  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
+  displayArea.x      = screenPosition.x - pivotOffSet.x;
+  displayArea.y      = screenPosition.y - pivotOffSet.y;
   displayArea.width  = actorSize.x;
   displayArea.height = actorSize.y;
 
@@ -239,7 +239,6 @@ void WindowSurfaceStrategy::Stop()
   renderer.SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED);
 }
 
-
 void WindowSurfaceStrategy::CreateOverlayTextureVisual()
 {
   VideoView* videoView = GetVideoViewImpl();
@@ -279,16 +278,16 @@ void WindowSurfaceStrategy::CreateOverlayTextureVisual()
     shader.RegisterProperty("cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE);
     shader.RegisterProperty("cornerSquareness", Vector4::ZERO);
 
-    Actor                     self = videoView->Self();
+    Actor              self   = videoView->Self();
     Toolkit::VideoView handle = Toolkit::VideoView::DownCast(self);
     if(mOverlayTextureVisualIndex == Property::INVALID_INDEX)
     {
       mOverlayTextureVisualIndex = handle.RegisterProperty("videoViewTextureVisual", "videoViewTextureVisual", Property::AccessMode::READ_WRITE);
     }
 
-    Toolkit::VideoView videoViewHandle = GetVideoView();
-    Toolkit::Control       control     = Toolkit::Control::DownCast(videoViewHandle);
-    Toolkit::ControlImpl&  controlImpl = GetImplementation(control);
+    Toolkit::VideoView    videoViewHandle = GetVideoView();
+    Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
+    Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
 
     // Ignore corner radius for offscreen case.
     visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
@@ -306,9 +305,9 @@ void WindowSurfaceStrategy::ResetOverlayTextureVisual()
 {
   if(mOverlayTextureVisual && mOverlayTextureVisualIndex != Property::INVALID_INDEX)
   {
-    Toolkit::VideoView videoViewHandle = GetVideoView();
-    Toolkit::Control      control      = Toolkit::Control::DownCast(videoViewHandle);
-    Toolkit::ControlImpl& controlImpl  = GetImplementation(control);
+    Toolkit::VideoView    videoViewHandle = GetVideoView();
+    Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
+    Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
     Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayTextureVisualIndex);
 
     if(Dali::Adaptor::IsAvailable() && mOverlayTextureVisual)
@@ -331,8 +330,8 @@ void WindowSurfaceStrategy::EnableOffscreenFrameRendering(bool useOffScreenFrame
     NativeImagePtr previousNativeImage = Dali::NativeImage::New(0, 0, NativeImage::ColorDepth::COLOR_DEPTH_DEFAULT);
     mPreviousFrameTexture              = Dali::Texture::New(*previousNativeImage);
 
-    NativeImagePtr currentNativeImage  = Dali::NativeImage::New(0, 0, NativeImage::ColorDepth::COLOR_DEPTH_DEFAULT);
-    mCurrentFrameTexture               = Dali::Texture::New(*currentNativeImage);
+    NativeImagePtr currentNativeImage = Dali::NativeImage::New(0, 0, NativeImage::ColorDepth::COLOR_DEPTH_DEFAULT);
+    mCurrentFrameTexture              = Dali::Texture::New(*currentNativeImage);
 
     CreateOverlayTextureVisual();
 
@@ -358,11 +357,11 @@ NativeImageStrategy::NativeImageStrategy(Toolkit::VideoView videoViewHandle)
 NativeImageStrategy::~NativeImageStrategy()
 {
   Toolkit::VideoView videoViewHandle = GetVideoView();
-  Toolkit::Control control = Toolkit::Control::DownCast(videoViewHandle);
+  Toolkit::Control   control         = Toolkit::Control::DownCast(videoViewHandle);
   if(control)
   {
     Toolkit::ControlImpl& controlImpl = GetImplementation(control);
-    VideoView* videoView = GetVideoViewImpl();
+    VideoView*            videoView   = GetVideoViewImpl();
 
     if(videoView->GetTextureVisual())
     {
@@ -391,18 +390,18 @@ bool NativeImageStrategy::Initialize()
 
   Actor self(videoView->Self());
 
-  Toolkit::VideoView videoViewHandle = GetVideoView();
-  Toolkit::Control      control      = Toolkit::Control::DownCast(videoViewHandle);
-  Toolkit::ControlImpl& controlImpl  = GetImplementation(control);
+  Toolkit::VideoView    videoViewHandle = GetVideoView();
+  Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
+  Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
 
-  Any                        source;
+  Any                  source;
   Dali::NativeImagePtr nativeImagePtr = Dali::NativeImage::New(source);
   videoView->SetNativeTexture(Dali::Texture::New(*nativeImagePtr));
 
   if(!videoView->GetTextureVisual())
   {
-    Dali::Texture nativeTexture = videoView->GetNativeTexture();
-    Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(nativeTexture);
+    Dali::Texture           nativeTexture = videoView->GetNativeTexture();
+    Dali::Toolkit::ImageUrl imageUrl      = Dali::Toolkit::ImageUrl::New(nativeTexture);
 
     Property::Map shaderSource = CreateShader();
 
@@ -450,9 +449,9 @@ void NativeImageStrategy::UpdateProperties(const Property::Map& properties)
 
   if(videoView->GetTextureVisual() && !properties.Empty())
   {
-    Toolkit::VideoView videoViewHandle = GetVideoView();
-    Toolkit::Control      control      = Toolkit::Control::DownCast(videoViewHandle);
-    Toolkit::ControlImpl& controlImpl  = GetImplementation(control);
+    Toolkit::VideoView    videoViewHandle = GetVideoView();
+    Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
+    Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
 
     Property::Map visualProperties;
     visualProperties[Toolkit::Visual::Property::TYPE]   = Toolkit::Visual::Type::COLOR;
@@ -511,17 +510,17 @@ Property::Map NativeImageStrategy::CreateShader()
 
     if(!fragmentShaderValue || !checkShader)
     {
-      fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+      fragmentShader              = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
       Dali::Texture nativeTexture = videoView->GetNativeTexture();
       DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShader, 1);
     }
   }
   else
   {
-    vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
-    fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+    vertexShader                = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+    fragmentShader              = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
     Dali::Texture nativeTexture = videoView->GetNativeTexture();
-      DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShader, 1);
+    DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShader, 1);
   }
 
   Property::Map shader;

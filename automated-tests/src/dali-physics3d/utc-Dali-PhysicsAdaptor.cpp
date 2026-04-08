@@ -963,7 +963,7 @@ int UtcDaliPhysics3DAdaptorHitTestP(void)
     body->getWorldTransform().setOrigin(btVector3(0.f, 0.f, 0.f));
 
     ballActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-    ballActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+    ballActor[Actor::Property::PIVOT]  = Pivot::CENTER;
 
     auto physicsActor = adaptor.AddActorBody(ballActor, body);
   }

@@ -290,7 +290,7 @@ Internal::Visual::Base::Impl::Transform::Transform()
   mExtraSize(0.0f, 0.0f),
   mOffsetSizeMode(0.0f, 0.0f, 0.0f, 0.0f),
   mOrigin(Toolkit::Align::TOP_BEGIN),
-  mAnchorPoint(Toolkit::Align::TOP_BEGIN)
+  mPivot(Toolkit::Align::TOP_BEGIN)
 {
 }
 
@@ -302,7 +302,7 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap(const Property::Map
   mExtraSize      = Vector2(0.0f, 0.0f);
   mOffsetSizeMode = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
   mOrigin         = Toolkit::Align::TOP_BEGIN;
-  mAnchorPoint    = Toolkit::Align::TOP_BEGIN;
+  mPivot    = Toolkit::Align::TOP_BEGIN;
 
   UpdatePropertyMap(map);
 }
@@ -329,9 +329,9 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap(const Property::
         Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin);
         break;
       }
-      case Toolkit::Visual::Transform::Property::ANCHOR_POINT:
+      case Toolkit::Visual::Transform::Property::PIVOT:
       {
-        Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint);
+        Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mPivot);
         break;
       }
       case Toolkit::Visual::Transform::Property::OFFSET_POLICY:
@@ -370,7 +370,7 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap(Property::Map& map)
     .Add(Toolkit::Visual::Transform::Property::OFFSET, mOffset)
     .Add(Toolkit::Visual::Transform::Property::SIZE, mSize)
     .Add(Toolkit::Visual::Transform::Property::ORIGIN, mOrigin)
-    .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, mAnchorPoint)
+    .Add(Toolkit::Visual::Transform::Property::PIVOT, mPivot)
     .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(mOffsetSizeMode.x, mOffsetSizeMode.y))
     .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(mOffsetSizeMode.z, mOffsetSizeMode.w))
     .Add(Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, mExtraSize);
@@ -383,8 +383,8 @@ void Internal::Visual::Base::Impl::Transform::SetUniforms(Dali::VisualRenderer r
                        direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, mOffsetSizeMode);
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ORIGIN, PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
-  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT,
-                       Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_PIVOT,
+                       Vector2(0.5, 0.5) - PointToVector2(mPivot, direction));
   renderer.SetProperty(VisualRenderer::Property::EXTRA_SIZE, mExtraSize);
 }
 
@@ -401,7 +401,7 @@ const Property::Map& Internal::Visual::Base::Impl::Transform::GetDefaultTransfor
     {Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO},
     {Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE},
     {Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN},
-    {Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN},
+    {Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::TOP_BEGIN},
     {Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2::ZERO},
     {Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2::ZERO},
     {Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, Vector2::ZERO},

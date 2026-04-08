@@ -1613,7 +1613,7 @@ int UtcDaliImageViewPaddingProperty(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_WIDTH]  = 128;
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT] = 128;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1663,7 +1663,7 @@ int UtcDaliImageViewPaddingProperty02(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1704,7 +1704,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1752,7 +1752,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FILL;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1805,7 +1805,7 @@ int UtcDaliImageViewTransformTest01(void)
            .Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2(8, 8)));
 
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   application.GetScene().Add(imageView);
 
@@ -2827,7 +2827,7 @@ int UtcDaliImageViewLoadRemoteSVG01(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 
@@ -2867,7 +2867,7 @@ int UtcDaliImageViewLoadRemoteSVG02(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 
     application.GetScene().Add(imageView);
@@ -2903,7 +2903,7 @@ int UtcDaliImageViewLoadRemoteLottie(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage("https://lottie.json");
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 

@@ -44,7 +44,7 @@ An actor inherits its parent's position.  The relative position between the acto
 
 The default is "top-left", which can be visualized in 2D as (0, 0), but is actually Vector3(0, 0, 0.5) in the 3D DALi world.  The actor's position is relative to this point.
 
-2) AnchorPoint.  This Vector3 property defines a point within the child actor's area.
+2) Pivot.  This Vector3 property defines a point within the child actor's area.
 
 ![ ](anchor-point.png)
 
@@ -54,9 +54,9 @@ The default is "center", which can be visualized in 2D as (0.5, 0.5), but is act
 
 ![ ](actor-position.png)
 
-The default is (X = 0, Y = 0), so an actor placed directly without modifying the parent origin, anchor point or position would appear centred around the top left corner of its parent.
+The default is (X = 0, Y = 0), so an actor placed directly without modifying the parent origin, pivot or position would appear centred around the top left corner of its parent.
 
-An actor added directly to the stage with position (X = stageWidth*0.5, Y = stageHeight*0.5), would appear in the center of the screen.  Likewise an actor with position (X = actorWidth*0.5, Y = actorWidth*0.5), would appear at the top-left of the screen. However, basic positioning like that is normally done via changing the parent origin and/or anchor point instead - use ParentOrigin::CENTER and AnchorPoint::CENTER to place the actor in the center of the screen, and ParentOrigin::TOP_LEFT and AnchorPoint::TOP_LEFT to place it inside the screen on the top left.
+An actor added directly to the stage with position (X = stageWidth*0.5, Y = stageHeight*0.5), would appear in the center of the screen.  Likewise an actor with position (X = actorWidth*0.5, Y = actorWidth*0.5), would appear at the top-left of the screen. However, basic positioning like that is normally done via changing the parent origin and/or pivot instead - use ParentOrigin::CENTER and Pivot::CENTER to place the actor in the center of the screen, and ParentOrigin::TOP_LEFT and Pivot::TOP_LEFT to place it inside the screen on the top left.
 
 Note that since DALi is a 3D toolkit, this behaviour is the result of a default perspective camera setup.
 

@@ -1192,7 +1192,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
   DALI_TEST_EQUALS(std::get<2>(bridge_extents), 10, TEST_LOCATION);
   DALI_TEST_EQUALS(std::get<3>(bridge_extents), 10, TEST_LOCATION);
 
-  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT, false);
+  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_PIVOT, false);
   application.SendNotification();
   application.Render(1);
 
@@ -1269,7 +1269,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
   DALI_TEST_EQUALS(std::get<2>(bridge_extents), 10, TEST_LOCATION);
   DALI_TEST_EQUALS(std::get<3>(bridge_extents), 10, TEST_LOCATION);
 
-  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT, false);
+  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_PIVOT, false);
   application.SendNotification();
   application.Render(1);
 
@@ -1800,21 +1800,21 @@ int UtcDaliAccessibilityCheckHighlight(void)
   PushButton parentButton = PushButton::New();
   parentButton.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 200.0f));
   application.GetScene().Add(parentButton);
 
   PushButton buttonA = PushButton::New();
   buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   buttonA.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonA);
 
   PushButton buttonB = PushButton::New();
   buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f));
   buttonB.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonB);
@@ -2405,7 +2405,7 @@ private:
     button.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
     button.SetProperty(Actor::Property::VISIBLE, true);
     button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     button.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_0"));
     container.Add(button);
 
@@ -2413,14 +2413,14 @@ private:
     auto text = TextLabel::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, ToDaliString(label));
     text.SetProperty(Actor::Property::VISIBLE, true);
     text.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    text.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    text.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     text.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_1"));
     container.Add(text);
 
     // invisible actor
     auto invisibleActor = MakeInvisibleActor();
     invisibleActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::RIGHT);
-    invisibleActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    invisibleActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     invisibleActor.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_2"));
     container.Add(invisibleActor);
 
@@ -2438,7 +2438,7 @@ public:
     view.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 800.0f)); // full screen
     //view.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
     view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
     for(int i = 0; i < N; ++i)
     {
@@ -2698,7 +2698,7 @@ int UtcDaliWebViewCheckResumeOnAccessibilityMode(void)
   Dali::Accessibility::TestEnableSC(true);
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));

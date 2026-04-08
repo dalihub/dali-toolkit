@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,13 +187,13 @@ enum Type
   ORIGIN,
 
   /**
-   * @brief The anchor-point of the visual
-   * @details Name "anchorPoint", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @brief The pivot of the visual
+   * @details Name "pivot", type Align::Type (Property::INTEGER) or Property::STRING.
    * @see Toolkit::Align
    * @SINCE_1_2.60
    * @note The default is Align::TOP_BEGIN.
    */
-  ANCHOR_POINT,
+  PIVOT,
 
   /**
    * @brief Whether the x or y OFFSET values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).

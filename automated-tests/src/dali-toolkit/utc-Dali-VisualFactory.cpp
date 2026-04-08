@@ -73,7 +73,7 @@ Property::Map DefaultTransform()
     .Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f))
     .Add(Toolkit::Visual::Transform::Property::SIZE, Vector2(1.0f, 1.0f))
     .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER)
-    .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER)
+    .Add(Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::CENTER)
     .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE))
     .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
   return transformMap;
@@ -1352,7 +1352,7 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   transformMap["size"]                    = Vector2(0.5f, 0.5f);
   transformMap["offset"]                  = Vector2(20.0f, 0.0f);
   transformMap["offsetPolicy"]            = Vector2(Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE);
-  transformMap["anchorPoint"]             = Align::CENTER;
+  transformMap["pivot"]             = Align::CENTER;
   transformMap["origin"]                  = Align::CENTER;
   properties[Visual::Property::TRANSFORM] = transformMap;
 

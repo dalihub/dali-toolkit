@@ -214,7 +214,7 @@ int UtcDaliLightAdd01(void)
 {
   ToolkitTestApplication application;
   Scene3D::SceneView     sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -267,7 +267,7 @@ int UtcDaliLightAdd02(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -323,7 +323,7 @@ int UtcDaliLightAdd03(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -388,7 +388,7 @@ int UtcDaliLightAdd04(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -457,7 +457,7 @@ int UtcDaliLightAdd05(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -565,7 +565,7 @@ int UtcDaliLightModelAddAndRemove(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -620,7 +620,7 @@ int UtcDaliLightEnableShadowOnScene01(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -670,7 +670,7 @@ int UtcDaliLightEnableShadowOnScene02(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -725,7 +725,7 @@ int UtcDaliLightEnableShadowOnScene03(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -771,7 +771,7 @@ int UtcDaliLightDisableShadow01(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -829,7 +829,7 @@ int UtcDaliLightDisableShadow02(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -915,7 +915,7 @@ int UtcDaliLightEnableShadowOfNotEnabledLight(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -978,7 +978,7 @@ int UtcDaliLightSetGetProperty(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -1019,7 +1019,7 @@ int UtcDaliLightShadowSoftFiltering(void)
   ToolkitTestApplication application;
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
@@ -1084,7 +1084,7 @@ int UtcDaliLightShadowRenderTask(void)
   uint32_t baseRenderTaskCount = application.GetScene().GetRenderTaskList().GetTaskCount();
 
   Scene3D::SceneView sceneView = Scene3D::SceneView::New();
-  sceneView.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sceneView.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sceneView.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);
   sceneView.SetProperty(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, ResizePolicy::FILL_TO_PARENT);

@@ -2027,7 +2027,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   application.GetScene().Add(label);
 
   // Turn on all the effects
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 10.f));
 
@@ -2091,7 +2091,7 @@ int UtcDaliToolkitTextlabelEllipsisMode(void)
 
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 40.f));
 
@@ -2174,7 +2174,7 @@ int UtcDaliToolkitTextlabelEllipsisMode02(void)
 
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
   label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
@@ -3326,7 +3326,7 @@ int UtcDaliToolkitTextlabelAnchorColor(void)
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Check that anchor color can be properly set
   label.SetProperty(DevelTextLabel::Property::ANCHOR_COLOR, Color::BLUE);
@@ -3377,7 +3377,7 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -3404,7 +3404,7 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
   label.SetProperty(TextLabel::Property::TEXT, "<a color='red' clicked-color='green' href='https://www.tizen.org'>TIZEN</a>");
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -3574,7 +3574,7 @@ int utcDaliTextLabelGeometryRTL(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(150.f, 100.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
@@ -3630,7 +3630,7 @@ int utcDaliTextLabelGeometryGlyphMiddle(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::TEXT, "لا تحتوي على لا");
 
@@ -3675,7 +3675,7 @@ int utcDaliTextLabelGeometryOneGlyph(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
@@ -3733,7 +3733,7 @@ int utcDaliTextLabelGeometryNullPtr(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(TextLabel::Property::TEXT, "");
 
@@ -4105,7 +4105,7 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
   labelNewlineSeparator.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   labelNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   labelNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  labelNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  labelNewlineSeparator.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   labelNewlineSeparator.SetProperty(TextLabel::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
 
   labelParagraphTag.SetProperty(TextLabel::Property::MULTI_LINE, true);
@@ -4113,7 +4113,7 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
   labelParagraphTag.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   labelParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   labelParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  labelParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  labelParagraphTag.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   labelParagraphTag.SetProperty(TextLabel::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
 
   application.SendNotification();
@@ -4143,7 +4143,7 @@ int utcDaliTextLabelGetTextBoundingRectangle(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextLabel::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
 
   // Avoid a crash when core load gl resources.
@@ -4328,7 +4328,7 @@ int utcDaliTextLabelRequestUpdateManually(void)
   label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();

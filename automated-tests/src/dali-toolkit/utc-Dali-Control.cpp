@@ -999,7 +999,7 @@ int UtcDaliControlSetTransformSize(void)
 
   Property::Map transformMap;
   transformMap.Add(Visual::Transform::Property::OFFSET, Vector2(10, 10))
-    .Add(Visual::Transform::Property::ANCHOR_POINT, Align::BOTTOM_END)
+    .Add(Visual::Transform::Property::PIVOT, Align::BOTTOM_END)
     .Add(Visual::Transform::Property::ORIGIN, Align::BOTTOM_END)
     .Add(Visual::Transform::Property::SIZE, Vector2(10, 20));
 
@@ -1022,7 +1022,7 @@ int UtcDaliControlSetTransformSize(void)
   Property::Map* retMap = transformValue->GetMap();
   DALI_TEST_CHECK(retMap);
   DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::OFFSET)->Get<Vector2>(), Vector2(10, 10), TEST_LOCATION);
-  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::ANCHOR_POINT)->Get<int>(), (int)Align::BOTTOM_END, TEST_LOCATION);
+  DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::PIVOT)->Get<int>(), (int)Align::BOTTOM_END, TEST_LOCATION);
   DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::ORIGIN)->Get<int>(), (int)Align::BOTTOM_END, TEST_LOCATION);
   DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2(10, 20), TEST_LOCATION);
 
@@ -1555,7 +1555,7 @@ int UtcDaliControlOffScreenRendering(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   control.SetProperty(DevelControl::Property::BORDERLINE_WIDTH, 10.0f);
   control.SetProperty(DevelControl::Property::BORDERLINE_COLOR, Color::RED);
@@ -1577,7 +1577,7 @@ int UtcDaliControlOffScreenRendering(void)
     {Visual::Property::TRANSFORM,
      Property::Map{{Visual::Transform::Property::SIZE, Vector2(1.05f, 1.05f)},
                    {Visual::Transform::Property::ORIGIN, Align::CENTER},
-                   {Visual::Transform::Property::ANCHOR_POINT, Align::CENTER}}}};
+                   {Visual::Transform::Property::PIVOT, Align::CENTER}}}};
   control.SetProperty(DevelControl::Property::SHADOW, SHADOW);
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
@@ -1716,7 +1716,7 @@ int UtcDaliControlNewWithDisableVisuals(void)
 
   Control control = Control::New(Control::ControlBehaviour::DISABLE_VISUALS);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -1768,7 +1768,7 @@ int UtcDaliControlCornerRadius(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetBackgroundColor(Color::RED);
   tet_infoline("Set background visual");
 
@@ -1812,7 +1812,7 @@ int UtcDaliControlBorderline01(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -2016,7 +2016,7 @@ int UtcDaliControlBorderlineAnimation01(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   float   originWidth  = 50.0f;
   Vector4 originColor  = Color::YELLOW;
@@ -2070,7 +2070,7 @@ int UtcDaliControlBorderlineAnimation02(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -2116,7 +2116,7 @@ int UtcDaliControlBorderlineAnimation03(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -2171,7 +2171,7 @@ int UtcDaliControlBorderlineAnimation04(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -2273,7 +2273,7 @@ int UtcDaliControlBorderlineAnimation05(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(control);
 
@@ -2374,7 +2374,7 @@ int UtcDaliControlCornerRadiusAnimation1(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   tet_printf("Add first visual\n");
   Property::Map background;
@@ -2430,7 +2430,7 @@ int UtcDaliControlCornerRadiusAnimation2(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   tet_printf("Add first visual\n");
   Property::Map background;
@@ -2493,7 +2493,7 @@ int UtcDaliControlCornerRadiusAnimation3(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   tet_printf("Add first visual\n");
   Property::Map background;

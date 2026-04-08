@@ -464,7 +464,7 @@ int UtcDaliWebViewPageNavigation(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -530,7 +530,7 @@ int UtcDaliWebViewPageLoadErrorConsoleMessage(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -578,7 +578,7 @@ int UtcDaliWebViewTouchAndKeys(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -624,7 +624,7 @@ int UtcDaliWebViewFocusGainedAndLost(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -650,7 +650,7 @@ int UtcDaliWebViewPropertyPageZoomFactor(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -677,7 +677,7 @@ int UtcDaliWebViewPropertyTextZoomFactor(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -704,7 +704,7 @@ int UtcDaliWebViewPropertyLoadProgressPercentage(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -726,7 +726,7 @@ int UtcDaliWebViewMove(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -823,7 +823,7 @@ int UtcDaliWebViewHoverAndWheel(void)
 
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -878,7 +878,7 @@ int UtcDaliWebViewFormRepostDecidedFrameRendering(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -912,7 +912,7 @@ int UtcDaliWebViewSslCertificateHttpAuthentication(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -1237,7 +1237,7 @@ int UtcDaliWebViewSetGetScaleFactorActivateAccessibility(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
 
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -1517,7 +1517,7 @@ int UtcDaliWebViewReloadSuspendResumeNetworkLoadingCustomHeader(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));
@@ -2562,7 +2562,7 @@ int UtcDaliWebViewMethodsForCoverage2(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));

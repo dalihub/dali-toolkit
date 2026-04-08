@@ -24,7 +24,7 @@ UNIFORM_BLOCK VisualVertBlock
   UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 pivot;
 };
 
 void main()
@@ -42,7 +42,7 @@ void main()
   highp vec4 gridPosition = vec4(fixedFactor * fixedScaleDownRate + (visualSize - fixedTotal * fixedScaleDownRate) * stretch, 0.0, 1.0);
   highp vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= visualSize * vec2(0.5, 0.5);
-  vertexPosition.xy += anchorPoint * visualSize + visualOffset + origin * uSize.xy;
+  vertexPosition.xy += pivot * visualSize + visualOffset + origin * uSize.xy;
 
   vertexPosition = uMvpMatrix * vertexPosition;
 

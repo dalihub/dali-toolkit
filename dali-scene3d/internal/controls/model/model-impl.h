@@ -337,7 +337,7 @@ private:
   void ScaleModel(bool useCurrentSize);
 
   /**
-   * @brief Changes model anchor point to set the model at center or returns to the original model pivot.
+   * @brief Changes model pivot to set the model at center or returns to the original model pivot.
    */
   void FitModelPosition();
 

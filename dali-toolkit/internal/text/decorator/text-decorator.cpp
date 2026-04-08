@@ -65,7 +65,7 @@ namespace
 {
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE(1.25f, 1.5f, 1.0f);
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE(1.25f, 1.5f, 1.0f);
-const Dali::Vector3 ACTIVE_LAYER_ANCHOR_POINT(0.5f, 0.5f, 0.5f);
+const Dali::Vector3 ACTIVE_LAYER_PIVOT(0.5f, 0.5f, 0.5f);
 
 const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color. TODO: due some problems, maybe with the blending function in the text clipping, the color is fully opaque.
 
@@ -486,7 +486,7 @@ struct Decorator::Impl : public ConnectionTracker
     if(primaryHandle.active || secondaryHandle.active)
     {
       // The origin of the decorator's coordinate system in world coords.
-      const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION) - mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * ACTIVE_LAYER_ANCHOR_POINT;
+      const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION) - mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * ACTIVE_LAYER_PIVOT;
 
       if(preferBelow)
       {
@@ -571,7 +571,7 @@ struct Decorator::Impl : public ConnectionTracker
     // Check first the horizontal dimension. If is not within the boundaries, it calculates the offset.
 
     // The origin of the decorator's coordinate system in world coords.
-    const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION) - mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * ACTIVE_LAYER_ANCHOR_POINT;
+    const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION) - mActiveLayer.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * ACTIVE_LAYER_PIVOT;
 
     // The popup's position in world coords.
     Vector3 popupPositionWorldCoords = originWorldCoords + mCopyPastePopup.position;
@@ -647,7 +647,7 @@ struct Decorator::Impl : public ConnectionTracker
     cursor = Control::New();
     cursor.SetBackgroundColor(color);
     cursor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    cursor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    cursor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     cursor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
   }
 
@@ -798,7 +798,7 @@ struct Decorator::Impl : public ConnectionTracker
       {
         grabHandle.actor = ImageView::New(ToDaliString(mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED]));
         GetImpl(grabHandle.actor).SetDepthIndex(DepthIndex::DECORATION);
-        grabHandle.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+        grabHandle.actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         grabHandle.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
         // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -821,7 +821,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
 
         grabHandle.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
-        grabHandle.grabArea.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+        grabHandle.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         grabHandle.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         grabHandle.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE);
         grabHandle.actor.Add(grabHandle.grabArea);
@@ -860,12 +860,12 @@ struct Decorator::Impl : public ConnectionTracker
 
       if(LEFT_SELECTION_HANDLE == handleType)
       {
-        handle.markerActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+        handle.markerActor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
         handle.markerActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
       }
       else if(RIGHT_SELECTION_HANDLE == handleType)
       {
-        handle.markerActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+        handle.markerActor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
         handle.markerActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
       }
     }
@@ -882,7 +882,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
         primary.actor.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleOne");
 #endif
-        primary.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
+        primary.actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
         primary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(primary.actor).SetDepthIndex(DepthIndex::DECORATION);
         primary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
@@ -893,7 +893,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
         primary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         primary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
-        primary.grabArea.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+        primary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         primary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
         primary.grabArea.TouchedSignal().Connect(this, &Decorator::Impl::OnHandleOneTouched);
@@ -927,7 +927,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
         secondary.actor.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleTwo");
 #endif
-        secondary.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
+        secondary.actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
         secondary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(secondary.actor).SetDepthIndex(DepthIndex::DECORATION);
         secondary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
@@ -938,7 +938,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
         secondary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         secondary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
-        secondary.grabArea.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+        secondary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         secondary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
         secondary.grabArea.TouchedSignal().Connect(this, &Decorator::Impl::OnHandleTwoTouched);
@@ -972,7 +972,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       mCopyPastePopup.actor.SetProperty(Dali::Actor::Property::NAME, "mCopyPastePopup");
 #endif
-      mCopyPastePopup.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      mCopyPastePopup.actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
       mCopyPastePopup.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
       mCopyPastePopup.actor.OnRelayoutSignal().Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
     }
@@ -1078,8 +1078,8 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if(handle.actor && !handle.horizontallyFlipped)
       {
-        // Change the anchor point to flip the image.
-        handle.actor.SetProperty(Actor::Property::ANCHOR_POINT, isPrimaryHandle ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT);
+        // Change the pivot to flip the image.
+        handle.actor.SetProperty(Actor::Property::PIVOT, isPrimaryHandle ? Pivot::TOP_LEFT : Pivot::TOP_RIGHT);
 
         handle.horizontallyFlipped = true;
       }
@@ -1088,8 +1088,8 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if(handle.actor && handle.horizontallyFlipped)
       {
-        // Reset the anchor point.
-        handle.actor.SetProperty(Actor::Property::ANCHOR_POINT, isPrimaryHandle ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT);
+        // Reset the pivot.
+        handle.actor.SetProperty(Actor::Property::PIVOT, isPrimaryHandle ? Pivot::TOP_RIGHT : Pivot::TOP_LEFT);
 
         handle.horizontallyFlipped = false;
       }
@@ -1128,8 +1128,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   float CalculateAdjustedDisplacement(float position, float displacement, float edge)
   {
-    //Apply the displacement (on the X-axis & the Y-axis)
-    //as long as it does not exceed the control's edge.
+    // Apply the displacement (on the X-axis & the Y-axis)
+    // as long as it does not exceed the control's edge.
     float adjustedDisplacement = 0.0f;
     if(position + displacement < 0.0f)
     {
@@ -1198,7 +1198,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       mHighlightActor.SetProperty(Dali::Actor::Property::NAME, "HighlightActor");
       mHighlightActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      mHighlightActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      mHighlightActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mHighlightActor.SetProperty(Actor::Property::COLOR, mHighlightColor);
       mHighlightActor.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_COLOR);
     }
@@ -1779,7 +1779,7 @@ struct Decorator::Impl : public ConnectionTracker
       mCopyPastePopup.actor.RemovePropertyNotification(mPopupBottomExceedNotification);
     }
 
-    // Note Property notifications ignore any set anchor point so conditions must allow for this.  Default is Top Left.
+    // Note Property notifications ignore any set pivot so conditions must allow for this.  Default is Top Left.
 
     // Exceeding vertical boundary
 

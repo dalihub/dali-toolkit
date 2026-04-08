@@ -228,7 +228,7 @@ This is a basic example of a button defined in JSON by setting the default prope
     {
       "type": "ImageView",
       "parentOrigin": "CENTER",
-      "anchorPoint": "CENTER",
+      "pivot": "CENTER",
       "position": [0, 0, 0],
       "image":
       {

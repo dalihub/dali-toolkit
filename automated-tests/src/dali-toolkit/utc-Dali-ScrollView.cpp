@@ -641,7 +641,7 @@ int UtcDaliToolkitScrollModeP1(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers.
@@ -710,7 +710,7 @@ int UtcDaliToolkitScrollModeP2(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers.
@@ -768,7 +768,7 @@ int UtcDaliToolkitScrollModeP3(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers.
@@ -825,7 +825,7 @@ int UtcDaliToolkitScrollModeP4(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers - expect Default rulers to be used which don't snap
@@ -1117,7 +1117,7 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1133,7 +1133,7 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
   Actor image = Actor::New();
   image.SetProperty(Actor::Property::SIZE, stageSize);
   image.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  image.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  image.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollView.Add(image);
 
   Wait(application);
@@ -1179,7 +1179,7 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1199,7 +1199,7 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
   Actor image = Actor::New();
   image.SetProperty(Actor::Property::SIZE, stageSize);
   image.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  image.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  image.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollView.Add(image);
 
   Wait(application);
@@ -1246,7 +1246,7 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1293,7 +1293,7 @@ int UtcDaliToolkitScrollViewAxisAutoLock(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1398,7 +1398,7 @@ int UtcDaliToolkitScrollViewConstraints(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1443,7 +1443,7 @@ int UtcDaliToolkitScrollViewBind(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1504,7 +1504,7 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1636,7 +1636,7 @@ int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1706,7 +1706,7 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1797,7 +1797,7 @@ int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
 
@@ -1883,7 +1883,7 @@ int UtcDaliToolkitScrollViewRemoveScrollingDirectionP(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Vector2  START_POSITION = Vector2(10.0f, 10.0f);
   uint32_t time           = 0;
@@ -2706,7 +2706,7 @@ int UtcDaliToolkitScrollViewConstraintsMove(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -2751,7 +2751,7 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   Vector2 stageSize = application.GetScene().GetSize();
   scrollView.SetProperty(Actor::Property::SIZE, stageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -2772,7 +2772,7 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
 
   Constraint constraint = Constraint::New<Vector3>(scrollView, Actor::Property::POSITION, WrapActorConstraint);
   constraint.AddSource(LocalSource(Actor::Property::SCALE));
-  constraint.AddSource(LocalSource(Actor::Property::ANCHOR_POINT));
+  constraint.AddSource(LocalSource(Actor::Property::PIVOT));
   constraint.AddSource(LocalSource(Actor::Property::SIZE));
   constraint.AddSource(Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN));
   constraint.AddSource(Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX));
@@ -2807,7 +2807,7 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers.
@@ -3029,7 +3029,7 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
   scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
 
   // Position rulers.

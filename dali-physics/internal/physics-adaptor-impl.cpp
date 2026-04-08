@@ -56,7 +56,7 @@ void PhysicsAdaptor::Initialize(const Dali::Matrix& transform, Uint16Pair worldS
   mRootActor[Layer::Property::BEHAVIOR]      = Layer::LAYER_3D;
   mRootActor[Layer::Property::DEPTH_TEST]    = true;
   mRootActor[Actor::Property::SIZE]          = Vector2(worldSize.GetWidth(), worldSize.GetHeight());
-  mRootActor[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
+  mRootActor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
   mRootActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   // Initialize derived adaptor (and world)
