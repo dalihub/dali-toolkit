@@ -76,7 +76,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   auto parentButton = Toolkit::PushButton::New();
   parentButton.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
   application.GetScene().Add(parentButton);
@@ -84,7 +84,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   // Toatally inside of parent
   auto buttonA = Toolkit::PushButton::New();
   buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   buttonA.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonA);
@@ -92,7 +92,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   // Toatally outside of parent
   auto buttonB = Toolkit::PushButton::New();
   buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(300.0f, 300.0f));
   buttonB.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonB);
@@ -100,7 +100,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   // Partially inside of parent
   auto buttonC = Toolkit::PushButton::New();
   buttonC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonC.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonC.SetProperty(Actor::Property::POSITION, Dali::Vector2(100.0f, 100.0f));
   buttonC.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
   parentButton.Add(buttonC);

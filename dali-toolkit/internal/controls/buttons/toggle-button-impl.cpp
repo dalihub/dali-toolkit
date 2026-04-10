@@ -352,7 +352,7 @@ void ToggleButton::RelayoutVisual(Property::Index index, const Vector2& size)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER)
-      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER);
+      .Add(Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::CENTER);
 
     visual.SetTransformAndSize(visualTransform, size);
   }

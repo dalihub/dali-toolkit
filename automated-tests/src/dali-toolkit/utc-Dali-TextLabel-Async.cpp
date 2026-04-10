@@ -3236,7 +3236,7 @@ int UtcDaliToolkitTextLabelAsyncTextEllipsisMode(void)
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 40.f));
 
@@ -3310,7 +3310,7 @@ int UtcDaliToolkitTextLabelAsyncTextEllipsisMode02(void)
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
   label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_DIRECTION, DevelText::AutoScroll::VERTICAL);
@@ -3442,7 +3442,7 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   label.SetProperty(DevelTextLabel::Property::RENDER_SCALE, 1.045f);
   label.SetProperty(TextLabel::Property::PIXEL_SNAP_FACTOR, 1.0f);
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 20);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
   label.SetProperty(Actor::Property::SIZE, Vector2(expectedWidth, expectedHeight));
@@ -3544,7 +3544,7 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScrollTimingIssue(void)
 
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
   label.SetProperty(TextLabel::Property::TEXT, "This is a very long text that should trigger auto scrolling when enabled");
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   label.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.f));
   label.SetProperty(TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE);

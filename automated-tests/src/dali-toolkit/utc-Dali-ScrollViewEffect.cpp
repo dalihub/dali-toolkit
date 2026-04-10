@@ -137,7 +137,7 @@ ScrollView SetupTestScrollView(Dali::Integration::Scene scene, int rows, int col
 
   ScrollView scrollView = ScrollView::New();
   scrollView.SetProperty(Actor::Property::SIZE, size);
-  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   constraint = Constraint::New<Dali::Vector3>(scrollView, Dali::Actor::Property::SIZE, Dali::EqualToConstraint());
@@ -174,7 +174,7 @@ ScrollView SetupTestScrollView(Dali::Integration::Scene scene, int rows, int col
 
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  container.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  container.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   container.SetProperty(Actor::Property::SIZE, size);
   scrollView.Add(container);
 
@@ -193,7 +193,7 @@ ScrollView SetupTestScrollView(Dali::Integration::Scene scene, int rows, int col
       constraint.AddSource(Dali::ParentSource(Dali::Actor::Property::SIZE));
       constraint.Apply();
       page.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      page.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      page.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
       page.SetProperty(Actor::Property::POSITION, Vector2(column * size.x, row * size.y));
       container.Add(page);
 

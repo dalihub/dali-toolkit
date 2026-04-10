@@ -581,21 +581,21 @@ public:
   Vector3 GetItemsParentOrigin() const;
 
   /**
-   * @brief Set the anchor point of the items.
+   * @brief Set the pivot of the items.
    *
-   * A relayout will occur for all the items if the anchor point is different than the current one.
+   * A relayout will occur for all the items if the pivot is different than the current one.
    * @SINCE_1_0.0
-   * @param[in] anchorPoint New anchor point position vector
+   * @param[in] pivot New pivot position vector
    */
-  void SetItemsAnchorPoint(const Vector3& anchorPoint);
+  void SetItemsPivot(const Vector3& pivot);
 
   /**
-   * @brief Get the anchor point of the items.
+   * @brief Get the pivot of the items.
    *
    * @SINCE_1_0.0
-   * @return The current anchor point of the items
+   * @return The current pivot of the items
    */
-  Vector3 GetItemsAnchorPoint() const;
+  Vector3 GetItemsPivot() const;
 
   /**
    * @brief Get the range of items that are currently in ItemView.

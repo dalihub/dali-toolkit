@@ -4604,7 +4604,7 @@ int UtcDaliImageVisualSynchronousSizing01(void)
   Toolkit::ImageView imageView = Toolkit::ImageView::New();
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   imageView.SetProperty(Actor::Property::SIZE, size);
 
   DALI_TEST_EQUALS(imageView.GetRendererCount(), 0u, TEST_LOCATION);

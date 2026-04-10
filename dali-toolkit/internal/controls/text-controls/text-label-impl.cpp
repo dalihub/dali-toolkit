@@ -1693,7 +1693,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
+      .Add(Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::TOP_BEGIN);
     mVisual.SetTransformAndSize(visualTransform, size);
 
     if(mController->IsAutoScrollEnabled())

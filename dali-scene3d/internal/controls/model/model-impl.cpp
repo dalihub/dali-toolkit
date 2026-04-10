@@ -222,7 +222,7 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mModelRoot(),
   mShaderManager(new Scene3D::Loader::ShaderManager()),
   mNaturalSize(Vector3::ZERO),
-  mModelPivot(AnchorPoint::CENTER),
+  mModelPivot(Pivot::CENTER),
   mSceneIblScaleFactor(1.0f),
   mIblScaleFactor(1.0f),
   mSceneSpecularMipmapLevels(1u),
@@ -991,7 +991,7 @@ void Model::FitModelPosition()
   }
   // Loaded model pivot is not the model center.
   mModelRoot.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mModelRoot.SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3::ONE - mModelPivot);
+  mModelRoot.SetProperty(Dali::Actor::Property::PIVOT, Vector3::ONE - mModelPivot);
 }
 
 void Model::UpdateImageBasedLightTexture()
@@ -1142,7 +1142,7 @@ void Model::OnModelLoadComplete()
     }
     UpdateImageBasedLightTexture();
     UpdateImageBasedLightScaleFactor();
-    Self().SetProperty(Dali::Actor::Property::ANCHOR_POINT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
+    Self().SetProperty(Dali::Actor::Property::PIVOT, Vector3(mModelPivot.x, 1.0f - mModelPivot.y, mModelPivot.z));
 
     mModelLoadFailed = false;
   }

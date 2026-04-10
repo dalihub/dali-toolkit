@@ -64,19 +64,19 @@ int UtcRenderingAddOnTestP(void)
   auto imageView = Dali::Toolkit::ImageView::New(TEST_IMAGE_FILE_NAME);
   imageView.SetProperty(Actor::Property::SIZE, Vector2(400.f, 60.f));
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Load npatch image view
   auto imageView2 = Dali::Toolkit::ImageView::New(TEST_IMAGE_FILE_NAME_9);
   imageView2.SetProperty(Actor::Property::SIZE, Vector2(400.f, 60.f));
   imageView2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  imageView2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Load npatch image view
   auto imageView3 = Dali::Toolkit::ImageView::New(TEST_IMAGE_FILE_NAME2_9);
   imageView3.SetProperty(Actor::Property::SIZE, Vector2(400.f, 60.f));
   imageView3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  imageView3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView3.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(imageView);
   application.GetScene().Add(imageView2);

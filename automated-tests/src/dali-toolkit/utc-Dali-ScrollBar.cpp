@@ -525,7 +525,7 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
   DALI_TEST_CHECK(scrollBar);
 
   scrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollBar.SetProperty(Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f));
 
   application.GetScene().Add(scrollBar);
@@ -1683,7 +1683,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   DALI_TEST_CHECK(scrollBar);
 
   scrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollBar.SetProperty(Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f));
 
   // Set the indicator height to be fixed to 50.0f
@@ -1741,7 +1741,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   DALI_TEST_CHECK(scrollBar);
 
   scrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollBar.SetProperty(Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f));
 
   // Set the indicator height to be fixed to 50.0f
@@ -1808,7 +1808,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
   DALI_TEST_CHECK(scrollBar);
 
   scrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollBar.SetProperty(Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f));
 
   application.GetScene().Add(scrollBar);
@@ -1924,7 +1924,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
   DALI_TEST_CHECK(scrollBar);
 
   scrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  scrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  scrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scrollBar.SetProperty(Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f));
 
   application.GetScene().Add(scrollBar);

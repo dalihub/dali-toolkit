@@ -93,7 +93,7 @@ void OffScreenRenderingImpl::OnActivate()
     mCamera = CameraActor::New();
     mCamera.SetInvertYAxis(true);
     mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     mCamera.SetType(Dali::Camera::FREE_LOOK);
   }
   mCamera.SetPerspectiveProjection(GetTargetSize());

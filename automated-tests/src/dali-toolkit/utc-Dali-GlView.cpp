@@ -424,7 +424,7 @@ int UtcDaliGlViewResize(void)
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(glViewInit), Dali::MakeCallback(glViewRenderFrame), Dali::MakeCallback(glViewTerminate));
   view.SetResizeCallback(Dali::MakeCallback(glViewResizeCB));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
   application.SendNotification();

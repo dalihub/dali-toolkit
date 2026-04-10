@@ -1,7 +1,7 @@
 
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ int UtcDaliTextGeometryGetLineBoundingRectangleField(void)
 
   application.GetScene().Add(field);
 
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
@@ -420,7 +420,7 @@ int UtcDaliTextGeometryGetCharacterBoundingRectangleField(void)
 
   application.GetScene().Add(field);
 
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
@@ -620,7 +620,7 @@ int UtcDaliTextGeometryGetCharacterIndexAtPositionTextField(void)
 
   application.GetScene().Add(field);
 
-  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
   field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");

@@ -101,7 +101,7 @@ BaseHandle CreateToast()
 
   // Align to the bottom of the screen.
   popup.SetProperty(Actor::Property::PARENT_ORIGIN, DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN);
-  popup.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  popup.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_CENTER);
 
   // Let events pass through the toast popup.
   popup.SetProperty(Toolkit::Popup::Property::TOUCH_TRANSPARENT, true);
@@ -289,7 +289,7 @@ void Popup::OnInitialize()
 
   // Apply some default resizing rules.
   self.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  self.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  self.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   self.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_POPUP_PARENT_RELATIVE_SIZE);
   self.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
@@ -300,7 +300,7 @@ void Popup::OnInitialize()
   mLayer.SetProperty(Dali::Actor::Property::NAME, "popupLayer");
 
   mLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mLayer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mLayer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mLayer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Important to set as invisible as otherwise, if the popup is parented,
@@ -317,7 +317,7 @@ void Popup::OnInitialize()
   mPopupContainer = Actor::New();
   mPopupContainer.SetProperty(Dali::Actor::Property::NAME, "popupContainer");
   mPopupContainer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mPopupContainer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mPopupContainer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mPopupContainer.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   mLayer.Add(mPopupContainer);
 
@@ -330,7 +330,7 @@ void Popup::OnInitialize()
 
   mPopupLayout.SetProperty(Dali::Actor::Property::NAME, "popupLayoutTable");
   mPopupLayout.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mPopupLayout.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mPopupLayout.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   mPopupLayout.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
   mPopupLayout.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
@@ -609,7 +609,7 @@ void Popup::SetPopupBackgroundImage(Actor image)
   // Adds new background to the dialog.
   mPopupBackgroundImage = image;
   mPopupBackgroundImage.SetProperty(Dali::Actor::Property::NAME, "popupBackgroundImage");
-  mPopupBackgroundImage.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mPopupBackgroundImage.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mPopupBackgroundImage.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // Set the popup border to be slightly larger than the layout contents.
@@ -823,7 +823,7 @@ void Popup::LayoutPopup()
    * For example, if zooming, not only will the final result be anchored to the
    * selected point, but the zoom will originate from this point also.
    *
-   * EG: ParentOrigin::TOP_LEFT, AnchorPoint::TOP_LEFT :
+   * EG: ParentOrigin::TOP_LEFT, Pivot::TOP_LEFT :
    *
    *       --------                --------
    *       |X|                     |XXX|
@@ -833,7 +833,7 @@ void Popup::LayoutPopup()
    *       |                       |
    */
   mPopupContainer.SetProperty(Actor::Property::PARENT_ORIGIN, Self().GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN));
-  mPopupContainer.SetProperty(Actor::Property::ANCHOR_POINT, Self().GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  mPopupContainer.SetProperty(Actor::Property::PIVOT, Self().GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
 
   // If there is only a title, use less padding.
   if(mTitle)
@@ -880,32 +880,32 @@ void Popup::LayoutTail()
   const Vector3& parentOrigin = GetTailPosition();
   Vector3        position;
   std::string    image;
-  Vector3        anchorPoint;
+  Vector3        pivot;
 
   // depending on position of tail around ParentOrigin, a different tail image is used...
   if(parentOrigin.y < Math::MACHINE_EPSILON_1)
   {
-    image       = mTailUpImage;
-    anchorPoint = AnchorPoint::BOTTOM_CENTER;
-    position.y  = mBackgroundBorder.top;
+    image      = mTailUpImage;
+    pivot      = Pivot::BOTTOM_CENTER;
+    position.y = mBackgroundBorder.top;
   }
   else if(parentOrigin.y > (1.0f - Math::MACHINE_EPSILON_1))
   {
-    image       = mTailDownImage;
-    anchorPoint = AnchorPoint::TOP_CENTER;
-    position.y  = -mBackgroundBorder.bottom;
+    image      = mTailDownImage;
+    pivot      = Pivot::TOP_CENTER;
+    position.y = -mBackgroundBorder.bottom;
   }
   else if(parentOrigin.x < Math::MACHINE_EPSILON_1)
   {
-    image       = mTailLeftImage;
-    anchorPoint = AnchorPoint::CENTER_RIGHT;
-    position.x  = mBackgroundBorder.left;
+    image      = mTailLeftImage;
+    pivot      = Pivot::CENTER_RIGHT;
+    position.x = mBackgroundBorder.left;
   }
   else if(parentOrigin.x > (1.0f - Math::MACHINE_EPSILON_1))
   {
-    image       = mTailRightImage;
-    anchorPoint = AnchorPoint::CENTER_LEFT;
-    position.x  = -mBackgroundBorder.right;
+    image      = mTailRightImage;
+    pivot      = Pivot::CENTER_LEFT;
+    position.x = -mBackgroundBorder.right;
   }
 
   if(!image.empty())
@@ -914,7 +914,7 @@ void Popup::LayoutTail()
     mTailImage = Toolkit::ImageView::New(ToDaliString(image));
     mTailImage.SetProperty(Dali::Actor::Property::NAME, "tailImage");
     mTailImage.SetProperty(Actor::Property::PARENT_ORIGIN, parentOrigin);
-    mTailImage.SetProperty(Actor::Property::ANCHOR_POINT, anchorPoint);
+    mTailImage.SetProperty(Actor::Property::PIVOT, pivot);
     mTailImage.SetProperty(Actor::Property::POSITION, position);
 
     if(mPopupBackgroundImage)
@@ -1619,9 +1619,9 @@ void Popup::LayoutContext(const Vector2& size)
   }
 
   mPopupContainer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  // We always anchor to the CENTER, rather than a different anchor point for each contextual
+  // We always anchor to the CENTER, rather than a different pivot for each contextual
   // mode to allow code-reuse of the bound checking code (for maintainability).
-  mPopupContainer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mPopupContainer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   // Setup with some pre-calculations for speed.
   Vector3 halfStageSize(Stage().GetCurrent().GetSize() / 2.0f);

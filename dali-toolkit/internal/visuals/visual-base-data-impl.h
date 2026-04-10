@@ -123,7 +123,7 @@ struct Base::Impl
     Vector2              mExtraSize;
     Vector4              mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
-    Toolkit::Align::Type mAnchorPoint;
+    Toolkit::Align::Type mPivot;
   };
 
   struct ConstraintFeature

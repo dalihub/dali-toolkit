@@ -366,7 +366,7 @@ int UtcDaliSceneViewUserCamera(void)
   DALI_TEST_EQUALS(camera, view.GetSelectedCamera(), TEST_LOCATION);
 
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);
@@ -1251,7 +1251,7 @@ int UtcDaliSceneViewCapture01(void)
   CameraActor camera = Dali::CameraActor::New();
   camera.SetProperty(Dali::Actor::Property::NAME, "camera");
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);
@@ -1323,7 +1323,7 @@ int UtcDaliSceneViewCapture02(void)
   CameraActor camera = Dali::CameraActor::New();
   camera.SetProperty(Dali::Actor::Property::NAME, "camera");
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);
@@ -1385,7 +1385,7 @@ int UtcDaliSceneViewCaptureCancel(void)
   CameraActor camera = Dali::CameraActor::New();
   camera.SetProperty(Dali::Actor::Property::NAME, "camera");
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);
@@ -1444,7 +1444,7 @@ int UtcDaliSceneViewCaptureFailed(void)
   CameraActor camera = Dali::CameraActor::New();
   camera.SetProperty(Dali::Actor::Property::NAME, "camera");
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);
@@ -1496,7 +1496,7 @@ int UtcDaliSceneViewCaptureFailed2(void)
   CameraActor camera = Dali::CameraActor::New();
   camera.SetProperty(Dali::Actor::Property::NAME, "camera");
   camera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  camera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  camera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   camera.SetFieldOfView(0.5f);
   camera.SetNearClippingPlane(1.0f);
   camera.SetFarClippingPlane(5000.0f);

@@ -1395,7 +1395,7 @@ int utcDaliTextEditorAnchorClickedP(void)
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -1614,7 +1614,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
@@ -1827,7 +1827,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>");
@@ -2073,7 +2073,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
@@ -2266,7 +2266,7 @@ int utcDaliTextEditorEvent01(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2305,7 +2305,7 @@ int utcDaliTextEditorEvent01(void)
   TextEditor editor2 = TextEditor::New();
 
   editor2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor2.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   editor2.SetProperty(Actor::Property::POSITION, Vector2(100.f, 100.f));
 
@@ -2351,7 +2351,7 @@ int utcDaliTextEditorEvent02(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2485,7 +2485,7 @@ int utcDaliTextEditorEvent03(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(30.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2585,7 +2585,7 @@ int utcDaliTextEditorEvent04(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2674,7 +2674,7 @@ int utcDaliTextEditorEvent05(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(50.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::SMOOTH_SCROLL, true);
   editor.SetProperty(TextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f);
   editor.SetProperty(TextEditor::Property::ENABLE_SCROLL_BAR, true);
@@ -2756,7 +2756,7 @@ int utcDaliTextEditorEvent06(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -2882,7 +2882,7 @@ int utcDaliTextEditorEvent07(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3090,7 +3090,7 @@ int utcDaliTextEditorEvent08(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3292,7 +3292,7 @@ int utcDaliTextEditorHandles(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(30.f, 500.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3617,7 +3617,7 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(50.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_SCROLL_BAR, true);
   editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
 
@@ -3705,7 +3705,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   DALI_TEST_CHECK(editor);
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(editor);
 
   application.SendNotification();
@@ -3738,7 +3738,7 @@ int UtcDaliTextEditorEnableShiftSelectionProperty(void)
   DALI_TEST_CHECK(editor);
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(editor);
 
   application.SendNotification();
@@ -3766,7 +3766,7 @@ int UtcDaliTextEditorEnableGrabHandleProperty(void)
   DALI_TEST_CHECK(editor);
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(editor);
 
   application.SendNotification();
@@ -3794,7 +3794,7 @@ int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
   DALI_TEST_CHECK(editor);
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(editor);
 
   application.SendNotification();
@@ -3920,7 +3920,7 @@ int UtcDaliTextEditorSelectWholeText(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -3973,7 +3973,7 @@ int UtcDaliTextEditorSelectText(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4032,7 +4032,7 @@ int UtcDaliTextEditorSelectNone(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4112,7 +4112,7 @@ int UtcDaliTextEditorEnableEditing(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4184,7 +4184,7 @@ int UtcDaliTextEditorScrolling(void)
 
   textEditor.SetProperty(TextEditor::Property::TEXT, "Tex1\nTex2\nTex3\nTex4\nTex5\nTex6\nTex7\nTex8");
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(60.0f, 160.0f));
 
   application.SendNotification();
@@ -4256,7 +4256,7 @@ int UtcDaliTextEditorPrimaryCursorPosition(void)
   textEditor.SetProperty(TextEditor::Property::TEXT, "ABCEF");
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4287,7 +4287,7 @@ int UtcDaliTextEditorLineCountAfterGetNaturalSize(void)
   textEditor.SetProperty(TextEditor::Property::TEXT, "A\nB\nC\nD\nE\nF\n");
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(textEditor);
 
   application.SendNotification();
@@ -4728,7 +4728,7 @@ int UtcDaliTextEditorCopyText(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4805,7 +4805,7 @@ int UtcDaliTextEditorCutText(void)
 
   textEditor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
   textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textEditor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -4922,7 +4922,7 @@ int UtcDaliTextEditorPasteText(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5114,7 +5114,7 @@ int utcDaliTextEditorCursorPositionChangedSignal(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5209,7 +5209,7 @@ int utcDaliTextEditorGeometryEllipsisStart(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
@@ -5262,7 +5262,7 @@ int utcDaliTextEditorGeometryEllipsisMiddle(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
@@ -5315,7 +5315,7 @@ int utcDaliTextEditorGeometryEllipsisEnd(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(DevelTextEditor::Property::ENABLE_SCROLL_BAR, false);
   editor.SetProperty(DevelTextEditor::Property::ELLIPSIS, true);
@@ -5368,7 +5368,7 @@ int utcDaliTextEditorGeometryRTL(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
   editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
@@ -5424,7 +5424,7 @@ int utcDaliTextEditorGeometryGlyphMiddle(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(150.f, 200.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "لا تحتوي على لا");
 
@@ -5469,7 +5469,7 @@ int utcDaliTextEditorGeometryOneGlyph(void)
   label.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   label.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   label.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
@@ -5516,7 +5516,7 @@ int utcDaliTextEditorGeometryNullPtr(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "");
 
@@ -5560,7 +5560,7 @@ int utcDaliTextEditorSelectionClearedSignal(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5694,7 +5694,7 @@ int utcDaliTextEditorSelectionStartedSignal(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5757,7 +5757,7 @@ int utcDaliTextEditorSelectionWithSecondaryCursor(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 12.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 50.f);
   editor.SetProperty(DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, false);
 
@@ -5807,7 +5807,7 @@ int utcDaliTextEditorSelectionChangedSignal(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
@@ -5978,7 +5978,7 @@ int utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize(void)
   //Set multilines text
   editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
   editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
@@ -6033,7 +6033,7 @@ int utcDaliTextEditorRemoveCharacterAfterInitWithResizePolicyNaturalSize(void)
   //Set multilines text
   editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
   editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
@@ -6081,7 +6081,7 @@ int utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize(void)
   //Set multilines text
   editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
   editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
@@ -6131,7 +6131,7 @@ int utcDaliTextEditorDoubleEnterAfterInitWithResizePolicyNaturalSize(void)
   //Set multilines text
   editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
   editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
@@ -6528,7 +6528,7 @@ int UtcDaliTextEditorLineSpacingKeyArrowDown(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 200.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::LINE_SPACING, -15);
 
@@ -6601,13 +6601,13 @@ int UtcDaliToolkitTexteditorParagraphTag(void)
   editorNewlineSeparator.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editorNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editorNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editorNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorNewlineSeparator.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editorNewlineSeparator.SetProperty(TextEditor::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
 
   editorParagraphTag.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editorParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editorParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editorParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorParagraphTag.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editorParagraphTag.SetProperty(TextEditor::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
 
   application.SendNotification();
@@ -6710,7 +6710,7 @@ int utcDaliTextEditorPanGesturePropagation(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   TextEditor editor = TextEditor::New();
@@ -6721,7 +6721,7 @@ int utcDaliTextEditorPanGesturePropagation(void)
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(30.f, 500.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   actor.Add(editor);
 
@@ -6787,7 +6787,7 @@ int utcDaliTextEditorGetTextBoundingRectangle(void)
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 7.f);
   editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
 
   // Avoid a crash when core load gl resources.

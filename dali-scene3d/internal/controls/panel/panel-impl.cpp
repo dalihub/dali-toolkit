@@ -315,7 +315,7 @@ void Panel::OnInitialize()
   mPanelNode.SetProperty(Dali::Actor::Property::NAME, "PanelNode");
   mPanelNode.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
   mPanelNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mPanelNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mPanelNode.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   self.Add(mPanelNode);
 
   if(!mGeometry)
@@ -327,7 +327,7 @@ void Panel::OnInitialize()
   mContentPlaneNode.SetProperty(Dali::Actor::Property::NAME, "ContentPlaneNode");
   mContentPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mContentPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mContentPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mContentPlaneNode.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   mPanelNode.Add(mContentPlaneNode);
 
   mContentPlaneMaterial                         = Scene3D::Material::New();
@@ -341,7 +341,7 @@ void Panel::OnInitialize()
   mBackPlaneNode.SetProperty(Dali::Actor::Property::NAME, "BackPlaneNode");
   mBackPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mBackPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mBackPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mBackPlaneNode.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   mBackPlaneNode.SetProperty(Dali::Actor::Property::ORIENTATION, Quaternion(Dali::Radian(Dali::ANGLE_180), Vector3::YAXIS));
   mPanelNode.Add(mBackPlaneNode);
 
@@ -361,7 +361,7 @@ void Panel::OnInitialize()
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::NAME, "DoubleSidedPlaneNode");
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::SIZE, Vector2::ONE);
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   mDoubleSidedPlaneNode.SetProperty(Dali::Actor::Property::ORIENTATION, Quaternion(Dali::Radian(Dali::ANGLE_180), Vector3::YAXIS));
   mPanelNode.Add(mDoubleSidedPlaneNode);
 
@@ -659,7 +659,7 @@ void Panel::UpdateRenderTask()
     mCamera = Dali::CameraActor::New(mPanelResolution);
     mCamera.SetProperty(Dali::Actor::Property::NAME, "PanelCamera");
     mCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    mCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
     mCamera.SetProperty(Dali::Actor::Property::POSITION_X, mPanelResolution.x / 2.0f);
     mCamera.SetProperty(Dali::Actor::Property::POSITION_Y, mPanelResolution.y / 2.0f);
     mRootLayer.Add(mCamera);

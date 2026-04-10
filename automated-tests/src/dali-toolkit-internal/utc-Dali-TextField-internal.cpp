@@ -39,7 +39,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   TextField textField = TextField::New();
   textField.SetProperty(Actor::Property::SIZE, Vector2(400.f, 60.f));
   textField.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  textField.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  textField.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Add the text field to the stage
   application.GetScene().Add(textField);

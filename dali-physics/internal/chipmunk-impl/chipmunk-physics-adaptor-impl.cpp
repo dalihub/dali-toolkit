@@ -83,7 +83,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   debugLayer                                 = Layer::New();
   debugLayer[Actor::Property::NAME]          = "PhysicsDebugLayer";
-  debugLayer[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
+  debugLayer[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
   debugLayer[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   Constraint positionConstraint = Constraint::New<Vector3>(debugLayer, Actor::Property::POSITION, EqualToConstraint());
@@ -100,7 +100,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   mDebugActor = DrawableActor::New(*(debugRenderer->GetCallback().Get()));
   world->SetDebugRenderer(debugRenderer.Release());
 
-  mDebugActor[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
+  mDebugActor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
   mDebugActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   Constraint sizeConstraint2 = Constraint::New<Vector3>(mDebugActor, Actor::Property::SIZE, EqualToConstraint());
@@ -139,7 +139,7 @@ PhysicsActorPtr ChipmunkPhysicsAdaptor::AddActorBody(Dali::Actor actor, Dali::An
 
   mPhysicsActors.insert(std::make_pair(id, PhysicsActor::New(actor, body, *this)));
   actor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
-  actor[Actor::Property::ANCHOR_POINT]  = Dali::AnchorPoint::CENTER;
+  actor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
   mRootActor.Add(actor);
   return mPhysicsActors.at(id);
 }

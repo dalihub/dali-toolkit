@@ -60,7 +60,7 @@ UNIFORM_BLOCK VisualVertBlock
   UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 pivot;
 };
 
 #ifdef IS_REQUIRED_BORDERLINE
@@ -147,7 +147,7 @@ vec4 ComputeVertexPosition()
 #endif
                                                       );
 
-  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+  return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
 
 #ifdef IS_REQUIRED_DEBUG_VISUAL_SHADER

@@ -48,7 +48,7 @@ UNIFORM_BLOCK VisualVertBlock
   UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 pivot;
 };
 
 UNIFORM_BLOCK SharedBlock
@@ -126,7 +126,7 @@ vec4 ComputeVertexPosition()
 #endif
 
 #if defined(IS_REQUIRED_CUTOUT)
-  vPositionFromCenter = vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy;
+  vPositionFromCenter = vPosition + pivot * visualSize + visualOffset + origin * uSize.xy;
 #if defined(IS_REQUIRED_ROUNDED_CORNER)
   // Reuse each parameters for cutout cases
   minSize = min(uSize.x, uSize.y);
@@ -136,7 +136,7 @@ vec4 ComputeVertexPosition()
 #endif
   return vec4(vPositionFromCenter, 0.0, 1.0);
 #else
-  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+  return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 #endif
 }
 

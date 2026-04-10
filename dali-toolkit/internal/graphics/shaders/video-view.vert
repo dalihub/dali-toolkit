@@ -67,8 +67,8 @@ void main()
   // gl_Position = uMvpMatrix * vertexPosition;
   //
   // The new logic from color-visual-shader.vert for final position is:
-  // vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0)
-  // For VideoView, anchorPoint, visualOffset, origin are effectively 0.
+  // vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0)
+  // For VideoView, pivot, visualOffset, origin are effectively 0.
   // So, gl_Position = uMvpMatrix * vec4(vPosition, 0.0, 1.0);
   gl_Position = uMvpMatrix * vec4(vPosition, 0.0, 1.0);
 }

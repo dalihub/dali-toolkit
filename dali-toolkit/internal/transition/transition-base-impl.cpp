@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ namespace
 Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
 {
   Property::Map propertyMap;
-  propertyMap.Insert(Dali::Actor::Property::ANCHOR_POINT, control[Dali::Actor::Property::ANCHOR_POINT]);
+  propertyMap.Insert(Dali::Actor::Property::PIVOT, control[Dali::Actor::Property::PIVOT]);
   propertyMap.Insert(Dali::Actor::Property::PARENT_ORIGIN, control[Dali::Actor::Property::PARENT_ORIGIN]);
-  propertyMap.Insert(Dali::Actor::Property::POSITION_USES_ANCHOR_POINT, control[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT]);
+  propertyMap.Insert(Dali::Actor::Property::POSITION_USES_PIVOT, control[Dali::Actor::Property::POSITION_USES_PIVOT]);
   propertyMap.Insert(Dali::Actor::Property::INHERIT_POSITION, control[Dali::Actor::Property::INHERIT_POSITION]);
   propertyMap.Insert(Dali::Actor::Property::INHERIT_ORIENTATION, control[Dali::Actor::Property::INHERIT_ORIENTATION]);
   propertyMap.Insert(Dali::Actor::Property::INHERIT_SCALE, control[Dali::Actor::Property::INHERIT_SCALE]);
@@ -144,9 +144,9 @@ void TransitionBase::Play()
   targetWorldTransform.GetTransformComponents(targetPosition, targetOrientation, targetScale);
   Vector4 targetColor = DevelActor::GetWorldColor(mTarget);
 
-  mTarget[Dali::Actor::Property::ANCHOR_POINT]               = AnchorPoint::CENTER;
+  mTarget[Dali::Actor::Property::PIVOT]               = Pivot::CENTER;
   mTarget[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
-  mTarget[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
+  mTarget[Dali::Actor::Property::POSITION_USES_PIVOT] = true;
   mTarget[Dali::Actor::Property::INHERIT_POSITION]           = false;
   mTarget[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
   mTarget[Dali::Actor::Property::INHERIT_SCALE]              = false;

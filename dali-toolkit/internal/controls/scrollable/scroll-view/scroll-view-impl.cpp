@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
@@ -31,6 +30,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/object/property-map.h>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
@@ -41,7 +41,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
-//#define ENABLED_SCROLL_STATE_LOGGING
+// #define ENABLED_SCROLL_STATE_LOGGING
 
 #ifdef ENABLED_SCROLL_STATE_LOGGING
 #define DALI_LOG_SCROLL_STATE(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::INFO, "%s:%d " format "\n", __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -152,7 +152,7 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
 Dali::Vector3 GetPositionOfAnchor(Dali::Actor& actor, const Dali::Vector3& anchor)
 {
   Dali::Vector3 childPosition = actor.GetCurrentProperty<Dali::Vector3>(Dali::Actor::Property::POSITION);
-  Dali::Vector3 childAnchor   = -actor.GetCurrentProperty<Dali::Vector3>(Dali::Actor::Property::ANCHOR_POINT) + anchor;
+  Dali::Vector3 childAnchor   = -actor.GetCurrentProperty<Dali::Vector3>(Dali::Actor::Property::PIVOT) + anchor;
   Dali::Vector3 childSize     = actor.GetCurrentProperty<Dali::Vector3>(Dali::Actor::Property::SIZE);
 
   return childPosition + childAnchor * childSize;
@@ -188,7 +188,7 @@ Actor FindClosestActorToPosition(
       continue;
     }
 
-    Vector3 childPosition = GetPositionOfAnchor(child, AnchorPoint::CENTER);
+    Vector3 childPosition = GetPositionOfAnchor(child, Pivot::CENTER);
 
     Vector3 delta = childPosition - actualPosition;
 
@@ -423,7 +423,7 @@ void SnapWithVelocity(
       Vector2 position = scrollView.Self().GetCurrentProperty<Vector2>(Toolkit::ScrollView::Property::SCROLL_POSITION);
 
       // Get center-point of the Actor.
-      Vector3 childPosition = GetPositionOfAnchor(child, AnchorPoint::CENTER);
+      Vector3 childPosition = GetPositionOfAnchor(child, Pivot::CENTER);
 
       if(rulerX->IsEnabled())
       {
@@ -532,11 +532,11 @@ void SnapWithVelocity(
 
 Dali::Vector2 GetPosition(Dali::Actor actor)
 {
-  Vector2 screenPosition          = actor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
-  Vector3 size                    = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
-  bool    positionUsesAnchorPoint = actor.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
-  Vector3 anchorPointOffSet       = size * (positionUsesAnchorPoint ? actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 position                = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
+  Vector2 screenPosition    = actor.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
+  Vector3 size              = actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
+  bool    positionUsesPivot = actor.GetProperty<bool>(Actor::Property::POSITION_USES_PIVOT);
+  Vector3 pivotOffSet       = size * (positionUsesPivot ? actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT) : Pivot::TOP_LEFT);
+  Vector2 position          = Vector2(screenPosition.x - pivotOffSet.x, screenPosition.y - pivotOffSet.y);
 
   return position;
 }
@@ -662,7 +662,7 @@ void ScrollView::OnInitialize()
   self.Add(mInternalActor);
 
   mInternalActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mInternalActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mInternalActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mInternalActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   mAlterChild = true;

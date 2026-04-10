@@ -916,7 +916,7 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
       .Add(Toolkit::Visual::Transform::Property::OFFSET, visualTransformOffset)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN);
+      .Add(Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::TOP_BEGIN);
     SetTransformAndSize(visualTransform, textControlSize);
 
     Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(renderInfo.hasMultipleTextColors).EnableEmoji(renderInfo.containsColorGlyph).EnableStyle(renderInfo.styleEnabled).EnableOverlay(renderInfo.isOverlayStyle).EnableEmboss(renderInfo.embossEnabled));

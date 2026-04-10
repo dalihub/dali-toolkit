@@ -239,7 +239,7 @@ namespace Internal
 {
 namespace // unnamed namespace
 {
-//Type registration
+// Type registration
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ItemView, Toolkit::Scrollable, nullptr)
 
@@ -326,7 +326,7 @@ ItemView::ItemView(ItemFactory& factory)
 : Scrollable(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
-  mItemsAnchorPoint(AnchorPoint::CENTER),
+  mItemsPivot(Pivot::CENTER),
   mTotalPanDisplacement(Vector2::ZERO),
   mActiveLayout(NULL),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
@@ -975,7 +975,7 @@ void ItemView::AddNewActor(unsigned int itemId, const Vector3& layoutSize)
 void ItemView::SetupActor(Item item, const Vector3& layoutSize)
 {
   item.second.SetProperty(Actor::Property::PARENT_ORIGIN, mItemsParentOrigin);
-  item.second.SetProperty(Actor::Property::ANCHOR_POINT, mItemsAnchorPoint);
+  item.second.SetProperty(Actor::Property::PIVOT, mItemsPivot);
 
   if(mActiveLayout)
   {
@@ -1591,7 +1591,7 @@ void ItemView::EnableScrollOvershoot(bool enable)
       mOvershootOverlay                            = CreateBouncingEffectActor(effectOvershootPropertyIndex);
       mOvershootOverlay.SetProperty(Actor::Property::COLOR, mOvershootEffectColor);
       mOvershootOverlay.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      mOvershootOverlay.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      mOvershootOverlay.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mOvershootOverlay.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
       self.Add(mOvershootOverlay);
 
@@ -1710,21 +1710,21 @@ Vector3 ItemView::GetItemsParentOrigin() const
   return mItemsParentOrigin;
 }
 
-void ItemView::SetItemsAnchorPoint(const Vector3& anchorPoint)
+void ItemView::SetItemsPivot(const Vector3& pivot)
 {
-  if(anchorPoint != mItemsAnchorPoint)
+  if(pivot != mItemsPivot)
   {
-    mItemsAnchorPoint = anchorPoint;
+    mItemsPivot = pivot;
     for(ItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
     {
-      iter->second.SetProperty(Actor::Property::ANCHOR_POINT, anchorPoint);
+      iter->second.SetProperty(Actor::Property::PIVOT, pivot);
     }
   }
 }
 
-Vector3 ItemView::GetItemsAnchorPoint() const
+Vector3 ItemView::GetItemsPivot() const
 {
-  return mItemsAnchorPoint;
+  return mItemsPivot;
 }
 
 void ItemView::GetItemsRange(ItemRange& range)
@@ -1852,7 +1852,7 @@ void ItemView::SetLayoutArray(const Property::Array& layouts)
           int layoutType = propertyPair.second.Get<int>();
           if(layoutType <= DefaultItemLayout::SPIRAL && layoutType >= DefaultItemLayout::DEPTH)
           {
-            //DEPTH, GRID, LIST, SPIRAL
+            // DEPTH, GRID, LIST, SPIRAL
             switch(DefaultItemLayout::Type(layoutType))
             {
               case DefaultItemLayout::DEPTH:

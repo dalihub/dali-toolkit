@@ -175,7 +175,7 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
   ToggleButton toggleButton = ToggleButton::New();
   application.GetScene().Add(toggleButton);
   toggleButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  toggleButton.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   { // Check empty array
@@ -256,7 +256,7 @@ int UtcDaliToggleButtonToggleTipsProperty(void)
   ToggleButton toggleButton = ToggleButton::New();
   application.GetScene().Add(toggleButton);
   toggleButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  toggleButton.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   { // Check empty tip array
@@ -314,7 +314,7 @@ int UtcDaliToggleButtonStateChange(void)
   ToggleButton toggleButton = ToggleButton::New();
   application.GetScene().Add(toggleButton);
   toggleButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  toggleButton.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty(Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS);
   toggleButton.SetProperty(Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS);
 

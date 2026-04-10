@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ int UtcDaliScaleTransitionWithOffScene(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty;
   controlProperty.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -162,7 +162,7 @@ int UtcDaliScaleTransitionDisappearing(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::SIZE, Vector3(100, 100, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);
   Property::Map controlProperty;
@@ -226,7 +226,7 @@ int UtcDaliScaleTransitionAppearing(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::SIZE, Vector3(100, 100, 0));
   control.SetProperty(Actor::Property::OPACITY, 1.0f);
   Property::Map controlProperty;

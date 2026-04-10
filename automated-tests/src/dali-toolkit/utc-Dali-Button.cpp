@@ -398,7 +398,7 @@ int UtcDaliButtonAutoRepeatingP(void)
   const float AUTO_REPEATING_DELAY = 0.15f;
 
   Button button = PushButton::New();
-  button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::POSITION, Vector2(240, 400));
   button.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
@@ -619,7 +619,7 @@ int UtcDaliButtonPressedSignalP(void)
   tet_infoline(" UtcDaliButtonPressedSignalP");
 
   Button button = PushButton::New();
-  button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::POSITION, Vector2(240, 400));
   button.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
@@ -726,7 +726,7 @@ int UtcDaliButtonClickedSignalP(void)
   tet_infoline(" UtcDaliButtonClickedSignalP");
 
   Button button = PushButton::New();
-  button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::POSITION, Vector2(240, 400));
   button.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
@@ -879,13 +879,13 @@ int UtcDaliButtonEventConsumption(void)
   ToolkitTestApplication application;
 
   Button parentButton = PushButton::New();
-  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::SIZE, Vector2(20, 20));
   application.GetScene().Add(parentButton);
 
   Button childButton = PushButton::New();
-  childButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   childButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
   childButton.SetProperty(Actor::Property::SIZE, Vector2(20, 20));
   parentButton.Add(childButton);
@@ -933,7 +933,7 @@ int UtcDaliButtonRelease(void)
   ToolkitTestApplication application;
 
   Button parentButton = PushButton::New();
-  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::SIZE, Vector2(20, 20));
   application.GetScene().Add(parentButton);
@@ -978,7 +978,7 @@ int UtcDaliButtonMultiTouch(void)
   Button button = PushButton::New();
   button.SetProperty(Button::Property::TOGGLABLE, true);
 
-  button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::SIZE, Vector2(20, 20));
   application.GetScene().Add(button);

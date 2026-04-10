@@ -786,7 +786,7 @@ int UtcDaliTableViewChildProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(child3.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), AnchorPoint::TOP_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(child3.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), Pivot::TOP_LEFT, TEST_LOCATION);
   DALI_TEST_EQUALS(child3.GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN), ParentOrigin::TOP_LEFT, TEST_LOCATION);
   DALI_TEST_EQUALS(child3.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(2.5f, 5.0f, 0.0f), TEST_LOCATION);
 
