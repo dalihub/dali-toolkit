@@ -22,6 +22,7 @@
 #if defined(__GLIBC__)
 #include <libintl.h>
 #endif
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -627,8 +628,8 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
     option.SetProperty(Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BOTTOM");
 
     // TODO: This is temporarily disabled until the text-selection-popup image API is changed to strings.
-    //option.SetProperty(  Toolkit::Button::Property::SELECTED_VISUAL, button.icon );
-    //option.SetProperty(  Toolkit::Button::Property::UNSELECTED_VISUAL, button.icon );
+    // option.SetProperty(  Toolkit::Button::Property::SELECTED_VISUAL, button.icon );
+    // option.SetProperty(  Toolkit::Button::Property::UNSELECTED_VISUAL, button.icon );
   }
 
   // 3. Set the normal option image (blank / Transparent).
@@ -639,10 +640,10 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   if(mPressedImage.empty())
   {
     // The image can be blank, the color can be used in that case.
-    selectedBackgroundValue = Property::Value{{Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR},
-                                              {Toolkit::ColorVisual::Property::MIX_COLOR, mPressedColor},
-                                              {Toolkit::DevelVisual::Property::CORNER_RADIUS, mPressedCornerRadius},
-                                              {Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE}};
+    selectedBackgroundValue = CreatePropertyValue({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR},
+                                                   {Toolkit::ColorVisual::Property::MIX_COLOR, mPressedColor},
+                                                   {Toolkit::DevelVisual::Property::CORNER_RADIUS, mPressedCornerRadius},
+                                                   {Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE}});
   }
   option.SetProperty(Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, selectedBackgroundValue);
   // The value set by user takes precedence over the theme value.

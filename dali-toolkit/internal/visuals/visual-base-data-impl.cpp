@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
@@ -302,7 +303,7 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap(const Property::Map
   mExtraSize      = Vector2(0.0f, 0.0f);
   mOffsetSizeMode = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
   mOrigin         = Toolkit::Align::TOP_BEGIN;
-  mPivot    = Toolkit::Align::TOP_BEGIN;
+  mPivot          = Toolkit::Align::TOP_BEGIN;
 
   UpdatePropertyMap(map);
 }
@@ -397,7 +398,7 @@ Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize(const Vector2& co
 
 const Property::Map& Internal::Visual::Base::Impl::Transform::GetDefaultTransformMap()
 {
-  static const Property::Map sDefaultTransformMap{
+  static const Property::Map sDefaultTransformMap = Dali::CreatePropertyMap({
     {Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO},
     {Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE},
     {Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN},
@@ -405,7 +406,7 @@ const Property::Map& Internal::Visual::Base::Impl::Transform::GetDefaultTransfor
     {Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2::ZERO},
     {Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2::ZERO},
     {Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, Vector2::ZERO},
-  };
+  });
 
   return sDefaultTransformMap;
 }

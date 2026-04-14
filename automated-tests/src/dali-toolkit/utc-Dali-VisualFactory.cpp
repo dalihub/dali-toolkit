@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
 #include <dali/integration-api/debug.h>
@@ -1352,7 +1353,7 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   transformMap["size"]                    = Vector2(0.5f, 0.5f);
   transformMap["offset"]                  = Vector2(20.0f, 0.0f);
   transformMap["offsetPolicy"]            = Vector2(Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE);
-  transformMap["pivot"]             = Align::CENTER;
+  transformMap["pivot"]                   = Align::CENTER;
   transformMap["origin"]                  = Align::CENTER;
   properties[Visual::Property::TRANSFORM] = transformMap;
 
@@ -1405,9 +1406,8 @@ int UtcDaliNPatchVisualAuxiliaryImage02(void)
   ToolkitTestApplication application;
   tet_infoline("Multiple NPatchVisual with aux image coincidentally");
 
-  const Property::Value NPATCH_TEST{
-    {ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME},
-    {DevelImageVisual::Property::AUXILIARY_IMAGE, TEST_AUX_IMAGE}};
+  const Property::Value NPATCH_TEST = CreatePropertyValue({{ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME},
+                                                           {DevelImageVisual::Property::AUXILIARY_IMAGE, TEST_AUX_IMAGE}});
 
   ImageView imageView1                   = ImageView::New();
   imageView1[ImageView::Property::IMAGE] = NPATCH_TEST;
