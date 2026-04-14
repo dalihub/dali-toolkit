@@ -183,12 +183,12 @@ inline DALI_SCENE3D_API void VisitActor(Actor a, Func fn)
 }
 
 /**
- * @brief Convenience function to set the given actor @a 's anchor point and parent origin to center.
+ * @brief Convenience function to set the given actor @a 's pivot and parent origin to center.
  * @SINCE_2_0.7
  */
 inline DALI_SCENE3D_API void SetActorCentered(Actor a)
 {
-  a.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  a.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   a.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 }
 

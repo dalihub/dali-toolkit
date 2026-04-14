@@ -19,8 +19,6 @@
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
-#include <cstring> // for strcmp
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -32,6 +30,8 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
+#include <algorithm>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
@@ -239,7 +239,7 @@ namespace Internal
 {
 namespace // unnamed namespace
 {
-//Type registration
+// Type registration
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ItemView, Toolkit::Scrollable, nullptr)
 
@@ -270,7 +270,7 @@ DALI_TYPE_REGISTRATION_END()
 
 const ItemIter FindItemById(ItemContainer& items, ItemId id)
 {
-  for(ItemIter iter = items.begin(); items.end() != iter; ++iter)
+  for(ItemIter iter = items.Begin(); items.End() != iter; ++iter)
   {
     if(iter->first == id)
     {
@@ -278,15 +278,15 @@ const ItemIter FindItemById(ItemContainer& items, ItemId id)
     }
   }
 
-  return items.end();
+  return items.End();
 }
 
 void InsertToItemContainer(ItemContainer& items, Item item)
 {
-  if(items.end() == FindItemById(items, item.first))
+  if(items.End() == FindItemById(items, item.first))
   {
-    ItemIter iterToInsert = std::lower_bound(items.begin(), items.end(), item);
-    items.insert(iterToInsert, item);
+    ItemIter iterToInsert = std::lower_bound(items.Begin(), items.End(), item);
+    items.Insert(iterToInsert, item);
   }
 }
 
@@ -326,7 +326,7 @@ ItemView::ItemView(ItemFactory& factory)
 : Scrollable(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
-  mItemsAnchorPoint(AnchorPoint::CENTER),
+  mItemsPivot(Pivot::CENTER),
   mTotalPanDisplacement(Vector2::ZERO),
   mActiveLayout(NULL),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
@@ -436,7 +436,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
   // Move the items to the new layout positions...
 
-  for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     unsigned int itemId = iter->first;
     Actor        actor  = iter->second;
@@ -503,7 +503,7 @@ void ItemView::DeactivateCurrentLayout()
 {
   if(mActiveLayout)
   {
-    for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
     {
       Actor actor = iter->second;
       actor.RemoveConstraints();
@@ -530,11 +530,11 @@ void ItemView::OnRefreshNotification(PropertyNotification& source)
 
 void ItemView::Refresh()
 {
-  for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     ReleaseActor(iter->first, iter->second);
   }
-  mItemPool.clear();
+  mItemPool.Clear();
 
   DoRefresh(GetCurrentLayoutPosition(0), true);
 }
@@ -631,7 +631,7 @@ Actor ItemView::GetItem(unsigned int itemId) const
 {
   Actor actor;
 
-  for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     if(iter->first == itemId)
     {
@@ -647,7 +647,7 @@ unsigned int ItemView::GetItemId(Actor actor) const
 {
   unsigned int itemId(0);
 
-  for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     if(iter->second == actor)
     {
@@ -665,10 +665,10 @@ void ItemView::InsertItem(Item newItem, float durationSeconds)
   Vector3 layoutSize = Self().GetCurrentProperty<Vector3>(Actor::Property::SIZE);
 
   Actor    displacedActor;
-  ItemIter afterDisplacedIter = mItemPool.end();
+  ItemIter afterDisplacedIter = mItemPool.End();
 
   ItemIter foundIter = FindItemById(mItemPool, newItem.first);
-  if(mItemPool.end() != foundIter)
+  if(mItemPool.End() != foundIter)
   {
     SetupActor(newItem, layoutSize);
     Self().Add(newItem.second);
@@ -681,12 +681,12 @@ void ItemView::InsertItem(Item newItem, float durationSeconds)
   else
   {
     // Inserting before the existing item range?
-    ItemIter iter = mItemPool.begin();
-    if(iter != mItemPool.end() &&
+    ItemIter iter = mItemPool.Begin();
+    if(iter != mItemPool.End() &&
        iter->first > newItem.first)
     {
       displacedActor = iter->second;
-      iter           = mItemPool.erase(iter); // iter is still valid after the erase
+      iter           = mItemPool.Erase(iter); // iter is still valid after the erase
 
       afterDisplacedIter = iter;
     }
@@ -695,7 +695,7 @@ void ItemView::InsertItem(Item newItem, float durationSeconds)
   if(displacedActor)
   {
     // Move the existing actors to make room
-    for(ItemIter iter = afterDisplacedIter; mItemPool.end() != iter; ++iter)
+    for(ItemIter iter = afterDisplacedIter; mItemPool.End() != iter; ++iter)
     {
       Actor temp     = iter->second;
       iter->second   = displacedActor;
@@ -706,10 +706,9 @@ void ItemView::InsertItem(Item newItem, float durationSeconds)
     }
 
     // Create last item
-    ItemContainer::reverse_iterator lastIter = mItemPool.rbegin();
-    if(lastIter != mItemPool.rend())
+    if(!mItemPool.Empty())
     {
-      ItemId lastId = lastIter->first;
+      ItemId lastId = mItemPool.Back().first;
       Item   lastItem(lastId + 1, displacedActor);
       InsertToItemContainer(mItemPool, lastItem);
 
@@ -730,20 +729,20 @@ void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
 
   // Insert from lowest id to highest
   ItemContainer sortedItems(newItems);
-  std::sort(sortedItems.begin(), sortedItems.end());
+  std::sort(sortedItems.Begin(), sortedItems.End());
 
-  for(ItemIter iter = sortedItems.begin(); sortedItems.end() != iter; ++iter)
+  for(ItemIter iter = sortedItems.Begin(); sortedItems.End() != iter; ++iter)
   {
     Self().Add(iter->second);
 
     ItemIter foundIter = FindItemById(mItemPool, iter->first);
-    if(mItemPool.end() != foundIter)
+    if(mItemPool.End() != foundIter)
     {
       Actor moveMe      = foundIter->second;
       foundIter->second = iter->second;
 
       // Move the existing actors to make room
-      for(ItemIter iter = ++foundIter; mItemPool.end() != iter; ++iter)
+      for(ItemIter iter = ++foundIter; mItemPool.End() != iter; ++iter)
       {
         Actor temp   = iter->second;
         iter->second = moveMe;
@@ -751,9 +750,12 @@ void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
       }
 
       // Create last item
-      ItemId lastId = mItemPool.rbegin()->first;
-      Item   lastItem(lastId + 1, moveMe);
-      InsertToItemContainer(mItemPool, lastItem);
+      if(!mItemPool.Empty())
+      {
+        ItemId lastId = mItemPool.Back().first;
+        Item   lastItem(lastId + 1, moveMe);
+        InsertToItemContainer(mItemPool, lastItem);
+      }
     }
     else
     {
@@ -762,10 +764,10 @@ void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
   }
 
   // Relayout everything
-  for(ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     // If newly inserted
-    if(std::binary_search(sortedItems.begin(), sortedItems.end(), *iter))
+    if(std::binary_search(sortedItems.Begin(), sortedItems.End(), *iter))
     {
       SetupActor(*iter, layoutSize);
     }
@@ -798,10 +800,11 @@ void ItemView::RemoveItems(const ItemIdContainer& itemIds, float durationSeconds
 
   // Remove from highest id to lowest
   ItemIdContainer sortedItems(itemIds);
-  std::sort(sortedItems.begin(), sortedItems.end());
+  std::sort(sortedItems.Begin(), sortedItems.End());
 
-  for(ItemIdContainer::reverse_iterator iter = sortedItems.rbegin(); sortedItems.rend() != iter; ++iter)
+  for(ItemIdIter iter = sortedItems.End(); sortedItems.Begin() != iter;)
   {
+    --iter;
     if(RemoveActor(*iter))
     {
       actorsReordered = true;
@@ -821,25 +824,25 @@ bool ItemView::RemoveActor(unsigned int itemId)
   bool reordered(false);
 
   ItemIter removeIter = FindItemById(mItemPool, itemId);
-  if(removeIter != mItemPool.end())
+  if(removeIter != mItemPool.End())
   {
     ReleaseActor(itemId, removeIter->second);
   }
   else
   {
     // Removing before the existing item range?
-    ItemIter iter = mItemPool.begin();
-    if(iter != mItemPool.end() &&
+    ItemIter iter = mItemPool.Begin();
+    if(iter != mItemPool.End() &&
        iter->first > itemId)
     {
       // In order to decrement the first visible item ID
       InsertToItemContainer(mItemPool, Item(iter->first - 1, Actor()));
 
-      removeIter = mItemPool.begin();
+      removeIter = mItemPool.Begin();
     }
   }
 
-  if(removeIter != mItemPool.end())
+  if(removeIter != mItemPool.End())
   {
     reordered = true;
 
@@ -849,16 +852,20 @@ bool ItemView::RemoveActor(unsigned int itemId)
     //     ID 2 - ActorB       ID 2 - ActorC (previously ID 3)
     //     ID 3 - ActorC       ID 3 - ActorB (previously ID 4)
     //     ID 4 - ActorD
-    for(ItemIter iter = removeIter; iter != mItemPool.end(); ++iter)
+    if(!mItemPool.Empty())
     {
-      if(iter->first < mItemPool.rbegin()->first)
+      const ItemId lastItemId = mItemPool.Back().first;
+      for(ItemIter iter = removeIter; iter != mItemPool.End(); ++iter)
       {
-        iter->second = (iter + 1)->second;
-      }
-      else
-      {
-        mItemPool.erase(iter);
-        break;
+        if(iter->first < lastItemId)
+        {
+          iter->second = (iter + 1)->second;
+        }
+        else
+        {
+          mItemPool.Erase(iter);
+          break;
+        }
       }
     }
   }
@@ -875,7 +882,7 @@ void ItemView::ReplaceItem(Item replacementItem, float durationSeconds)
   Self().Add(replacementItem.second);
 
   const ItemIter iter = FindItemById(mItemPool, replacementItem.first);
-  if(mItemPool.end() != iter)
+  if(mItemPool.End() != iter)
   {
     ReleaseActor(iter->first, iter->second);
     iter->second = replacementItem.second;
@@ -892,7 +899,7 @@ void ItemView::ReplaceItem(Item replacementItem, float durationSeconds)
 
 void ItemView::ReplaceItems(const ItemContainer& replacementItems, float durationSeconds)
 {
-  for(ConstItemIter iter = replacementItems.begin(); replacementItems.end() != iter; ++iter)
+  for(ConstItemIter iter = replacementItems.Begin(); replacementItems.End() != iter; ++iter)
   {
     ReplaceItem(*iter, durationSeconds);
   }
@@ -901,7 +908,7 @@ void ItemView::ReplaceItems(const ItemContainer& replacementItems, float duratio
 void ItemView::RemoveActorsOutsideRange(ItemRange range)
 {
   // Remove unwanted actors from the ItemView & ItemPool
-  for(ItemIter iter = mItemPool.begin(); iter != mItemPool.end();)
+  for(ItemIter iter = mItemPool.Begin(); iter != mItemPool.End();)
   {
     unsigned int current = iter->first;
 
@@ -909,7 +916,7 @@ void ItemView::RemoveActorsOutsideRange(ItemRange range)
     {
       ReleaseActor(iter->first, iter->second);
 
-      iter = mItemPool.erase(iter); // iter is still valid after the erase
+      iter = mItemPool.Erase(iter); // iter is still valid after the erase
     }
     else
     {
@@ -947,7 +954,7 @@ void ItemView::AddNewActor(unsigned int itemId, const Vector3& layoutSize)
 {
   mAddingItems = true;
 
-  if(mItemPool.end() == FindItemById(mItemPool, itemId))
+  if(mItemPool.End() == FindItemById(mItemPool, itemId))
   {
     Actor actor = mItemFactory.NewItem(itemId);
 
@@ -968,7 +975,7 @@ void ItemView::AddNewActor(unsigned int itemId, const Vector3& layoutSize)
 void ItemView::SetupActor(Item item, const Vector3& layoutSize)
 {
   item.second.SetProperty(Actor::Property::PARENT_ORIGIN, mItemsParentOrigin);
-  item.second.SetProperty(Actor::Property::ANCHOR_POINT, mItemsAnchorPoint);
+  item.second.SetProperty(Actor::Property::PIVOT, mItemsPivot);
 
   if(mActiveLayout)
   {
@@ -1079,7 +1086,7 @@ void ItemView::ReapplyAllConstraints()
 {
   Vector3 layoutSize = Self().GetCurrentProperty<Vector3>(Actor::Property::SIZE);
 
-  for(ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for(ConstItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
   {
     unsigned int id    = iter->first;
     Actor        actor = iter->second;
@@ -1584,7 +1591,7 @@ void ItemView::EnableScrollOvershoot(bool enable)
       mOvershootOverlay                            = CreateBouncingEffectActor(effectOvershootPropertyIndex);
       mOvershootOverlay.SetProperty(Actor::Property::COLOR, mOvershootEffectColor);
       mOvershootOverlay.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      mOvershootOverlay.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      mOvershootOverlay.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mOvershootOverlay.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
       self.Add(mOvershootOverlay);
 
@@ -1691,7 +1698,7 @@ void ItemView::SetItemsParentOrigin(const Vector3& parentOrigin)
   if(parentOrigin != mItemsParentOrigin)
   {
     mItemsParentOrigin = parentOrigin;
-    for(ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    for(ItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
     {
       iter->second.SetProperty(Actor::Property::PARENT_ORIGIN, parentOrigin);
     }
@@ -1703,29 +1710,29 @@ Vector3 ItemView::GetItemsParentOrigin() const
   return mItemsParentOrigin;
 }
 
-void ItemView::SetItemsAnchorPoint(const Vector3& anchorPoint)
+void ItemView::SetItemsPivot(const Vector3& pivot)
 {
-  if(anchorPoint != mItemsAnchorPoint)
+  if(pivot != mItemsPivot)
   {
-    mItemsAnchorPoint = anchorPoint;
-    for(ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    mItemsPivot = pivot;
+    for(ItemIter iter = mItemPool.Begin(); iter != mItemPool.End(); ++iter)
     {
-      iter->second.SetProperty(Actor::Property::ANCHOR_POINT, anchorPoint);
+      iter->second.SetProperty(Actor::Property::PIVOT, pivot);
     }
   }
 }
 
-Vector3 ItemView::GetItemsAnchorPoint() const
+Vector3 ItemView::GetItemsPivot() const
 {
-  return mItemsAnchorPoint;
+  return mItemsPivot;
 }
 
 void ItemView::GetItemsRange(ItemRange& range)
 {
-  if(!mItemPool.empty())
+  if(!mItemPool.Empty())
   {
-    range.begin = mItemPool.begin()->first;
-    range.end   = mItemPool.rbegin()->first + 1;
+    range.begin = mItemPool.Front().first;
+    range.end   = mItemPool.Back().first + 1;
   }
   else
   {
@@ -1845,7 +1852,7 @@ void ItemView::SetLayoutArray(const Property::Array& layouts)
           int layoutType = propertyPair.second.Get<int>();
           if(layoutType <= DefaultItemLayout::SPIRAL && layoutType >= DefaultItemLayout::DEPTH)
           {
-            //DEPTH, GRID, LIST, SPIRAL
+            // DEPTH, GRID, LIST, SPIRAL
             switch(DefaultItemLayout::Type(layoutType))
             {
               case DefaultItemLayout::DEPTH:

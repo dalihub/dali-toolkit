@@ -155,7 +155,7 @@ int UtcDaliItemViewNew(void)
 
   DALI_TEST_CHECK(view);
 
-  //Additional check to ensure object is created by checking if it's registered
+  // Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK(registry);
 
@@ -776,10 +776,10 @@ int UtcDaliItemViewInsertItemsP(void)
     Actor child    = view.GetChildAt(i);
     Actor newActor = Actor::New();
     newActor.SetProperty(Dali::Actor::Property::NAME, "Inserted");
-    insertList.push_back(Item(view.GetItemId(child), newActor));
+    insertList.PushBack(Item(view.GetItemId(child), newActor));
   }
 
-  if(!insertList.empty())
+  if(!insertList.Empty())
   {
     view.InsertItems(insertList, 0.5f);
   }
@@ -798,11 +798,11 @@ int UtcDaliItemViewInsertItemsP(void)
 
     if(child.GetProperty<Dali::String>(Dali::Actor::Property::NAME) == "Inserted")
     {
-      removeList.push_back(view.GetItemId(child));
+      removeList.PushBack(view.GetItemId(child));
     }
   }
 
-  if(!removeList.empty())
+  if(!removeList.Empty())
   {
     view.RemoveItems(removeList, 0.5f);
   }
@@ -866,10 +866,10 @@ int UtcDaliItemViewReplaceItemsP(void)
     Actor newActor = Actor::New();
     newActor.SetProperty(Dali::Actor::Property::NAME, "Replaced");
 
-    replaceList.push_back(Item(i, newActor));
+    replaceList.PushBack(Item(i, newActor));
   }
 
-  if(!replaceList.empty())
+  if(!replaceList.Empty())
   {
     view.ReplaceItems(replaceList, 0.5f);
   }
@@ -904,7 +904,7 @@ int UtcDaliItemViewGetItemsRangeP(void)
   END_TEST;
 }
 
-int UtcDaliItemViewSetItemsAnchorPointP(void)
+int UtcDaliItemViewSetItemsPivotP(void)
 {
   ToolkitTestApplication application;
 
@@ -921,12 +921,12 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
-  Vector3 anchorPoint(10.0f, 10.0f, 0.0f);
+  Vector3 pivot(10.0f, 10.0f, 0.0f);
 
-  view.SetItemsAnchorPoint(anchorPoint);
+  view.SetItemsPivot(pivot);
 
-  DALI_TEST_CHECK(view.GetItemsAnchorPoint() == anchorPoint);
-  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) == anchorPoint);
+  DALI_TEST_CHECK(view.GetItemsPivot() == pivot);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty<Vector3>(Actor::Property::PIVOT) == pivot);
   END_TEST;
 }
 
@@ -1072,7 +1072,7 @@ int UtcDaliItemViewSetGetProperty(void)
   Property::Array getLayoutArray;
   DALI_TEST_CHECK(view.GetProperty(ItemView::Property::LAYOUT).Get(getLayoutArray));
 
-  //Check that the result is the same as
+  // Check that the result is the same as
   DALI_TEST_EQUALS(layoutArray.Count(), getLayoutArray.Count(), TEST_LOCATION);
   Property::Map firstLayout = *((getLayoutArray.GetElementAt(0)).GetMap());
 
@@ -1301,7 +1301,7 @@ int UtcDaliItemEnableDisableRefresh(void)
   Vector3 stageSize(stage.GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
-  //Connect to signal scroll updated
+  // Connect to signal scroll updated
   view.ScrollUpdatedSignal().Connect(&OnScrollUpdate);
 
   Property::Map attributes;
@@ -1341,7 +1341,7 @@ int UtcDaliItemViewWheelEvent(void)
   Vector3 stageSize(stage.GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
-  //Connect to wheel event signal
+  // Connect to wheel event signal
   view.WheelEventSignal().Connect(&OnWheelEvent);
 
   DALI_TEST_CHECK(!gOnWheelEventCalled);

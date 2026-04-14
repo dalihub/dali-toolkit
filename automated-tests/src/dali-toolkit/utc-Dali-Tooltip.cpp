@@ -485,7 +485,7 @@ int UtcDaliTooltipDisplay(void)
 
   Control control = Control::New();
   control.SetProperty(DevelControl::Property::TOOLTIP, "Test");
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
 
@@ -520,7 +520,7 @@ int UtcDaliTooltipDisplayWithTail(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -555,7 +555,7 @@ int UtcDaliTooltipDisplayWithContentArray(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -593,7 +593,7 @@ int UtcDaliTooltipDisplayBelow(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -627,7 +627,7 @@ int UtcDaliTooltipDisplayAbove(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -661,7 +661,7 @@ int UtcDaliTooltipDisplayAtHoverPoint(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -699,7 +699,7 @@ int UtcDaliTooltipExceedThreshold(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -746,7 +746,7 @@ int UtcDaliTooltipGoOutOfBounds(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP, "Test");
@@ -792,7 +792,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
 
   Control control = Control::New();
   control.SetProperty(DevelControl::Property::TOOLTIP, "Test");
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
 
@@ -835,7 +835,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -881,7 +881,7 @@ int UtcDaliTooltipChangeContent(void)
 
   Control control = Control::New();
   control.SetProperty(DevelControl::Property::TOOLTIP, "Test");
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   control.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
 
@@ -968,7 +968,7 @@ int UtcDaliTooltipEnsureRemainsOnStage1(void)
 
   tet_infoline("Create a control and place it at the bottom of the screen, setting the tooltip to appear below");
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::SIZE, stageSize);
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -1004,7 +1004,7 @@ int UtcDaliTooltipEnsureRemainsOnStage2(void)
 
   tet_infoline("Create a control and place it at the top of the screen, setting the tooltip to appear above");
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
   control.SetProperty(Actor::Property::SIZE, stageSize);
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -1041,7 +1041,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
 
   tet_infoline("Create a control and adjust it's position so that the tooltip will attempt to appear to the left of the screen");
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::SIZE, stageSize);
   control.SetProperty(DevelControl::Property::TOOLTIP,
@@ -1080,7 +1080,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
 
   tet_infoline("Create a control and adjust it's position so that the tooltip will attempt to appear to the right of the screen");
   Control control = Control::New();
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER);
   control.SetProperty(Actor::Property::SIZE, stageSize);
   control.SetProperty(DevelControl::Property::TOOLTIP,

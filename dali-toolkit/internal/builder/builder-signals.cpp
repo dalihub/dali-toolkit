@@ -17,9 +17,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-notification.h>
 
 #include <dali/integration-api/debug.h>
@@ -403,6 +403,23 @@ void GetParameters(const TreeNode& child, Property::Map& params)
   }
 }
 
+// Shim for the actor signal
+template<typename T>
+struct ActorSignalShim
+{
+  T mFunctor;
+
+  ActorSignalShim(T& functor)
+  : mFunctor(functor)
+  {
+  }
+
+  void operator()(void)
+  {
+    mFunctor();
+  }
+};
+
 // Shim for the property notifcation signal
 template<typename T>
 struct PropertyNotifcationSignalShim
@@ -444,7 +461,7 @@ struct SignalConnector<Actor>
   template<typename T>
   void Connect(T& functor)
   {
-    mActor.ConnectSignal(mTracker, ToDaliStringView(mName), functor);
+    mActor.ConnectSignal(mTracker, ToDaliStringView(mName), ActorSignalShim(functor));
   }
 };
 

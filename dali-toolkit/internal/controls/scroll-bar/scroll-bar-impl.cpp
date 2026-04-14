@@ -248,7 +248,7 @@ void ScrollBar::CreateDefaultIndicatorActor()
   const std::string  imageDirPath = AssetManager::GetDaliImagePath();
   Toolkit::ImageView indicator    = Toolkit::ImageView::New(ToDaliString(imageDirPath + DEFAULT_INDICATOR_IMAGE_FILE_NAME));
   indicator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  indicator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  indicator.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   indicator.SetStyleName("ScrollBarIndicator");
   indicator.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR);
   SetScrollIndicator(indicator);

@@ -29,14 +29,14 @@ UNIFORM_BLOCK VisualVertBlock
   UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 pivot;
 };
 
 vec2 ComputeVertexPosition()
 {
   vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize + vec2(0.75, 0.75);
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
-  return (aPosition + anchorPoint)*visualSize + visualOffset + origin * uSize.xy;
+  return (aPosition + pivot)*visualSize + visualOffset + origin * uSize.xy;
 }
 
 void main()

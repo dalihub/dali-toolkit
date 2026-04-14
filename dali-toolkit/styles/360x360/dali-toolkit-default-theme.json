@@ -222,7 +222,7 @@
     },
     "PushButton":
     {
-      "anchorPoint": [ 0.5, 1.0, 0.5 ],
+      "pivot": [ 0.5, 1.0, 0.5 ],
       "parentOrigin": [ 0.5, 1.0, 0,5 ],
       "label":
        {

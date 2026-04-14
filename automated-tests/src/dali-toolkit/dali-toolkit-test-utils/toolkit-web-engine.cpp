@@ -15,8 +15,7 @@
  *
  */
 
-#include "toolkit-timer.h"
-
+#include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
@@ -45,8 +44,11 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <string.h>
-#include <toolkit-application.h>
 #include <memory>
+
+#include <toolkit-test-application.h>
+#include <toolkit-timer.h>
+#include <toolkit-web-engine.h>
 
 using Dali::Integration::ToDaliString;
 
@@ -68,6 +70,9 @@ WebEngine*                  gInstance                   = nullptr;
 int                         gInstanceCount              = 0;
 MockWebEngineContext*       gWebEngineContextInstance   = nullptr;
 MockWebEngineCookieManager* gMockWebEngineCookieManager = nullptr;
+
+Dali::Accessibility::ActorAccessible* gWebAccessible = nullptr;
+Dali::Accessibility::Address          gWebAccessibleActivatedAddress{};
 
 bool OnGoBack();
 bool OnGoForward();
@@ -103,6 +108,16 @@ static void DisconnectFromGlobalSignal(bool (*func)())
   timer.TickSignal().Disconnect(func);
 }
 } // namespace
+
+inline void SetTestWebViewAccessible(Dali::Accessibility::ActorAccessible* webAccessible)
+{
+  gWebAccessible = webAccessible;
+}
+
+inline void SetTestWebAccessibleActivatedAddress(Dali::Accessibility::Address address)
+{
+  gWebAccessibleActivatedAddress = address;
+}
 
 class MockWebEngineContext : public Dali::WebEngineContext
 {
@@ -346,7 +361,7 @@ private:
   float                              mockZoomFactor;
 };
 
-Dali::WebEngineContext* GetContext()
+Dali::WebEngineContext* GetContext(bool isIncognito)
 {
   if(!gWebEngineContextInstance)
   {
@@ -397,7 +412,7 @@ private:
   Dali::WebEngineCookieManager::CookieAcceptPolicy mockCookieAcceptPolicy;
 };
 
-Dali::WebEngineCookieManager* GetCookieManager()
+Dali::WebEngineCookieManager* GetCookieManager(bool isIncognito)
 {
   if(!gMockWebEngineCookieManager)
   {
@@ -1217,6 +1232,10 @@ public:
   {
     return nullptr;
   }
+  bool IsIncognito() const override
+  {
+    return false;
+  }
   void ChangeOrientation(int orientation) override
   {
   }
@@ -1376,11 +1395,11 @@ public:
   {
     return std::string();
   }
-  bool SendTouchEvent(const TouchEvent& touch) override
+  bool SendTouchEvent(const Dali::TouchEvent& touch) override
   {
     return false;
   }
-  bool SendKeyEvent(const KeyEvent& event) override
+  bool SendKeyEvent(const Dali::KeyEvent& event) override
   {
     return false;
   }
@@ -1457,11 +1476,11 @@ public:
   void EnableVideoHole(bool enabled) override
   {
   }
-  bool SendHoverEvent(const HoverEvent& event) override
+  bool SendHoverEvent(const Dali::HoverEvent& event) override
   {
     return false;
   }
-  bool SendWheelEvent(const WheelEvent& event) override
+  bool SendWheelEvent(const Dali::WheelEvent& event) override
   {
     return false;
   }
@@ -1755,6 +1774,11 @@ public:
     mUrl = url;
     SetAccessibilityAddress();
     ConnectToGlobalSignal(&OnLoadUrl);
+
+    if(gWebAccessible)
+    {
+      gWebAccessible->OnChildrenChanged();
+    }
   }
 
   std::string GetUrl() const
@@ -1961,7 +1985,7 @@ public:
 
   void SetAccessibilityAddress()
   {
-    mAccessibilityAddress = {":9.99", "root"};
+    mAccessibilityAddress = gWebAccessibleActivatedAddress;
   }
 
   Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
@@ -2642,14 +2666,14 @@ WebEngine WebEngine::New(int32_t type)
   return WebEngine(baseObject);
 }
 
-Dali::WebEngineContext* WebEngine::GetContext()
+Dali::WebEngineContext* WebEngine::GetContext(bool isIncognito)
 {
-  return Internal::Adaptor::GetContext();
+  return Internal::Adaptor::GetContext(isIncognito);
 }
 
-Dali::WebEngineCookieManager* WebEngine::GetCookieManager()
+Dali::WebEngineCookieManager* WebEngine::GetCookieManager(bool isIncognito)
 {
-  return Internal::Adaptor::GetCookieManager();
+  return Internal::Adaptor::GetCookieManager(isIncognito);
 }
 
 WebEngine::WebEngine(const WebEngine& WebEngine)
@@ -2720,6 +2744,11 @@ NativeImagePtr WebEngine::GetNativeImage()
   Any                  source;
   Dali::NativeImagePtr sourcePtr = Dali::NativeImage::New(source);
   return sourcePtr;
+}
+
+bool WebEngine::IsIncognito() const
+{
+  return false;
 }
 
 void WebEngine::ChangeOrientation(int orientation)
@@ -3231,3 +3260,15 @@ void WebEngine::SetVideoHole(bool enabled, bool isWaylandWindow)
 }
 
 } // namespace Dali
+
+namespace Test::WebEngine
+{
+void SetWebViewAccessible(Dali::Accessibility::Accessible* webAccessible)
+{
+  Dali::Internal::Adaptor::SetTestWebViewAccessible(dynamic_cast<Dali::Accessibility::ActorAccessible*>(webAccessible));
+}
+void SetWebAccessibleActivatedAddress(Dali::Accessibility::Address address)
+{
+  Dali::Internal::Adaptor::SetTestWebAccessibleActivatedAddress(address);
+}
+} // namespace Test::WebEngine

@@ -38,7 +38,7 @@ Consider the following use cases as an example of when and when not to use a con
   </tr>
   <tr>
     <td>Need an actor to appear centered around the bottom-right corner of it's parent.</td>
-    <td>Use ParentOrigin & AnchorPoint.</td>
+    <td>Use ParentOrigin & Pivot.</td>
   </tr>
   <tr>
     <td>Need to lay out a series of controls with various alignment requirements.</td>

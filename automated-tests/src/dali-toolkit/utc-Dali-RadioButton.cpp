@@ -224,7 +224,7 @@ int UtcDaliRadioButtonSelectedProperty(void)
   RadioButton radioButton = RadioButton::New();
   application.GetScene().Add(radioButton);
   radioButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  radioButton.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  radioButton.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   radioButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   // Default selected
@@ -245,18 +245,18 @@ int UtcDaliRadioButtonSelectedProperty(void)
   // Test selecting radio buttons
   RadioButton radioButton2 = RadioButton::New("label");
   radioButton2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  radioButton2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  radioButton2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   radioButton2.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   RadioButton radioButton3 = RadioButton::New("label");
   radioButton3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  radioButton3.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  radioButton3.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   radioButton3.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 40.0f));
 
   Actor radioGroup = Actor::New();
   application.GetScene().Add(radioGroup);
   radioGroup.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  radioGroup.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  radioGroup.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   radioGroup.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   radioGroup.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0));
 

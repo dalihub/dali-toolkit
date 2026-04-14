@@ -28,7 +28,7 @@ UNIFORM_BLOCK VisualVertBlock
   UNIFORM highp vec2 extraSize;
   UNIFORM mediump vec4 offsetSizeMode;
   UNIFORM mediump vec2 origin;
-  UNIFORM mediump vec2 anchorPoint;
+  UNIFORM mediump vec2 pivot;
 };
 
 void main()
@@ -39,7 +39,7 @@ void main()
   vTexCoord.x = ( uHorizontalAlign * ( uTextureSize.x - visualSize.x ) + aPosition.x * visualSize.x ) / uTextureSize.x + 0.5;
   vTexCoord.y = ( uDelta + uVerticalAlign * ( uTextureSize.y - visualSize.y - uGap ) + aPosition.y * visualSize.y - uGap * 0.5 ) / ( uTextureSize.y ) + 0.5;
 
-  highp vec4 vertexPosition = vec4( ( aPosition + anchorPoint ) * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0 );
+  highp vec4 vertexPosition = vec4( ( aPosition + pivot ) * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0 );
 
   vec2 snappedPosition = vertexPosition.xy;
   snappedPosition.x = floor(snappedPosition.x * uScale.x + 0.5) / uScale.x;

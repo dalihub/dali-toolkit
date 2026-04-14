@@ -28,8 +28,8 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
@@ -527,9 +527,9 @@ int UtcTextureManagerExternalTexture(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  Dali::Toolkit::ImageUrl imageUrl          = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl          = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
   String                  externalImageUrl  = imageUrl.GetUrl();
-  Dali::Toolkit::ImageUrl imageUrl2         = Dali::Toolkit::Image::GenerateUrl(pixelData, false);
+  Dali::Toolkit::ImageUrl imageUrl2         = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, false);
   String                  externalImageUrl2 = imageUrl2.GetUrl();
 
   for(int testCase = 0; testCase < 6; testCase++)
@@ -709,7 +709,7 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
 
   DALI_TEST_CHECK(pixelData);
 
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
   String                  url1     = imageUrl.GetUrl();
   String                  url2     = TEST_IMAGE_FILE_NAME;
 
@@ -2353,7 +2353,7 @@ int UtcTextureManagerMaskByExternalTexture01(void)
 
   uint8_t*                buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
   PixelData               pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
-  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
 
   TestObserver observer1;
   TestObserver observer2;
@@ -2476,8 +2476,8 @@ int UtcTextureManagerMaskByExternalTexture02(void)
 
   uint8_t*                buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
   PixelData               pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
-  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
-  Dali::Toolkit::ImageUrl imageUrl2 = Dali::Toolkit::Image::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl  = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
+  Dali::Toolkit::ImageUrl imageUrl2 = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData, true);
 
   TestObserver observer1;
   TestObserver observer2;

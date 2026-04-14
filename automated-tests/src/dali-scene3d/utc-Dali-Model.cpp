@@ -18,8 +18,8 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/object/type-registry.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -768,7 +768,7 @@ int UtcDaliModelChildrenSensitive01(void)
   Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
-  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // Get default vaule.
@@ -865,7 +865,7 @@ int UtcDaliModelChildrenSensitive02(void)
   Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
-  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // Get vaule.
@@ -945,7 +945,7 @@ int UtcDaliModelChildrenFocusable01(void)
   Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
-  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // Get vaule. Default is false.
@@ -986,7 +986,7 @@ int UtcDaliModelChildrenFocusable01(void)
   Control focusStartActor = Control::New();
   focusStartActor.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
-  focusStartActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
   application.GetScene().Add(focusStartActor);
@@ -1053,7 +1053,7 @@ int UtcDaliModelModelChildrenFocusable02(void)
   Scene3D::Model view = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
   view.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   view.SetProperty(Dali::Actor::Property::POSITION, Vector3(0, 0, 0));
-  view.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  view.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   view.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // Get vaule. Default is true.
@@ -1094,7 +1094,7 @@ int UtcDaliModelModelChildrenFocusable02(void)
   Control focusStartActor = Control::New();
   focusStartActor.SetProperty(Dali::Actor::Property::SIZE, Vector3(100, 100, 100));
   focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
-  focusStartActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  focusStartActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
   application.GetScene().Add(focusStartActor);

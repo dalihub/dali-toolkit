@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple(bool vertical, Scrollab
   mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
   mOvershootOverlay.SetProperty(Actor::Property::COLOR, mAttachedScrollView.GetOvershootEffectColor());
   mOvershootOverlay.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  mOvershootOverlay.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  mOvershootOverlay.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   mOvershootOverlay.SetProperty(Actor::Property::VISIBLE, false);
 }
 

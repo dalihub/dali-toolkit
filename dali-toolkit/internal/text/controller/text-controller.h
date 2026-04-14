@@ -2018,13 +2018,13 @@ public: // Queries & retrieves.
 
   /**
    * @brief Retrieves cursorInsetEnabled value.
-   * @return Wether the cursor inset is enabled.
+   * @return Whether the cursor inset is enabled.
    */
   bool IsCursorInsetEnabled() const;
 
   /**
    * @brief Sets cursorInsetEnabled value.
-   * @param[in] enable Wether the cursor inset is enabled.
+   * @param[in] enable Whether the cursor inset is enabled.
    */
   void SetCursorInsetEnabled(bool enable);
 

@@ -17,9 +17,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/animated-property.h>

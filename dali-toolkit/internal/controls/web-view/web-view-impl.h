@@ -79,17 +79,22 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetContext()
    */
-  static Dali::WebEngineContext* GetContext();
+  static Dali::WebEngineContext* GetContext(bool isIncognito);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetCookieManager()
    */
-  static Dali::WebEngineCookieManager* GetCookieManager();
+  static Dali::WebEngineCookieManager* GetCookieManager(bool isIncognito);
 
   /**
    * @copydoc Dali::Toolkit::WebView::ChangeOrientation()
    */
   void ChangeOrientation(int orientation);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::IsIncognito()
+   */
+  bool IsIncognito() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetSettings()
@@ -807,6 +812,10 @@ protected:
 
     WebViewAccessible(Dali::Actor self, Dali::WebEngine& webEngine);
 
+    void SetForceRefreshAddress(bool forceRefresh);
+
+    void SetRemoteChildAddress(Dali::Accessibility::Address address);
+
   protected:
     /**
      * @copydoc Dali::Accessibility::Accessible::GetAttributes()
@@ -821,10 +830,10 @@ protected:
   private:
     void OnAccessibilityEnabled();
     void OnAccessibilityDisabled();
-    void SetRemoteChildAddress(Dali::Accessibility::Address address);
 
     Dali::Accessibility::ProxyAccessible mRemoteChild;
     Dali::WebEngine&                     mWebEngine;
+    bool                                 mForceRefreshAddress{false};
   };
 
 private:

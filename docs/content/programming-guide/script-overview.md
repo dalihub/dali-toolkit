@@ -42,7 +42,7 @@ JSON file contains different sections:
       "name":"users",
       "type":"Actor",
       "parentOrigin":"TOP_CENTER",
-      "anchorPoint":"TOP_CENTER",
+      "pivot":"TOP_CENTER",
       "size":"{DEFAULT_MENU_USER_SIZE}",
       "colorMode":"USE_OWN_COLOR",
       "actors":
@@ -51,7 +51,7 @@ JSON file contains different sections:
           "name":"usersBackground",
           "type":"ImageView",
           "parentOrigin":"CENTER",
-          "anchorPoint":"CENTER",
+          "pivot":"CENTER",
           "size":"{DEFAULT_MENU_USER_SIZE}",
           "colorMode":"USE_OWN_COLOR",
           "image":{ "url":"{IMAGE_PATH}white-pixel.png" },
@@ -61,7 +61,7 @@ JSON file contains different sections:
           "name":"icon",
           "type":"ImageView",
           "parentOrigin":"TOP_CENTER",
-          "anchorPoint":"TOP_CENTER",
+          "pivot":"TOP_CENTER",
           "position":[0,41,1],
           "image":{ "url":"{IMAGE_PATH}ico_man_nor.png" }
         },

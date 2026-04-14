@@ -26,14 +26,14 @@ This is required to avoid ambiguity as multiple visuals may be capable of render
 
 Visuals have a **transform** field in the property map to allow layouting within a control. If this field is not set, then the visual defaults to filling the control. The **transform** field has a property map with the following keys:
 
-| Property                                                       | String       | Type              | Required | Description                                                                                 |
-|----------------------------------------------------------------|--------------|:-----------------:|:--------:|---------------------------------------------------------------------------------------------|
+| Property                                                  | String       | Type              | Required | Description                                                                                 |
+|-----------------------------------------------------------|--------------|:-----------------:|:--------:|---------------------------------------------------------------------------------------------|
 | Dali::Toolkit::Visual::Transform::Property::OFFSET        | offset       | VECTOR2           | No       | The offset of the visual.                                                                   |
 | Dali::Toolkit::Visual::Transform::Property::SIZE          | size         | VECTOR2           | No       | The size of the visual.                                                                     |
 | Dali::Toolkit::Visual::Transform::Property::OFFSET_POLICY | offsetPolicy | VECTOR4           | No       | Whether the offset components are Relative or Absolute [More info](@ref offset-size-policy) |
 | Dali::Toolkit::Visual::Transform::Property::SIZE_POLICY   | sizePolicy   | VECTOR4           | No       | Whether the size components are Relative or Absolute [More info](@ref offset-size-policy)   |
 | Dali::Toolkit::Visual::Transform::Property::ORIGIN        | origin       | INTEGER or STRING | No       | The origin of the visual within the control's area. [More info](@ref align-type)            |
-| Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT  | anchorPoint  | INTEGER or STRING | No       | The anchor point of the visual. [More info](@ref align-type)                                |
+| Dali::Toolkit::Visual::Transform::Property::PIVOT         | pivot        | INTEGER or STRING | No       | The pivot of the visual. [More info](@ref align-type)                                       |
  
 
 ## Offset & Size Policy  {#offset-size-policy}

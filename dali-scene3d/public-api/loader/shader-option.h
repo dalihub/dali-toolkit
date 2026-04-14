@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

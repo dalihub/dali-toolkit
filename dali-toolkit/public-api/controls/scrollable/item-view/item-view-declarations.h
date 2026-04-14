@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-pair.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -34,15 +34,15 @@ namespace Toolkit
 
 typedef unsigned int ItemId; ///< Unique identity for each item in the view. @SINCE_1_0.0
 
-typedef std::vector<ItemId>             ItemIdContainer; ///< Item id container type @SINCE_1_0.0
-typedef ItemIdContainer::iterator       ItemIdIter;      ///< Item id iterator type @SINCE_1_0.0
-typedef ItemIdContainer::const_iterator ConstItemIdIter; ///< Item id const iterator type @SINCE_1_0.0
+typedef Dali::Vector<ItemId>           ItemIdContainer; ///< Item id container type @SINCE_1_0.0
+typedef ItemIdContainer::Iterator      ItemIdIter;      ///< Item id iterator type @SINCE_1_0.0
+typedef ItemIdContainer::ConstIterator ConstItemIdIter; ///< Item id const iterator type @SINCE_1_0.0
 
 typedef Dali::Pair<ItemId, Actor> Item; ///< Item type @SINCE_1_0.0
 
-typedef std::vector<Item>             ItemContainer; ///< Item container type @SINCE_1_0.0
-typedef ItemContainer::iterator       ItemIter;      ///< Item iterator type @SINCE_1_0.0
-typedef ItemContainer::const_iterator ConstItemIter; ///< Item const iterator type @SINCE_1_0.0
+typedef Dali::Vector<Item>           ItemContainer; ///< Item container type @SINCE_1_0.0
+typedef ItemContainer::Iterator      ItemIter;      ///< Item iterator type @SINCE_1_0.0
+typedef ItemContainer::ConstIterator ConstItemIter; ///< Item const iterator type @SINCE_1_0.0
 
 class ItemView;
 class ItemLayout;

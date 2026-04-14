@@ -44,7 +44,7 @@ public:
     Stage stage = Stage::GetCurrent();
 
     mTextLabel = TextLabel::New( "Hello World" );
-    mTextLabel.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+    mTextLabel.SetProperty( Actor::Property::PIVOT, Pivot::TOP_LEFT );
     stage.Add( mTextLabel );
 
     // Respond to a click anywhere on the stage

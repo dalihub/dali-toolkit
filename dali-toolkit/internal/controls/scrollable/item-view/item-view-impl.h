@@ -272,14 +272,14 @@ public:
   Vector3 GetItemsParentOrigin() const;
 
   /**
-   * @copydoc Toolkit::ItemView::SetItemsAnchorPoint
+   * @copydoc Toolkit::ItemView::SetItemsPivot
    */
-  void SetItemsAnchorPoint(const Vector3& anchorPoint);
+  void SetItemsPivot(const Vector3& pivot);
 
   /**
-   * @copydoc Toolkit::ItemView::GetItemsAnchorPoint
+   * @copydoc Toolkit::ItemView::GetItemsPivot
    */
-  Vector3 GetItemsAnchorPoint() const;
+  Vector3 GetItemsPivot() const;
 
   /**
    * @copydoc Toolkit::ItemView::GetItemsRange
@@ -305,7 +305,7 @@ public:
    */
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
-  //properties
+  // properties
 
   /**
    * Called when a property of an object of this type is set.
@@ -627,7 +627,7 @@ private:
   LayoutActivatedSignalType  mLayoutActivatedSignal;
   Vector3                    mActiveLayoutTargetSize;
   Vector3                    mItemsParentOrigin;
-  Vector3                    mItemsAnchorPoint;
+  Vector3                    mItemsPivot;
   Vector2                    mTotalPanDisplacement;
   ItemLayout*                mActiveLayout;
 

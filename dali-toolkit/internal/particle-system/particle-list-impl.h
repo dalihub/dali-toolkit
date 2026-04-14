@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_LIST_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_LIST_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/public-api/common/list-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <algorithm>
 #include <cstring>
@@ -150,7 +150,7 @@ public:
 
   uint32_t GetDefaultStreamIndex(ParticleStreamTypeFlagBit streamBit);
 
-  std::list<ParticleSystem::Particle>& GetParticles();
+  Dali::Vector<ParticleSystem::Particle>& GetParticles();
 
   void ReleaseParticles(const std::vector<uint32_t>& sortedEraseIndices);
 
@@ -183,7 +183,7 @@ private:
 
   std::map<uint32_t, uint32_t> mBuiltInStreamMap;
 
-  std::list<ParticleSystem::Particle> mParticles;
+  Dali::Vector<ParticleSystem::Particle> mParticles;
 
   uint32_t mParticleStreamElementSizeWithLocal{0u};
   uint32_t mParticleStreamElementSize{0u};

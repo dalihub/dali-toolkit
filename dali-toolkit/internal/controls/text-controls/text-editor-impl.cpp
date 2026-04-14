@@ -626,7 +626,7 @@ void TextEditor::OnInitialize()
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = ControlImpl::New(ControlBehaviour(Dali::Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
-  mStencil.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  mStencil.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   mStencil.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   mStencil.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
 
@@ -1161,7 +1161,7 @@ void TextEditor::AddDecoration(Actor& actor, DecorationType type, bool needsClip
 void TextEditor::AddLayer(Actor& layer, Actor& actor)
 {
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   Self().Add(actor);
   layer = actor;
 }
@@ -1222,7 +1222,7 @@ void TextEditor::UpdateScrollBar()
     mScrollBar = Toolkit::ScrollBar::New(Toolkit::ScrollBar::VERTICAL);
     mScrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
     mScrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-    mScrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+    mScrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
     mScrollBar.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
     mScrollBar.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH);
 

@@ -100,25 +100,25 @@ void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const font
   {
     if(fontDefaults->familyDefined)
     {
-      inputStyle.familyName      = fontDefaults->mFontDescription.family;
+      inputStyle.familyName      = fontDefaults->GetFontDescription().family;
       inputStyle.isFamilyDefined = true;
     }
 
     if(fontDefaults->weightDefined)
     {
-      inputStyle.weight          = fontDefaults->mFontDescription.weight;
+      inputStyle.weight          = fontDefaults->GetFontDescription().weight;
       inputStyle.isWeightDefined = true;
     }
 
     if(fontDefaults->widthDefined)
     {
-      inputStyle.width          = fontDefaults->mFontDescription.width;
+      inputStyle.width          = fontDefaults->GetFontDescription().width;
       inputStyle.isWidthDefined = true;
     }
 
     if(fontDefaults->slantDefined)
     {
-      inputStyle.slant          = fontDefaults->mFontDescription.slant;
+      inputStyle.slant          = fontDefaults->GetFontDescription().slant;
       inputStyle.isSlantDefined = true;
     }
 
@@ -1027,7 +1027,7 @@ void Controller::Impl::UpdateAfterFontChange(const std::string& newDefaultFont)
   if(!mFontDefaults->familyDefined) // If user defined font then should not update when system font changes
   {
     DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str());
-    mFontDefaults->mFontDescription.family = newDefaultFont;
+    mFontDefaults->GetFontDescription().family = newDefaultFont;
 
     ClearFontData();
 
@@ -1740,7 +1740,7 @@ Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
 {
   auto actor = Toolkit::TextAnchor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   auto    rect   = Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mModel, anchor.startIndex, anchor.endIndex - 1);
   Vector2 offset = mModel->mLayoutOffsetWithPadding;

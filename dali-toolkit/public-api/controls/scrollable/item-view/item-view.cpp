@@ -220,14 +220,14 @@ Vector3 ItemView::GetItemsParentOrigin() const
   return GetImpl(*this).GetItemsParentOrigin();
 }
 
-void ItemView::SetItemsAnchorPoint(const Vector3& anchorPoint)
+void ItemView::SetItemsPivot(const Vector3& pivot)
 {
-  GetImpl(*this).SetItemsAnchorPoint(anchorPoint);
+  GetImpl(*this).SetItemsPivot(pivot);
 }
 
-Vector3 ItemView::GetItemsAnchorPoint() const
+Vector3 ItemView::GetItemsPivot() const
 {
-  return GetImpl(*this).GetItemsAnchorPoint();
+  return GetImpl(*this).GetItemsPivot();
 }
 
 void ItemView::GetItemsRange(ItemRange& range)

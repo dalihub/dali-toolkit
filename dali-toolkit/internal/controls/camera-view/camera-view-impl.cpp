@@ -168,14 +168,14 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
 
   Actor self(Self());
 
-  bool    positionUsesAnchorPoint = self.GetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>();
-  Vector3 actorSize               = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  bool    positionUsesPivot = self.GetProperty(Actor::Property::POSITION_USES_PIVOT).Get<bool>();
+  Vector3 actorSize         = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
+  Vector3 pivotOffSet       = actorSize * (positionUsesPivot ? self.GetCurrentProperty<Vector3>(Actor::Property::PIVOT) : Pivot::TOP_LEFT);
 
   Vector2 screenPosition = self.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  mDisplayArea.x      = screenPosition.x - anchorPointOffSet.x;
-  mDisplayArea.y      = screenPosition.y - anchorPointOffSet.y;
+  mDisplayArea.x      = screenPosition.x - pivotOffSet.x;
+  mDisplayArea.y      = screenPosition.y - pivotOffSet.y;
   mDisplayArea.width  = actorSize.x;
   mDisplayArea.height = actorSize.y;
 

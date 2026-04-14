@@ -19,7 +19,7 @@ SET(TC_SOURCES
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
   utc-Dali-GaussianBlurView.cpp
-  utc-Dali-Image.cpp
+  utc-Dali-ImageUrlUtils.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
   utc-Dali-ImageUrl.cpp
@@ -72,6 +72,7 @@ SET(TC_SOURCES
   utc-Dali-ScrollViewEffect.cpp
   utc-Dali-SvgVisual.cpp
   utc-Dali-Toolkit.cpp
+  utc-Dali-ToolkitPreInitialize.cpp
   utc-Dali-Visual.cpp
   utc-Dali-VisualFactory.cpp
   utc-Dali-VideoView.cpp
@@ -88,7 +89,6 @@ SET(TC_SOURCES
 # List of test harness files (Won't get parsed for test cases)
 SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-adaptor.cpp
-  dali-toolkit-test-utils/toolkit-application.cpp
   dali-toolkit-test-utils/toolkit-async-task-manager.cpp
   dali-toolkit-test-utils/toolkit-canvas-renderer.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp

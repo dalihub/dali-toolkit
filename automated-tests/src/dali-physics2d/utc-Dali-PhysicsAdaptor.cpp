@@ -988,7 +988,7 @@ int UtcDaliPhysics2DAdaptorHitTestP(void)
     cpBodySetPosition(body, cpv(center.x, center.y));
 
     ballActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-    ballActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+    ballActor[Actor::Property::PIVOT]  = Pivot::CENTER;
 
     auto physicsActor = adaptor.AddActorBody(ballActor, body);
   }

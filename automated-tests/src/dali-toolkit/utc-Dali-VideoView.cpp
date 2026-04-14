@@ -401,7 +401,7 @@ int UtcDaliVideoViewCustomShaderForCoverage(void)
   VideoView              videoView = VideoView::New();
   DALI_TEST_CHECK(videoView);
 
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
 
   videoView.SetProperty(Toolkit::VideoView::Property::UNDERLAY, false);
   bool isUnderlay = videoView.GetProperty(Toolkit::VideoView::Property::UNDERLAY).Get<bool>();
@@ -472,7 +472,7 @@ int UtcDaliVideoViewCustomShaderForCoverage3(void)
   VideoView              videoView = VideoView::New();
   DALI_TEST_CHECK(videoView);
 
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
 
   videoView.SetProperty(Toolkit::VideoView::Property::UNDERLAY, false);
   bool isUnderlay = videoView.GetProperty(Toolkit::VideoView::Property::UNDERLAY).Get<bool>();
@@ -500,7 +500,7 @@ int UtcDaliVideoViewPropertyUnderlay(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVideoViewPropertyUnderlay");
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
 
   VideoView view = VideoView::New();
   DALI_TEST_CHECK(view);
@@ -526,14 +526,14 @@ int UtcDaliVideoViewPropertyUnderlay(void)
 
   // If platform api doesn't provide any API or feature for decoded images of video,
   // UNDERLAY should be true
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = false;
 
   view.SetProperty(Toolkit::VideoView::Property::UNDERLAY, false);
   isUnderlay = view.GetProperty(Toolkit::VideoView::Property::UNDERLAY).Get<bool>();
   DALI_TEST_CHECK(isUnderlay);
 
   // For coverage
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
 
   view.SetProperty(Toolkit::VideoView::Property::UNDERLAY, true);
   view.SetProperty(Toolkit::VideoView::Property::UNDERLAY, false);
@@ -685,7 +685,7 @@ int UtcDaliVideoViewCustomShader(void)
   VideoView view = VideoView::New(false);
   DALI_TEST_CHECK(view);
 
-  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
 
   view.SetProperty(Toolkit::VideoView::Property::UNDERLAY, false);
   bool isUnderlay = view.GetProperty(Toolkit::VideoView::Property::UNDERLAY).Get<bool>();
@@ -1070,7 +1070,7 @@ int UtcDaliVideoViewWithPlayerHandle(void)
 
   // Create a dummy player handle with type (nullptr for test purposes)
   Dali::VideoPlayerPlugin::PlayerHandle playerHandle;
-  playerHandle.handle = nullptr;
+  playerHandle.handle     = nullptr;
   playerHandle.playerType = Dali::VideoPlayerPlugin::PlayerHandleType::DEFAULT;
 
   VideoView videoView = DevelVideoView::New(playerHandle);

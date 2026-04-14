@@ -24,10 +24,10 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
@@ -53,7 +53,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(1); // PixelArea
+const int CUSTOM_PROPERTY_COUNT(0); // PixelArea
 
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 

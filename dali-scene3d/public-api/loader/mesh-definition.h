@@ -20,7 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/unique-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>

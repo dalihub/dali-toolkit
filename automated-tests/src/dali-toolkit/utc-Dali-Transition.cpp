@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h> // for Renderer Property Index.
+#include <dali/integration-api/rendering/decorated-visual-renderer.h> // for Renderer Property Index.
 #include <stdlib.h>
 #include <iostream>
 
@@ -90,7 +90,7 @@ int UtcDaliTransitionSetGetProperty01(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   Property::Map controlProperty1;
   controlProperty1.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -104,7 +104,7 @@ int UtcDaliTransitionSetGetProperty01(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   Property::Map controlProperty2;
   controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -152,7 +152,7 @@ int UtcDaliTransitionSetGetProperty02(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   Property::Map controlProperty1;
   controlProperty1.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -166,7 +166,7 @@ int UtcDaliTransitionSetGetProperty02(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   Property::Map controlProperty2;
   controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -227,7 +227,7 @@ int UtcDaliTransitionBetweenControlPair(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control1.SetProperty(Actor::Property::SCALE, Vector3(1, 2, 0));
@@ -245,7 +245,7 @@ int UtcDaliTransitionBetweenControlPair(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, destinationSize);
   control2.SetProperty(Actor::Property::SCALE, destinationScale);
@@ -374,7 +374,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control1.SetProperty(Actor::Property::POSITION, sourcePosition);
   control1.SetProperty(Actor::Property::SIZE, sourceSize);
   control1.SetProperty(Actor::Property::SCALE, sourceScale);
@@ -392,7 +392,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::CENTER);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::CENTER);
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, destinationSize);
   control2.SetProperty(Actor::Property::SCALE, destinationScale);
@@ -538,12 +538,12 @@ int UtcDaliTransitionBetweenControlPairWithoutEmptySourceBackground(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   Property::Map controlProperty2;
   controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -635,7 +635,7 @@ int UtcDaliTransitionBetweenImageViewPair(void)
 
   ImageView control1 = ImageView::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty1;
@@ -650,7 +650,7 @@ int UtcDaliTransitionBetweenImageViewPair(void)
 
   ImageView control2 = ImageView::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -723,7 +723,7 @@ int UtcDaliTransitionBetweenImageViewPairWithDelay(void)
 
   ImageView control1 = ImageView::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty1;
@@ -738,7 +738,7 @@ int UtcDaliTransitionBetweenImageViewPairWithDelay(void)
 
   ImageView control2 = ImageView::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -829,7 +829,7 @@ int UtcDaliTransitionBetweenControlPairWithTree(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -839,7 +839,7 @@ int UtcDaliTransitionBetweenControlPairWithTree(void)
 
   Control control3 = Control::New();
   control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control3.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control3.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   control3.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty3;
@@ -896,7 +896,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithChild(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control2.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -906,7 +906,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithChild(void)
 
   Control control3 = Control::New();
   control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control3.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control3.SetProperty(Actor::Property::POSITION, Vector3(50, 50, 0));
   control3.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty3;
@@ -956,7 +956,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutPositionInheritance(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control1.SetProperty(Actor::Property::POSITION, sourcePosition);
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty1;
@@ -966,7 +966,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutPositionInheritance(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control2.SetProperty(Actor::Property::POSITION, Vector3(150, 150, 0));
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -976,7 +976,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutPositionInheritance(void)
 
   Control control3 = Control::New();
   control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control3.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control3.SetProperty(Actor::Property::POSITION, destinationPosition);
   control3.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty3;
@@ -1041,7 +1041,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutOrientationInheritance(voi
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control1.SetProperty(Actor::Property::ORIENTATION, sourceOrientation);
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty1;
@@ -1051,7 +1051,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutOrientationInheritance(voi
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control2.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(2.0f), Vector3::XAXIS));
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -1061,7 +1061,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutOrientationInheritance(voi
 
   Control control3 = Control::New();
   control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control3.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control3.SetProperty(Actor::Property::ORIENTATION, destinationOrientation);
   control3.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty3;
@@ -1130,7 +1130,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutScaleInheritance(void)
 
   Control control1 = Control::New();
   control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control1.SetProperty(Actor::Property::SCALE, sourceScale);
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty1;
@@ -1140,7 +1140,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutScaleInheritance(void)
 
   Control control2 = Control::New();
   control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control2.SetProperty(Actor::Property::SCALE, Vector3(3, 3, 1));
   control2.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty2;
@@ -1150,7 +1150,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutScaleInheritance(void)
 
   Control control3 = Control::New();
   control3.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control3.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   control3.SetProperty(Actor::Property::SCALE, destinationScale);
   control3.SetProperty(Actor::Property::SIZE, Vector3(120, 120, 0));
   Property::Map controlProperty3;
@@ -1215,7 +1215,7 @@ int UtcDaliMultipleTransitionAppearing(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   Property::Map controlProperty;

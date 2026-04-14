@@ -23,8 +23,8 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <memory>
 
 using Dali::Integration::ToDaliStringView;
@@ -53,7 +53,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // ltr, wrap, pixel area, crop to mask, mask texture ratio, pre-multiplied alph
+const int CUSTOM_PROPERTY_COUNT(0);
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)

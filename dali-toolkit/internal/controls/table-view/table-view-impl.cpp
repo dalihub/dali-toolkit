@@ -833,9 +833,9 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
       if(actor && position.rowIndex == row && position.columnIndex == column)
       {
         // Anchor actor to top left of the cell
-        if(actor.GetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>())
+        if(actor.GetProperty(Actor::Property::POSITION_USES_PIVOT).Get<bool>())
         {
-          actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+          actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
         }
         actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 

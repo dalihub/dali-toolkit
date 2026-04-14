@@ -39,8 +39,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 
@@ -788,7 +788,7 @@ int UtcDaliImageViewAsyncLoadingEncodedBuffer(void)
 
   // Get encoded raw-buffer image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading, big size image
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -818,7 +818,7 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
 
   // Get encoded raw-buffer image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Sync loading, small size image
   {
@@ -861,7 +861,7 @@ int UtcDaliImageViewEncodedBufferWithSvg(void)
 
   // Get encoded raw-buffer svg image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -901,7 +901,7 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
 
   // Get encoded raw-buffer lottie image and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -941,7 +941,7 @@ int UtcDaliImageViewEncodedBufferWithInvalidImageType(void)
 
   // Get encoded raw-buffer jpg image with invalid image type, and generate url
   EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA, static_cast<EncodedImageBuffer::ImageType>(-1));
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
+  ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
   ImageView imageView = ImageView::New(url.GetUrl());
@@ -1613,7 +1613,7 @@ int UtcDaliImageViewPaddingProperty(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_WIDTH]  = 128;
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT] = 128;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1663,7 +1663,7 @@ int UtcDaliImageViewPaddingProperty02(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1704,7 +1704,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1752,7 +1752,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   imagePropertyMap[ImageVisual::Property::DESIRED_HEIGHT]      = 128;
   imagePropertyMap[DevelVisual::Property::VISUAL_FITTING_MODE] = Toolkit::DevelVisual::FILL;
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   imageView.SetProperty(Control::Property::PADDING, Extents(15, 10, 5, 10));
   application.GetScene().Add(imageView);
@@ -1805,7 +1805,7 @@ int UtcDaliImageViewTransformTest01(void)
            .Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2(8, 8)));
 
   imageView.SetProperty(Toolkit::ImageView::Property::IMAGE, imagePropertyMap);
-  imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   application.GetScene().Add(imageView);
 
@@ -2827,7 +2827,7 @@ int UtcDaliImageViewLoadRemoteSVG01(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 
@@ -2867,7 +2867,7 @@ int UtcDaliImageViewLoadRemoteSVG02(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage(svgImageUrl);
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 
     application.GetScene().Add(imageView);
@@ -2903,7 +2903,7 @@ int UtcDaliImageViewLoadRemoteLottie(void)
     imageView = Toolkit::ImageView::New();
     imageView.SetImage("https://lottie.json");
     imageView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    imageView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    imageView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     imageView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
     imageView.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
 
@@ -4864,7 +4864,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
   application.Render();
 
   // Make AddIdle failed.
-  ToolkitApplication::ADD_IDLE_SUCCESS = false;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = false;
 
   try
   {
@@ -4898,7 +4898,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal10WhenAddIdleFailed(void)
     DALI_TEST_CHECK(false);
   }
 
-  ToolkitApplication::ADD_IDLE_SUCCESS = true;
+  ToolkitTestApplication::ADD_IDLE_SUCCESS = true;
 
   // Clear cache.
   application.SendNotification();

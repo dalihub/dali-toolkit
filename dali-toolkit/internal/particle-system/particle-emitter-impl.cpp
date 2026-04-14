@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,7 +306,7 @@ void ParticleEmitter::UpdateModifierMT(Dali::Toolkit::ParticleSystem::ParticleMo
 
   // at least 10 particles per worker thread (should be parametrized)
   // If less, continue ST
-  if(activeCount < workerThreads * 10)
+  if(DALI_UNLIKELY(workerThreads == 0u) || activeCount / 10 < workerThreads)
   {
     GetImplementation(modifier).Update(mParticleList, 0, activeCount);
     return;

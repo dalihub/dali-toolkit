@@ -508,9 +508,9 @@ void FlexContainer::OnRelayout(const Vector2& size, RelayoutContainer& container
     if(child)
     {
       // Anchor actor to top left of the container
-      if(child.GetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>())
+      if(child.GetProperty(Actor::Property::POSITION_USES_PIVOT).Get<bool>())
       {
-        child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+        child.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       }
       child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 

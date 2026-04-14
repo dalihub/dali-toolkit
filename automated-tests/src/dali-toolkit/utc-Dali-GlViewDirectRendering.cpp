@@ -25,7 +25,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/public-api/signals/render-callback.h>
+#include <dali/devel-api/signals/render-callback.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -519,7 +519,7 @@ int UtcDaliGlViewDirectRenderingResize(void)
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrame), Dali::MakeCallback(DirectRenderingCode::glTerminate));
   view.SetResizeCallback(Dali::MakeCallback(DirectRenderingCode::resizeCB));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
   application.SendNotification();
@@ -547,7 +547,7 @@ int UtcDaliGlViewDirectRenderingDirectResize(void)
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrame), Dali::MakeCallback(DirectRenderingCode::glTerminate));
   view.SetResizeCallback(Dali::MakeCallback(DirectRenderingCode::resizeCB));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
   application.SendNotification();
@@ -575,7 +575,7 @@ int UtcDaliGlViewDirectRenderingTerminateCallback(void)
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrame), Dali::MakeCallback(DirectRenderingCode::glTerminate));
   view.SetResizeCallback(Dali::MakeCallback(DirectRenderingCode::resizeCB));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
   application.SendNotification();
@@ -601,7 +601,7 @@ int UtcDaliGlViewDirectRenderingTextureBinding(void)
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit), Dali::MakeCallback(DirectRenderingCode::glRenderFrameWithTextures), Dali::MakeCallback(DirectRenderingCode::glTerminate));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
@@ -667,7 +667,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene01(void)
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
@@ -731,7 +731,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene02(void)
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)
@@ -762,7 +762,7 @@ int UtcDaliGlViewDirectRenderingThreadedOnScene03(void)
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_3_0);
   view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInitMT), Dali::MakeCallback(DirectRenderingCode::glRenderFrameMT), Dali::MakeCallback(DirectRenderingCode::glTerminateMT));
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
   // Set size on the actor (half the window size to show that glClear() and scissor test work together)

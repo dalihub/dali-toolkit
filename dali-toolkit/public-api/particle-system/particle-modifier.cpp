@@ -15,7 +15,7 @@
  *
  */
 
-#include <memory>
+#include <utility>
 
 #include <dali-toolkit/internal/particle-system/particle-modifier-impl.h>
 #include <dali-toolkit/public-api/particle-system/particle-modifier.h>

@@ -222,7 +222,7 @@ int utcDaliAccessibilityTextEditorGetRangeExtents(void)
     editor.SetProperty(Toolkit::TextEditor::Property::POINT_SIZE, 7.f);
     editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
     editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text editor test sentence");
 
     // Avoid a crash when core load gl resources.
@@ -456,7 +456,7 @@ int utcDaliAccessibilityTextFieldGetRangeExtents(void)
     field.SetProperty(Toolkit::TextField::Property::POINT_SIZE, 7.f);
     field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
     field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text field test sentence");
 
     // Avoid a crash when core load gl resources.
@@ -604,7 +604,7 @@ int utcDaliAccessibilityTextLabelGetRangeExtents(void)
     label.SetProperty(Toolkit::TextLabel::Property::MULTI_LINE, true);
     label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
     label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text label\n test sentence");
 
     // Avoid a crash when core load gl resources.

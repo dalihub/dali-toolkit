@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_JSON_UTIL_H_
 #define DALI_SCENE3D_LOADER_JSON_UTIL_H_
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/tree-node.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property.h>
 

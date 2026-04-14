@@ -64,7 +64,7 @@ public:
   {
   }
 
-  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction, const std::string& deviceName)
+  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction, const Dali::String& deviceName)
   {
     tet_infoline("Verifying CustomAlgorithm()");
 
@@ -91,7 +91,7 @@ public:
   Actor                             mCurrentFocusedActor;
   Actor                             mProposedActorToFocus;
   Control::KeyboardFocus::Direction mDirection;
-  std::string                       mDeviceName;
+  Dali::String                      mDeviceName;
 };
 
 // Functors to test whether PreFocusChange signal is emitted when the keyboard focus is about to change
@@ -343,7 +343,7 @@ int UtcDaliKeyboardFocusManagerLastFocusChangeContext(void)
   Actor touchable = Actor::New();
   touchable.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   touchable.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  touchable.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  touchable.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   touchable.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   touchable.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
   application.GetScene().Add(touchable);
@@ -802,7 +802,7 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
   preFocusChangeCallback.Reset();
 
   bool            customAlgorithmInterfaceVerified = false;
-  std::string     deviceName                       = "deviceName";
+  Dali::String    deviceName                       = "deviceName";
   CustomAlgorithm customAlgorithm(customAlgorithmInterfaceVerified);
   Toolkit::DevelKeyboardFocusManager::SetCustomAlgorithm(manager, customAlgorithm);
 
@@ -2450,7 +2450,7 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode(void)
   Actor first = Actor::New();
   first.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
   first.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   first.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
   application.GetScene().Add(first);
@@ -2459,7 +2459,7 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode(void)
   Actor second = Actor::New();
   second.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
   second.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
-  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   application.GetScene().Add(second);
 
@@ -2557,8 +2557,8 @@ int UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm(void)
   // button1 -- button2
   button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
-  button1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  button2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  button2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2876,14 +2876,14 @@ int UtcDaliKeyboardFocusManagerFocusFinderRootActor(void)
   // button1 -- button2
   button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
-  button1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  button2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  button1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  button2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // buttonA -- buttonB
   buttonA.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 50.0f));
   buttonB.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 50.0f));
-  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // flush the queue and render once
   application.SendNotification();

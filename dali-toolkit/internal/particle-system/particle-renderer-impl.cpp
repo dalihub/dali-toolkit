@@ -245,7 +245,7 @@ void ParticleRenderer::CreateShader()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     // Note : MUST NOT call this API during app terminating
-    mStreamBuffer.SetVertexBufferUpdateCallback(std::move(mStreamBufferUpdateCallback));
+    DevelVertexBuffer::SetVertexBufferUpdateCallback(mStreamBuffer, std::move(mStreamBufferUpdateCallback));
   }
 
   mRenderer = Renderer::New(mGeometry, mShader);
@@ -315,7 +315,7 @@ uint32_t ParticleRenderer::OnStreamBufferUpdate(void* streamData, size_t maxByte
   // divide particles if over the threshold
 
   [[maybe_unused]] bool runParallel = true;
-  if(!mEmitter->IsParallelProcessingEnabled() || particleCount < workerCount * 10) // don't run parallel if only a few particles to update
+  if(!mEmitter->IsParallelProcessingEnabled() || DALI_UNLIKELY(workerCount == 0u) || particleCount / 10 < workerCount) // don't run parallel if only a few particles to update
   {
     runParallel = false;
   }
@@ -446,7 +446,7 @@ void ParticleRenderer::PrepareToDie()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()) && mStreamBuffer)
   {
     // Note : MUST NOT call this API during app terminating
-    mStreamBuffer.ClearVertexBufferUpdateCallback();
+    DevelVertexBuffer::ClearVertexBufferUpdateCallback(mStreamBuffer);
   }
 }
 

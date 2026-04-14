@@ -65,7 +65,7 @@ Property::Map DefaultTransform()
     .Add(Toolkit::Visual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f))
     .Add(Toolkit::Visual::Transform::Property::SIZE, Vector2(1.0f, 1.0f))
     .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-    .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN)
+    .Add(Toolkit::Visual::Transform::Property::PIVOT, Toolkit::Align::TOP_BEGIN)
     .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE))
     .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE));
   return transformMap;
@@ -1971,7 +1971,7 @@ int UtcDaliVisualGetTransform(void)
     DALI_TEST_CHECK((Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN);
   }
   {
-    Property::Value* typeValue = map->Find(Toolkit::Visual::Transform::Property::ANCHOR_POINT);
+    Property::Value* typeValue = map->Find(Toolkit::Visual::Transform::Property::PIVOT);
     DALI_TEST_CHECK(typeValue);
     DALI_TEST_CHECK((Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN);
   }
@@ -1993,7 +1993,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   transform.Insert(Visual::Transform::Property::SIZE, Vector2(0.2f, 0.2f));
   transform.Insert(Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE));
   transform.Insert(Visual::Transform::Property::ORIGIN, "CENTER");
-  transform.Insert(Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END);
+  transform.Insert(Visual::Transform::Property::PIVOT, Toolkit::Align::BOTTOM_END);
   transform.Insert(DevelVisual::Transform::Property::EXTRA_SIZE, Vector2(50.0f, 50.0f));
 
   visual.SetTransformAndSize(transform, Vector2(100, 100));
@@ -2030,7 +2030,7 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
     DALI_TEST_EQUALS((Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::CENTER, TEST_LOCATION);
   }
   {
-    Property::Value* typeValue = map->Find(Toolkit::Visual::Transform::Property::ANCHOR_POINT);
+    Property::Value* typeValue = map->Find(Toolkit::Visual::Transform::Property::PIVOT);
     DALI_TEST_CHECK(typeValue);
     DALI_TEST_EQUALS((Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::BOTTOM_END, TEST_LOCATION);
   }
@@ -2066,8 +2066,8 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   Vector2 parentOrigin = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN);
   DALI_TEST_EQUALS(parentOrigin, Vector2(0.0f, 0.0f), TEST_LOCATION);
 
-  Vector2 anchorPoint = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT);
-  DALI_TEST_EQUALS(anchorPoint, Vector2(-0.5f, -0.5f), TEST_LOCATION);
+  Vector2 pivot = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT);
+  DALI_TEST_EQUALS(pivot, Vector2(-0.5f, -0.5f), TEST_LOCATION);
 
   Vector2 extraSize = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   DALI_TEST_EQUALS(extraSize, Vector2(50.0f, 50.0f), TEST_LOCATION);
@@ -2093,12 +2093,12 @@ static void TestTransform(ToolkitTestApplication& application, Visual::Base visu
   offsetSizeMode = renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   DALI_TEST_EQUALS(offsetSizeMode, Vector4(0.0f, 0.0f, 1.0f, 1.0f), TEST_LOCATION);
 
-  // Parent origin and anchor point should have the default values
+  // Parent origin and pivot should have the default values
   parentOrigin = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN);
   DALI_TEST_EQUALS(parentOrigin, Vector2(-0.5f, -0.5f), TEST_LOCATION);
 
-  anchorPoint = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT);
-  DALI_TEST_EQUALS(anchorPoint, Vector2(0.5f, 0.5f), TEST_LOCATION);
+  pivot = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT);
+  DALI_TEST_EQUALS(pivot, Vector2(0.5f, 0.5f), TEST_LOCATION);
 
   extraSize = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   DALI_TEST_EQUALS(extraSize, Vector2(0.5f, 0.5f), TEST_LOCATION);
@@ -2323,7 +2323,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   transformMap["size"]                    = Vector2(0.5f, 0.5f);
   transformMap["offset"]                  = Vector2(20.0f, 0.0f);
   transformMap["offsetPolicy"]            = Vector2(Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE);
-  transformMap["anchorPoint"]             = Align::CENTER;
+  transformMap["pivot"]                   = Align::CENTER;
   transformMap["origin"]                  = Align::CENTER;
   transformMap["extraSize"]               = Vector2(0.0f, 50.0f);
   properties[Visual::Property::TRANSFORM] = transformMap;
@@ -5622,7 +5622,7 @@ int UtcDaliVisualUpdateProperty02(void)
   Vector2              targetTransformOffsetPolicy = Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::RELATIVE);
   Vector2              targetTransformSizePolicy   = Vector2(Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::ABSOLUTE);
   Toolkit::Align::Type targetTransformOrigin       = Toolkit::Align::CENTER;
-  Toolkit::Align::Type targetTransformAnchorPoint  = Toolkit::Align::BOTTOM_END;
+  Toolkit::Align::Type targetTransformPivot        = Toolkit::Align::BOTTOM_END;
   Vector2              targetTransformExtraSize    = Vector2(50.0f, 5.0f);
   Property::Map        transform;
   transform.Insert(Visual::Transform::Property::OFFSET, targetTransformOffset);
@@ -5630,7 +5630,7 @@ int UtcDaliVisualUpdateProperty02(void)
   transform.Insert(Visual::Transform::Property::OFFSET_POLICY, targetTransformOffsetPolicy);
   transform.Insert(Visual::Transform::Property::SIZE_POLICY, targetTransformSizePolicy);
   transform.Insert(Visual::Transform::Property::ORIGIN, targetTransformOrigin);
-  transform.Insert(Visual::Transform::Property::ANCHOR_POINT, targetTransformAnchorPoint);
+  transform.Insert(Visual::Transform::Property::PIVOT, targetTransformPivot);
   transform.Insert(DevelVisual::Transform::Property::EXTRA_SIZE, targetTransformExtraSize);
   targetPropertyMap[Visual::Property::TRANSFORM] = transform;
 
@@ -5690,9 +5690,9 @@ int UtcDaliVisualUpdateProperty02(void)
   DALI_TEST_CHECK(transformOriginValue);
   DALI_TEST_EQUALS(transformOriginValue->Get<int32_t>(), static_cast<int32_t>(targetTransformOrigin), TEST_LOCATION);
 
-  Property::Value* transformAnchorPointValue = transformMap->Find(Visual::Transform::Property::ANCHOR_POINT, Property::INTEGER);
-  DALI_TEST_CHECK(transformAnchorPointValue);
-  DALI_TEST_EQUALS(transformAnchorPointValue->Get<int32_t>(), static_cast<int32_t>(targetTransformAnchorPoint), TEST_LOCATION);
+  Property::Value* transformPivotValue = transformMap->Find(Visual::Transform::Property::PIVOT, Property::INTEGER);
+  DALI_TEST_CHECK(transformPivotValue);
+  DALI_TEST_EQUALS(transformPivotValue->Get<int32_t>(), static_cast<int32_t>(targetTransformPivot), TEST_LOCATION);
 
   Property::Value* transformExtraSizeValue = transformMap->Find(DevelVisual::Transform::Property::EXTRA_SIZE, Property::VECTOR2);
   DALI_TEST_CHECK(transformExtraSizeValue);

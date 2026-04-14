@@ -209,7 +209,7 @@ void MaskEffectImpl::OnInitialize()
   mCamera = CameraActor::New();
   mCamera.SetInvertYAxis(true);
   mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   // renderer
   Renderer maskRenderer = GetTargetRenderer();
@@ -310,11 +310,11 @@ void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
   uint32_t width  = size.GetWidth();
   uint32_t height = size.GetHeight();
 
-  mMaskTargetFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mMaskTargetFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
   mMaskTargetTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
   mMaskTargetFrameBuffer.AttachColorTexture(mMaskTargetTexture);
 
-  mMaskSourceFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mMaskSourceFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
   mMaskSourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
   mMaskSourceFrameBuffer.AttachColorTexture(mMaskSourceTexture);
 }

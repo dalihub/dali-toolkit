@@ -23,8 +23,8 @@
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
@@ -165,7 +165,7 @@ Dali::Actor CreateSkybox()
   Dali::Actor skyboxActor = Actor::New();
   skyboxActor.SetProperty(Dali::Actor::Property::NAME, "SkyBox");
   skyboxActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  skyboxActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  skyboxActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   skyboxActor.AddRenderer(skyboxRenderer);
   return skyboxActor;
 }
@@ -998,11 +998,11 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
 
     captureData->mCaptureInvertCamera = Dali::CameraActor::New(size);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
     captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
 
-    captureData->mCaptureUrl       = Dali::Toolkit::Image::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
+    captureData->mCaptureUrl       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
     captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
     captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
     captureData->mCaptureImageView.Add(captureData->mCaptureInvertCamera);
@@ -1011,7 +1011,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     window.Add(captureData->mCaptureImageView);
 
     captureData->mCaptureInvertTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
-    captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::DEPTH_STENCIL);
+    captureData->mCaptureInvertFrameBuffer = Dali::FrameBuffer::New(captureData->mCaptureInvertTexture.GetWidth(), captureData->mCaptureInvertTexture.GetHeight(), Dali::FrameBuffer::Attachment::NONE);
     captureData->mCaptureInvertFrameBuffer.AttachColorTexture(captureData->mCaptureInvertTexture);
 
     captureData->mCaptureInvertTask = taskList.CreateTask();
@@ -1335,7 +1335,7 @@ void SceneView::OnInitialize()
 
   mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mDefaultCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mDefaultCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   AddCamera(mDefaultCamera);
   UpdateCamera(mDefaultCamera);
 
@@ -1444,7 +1444,7 @@ void SceneView::UpdateRenderTask()
         mFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::DEPTH_STENCIL);
         mFrameBuffer.AttachColorTexture(mTexture);
         DevelFrameBuffer::SetMultiSamplingLevel(mFrameBuffer, mFrameBufferMultiSamplingLevel);
-        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(mFrameBuffer, 0u);
+        Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(mFrameBuffer, 0u);
 
         Property::Map imagePropertyMap;
         imagePropertyMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
@@ -1841,7 +1841,7 @@ void SceneView::RequestCameraTransition()
 
     mTransitionCamera = Dali::CameraActor::New3DCamera();
     mTransitionCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mTransitionCamera.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mTransitionCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
     mRootLayer.Add(mTransitionCamera);
 
     mTransitionAnimation.AnimateBetween(Dali::Property(mTransitionCamera, Dali::Actor::Property::POSITION), positionKeyFrames, mTransitionAlphaFunction, Dali::Animation::Interpolation::LINEAR);

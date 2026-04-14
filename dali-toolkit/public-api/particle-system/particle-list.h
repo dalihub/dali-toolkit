@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_LIST_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_LIST_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,8 @@
 #include <dali-toolkit/public-api/particle-system/particle.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
-#include <cinttypes>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
@@ -232,7 +231,7 @@ public:
    * @brief Returns raw data container of the particle list
    * @return list of particles
    */
-  std::list<Particle>& GetActiveParticles();
+  Dali::Vector<Particle>& GetActiveParticles();
 
 private:
   /// @cond internal

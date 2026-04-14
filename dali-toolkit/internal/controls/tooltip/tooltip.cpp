@@ -477,7 +477,7 @@ bool Tooltip::OnTimeout()
     mPopup.SetProperty(Toolkit::Popup::Property::BACKING_ENABLED, false);  // Disable the dimmed backing.
     mPopup.SetProperty(Toolkit::Popup::Property::TOUCH_TRANSPARENT, true); // Let events pass through the popup
     mPopup.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    mPopup.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    mPopup.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
     // Background
     mPopup.SetProperty(Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, ToPropertyValue(mBackgroundImage));

@@ -336,7 +336,7 @@ void GaussianBlurEffectImpl::OnActivate()
     mCamera = CameraActor::New();
     mCamera.SetInvertYAxis(true);
     mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     mCamera.SetType(Dali::Camera::FREE_LOOK);
     mInternalRoot.Add(mCamera);
   }
@@ -347,7 +347,7 @@ void GaussianBlurEffectImpl::OnActivate()
     mRenderDownsampledCamera = CameraActor::New();
     mRenderDownsampledCamera.SetInvertYAxis(true);
     mRenderDownsampledCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mRenderDownsampledCamera.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    mRenderDownsampledCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK);
     mInternalRoot.Add(mRenderDownsampledCamera);
   }
@@ -467,7 +467,7 @@ void GaussianBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsample
   uint32_t downsampledHeight = downsampledSize.GetHeight();
 
   // buffer to draw input texture
-  mInputFrameBuffer              = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::DEPTH_STENCIL);
+  mInputFrameBuffer              = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::AUTO);
   Texture inputBackgroundTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
   mInputFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 

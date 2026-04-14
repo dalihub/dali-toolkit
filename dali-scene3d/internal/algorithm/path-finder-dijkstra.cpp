@@ -18,8 +18,8 @@
 #include <dali-scene3d/internal/algorithm/path-finder-dijkstra.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/list-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/list-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <algorithm> ///< for std::priority_queue
 #include <limits>
 #include <queue> ///< for std::priority_queue

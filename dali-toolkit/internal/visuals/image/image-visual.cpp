@@ -28,9 +28,9 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -59,7 +59,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(8); // ltr, wrap, pixel area, pixalign, crop to mask, mask texture ratio, pre-multiplied alpha
+const int CUSTOM_PROPERTY_COUNT(0);
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)

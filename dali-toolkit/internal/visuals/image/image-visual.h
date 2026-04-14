@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <memory>
 
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>

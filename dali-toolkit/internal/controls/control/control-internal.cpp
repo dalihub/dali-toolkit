@@ -29,11 +29,12 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 #include <cstring>
 #include <limits>
 
@@ -57,7 +58,6 @@
 #include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToDaliString;
@@ -123,7 +123,7 @@ static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInp
 {
   // We just assume below state are applied.
   // - Transform::ORIGIN is CENTER
-  // - Transform::ANCHOR_POINT is CENTER
+  // - Transform::PIVOT is CENTER
   // - Transform::OFFSET_POLICY are ABSOLUTE
   // - Transform::SIZE_POLICY are RELATIVE
   // - Transform::SIZE is Vector2::ONE
@@ -172,7 +172,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
 {
   // We just assume below state are applied.
   // - Transform::ORIGIN is CENTER
-  // - Transform::ANCHOR_POINT is CENTER
+  // - Transform::PIVOT is CENTER
   // - Transform::OFFSET_POLICY are ABSOLUTE
   // - Transform::SIZE_POLICY are RELATIVE
   // - Transform::SIZE is Vector2::ONE

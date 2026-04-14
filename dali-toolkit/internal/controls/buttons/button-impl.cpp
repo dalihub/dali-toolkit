@@ -845,7 +845,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
     foregroundVisualPadding = mForegroundPadding;
   }
 
-  Toolkit::Align::Type visualAnchorPoint = Toolkit::Align::TOP_BEGIN;
+  Toolkit::Align::Type visualPivot = Toolkit::Align::TOP_BEGIN;
 
   Vector2 visualAndPaddingSize = Vector2((foregroundVisualPadding.x + visualSize.width + foregroundVisualPadding.y),
                                          (foregroundVisualPadding.width + visualSize.height + foregroundVisualPadding.height));
@@ -860,7 +860,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
   {
     case BEGIN:
     {
-      visualAnchorPoint = Toolkit::Align::TOP_END;
+      visualPivot = Toolkit::Align::TOP_END;
       visualPosition.x  = foregroundVisualPadding.right;
       visualPosition.y  = foregroundVisualPadding.top;
 
@@ -873,7 +873,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
     case END:
     {
-      visualAnchorPoint = Toolkit::Align::TOP_BEGIN;
+      visualPivot = Toolkit::Align::TOP_BEGIN;
       visualPosition.x  = foregroundVisualPadding.left;
       visualPosition.y  = foregroundVisualPadding.top;
 
@@ -886,7 +886,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
     case TOP:
     {
-      visualAnchorPoint = Toolkit::Align::BOTTOM_END;
+      visualPivot = Toolkit::Align::BOTTOM_END;
       visualPosition.x  = foregroundVisualPadding.left;
       visualPosition.y  = foregroundVisualPadding.bottom;
 
@@ -900,7 +900,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
     case BOTTOM:
     {
-      visualAnchorPoint = Toolkit::Align::TOP_END;
+      visualPivot = Toolkit::Align::TOP_END;
       visualPosition.x  = foregroundVisualPadding.left;
       visualPosition.y  = foregroundVisualPadding.top;
 
@@ -937,7 +937,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
       .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
       .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, visualAnchorPoint);
+      .Add(Toolkit::Visual::Transform::Property::PIVOT, visualPivot);
 
     currentVisual.SetTransformAndSize(visualTransform, size);
   }
@@ -967,7 +967,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
         .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
         .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
         .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
-        .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, visualAnchorPoint);
+        .Add(Toolkit::Visual::Transform::Property::PIVOT, visualPivot);
 
       textVisual.SetTransformAndSize(textVisualTransform, size);
     }

@@ -19,12 +19,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/uniform-block.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>

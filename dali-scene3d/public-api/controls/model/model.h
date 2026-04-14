@@ -62,7 +62,7 @@ class Model;
  *
  * Model model = Model::New(modelUrl);
  * model.SetProperty(Dali::Actor::Property::SIZE, Vector2(width, height));
- * model.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+ * model.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
  * model.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
  * model.SetImageBasedLightSource(diffuseUrl, specularUrl, scaleFactor);
  * window.Add(model);

@@ -21,6 +21,7 @@
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/texture.h>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>

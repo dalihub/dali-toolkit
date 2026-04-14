@@ -18,6 +18,7 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
+#include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-web-engine.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
@@ -70,12 +71,16 @@ static void Wait(ToolkitTestApplication& application)
 void utc_dali_toolkit_accessibility_control_bridgeup_startup(void)
 {
   test_return_value = TET_UNDEF;
+  Test::WebEngine::SetWebViewAccessible(nullptr);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({":9.99", "root"});
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_toolkit_accessibility_control_bridgeup_cleanup(void)
 {
   test_return_value = TET_PASS;
+  Test::WebEngine::SetWebViewAccessible(nullptr);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({":9.99", "root"});
   DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
@@ -1187,7 +1192,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
   DALI_TEST_EQUALS(std::get<2>(bridge_extents), 10, TEST_LOCATION);
   DALI_TEST_EQUALS(std::get<3>(bridge_extents), 10, TEST_LOCATION);
 
-  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT, false);
+  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_PIVOT, false);
   application.SendNotification();
   application.Render(1);
 
@@ -1264,7 +1269,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
   DALI_TEST_EQUALS(std::get<2>(bridge_extents), 10, TEST_LOCATION);
   DALI_TEST_EQUALS(std::get<3>(bridge_extents), 10, TEST_LOCATION);
 
-  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT, false);
+  control.SetProperty(Dali::DevelActor::Property::POSITION_USES_PIVOT, false);
   application.SendNotification();
   application.Render(1);
 
@@ -1795,21 +1800,21 @@ int UtcDaliAccessibilityCheckHighlight(void)
   PushButton parentButton = PushButton::New();
   parentButton.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 200.0f));
   application.GetScene().Add(parentButton);
 
   PushButton buttonA = PushButton::New();
   buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
   buttonA.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonA);
 
   PushButton buttonB = PushButton::New();
   buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f));
   buttonB.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonB);
@@ -1926,6 +1931,8 @@ int UtcDaliWebViewAccessible(void)
   auto webView           = Dali::Toolkit::WebView::New();
   auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
 
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
   DALI_TEST_CHECK(webViewAccessible);
 
   auto children = webViewAccessible->GetChildren();
@@ -1955,6 +1962,139 @@ int UtcDaliWebViewAccessible(void)
 
   DALI_TEST_CHECK(address);
   DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  END_TEST;
+}
+
+int UtcDaliWebViewAccessibleEnabledAfterLoad(void)
+{
+  ToolkitTestApplication application;
+
+  auto webView           = Dali::Toolkit::WebView::New();
+  auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
+
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
+  DALI_TEST_CHECK(webViewAccessible);
+
+  auto children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  // Assuming the webengine lazy sets accessibility address on LoadUrl
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  webView.LoadUrl("http://www.somewhere.valid1.com");
+
+  // Test children still empty.
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  // Enables accessibility
+  Dali::Accessibility::TestEnableSC(true);
+
+  // Test we could get child after accessiblity enagled.
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  // Test children still empty.
+
+  auto* child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  auto address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC(false);
+
+  children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  END_TEST;
+}
+
+int UtcDaliWebViewAccessibleActivateAccessibility(void)
+{
+  ToolkitTestApplication application;
+
+  auto webView           = Dali::Toolkit::WebView::New();
+  auto webViewAccessible = Dali::Accessibility::Accessible::Get(webView);
+
+  Test::WebEngine::SetWebViewAccessible(webViewAccessible);
+
+  DALI_TEST_CHECK(webViewAccessible);
+
+  auto children = webViewAccessible->GetChildren();
+
+  DALI_TEST_CHECK(children.empty());
+
+  // Enables accessibility
+  Dali::Accessibility::TestEnableSC(true);
+
+  // Assuming the webengine lazy sets accessibility address on LoadUrl
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_CHECK(children.empty());
+
+  // our test webengine sets accessibility address here
+  webView.LoadUrl("http://www.somewhere.valid1.com");
+
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  auto* child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  auto address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_NOT_EQUALS(address.GetBus(), webViewAccessible->GetAddress().GetBus(), 0.0f, TEST_LOCATION);
+
+  // Disable accessibility
+  webView.ActivateAccessibility(false);
+
+  // Call GetChildren to reset children updated flag.
+  children = webViewAccessible->GetChildren();
+
+  // Change dummy bus address to check address re-validate after accessibility enabled again
+  std::string dummyBus = ":9.88";
+  DALI_TEST_NOT_EQUALS(address.GetBus(), dummyBus, 0.0f, TEST_LOCATION);
+  Test::WebEngine::SetWebAccessibleActivatedAddress({dummyBus, "root"});
+
+  // our test webengine change accessibility address here
+  webView.LoadUrl("http://www.someanother.valid1.com");
+
+  // Enable accessibility again
+  webView.ActivateAccessibility(true);
+
+  children = webViewAccessible->GetChildren();
+  DALI_TEST_EQUALS(children.size(), 1u, TEST_LOCATION);
+
+  child = children[0];
+
+  DALI_TEST_CHECK(child);
+  DALI_TEST_CHECK(child->IsProxy());
+  DALI_TEST_EQUALS(child->GetParent(), webViewAccessible, TEST_LOCATION);
+
+  address = child->GetAddress();
+
+  DALI_TEST_CHECK(address);
+  DALI_TEST_EQUALS(address.GetBus(), dummyBus, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC(false);
 
@@ -2265,7 +2405,7 @@ private:
     button.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f));
     button.SetProperty(Actor::Property::VISIBLE, true);
     button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    button.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     button.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_0"));
     container.Add(button);
 
@@ -2273,14 +2413,14 @@ private:
     auto text = TextLabel::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, ToDaliString(label));
     text.SetProperty(Actor::Property::VISIBLE, true);
     text.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    text.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    text.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     text.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_1"));
     container.Add(text);
 
     // invisible actor
     auto invisibleActor = MakeInvisibleActor();
     invisibleActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::RIGHT);
-    invisibleActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    invisibleActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     invisibleActor.SetProperty(DevelControl::Property::AUTOMATION_ID, ToDaliString(label + "_2"));
     container.Add(invisibleActor);
 
@@ -2298,7 +2438,7 @@ public:
     view.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 800.0f)); // full screen
     //view.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
     view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
     for(int i = 0; i < N; ++i)
     {
@@ -2558,7 +2698,7 @@ int UtcDaliWebViewCheckResumeOnAccessibilityMode(void)
   Dali::Accessibility::TestEnableSC(true);
 
   WebView view = WebView::New();
-  view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   view.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   view.SetProperty(Actor::Property::POSITION, Vector2(0, 0));
   view.SetProperty(Actor::Property::SIZE, Vector2(800, 600));

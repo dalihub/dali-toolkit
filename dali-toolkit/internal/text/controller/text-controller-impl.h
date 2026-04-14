@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
@@ -194,19 +195,17 @@ struct ModifyEvent
 struct FontDefaults
 {
   FontDefaults()
-  : mFontDescription(),
-    mDefaultPointSize(0.f),
+  : mDefaultPointSize(0.f),
     mFitPointSize(0.f),
     mFontId(0u),
     familyDefined(false),
     weightDefined(false),
     widthDefined(false),
     slantDefined(false),
-    sizeDefined(false)
+    sizeDefined(false),
+    fontDescriptionGetted(false),
+    mFontDescription()
   {
-    // Initially use the default platform font
-    TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-    fontClient.GetDefaultPlatformFontDescription(mFontDescription);
   }
 
   FontId GetFontId(TextAbstraction::FontClient& fontClient, float fontPointSize)
@@ -214,21 +213,54 @@ struct FontDefaults
     if(!mFontId)
     {
       const PointSize26Dot6 pointSize = static_cast<PointSize26Dot6>(fontPointSize * 64.f);
-      mFontId                         = fontClient.GetFontId(mFontDescription, pointSize);
+
+      if(DALI_UNLIKELY(!fontDescriptionGetted))
+      {
+        fontDescriptionGetted = true;
+        fontClient.GetDefaultPlatformFontDescription(mFontDescription);
+      }
+
+      mFontId = fontClient.GetFontId(mFontDescription, pointSize);
     }
 
     return mFontId;
   }
 
-  TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
-  float                            mDefaultPointSize; ///< The default font's point size.
-  float                            mFitPointSize;     ///< The fit font's point size.
-  FontId                           mFontId;           ///< The font's id of the default font.
-  bool                             familyDefined : 1; ///< Whether the default font's family name is defined.
-  bool                             weightDefined : 1; ///< Whether the default font's weight is defined.
-  bool                             widthDefined : 1;  ///< Whether the default font's width is defined.
-  bool                             slantDefined : 1;  ///< Whether the default font's slant is defined.
-  bool                             sizeDefined : 1;   ///< Whether the default font's point size is defined.
+  TextAbstraction::FontDescription& GetFontDescription()
+  {
+    if(!fontDescriptionGetted)
+    {
+      DALI_ASSERT_DEBUG(Dali::Adaptor::IsAvailable() && "Must be called GetFontDescription() for non-const type at main thread!");
+
+      fontDescriptionGetted = true;
+      // Initially use the default platform font
+      TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+      fontClient.GetDefaultPlatformFontDescription(mFontDescription);
+    }
+    return mFontDescription;
+  }
+
+  const TextAbstraction::FontDescription& GetFontDescription() const
+  {
+    DALI_ASSERT_DEBUG(fontDescriptionGetted && "Must be called GetFontDescription() for non-const type before!");
+    return mFontDescription;
+  }
+
+public:
+  float  mDefaultPointSize; ///< The default font's point size.
+  float  mFitPointSize;     ///< The fit font's point size.
+  FontId mFontId;           ///< The font's id of the default font.
+
+  bool familyDefined : 1;         ///< Whether the default font's family name is defined.
+  bool weightDefined : 1;         ///< Whether the default font's weight is defined.
+  bool widthDefined : 1;          ///< Whether the default font's width is defined.
+  bool slantDefined : 1;          ///< Whether the default font's slant is defined.
+  bool sizeDefined : 1;           ///< Whether the default font's point size is defined.
+  bool fontDescriptionGetted : 1; ///< Whether the default font's description getted from default platform font.
+
+private:
+  TextAbstraction::FontDescription mFontDescription; ///< The default font's description. Make it private to ensure to get
+                                                     ///< the default font's description from the system at least once to initialize it.
 };
 
 /**

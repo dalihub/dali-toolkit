@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 #include <memory> ///< for std::unique_ptr
 #include <unordered_set>
@@ -123,7 +123,7 @@ struct Base::Impl
     Vector2              mExtraSize;
     Vector4              mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
-    Toolkit::Align::Type mAnchorPoint;
+    Toolkit::Align::Type mPivot;
   };
 
   struct ConstraintFeature

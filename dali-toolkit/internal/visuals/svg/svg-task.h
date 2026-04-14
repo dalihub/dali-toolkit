@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <memory>
 

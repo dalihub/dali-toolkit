@@ -218,7 +218,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     DummyControl dummy = DummyControl::New(true);
     dummy.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
 
-    dummy.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    dummy.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     application.GetScene().Add(dummy);
 
     // Render and notify a couple of times
@@ -601,7 +601,7 @@ int UtcDaliControlImplSetStyleName(void)
     DummyControl dummy = DummyControl::New(true);
 
     dummy.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-    dummy.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    dummy.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     application.GetScene().Add(dummy);
 
     dummy.SetStyleName("TestStyle");
@@ -1152,7 +1152,7 @@ int UtcDaliControlImplOnPinch(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(control);
 
   application.SendNotification();
@@ -1193,7 +1193,7 @@ int UtcDaliControlImplResourceReady(void)
   gResourceReadyCalled      = false;
   Control control           = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   control.OnRelayoutSignal().Connect(OnRelayoutCallback);
   control.ResourceReadySignal().Connect(OnResourceReady);
   application.GetScene().Add(control);

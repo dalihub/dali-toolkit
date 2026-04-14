@@ -21,11 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 #ifdef TRACE_ENABLED
 #include <chrono>

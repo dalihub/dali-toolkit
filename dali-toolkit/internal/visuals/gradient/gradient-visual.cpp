@@ -23,9 +23,9 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <typeinfo>
 
 // INTERNAL INCLUDES
@@ -52,7 +52,7 @@ namespace Internal
 {
 namespace
 {
-static constexpr int32_t CUSTOM_PROPERTY_COUNT(1); // alignment
+static constexpr int32_t CUSTOM_PROPERTY_COUNT(3); // alignment, scalefactor, offset
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)

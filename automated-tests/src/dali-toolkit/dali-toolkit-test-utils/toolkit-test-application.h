@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <test-application.h>
 #include <toolkit-adaptor-impl.h>
-#include "test-application.h"
 
 // #undef assert
 
@@ -68,6 +68,11 @@ public:
    */
   void RunIdles();
 
+  /**
+   * @brief Notify to application that pre-initialize application case.
+   */
+  void PreInitializeCompleted();
+
   Dali::Window GetWindow()
   {
     return mMainWindow;
@@ -83,6 +88,11 @@ public:
     return mPreInitialized;
   }
 
+public:
+  static bool DECODED_IMAGES_SUPPORTED;
+  static bool ADD_IDLE_SUCCESS;                       ///< Default as true.
+  static bool PREINITIALIZE_ADAPTOR_CREATION_ENABLED; ///< Default as true.
+
 private:
   Dali::Window             mMainWindow;
   std::unique_ptr<Adaptor> mAdaptor;
@@ -90,5 +100,10 @@ private:
 };
 
 } // namespace Dali
+
+namespace Test::ToolkitTestApplication
+{
+Dali::ToolkitTestApplication& GetPreInitializedApplication();
+} // namespace Test::ToolkitTestApplication
 
 #endif // DALI_TOOLKIT_TEST_APPLICATION_H

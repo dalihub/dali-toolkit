@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
       if(impl.IsShowingPlaceholderText() && impl.mEventData && (nullptr != impl.mEventData->mPlaceholderFont))
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
-        defaultFontDescription = impl.mEventData->mPlaceholderFont->mFontDescription;
+        defaultFontDescription = impl.mEventData->mPlaceholderFont->GetFontDescription();
         if(impl.mEventData->mPlaceholderFont->sizeDefined)
         {
           defaultPointSize = impl.mEventData->mPlaceholderFont->mDefaultPointSize * impl.GetFontSizeScale() * numberOfPointsPerOneUnitOfPointSize;
@@ -270,7 +270,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
       else if(nullptr != impl.mFontDefaults)
       {
         // Set the normal font and the placeholder font.
-        defaultFontDescription = impl.mFontDefaults->mFontDescription;
+        defaultFontDescription = impl.mFontDefaults->GetFontDescription();
 
         if(impl.mTextFitEnabled || impl.mTextFitArrayEnabled)
         {

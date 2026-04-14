@@ -21,20 +21,20 @@
 // EXTERNAL INCLUDE
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/round-robin-container-view.h>
-#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <algorithm>
 #include <memory>
 #include <unordered_map>
 
 // INTERNAL INCLUDE
-#include <toolkit-application.h>
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-test-application.h>
 #include "dali-test-suite-utils.h"
 
 namespace Dali

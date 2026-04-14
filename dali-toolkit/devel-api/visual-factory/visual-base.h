@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -37,7 +37,7 @@ namespace Visual
 {
 class Base;
 }
-} //namespace Internal DALI_INTERNAL
+} // namespace Internal DALI_INTERNAL
 
 namespace Visual
 {
@@ -65,12 +65,12 @@ namespace Visual
  * | shaderHints             | INTEGER or ARRAY of STRING | No       | NONE    | Bitmask of hints @sa Dali::Shader::Hint |
  *
  * and \b transform is a map with the following properties:
- * | %Property Name          | Type              | Required | Default                | Description                                         |
- * |-------------------------|-------------------|----------|------------------------|-----------------------------------------------------|
- * | offset                  | VECTOR2           | No       | (0,0)                  | Offset of visual from origin                        |
- * | size                    | VECTOR2           | No       | (1,1)                  | size of visual                                      |
- * | origin                  | INTEGER or STRING | No       | CENTER                 | origin of the visual @sa Dali::Toolkit::Align       |
- * | anchorPoint             | INTEGER or STRING | No       | CENTER                 | anchor point of the visual @sa Dali::Toolkit::Align |
+ * | %Property Name          | Type              | Required | Default                | Description                                    |
+ * |-------------------------|-------------------|----------|------------------------|------------------------------------------------|
+ * | offset                  | VECTOR2           | No       | (0,0)                  | Offset of visual from origin                   |
+ * | size                    | VECTOR2           | No       | (1,1)                  | size of visual                                 |
+ * | origin                  | INTEGER or STRING | No       | CENTER                 | origin of the visual @sa Dali::Toolkit::Align  |
+ * | pivot                   | INTEGER or STRING | No       | CENTER                 | pivot of the visual @sa Dali::Toolkit::Align   |
  * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
  * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
  *

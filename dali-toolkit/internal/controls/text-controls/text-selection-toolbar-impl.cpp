@@ -200,7 +200,7 @@ void TextSelectionToolbar::SetUpScrollView()
   mScrollView.SetProperty(Dali::Actor::Property::NAME, "TextSelectionScrollView");
   mScrollView.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   mScrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  mScrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  mScrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
 
   mScrollView.SetScrollingDirection(PanGestureDetector::DIRECTION_HORIZONTAL, Degree(40.0f));
   mScrollView.SetAxisAutoLock(true);
@@ -226,7 +226,7 @@ void TextSelectionToolbar::SetUp()
   // Create Actor to house the toolbar.
   mToolbarActor = Actor::New();
   mToolbarActor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
-  mToolbarActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mToolbarActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mToolbarActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   if(!mScrollView)
@@ -239,7 +239,7 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons = Dali::Toolkit::TableView::New(1, 1);
   mTableOfButtons.SetFitHeight(0);
   mTableOfButtons.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  mTableOfButtons.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  mTableOfButtons.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
 
   mScrollView.Add(mTableOfButtons);
   mToolbarActor.Add(mScrollView);
@@ -255,14 +255,14 @@ void TextSelectionToolbar::SetUpScrollBar(bool enable)
     {
       Toolkit::ImageView indicator = Toolkit::ImageView::New();
       indicator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      indicator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      indicator.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       indicator.SetStyleName("TextSelectionScrollIndicator");
 
       mScrollBar = Toolkit::ScrollBar::New(Toolkit::ScrollBar::HORIZONTAL);
       mScrollBar.SetProperty(Dali::Actor::Property::NAME, "Text popup scroll bar");
       mScrollBar.SetStyleName("TextSelectionScrollBar");
       mScrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-      mScrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      mScrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mScrollBar.SetProperty(Actor::Property::POSITION, Vector2(mScrollBarPadding.x, -mScrollBarPadding.y));
       mScrollBar.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
       mScrollBar.SetProperty(Actor::Property::ORIENTATION, Quaternion(Quaternion(Radian(1.5f * Math::PI), Vector3::ZAXIS)));

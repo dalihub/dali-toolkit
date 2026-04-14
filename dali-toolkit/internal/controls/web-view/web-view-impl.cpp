@@ -52,8 +52,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali/integration-api/debug.h>
 
@@ -123,16 +123,16 @@ enum class DisplayAreaCalculateOption
  */
 Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption option)
 {
-  bool    positionUsesAnchorPoint = self.GetProperty<bool>(Actor::Property::POSITION_USES_ANCHOR_POINT);
-  Vector3 actorSize               = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
-                                                                                             : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
-  Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 screenPosition          = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
-                                                                                             : Dali::DevelActor::CalculateScreenPosition(self);
+  bool    positionUsesPivot = self.GetProperty<bool>(Actor::Property::POSITION_USES_PIVOT);
+  Vector3 actorSize         = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
+                                                                                       : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
+  Vector3 pivotOffSet       = actorSize * (positionUsesPivot ? self.GetCurrentProperty<Vector3>(Actor::Property::PIVOT) : Pivot::TOP_LEFT);
+  Vector2 screenPosition    = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
+                                                                                       : Dali::DevelActor::CalculateScreenPosition(self);
 
   Dali::Rect<int32_t> displayArea;
-  displayArea.x      = screenPosition.x - anchorPointOffSet.x;
-  displayArea.y      = screenPosition.y - anchorPointOffSet.y;
+  displayArea.x      = screenPosition.x - pivotOffSet.x;
+  displayArea.y      = screenPosition.y - pivotOffSet.y;
   displayArea.width  = actorSize.x;
   displayArea.height = actorSize.y;
 
@@ -285,14 +285,14 @@ Toolkit::WebView WebView::FindWebView(Dali::WebEnginePlugin* plugin)
   return Toolkit::WebView();
 }
 
-Dali::WebEngineContext* WebView::GetContext()
+Dali::WebEngineContext* WebView::GetContext(bool isIncognito)
 {
-  return Dali::WebEngine::GetContext();
+  return Dali::WebEngine::GetContext(isIncognito);
 }
 
-Dali::WebEngineCookieManager* WebView::GetCookieManager()
+Dali::WebEngineCookieManager* WebView::GetCookieManager(bool isIncognito)
 {
-  return Dali::WebEngine::GetCookieManager();
+  return Dali::WebEngine::GetCookieManager(isIncognito);
 }
 
 void WebView::OnInitialize()
@@ -364,6 +364,11 @@ void WebView::ChangeOrientation(int orientation)
     DALI_LOG_DEBUG_INFO("WebView[%p] ChangeOrientation(%d)\n", this, orientation);
     mWebEngine.ChangeOrientation(orientation);
   }
+}
+
+bool WebView::IsIncognito() const
+{
+  return mWebEngine ? mWebEngine.IsIncognito() : false;
 }
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
@@ -690,10 +695,28 @@ float WebView::GetScaleFactor() const
 
 void WebView::ActivateAccessibility(bool activated)
 {
-  if(mWebEngine)
+  if(!mWebEngine)
   {
-    DALI_LOG_DEBUG_INFO("WebView[%p] ActivateAccessibility(%d)\n", this, activated);
-    mWebEngine.ActivateAccessibility(activated);
+    return;
+  }
+
+  DALI_LOG_DEBUG_INFO("WebView[%p] ActivateAccessibility(%d)\n", this, activated);
+  Actor self = Self();
+  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, !activated);
+  mWebEngine.ActivateAccessibility(activated);
+
+  auto accessible = GetAccessibleObject();
+  if(auto webviewAccessible = std::dynamic_pointer_cast<WebViewAccessible>(accessible))
+  {
+    if(!activated)
+    {
+      webviewAccessible->SetForceRefreshAddress(true);
+    }
+    else
+    {
+      webviewAccessible->SetRemoteChildAddress({});
+      webviewAccessible->OnChildrenChanged();
+    }
   }
 }
 
@@ -787,7 +810,7 @@ Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
     return Dali::Toolkit::ImageView();
   }
 
-  Dali::Toolkit::ImageUrl  url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageUrl  url       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixel);
   Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url.GetUrl());
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
   return imageView;
@@ -1082,7 +1105,7 @@ void WebView::OnFrameRendered()
   mLastRenderedNativeImageWidth  = nativeImagePtr->GetWidth();
   mLastRenderedNativeImageHeight = nativeImagePtr->GetHeight();
 
-  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImagePtr, true);
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(nativeImagePtr, true);
 
   newWebMap[Toolkit::ImageVisual::Property::URL] = nativeImageUrl.GetUrl();
 
@@ -1617,9 +1640,9 @@ Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() cons
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
-  if(Dali::Accessibility::IsUp() && !mRemoteChild.GetAddress())
+  if(Dali::Accessibility::IsUp() && (!mRemoteChild.GetAddress() || mForceRefreshAddress))
   {
-    DALI_LOG_DEBUG_INFO("Try setting address as it has not not been set on initialize.\n");
+    DALI_LOG_DEBUG_INFO("Try setting address as it has not not been set on initialize. (force:%d)\n", mForceRefreshAddress);
     SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
   }
 
@@ -1651,6 +1674,7 @@ void WebView::WebViewAccessible::OnAccessibilityEnabled()
 
   mWebEngine.ActivateAccessibility(true);
   SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
+  OnChildrenChanged();
 }
 
 void WebView::WebViewAccessible::OnAccessibilityDisabled()
@@ -1662,12 +1686,18 @@ void WebView::WebViewAccessible::OnAccessibilityDisabled()
 
   SetRemoteChildAddress({});
   mWebEngine.ActivateAccessibility(false);
+  OnChildrenChanged();
 }
 
 void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
 {
   mRemoteChild.SetAddress(address);
-  OnChildrenChanged();
+  mForceRefreshAddress = false;
+}
+
+void WebView::WebViewAccessible::SetForceRefreshAddress(bool forceRefresh)
+{
+  mForceRefreshAddress = forceRefresh;
 }
 
 } // namespace Internal
