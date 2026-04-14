@@ -174,7 +174,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 } // namespace
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -198,7 +198,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 }
 
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),

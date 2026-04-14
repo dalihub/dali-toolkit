@@ -479,7 +479,7 @@ struct TestDBusWrapper : public DBusWrapper
 
   public:
     template<typename T>
-    Element(T&& t, typename std::enable_if<detail::DBusSig<T>::value != 0>::type* = nullptr)
+    Element(T&& t, typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type* = nullptr)
     {
       set(std::forward<T>(t));
     }
@@ -504,18 +504,18 @@ struct TestDBusWrapper : public DBusWrapper
     {
       return index_ == detail::IndexFromTypeTuple<ElementTuple, ElementList>::value;
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     bool is() const
     {
       return index_ == detail::IndexFromTypeTuple<ElementTuple, T>::value;
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     const T& get() const
     {
       if(!is<T>()) throw error{};
       return std::get<detail::IndexFromTypeTuple<ElementTuple, T>::value>(data);
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     T& get()
     {
       if(!is<T>()) throw error{};
