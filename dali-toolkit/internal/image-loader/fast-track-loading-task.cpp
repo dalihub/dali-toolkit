@@ -160,7 +160,12 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
 
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
       // Call Upload API, only for add informations of GPU memory usage.
-      Dali::Integration::TextureUploadWithContent(mTextures[index], GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(mUrl.GetUrl() + "(" + ("YUVA"[index]) + ")"), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE);
+      std::string content = mUrl.GetUrl();
+      if(index > 0u || (index == 0u && mPlanesLoaded))
+      {
+        content += std::string("(") + ("YUVA"[index]) + ")";
+      }
+      Dali::Integration::TextureUploadWithContent(mTextures[index], GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(content), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE);
 #endif
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
