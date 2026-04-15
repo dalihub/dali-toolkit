@@ -986,7 +986,7 @@ int UtcDaliVisualGetPropertyMap6(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualGetPropertyMap6: NPatchVisual");
 
-  Rect<int> border(1, 1, 1, 1);
+  Extents border(1, 1, 1, 1);
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -1019,9 +1019,9 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>());
 
-  value = resultMap.Find(ImageVisual::Property::BORDER, Property::RECTANGLE);
+  value = resultMap.Find(ImageVisual::Property::BORDER, Property::EXTENTS);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Rect<int>>() == border);
+  DALI_TEST_CHECK(value->Get<Extents>() == border);
 
   value = resultMap.Find(DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING);
   DALI_TEST_CHECK(value);
@@ -1060,9 +1060,9 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>());
 
-  value = resultMap.Find(ImageVisual::Property::BORDER, Property::RECTANGLE);
+  value = resultMap.Find(ImageVisual::Property::BORDER, Property::EXTENTS);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Rect<int>>() == border);
+  DALI_TEST_CHECK(value->Get<Extents>() == border);
 
   END_TEST;
 }

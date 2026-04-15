@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ bool ReadQuadHelper(const TreeNode* tn, const std::array<T*, 4>& quad)
   while(iJson != tn->CEnd() && i != iEnd)
   {
     int value;
-    if(ReadInt(&(*iJson).second, value) && value <= std::numeric_limits<T>::max())
+    if(ReadInt(&(*iJson).second, value) && value <= std::numeric_limits<T>::max() && value >= std::numeric_limits<T>::min())
     {
       **i = value;
       ++i;
@@ -158,7 +158,7 @@ const std::map<std::string_view, Property::Value (*)(const TreeNode*)>& GetTypeI
     {"extents", [](const TreeNode* tn)
   {
     Extents value;
-    if(ReadQuadHelper<uint16_t>(tn, {&value.start, &value.end, &value.top, &value.bottom}))
+    if(ReadQuadHelper<int16_t>(tn, {&value.start, &value.end, &value.top, &value.bottom}))
     {
       return Property::Value(value);
     }
@@ -454,7 +454,7 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const TreeNode
     case Property::EXTENTS:
     {
       Extents value;
-      if(ReadQuadHelper<uint16_t>(&tn, {&value.start, &value.end, &value.top, &value.bottom}))
+      if(ReadQuadHelper<int16_t>(&tn, {&value.start, &value.end, &value.top, &value.bottom}))
       {
         return Property::Value(value);
       }

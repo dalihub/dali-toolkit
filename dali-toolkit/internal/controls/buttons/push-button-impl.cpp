@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,8 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::PushButton, Toolkit::Button, Create)
 
-DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "labelPadding", STRING, LABEL_PADDING)
-DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "iconPadding", STRING, ICON_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "labelPadding", VECTOR4, LABEL_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "iconPadding", VECTOR4, ICON_PADDING)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -153,13 +153,13 @@ void PushButton::SetProperty(BaseObject* object, Property::Index propertyIndex, 
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
         Vector4 padding(value.Get<Vector4>());
-        pushButtonImpl.Button::SetLabelPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+        pushButtonImpl.Button::SetLabelPadding(padding);
         break;
       }
       case Toolkit::PushButton::Property::ICON_PADDING:
       {
         Vector4 padding(value.Get<Vector4>());
-        pushButtonImpl.Button::SetForegroundPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+        pushButtonImpl.Button::SetForegroundPadding(padding);
         break;
       }
     }
@@ -180,14 +180,12 @@ Property::Value PushButton::GetProperty(BaseObject* object, Property::Index prop
     {
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
-        Padding padding = pushButtonImpl.Button::GetLabelPadding();
-        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
+        value = pushButtonImpl.Button::GetLabelPadding();
         break;
       }
       case Toolkit::PushButton::Property::ICON_PADDING:
       {
-        Padding padding = pushButtonImpl.Button::GetForegroundPadding();
-        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
+        value = pushButtonImpl.Button::GetForegroundPadding();
         break;
       }
     }

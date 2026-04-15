@@ -242,27 +242,27 @@ private: // Implementation
 
   /**
    * Set option divider padding
-   * @param[in] padding BEGIN END BOTTOM TOP
+   * @param[in] padding start / end / top / bottom
    */
-  void SetOptionDividerPadding(const Padding& padding);
+  void SetOptionDividerPadding(const Vector4& padding);
 
   /**
    * Get option divider padding
    * @return Padding
    */
-  Padding GetOptionDividerPadding() const;
+  Vector4 GetOptionDividerPadding() const;
 
   /**
    * Set label padding
-   * @param[in] padding BEGIN END BOTTOM TOP
+   * @param[in] padding start / end / top / bottom
    */
-  void SetLabelPadding(const Padding& padding);
+  void SetLabelPadding(const Vector4& padding);
 
   /**
    * Get label padding
    * @return Padding
    */
-  Padding GetLabelPadding() const;
+  Vector4 GetLabelPadding() const;
 
   void CreateOrderedListOfPopupOptions();
 
@@ -321,10 +321,10 @@ private: // Data
   Size    mOptionMaxSize;        // Maximum size of an Option button
   Size    mOptionMinSize;        // Minimum size of an Option button
   Size    mOptionDividerSize;    // Size of divider line
-  Padding mOptionDividerPadding; // Padding of divider line
+  Vector4 mOptionDividerPadding; // Padding of divider line
 
   Vector2       mLabelMinimumSize; // Minimum size of label
-  Padding       mLabelPadding;     // Padding of label
+  Vector4       mLabelPadding;     // Padding of label
   Property::Map mLabelTextVisual;  // Text visual map of label
   bool          mEnableScrollBar;  // Enable scrollbar
 

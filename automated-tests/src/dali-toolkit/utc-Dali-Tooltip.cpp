@@ -375,6 +375,41 @@ int UtcDaliTooltipCreateWithBackgroundMap(void)
 
   Control control = Control::New();
   control.SetProperty(DevelControl::Property::TOOLTIP,
+                      Property::Map().Add(Tooltip::Property::CONTENT, "Hello TextVisual Test").Add(Tooltip::Property::BACKGROUND, Property::Map().Add(Tooltip::Background::Property::VISUAL, "tooltip-background.png").Add(Tooltip::Background::Property::BORDER, Extents(10, 20, 30, 40))));
+
+  tet_infoline("Check if Property::MAP is returned");
+  Property::Value value = control.GetProperty(DevelControl::Property::TOOLTIP);
+  DALI_TEST_EQUALS(value.GetType(), Property::MAP, TEST_LOCATION);
+
+  tet_infoline("Ensure map is valid");
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK(map);
+
+  tet_infoline("Check background map");
+  Property::Value* backgroundMapValue = map->Find(Tooltip::Property::BACKGROUND);
+  DALI_TEST_CHECK(backgroundMapValue);
+  Property::Map* backgroundMap = backgroundMapValue->GetMap();
+  DALI_TEST_CHECK(backgroundMap);
+
+  tet_infoline("Check visual");
+  Property::Value* backgroundStringValue = backgroundMap->Find(Tooltip::Background::Property::VISUAL);
+  DALI_TEST_CHECK(backgroundStringValue);
+  DALI_TEST_EQUALS(backgroundStringValue->Get<Dali::String>(), "tooltip-background.png", TEST_LOCATION);
+
+  tet_infoline("Check border");
+  Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
+  DALI_TEST_CHECK(borderValue);
+  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(10, 20, 30, 40), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTooltipCreateWithBackgroundMapRectInt(void)
+{
+  ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
+
+  Control control = Control::New();
+  control.SetProperty(DevelControl::Property::TOOLTIP,
                       Property::Map().Add(Tooltip::Property::CONTENT, "Hello TextVisual Test").Add(Tooltip::Property::BACKGROUND, Property::Map().Add(Tooltip::Background::Property::VISUAL, "tooltip-background.png").Add(Tooltip::Background::Property::BORDER, Rect<int>(10, 20, 30, 40))));
 
   tet_infoline("Check if Property::MAP is returned");
@@ -399,7 +434,7 @@ int UtcDaliTooltipCreateWithBackgroundMap(void)
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
   DALI_TEST_CHECK(borderValue);
-  DALI_TEST_EQUALS(borderValue->Get<Rect<int> >(), Rect<int>(10, 20, 30, 40), TEST_LOCATION);
+  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(10, 20, 30, 40), TEST_LOCATION);
 
   END_TEST;
 }
@@ -434,7 +469,7 @@ int UtcDaliTooltipCreateWithBackgroundMapVector4(void)
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
   DALI_TEST_CHECK(borderValue);
-  DALI_TEST_EQUALS(borderValue->Get<Rect<int> >(), Rect<int>(40, 30, 20, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(40, 30, 20, 10), TEST_LOCATION);
 
   END_TEST;
 }

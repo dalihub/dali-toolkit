@@ -19,7 +19,6 @@
 #include "button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -29,6 +28,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
@@ -757,12 +757,12 @@ Vector3 Button::GetNaturalSize()
   // Get horizontal padding total
   if(largestProvidedVisual.width > 0) // if visual exists
   {
-    size.width += largestProvidedVisual.width + mForegroundPadding.left + mForegroundPadding.right;
+    size.width += largestProvidedVisual.width + mForegroundPadding.x + mForegroundPadding.y;
   }
   // Get vertical padding total
   if(largestProvidedVisual.height > 0)
   {
-    size.height += largestProvidedVisual.height + mForegroundPadding.top + mForegroundPadding.bottom;
+    size.height += largestProvidedVisual.height + mForegroundPadding.w + mForegroundPadding.z;
   }
 
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "GetNaturalSize visual Size(%f,%f)\n", largestProvidedVisual.width, largestProvidedVisual.height);
@@ -776,10 +776,10 @@ Vector3 Button::GetNaturalSize()
     {
       visual.GetNaturalSize(labelSize);
 
-      DALI_LOG_INFO(gLogButtonFilter, Debug::General, "GetNaturalSize labelSize(%f,%f) padding(%f,%f)\n", labelSize.width, labelSize.height, mLabelPadding.left + mLabelPadding.right, mLabelPadding.top + mLabelPadding.bottom);
+      DALI_LOG_INFO(gLogButtonFilter, Debug::General, "GetNaturalSize labelSize(%f,%f) padding(%f,%f)\n", labelSize.width, labelSize.height, mLabelPadding.x + mLabelPadding.y, mLabelPadding.z + mLabelPadding.w);
 
-      labelSize.width += mLabelPadding.left + mLabelPadding.right;
-      labelSize.height += mLabelPadding.top + mLabelPadding.bottom;
+      labelSize.width += mLabelPadding.x + mLabelPadding.y;
+      labelSize.height += mLabelPadding.w + mLabelPadding.z;
 
       // Add label size to height or width depending on alignment position
       if(horizontalAlignment)
@@ -829,18 +829,18 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Vector2 visualPosition          = Vector2::ZERO;
   Vector2 labelPosition           = Vector2::ZERO;
   Size    visualSize              = Size::ZERO;
-  Padding foregroundVisualPadding = Padding(0.0f, 0.0f, 0.0f, 0.0f);
-  Padding labelVisualPadding      = Padding(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 foregroundVisualPadding = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 labelVisualPadding      = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
   if(mTextStringSetFlag)
   {
-    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout Label padding setting padding:%f,%f,%f,%f\n", mLabelPadding.y, mLabelPadding.x, mLabelPadding.width, mLabelPadding.height);
+    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout Label padding setting padding:%f,%f,%f,%f\n", mLabelPadding.x, mLabelPadding.y, mLabelPadding.z, mLabelPadding.w);
     labelVisualPadding = mLabelPadding;
   }
 
   if(currentVisual)
   {
-    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout Foreground Visual setting padding:%f,%f,%f,%f\n", mForegroundPadding.y, mForegroundPadding.x, mForegroundPadding.width, mForegroundPadding.height);
+    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout Foreground Visual setting padding:%f,%f,%f,%f\n", mForegroundPadding.x, mForegroundPadding.y, mForegroundPadding.z, mForegroundPadding.w);
     currentVisual.GetNaturalSize(visualSize);
     foregroundVisualPadding = mForegroundPadding;
   }
@@ -848,7 +848,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Toolkit::Align::Type visualPivot = Toolkit::Align::TOP_BEGIN;
 
   Vector2 visualAndPaddingSize = Vector2((foregroundVisualPadding.x + visualSize.width + foregroundVisualPadding.y),
-                                         (foregroundVisualPadding.width + visualSize.height + foregroundVisualPadding.height));
+                                         (foregroundVisualPadding.z + visualSize.height + foregroundVisualPadding.w));
 
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout visualAndPaddingSize(%f,%f)\n", visualAndPaddingSize.width, visualAndPaddingSize.height);
 
@@ -860,55 +860,55 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
   {
     case BEGIN:
     {
-      visualPivot = Toolkit::Align::TOP_END;
-      visualPosition.x  = foregroundVisualPadding.right;
-      visualPosition.y  = foregroundVisualPadding.top;
+      visualPivot      = Toolkit::Align::TOP_END;
+      visualPosition.x = foregroundVisualPadding.y; // right
+      visualPosition.y = foregroundVisualPadding.z; // top
 
-      labelPosition.x = labelVisualPadding.x;
-      labelPosition.y = labelVisualPadding.top;
+      labelPosition.x = labelVisualPadding.x; // left
+      labelPosition.y = labelVisualPadding.z; // top
 
       remainingSpaceForText.width  = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
-      remainingSpaceForText.height = size.height - labelVisualPadding.top - labelVisualPadding.bottom;
+      remainingSpaceForText.height = size.height - labelVisualPadding.z - labelVisualPadding.w;
       break;
     }
     case END:
     {
-      visualPivot = Toolkit::Align::TOP_BEGIN;
-      visualPosition.x  = foregroundVisualPadding.left;
-      visualPosition.y  = foregroundVisualPadding.top;
+      visualPivot      = Toolkit::Align::TOP_BEGIN;
+      visualPosition.x = foregroundVisualPadding.x; // left
+      visualPosition.y = foregroundVisualPadding.z; // top
 
-      labelPosition.x = visualAndPaddingSize.width + labelVisualPadding.x;
-      labelPosition.y = labelVisualPadding.top;
+      labelPosition.x = visualAndPaddingSize.width + labelVisualPadding.x; // width + left
+      labelPosition.y = labelVisualPadding.z;                              // top
 
       remainingSpaceForText.width  = size.width - visualAndPaddingSize.width - labelVisualPadding.x - labelVisualPadding.y;
-      remainingSpaceForText.height = size.height - labelVisualPadding.top - labelVisualPadding.bottom;
+      remainingSpaceForText.height = size.height - labelVisualPadding.z - labelVisualPadding.w;
       break;
     }
     case TOP:
     {
-      visualPivot = Toolkit::Align::BOTTOM_END;
-      visualPosition.x  = foregroundVisualPadding.left;
-      visualPosition.y  = foregroundVisualPadding.bottom;
+      visualPivot      = Toolkit::Align::BOTTOM_END;
+      visualPosition.x = foregroundVisualPadding.x; // left
+      visualPosition.y = foregroundVisualPadding.w; // bottom
 
-      labelPosition.x = labelVisualPadding.left;
-      labelPosition.y = labelVisualPadding.top;
+      labelPosition.x = labelVisualPadding.x; // left
+      labelPosition.y = labelVisualPadding.z; // top
 
       remainingSpaceForText.width  = size.width - labelVisualPadding.x - labelVisualPadding.y;
-      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.top - labelVisualPadding.bottom;
+      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.z - labelVisualPadding.w;
 
       break;
     }
     case BOTTOM:
     {
-      visualPivot = Toolkit::Align::TOP_END;
-      visualPosition.x  = foregroundVisualPadding.left;
-      visualPosition.y  = foregroundVisualPadding.top;
+      visualPivot      = Toolkit::Align::TOP_END;
+      visualPosition.x = foregroundVisualPadding.x; // left
+      visualPosition.y = foregroundVisualPadding.z; // top
 
-      labelPosition.x = labelVisualPadding.left;
-      labelPosition.y = visualAndPaddingSize.height + labelVisualPadding.top;
+      labelPosition.x = labelVisualPadding.x;                               // left
+      labelPosition.y = visualAndPaddingSize.height + labelVisualPadding.z; // height + top
 
       remainingSpaceForText.width  = size.width - labelVisualPadding.x - labelVisualPadding.y;
-      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.top - labelVisualPadding.bottom;
+      remainingSpaceForText.height = size.height - visualAndPaddingSize.height - labelVisualPadding.w - labelVisualPadding.z;
 
       break;
     }
@@ -951,8 +951,8 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
       if(!currentVisual)
       {
         DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout Only Text\n");
-        labelPosition.x = labelVisualPadding.left;
-        labelPosition.y = labelVisualPadding.height;
+        labelPosition.x = labelVisualPadding.x; // left
+        labelPosition.y = labelVisualPadding.z; // top
       }
 
       Vector2 preSize = Vector2(static_cast<int>(remainingSpaceForText.x), static_cast<int>(remainingSpaceForText.y));
@@ -1176,14 +1176,14 @@ void Button::SetProperty(BaseObject* object, Property::Index index, const Proper
       case Toolkit::DevelButton::Property::LABEL_PADDING:
       {
         Vector4 padding(value.Get<Vector4>());
-        GetImplementation(button).SetLabelPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+        GetImplementation(button).SetLabelPadding(padding);
         break;
       }
 
       case Toolkit::DevelButton::Property::VISUAL_PADDING:
       {
         Vector4 padding(value.Get<Vector4>());
-        GetImplementation(button).SetForegroundPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+        GetImplementation(button).SetForegroundPadding(padding);
         break;
       }
     }
@@ -1269,15 +1269,13 @@ Property::Value Button::GetProperty(BaseObject* object, Property::Index property
 
       case Toolkit::DevelButton::Property::LABEL_PADDING:
       {
-        Padding padding = GetImplementation(button).GetLabelPadding();
-        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
+        value = GetImplementation(button).GetLabelPadding();
         break;
       }
 
       case Toolkit::DevelButton::Property::VISUAL_PADDING:
       {
-        Padding padding = GetImplementation(button).GetForegroundPadding();
-        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
+        value = GetImplementation(button).GetForegroundPadding();
       }
     }
   }
@@ -1285,26 +1283,26 @@ Property::Value Button::GetProperty(BaseObject* object, Property::Index property
   return value;
 }
 
-void Button::SetLabelPadding(const Padding& padding)
+void Button::SetLabelPadding(const Vector4& padding)
 {
-  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "Button::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top);
-  mLabelPadding = Padding(padding.left, padding.right, padding.bottom, padding.top);
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "Button::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.x, padding.y, padding.z, padding.w);
+  mLabelPadding = padding;
   RelayoutRequest();
 }
 
-Padding Button::GetLabelPadding()
+Vector4 Button::GetLabelPadding()
 {
   return mLabelPadding;
 }
 
-void Button::SetForegroundPadding(const Padding& padding)
+void Button::SetForegroundPadding(const Vector4& padding)
 {
-  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "Button::SetForegroundPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top);
-  mForegroundPadding = Padding(padding.left, padding.right, padding.bottom, padding.top);
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "Button::SetForegroundPadding padding(%f,%f,%f,%f)\n", padding.x, padding.y, padding.z, padding.w);
+  mForegroundPadding = padding;
   RelayoutRequest();
 }
 
-Padding Button::GetForegroundPadding()
+Vector4 Button::GetForegroundPadding()
 {
   return mForegroundPadding;
 }

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOOLTIP_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
@@ -138,7 +139,7 @@ private:
   Property::Map   mTailImages;        ///< The different images used by the tail.
   Property::Array mContentArray;      ///< If using an array of visuals, then this is used.
 
-  Rect<int> mBackgroundBorder; ///< The size of the background border in the order: left, right, bottom, top. @see Toolkit::Tooltip::Border::Property::BORDER
+  Extents mBackgroundBorder; ///< The size of the background border in the order: left, right, top, bottom. @see Toolkit::Tooltip::Border::Property::BORDER
 
   Vector2 mLayout;           ///< The layout of the content if using an array.
   Vector2 mHoverPoint;       ///< The first point where hover starts.

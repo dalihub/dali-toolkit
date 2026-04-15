@@ -55,8 +55,7 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
     }
     case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
     {
-      Vector4 padding(value.Get<Vector4>());
-      impl.SetOptionDividerPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+      impl.SetOptionDividerPadding(value.Get<Vector4>());
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
@@ -143,8 +142,7 @@ void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopu
     }
     case Toolkit::TextSelectionPopup::Property::LABEL_PADDING:
     {
-      Vector4 padding(value.Get<Vector4>());
-      impl.SetLabelPadding(Padding(padding.x, padding.y, padding.z, padding.w));
+      impl.SetLabelPadding(value.Get<Vector4>());
       break;
     }
     case Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL:
@@ -189,8 +187,7 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
     }
     case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
     {
-      Padding padding = impl.GetOptionDividerPadding();
-      value           = Vector4(padding.left, padding.right, padding.top, padding.bottom);
+      value = impl.GetOptionDividerPadding();
       break;
     }
     case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
@@ -287,8 +284,7 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
     }
     case Toolkit::TextSelectionPopup::Property::LABEL_PADDING:
     {
-      Padding padding = impl.GetLabelPadding();
-      value           = Vector4(padding.left, padding.right, padding.top, padding.bottom);
+      value = impl.GetLabelPadding();
       break;
     }
     case Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL:

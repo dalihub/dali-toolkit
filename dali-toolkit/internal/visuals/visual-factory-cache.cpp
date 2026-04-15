@@ -276,8 +276,8 @@ Dali::UniformBlock& VisualFactoryCache::GetDefaultUniformBlock()
     mDefaultUniformBlock.RegisterUniqueProperty("offset", Vector2::ZERO);
     mDefaultUniformBlock.RegisterUniqueProperty("size", Vector2::ONE);
     mDefaultUniformBlock.RegisterUniqueProperty("offsetSizeMode", Vector4::ZERO);
-    mDefaultUniformBlock.RegisterUniqueProperty("origin", -Vector2(0.5f, 0.5f));     ///< TOP_BEGIN for LTR
-    mDefaultUniformBlock.RegisterUniqueProperty("pivot", Vector2(0.5f, 0.5f)); ///< TOP_BEGIN for LTR
+    mDefaultUniformBlock.RegisterUniqueProperty("origin", -Vector2(0.5f, 0.5f)); ///< TOP_BEGIN for LTR
+    mDefaultUniformBlock.RegisterUniqueProperty("pivot", Vector2(0.5f, 0.5f));   ///< TOP_BEGIN for LTR
     mDefaultUniformBlock.RegisterUniqueProperty("extraSize", Vector2::ZERO);
   }
   return mDefaultUniformBlock;
@@ -516,7 +516,7 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(VisualRenderer& renderer, con
         if(mBrokenImageInfoContainer[index].visualType == VisualUrl::Type::N_PATCH)
         {
           NPatchDataPtr data;
-          Rect<int>     border;
+          Extents       border;
           mBrokenImageInfoContainer[index].npatchId = mNPatchLoader.Load(mTextureManager, NULL, mBrokenImageInfoContainer[index].url, border, mPreMultiplyOnLoad, true);
           if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
           {

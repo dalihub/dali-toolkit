@@ -296,7 +296,7 @@ void Tooltip::SetBackground(const Property::Value& value)
   {
     if(DALI_LIKELY(GetStdString(value, mBackgroundImage)))
     {
-      mBackgroundBorder.Set(0, 0, 0, 0);
+      mBackgroundBorder = Extents();
     }
   }
   else if(type == Property::MAP)
@@ -317,18 +317,23 @@ void Tooltip::SetBackground(const Property::Value& value)
         }
         else if(key == Toolkit::Tooltip::Background::Property::BORDER || key == PROPERTY_BACKGROUND_BORDER)
         {
-          if(!value.Get(mBackgroundBorder))
+          if(!value.Get(mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
           {
-            // If not a Property::RECTANGLE, then check if it's a Vector4 and set it accordingly
-            Vector4 valueVector4;
-            if(value.Get(valueVector4))
+            // Not a extents so try rect
+            Rect<int32_t> rect;
+            if(value.Get(rect))
             {
-              mBackgroundBorder.left   = valueVector4.x;
-              mBackgroundBorder.right  = valueVector4.y;
-              mBackgroundBorder.bottom = valueVector4.z;
-              mBackgroundBorder.top    = valueVector4.w;
+              mBackgroundBorder.start  = static_cast<int16_t>(rect.x);
+              mBackgroundBorder.end    = static_cast<int16_t>(rect.y);
+              mBackgroundBorder.top    = static_cast<int16_t>(rect.width);
+              mBackgroundBorder.bottom = static_cast<int16_t>(rect.height);
             }
           }
+          // Ensure the range of border valid.
+          Dali::ClampInPlace(mBackgroundBorder.start, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(mBackgroundBorder.end, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(mBackgroundBorder.top, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(mBackgroundBorder.bottom, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
         }
       }
     }

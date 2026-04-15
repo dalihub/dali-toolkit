@@ -429,27 +429,27 @@ private:
 protected:
   /**
    * Set Text Label Padding
-   * @param[in] padding BEGIN END BOTTOM TOP
+   * @param[in] padding start / end / top / bottom
    */
-  void SetLabelPadding(const Padding& padding);
+  void SetLabelPadding(const Vector4& padding);
 
   /**
    * Get Text Label padding
    * @return Padding
    */
-  Padding GetLabelPadding();
+  Vector4 GetLabelPadding();
 
   /**
    * Set Foreground/icon Padding
-   * @param[in] padding BEGIN END BOTTOM TOP
+   * @param[in] padding start / end / top / bottom
    */
-  void SetForegroundPadding(const Padding& padding);
+  void SetForegroundPadding(const Vector4& padding);
 
   /**
    * Get Foreground padding
    * @ return Padding
    */
-  Padding GetForegroundPadding();
+  Vector4 GetForegroundPadding();
 
   /**
    * @brief Setup the button components for example foregrounds and background
@@ -521,8 +521,8 @@ private:
   Timer mAutoRepeatingTimer;
 
   Actor   mLabel;             ///< Stores the button text label.
-  Padding mLabelPadding;      ///< The padding around the label (if present).
-  Padding mForegroundPadding; ///< The padding around the foreground/icon visual (if present).
+  Vector4 mLabelPadding;      ///< The padding around the label (if present).
+  Vector4 mForegroundPadding; ///< The padding around the foreground/icon visual (if present).
 
   Align mTextLabelAlignment; ///< Position of text label in relation to foreground/icon when both are present.
 

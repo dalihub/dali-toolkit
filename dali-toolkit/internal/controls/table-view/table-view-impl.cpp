@@ -839,7 +839,8 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
         }
         actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
-        Padding padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
+        // x, y, z, w = left, right, top, bottom
+        Vector4 padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
 
         float left = (column > 0) ? mColumnData[column - 1].position : 0.f;
         float right;
@@ -859,28 +860,28 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
         if(cellData.horizontalAlignment == HorizontalAlignment::LEFT)
         {
-          actor.SetProperty(Actor::Property::POSITION_X, left + mPadding.width + padding.left);
+          actor.SetProperty(Actor::Property::POSITION_X, left + mPadding.width + padding.x);
         }
         else if(cellData.horizontalAlignment == HorizontalAlignment::RIGHT)
         {
-          actor.SetProperty(Actor::Property::POSITION_X, right - mPadding.width - padding.right - actor.GetRelayoutSize(Dimension::WIDTH));
+          actor.SetProperty(Actor::Property::POSITION_X, right - mPadding.width - padding.y - actor.GetRelayoutSize(Dimension::WIDTH));
         }
         else //if( cellData.horizontalAlignment ==  HorizontalAlignment::CENTER )
         {
-          actor.SetProperty(Actor::Property::POSITION_X, (left + right + padding.left - padding.right - actor.GetRelayoutSize(Dimension::WIDTH)) * 0.5f);
+          actor.SetProperty(Actor::Property::POSITION_X, (left + right + padding.x - padding.y - actor.GetRelayoutSize(Dimension::WIDTH)) * 0.5f);
         }
 
         if(cellData.verticalAlignment == VerticalAlignment::TOP)
         {
-          actor.SetProperty(Actor::Property::POSITION_Y, top + mPadding.height + padding.top);
+          actor.SetProperty(Actor::Property::POSITION_Y, top + mPadding.height + padding.z);
         }
         else if(cellData.verticalAlignment == VerticalAlignment::BOTTOM)
         {
-          actor.SetProperty(Actor::Property::POSITION_Y, bottom - mPadding.height - padding.bottom - actor.GetRelayoutSize(Dimension::HEIGHT));
+          actor.SetProperty(Actor::Property::POSITION_Y, bottom - mPadding.height - padding.w - actor.GetRelayoutSize(Dimension::HEIGHT));
         }
         else //if( cellData.verticalAlignment = VerticalAlignment::CENTER )
         {
-          actor.SetProperty(Actor::Property::POSITION_Y, (top + bottom + padding.top - padding.bottom - actor.GetRelayoutSize(Dimension::HEIGHT)) * 0.5f);
+          actor.SetProperty(Actor::Property::POSITION_Y, (top + bottom + padding.z - padding.w - actor.GetRelayoutSize(Dimension::HEIGHT)) * 0.5f);
         }
       }
     }

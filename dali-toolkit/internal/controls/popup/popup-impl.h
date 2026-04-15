@@ -23,6 +23,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/extents.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -565,7 +566,7 @@ private:
   bool        mBackingEnabled;       ///< True if a dimmed backing will be used.
   Vector4     mBackingColor;         ///< The color of the backing.
   Actor       mPopupBackgroundImage; ///< Stores the background image.
-  Rect<int>   mBackgroundBorder;     ///< Background border.
+  Extents     mBackgroundBorder;     ///< Background border.
   float       mMargin;               ///< Internal margin for popup contents.
   std::string mTailUpImage;          ///< Image used for the tail for the up direction.
   std::string mTailDownImage;        ///< Image used for the tail for the down direction.

@@ -179,12 +179,12 @@ uint32_t NPatchData::GetCroppedHeight() const
   return mCroppedHeight;
 }
 
-void NPatchData::SetBorder(const Rect<int> border)
+void NPatchData::SetBorder(const Dali::Extents& border)
 {
   mBorder = border;
 }
 
-Rect<int> NPatchData::GetBorder() const
+Dali::Extents NPatchData::GetBorder() const
 {
   return mBorder;
 }
@@ -216,14 +216,14 @@ void* NPatchData::GetRenderingMap() const
 
 void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied)
 {
-  if(mBorder == Rect<int>(0, 0, 0, 0) && NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY))
+  if(mBorder == Extents() && NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY))
   {
     // Crop the image
     pixelBuffer.Crop(1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2);
   }
   else
   {
-    mStretchPixelsX.PushBack(NPatchUtility::GetValidStrechPointFromBorder(pixelBuffer.GetWidth(), static_cast<uint32_t>(mBorder.left), static_cast<uint32_t>(mBorder.right)));
+    mStretchPixelsX.PushBack(NPatchUtility::GetValidStrechPointFromBorder(pixelBuffer.GetWidth(), static_cast<uint32_t>(mBorder.start), static_cast<uint32_t>(mBorder.end)));
     mStretchPixelsY.PushBack(NPatchUtility::GetValidStrechPointFromBorder(pixelBuffer.GetHeight(), static_cast<uint32_t>(mBorder.top), static_cast<uint32_t>(mBorder.bottom)));
   }
 

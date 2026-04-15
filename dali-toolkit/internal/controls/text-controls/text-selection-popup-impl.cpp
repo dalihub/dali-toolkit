@@ -201,9 +201,9 @@ void TextSelectionPopup::GetProperties(Property::Map& properties)
 
   map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_MAX_SIZE, GetDimensionToCustomise(POPUP_MAXIMUM_SIZE));
   map.Insert(Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE, GetDimensionToCustomise(OPTION_DIVIDER_SIZE));
-  map.Insert(Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING, Vector4(mOptionDividerPadding.left, mOptionDividerPadding.right, mOptionDividerPadding.top, mOptionDividerPadding.bottom));
+  map.Insert(Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING, mOptionDividerPadding);
   map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_MINIMUM_SIZE, mLabelMinimumSize);
-  map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_PADDING, Vector4(mLabelPadding.left, mLabelPadding.right, mLabelPadding.top, mLabelPadding.bottom));
+  map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_PADDING, mLabelPadding);
   map.Insert(Toolkit::TextSelectionPopup::Property::LABEL_TEXT_VISUAL, mLabelTextVisual);
   map.Insert(Toolkit::TextSelectionPopup::Property::ENABLE_SCROLL_BAR, mEnableScrollBar);
   map.Insert(Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR, mDividerColor);
@@ -520,24 +520,24 @@ std::string TextSelectionPopup::GetPressedImage() const
   return mPressedImage;
 }
 
-void TextSelectionPopup::SetOptionDividerPadding(const Padding& padding)
+void TextSelectionPopup::SetOptionDividerPadding(const Vector4& padding)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetOptionDividerPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.top, padding.bottom);
-  mOptionDividerPadding = Padding(padding.left, padding.right, padding.top, padding.bottom);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetOptionDividerPadding padding(%f,%f,%f,%f)\n", padding.x, padding.y, padding.z, padding.w);
+  mOptionDividerPadding = padding;
 }
 
-Padding TextSelectionPopup::GetOptionDividerPadding() const
+Vector4 TextSelectionPopup::GetOptionDividerPadding() const
 {
   return mOptionDividerPadding;
 }
 
-void TextSelectionPopup::SetLabelPadding(const Padding& padding)
+void TextSelectionPopup::SetLabelPadding(const Vector4& padding)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.top, padding.bottom);
-  mLabelPadding = Padding(padding.left, padding.right, padding.top, padding.bottom);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetLabelPadding padding(%f,%f,%f,%f)\n", padding.x, padding.y, padding.z, padding.w);
+  mLabelPadding = padding;
 }
 
-Padding TextSelectionPopup::GetLabelPadding() const
+Vector4 TextSelectionPopup::GetLabelPadding() const
 {
   return mLabelPadding;
 }
@@ -612,8 +612,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   if(showCaption)
   {
     // PushButton layout properties.
-    const Padding padding(mLabelPadding);
-    option.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, padding);
+    option.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, mLabelPadding);
 
     // Label properties.
     Property::Map buttonLabelProperties;
@@ -659,7 +658,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   if(showDivider)
   {
     const Size    size(mOptionDividerSize.width, 0.0f); // Height FILL_TO_PARENT
-    const Padding padding(mOptionDividerPadding);
+    const Vector4 padding(mOptionDividerPadding);
 
     Toolkit::Control divider = Toolkit::Control::New();
 #ifdef DECORATOR_DEBUG
