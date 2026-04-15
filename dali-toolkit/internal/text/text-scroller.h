@@ -23,6 +23,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <atomic>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
