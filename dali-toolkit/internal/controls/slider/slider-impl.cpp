@@ -87,11 +87,11 @@ const float DEFAULT_HIT_HEIGHT    = 72.0f;
 const float DEFAULT_HANDLE_HEIGHT = DEFAULT_HIT_HEIGHT;
 const float POPUP_TEXT_PADDING    = 10.0f;
 
-const char* SKINNED_TRACK_VISUAL_FILE_NAME       = "slider-skin.9.png";
-const char* SKINNED_HANDLE_VISUAL_FILE_NAME      = "slider-skin-handle.png";
-const char* SKINNED_PROGRESS_VISUAL_FILE_NAME    = "slider-skin-progress.9.png";
-const char* SKINNED_POPUP_VISUAL_FILE_NAME       = "slider-popup.9.png";
-const char* SKINNED_POPUP_ARROW_VISUAL_FILE_NAME = "slider-popup-arrow.png";
+const char* SKINNED_TRACK_VISUAL_FILE_NAME       = "slider-skin.9.webp";
+const char* SKINNED_HANDLE_VISUAL_FILE_NAME      = "slider-skin-handle.webp";
+const char* SKINNED_PROGRESS_VISUAL_FILE_NAME    = "slider-skin-progress.9.webp";
+const char* SKINNED_POPUP_VISUAL_FILE_NAME       = "slider-popup.9.webp";
+const char* SKINNED_POPUP_ARROW_VISUAL_FILE_NAME = "slider-popup-arrow.webp";
 
 const Vector2 DEFAULT_HIT_REGION(DEFAULT_WIDTH, DEFAULT_HIT_HEIGHT);
 const Vector2 DEFAULT_TRACK_REGION(DEFAULT_WIDTH, DEFAULT_HEIGHT);

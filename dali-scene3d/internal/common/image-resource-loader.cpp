@@ -51,7 +51,7 @@ namespace
 constexpr uint32_t MAXIMUM_COLLECTING_ITEM_COUNTS_PER_GC_CALL = 5u;
 constexpr uint32_t GC_PERIOD_MILLISECONDS                     = 1000u;
 
-constexpr std::string_view PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.png";
+constexpr std::string_view PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME = "brdfLUT.webp";
 
 class CacheImpl;
 

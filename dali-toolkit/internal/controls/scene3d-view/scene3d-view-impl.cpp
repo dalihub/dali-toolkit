@@ -33,7 +33,7 @@ namespace Internal
 {
 namespace
 {
-const char* const IMAGE_BRDF_FILE_NAME = "brdfLUT.png";
+const char* const IMAGE_BRDF_FILE_NAME = "brdfLUT.webp";
 
 // glTF file extension
 const char* GLTF_EXT(".gltf");

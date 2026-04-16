@@ -60,7 +60,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEY
 
 const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "isKeyboardFocusGroup"; // This property will be replaced by a flag in Control.
 
-const char* const FOCUS_BORDER_IMAGE_FILE_NAME = "keyboard_focus.9.png";
+const char* const FOCUS_BORDER_IMAGE_FILE_NAME = "keyboard_focus.9.webp";
 
 // Key name constants for OnKeyEvent
 constexpr const char* KEY_NAME_LEFT      = "Left";

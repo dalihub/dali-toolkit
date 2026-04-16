@@ -41,7 +41,7 @@ namespace Dali::Toolkit::DevelControl
 {
 namespace
 {
-constexpr const char* FOCUS_IMAGE    = "/keyboard_focus.9.png";
+constexpr const char* FOCUS_IMAGE    = "/keyboard_focus.9.webp";
 constexpr const char* OVERLAY_NAME   = "HighlightOverlay";
 constexpr const char* HIGHLIGHT_NAME = "HighlightIndicator";
 

@@ -30,7 +30,7 @@ const char* DEFAULT_THEME =
   "{\n"
   "  \"config\":\n"
   "  {\n"
-  "    \"brokenImageUrl\":\"{DALI_IMAGE_DIR}broken.png\"\n"
+  "    \"brokenImageUrl\":\"{DALI_IMAGE_DIR}broken.webp\"\n"
   "  },\n"
   "  \"styles\":\n"
   "  {\n"

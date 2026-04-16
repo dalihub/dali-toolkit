@@ -194,11 +194,11 @@ const Vector2 DEFAULT_CONTEXTUAL_ADJACENCY_MARGIN(10.0f, 10.0f); ///< How close 
 const Vector2 DEFAULT_CONTEXTUAL_STAGE_BORDER(15.0f, 15.0f);     ///< How close the Popup can be to the stage edges.
 
 // Popup style defaults.
-const char* DEFAULT_BACKGROUND_IMAGE_FILE_NAME = "00_popup_bg.9.png";    ///< Background image.
-const char* DEFAULT_TAIL_UP_IMAGE_FILE_NAME    = "popup_tail_up.png";    ///< Tail up image.
-const char* DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME  = "popup_tail_down.png";  ///< Tail down image.
-const char* DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME  = "popup_tail_left.png";  ///< Tail left image.
-const char* DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME = "popup_tail_right.png"; ///< Tail right image.
+const char* DEFAULT_BACKGROUND_IMAGE_FILE_NAME = "00_popup_bg.9.webp";    ///< Background image.
+const char* DEFAULT_TAIL_UP_IMAGE_FILE_NAME    = "popup_tail_up.webp";    ///< Tail up image.
+const char* DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME  = "popup_tail_down.webp";  ///< Tail down image.
+const char* DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME  = "popup_tail_left.webp";  ///< Tail left image.
+const char* DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME = "popup_tail_right.webp"; ///< Tail right image.
 
 const Vector4     DEFAULT_BACKING_COLOR(0.0f, 0.0f, 0.0f, 0.5f);      ///< Color of the dimmed backing.
 const Rect<int>   DEFAULT_BACKGROUND_BORDER(17, 17, 13, 13);          ///< Default border of the background.
