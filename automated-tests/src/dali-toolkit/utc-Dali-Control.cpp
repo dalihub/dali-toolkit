@@ -21,6 +21,8 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/object/property-map-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/string-utils.h>
 
 #include <dali-toolkit/dali-toolkit.h>
@@ -1571,13 +1573,12 @@ int UtcDaliControlOffScreenRendering(void)
   DALI_TEST_EQUALS(control.GetProperty(DevelControl::Property::OFFSCREEN_RENDERING).Get<int>(), (int)DevelControl::OffScreenRenderingType::REFRESH_ALWAYS, TEST_LOCATION);
   tet_infoline("Set offscreen rendering : refresh always");
 
-  const Property::Value SHADOW{
-    {Visual::Property::TYPE, Visual::COLOR},
-    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)},
-    {Visual::Property::TRANSFORM,
-     Property::Map{{Visual::Transform::Property::SIZE, Vector2(1.05f, 1.05f)},
-                   {Visual::Transform::Property::ORIGIN, Align::CENTER},
-                   {Visual::Transform::Property::PIVOT, Align::CENTER}}}};
+  const Property::Value SHADOW = CreatePropertyValue({{Visual::Property::TYPE, Visual::COLOR},
+                                                      {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)},
+                                                      {Visual::Property::TRANSFORM,
+                                                       CreatePropertyMap({{Visual::Transform::Property::SIZE, Vector2(1.05f, 1.05f)},
+                                                                          {Visual::Transform::Property::ORIGIN, Align::CENTER},
+                                                                          {Visual::Transform::Property::PIVOT, Align::CENTER}})}});
   control.SetProperty(DevelControl::Property::SHADOW, SHADOW);
 
   control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
@@ -2384,9 +2385,8 @@ int UtcDaliControlCornerRadiusAnimation1(void)
   control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
 
   tet_printf("Add second visual\n");
-  Property::Value shadow{
-    {Visual::Property::TYPE, Visual::COLOR},
-    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  Property::Value shadow = CreatePropertyValue({{Visual::Property::TYPE, Visual::COLOR},
+                                                {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}});
   control.SetProperty(DevelControl::Property::SHADOW, shadow);
 
   application.GetScene().Add(control);
@@ -2457,9 +2457,8 @@ int UtcDaliControlCornerRadiusAnimation2(void)
   application.Render(250);
 
   tet_printf("Add second visual\n");
-  Property::Value shadow{
-    {Visual::Property::TYPE, Visual::COLOR},
-    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  Property::Value shadow = CreatePropertyValue({{Visual::Property::TYPE, Visual::COLOR},
+                                                {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}});
   control.SetProperty(DevelControl::Property::SHADOW, shadow);
 
   application.SendNotification();
@@ -2503,9 +2502,8 @@ int UtcDaliControlCornerRadiusAnimation3(void)
   control.SetProperty(Toolkit::Control::Property::BACKGROUND, background);
 
   tet_printf("Add second visual\n");
-  Property::Value shadow{
-    {Visual::Property::TYPE, Visual::COLOR},
-    {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}};
+  Property::Value shadow = CreatePropertyValue({{Visual::Property::TYPE, Visual::COLOR},
+                                                {Visual::Property::MIX_COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f)}});
   control.SetProperty(DevelControl::Property::SHADOW, shadow);
 
   application.GetScene().Add(control);

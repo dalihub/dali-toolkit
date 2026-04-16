@@ -20,6 +20,7 @@
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-web-engine.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/object/property-array-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -392,7 +393,7 @@ int UtcDaliControlAccessibilityRoleToggleButton(void)
   auto button  = Dali::Accessibility::Role::TOGGLE_BUTTON;
 
   control.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS,
-                      Property::Array{"option1", "option2"});
+                      Dali::CreatePropertyArray({"option1", "option2"}));
 
   Dali::Accessibility::TestEnableSC(true);
 
