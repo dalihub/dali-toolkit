@@ -28,7 +28,7 @@
 {
   "config":
   {
-    "brokenImageUrl":"{DALI_IMAGE_DIR}broken.png",
+    "brokenImageUrl":"{DALI_IMAGE_DIR}broken.webp",
     "alwaysShowFocus":false,
     "clearFocusOnEscape":true
   },
@@ -70,9 +70,9 @@
       "secondaryCursorColor":[0.0,0.72,0.9,1.0],
       "cursorWidth":3,
       "selectionHighlightColor":[0.75,0.96,1.0,1.0],
-      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
-      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
-      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.webp",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.webp" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.webp" },
       "enableSelection":true
     },
 
@@ -106,11 +106,11 @@
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-background.9.png"
+        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-background.9.webp"
         },
       "backgroundBorder": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-border.9.png",
+        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-border.9.webp",
         "mixColor":[1.0,1.0,1.0,1.0]
         },
       "popupFadeInDuration":0.25,
@@ -160,7 +160,7 @@
       "image":
       {
         "visualType":"IMAGE",
-        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.png"
+        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.webp"
       },
       "color":[0.0,0.72,0.9,0.7]
     },
@@ -189,9 +189,9 @@
       "secondaryCursorColor":[0.0,0.72,0.9,1.0],
       "cursorWidth":3,
       "selectionHighlightColor":[0.75,0.96,1.0,1.0],
-      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
-      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
-      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.webp",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.webp" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.webp" },
       "enableScrollBar":true,
       "scrollBarShowDuration":0.8,
       "scrollBarFadeDuration":0.5,
@@ -199,20 +199,20 @@
     },
     "Popup":
     {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
-      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
-      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
-      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
-      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.webp",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.webp",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.webp",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.webp",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.webp",
       "popupBackgroundBorder":[17,17,13,13]
     },
     "ConfirmationPopup":
     {
-      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
-      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
-      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
-      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
-      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.webp",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.webp",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.webp",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.webp",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.webp",
       "popupBackgroundBorder":[17,17,13,13]
     },
     "Button":
@@ -237,22 +237,22 @@
       "unselectedBackgroundVisual":
        {
          "visualType": "IMAGE",
-         "url": "{DALI_IMAGE_DIR}button-up.9.png"
+         "url": "{DALI_IMAGE_DIR}button-up.9.webp"
        },
        "selectedBackgroundVisual":
        {
          "visualType": "IMAGE",
-         "url": "{DALI_IMAGE_DIR}button-down.9.png"
+         "url": "{DALI_IMAGE_DIR}button-down.9.webp"
        },
        "disabledSelectedBackgroundVisual":
        {
          "visualType": "IMAGE",
-         "url": "{DALI_IMAGE_DIR}button-down-disabled.9.png"
+         "url": "{DALI_IMAGE_DIR}button-down-disabled.9.webp"
        },
        "disabledUnselectedBackgroundVisual":
        {
          "visualType": "IMAGE",
-         "url": "{DALI_IMAGE_DIR}button-disabled.9.png"
+         "url": "{DALI_IMAGE_DIR}button-disabled.9.webp"
        }
     },
     "CheckBoxButton":
@@ -268,22 +268,22 @@
       "unselectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}checkbox-unselected.png"
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected.webp"
       },
       "selectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}checkbox-selected.png"
+        "url": "{DALI_IMAGE_DIR}checkbox-selected.webp"
       },
       "disabledUnselectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.png"
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.webp"
       },
       "disabledSelectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.png"
+        "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.webp"
       }
     },
     "RadioButton":
@@ -299,22 +299,22 @@
       "unselectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}radio-button-unselected.png"
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected.webp"
       },
       "selectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}radio-button-selected.png"
+        "url": "{DALI_IMAGE_DIR}radio-button-selected.webp"
       },
       "disabledUnselectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.png"
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.webp"
       },
       "disabledSelectedVisual":
       {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
+        "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.webp"
       }
     }
   }

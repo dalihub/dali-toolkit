@@ -5,6 +5,6 @@ SET( dali_toolkit_style_files
 )
 
 SET( dali_toolkit_style_images
-    ${toolkit_style_images_dir}/*.png
+    ${toolkit_style_images_dir}/*.webp
 )
 

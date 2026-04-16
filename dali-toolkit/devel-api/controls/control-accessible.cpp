@@ -68,7 +68,7 @@ std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit
 Dali::Actor CreateHighlightIndicatorActor()
 {
   std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   // Create the default if it hasn't been set and one that's shared by all the
   // keyboard focusable actors
