@@ -170,7 +170,7 @@ Control::OffScreenRenderingFinishedSignalType& Control::OffScreenRenderingFinish
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
 
-  return controlImpl.mOffScreenRenderingFinishedSignal;
+  return controlImpl.EnsureOffscreenRenderingContext().mFinishedSignal;
 }
 
 Control::Control(Internal::Control& implementation)

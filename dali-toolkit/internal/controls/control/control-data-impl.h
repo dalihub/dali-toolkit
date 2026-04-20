@@ -518,22 +518,123 @@ private:
    */
   void UpdateBorderline();
 
+public: // Rarely used item list
+  /**
+   * @brief Id list of focus chain
+   */
+  struct FocusableActorIdList
+  {
+    FocusableActorIdList()
+    : mLeftFocusableActorId(-1),
+      mRightFocusableActorId(-1),
+      mUpFocusableActorId(-1),
+      mDownFocusableActorId(-1),
+      mClockwiseFocusableActorId(-1),
+      mCounterClockwiseFocusableActorId(-1)
+    {
+    }
+
+    ~FocusableActorIdList()
+    {
+    }
+
+    int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
+    int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
+    int mUpFocusableActorId;               ///< Actor ID of Up focusable control.
+    int mDownFocusableActorId;             ///< Actor ID of Down focusable control.
+    int mClockwiseFocusableActorId;        ///< Actor ID of Clockwise focusable control.
+    int mCounterClockwiseFocusableActorId; ///< Actor ID of Counter clockwise focusable control.
+  };
+
+  /**
+   * @brief Create Focus chain by id ondemand.
+   */
+  FocusableActorIdList& EnsureFocusableIdList()
+  {
+    if(DALI_UNLIKELY(!mFocusableIdList))
+    {
+      mFocusableIdList.reset(new FocusableActorIdList());
+    }
+    return *mFocusableIdList;
+  }
+
+  /**
+   * @brief Collections of gesture detector for this control
+   */
+  struct GestureDetectorContext
+  {
+    GestureDetectorContext()
+    : mPinchGestureDetector(),
+      mPanGestureDetector(),
+      mTapGestureDetector(),
+      mLongPressGestureDetector()
+    {
+    }
+
+    ~GestureDetectorContext()
+    {
+    }
+
+    PinchGestureDetector     mPinchGestureDetector;
+    PanGestureDetector       mPanGestureDetector;
+    TapGestureDetector       mTapGestureDetector;
+    LongPressGestureDetector mLongPressGestureDetector;
+  };
+
+  /**
+   * @brief Create gesture detector context ondemand.
+   */
+  GestureDetectorContext& EnsureGestureDetectorContext() const
+  {
+    if(DALI_UNLIKELY(!mGestureDetectorContext))
+    {
+      mGestureDetectorContext.reset(new GestureDetectorContext());
+    }
+    return *mGestureDetectorContext;
+  }
+
+  /**
+   * @brief Collections of offscreen rendering relative items for this control
+   */
+  struct OffscreenRenderingContext
+  {
+    OffscreenRenderingContext()
+    : mImpl(nullptr),
+      mType(DevelControl::OffScreenRenderingType::NONE),
+      mFinishedSignal()
+    {
+    }
+
+    ~OffscreenRenderingContext()
+    {
+    }
+
+    OffScreenRenderingImplPtr                              mImpl;
+    DevelControl::OffScreenRenderingType                   mType;
+    Toolkit::Control::OffScreenRenderingFinishedSignalType mFinishedSignal; ///< Emits only when type is REFRESH_ONCE
+  };
+
+  /**
+   * @brief Create offscreen rendering context ondemand.
+   */
+  OffscreenRenderingContext& EnsureOffscreenRenderingContext()
+  {
+    if(DALI_UNLIKELY(!mOffScreenRenderingContext))
+    {
+      mOffScreenRenderingContext.reset(new OffscreenRenderingContext());
+    }
+    return *mOffScreenRenderingContext;
+  }
+
 public:
   Control&            mControlImpl;
   DevelControl::State mState;
-  std::string         mSubStateName;
+  std::unique_ptr<std::string> mSubStateNamePtr;
 
   std::unique_ptr<AccessibilityData> mAccessibilityData;
   std::unique_ptr<VisualData>        mVisualData;
 
-  int mLeftFocusableActorId;             ///< Actor ID of Left focusable control.
-  int mRightFocusableActorId;            ///< Actor ID of Right focusable control.
-  int mUpFocusableActorId;               ///< Actor ID of Up focusable control.
-  int mDownFocusableActorId;             ///< Actor ID of Down focusable control.
-  int mClockwiseFocusableActorId;        ///< Actor ID of Clockwise focusable control.
-  int mCounterClockwiseFocusableActorId; ///< Actor ID of Counter clockwise focusable control.
-
-  std::string                               mStyleName;
+  std::unique_ptr<std::string>              mStyleNamePtr;
   Vector4                                   mBackgroundColor;    ///< The color of the background visual
   RenderEffectImplPtr                       mRenderEffect;       ///< The render effect on this control
   Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
@@ -545,11 +646,14 @@ public:
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
   Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
 
+  // Manual focus chain
+  std::unique_ptr<FocusableActorIdList> mFocusableIdList;
+
   // Gesture Detection
-  PinchGestureDetector     mPinchGestureDetector;
-  PanGestureDetector       mPanGestureDetector;
-  TapGestureDetector       mTapGestureDetector;
-  LongPressGestureDetector mLongPressGestureDetector;
+  mutable std::unique_ptr<GestureDetectorContext> mGestureDetectorContext;
+
+  // Off screen rendering context
+  std::unique_ptr<OffscreenRenderingContext> mOffScreenRenderingContext;
 
   // Decoration data (CornerRadius, Borderline)
   DecorationData* mDecorationData;
@@ -559,11 +663,6 @@ public:
   // Key : PropertyIndex. Value map's Key : Animation.GetObjectPtr(), Value map's Value: count of animate called
   using PropertyOnAnimationContainer = std::unordered_map<Property::Index, std::unordered_map<const Dali::RefObject*, uint32_t>>;
   PropertyOnAnimationContainer mPropertyOnAnimation; ///< Properties that are currently on animation or constraint applied
-
-  // Off screen rendering context
-  std::unique_ptr<OffScreenRenderingImpl>                mOffScreenRenderingImpl;
-  DevelControl::OffScreenRenderingType                   mOffScreenRenderingType;
-  Toolkit::Control::OffScreenRenderingFinishedSignalType mOffScreenRenderingFinishedSignal; ///< Emits only when type is REFRESH_ONCE
 
   // Tooltip
   TooltipPtr mTooltip;

@@ -499,16 +499,10 @@ const AnimatablePropertyRegistration Control::Impl::ANIMATABLE_PROPERTY_6(typeRe
 Control::Impl::Impl(Control& controlImpl)
 : mControlImpl(controlImpl),
   mState(Toolkit::DevelControl::NORMAL),
-  mSubStateName(""),
+  mSubStateNamePtr(nullptr),
   mAccessibilityData(nullptr),
   mVisualData(nullptr),
-  mLeftFocusableActorId(-1),
-  mRightFocusableActorId(-1),
-  mUpFocusableActorId(-1),
-  mDownFocusableActorId(-1),
-  mClockwiseFocusableActorId(-1),
-  mCounterClockwiseFocusableActorId(-1),
-  mStyleName(""),
+  mStyleNamePtr(nullptr),
   mBackgroundColor(Color::TRANSPARENT),
   mRenderEffect(nullptr),
   mStartingPinchScale(nullptr),
@@ -519,14 +513,11 @@ Control::Impl::Impl(Control& controlImpl)
   mKeyInputFocusGainedSignal(),
   mKeyInputFocusLostSignal(),
   mResourceReadySignal(),
-  mPinchGestureDetector(),
-  mPanGestureDetector(),
-  mTapGestureDetector(),
-  mLongPressGestureDetector(),
+  mFocusableIdList(nullptr),
+  mGestureDetectorContext(nullptr),
+  mOffScreenRenderingContext(nullptr),
   mDecorationData{nullptr},
   mInnerShadowCornerRadiusConstraint{},
-  mOffScreenRenderingImpl(nullptr),
-  mOffScreenRenderingType(DevelControl::OffScreenRenderingType::NONE),
   mTooltip(NULL),
   mInputMethodContext(),
   mIdleCallback(nullptr),
@@ -694,9 +685,9 @@ void Control::Impl::OnSceneConnection()
     mVisualData->ConnectScene(self);
   }
 
-  if(mOffScreenRenderingImpl) // mOffScreenRenderingType != NONE
+  if(mOffScreenRenderingContext && mOffScreenRenderingContext->mImpl) // mOffScreenRenderingType != NONE
   {
-    mOffScreenRenderingImpl->SetOwnerControl(Toolkit::Control(mControlImpl.GetOwner()));
+    mOffScreenRenderingContext->mImpl->SetOwnerControl(Toolkit::Control(mControlImpl.GetOwner()));
   }
 }
 
@@ -710,9 +701,9 @@ void Control::Impl::OnSceneDisconnection()
     mVisualData->ClearScene(self);
   }
 
-  if(mOffScreenRenderingImpl)
+  if(mOffScreenRenderingContext && mOffScreenRenderingContext->mImpl)
   {
-    mOffScreenRenderingImpl->ClearOwnerControl();
+    mOffScreenRenderingContext->mImpl->ClearOwnerControl();
   }
 }
 
@@ -927,7 +918,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mLeftFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mLeftFocusableActorId = focusId;
         }
       }
       break;
@@ -937,7 +928,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mRightFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mRightFocusableActorId = focusId;
         }
       }
       break;
@@ -947,7 +938,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mUpFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mUpFocusableActorId = focusId;
         }
       }
       break;
@@ -957,7 +948,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mDownFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mDownFocusableActorId = focusId;
         }
       }
       break;
@@ -1153,7 +1144,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mClockwiseFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mClockwiseFocusableActorId = focusId;
         }
         break;
       }
@@ -1162,7 +1153,7 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         int focusId;
         if(value.Get(focusId))
         {
-          controlImpl.mImpl->mCounterClockwiseFocusableActorId = focusId;
+          controlImpl.mImpl->EnsureFocusableIdList().mCounterClockwiseFocusableActorId = focusId;
         }
         break;
       }
@@ -1409,31 +1400,31 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::SUB_STATE:
       {
-        value = controlImpl.mImpl->mSubStateName;
+        value = controlImpl.mImpl->mSubStateNamePtr ? *(controlImpl.mImpl->mSubStateNamePtr) : std::string();
         break;
       }
 
       case Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mLeftFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mLeftFocusableActorId : -1;
         break;
       }
 
       case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mRightFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mRightFocusableActorId : -1;
         break;
       }
 
       case Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mUpFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mUpFocusableActorId : -1;
         break;
       }
 
       case Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mDownFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mDownFocusableActorId : -1;
         break;
       }
 
@@ -1549,13 +1540,13 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::CLOCKWISE_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mClockwiseFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mClockwiseFocusableActorId : -1;
         break;
       }
 
       case Toolkit::DevelControl::Property::COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID:
       {
-        value = controlImpl.mImpl->mCounterClockwiseFocusableActorId;
+        value = controlImpl.mImpl->mFocusableIdList ? controlImpl.mImpl->mFocusableIdList->mCounterClockwiseFocusableActorId : -1;
         break;
       }
 
@@ -1596,7 +1587,7 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::OFFSCREEN_RENDERING:
       {
-        value = controlImpl.mImpl->mOffScreenRenderingType;
+        value = controlImpl.mImpl->mOffScreenRenderingContext ? controlImpl.mImpl->mOffScreenRenderingContext->mType : DevelControl::OffScreenRenderingType::NONE;
         break;
       }
 
@@ -1706,7 +1697,7 @@ void Control::Impl::SetState(DevelControl::State newState, bool withTransitions)
           if(oldStateStyle && newStateStyle)
           {
             // Only change if both state styles exist
-            mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, mSubStateName);
+            mVisualData->ReplaceStateVisualsAndProperties(*oldStateStyle, *newStateStyle, mSubStateNamePtr ? *mSubStateNamePtr : std::string(""));
           }
         }
       }
@@ -1716,12 +1707,15 @@ void Control::Impl::SetState(DevelControl::State newState, bool withTransitions)
 
 void Control::Impl::SetSubState(const std::string& subStateName, bool withTransitions)
 {
-  if(mSubStateName != subStateName)
+  if((!mSubStateNamePtr && !subStateName.empty()) ||
+     (mSubStateNamePtr && *mSubStateNamePtr != subStateName))
   {
     if(DALI_LIKELY(mVisualData))
     {
       // Get existing sub-state visuals, and unregister them
       Dali::CustomActor handle(mControlImpl.GetOwner());
+
+      const std::string oldSubStateName = mSubStateNamePtr ? *mSubStateNamePtr : std::string();
 
       Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
       if(styleManager)
@@ -1738,7 +1732,7 @@ void Control::Impl::SetSubState(const std::string& subStateName, bool withTransi
             StylePtr stateStyle(*state);
 
             const StylePtr* newStateStyle = stateStyle->subStates.Find(subStateName);
-            const StylePtr* oldStateStyle = stateStyle->subStates.Find(mSubStateName);
+            const StylePtr* oldStateStyle = stateStyle->subStates.Find(oldSubStateName);
             if(oldStateStyle && newStateStyle)
             {
               std::string empty;
@@ -1749,7 +1743,7 @@ void Control::Impl::SetSubState(const std::string& subStateName, bool withTransi
       }
     }
 
-    mSubStateName = subStateName;
+    mSubStateNamePtr.reset(new std::string(subStateName));
   }
 }
 
@@ -2195,13 +2189,13 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
 
   if(newType == DevelControl::OffScreenRenderingType::NONE)
   {
-    if(mOffScreenRenderingImpl)
+    if(mOffScreenRenderingContext)
     {
-      auto tempOffscreenRenderingImpl = std::move(mOffScreenRenderingImpl);
-      tempOffscreenRenderingImpl->ClearOwnerControl();
-
-      if(DALI_LIKELY(mVisualData))
+      if(DALI_LIKELY(mOffScreenRenderingContext->mImpl))
       {
+        auto tempOffscreenRenderingImpl = std::move(mOffScreenRenderingContext->mImpl);
+        tempOffscreenRenderingImpl->ClearOwnerControl();
+
         RegisteredVisualContainer& visuals = mVisualData->mVisuals;
         for(auto it = visuals.begin(); it != visuals.end(); it++)
         {
@@ -2217,12 +2211,13 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
           }
         }
       }
+      mOffScreenRenderingContext->mType = newType;
     }
   }
-  else if(mOffScreenRenderingType == DevelControl::OffScreenRenderingType::NONE)
+  else if(!mOffScreenRenderingContext || mOffScreenRenderingContext->mType == DevelControl::OffScreenRenderingType::NONE)
   {
-    mOffScreenRenderingImpl = std::make_unique<OffScreenRenderingImpl>(newType);
-    mOffScreenRenderingImpl->SetOwnerControl(handle);
+    EnsureOffscreenRenderingContext().mImpl.Reset(new Internal::OffScreenRenderingImpl(newType));
+    mOffScreenRenderingContext->mImpl->SetOwnerControl(handle);
 
     if(DALI_LIKELY(mVisualData))
     {
@@ -2241,12 +2236,13 @@ void Control::Impl::SetOffScreenRendering(int32_t offScreenRenderingType)
         }
       }
     }
+    mOffScreenRenderingContext->mType = newType;
   }
-  else if(mOffScreenRenderingType != newType)
+  else if(DALI_LIKELY(mOffScreenRenderingContext) && mOffScreenRenderingContext->mType != newType)
   {
-    mOffScreenRenderingImpl->SetType(newType);
+    mOffScreenRenderingContext->mImpl->SetType(newType);
+    mOffScreenRenderingContext->mType = newType;
   }
-  mOffScreenRenderingType = newType;
 }
 
 void Control::Impl::UpdateCornerRadius()
@@ -2294,9 +2290,9 @@ void Control::Impl::UpdateCornerRadius()
     mRenderEffect->SetCornerConstants(map);
   }
 
-  if(mOffScreenRenderingImpl)
+  if(mOffScreenRenderingContext && mOffScreenRenderingContext->mImpl)
   {
-    mOffScreenRenderingImpl->SetCornerConstants(map);
+    mOffScreenRenderingContext->mImpl->SetCornerConstants(map);
   }
 }
 

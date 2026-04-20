@@ -136,9 +136,10 @@ Toolkit::Control Control::New(ControlBehaviour additionalBehaviour)
 
 void Control::SetStyleName(const std::string& styleName)
 {
-  if(styleName != mImpl->mStyleName)
+  if((!mImpl->mStyleNamePtr && !styleName.empty()) ||
+     (mImpl->mStyleNamePtr && styleName != *(mImpl->mStyleNamePtr)))
   {
-    mImpl->mStyleName = styleName;
+    mImpl->mStyleNamePtr.reset(new std::string(styleName));
 
     // Apply new style, if stylemanager is available
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
@@ -151,7 +152,8 @@ void Control::SetStyleName(const std::string& styleName)
 
 const std::string& Control::GetStyleName() const
 {
-  return mImpl->mStyleName;
+  static std::string emptyString;
+  return mImpl->mStyleNamePtr ? *(mImpl->mStyleNamePtr) : emptyString;
 }
 
 void Control::SetBackgroundColor(const Vector4& color)
@@ -258,81 +260,88 @@ std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessible
 
 void Control::EnableGestureDetection(GestureType::Value type)
 {
-  if((type & GestureType::PINCH) && !mImpl->mPinchGestureDetector)
+  auto& context = mImpl->EnsureGestureDetectorContext();
+  if((type & GestureType::PINCH) && !context.mPinchGestureDetector)
   {
-    mImpl->mPinchGestureDetector = PinchGestureDetector::New();
-    mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
-    mImpl->mPinchGestureDetector.Attach(Self());
+    context.mPinchGestureDetector = PinchGestureDetector::New();
+    context.mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
+    context.mPinchGestureDetector.Attach(Self());
   }
 
-  if((type & GestureType::PAN) && !mImpl->mPanGestureDetector)
+  if((type & GestureType::PAN) && !context.mPanGestureDetector)
   {
-    mImpl->mPanGestureDetector = PanGestureDetector::New();
-    mImpl->mPanGestureDetector.SetMaximumTouchesRequired(2);
-    mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
-    mImpl->mPanGestureDetector.Attach(Self());
+    context.mPanGestureDetector = PanGestureDetector::New();
+    context.mPanGestureDetector.SetMaximumTouchesRequired(2);
+    context.mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
+    context.mPanGestureDetector.Attach(Self());
   }
 
-  if((type & GestureType::TAP) && !mImpl->mTapGestureDetector)
+  if((type & GestureType::TAP) && !context.mTapGestureDetector)
   {
-    mImpl->mTapGestureDetector = TapGestureDetector::New();
-    mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
-    mImpl->mTapGestureDetector.Attach(Self());
+    context.mTapGestureDetector = TapGestureDetector::New();
+    context.mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
+    context.mTapGestureDetector.Attach(Self());
   }
 
-  if((type & GestureType::LONG_PRESS) && !mImpl->mLongPressGestureDetector)
+  if((type & GestureType::LONG_PRESS) && !context.mLongPressGestureDetector)
   {
-    mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
-    mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
-    mImpl->mLongPressGestureDetector.Attach(Self());
+    context.mLongPressGestureDetector = LongPressGestureDetector::New();
+    context.mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
+    context.mLongPressGestureDetector.Attach(Self());
   }
 }
 
 void Control::DisableGestureDetection(GestureType::Value type)
 {
-  if((type & GestureType::PINCH) && mImpl->mPinchGestureDetector)
+  if(!mImpl->mGestureDetectorContext)
   {
-    mImpl->mPinchGestureDetector.Detach(Self());
-    mImpl->mPinchGestureDetector.Reset();
+    return;
   }
 
-  if((type & GestureType::PAN) && mImpl->mPanGestureDetector)
+  auto& context = *(mImpl->mGestureDetectorContext);
+  if((type & GestureType::PINCH) && context.mPinchGestureDetector)
   {
-    mImpl->mPanGestureDetector.Detach(Self());
-    mImpl->mPanGestureDetector.Reset();
+    context.mPinchGestureDetector.Detach(Self());
+    context.mPinchGestureDetector.Reset();
   }
 
-  if((type & GestureType::TAP) && mImpl->mTapGestureDetector)
+  if((type & GestureType::PAN) && context.mPanGestureDetector)
   {
-    mImpl->mTapGestureDetector.Detach(Self());
-    mImpl->mTapGestureDetector.Reset();
+    context.mPanGestureDetector.Detach(Self());
+    context.mPanGestureDetector.Reset();
   }
 
-  if((type & GestureType::LONG_PRESS) && mImpl->mLongPressGestureDetector)
+  if((type & GestureType::TAP) && context.mTapGestureDetector)
   {
-    mImpl->mLongPressGestureDetector.Detach(Self());
-    mImpl->mLongPressGestureDetector.Reset();
+    context.mTapGestureDetector.Detach(Self());
+    context.mTapGestureDetector.Reset();
+  }
+
+  if((type & GestureType::LONG_PRESS) && context.mLongPressGestureDetector)
+  {
+    context.mLongPressGestureDetector.Detach(Self());
+    context.mLongPressGestureDetector.Reset();
   }
 }
 
 PinchGestureDetector Control::GetPinchGestureDetector() const
 {
-  return mImpl->mPinchGestureDetector;
+  return mImpl->EnsureGestureDetectorContext().mPinchGestureDetector;
 }
 
 PanGestureDetector Control::GetPanGestureDetector() const
 {
-  return mImpl->mPanGestureDetector;
+  return mImpl->EnsureGestureDetectorContext().mPanGestureDetector;
 }
 
 TapGestureDetector Control::GetTapGestureDetector() const
 {
-  return mImpl->mTapGestureDetector;
+  return mImpl->EnsureGestureDetectorContext().mTapGestureDetector;
 }
 
 LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
-  return mImpl->mLongPressGestureDetector;
+  return mImpl->EnsureGestureDetectorContext().mLongPressGestureDetector;
 }
 
 void Control::SetKeyboardNavigationSupport(bool isSupported)
@@ -482,20 +491,20 @@ void Control::RefreshRenderEffects()
   {
     mImpl->mRenderEffect->Refresh();
   }
-  if(mImpl->mOffScreenRenderingImpl)
+  if(mImpl->mOffScreenRenderingContext && mImpl->mOffScreenRenderingContext->mImpl)
   {
-    mImpl->mOffScreenRenderingImpl->Refresh();
+    mImpl->mOffScreenRenderingContext->mImpl->Refresh();
   }
 }
 
 Dali::Texture Control::GetOffScreenRenderingOutput() const
 {
-  if(mImpl->mOffScreenRenderingType != DevelControl::OffScreenRenderingType::REFRESH_ONCE)
+  if(!mImpl->mOffScreenRenderingContext || mImpl->mOffScreenRenderingContext->mType != DevelControl::OffScreenRenderingType::REFRESH_ONCE)
   {
     DALI_LOG_ERROR("Precondition unsatisfied: Set property OFFSCREEN_RENDERING to OffScreenRenderingType::REFRESH_ONCE\n");
     return Dali::Texture();
   }
-  return mImpl->mOffScreenRenderingImpl->GetTexture();
+  return mImpl->mOffScreenRenderingContext->mImpl->GetTexture();
 }
 
 Control::Control(ControlBehaviour behaviourFlags)
@@ -743,9 +752,9 @@ void Control::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool
   {
     mImpl->mRenderEffect->GetOffScreenRenderTasks(tasks, isForward);
   }
-  if(mImpl->mOffScreenRenderingImpl)
+  if(mImpl->mOffScreenRenderingContext && mImpl->mOffScreenRenderingContext->mImpl)
   {
-    mImpl->mOffScreenRenderingImpl->GetOffScreenRenderTasks(tasks, isForward);
+    mImpl->mOffScreenRenderingContext->mImpl->GetOffScreenRenderTasks(tasks, isForward);
   }
 }
 
