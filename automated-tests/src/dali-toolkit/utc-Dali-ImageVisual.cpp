@@ -4452,6 +4452,88 @@ int UtcDaliImageVisualLoadFastTrackImageResourcePlanesReady(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualLoadFastTrackImagePlanesLoadFailed(void)
+{
+  EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");
+  EnvironmentVariable::SetTestEnvironmentVariable(ENABLE_DECODE_JPEG_TO_YUV_420_ENV, "1");
+
+  tet_infoline("Test YUV plane loading with FastTrackUploading when load fails - shader should be updated correctly");
+  ToolkitTestApplication application;
+
+  Test::TextureUploadManager::InitalizeGraphicsController(application.GetGraphicsController());
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_INVALID_FILE_NAME); // Use invalid file to trigger load failure
+  propertyMap.Insert(DevelImageVisual::Property::FAST_TRACK_UPLOADING, true);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // EventThread with callback - wait for the fast track loading task to complete
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // Verify that the resource status is FAILED (not stuck with wrong shader)
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(Control::CONTROL_PROPERTY_END_INDEX + 1);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  // Verify that the broken image is shown (renderer should exist with broken image)
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  // Verify that the resource is ready (even though it failed, the broken image should be shown)
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+
+  // Get the renderer and verify it has a valid shader (not a YUV shader that would cause rendering issues)
+  Renderer renderer = actor.GetRendererAt(0);
+  DALI_TEST_CHECK(renderer);
+
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK(shader);
+
+  // Verify the shader is not using YUV samplers (which would indicate the shader wasn't updated properly)
+  Property::Value programValue = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(programValue.GetType() == Property::MAP);
+  const Property::Map* programMap = programValue.GetMap();
+  DALI_TEST_CHECK(programMap);
+
+  Property::Value* fragmentValue = programMap->Find("fragment");
+  DALI_TEST_CHECK(fragmentValue);
+
+  Dali::String fragmentShader = fragmentValue->Get<Dali::String>();
+  std::string  fragmentStr(fragmentShader.CStr(), fragmentShader.Size());
+
+  // The fragment shader should NOT contain YUV-specific sampler names like "IS_REQUIRED_YUV_TO_RGB", "IS_REQUIRED_UNIFIED_YUV_AND_RGB", "IS_REQUIRED_YUV_ALPHA"
+  bool hasYuvSamplers = (fragmentStr.find("#define IS_REQUIRED_YUV_TO_RGB") != std::string::npos ||
+                         fragmentStr.find("#define IS_REQUIRED_UNIFIED_YUV_AND_RGB") != std::string::npos ||
+                         fragmentStr.find("#define IS_REQUIRED_YUV_ALPHA") != std::string::npos);
+
+  // Note: The broken image shader should use regular sampler, not YUV samplers
+  // This test verifies the shader was updated correctly after load failure
+  DALI_TEST_EQUALS(hasYuvSamplers, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualDebugImageVisualShaderP1(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(DALI_DEBUG_IMAGE_VISUAL_SHADER_ENV, "1");
