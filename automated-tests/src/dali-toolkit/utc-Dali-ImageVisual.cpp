@@ -405,6 +405,9 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   application.GetScene().Add(actor);
   application.SendNotification();
 
+  // Need to wait 1 trigger to initialize curl.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
@@ -1417,6 +1420,9 @@ int UtcDaliImageVisualTextureReuse2(void)
   application.GetScene().Add(actor);
   application.SendNotification();
 
+  // Need to wait 1 trigger to initialize curl.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   // Wait for image to load
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
@@ -2281,6 +2287,10 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
+
+  // Need to wait 1 trigger to initialize curl.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
@@ -2684,6 +2694,9 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
+
+  // Need to wait 1 trigger to initialize curl.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
@@ -4038,6 +4051,12 @@ int UtcDaliImageVisualLoadFastTrackImage01(void)
     application.SendNotification();
     application.Render();
 
+    if(filename == TEST_REMOTE_IMAGE_FILE_NAME)
+    {
+      // Need to wait 1 trigger to initialize curl.
+      DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    }
+
     // EventThread without callback
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 30, false), true, TEST_LOCATION);
 
@@ -4907,6 +4926,9 @@ int UtcDaliImageVisualSynchronousRemoteImageLoading(void)
 
   application.GetScene().Add(actor);
   application.SendNotification();
+
+  // Need to wait 1 trigger to initialize curl.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   // For remote images, even with synchronous loading requested, it should be forced to async
   // So we need to wait for async loading to complete

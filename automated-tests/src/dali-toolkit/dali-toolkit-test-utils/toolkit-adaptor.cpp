@@ -22,6 +22,7 @@
 // Don't want to include the actual window.h which otherwise will be indirectly included by adaptor.h.
 #define DALI_WINDOW_H
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/file-download/file-download-plugin-proxy.h> ///< For FileDownloadPluginProxy::RegisterEventThreadCallback
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 #include <dali/integration-api/debug.h>
@@ -95,6 +96,8 @@ Adaptor::~Adaptor()
 void Adaptor::Start(Dali::Window window)
 {
   AddWindow(&GetImplementation(window));
+
+  FileDownloadPluginProxy::RegisterEventThreadCallback();
 }
 
 void Adaptor::Stop()
@@ -106,6 +109,7 @@ void Adaptor::Stop()
     core.SceneDestroyed();
   }
 
+  FileDownloadPluginProxy::UnregisterEventThreadCallback();
   mStopped = true;
 }
 
