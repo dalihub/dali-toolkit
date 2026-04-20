@@ -54,7 +54,7 @@ ParticleList ParticleList::DownCast(BaseHandle handle)
   return {dynamic_cast<Internal::ParticleList*>(handle.GetObjectPtr())};
 }
 
-uint32_t ParticleList::AddStream(void* defaults, size_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream)
+uint32_t ParticleList::AddStream(void* defaults, uint32_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream)
 {
   return GetImplementation(*this).AddStream(dataTypeSize, defaults, dataType, "", localStream);
 }
