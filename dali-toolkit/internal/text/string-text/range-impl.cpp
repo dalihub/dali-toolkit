@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ namespace Internal
 {
 struct Range::Impl
 {
-  u_int32_t mStartIndex; /// The start index of range
-  u_int32_t mEndIndex;   /// The end index of range
+  uint32_t mStartIndex; /// The start index of range
+  uint32_t mEndIndex;   /// The end index of range
 };
 
-Dali::Toolkit::Text::Range Range::New(u_int32_t startIndex, u_int32_t endIndex)
+Dali::Toolkit::Text::Range Range::New(uint32_t startIndex, uint32_t endIndex)
 {
   RangePtr object = new Range(startIndex, endIndex);
 
@@ -41,7 +41,7 @@ Dali::Toolkit::Text::Range Range::New(u_int32_t startIndex, u_int32_t endIndex)
   return handle;
 }
 
-Range::Range(u_int32_t startIndex, u_int32_t endIndex)
+Range::Range(uint32_t startIndex, uint32_t endIndex)
 {
   mImpl = std::make_unique<Impl>();
 
@@ -53,17 +53,17 @@ Range::~Range()
 {
 }
 
-u_int32_t Range::GetStartIndex() const
+uint32_t Range::GetStartIndex() const
 {
   return mImpl->mStartIndex;
 }
 
-u_int32_t Range::GetEndIndex() const
+uint32_t Range::GetEndIndex() const
 {
   return mImpl->mEndIndex;
 }
 
-u_int32_t Range::GetNumberOfIndices() const
+uint32_t Range::GetNumberOfIndices() const
 {
   return 1u + ((mImpl->mStartIndex <= mImpl->mEndIndex) ? (mImpl->mEndIndex - mImpl->mStartIndex) : (mImpl->mStartIndex - mImpl->mEndIndex));
 }
