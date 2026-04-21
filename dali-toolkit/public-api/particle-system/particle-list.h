@@ -244,7 +244,7 @@ private:
    * @param[in] localStream Flag indicating whether stream is local (not used in shaders) or not
    * @return Index of new stream
    */
-  uint32_t AddStream(void* defaults, size_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream);
+  uint32_t AddStream(void* defaults, uint32_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream);
   /// @endcond
 
   /// @cond internal
