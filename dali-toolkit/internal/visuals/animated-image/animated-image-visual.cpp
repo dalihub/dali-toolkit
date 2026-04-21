@@ -53,8 +53,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(0);
-
 // sampling modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
@@ -1163,7 +1161,6 @@ void AnimatedImageVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);

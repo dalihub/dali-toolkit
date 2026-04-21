@@ -102,22 +102,22 @@ void MotionDataLoadTask::Process()
   {
     case LoadMethod::BVH_FILE:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvh(ToDaliString(mFileUrl), Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale));
+      mAnimationDefinition = Loader::LoadBvh(ToDaliString(mFileUrl), Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale);
       break;
     }
     case LoadMethod::BVH_BUFFER:
     {
-      mAnimationDefinition = std::move(Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale));
+      mAnimationDefinition = Loader::LoadBvhFromBuffer(mRawBuffer, mRawBufferLength, Dali::String("LoadedBvhMotionData"), mUseRootTranslationOnly, mScale);
       break;
     }
     case LoadMethod::FACIAL_FILE:
     {
-      mAnimationDefinition = std::move(Loader::LoadFacialAnimation(ToDaliString(mFileUrl)));
+      mAnimationDefinition = Loader::LoadFacialAnimation(ToDaliString(mFileUrl));
       break;
     }
     case LoadMethod::FACIAL_BUFFER:
     {
-      mAnimationDefinition = std::move(Loader::LoadFacialAnimationFromBuffer(mRawBuffer, mRawBufferLength));
+      mAnimationDefinition = Loader::LoadFacialAnimationFromBuffer(mRawBuffer, mRawBufferLength);
       break;
     }
   }

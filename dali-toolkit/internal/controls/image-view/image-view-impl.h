@@ -152,7 +152,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize

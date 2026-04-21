@@ -47,7 +47,7 @@ typedef IntrusivePtr<ScrollInternalConstraints> ScrollInternalConstraintsPtr;
 class ScrollOvershootIndicator;
 typedef IntrusivePtr<ScrollOvershootIndicator> ScrollOvershootIndicatorPtr;
 
-class ScrollViewPropertyHandler;
+struct ScrollViewPropertyHandler;
 
 /**
  * @copydoc Toolkit::ScrollView
@@ -452,7 +452,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentScrollPosition
    */
-  Vector2 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const override;
 
   /**
    * @copydoc ScrollTo(const Vector2&)
@@ -474,7 +474,7 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector2& position, float duration);
+  void ScrollTo(const Vector2& position, float duration) override;
 
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
@@ -572,22 +572,22 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
    */
-  void AddOverlay(Actor actor);
+  void AddOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::RemoveOverlay()
    */
-  void RemoveOverlay(Actor actor);
+  void RemoveOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootSize
    */
-  void SetOvershootSize(const Vector2& size);
+  void SetOvershootSize(const Vector2& size) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
-  void SetOvershootEffectColor(const Vector4& color);
+  void SetOvershootEffectColor(const Vector4& color) override;
 
   //properties
 
@@ -797,7 +797,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(const PanGesture& pan);
+  void OnPan(const PanGesture& pan) override;
 
   /**
    * Extension of the above gestures.

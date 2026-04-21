@@ -78,7 +78,6 @@ DALI_TYPE_REGISTRATION_END()
 Property::Index           RENDERING_BUFFER        = Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX + 1;
 static constexpr float    MIM_CAPTURE_SIZE        = 1.0f;
 static constexpr int32_t  DEFAULT_ORIENTATION     = 0;
-static constexpr int32_t  INVALID_INDEX           = -1;
 static constexpr uint32_t MAXIMUM_SIZE_SHADOW_MAP = 2048;
 
 static constexpr int32_t SCENE_ORDER_INDEX  = 100;

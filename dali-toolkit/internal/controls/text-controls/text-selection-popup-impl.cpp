@@ -59,6 +59,9 @@ namespace
 {
 #if defined(__GLIBC__)
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
+
+const char* IDS_LTR("IDS_LTR");
+const char* RTL_DIRECTION("RTL");
 #endif
 
 const char*         TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME("TextSelectionPopupButton");
@@ -96,9 +99,6 @@ const char* const OPTION_CUT("optionCut");                   // "Cut" popup opti
 const char* const OPTION_COPY("optionCopy");                 // "Copy" popup option.
 const char* const OPTION_PASTE("optionPaste");               // "Paste" popup option.
 const char* const OPTION_CLIPBOARD("optionClipboard");       // "Clipboard" popup option.
-
-const char* IDS_LTR("IDS_LTR");
-const char* RTL_DIRECTION("RTL");
 
 BaseHandle Create()
 {

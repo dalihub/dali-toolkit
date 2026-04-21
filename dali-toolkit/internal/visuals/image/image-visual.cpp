@@ -59,8 +59,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(0);
-
 // sampling modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
@@ -641,7 +639,6 @@ void ImageVisual::OnInitialize()
 
   // Create the renderer
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   if(mPixelArea != FULL_TEXTURE_RECT)
   {

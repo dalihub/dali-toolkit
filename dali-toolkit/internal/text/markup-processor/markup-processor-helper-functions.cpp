@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ const char WHITE_SPACE      = 0x20; // ASCII value of the white space.
 const char FIRST_UPPER_CASE = 0x41; // ASCII value of the one after the first upper case character (A).
 const char LAST_UPPER_CASE  = 0x5b; // ASCII value of the one after the last upper case character (Z).
 const char TO_LOWER_CASE    = 32;   // Value to add to a upper case character to transform it into a lower case.
-
-const unsigned int MAX_FLOAT_ATTRIBUTE_SIZE = 17u; ///< The maximum length of any of the possible float values.  +99999.999999999f  (sign, five digits, dot, nine digits, f)
 
 const char        WEB_COLOR_TOKEN('#');
 const char* const HEX_COLOR_TOKEN("0x");

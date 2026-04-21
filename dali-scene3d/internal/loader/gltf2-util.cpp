@@ -303,7 +303,7 @@ std::vector<std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>>> ReadM
   auto element = jsonObject.start;
   while(element)
   {
-    result.push_back(std::move(ReadMeshPrimitiveAttributes2(*element->value)));
+    result.push_back(ReadMeshPrimitiveAttributes2(*element->value));
     element = element->next;
   }
 
@@ -782,7 +782,7 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
       {},
       {});
 
-    sparseBlob = std::move(MeshDefinition::SparseBlob(std::move(indicesBlob), std::move(valuesBlob), accessor.mSparse->mCount));
+    sparseBlob = MeshDefinition::SparseBlob(std::move(indicesBlob), std::move(valuesBlob), accessor.mSparse->mCount);
   }
 
   uint32_t bufferViewOffset = 0u;
@@ -794,12 +794,12 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
   }
 
   return MeshDefinition::Accessor{
-    std::move(MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
-                                   accessor.GetBytesLength(),
-                                   static_cast<uint16_t>(bufferViewStride),
-                                   static_cast<uint16_t>(accessor.GetElementSizeBytes()),
-                                   accessor.mMin,
-                                   accessor.mMax}),
+    MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
+                         accessor.GetBytesLength(),
+                         static_cast<uint16_t>(bufferViewStride),
+                         static_cast<uint16_t>(accessor.GetElementSizeBytes()),
+                         accessor.mMin,
+                         accessor.mMax},
     std::move(sparseBlob),
     accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
     accessor.mNormalized};

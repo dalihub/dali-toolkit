@@ -145,7 +145,7 @@ private:
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()

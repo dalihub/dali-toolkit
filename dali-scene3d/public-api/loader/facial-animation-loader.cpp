@@ -67,7 +67,7 @@ std::vector<std::vector<float>> ReadBlendShapeKeys(const json_value_s& j)
   auto i = jo.start;
   while(i)
   {
-    result.push_back(std::move(js::Read::Array<float, js::Read::Number>(*i->value)));
+    result.push_back(js::Read::Array<float, js::Read::Number>(*i->value));
     i = i->next;
   }
 

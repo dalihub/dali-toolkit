@@ -215,32 +215,32 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::GetCurrentScrollPosition
    */
-  Vector2 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const override;
 
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
    */
-  void AddOverlay(Actor actor);
+  void AddOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::RemoveOverlay()
    */
-  void RemoveOverlay(Actor actor);
+  void RemoveOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector2& position, float duration);
+  void ScrollTo(const Vector2& position, float duration) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootSize
    */
-  void SetOvershootSize(const Vector2& size);
+  void SetOvershootSize(const Vector2& size) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
-  void SetOvershootEffectColor(const Vector4& color);
+  void SetOvershootEffectColor(const Vector4& color) override;
 
   /**
    * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
@@ -526,7 +526,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(const PanGesture& pan);
+  void OnPan(const PanGesture& pan) override;
 
   /**
    * Helper to handle anchoring animations.

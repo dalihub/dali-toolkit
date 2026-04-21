@@ -64,7 +64,7 @@ YGSize MeasureChild(YGNodeRef child, float width, YGMeasureMode measureModeWidth
 
 } // namespace
 
-struct Node;
+class Node;
 
 using NodePtr = std::unique_ptr<Node>;
 

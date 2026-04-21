@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ const int CUSTOM_PROPERTY_COUNT(2); // color,size
 
 const char* const POSITION_ATTRIBUTE_NAME("aPosition");
 const char* const DRIFT_ATTRIBUTE_NAME("aDrift");
-const char* const INDEX_NAME("indices");
 } // namespace
 
 BorderVisualPtr BorderVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)

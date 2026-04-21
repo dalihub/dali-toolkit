@@ -56,7 +56,9 @@ constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_BORDERLINE_BLUR_EDGE,
 };
+#if defined(DEBUG_ENABLED)
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
+#endif
 
 // enum of required list when we select shader
 enum ColorVisualRequireFlag

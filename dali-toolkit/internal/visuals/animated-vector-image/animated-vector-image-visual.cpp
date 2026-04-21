@@ -53,8 +53,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(0); // PixelArea
-
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 constexpr float ALPHA_VALUE_PREMULTIPLIED(1.0f);
@@ -522,7 +520,6 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer.SetTextures(textureSet);
