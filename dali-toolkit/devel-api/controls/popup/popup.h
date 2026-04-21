@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_POPUP_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public:
       BACKING_ENABLED,              ///< name "backingEnabled",         type bool
       BACKING_COLOR,                ///< name "backingColor",           type Vector4
       POPUP_BACKGROUND_IMAGE,       ///< name "popupBackgroundImage",   type std::string
-      POPUP_BACKGROUND_BORDER,      ///< name "popupBackgroundBorder",  type Rect< int >,      Values are in the order: left, right, bottom, top
+      POPUP_BACKGROUND_BORDER,      ///< name "popupBackgroundBorder",  type Extents, or Rect<int> or Vector4.If not Extents, Values are in the order: left, right, top, bottom
       TAIL_UP_IMAGE,                ///< name "tailUpImage",            type std::string
       TAIL_DOWN_IMAGE,              ///< name "tailDownImage",          type std::string
       TAIL_LEFT_IMAGE,              ///< name "tailLeftImage",          type std::string

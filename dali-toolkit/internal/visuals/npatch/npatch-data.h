@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>
@@ -204,14 +205,14 @@ public:
    *
    * @param [in] border border of NPatch
    */
-  void SetBorder(const Rect<int> border);
+  void SetBorder(const Dali::Extents& border);
 
   /**
    * @brief Retrieve border of NPatch.
    *
    * @return Return border of NPatch.
    */
-  Rect<int> GetBorder() const;
+  Dali::Extents GetBorder() const;
 
   /**
    * @brief Set whether the loaded image is premultiplied or not
@@ -294,7 +295,7 @@ private:
   std::size_t                  mHash;           ///< Hash code for the Url
   uint32_t                     mCroppedWidth;   ///< Width of the cropped middle part of N-patch
   uint32_t                     mCroppedHeight;  ///< Height of the cropped middle part of N-patch
-  Rect<int>                    mBorder;         ///< The size of the border
+  Extents                      mBorder;         ///< The size of the border
   LoadingState                 mLoadingState;   ///< True if the data loading is completed
   void*                        mRenderingMap;   ///< NPatch rendering data
 

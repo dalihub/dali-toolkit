@@ -28,6 +28,7 @@
 #include <dali/integration-api/adaptor-framework/round-robin-container-view.h>
 #include <dali/public-api/object/base-object.h>
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <unordered_map>
 

@@ -109,7 +109,7 @@ Dali::Geometry CreatePlaneGeometry(bool flip = false)
 } // anonymous namespace
 
 Panel::Panel()
-: ControlImpl(ControlBehaviour(DISABLE_VISUALS | DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(DISABLE_SIZE_NEGOTIATION) | DISABLE_STYLE_CHANGE_SIGNALS | DISABLE_VISUALS)),
   mPanelResolution(Vector2::ZERO),
   mResolutionPropertyIndex(Property::INVALID_INDEX),
   mIsTransparent(false),

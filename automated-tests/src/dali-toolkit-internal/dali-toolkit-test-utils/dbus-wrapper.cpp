@@ -728,7 +728,7 @@ struct DefaultDBusWrapper : public DBusWrapper
       assert(v);
       globalEntries[v] = std::move(impl);
       DBUS_DEBUG("registering interface %p (%d)", v, fallback ? 1 : 0);
-      destructors.push_back([=]()
+      destructors.push_back([v]()
       {
         DBUS_DEBUG("unregistering interface %p", v);
         {
@@ -1210,7 +1210,7 @@ void TestDBusWrapper::add_interface_impl(bool fallback, const std::string& path_
   for(auto& m : dscrProperties)
   {
     auto key         = std::make_tuple("/org/a11y/atspi/accessible" + path, interface, m.memberName, MethodType::Getter);
-    daliMethods[key] = [=](const MessagePtr& msg) -> MessagePtr
+    daliMethods[key] = [m, path, interface](const MessagePtr& msg) -> MessagePtr
     {
       auto ret   = std::make_shared<MessageImpl>(MessageImpl{
         "bus", path, interface, m.memberName, true});
@@ -1224,7 +1224,7 @@ void TestDBusWrapper::add_interface_impl(bool fallback, const std::string& path_
       return ret;
     };
     std::get<3>(key) = MethodType::Setter;
-    daliMethods[key] = [=](const MessagePtr& msg) -> MessagePtr
+    daliMethods[key] = [m, path, interface](const MessagePtr& msg) -> MessagePtr
     {
       auto v = m.setCallback(msg, std::make_shared<MessageIterImpl>(MessageIterImpl{msg, &get(msg)->data, false}));
       return v.empty() ? std::make_shared<MessageImpl>(MessageImpl{

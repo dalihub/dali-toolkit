@@ -19,6 +19,8 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/devel-api/object/property-array-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
@@ -402,8 +404,8 @@ bool VectorAnimationRenderer::GetMarkerInfo(const std::string& marker, uint32_t&
 
 void VectorAnimationRenderer::GetMarkerInfo(Property::Map& map) const
 {
-  map.Add(VECTOR_ANIMATION_MARKER_NAME_1, Property::Array({VECTOR_ANIMATION_MARKER_START_FRAME_1, VECTOR_ANIMATION_MARKER_END_FRAME_1}));
-  map.Add(VECTOR_ANIMATION_MARKER_NAME_2, Property::Array({VECTOR_ANIMATION_MARKER_START_FRAME_2, VECTOR_ANIMATION_MARKER_END_FRAME_2}));
+  map.Add(VECTOR_ANIMATION_MARKER_NAME_1, Dali::CreatePropertyArray({VECTOR_ANIMATION_MARKER_START_FRAME_1, VECTOR_ANIMATION_MARKER_END_FRAME_1}));
+  map.Add(VECTOR_ANIMATION_MARKER_NAME_2, Dali::CreatePropertyArray({VECTOR_ANIMATION_MARKER_START_FRAME_2, VECTOR_ANIMATION_MARKER_END_FRAME_2}));
 }
 
 void VectorAnimationRenderer::InvalidateBuffer()

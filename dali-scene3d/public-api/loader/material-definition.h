@@ -200,6 +200,65 @@ struct DALI_SCENE3D_API MaterialDefinition
   MaterialDefinition& operator=(MaterialDefinition&&) = default;
 
   /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  MaterialDefinition(SharedPtr<RawData>               rawData,
+                     uint32_t                         flag,
+                     Index                            environmentIdx,
+                     const Vector4&                   color,
+                     float                            metallic,
+                     float                            roughness,
+                     const Vector4&                   baseColorFactor,
+                     float                            normalScale,
+                     float                            occlusionStrength,
+                     const Vector3&                   emissiveFactor,
+                     float                            ior,
+                     float                            dielectricSpecular,
+                     float                            specularFactor,
+                     const Vector3&                   specularColorFactor,
+                     bool                             needAlbedoTexture,
+                     bool                             needMetallicRoughnessTexture,
+                     bool                             needMetallicTexture,
+                     bool                             needRoughnessTexture,
+                     bool                             needNormalTexture,
+                     bool                             doubleSided,
+                     Scene3D::Material::AlphaModeType alphaModeType,
+                     bool                             isOpaque,
+                     bool                             isMask,
+                     bool                             shadowAvailable,
+                     std::vector<TextureStage>        textureStages,
+                     Material                         material)
+  : mRawData(std::move(rawData)),
+    mFlags(flag),
+    mEnvironmentIdx(environmentIdx),
+    mColor(color),
+    mMetallic(metallic),
+    mRoughness(roughness),
+    mBaseColorFactor(baseColorFactor),
+    mNormalScale(normalScale),
+    mOcclusionStrength(occlusionStrength),
+    mEmissiveFactor(emissiveFactor),
+    mIor(ior),
+    mDielectricSpecular(dielectricSpecular),
+    mSpecularFactor(specularFactor),
+    mSpecularColorFactor(specularColorFactor),
+    mNeedAlbedoTexture(needAlbedoTexture),
+    mNeedMetallicRoughnessTexture(needMetallicRoughnessTexture),
+    mNeedMetallicTexture(needMetallicTexture),
+    mNeedRoughnessTexture(needRoughnessTexture),
+    mNeedNormalTexture(needNormalTexture),
+    mDoubleSided(doubleSided),
+    mAlphaModeType(alphaModeType),
+    mIsOpaque(isOpaque),
+    mIsMask(isMask),
+    mShadowAvailable(shadowAvailable),
+    mTextureStages(std::move(textureStages)),
+    mMaterial(std::move(material))
+  {
+  }
+
+  /**
    * @brief Loads (or, in the case of solid color materials, creates) raw pixel data,
    *  which is then returned.
    * @SINCE_2_0.7

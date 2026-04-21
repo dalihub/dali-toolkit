@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
+#include <atomic>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/drawable-view-native-renderer.h>

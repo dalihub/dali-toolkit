@@ -34,6 +34,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/property-map-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -141,19 +143,19 @@ Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
 
 constexpr Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-const Property::Map EMPTY_VISUAL_PROPERTIES{
+const Property::Map EMPTY_VISUAL_PROPERTIES = CreatePropertyMap({
   {Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::COLOR},
   {Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT},
-};
+});
 
-const Property::Map DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES{
+const Property::Map DEFAULT_WEB_IMAGE_VISUAL_PROPERTIES = CreatePropertyMap({
   {Dali::Toolkit::Visual::Property::TYPE, Dali::Toolkit::Visual::IMAGE},
   {Dali::Toolkit::ImageVisual::Property::URL, ""},
   {Dali::Toolkit::ImageVisual::Property::PIXEL_AREA, FULL_TEXTURE_RECT},
   {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U, Dali::WrapMode::CLAMP_TO_EDGE},
   {Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V, Dali::WrapMode::CLAMP_TO_EDGE},
-  {Dali::Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE}}},
-};
+  {Dali::Toolkit::Visual::Property::TRANSFORM, CreatePropertyMap({{Dali::Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE}})},
+});
 
 /**
  * @brief Helper function to calculate exact texture ratio value by view and texture size.
@@ -174,7 +176,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 } // namespace
 
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -198,7 +200,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 }
 
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
@@ -1168,7 +1170,10 @@ void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
       const Vector4 pixelArea(0.0f, 0.0f, std::min(1.0f, textureRatio.x), std::min(1.0f, textureRatio.y));
       const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.y));
 
-      Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY, {{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea}, {Toolkit::Visual::Property::TRANSFORM, {{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}}}});
+      Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY,
+                                                   CreatePropertyValue({{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea},
+                                                                        {Toolkit::Visual::Property::TRANSFORM,
+                                                                         CreatePropertyMap({{Dali::Toolkit::Visual::Transform::Property::SIZE, transformSize}})}}));
     }
 
     mWebViewArea = displayArea;

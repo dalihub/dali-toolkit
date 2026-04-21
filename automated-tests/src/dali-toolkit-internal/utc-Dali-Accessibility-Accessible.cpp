@@ -18,6 +18,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/object/property-array-devel.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -260,7 +261,7 @@ int utcDaliAccessibilityImgSrc(void)
     const String    image1 = "application-icon-20.png";
     const String    image2 = "application-icon-21.png";
     Property::Map   imageMap;
-    Property::Array urls{image1, image2};
+    Property::Array urls                                     = CreatePropertyArray({image1, image2});
     imageMap[Toolkit::ImageVisual::Property::URL]            = urls;
     imageMap[Toolkit::ImageVisual::Property::RELEASE_POLICY] = Toolkit::ImageVisual::ReleasePolicy::DETACHED;
 

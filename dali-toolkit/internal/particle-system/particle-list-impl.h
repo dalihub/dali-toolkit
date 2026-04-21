@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cstring>
 #include <memory>
+#include <string>
 
 namespace Dali::Toolkit::ParticleSystem::Internal
 {

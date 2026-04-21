@@ -66,6 +66,45 @@ struct DALI_SCENE3D_API EnvironmentDefinition
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  EnvironmentDefinition(Dali::String       diffuseMapPath,
+                        Dali::String       specularMapPath,
+                        SharedPtr<RawData> rawData,
+                        const Quaternion&  cubeOrientation,
+                        const Vector3&     yDirection,
+                        float              iblIntensity,
+                        bool               useBrdfTexture)
+  : mDiffuseMapPath(std::move(diffuseMapPath)),
+    mSpecularMapPath(std::move(specularMapPath)),
+    mRawData(std::move(rawData)),
+    mCubeOrientation(cubeOrientation),
+    mYDirection(yDirection),
+    mIblIntensity(iblIntensity),
+    mUseBrdfTexture(useBrdfTexture)
+  {
+  }
+
+  /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  EnvironmentDefinition(Dali::String diffuseMapPath, Dali::String specularMapPath)
+  : EnvironmentDefinition(std::move(diffuseMapPath), std::move(specularMapPath), {}, Quaternion::IDENTITY, Vector3::ONE, 1.0f, false)
+  {
+  }
+
+  /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  EnvironmentDefinition(Dali::String diffuseMapPath)
+  : EnvironmentDefinition(std::move(diffuseMapPath), "")
+  {
+  }
+
+  /**
    * @brief Loads raw pixel data for the given diffuse and specular maps.
    * @SINCE_2_0.7
    * @return The raw data for the given diffuse and specular maps

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,19 +45,19 @@ static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return source.left - dest.right;
+      return source.Left() - dest.Right();
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return dest.left - source.right;
+      return dest.Left() - source.Right();
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return source.top - dest.bottom;
+      return source.Top() - dest.Bottom();
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return dest.top - source.bottom;
+      return dest.Top() - source.Bottom();
     }
     default:
     {
@@ -82,19 +82,19 @@ static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return source.left - dest.left;
+      return source.Left() - dest.Left();
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return dest.right - source.right;
+      return dest.Right() - source.Right();
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return source.top - dest.top;
+      return source.Top() - dest.Top();
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return dest.bottom - source.bottom;
+      return dest.Bottom() - source.Bottom();
     }
     default:
     {
@@ -129,15 +129,15 @@ static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction di
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
       // the distance between the center verticals
-      return std::abs((source.top + (source.bottom - source.top) * 0.5f) -
-                      (dest.top + (dest.bottom - dest.top) * 0.5f));
+      return std::abs((source.Top() + (source.Bottom() - source.Top()) * 0.5f) -
+                      (dest.Top() + (dest.Bottom() - dest.Top()) * 0.5f));
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
       // the distance between the center horizontals
-      return std::abs((source.left + (source.right - source.left) * 0.5f) -
-                      (dest.left + (dest.right - dest.left) * 0.5f));
+      return std::abs((source.Left() + (source.Right() - source.Left()) * 0.5f) -
+                      (dest.Left() + (dest.Right() - dest.Left()) * 0.5f));
     }
     default:
     {
@@ -158,24 +158,6 @@ static uint64_t GetWeightedDistanceFor(int majorAxisDistance, int minorAxisDista
 }
 
 /**
- * Convert x,y,width,height coordinates into left, right, bottom, top coordinates.
- * @param[in,out] rect The rect
- */
-static void ConvertCoordinate(Dali::Rect<float>& rect)
-{
-  // convert x, y, width, height -> left, right, bottom, top
-  float left   = rect.x;
-  float right  = rect.x + rect.width;
-  float bottom = rect.y + rect.height;
-  float top    = rect.y;
-
-  rect.left   = left;
-  rect.right  = right;
-  rect.bottom = bottom;
-  rect.top    = top;
-}
-
-/**
  * Is destRect a candidate for the next focus given the direction?
  * @param srcRect The source rect.
  * @param destRect The dest rect.
@@ -188,19 +170,19 @@ static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, D
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return (srcRect.right > destRect.right || srcRect.left >= destRect.right) && srcRect.left > destRect.left;
+      return (srcRect.Right() > destRect.Right() || srcRect.Left() >= destRect.Right()) && srcRect.Left() > destRect.Left();
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return (srcRect.left < destRect.left || srcRect.right <= destRect.left) && srcRect.right < destRect.right;
+      return (srcRect.Left() < destRect.Left() || srcRect.Right() <= destRect.Left()) && srcRect.Right() < destRect.Right();
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom) && srcRect.top > destRect.top;
+      return (srcRect.Bottom() > destRect.Bottom() || srcRect.Top() >= destRect.Bottom()) && srcRect.Top() > destRect.Top();
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top) && srcRect.bottom < destRect.bottom;
+      return (srcRect.Top() < destRect.Top() || srcRect.Bottom() <= destRect.Top()) && srcRect.Bottom() < destRect.Bottom();
     }
     default:
     {
@@ -222,19 +204,19 @@ static bool IsToDirectionOf(Dali::Toolkit::Control::KeyboardFocus::Direction dir
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return src.left >= dest.right;
+      return src.Left() >= dest.Right();
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return src.right <= dest.left;
+      return src.Right() <= dest.Left();
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return src.top >= dest.bottom;
+      return src.Top() >= dest.Bottom();
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return src.bottom <= dest.top;
+      return src.Bottom() <= dest.Top();
     }
     default:
     {
@@ -257,12 +239,12 @@ static bool BeamsOverlap(Dali::Toolkit::Control::KeyboardFocus::Direction direct
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return (rect2.bottom >= rect1.top) && (rect2.top <= rect1.bottom);
+      return (rect2.Bottom() >= rect1.Top()) && (rect2.Top() <= rect1.Bottom());
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return (rect2.right >= rect1.left) && (rect2.left <= rect1.right);
+      return (rect2.Right() >= rect1.Left()) && (rect2.Left() <= rect1.Right());
     }
     default:
     {
@@ -366,9 +348,6 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
       {
         Rect<float> candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
 
-        // convert x, y, width, height -> left, right, bottom, top
-        ConvertCoordinate(candidateRect);
-
         if(IsBetterCandidate(direction, focusedRect, candidateRect, bestCandidateRect))
         {
           bestCandidateRect = candidateRect;
@@ -438,9 +417,6 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
     }
   }
 
-  ConvertCoordinate(bestCandidateRect);
-
-  ConvertCoordinate(focusedRect);
   nearestActor = FindNextFocus(rootActor, focusedActor, focusedRect, bestCandidateRect, direction);
   return nearestActor;
 }

@@ -270,6 +270,65 @@ struct DALI_SCENE3D_API MeshDefinition
   MeshDefinition& operator=(MeshDefinition&&) = default;
 
   /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  MeshDefinition(SharedPtr<RawData>      rawData,
+                 uint32_t                flags,
+                 Geometry::Type          primitiveType,
+                 Dali::String            uri,
+                 Accessor                indices,
+                 Accessor                positions,
+                 Accessor                normals,
+                 Accessor                tangents,
+                 std::vector<Accessor>   texCoords,
+                 std::vector<Accessor>   colors,
+                 std::vector<Accessor>   joints,
+                 std::vector<Accessor>   weights,
+                 Property::Type          tangentType,
+                 Blob                    blendShapeHeader,
+                 std::vector<BlendShape> blendShapes,
+                 BlendShapes::Version    blendShapeVersion,
+                 Index                   skeletonIdx,
+                 ModelPrimitive          modelPrimitive)
+  : mRawData(std::move(rawData)),
+    mFlags(flags),
+    mPrimitiveType(primitiveType),
+    mUri(std::move(uri)),
+    mIndices(std::move(indices)),
+    mPositions(std::move(positions)),
+    mNormals(std::move(normals)),
+    mTangents(std::move(tangents)),
+    mTexCoords(std::move(texCoords)),
+    mColors(std::move(colors)),
+    mJoints(std::move(joints)),
+    mWeights(std::move(weights)),
+    mTangentType(tangentType),
+    mBlendShapeHeader(std::move(blendShapeHeader)),
+    mBlendShapes(std::move(blendShapes)),
+    mBlendShapeVersion(blendShapeVersion),
+    mSkeletonIdx(skeletonIdx),
+    mModelPrimitive(std::move(modelPrimitive))
+  {
+  }
+
+  /**
+   * @brief Constructor for brace-enclosed initializer list
+   * @SINCE_2_5.18
+   */
+  MeshDefinition(SharedPtr<RawData> rawData,
+                 uint32_t           flags,
+                 Geometry::Type     primitiveType,
+                 Dali::String       uri,
+                 Accessor           indices,
+                 Accessor           positions,
+                 Accessor           normals,
+                 Accessor           tangents)
+  : MeshDefinition(std::move(rawData), flags, primitiveType, std::move(uri), std::move(indices), std::move(positions), std::move(normals), std::move(tangents), {}, {}, {}, {}, Property::VECTOR3, {}, {}, BlendShapes::Version::INVALID, INVALID_INDEX, nullptr)
+  {
+  }
+
+  /**
    * @brief Determines whether the mesh definition is that of a quad.
    * @SINCE_2_0.7
    */

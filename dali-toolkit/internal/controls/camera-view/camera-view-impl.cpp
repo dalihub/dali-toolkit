@@ -54,7 +54,7 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 CameraView::CameraView(Dali::Toolkit::CameraView::DisplayType displayType)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mDisplayType(displayType)
 {
 }

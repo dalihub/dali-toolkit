@@ -81,7 +81,7 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE(Toolkit::VisualFactory, Dali::BaseHandle, Create, true)
 DALI_TYPE_REGISTRATION_END()
-const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of the broken image.
+const char* const BROKEN_IMAGE_FILE_NAME = "broken.webp"; ///< The file name of the broken image.
 
 } // namespace
 

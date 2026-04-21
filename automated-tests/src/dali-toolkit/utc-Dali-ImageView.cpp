@@ -22,6 +22,7 @@
 // test harness headers before dali headers.
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/string-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-vector-image-renderer.h>
@@ -1005,12 +1006,12 @@ int UtcDaliImageViewSizeWithBackground(void)
   ImageView imageView = ImageView::New();
 
   imageView.SetProperty(Control::Property::BACKGROUND,
-                        {
+                        CreatePropertyValue({
                           {Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
                           {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
                           {ImageVisual::Property::DESIRED_WIDTH, width},
                           {ImageVisual::Property::DESIRED_HEIGHT, height},
-                        });
+                        }));
 
   application.GetScene().Add(imageView);
   application.SendNotification();
@@ -1034,12 +1035,12 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
   ImageView imageView = ImageView::New();
 
   imageView.SetProperty(Control::Property::BACKGROUND,
-                        {
+                        CreatePropertyValue({
                           {Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
                           {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
                           {ImageVisual::Property::DESIRED_WIDTH, widthBackground},
                           {ImageVisual::Property::DESIRED_HEIGHT, heightBackground},
-                        });
+                        }));
 
   imageView.SetImage(gImage_600_RGB); // 1 to 1 ratio, 600x600 pixels
 
@@ -1063,10 +1064,10 @@ int UtcDaliImageViewHeightForWidthBackground(void)
   ImageView imageView = ImageView::New();
 
   imageView.SetProperty(Control::Property::BACKGROUND,
-                        {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-                         {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
-                         {ImageVisual::Property::DESIRED_WIDTH, widthBackground},
-                         {ImageVisual::Property::DESIRED_HEIGHT, heightBackground}});
+                        CreatePropertyValue({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+                                             {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
+                                             {ImageVisual::Property::DESIRED_WIDTH, widthBackground},
+                                             {ImageVisual::Property::DESIRED_HEIGHT, heightBackground}}));
 
   application.GetScene().Add(imageView);
   application.SendNotification();
@@ -1092,10 +1093,10 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
   ImageView imageView = ImageView::New();
 
   imageView.SetProperty(Control::Property::BACKGROUND,
-                        {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-                         {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
-                         {ImageVisual::Property::DESIRED_WIDTH, widthBackground},
-                         {ImageVisual::Property::DESIRED_HEIGHT, heightBackground}}); // 1 to 2 ratio
+                        CreatePropertyValue({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+                                             {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
+                                             {ImageVisual::Property::DESIRED_WIDTH, widthBackground},
+                                             {ImageVisual::Property::DESIRED_HEIGHT, heightBackground}})); // 1 to 2 ratio
 
   imageView.SetImage(gImage_600_RGB); // 1 to 1 ratio
 
@@ -1163,10 +1164,10 @@ int UtcDaliImageViewCheckResourceReady(void)
   ImageView imageView = ImageView::New(TEST_GIF_FILE_NAME);
 
   imageView.SetProperty(Control::Property::BACKGROUND,
-                        {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-                         {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
-                         {ImageVisual::Property::DESIRED_WIDTH, 100},
-                         {ImageVisual::Property::DESIRED_HEIGHT, 200}});
+                        CreatePropertyValue({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+                                             {Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg"},
+                                             {ImageVisual::Property::DESIRED_WIDTH, 100},
+                                             {ImageVisual::Property::DESIRED_HEIGHT, 200}}));
 
   DALI_TEST_EQUALS(imageView.IsResourceReady(), false, TEST_LOCATION);
 

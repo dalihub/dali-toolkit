@@ -101,7 +101,7 @@ const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 } // namespace
 
 VideoView::VideoView(Dali::VideoSyncMode syncMode)
-: ControlImpl(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mCurrentVideoPlayPosition(0),
   mFrameID(0),
   mIsPlay(false),
@@ -155,7 +155,6 @@ void VideoView::OnInitialize()
   // update self property
   self.RegisterProperty(IS_VIDEO_VIEW_PROPERTY_NAME, true, Property::READ_WRITE);
 
-
   if(!mRenderingStrategy)
   {
     Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(self);
@@ -174,9 +173,9 @@ void VideoView::OnInitialize()
   {
     if(!mIsUnderlay)
     {
-      mIsUnderlay = true;
+      mIsUnderlay                        = true;
       Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(self);
-      mRenderingStrategy = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+      mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
       mRenderingStrategy->Initialize();
     }
   }
@@ -611,7 +610,7 @@ void VideoView::OnSceneConnection(int depth)
     }
   }
 
-  int curPos = mVideoPlayer.GetPlayPosition();
+  int  curPos     = mVideoPlayer.GetPlayPosition();
   bool wasPlaying = IsPlay();
 
   if(wasPlaying)
@@ -623,9 +622,9 @@ void VideoView::OnSceneConnection(int depth)
   {
     if(!mIsUnderlay)
     {
-      mIsUnderlay = true;
+      mIsUnderlay                        = true;
       Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(self);
-      mRenderingStrategy = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+      mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
       mRenderingStrategy->Initialize();
     }
   }
@@ -753,8 +752,8 @@ void VideoView::SetUnderlay(bool isUnderlay)
   {
     mSettingUnderlay = true;
     mIsUnderlay      = isUnderlay;
-    int curPos = mVideoPlayer.GetPlayPosition();
-    bool wasPlaying = IsPlay();
+    int  curPos      = mVideoPlayer.GetPlayPosition();
+    bool wasPlaying  = IsPlay();
 
     if(wasPlaying)
     {
@@ -776,9 +775,9 @@ void VideoView::SetUnderlay(bool isUnderlay)
     {
       if(!mIsUnderlay)
       {
-        mIsUnderlay = true;
+        mIsUnderlay                        = true;
         Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(Self());
-        mRenderingStrategy = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+        mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
         mRenderingStrategy->Initialize();
       }
     }

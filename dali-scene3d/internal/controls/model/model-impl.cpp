@@ -216,7 +216,7 @@ void ResetResourceTask(IntrusivePtr<AsyncTask>&& asyncTask)
 } // anonymous namespace
 
 Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUrl)
-: ControlImpl(ControlBehaviour(DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(DISABLE_SIZE_NEGOTIATION) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),

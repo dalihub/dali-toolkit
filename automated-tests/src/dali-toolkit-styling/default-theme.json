@@ -3,7 +3,7 @@
   {
     "alwaysShowFocus":false,
     "clearFocusOnEscape":true,
-    "brokenImageUrl":"{DALI_IMAGE_DIR}broken.png"
+    "brokenImageUrl":"{DALI_IMAGE_DIR}broken.webp"
   },
   "constants":
   {
@@ -44,9 +44,9 @@
       "secondaryCursorColor":[0.0,0.72,0.9,1.0],
       "cursorWidth":3,
       "selectionHighlightColor":[0.75,0.96,1.0,1.0],
-      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
-      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
-      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.webp",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.webp" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.webp" }
     },
 
     "textfieldFontSize0":
@@ -78,7 +78,7 @@
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "rendererType": "nPatch",
-        "imageUrl": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        "imageUrl": "{DALI_IMAGE_DIR}selection-popup-background.9.webp"
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
@@ -119,9 +119,9 @@
       "secondaryCursorColor":[0.0,0.72,0.9,1.0],
       "cursorWidth":3,
       "selectionHighlightColor":[0.75,0.96,1.0,1.0],
-      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
-      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
-      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.webp",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.webp" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.webp" }
     },
     "ComplexControl":
     {

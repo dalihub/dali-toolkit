@@ -136,7 +136,7 @@ DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "autoHideDelay",         INTEGER,   A
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "backingEnabled",        BOOLEAN,   BACKING_ENABLED        )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "backingColor",          VECTOR4,   BACKING_COLOR          )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "popupBackgroundImage",  STRING,    POPUP_BACKGROUND_IMAGE )
-DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "popupBackgroundBorder", RECTANGLE, POPUP_BACKGROUND_BORDER)
+DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "popupBackgroundBorder", EXTENTS, POPUP_BACKGROUND_BORDER)
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailUpImage",           STRING,    TAIL_UP_IMAGE          )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailDownImage",         STRING,    TAIL_DOWN_IMAGE        )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailLeftImage",         STRING,    TAIL_LEFT_IMAGE        )
@@ -199,14 +199,14 @@ const Vector2 DEFAULT_CONTEXTUAL_ADJACENCY_MARGIN(10.0f, 10.0f); ///< How close 
 const Vector2 DEFAULT_CONTEXTUAL_STAGE_BORDER(15.0f, 15.0f);     ///< How close the Popup can be to the stage edges.
 
 // Popup style defaults.
-const char* DEFAULT_BACKGROUND_IMAGE_FILE_NAME = "00_popup_bg.9.png";    ///< Background image.
-const char* DEFAULT_TAIL_UP_IMAGE_FILE_NAME    = "popup_tail_up.png";    ///< Tail up image.
-const char* DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME  = "popup_tail_down.png";  ///< Tail down image.
-const char* DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME  = "popup_tail_left.png";  ///< Tail left image.
-const char* DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME = "popup_tail_right.png"; ///< Tail right image.
+const char* DEFAULT_BACKGROUND_IMAGE_FILE_NAME = "00_popup_bg.9.webp";    ///< Background image.
+const char* DEFAULT_TAIL_UP_IMAGE_FILE_NAME    = "popup_tail_up.webp";    ///< Tail up image.
+const char* DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME  = "popup_tail_down.webp";  ///< Tail down image.
+const char* DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME  = "popup_tail_left.webp";  ///< Tail left image.
+const char* DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME = "popup_tail_right.webp"; ///< Tail right image.
 
 const Vector4     DEFAULT_BACKING_COLOR(0.0f, 0.0f, 0.0f, 0.5f);      ///< Color of the dimmed backing.
-const Rect<int>   DEFAULT_BACKGROUND_BORDER(17, 17, 13, 13);          ///< Default border of the background.
+const Extents     DEFAULT_BACKGROUND_BORDER(17, 17, 13, 13);          ///< Default border of the background.
 const Rect<float> DEFAULT_TITLE_PADDING(20.0f, 20.0f, 20.0f, 20.0f);  ///< Title padding used on popups with content and/or controls (from Tizen GUI UX).
 const Rect<float> DEFAULT_TITLE_ONLY_PADDING(8.0f, 8.0f, 8.0f, 8.0f); ///< Title padding used on popups with a title only (like toast popups).
 const Vector3     FOOTER_SIZE(620.0f, 96.0f, 0.0f);                   ///< Default size of the bottom control area.
@@ -899,13 +899,13 @@ void Popup::LayoutTail()
   {
     image      = mTailLeftImage;
     pivot      = Pivot::CENTER_RIGHT;
-    position.x = mBackgroundBorder.left;
+    position.x = mBackgroundBorder.start;
   }
   else if(parentOrigin.x > (1.0f - Math::MACHINE_EPSILON_1))
   {
     image      = mTailRightImage;
     pivot      = Pivot::CENTER_LEFT;
-    position.x = -mBackgroundBorder.right;
+    position.x = -mBackgroundBorder.end;
   }
 
   if(!image.empty())
@@ -1044,10 +1044,10 @@ void Popup::UpdateBackgroundPositionAndSize()
   if(mPopupBackgroundImage)
   {
     mPopupBackgroundImage.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
-    mPopupBackgroundImage.SetProperty(Actor::Property::SIZE_MODE_FACTOR, Vector3(mBackgroundBorder.left + mBackgroundBorder.right, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f));
+    mPopupBackgroundImage.SetProperty(Actor::Property::SIZE_MODE_FACTOR, Vector3(mBackgroundBorder.start + mBackgroundBorder.end, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f));
 
     // Adjust the position of the background so the transparent areas are set appropriately
-    mPopupBackgroundImage.SetProperty(Actor::Property::POSITION, Vector2((mBackgroundBorder.right - mBackgroundBorder.left) * 0.5f, (mBackgroundBorder.bottom - mBackgroundBorder.top) * 0.5f));
+    mPopupBackgroundImage.SetProperty(Actor::Property::POSITION, Vector2((mBackgroundBorder.end - mBackgroundBorder.start) * 0.5f, (mBackgroundBorder.bottom - mBackgroundBorder.top) * 0.5f));
   }
 }
 
@@ -1317,22 +1317,31 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       {
         bool valueUpdated = false;
 
-        Vector4 valueVector4;
-        if(value.Get(popupImpl.mBackgroundBorder))
+        if(value.Get(popupImpl.mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
         {
           valueUpdated = true;
         }
-        else if(value.Get(valueVector4))
+        else
         {
-          popupImpl.mBackgroundBorder.left   = valueVector4.x;
-          popupImpl.mBackgroundBorder.right  = valueVector4.y;
-          popupImpl.mBackgroundBorder.bottom = valueVector4.z;
-          popupImpl.mBackgroundBorder.top    = valueVector4.w;
-          valueUpdated                       = true;
+          Rect<int> valueRect;
+          if(value.Get(valueRect))
+          {
+            popupImpl.mBackgroundBorder.start  = valueRect.x;
+            popupImpl.mBackgroundBorder.end    = valueRect.y;
+            popupImpl.mBackgroundBorder.top    = valueRect.width;
+            popupImpl.mBackgroundBorder.bottom = valueRect.height;
+            valueUpdated                       = true;
+          }
         }
 
         if(valueUpdated)
         {
+          // Ensure the range of border valid.
+          Dali::ClampInPlace(popupImpl.mBackgroundBorder.start, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(popupImpl.mBackgroundBorder.end, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(popupImpl.mBackgroundBorder.top, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+          Dali::ClampInPlace(popupImpl.mBackgroundBorder.bottom, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+
           popupImpl.LayoutTail();                      // Update the tail if required
           popupImpl.UpdateBackgroundPositionAndSize(); // Update the background's size and position
         }

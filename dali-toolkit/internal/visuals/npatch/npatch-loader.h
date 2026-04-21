@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>
 #include <utility> // for std::pair
@@ -70,7 +71,7 @@ public:
    * @param [in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the texture.
    */
-  NPatchData::NPatchDataId Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading);
+  NPatchData::NPatchDataId Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Dali::Extents& border, bool& preMultiplyOnLoad, bool synchronousLoading);
 
   /**
    * @brief Retrieve N patch data matching to an id
@@ -166,7 +167,7 @@ private:
    *                                   image has no alpha channel
    * @return NPatchData pointer that Load function will used.
    */
-  NPatchDataPtr GetNPatchData(const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad);
+  NPatchDataPtr GetNPatchData(const VisualUrl& url, const Dali::Extents& border, bool& preMultiplyOnLoad);
 
 protected:
   /**

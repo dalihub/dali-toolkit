@@ -42,7 +42,7 @@ using namespace Dali;
 
 namespace
 {
-const char* DEFAULT_INDICATOR_IMAGE_FILE_NAME = "popup_scroll.9.png";
+const char* DEFAULT_INDICATOR_IMAGE_FILE_NAME = "popup_scroll.9.webp";
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
 const float DEFAULT_INDICATOR_HIDE_DURATION(0.5f);

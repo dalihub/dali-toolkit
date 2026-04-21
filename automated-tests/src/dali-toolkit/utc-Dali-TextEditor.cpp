@@ -21,6 +21,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/string-utils.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
@@ -3285,10 +3286,10 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty(TextEditor::Property::GRAB_HANDLE_IMAGE, HANDLE_IMAGE_FILE_NAME);
   editor.SetProperty(TextEditor::Property::SMOOTH_SCROLL, true);
 
-  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, Property::Map{{"filename", HANDLE_LEFT_SELECTION_FILE_NAME}});
-  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT, Property::Map{{"filename", HANDLE_LEFT_SELECTION_FILE_NAME}});
-  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, Property::Map{{"filename", HANDLE_RIGHT_SELECTION_FILE_NAME}});
-  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, Property::Map{{"filename", HANDLE_RIGHT_SELECTION_FILE_NAME}});
+  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, CreatePropertyMap({{"filename", HANDLE_LEFT_SELECTION_FILE_NAME}}));
+  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT, CreatePropertyMap({{"filename", HANDLE_LEFT_SELECTION_FILE_NAME}}));
+  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, CreatePropertyMap({{"filename", HANDLE_RIGHT_SELECTION_FILE_NAME}}));
+  editor.SetProperty(TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, CreatePropertyMap({{"filename", HANDLE_RIGHT_SELECTION_FILE_NAME}}));
 
   editor.SetProperty(Actor::Property::SIZE, Vector2(30.f, 500.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);

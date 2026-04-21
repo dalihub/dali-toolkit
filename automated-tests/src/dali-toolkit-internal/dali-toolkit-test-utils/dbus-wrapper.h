@@ -479,7 +479,7 @@ struct TestDBusWrapper : public DBusWrapper
 
   public:
     template<typename T>
-    Element(T&& t, typename std::enable_if<detail::DBusSig<T>::value != 0>::type* = nullptr)
+    Element(T&& t, typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type* = nullptr)
     {
       set(std::forward<T>(t));
     }
@@ -504,18 +504,18 @@ struct TestDBusWrapper : public DBusWrapper
     {
       return index_ == detail::IndexFromTypeTuple<ElementTuple, ElementList>::value;
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     bool is() const
     {
       return index_ == detail::IndexFromTypeTuple<ElementTuple, T>::value;
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     const T& get() const
     {
       if(!is<T>()) throw error{};
       return std::get<detail::IndexFromTypeTuple<ElementTuple, T>::value>(data);
     }
-    template<typename T, typename = typename std::enable_if<detail::DBusSig<T>::value != 0>::type>
+    template<typename T, typename = typename std::enable_if<static_cast<int>(detail::DBusSig<T>::value) != 0>::type>
     T& get()
     {
       if(!is<T>()) throw error{};
@@ -3309,7 +3309,7 @@ public:
       detail::CallId getterId;
       z.getterId = getterId;
       DBUS_DEBUG("call %d: property %s (get) type %s", getterId.id, memberName.c_str(), detail::signature<T>::name().c_str());
-      z.getCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& dst) -> std::string
+      z.getCallback = [getter, getterId](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& dst) -> std::string
       {
         try
         {
@@ -3338,7 +3338,7 @@ public:
       detail::CallId setterId;
       z.setterId = setterId;
       DBUS_DEBUG("call %d: property %s (set) type %s", setterId.id, memberName.c_str(), detail::signature<T>::name().c_str());
-      z.setCallback = [=](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& src_iter) -> std::string
+      z.setCallback = [setter, setterId](const DBusWrapper::MessagePtr& src, const DBusWrapper::MessageIterPtr& src_iter) -> std::string
       {
         std::tuple<T> value;
         auto          src_signature = DBUS_W->eldbus_message_iter_signature_get_impl(src_iter);
@@ -3403,7 +3403,7 @@ private:
                                                                                        typename detail::dbus_interface_traits<T>::SyncCB callback)
   {
     using VEArgs = typename detail::dbus_interface_traits<T>::VEArgs;
-    return [=](const DBusWrapper::MessagePtr& msg) -> DBusWrapper::MessagePtr
+    return [callId, callback](const DBusWrapper::MessagePtr& msg) -> DBusWrapper::MessagePtr
     {
       DBUS_DEBUG("call %d: entering", callId.id);
       DBusWrapper::MessagePtr ret  = {};
@@ -3541,7 +3541,7 @@ public:
    *   // process something later on
    *   DBusServer::getCurrentObjectPath(); // this will return empty string
    * };
-   * interface.addAsyncMethod<void()>("m", [=](std::function<void(void)> done_cb) {
+   * interface.addAsyncMethod<void()>("m", [](std::function<void(void)> done_cb) {
    *   DBusServer::getCurrentObjectPath(); // this will current object's path
    *
    *   // do some processing later on and call done_cb, when it's done
@@ -3567,7 +3567,7 @@ public:
    *   // process something later on
    *   DBusServer::getCurrentObjectPath(); // this will return empty string
    * };
-   * interface.addAsyncMethod<void()>("m", [=](std::function<void(void)> done_cb) {
+   * interface.addAsyncMethod<void()>("m", [](std::function<void(void)> done_cb) {
    *   DBusServer::getCurrentObjectPath(); // this will current object's path
    *
    *   // do some processing later on and call done_cb, when it's done

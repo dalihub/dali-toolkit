@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Toolkit
 {
 namespace Text
 {
-Range Range::New(u_int32_t startIndex, u_int32_t endIndex)
+Range Range::New(uint32_t startIndex, uint32_t endIndex)
 {
   return Internal::Range::New(startIndex, endIndex);
 }
@@ -50,17 +50,17 @@ Range& Range::operator=(Range&& rhs) = default;
 Range::~Range() = default;
 
 //Methods
-u_int32_t Range::GetStartIndex() const
+uint32_t Range::GetStartIndex() const
 {
   return GetImplementation(*this).GetStartIndex();
 }
 
-u_int32_t Range::GetEndIndex() const
+uint32_t Range::GetEndIndex() const
 {
   return GetImplementation(*this).GetEndIndex();
 }
 
-u_int32_t Range::GetNumberOfIndices() const
+uint32_t Range::GetNumberOfIndices() const
 {
   return GetImplementation(*this).GetNumberOfIndices();
 }

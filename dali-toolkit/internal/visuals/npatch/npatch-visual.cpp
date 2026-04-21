@@ -165,23 +165,23 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
   Property::Value* borderValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER, BORDER);
   if(borderValue)
   {
-    if(!borderValue->Get(mBorder)) // If value exists and is rect, just set mBorder
+    if(!borderValue->Get(mBorder)) // If value exists and is Extents (or Vector4), just set mBorder
     {
-      // Not a rect so try vector4
-      Vector4 border;
-      if(borderValue->Get(border))
+      // Not a extents so try rect
+      Rect<int32_t> rect;
+      if(borderValue->Get(rect))
       {
-        mBorder.left   = static_cast<int>(border.x);
-        mBorder.right  = static_cast<int>(border.y);
-        mBorder.bottom = static_cast<int>(border.z);
-        mBorder.top    = static_cast<int>(border.w);
+        mBorder.start  = static_cast<int16_t>(rect.x);
+        mBorder.end    = static_cast<int16_t>(rect.y);
+        mBorder.top    = static_cast<int16_t>(rect.width);
+        mBorder.bottom = static_cast<int16_t>(rect.height);
       }
     }
     // Ensure the range of border valid.
-    Dali::ClampInPlace(mBorder.left, 0, 0xFFFF);
-    Dali::ClampInPlace(mBorder.right, 0, 0xFFFF);
-    Dali::ClampInPlace(mBorder.bottom, 0, 0xFFFF);
-    Dali::ClampInPlace(mBorder.top, 0, 0xFFFF);
+    Dali::ClampInPlace(mBorder.start, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+    Dali::ClampInPlace(mBorder.end, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+    Dali::ClampInPlace(mBorder.top, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
+    Dali::ClampInPlace(mBorder.bottom, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
   }
 
   Property::Value* auxImage = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, AUXILIARY_IMAGE_NAME);

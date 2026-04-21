@@ -1501,18 +1501,23 @@ int UtcDaliPopupSetPopupBackgroundBorderProperty(void)
   tet_infoline("Set the background border property of a popup & retrieve it");
   Popup popup = Popup::New();
 
-  Rect<int> rect(40, 30, 20, 10);
+  Extents rect(40, 30, 20, 10);
   tet_infoline("Ensure value we want to set is different from what is already set");
-  DALI_TEST_CHECK(rect != popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Rect<int> >());
+  DALI_TEST_CHECK(rect != popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Extents>());
 
   tet_infoline("Set the property and retrieve it to make sure it's the value we set");
   popup.SetProperty(Popup::Property::POPUP_BACKGROUND_BORDER, rect);
-  DALI_TEST_EQUALS(rect, popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Rect<int> >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(rect, popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Extents>(), TEST_LOCATION);
+
+  tet_infoline("Set a Rect<int> as well which should also work");
+  Rect<int> rectValue(1, 2, 3, 4);
+  popup.SetProperty(Popup::Property::POPUP_BACKGROUND_BORDER, rectValue);
+  DALI_TEST_EQUALS(Extents(1, 2, 3, 4), popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Extents>(), TEST_LOCATION);
 
   tet_infoline("Set a vector4 as well which should also work");
   Vector4 vectorValue(10.0f, 20.0f, 30.0f, 40.0f);
   popup.SetProperty(Popup::Property::POPUP_BACKGROUND_BORDER, vectorValue);
-  DALI_TEST_EQUALS(Rect<int>(10, 20, 30, 40), popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Rect<int> >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), popup.GetProperty(Popup::Property::POPUP_BACKGROUND_BORDER).Get<Extents>(), TEST_LOCATION);
 
   END_TEST;
 }

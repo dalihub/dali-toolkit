@@ -45,7 +45,7 @@ public:
    * Construct a new GlView.
    */
   explicit GlViewImpl(GlView::BackendMode backendMode)
-  : ControlImpl(ControlBehaviour(0u | ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
+  : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
     mBackendMode(backendMode)
   {
   }

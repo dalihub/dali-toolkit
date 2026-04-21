@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,8 +149,8 @@ enum
 
   /**
    * @brief The border of the image.
-   * @details Name "border", type Property::RECTANGLE or Property::VECTOR4.
-   *          The border of the image in the order: left, right, bottom, top.
+   * @details Name "border", type Property::EXTENTS, Property::RECTANGLE or Property::VECTOR4.
+   *          The border of the image in the order: left, right, top, bottom.
    * @SINCE_1_2.60
    * @note Optional.
    * @note For N-Patch images only.

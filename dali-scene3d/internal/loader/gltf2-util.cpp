@@ -1111,10 +1111,12 @@ ModelRenderable* MakeModelRenderable(const gltf2::Mesh::Primitive& primitive, Co
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#default-material
     if(INVALID_INDEX == context.mDefaultMaterial)
     {
+      static const gltf2::Material sDefaultMaterial;
+
       auto& outMaterials       = context.mOutput.mResources.mMaterials;
       context.mDefaultMaterial = outMaterials.size();
 
-      ConvertMaterial(gltf2::Material{}, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials, context);
+      ConvertMaterial(sDefaultMaterial, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials, context);
     }
 
     materialIdx = context.mDefaultMaterial;

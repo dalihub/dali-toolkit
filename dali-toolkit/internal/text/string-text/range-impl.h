@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_RANGE_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public:
    *
    * @return A public handle to the newly allocated Range.
    */
-  static Dali::Toolkit::Text::Range New(u_int32_t startIndex, u_int32_t endIndex);
+  static Dali::Toolkit::Text::Range New(uint32_t startIndex, uint32_t endIndex);
 
   /**
    * @brief Destructor
@@ -68,23 +68,23 @@ protected:
    * @param[in] endIndex the end index of range (included)
    *
    */
-  Range(u_int32_t startIndex, u_int32_t endIndex);
+  Range(uint32_t startIndex, uint32_t endIndex);
 
 public: //Methods
   /**
    * @copydoc Dali::Toolkit::Text::Range::GetStartIndex()
    */
-  u_int32_t GetStartIndex() const;
+  uint32_t GetStartIndex() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::Range::GetEndIndex()
    */
-  u_int32_t GetEndIndex() const;
+  uint32_t GetEndIndex() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::Range::GetNumberOfIndices()
    */
-  u_int32_t GetNumberOfIndices() const;
+  uint32_t GetNumberOfIndices() const;
 
 public:
   Range(const Range&)            = delete; ///< Deleted copy constructor

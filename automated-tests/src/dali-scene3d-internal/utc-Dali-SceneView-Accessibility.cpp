@@ -107,7 +107,7 @@ int UtcDaliSceneViewUpdateOverlay(void)
 {
   ToolkitTestApplication application;
   std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
   auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
@@ -140,7 +140,7 @@ int UtcDaliSceneViewSetCustomHighlght01(void)
 {
   ToolkitTestApplication application;
   std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
   auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
@@ -174,7 +174,7 @@ int UtcDaliSceneViewSetCustomHighlght02(void)
 {
   ToolkitTestApplication application;
   std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
   auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
@@ -216,7 +216,7 @@ int UtcDaliSceneViewHideOverlay(void)
 {
   ToolkitTestApplication application;
   std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
   auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
@@ -247,7 +247,7 @@ int UtcDaliSceneViewRemoveHighlight(void)
 {
   ToolkitTestApplication application;
   std::string            focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
+  focusBorderImagePath += "/keyboard_focus.9.webp";
 
   AccessibilityHighlightOverlay mHighlightOverlay;
   auto                          highlight = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
