@@ -243,6 +243,7 @@ private:
    * @param[in] dataType Stream data type
    * @param[in] localStream Flag indicating whether stream is local (not used in shaders) or not
    * @return Index of new stream
+   * @note Must be exported: called by inline template AddStream<T>() and AddLocalStream<T>()
    */
   uint32_t AddStream(void* defaults, uint32_t dataTypeSize, ParticleStream::StreamDataType dataType, bool localStream);
   /// @endcond
@@ -254,6 +255,7 @@ private:
    * @param[in] streamIndex Stream index
    *
    * @return Valid data pointer or nullptr if index invalid
+   * @note Must be exported: called by inline template GetStream<T>()
    */
   void* GetRawStream(uint32_t streamIndex);
   /// @endcond
@@ -264,6 +266,7 @@ private:
    * @param[in] streamBit Bit (ParticleStreamTypeFlagBit) representing the stream
    *
    * @return Returns valid pointer to the data or nullptr if stream hasn't been used
+   * @note Must be exported: called by inline template GetDefaultStream<T>()
    */
   void* GetDefaultStream(ParticleStreamTypeFlagBit streamBit);
   /// @endcond
@@ -274,7 +277,7 @@ private:
    *
    * @param [in] impl A pointer to a newly allocated implementation
    */
-  ParticleList(Dali::Toolkit::ParticleSystem::Internal::ParticleList* impl);
+  DALI_INTERNAL ParticleList(Dali::Toolkit::ParticleSystem::Internal::ParticleList* impl);
   /// @endcond
 };
 
