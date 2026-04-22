@@ -140,7 +140,7 @@ void LoadSceneMetadata(const Dali::String& url, SceneMetadata& sceneMetadata)
     }
     else
     {
-      sceneMetadata.mImageMetadata.insert({ToDaliString(data.mImageUri), ImageMetadata{ImageDimensions(data.mMinWidth, data.mMinHeight), static_cast<Dali::SamplingMode::Type>(data.mSamplingMode)}});
+      sceneMetadata.mImageMetadata.Insert(ToDaliString(data.mImageUri), ImageMetadata{ImageDimensions(data.mMinWidth, data.mMinHeight), static_cast<Dali::SamplingMode::Type>(data.mSamplingMode)});
     }
   }
 }

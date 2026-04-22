@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/open-hash-map-managed.h>
 
 #include <string>
 
@@ -37,8 +38,6 @@
 namespace Dali::Scene3D::Loader
 {
 class MaterialDefinition;
-
-using ImageMetadataMap = std::unordered_map<Dali::String, ImageMetadata>;
 
 /**
  * @class UsdTextureConverter

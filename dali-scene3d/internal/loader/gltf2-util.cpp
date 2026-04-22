@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -630,15 +631,15 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
   materialDefinition.mFlags |= semantic;
 }
 
-void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<Dali::String, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
+void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<Dali::String, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
+  auto getTextureMetaData = [](const ImageMetadataMap& metaData, const gltf2::TextureInfo& info)
   {
     if(!info.mTexture->mSource->mUri.empty())
     {
-      if(auto search = metaData.find(Dali::String(info.mTexture->mSource->mUri.data())); search != metaData.end())
+      if(auto* found = metaData.Find(Dali::String(info.mTexture->mSource->mUri.data())))
       {
-        return search->second;
+        return *found;
       }
     }
     return ImageMetadata();

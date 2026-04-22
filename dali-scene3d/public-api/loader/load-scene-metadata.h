@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/open-hash-map-managed.h>
 #include <dali/public-api/rendering/texture.h>
-#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -37,6 +37,8 @@ struct ImageMetadata
   ImageDimensions    mMinSize{};                                   ///< The minimum required image size for rendering. @SINCE_2_2.5
   SamplingMode::Type mSamplingMode{SamplingMode::BOX_THEN_LINEAR}; ///< The sampling mode used to resize the image. @SINCE_2_2.5
 };
+
+using ImageMetadataMap = Dali::ManagedOpenHashMap<Dali::String, ImageMetadata, Dali::StringHash, Dali::StringEqual>;
 
 /**
  * @brief Stores the metadata for a scene.
@@ -54,7 +56,7 @@ struct ImageMetadata
  */
 struct SceneMetadata
 {
-  std::unordered_map<Dali::String, ImageMetadata> mImageMetadata{}; ///< The container of image metadata (i.e. the pairs of image URI and image metadata)
+  ImageMetadataMap mImageMetadata{}; ///< The container of image metadata (i.e. the pairs of image URI and image metadata)
 };
 
 /**

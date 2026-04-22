@@ -252,9 +252,9 @@ bool UsdTextureConverter::ProcessImageBuffer(
   if(!imageFileName.empty())
   {
     String fileNameStr = ToDaliString(imageFileName);
-    if(auto search = imageMetaDataMap.find(fileNameStr); search != imageMetaDataMap.end())
+    if(auto* found = imageMetaDataMap.Find(fileNameStr))
     {
-      metaData = search->second;
+      metaData = *found;
     }
   }
 
