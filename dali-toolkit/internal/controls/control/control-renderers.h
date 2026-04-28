@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/math/uint-16-pair.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
