@@ -51,7 +51,7 @@ VisualFactory VisualFactory::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to VisualFactory
-      factory = VisualFactory(dynamic_cast<Internal::VisualFactory*>(handle.GetObjectPtr()));
+      factory = VisualFactory(static_cast<Internal::VisualFactory*>(handle.GetObjectPtr()));
     }
 
     if(!factory) // If not, create the VisualFactory and register it as a singleton

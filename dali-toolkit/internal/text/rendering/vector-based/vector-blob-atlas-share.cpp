@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ VectorBlobAtlasShare VectorBlobAtlasShare::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to VectorBlobAtlasShare
-      manager = VectorBlobAtlasShare(dynamic_cast<VectorBlobAtlasShare::Impl*>(handle.GetObjectPtr()));
+      manager = VectorBlobAtlasShare(static_cast<VectorBlobAtlasShare::Impl*>(handle.GetObjectPtr()));
     }
 
     if(!manager)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ ModelCacheManager ModelCacheManager::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to ModelCacheManager
-      manager = ModelCacheManager(dynamic_cast<ModelCacheManager::Impl*>(handle.GetObjectPtr()));
+      manager = ModelCacheManager(static_cast<ModelCacheManager::Impl*>(handle.GetObjectPtr()));
     }
 
     if(!manager)

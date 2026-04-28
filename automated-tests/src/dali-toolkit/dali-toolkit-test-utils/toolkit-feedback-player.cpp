@@ -48,7 +48,7 @@ public:
       Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::FeedbackPlayer));
       if(handle)
       {
-        player = Dali::FeedbackPlayer(dynamic_cast<FeedbackPlayer*>(handle.GetObjectPtr()));
+        player = Dali::FeedbackPlayer(static_cast<FeedbackPlayer*>(handle.GetObjectPtr()));
       }
       else
       {
