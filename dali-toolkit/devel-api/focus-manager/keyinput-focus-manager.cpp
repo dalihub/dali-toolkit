@@ -48,7 +48,7 @@ KeyInputFocusManager KeyInputFocusManager::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to focus manager
-      manager = KeyInputFocusManager(dynamic_cast<Internal::KeyInputFocusManager*>(handle.GetObjectPtr()));
+      manager = KeyInputFocusManager(static_cast<Internal::KeyInputFocusManager*>(handle.GetObjectPtr()));
     }
 
     if(!manager)

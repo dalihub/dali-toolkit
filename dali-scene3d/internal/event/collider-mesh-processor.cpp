@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ ColliderMeshProcessor ColliderMeshProcessor::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to focus manager
-      processor = ColliderMeshProcessor(dynamic_cast<Internal::ColliderMeshProcessor*>(handle.GetObjectPtr()));
+      processor = ColliderMeshProcessor(static_cast<Internal::ColliderMeshProcessor*>(handle.GetObjectPtr()));
     }
 
     if(!processor)

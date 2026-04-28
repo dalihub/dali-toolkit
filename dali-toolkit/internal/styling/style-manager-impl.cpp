@@ -105,7 +105,7 @@ Toolkit::StyleManager StyleManager::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton
-      manager = Toolkit::StyleManager(dynamic_cast<StyleManager*>(handle.GetObjectPtr()));
+      manager = Toolkit::StyleManager(static_cast<StyleManager*>(handle.GetObjectPtr()));
     }
   }
 
