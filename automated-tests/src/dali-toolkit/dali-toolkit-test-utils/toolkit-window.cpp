@@ -80,7 +80,7 @@ void Window::SetPositionSize(PositionSize positionSize)
 {
   mRenderSurface->MoveResize(positionSize);
 
-  Uint16Pair   newSize(positionSize.width, positionSize.height);
+  Int32Pair    newSize(positionSize.width, positionSize.height);
   Dali::Window handle(this);
   mResizeSignal.Emit(handle, newSize);
 }
