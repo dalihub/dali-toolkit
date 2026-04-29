@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ Dali::Toolkit::Text::Backend Backend::Get()
     if(handle)
     {
       // If so, downcast the handle
-      Backend* impl = dynamic_cast<Dali::Toolkit::Text::Internal::Backend*>(handle.GetObjectPtr());
+      Backend* impl = static_cast<Dali::Toolkit::Text::Internal::Backend*>(handle.GetObjectPtr());
       backendHandle = Dali::Toolkit::Text::Backend(impl);
     }
     else // create and register the object

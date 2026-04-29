@@ -23,7 +23,6 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 

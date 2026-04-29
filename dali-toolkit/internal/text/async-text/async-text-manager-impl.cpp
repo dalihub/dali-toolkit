@@ -123,7 +123,7 @@ Text::AsyncTextManager AsyncTextManager::Get()
     if(handle)
     {
       // If so, downcast the handle
-      AsyncTextManager* impl = dynamic_cast<Internal::AsyncTextManager*>(handle.GetObjectPtr());
+      AsyncTextManager* impl = static_cast<Internal::AsyncTextManager*>(handle.GetObjectPtr());
       asyncTextManagerHandle = Text::AsyncTextManager(impl);
     }
     else // create and register the object

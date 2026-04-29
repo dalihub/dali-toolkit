@@ -40,6 +40,9 @@ namespace Toolkit
 {
 namespace Internal
 {
+class OffScreenRenderingImpl;
+using OffScreenRenderingImplPtr = IntrusivePtr<OffScreenRenderingImpl>;
+
 /**
  * @brief This effect renders all children(including self) at off screen framebuffer.
  * This effect is handleless, so initiate an instance through setting DevelControl::Property::OFFSCREEN_RENDERING

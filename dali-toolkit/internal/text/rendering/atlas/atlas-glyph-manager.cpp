@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ AtlasGlyphManager AtlasGlyphManager::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to AtlasGlyphManager
-      manager = AtlasGlyphManager(dynamic_cast<Internal::AtlasGlyphManager*>(handle.GetObjectPtr()));
+      manager = AtlasGlyphManager(static_cast<Internal::AtlasGlyphManager*>(handle.GetObjectPtr()));
     }
 
     if(!manager)

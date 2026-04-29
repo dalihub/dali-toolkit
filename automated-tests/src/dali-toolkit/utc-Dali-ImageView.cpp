@@ -2840,6 +2840,9 @@ int UtcDaliImageViewLoadRemoteSVG01(void)
 
     application.SendNotification();
 
+    // Need to wait 1 trigger to initialize curl.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
     // Wait for loading & rasterization
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
@@ -2878,6 +2881,9 @@ int UtcDaliImageViewLoadRemoteSVG02(void)
     DALI_TEST_EQUALS(imageView.GetRendererCount(), 0u, TEST_LOCATION);
 
     application.SendNotification();
+
+    // Need to wait 1 trigger to initialize curl.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     // Wait for loading & rasterization
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
@@ -3292,6 +3298,9 @@ int UtcDaliImageViewSvgLoadingFailureRemoteFile01(void)
 
     application.SendNotification();
 
+    // Need to wait 1 trigger to initialize curl.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
     // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
@@ -3330,6 +3339,9 @@ int UtcDaliImageViewSvgLoadingFailureRemoteFile02(void)
     application.GetScene().Add(imageView);
 
     application.SendNotification();
+
+    // Need to wait 1 trigger to initialize curl.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     // loading started, this waits for the loader thread - load & rasterize
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);

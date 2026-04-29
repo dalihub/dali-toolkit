@@ -76,10 +76,13 @@ private:
 
 SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
 : mId(0),
-  mScene(Dali::Integration::Scene::New(Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)))),
   mRenderSurface(new TestRenderSurface(positionSize)),
   mFocusChangedGeneratedSignal()
 {
+  Graphics::RenderTargetCreateInfo createInfo;
+  createInfo.SetExtent({static_cast<uint16_t>(positionSize.width), static_cast<uint16_t>(positionSize.height)});
+  createInfo.SetSurface(mRenderSurface.get());
+  mScene = Dali::Integration::Scene::New(createInfo, Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)));
 }
 
 SceneHolder::~SceneHolder()

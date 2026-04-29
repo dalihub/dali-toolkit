@@ -129,7 +129,7 @@ Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
     if(handle)
     {
       // If so, downcast the handle of singleton to keyboard focus manager
-      manager = Toolkit::KeyboardFocusManager(dynamic_cast<KeyboardFocusManager*>(handle.GetObjectPtr()));
+      manager = Toolkit::KeyboardFocusManager(static_cast<KeyboardFocusManager*>(handle.GetObjectPtr()));
     }
   }
 
