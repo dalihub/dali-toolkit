@@ -107,7 +107,6 @@ public:
    * @param[out] textureId             The textureId of the frame
    * @param[in, out] maskInfo          Mask info structure
    * @param[in]  desiredSize           The size the image is likely to appear at. This can be set to 0, 0 for automatic
-   * @param[in]  fittingMode           The FittingMode to use
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
    * @param[in]  textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
@@ -123,7 +122,6 @@ public:
                                       TextureManager::TextureId&      textureId,
                                       MaskingDataPointer&             maskInfo,
                                       const Dali::ImageDimensions&    desiredSize,
-                                      const Dali::FittingMode::Type   fittingMode,
                                       const Dali::SamplingMode::Type  samplingMode,
                                       const bool                      synchronousLoading,
                                       TextureUploadObserver*          textureObserver,
@@ -137,7 +135,6 @@ public:
    *
    * @param[in] url                   The URL of the image to load
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
    * @param[in] textureObserver       The client object should inherit from this and provide the "LoadCompleted" virtual.
@@ -151,7 +148,6 @@ public:
   Devel::PixelBuffer LoadPixelBuffer(
     const VisualUrl&                url,
     const Dali::ImageDimensions&    desiredSize,
-    const Dali::FittingMode::Type   fittingMode,
     const Dali::SamplingMode::Type  samplingMode,
     const bool                      synchronousLoading,
     TextureUploadObserver*          textureObserver,
@@ -168,7 +164,6 @@ public:
    *
    * @param[in] url                   The URL of the image to load
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in, out] maskInfo         Mask info structure
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
@@ -187,7 +182,6 @@ public:
   TextureSet LoadTexture(
     const VisualUrl&                   url,
     const Dali::ImageDimensions&       desiredSize,
-    const Dali::FittingMode::Type      fittingMode,
     const Dali::SamplingMode::Type     samplingMode,
     MaskingDataPointer&                maskInfo,
     const bool                         synchronousLoading,
@@ -300,7 +294,6 @@ public: // Load Request API
    *
    * @param[in] url                   The URL of the image to load
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] observer              The client object should inherit from this and provide the "LoadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
@@ -314,7 +307,6 @@ public: // Load Request API
   TextureId RequestLoad(
     const VisualUrl&                   url,
     const ImageDimensions&             desiredSize,
-    const Dali::FittingMode::Type      fittingMode,
     const Dali::SamplingMode::Type     samplingMode,
     TextureUploadObserver*             observer,
     const bool                         orientationCorrection,
@@ -339,7 +331,6 @@ private: // Internal Load Request API
    * @param[in] previousTextureId     The texture id of an image which the requestor already has before
    * @param[in] contentScale          The scale factor to apply to the image before masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] cropToMask            Only used with masking, this will crop the scaled image to the mask size.
    *                                  If false, then the mask will be scaled to fit the image before being applied.
@@ -360,7 +351,6 @@ private: // Internal Load Request API
     const TextureManager::TextureId    previousTextureId,
     const float                        contentScale,
     const ImageDimensions&             desiredSize,
-    const Dali::FittingMode::Type      fittingMode,
     const Dali::SamplingMode::Type     samplingMode,
     const bool                         cropToMask,
     TextureUploadObserver*             observer,
@@ -400,7 +390,6 @@ private: // Internal Load Request API
    *                                  when reloadPolicy is FORCED.
    * @param[in] contentScale          The scaling factor to apply to the content when masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
    *                                  masking.
@@ -424,7 +413,6 @@ private: // Internal Load Request API
     const TextureManager::TextureId    previousTextureId,
     const float                        contentScale,
     const Dali::ImageDimensions&       desiredSize,
-    const Dali::FittingMode::Type      fittingMode,
     const Dali::SamplingMode::Type     samplingMode,
     const bool                         cropToMask,
     const TextureManager::StorageType  storageType,
@@ -441,7 +429,6 @@ private: // Internal Load Request API
    * @param[in] url                   The URL of the image to load
    * @param[in] desiredSize           The size the image is likely to appear at.
    *                                  This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
    *                                  e.g., from portrait to landscape
@@ -452,7 +439,6 @@ private: // Internal Load Request API
   void LoadImageSynchronously(
     const VisualUrl&                 url,
     const Dali::ImageDimensions&     desiredSize,
-    const Dali::FittingMode::Type    fittingMode,
     const Dali::SamplingMode::Type   samplingMode,
     const bool                       orientationCorrection,
     const bool                       loadYuvPlanes,

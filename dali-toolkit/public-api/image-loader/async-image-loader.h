@@ -172,7 +172,6 @@ public:
   /**
    * @brief Starts an image loading task.
    * Note: When using this method, the following defaults will be used:
-   * fittingMode = FittingMode::DEFAULT
    * samplingMode = SamplingMode::BOX_THEN_LINEAR
    * orientationCorrection = true
    *
@@ -187,7 +186,6 @@ public:
   /**
    * @brief Starts an image loading task.
    * Note: When using this method, the following defaults will be used:
-   * fittingMode = FittingMode::DEFAULT
    * samplingMode = SamplingMode::BOX_THEN_LINEAR
    * orientationCorrection = true
    *
@@ -207,14 +205,12 @@ public:
    * @REMARK_STORAGE
    * @param[in] url The URL of the image file to load
    * @param[in] dimensions The width and height to fit the loaded image to
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return The loading task id
    */
   uint32_t Load(const Dali::String& url,
                 ImageDimensions     dimensions,
-                FittingMode::Type   fittingMode,
                 SamplingMode::Type  samplingMode,
                 bool                orientationCorrection);
 

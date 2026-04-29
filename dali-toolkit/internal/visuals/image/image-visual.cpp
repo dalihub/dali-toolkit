@@ -61,16 +61,6 @@ namespace
 {
 const int CUSTOM_PROPERTY_COUNT(0);
 
-// fitting modes
-DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SHRINK_TO_FIT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SCALE_TO_FILL)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_WIDTH)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_HEIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, VISUAL_FITTING)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, DEFAULT)
-DALI_ENUM_TO_STRING_TABLE_END(FITTING_MODE)
-
 // sampling modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
@@ -165,10 +155,9 @@ ImageVisualPtr ImageVisual::New(VisualFactoryCache&       factoryCache,
                                 const VisualUrl&          imageUrl,
                                 const Property::Map&      properties,
                                 ImageDimensions           size,
-                                FittingMode::Type         fittingMode,
                                 Dali::SamplingMode::Type  samplingMode)
 {
-  ImageVisualPtr imageVisualPtr(new ImageVisual(factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode));
+  ImageVisualPtr imageVisualPtr(new ImageVisual(factoryCache, shaderFactory, imageUrl, size, samplingMode));
   imageVisualPtr->SetProperties(properties);
   imageVisualPtr->Initialize();
   return imageVisualPtr;
@@ -178,10 +167,9 @@ ImageVisualPtr ImageVisual::New(VisualFactoryCache&       factoryCache,
                                 ImageVisualShaderFactory& shaderFactory,
                                 const VisualUrl&          imageUrl,
                                 ImageDimensions           size,
-                                FittingMode::Type         fittingMode,
                                 Dali::SamplingMode::Type  samplingMode)
 {
-  ImageVisualPtr imageVisualPtr(new ImageVisual(factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode));
+  ImageVisualPtr imageVisualPtr(new ImageVisual(factoryCache, shaderFactory, imageUrl, size, samplingMode));
   imageVisualPtr->Initialize();
   return imageVisualPtr;
 }
@@ -190,7 +178,6 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
                          ImageVisualShaderFactory& shaderFactory,
                          const VisualUrl&          imageUrl,
                          ImageDimensions           size,
-                         FittingMode::Type         fittingMode,
                          Dali::SamplingMode::Type  samplingMode)
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE),
   mPixelArea(FULL_TEXTURE_RECT),
@@ -205,7 +192,6 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mTextures(),
   mNativeTexture(),
   mImageVisualShaderFactory(shaderFactory),
-  mFittingMode(fittingMode),
   mSamplingMode(samplingMode),
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
@@ -333,9 +319,8 @@ void ImageVisual::DoSetProperty(Property::Index index, const Property::Value& va
 
     case Toolkit::ImageVisual::Property::FITTING_MODE:
     {
-      int fittingMode = 0;
-      Scripting::GetEnumerationProperty(value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, fittingMode);
-      mFittingMode = Dali::FittingMode::Type(fittingMode);
+      // FittingMode is no longer a loader-side concept; the property is kept for ABI compatibility
+      // but the value is ignored. Layout-side fitting is handled by the visual fitting mode.
       break;
     }
 
@@ -608,7 +593,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
     {
       // Note that We don't consider desired image size for this case.
       // Just use (0, 0) value for desired size of image.
-      ImageDimensions dimensions = Dali::GetClosestImageSize(mImageUrl.GetUrl(), ImageDimensions(0, 0), mFittingMode, mSamplingMode, mOrientationCorrection);
+      ImageDimensions dimensions = Dali::GetClosestImageSize(mImageUrl.GetUrl(), ImageDimensions(0, 0), mSamplingMode, mOrientationCorrection);
 
       if(dimensions != ImageDimensions(0, 0))
       {
@@ -749,7 +734,7 @@ void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions&
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 
     // Set new TextureSet with fast track loading task
-    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, size, mFittingMode, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
+    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, size, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
 
     TextureSet textureSet = TextureSet::New();
     if(!mFastTrackLoadingTask->mLoadPlanesAvaliable)
@@ -778,7 +763,7 @@ void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions&
   }
   else
   {
-    textures = textureManager.LoadTexture(mImageUrl, size, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, loadingStatus, textureObserver, mOrientationCorrection, forceReload, preMultiplyOnLoad);
+    textures = textureManager.LoadTexture(mImageUrl, size, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, loadingStatus, textureObserver, mOrientationCorrection, forceReload, preMultiplyOnLoad);
   }
 
   if(textures)
@@ -950,7 +935,6 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, size.GetHeight());
   }
 
-  map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
   map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
 
   if(mImpl->mRenderer && mPixelAreaIndex != Property::INVALID_INDEX)

@@ -61,7 +61,7 @@ int UtcDaliSyncImageLoaderLoadWithDimensions(void)
 
 int UtcDaliSyncImageLoaderLoadWithAllOptions(void)
 {
-  PixelData pixelData = Toolkit::SyncImageLoader::Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
+  PixelData pixelData = Toolkit::SyncImageLoader::Load(gImage_128_RGB, ImageDimensions(100, 100), SamplingMode::BOX_THEN_LINEAR, true);
 
   VerifyLoad(pixelData, 100u, 100u);
 

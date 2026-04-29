@@ -43,7 +43,6 @@ public:
    * @brief Constructor.
    * @param[in] textureManager       The texture manager
    * @param[in] size                 The width and height to fit the loaded image to.
-   * @param[in] fittingMode          The FittingMode of the resource to load
    * @param[in] samplingMode         The SamplingMode of the resource to load
    * @param[in] animatedImageLoading The loaded animated image
    * @param[in] maskingData          Masking data to be applied.
@@ -60,7 +59,6 @@ public:
    */
   RollingAnimatedImageCache(TextureManager&                     textureManager,
                             ImageDimensions                     size,
-                            Dali::FittingMode::Type             fittingMode,
                             Dali::SamplingMode::Type            samplingMode,
                             AnimatedImageLoading&               animatedImageLoading,
                             TextureManager::MaskingDataPointer& maskingData,

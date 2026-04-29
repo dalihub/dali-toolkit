@@ -169,7 +169,7 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
     oss << "u:" << info.mUrl << "]";
   });
   // Load the image synchronously (block the thread here).
-  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, Dali::FittingMode::DEFAULT, info.mSamplingMode, true);
+  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mSamplingMode, true);
   if(pixelBuffer)
   {
     pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);

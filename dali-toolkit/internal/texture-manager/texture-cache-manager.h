@@ -190,12 +190,11 @@ public:
 
   /**
    * @brief Generates a hash for caching based on the input parameters.
-   * Only applies size, fitting mode andsampling mode if the size is specified.
+   * Only applies size and sampling mode if the size is specified.
    * Only applies maskTextureId if it isn't INVALID_TEXTURE_ID
    * Only applied frameIndex if it is not 0.
    * @param[in] url              The URL of the image to load
    * @param[in] size             The image size
-   * @param[in] fittingMode      The FittingMode to use
    * @param[in] samplingMode     The SamplingMode to use
    * @param[in] maskTextureId    The masking texture id (or INVALID_TEXTURE_ID)
    * @param[in] cropToMask       True if crop to mask
@@ -205,7 +204,6 @@ public:
   TextureCacheManager::TextureHash GenerateHash(
     const VisualUrl&                     url,
     const Dali::ImageDimensions&         size,
-    const Dali::FittingMode::Type        fittingMode,
     const Dali::SamplingMode::Type       samplingMode,
     const TextureCacheManager::TextureId maskTextureId,
     const bool                           cropToMask,
@@ -218,7 +216,6 @@ public:
    * @param[in] hash              The hash to look up
    * @param[in] url               The URL of the image to load
    * @param[in] size              The image size
-   * @param[in] fittingMode       The FittingMode to use
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] storageType       Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
@@ -232,7 +229,6 @@ public:
     const TextureCacheManager::TextureHash    hash,
     const VisualUrl&                          url,
     const Dali::ImageDimensions&              size,
-    const Dali::FittingMode::Type             fittingMode,
     const Dali::SamplingMode::Type            samplingMode,
     const TextureCacheManager::StorageType    storageType,
     const TextureCacheManager::TextureId      maskTextureId,

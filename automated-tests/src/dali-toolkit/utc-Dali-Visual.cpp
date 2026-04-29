@@ -920,7 +920,6 @@ int UtcDaliVisualGetPropertyMap5(void)
   propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
   propertyMap.Insert(ImageVisual::Property::DESIRED_WIDTH, 20);
   propertyMap.Insert(ImageVisual::Property::DESIRED_HEIGHT, 30);
-  propertyMap.Insert("fittingMode", FittingMode::FIT_HEIGHT);
   propertyMap.Insert("samplingMode", SamplingMode::BOX_THEN_NEAREST);
   propertyMap.Insert("pixelArea", Vector4(0.25f, 0.25f, 0.5f, 0.5f));
   propertyMap.Insert("wrapModeU", WrapMode::REPEAT);
@@ -945,10 +944,6 @@ int UtcDaliVisualGetPropertyMap5(void)
   value = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<Vector4>() == Color::MAGENTA);
-
-  value = resultMap.Find(ImageVisual::Property::FITTING_MODE, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<int>() == FittingMode::FIT_HEIGHT);
 
   value = resultMap.Find(ImageVisual::Property::SAMPLING_MODE, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -2243,7 +2238,6 @@ int UtcDaliVisualSetTransform5(void)
   propertyMap[Toolkit::ImageVisual::Property::URL]                 = TEST_IMAGE_FILE_NAME;
   propertyMap[Toolkit::ImageVisual::Property::DESIRED_WIDTH]       = 100.0f;
   propertyMap[Toolkit::ImageVisual::Property::DESIRED_HEIGHT]      = 100.0f;
-  propertyMap[Toolkit::ImageVisual::Property::FITTING_MODE]        = FittingMode::SCALE_TO_FILL;
   propertyMap[Toolkit::ImageVisual::Property::SAMPLING_MODE]       = SamplingMode::BOX_THEN_LINEAR;
   propertyMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
   Visual::Base visual                                              = factory.CreateVisual(propertyMap);

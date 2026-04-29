@@ -508,7 +508,6 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedEncodedIma
 TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   const VisualUrl&                     url,
   const Dali::ImageDimensions&         size,
-  const Dali::FittingMode::Type        fittingMode,
   const Dali::SamplingMode::Type       samplingMode,
   const TextureCacheManager::TextureId maskTextureId,
   const bool                           cropToMask,
@@ -532,9 +531,8 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
     *hashTargetPtr++ = size.GetHeight() & 0xff;
     *hashTargetPtr++ = (size.GetHeight() >> 8u) & 0xff;
 
-    // Bit-pack the FittingMode, SamplingMode.
-    // FittingMode=3bits, SamplingMode=4bits
-    *hashTargetPtr = (fittingMode << 4u) | (samplingMode);
+    // SamplingMode (4 bits used in the lower nibble; upper nibble is reserved for future use).
+    *hashTargetPtr = static_cast<std::uint8_t>(samplingMode);
   }
 
   // Append whether we will not correction orientation. We don't do additional job when it is true, the general cases.
@@ -587,7 +585,6 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
   const TextureCacheManager::TextureHash    hash,
   const VisualUrl&                          url,
   const Dali::ImageDimensions&              size,
-  const Dali::FittingMode::Type             fittingMode,
   const Dali::SamplingMode::Type            samplingMode,
   const TextureCacheManager::StorageType    storageType,
   const TextureCacheManager::TextureId      maskTextureId,
@@ -618,8 +615,7 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::FindCachedTexture(
            (frameIndex == textureInfo.frameIndex) &&
            (orientationCorrection == textureInfo.orientationCorrection) &&
            ((size.GetWidth() == 0 && size.GetHeight() == 0) ||
-            (fittingMode == textureInfo.fittingMode &&
-             samplingMode == textureInfo.samplingMode)))
+            (samplingMode == textureInfo.samplingMode)))
         {
           // 1. If preMultiplyOnLoad is MULTIPLY_ON_LOAD, then textureInfo.preMultiplyOnLoad should be true. The premultiplication result can be different.
           // 2. If preMultiplyOnLoad is LOAD_WITHOUT_MULTIPLY, then textureInfo.preMultiplied should be false.

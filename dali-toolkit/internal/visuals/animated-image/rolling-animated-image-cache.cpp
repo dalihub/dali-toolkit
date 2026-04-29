@@ -64,7 +64,6 @@ static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 
 RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
                                                      ImageDimensions                     size,
-                                                     Dali::FittingMode::Type             fittingMode,
                                                      Dali::SamplingMode::Type            samplingMode,
                                                      AnimatedImageLoading&               animatedImageLoading,
                                                      TextureManager::MaskingDataPointer& maskingData,
@@ -75,7 +74,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      const Dali::WrapMode::Type&         wrapModeV,
                                                      bool                                isSynchronousLoading,
                                                      bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
@@ -221,7 +220,6 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                                      loadTextureId,
                                                                                      mMaskingData,
                                                                                      mDesiredSize,
-                                                                                     mFittingMode,
                                                                                      mSamplingMode,
                                                                                      synchronousLoading,
                                                                                      this,

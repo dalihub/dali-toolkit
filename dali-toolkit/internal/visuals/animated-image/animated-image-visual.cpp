@@ -55,16 +55,6 @@ namespace
 {
 const int CUSTOM_PROPERTY_COUNT(0);
 
-// fitting modes
-DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SHRINK_TO_FIT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SCALE_TO_FILL)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_WIDTH)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_HEIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, VISUAL_FITTING)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, DEFAULT)
-DALI_ENUM_TO_STRING_TABLE_END(FITTING_MODE)
-
 // sampling modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
@@ -286,7 +276,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), IsPreMultipliedAlphaEnabled());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), IsPreMultipliedAlphaEnabled());
   }
   else if(mImageUrls)
   {
@@ -298,11 +288,11 @@ void AnimatedImageVisual::CreateImageCache()
 
     if(cacheSize < numUrls)
     {
-      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
+      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
     }
     else
     {
-      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
+      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay, IsPreMultipliedAlphaEnabled());
     }
   }
 
@@ -347,7 +337,6 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
-  mFittingMode(FittingMode::VISUAL_FITTING),
   mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
   mStartFirstFrame(false),
   mIsJumpTo(false),
@@ -552,7 +541,6 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
-  map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
   map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
 
   Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
@@ -938,9 +926,8 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
 
     case Toolkit::ImageVisual::Property::FITTING_MODE:
     {
-      int fittingMode = 0;
-      Scripting::GetEnumerationProperty(value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, fittingMode);
-      mFittingMode = Dali::FittingMode::Type(fittingMode);
+      // FittingMode is no longer a loader-side concept; the property is kept for ABI compatibility
+      // but the value is ignored. Layout-side fitting is handled by the visual fitting mode.
       break;
     }
 
