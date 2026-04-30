@@ -82,9 +82,6 @@ const char* VERSION("version");
 
 const char* const SHADOW_MAP_SIZE   = "shadowMapSize";
 const char* const ORTHOGRAPHIC_SIZE = "orthographicSize";
-const char* const PIXEL_UNITS       = "px";
-
-const char SLASH = '/';
 
 void ReadModelTransform(const TreeNode* node, Quaternion& orientation, Vector3& translation, Vector3& scale)
 {

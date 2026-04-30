@@ -44,8 +44,8 @@ struct DALI_SCENE3D_API BufferDefinition
 
   ~BufferDefinition();
 
-  BufferDefinition(const BufferDefinition& other)            = default;
-  BufferDefinition& operator=(const BufferDefinition& other) = default;
+  BufferDefinition(const BufferDefinition& other)            = delete;
+  BufferDefinition& operator=(const BufferDefinition& other) = delete;
 
   BufferDefinition(BufferDefinition&& other);
   BufferDefinition& operator=(BufferDefinition&&) = default;

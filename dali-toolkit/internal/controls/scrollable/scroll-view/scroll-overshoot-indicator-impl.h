@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_OVERSHOOT_INDICATOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ typedef IntrusivePtr<ScrollOvershootEffect>         ScrollOvershootEffectPtr;
 typedef IntrusivePtr<ScrollOvershootEffectGradient> ScrollOvershootEffectGradientPtr;
 typedef IntrusivePtr<ScrollOvershootEffectRipple>   ScrollOvershootEffectRipplePtr;
 
-struct ScrollOvershootIndicator : public Dali::RefObject
+class ScrollOvershootIndicator : public Dali::RefObject
 {
 public:
   /**
@@ -94,7 +94,7 @@ private:
  * ScrollOvershootEffect is a derivable class, designed to allow the application programmer to create their own
  * overshoot effect and apply it with minimal implementation required
  */
-struct ScrollOvershootEffect : public Dali::RefObject
+class ScrollOvershootEffect : public Dali::RefObject
 {
 public:
   /**
@@ -165,8 +165,9 @@ private:
  * ScrollOvershootEffectRipple creates an animated bounce effect at the end of the scrollable area if the user
  * attempts to scroll past it
  */
-struct ScrollOvershootEffectRipple : public ScrollOvershootEffect, public ConnectionTracker
+class ScrollOvershootEffectRipple : public ScrollOvershootEffect, public ConnectionTracker
 {
+public:
   enum AnimationState
   {
     AnimatingIn  = 0x01, ///< animating overshoot to 0
@@ -200,12 +201,12 @@ public:
   /**
    * @copydoc ScrollOvershootEffect::UpdatePropertyNotifications
    */
-  void UpdatePropertyNotifications();
+  void UpdatePropertyNotifications() override;
 
   /**
    * @copydoc ScrollOvershootEffect::SetOvershootEffectColor()
    */
-  void SetOvershootEffectColor(const Vector4& color);
+  void SetOvershootEffectColor(const Vector4& color) override;
 
   /**
    * Updates the vibility of the overshoot image as well as updating its size, position and rotation
@@ -226,7 +227,7 @@ public:
   /**
    * @copydoc ScrollOvershootEffect::SetOvershoot()
    */
-  void SetOvershoot(float amount, bool animate = true);
+  void SetOvershoot(float amount, bool animate = true) override;
 
   /**
    * Connects to the animation finished signal of our overshoot animation

@@ -50,9 +50,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(0); ///< Note : cutout policy property will be registered only of the cutout view is used.
-                                    ///<        We don't need to reserve that property memory always.
-
 // cutout policies
 DALI_ENUM_TO_STRING_TABLE_BEGIN(CUTOUT_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelColorVisual::CutoutPolicy, NONE)
@@ -264,7 +261,6 @@ void ColorVisual::OnInitialize()
   Shader shader = GenerateShader();
 
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   if(mAlwaysUsingBlurRadius || !EqualsZero(mBlurRadius))
   {

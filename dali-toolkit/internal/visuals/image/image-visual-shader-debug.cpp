@@ -113,7 +113,7 @@ bool LoadJsonScript(std::string& stringOut)
   return false;
 }
 // Json keywords what we will get information from json.
-constexpr std::string_view DEBUG_SCRIPT_VERSION_JSON_KEY = "version";
+// constexpr std::string_view DEBUG_SCRIPT_VERSION_JSON_KEY = "version"; ///< For now, only 1.0.0 is supported, so we don't use this key yet.
 
 constexpr std::string_view DEBUG_EXTRA_ATTRIBUTES_JSON_KEY    = "extraAttributes";
 constexpr std::string_view DEBUG_EXTRA_VARYINGS_JSON_KEY      = "extraVaryings";

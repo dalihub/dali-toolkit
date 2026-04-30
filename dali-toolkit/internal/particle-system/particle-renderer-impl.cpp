@@ -104,7 +104,6 @@ void ParticleRenderer::CreateShader()
     Dali::Vector2 uv{};
   };
 
-  uint32_t      streamElementSize = 0u;
   Property::Map streamAtttributes;
 
   std::stringstream ss;
@@ -113,10 +112,9 @@ void ParticleRenderer::CreateShader()
     // Don't add local streams to the shader
     if(!list.IsStreamLocal(i))
     {
-      uint32_t    dataTypeSize  = list.GetStreamDataTypeSize(i);
       auto        dataTypeIndex = uint32_t(list.GetStreamDataType(i));
       const auto& streamName    = list.GetStreamName(i);
-      streamElementSize += dataTypeSize;
+
       char key[256];
       if(streamName.empty())
       {

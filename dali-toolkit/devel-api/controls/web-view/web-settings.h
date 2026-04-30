@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_SETTINGS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace Toolkit
  * For working WebEngineSettings, a WebView should be provided.
  *
  */
-class DALI_TOOLKIT_API WebSettings
+class DALI_TOOLKIT_API WebSettings final
 {
 public:
   /**
@@ -55,7 +55,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~WebSettings() final;
+  virtual ~WebSettings();
 
   /**
    *@brief Allow running mixed contents or not.

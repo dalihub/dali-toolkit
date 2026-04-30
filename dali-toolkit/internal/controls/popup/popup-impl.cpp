@@ -190,8 +190,6 @@ const unsigned int ContextualModeTableCount = sizeof(ContextualModeTable) / size
 // Popup defaults.
 const Vector3 DEFAULT_POPUP_PARENT_RELATIVE_SIZE(0.75f, 1.0f, 1.0f); ///< Default size percentage of parent.
 const float   DEFAULT_POPUP_ANIMATION_DURATION = 0.6f;               ///< Duration of hide/show animations.
-const float   POPUP_OUT_MARGIN_WIDTH           = 16.f;               ///< Space between the screen edge and the popup edge in the horizontal dimension.
-const float   POPUP_OUT_MARGIN_HEIGHT          = 36.f;               ///< Space between the screen edge and the popup edge in the vertical dimension.
 const Vector3 DEFAULT_TAIL_POSITION(0.5f, 1.0f, 0.0f);               ///< Position the tail will be displayed when enabled without setting the position.
 
 // Contextual defaults.
@@ -209,7 +207,6 @@ const Vector4     DEFAULT_BACKING_COLOR(0.0f, 0.0f, 0.0f, 0.5f);      ///< Color
 const Extents     DEFAULT_BACKGROUND_BORDER(17, 17, 13, 13);          ///< Default border of the background.
 const Rect<float> DEFAULT_TITLE_PADDING(20.0f, 20.0f, 20.0f, 20.0f);  ///< Title padding used on popups with content and/or controls (from Tizen GUI UX).
 const Rect<float> DEFAULT_TITLE_ONLY_PADDING(8.0f, 8.0f, 8.0f, 8.0f); ///< Title padding used on popups with a title only (like toast popups).
-const Vector3     FOOTER_SIZE(620.0f, 96.0f, 0.0f);                   ///< Default size of the bottom control area.
 const float       DEFAULT_RELATIVE_PARENT_WIDTH = 0.75f;              ///< If width is not fixed, relative size to parent is used by default.
 
 } // Unnamed namespace

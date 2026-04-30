@@ -422,12 +422,12 @@ private: // from AsyncTextInterface
   /**
    * @copydoc Text::AsyncTextInterface::AsyncLoadComplete()
    */
-  void AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo);
+  void AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo) override;
 
   /**
    * @copydoc Text::AsyncTextInterface::AsyncSizeComputed()
    */
-  void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo);
+  void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo) override;
 
 private: // Implementation
   /**

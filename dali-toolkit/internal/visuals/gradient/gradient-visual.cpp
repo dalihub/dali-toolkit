@@ -113,7 +113,9 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_ROUNDED_BORDERLINE,
   VisualFactoryCache::GRADIENT_SHADER_CONIC_USER_SPACE_SQUIRCLE_BORDERLINE,
 };
+#if defined(DEBUG_ENABLED)
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
+#endif
 
 // enum of required list when we select shader
 enum GradientVisualRequireFlag
@@ -261,23 +263,32 @@ void GradientVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::GradientVisual::Property::STOP_OFFSET, offsets);
   map.Insert(Toolkit::GradientVisual::Property::STOP_COLOR, colors);
 
-  if(&typeid(*mGradient) == &typeid(LinearGradient))
+  if(mGradient)
   {
-    LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
-    map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
-    map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
-  }
-  else if(&typeid(*mGradient) == &typeid(RadialGradient))
-  {
-    RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
-    map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-    map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
-  }
-  else // if( &typeid( *mGradient ) == &typeid(ConicGradient) )
-  {
-    ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
-    map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-    map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
+    switch(mGradientType)
+    {
+      case Type::LINEAR:
+      {
+        LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
+        map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
+        break;
+      }
+      case Type::RADIAL:
+      {
+        RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+        map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
+        break;
+      }
+      case Type::CONIC:
+      {
+        ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+        map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
+        break;
+      }
+    }
   }
 }
 

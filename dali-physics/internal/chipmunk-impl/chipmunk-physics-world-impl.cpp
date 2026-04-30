@@ -23,11 +23,6 @@
 
 namespace
 {
-inline cpVect ConvertVector(Dali::Vector3 vector)
-{
-  return cpv(vector.x, vector.y);
-}
-
 static void ShapeFreeWrap(cpSpace* space, cpShape* shape, void* unused)
 {
   cpSpaceRemoveShape(space, shape);

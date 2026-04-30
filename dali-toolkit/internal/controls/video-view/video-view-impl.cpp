@@ -93,8 +93,6 @@ const char* const WINDOW_SURFACE_TARGET("windowSurfaceTarget");
 const char* const NATIVE_IMAGE_TARGET("nativeImageTarget");
 
 const char* const CUSTOM_SHADER("shader");
-const char* const CUSTOM_VERTEX_SHADER("vertexShader");
-const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
 
 const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 

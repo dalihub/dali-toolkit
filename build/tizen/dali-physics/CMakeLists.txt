@@ -39,6 +39,18 @@ set(physics_dir "${repo_root_dir}/dali-physics")
 option(ENABLE_PKG_CONFIGURE "Use pkgconfig" ON)
 option(ENABLE_COVERAGE "Coverage" OFF)
 
+
+IF( WIN32 )
+ELSE()
+  INCLUDE(CheckCXXCompilerFlag)
+
+  # Set up compiler flags and warnings
+  CHECK_CXX_COMPILER_FLAG(-Wno-nan-infinity-disabled HAVE_NO_NAN_INFINITY_DISABLED)
+  IF (HAVE_NO_NAN_INFINITY_DISABLED)
+    ADD_COMPILE_OPTIONS(-Wno-nan-infinity-disabled)
+  ENDIF()
+ENDIF()
+
 if (ENABLE_PKG_CONFIGURE)
     find_package(PkgConfig REQUIRED)
 

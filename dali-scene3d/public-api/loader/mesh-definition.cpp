@@ -264,8 +264,10 @@ void ReadVectorAccessor(const MeshDefinition::Accessor& accessor, std::istream& 
     ExceptionFlinger(ASSERT_LOCATION) << "Failed to read vector data from Accessor.";
   }
 
-  if(sizeofBlobUnit != sizeof(Vector4))
+  if constexpr(sizeofBlobUnit != sizeof(Vector4))
   {
+    static_assert(sizeof(T) < 4, "T is only expected to be uint8_t or uint16_t.");
+
     auto       floats = reinterpret_cast<float*>(buffer.data());
     const auto end    = inBuffer + inBufferSize;
     while(inBuffer != end)
@@ -684,7 +686,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t geometryBufferIndex, uint32_t deltaIndex)
         {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
@@ -759,7 +761,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::vector<MeshDefiniti
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t geometryBufferIndex, uint32_t deltaIndex)
         {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
