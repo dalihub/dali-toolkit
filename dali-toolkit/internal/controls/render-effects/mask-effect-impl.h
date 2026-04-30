@@ -197,9 +197,6 @@ private:
   MaskEffectImpl& operator=(const MaskEffectImpl&) = delete; // no copy()
 
 private:
-  // Camera actors
-  CameraActor mCamera;
-
   WeakHandle<Toolkit::Control> mMaskControl;
 
   // Resource
