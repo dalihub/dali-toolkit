@@ -45,12 +45,11 @@ void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureI
                                                   Dali::AnimatedImageLoading                     animatedImageLoading,
                                                   const uint32_t                                 frameIndex,
                                                   const Dali::ImageDimensions&                   desiredSize,
-                                                  const Dali::FittingMode::Type                  fittingMode,
                                                   const Dali::SamplingMode::Type                 samplingMode,
                                                   const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                                                   const bool                                     loadYuvPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, samplingMode, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
@@ -58,7 +57,6 @@ void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureI
 void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId                textureId,
                                      const VisualUrl&                               url,
                                      const Dali::ImageDimensions&                   desiredSize,
-                                     const Dali::FittingMode::Type                  fittingMode,
                                      const Dali::SamplingMode::Type                 samplingMode,
                                      const bool                                     orientationCorrection,
                                      const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
@@ -67,11 +65,11 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
   LoadingTaskPtr loadingTask;
   if(DALI_UNLIKELY(url.IsBufferResource()))
   {
-    loadingTask = new LoadingTask(++mLoadTaskId, mTextureManager.GetEncodedImageBuffer(url), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+    loadingTask = new LoadingTask(++mLoadTaskId, mTextureManager.GetEncodedImageBuffer(url), desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   }
   else
   {
-    loadingTask = new LoadingTask(++mLoadTaskId, url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+    loadingTask = new LoadingTask(++mLoadTaskId, url, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   }
 
   loadingTask->SetTextureId(textureId);

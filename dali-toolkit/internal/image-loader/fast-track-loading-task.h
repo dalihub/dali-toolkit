@@ -53,7 +53,6 @@ public:
    */
   FastTrackLoadingTask(const VisualUrl&                         url,
                        ImageDimensions                          dimensions,
-                       FittingMode::Type                        fittingMode,
                        SamplingMode::Type                       samplingMode,
                        bool                                     orientationCorrection,
                        DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
@@ -121,7 +120,6 @@ public:
 
 private:
   ImageDimensions                          mDimensions;   ///< dimensions to load
-  FittingMode::Type                        mFittingMode;  ///< fitting options
   SamplingMode::Type                       mSamplingMode; ///< sampling options
   DevelAsyncImageLoader::PreMultiplyOnLoad mPreMultiplyOnLoad;
   std::unique_ptr<CallbackBase>            mCallback;

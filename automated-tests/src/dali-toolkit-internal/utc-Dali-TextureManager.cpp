@@ -214,7 +214,6 @@ int UtcTextureManagerRequestLoad(void)
   TextureManager::TextureId textureId   = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer,
     true,
@@ -240,7 +239,6 @@ int UtcTextureManagerGenerateHash(void)
   TextureManager::TextureId textureId   = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer,
     true,
@@ -287,7 +285,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   textureManager.RequestLoad(
     url1,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer1,
     true, ///< orientationCorrection
@@ -314,7 +311,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     true, ///< synchronousLoading
     &observer2,
@@ -329,7 +325,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     false, ///< synchronousLoading
     &observer2,
@@ -360,7 +355,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   textureManager.RequestLoad(
     url1,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer3,
     true, ///< orientationCorrection
@@ -376,7 +370,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   textureManager.RequestLoad(
     url2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer4,
     true, ///< orientationCorrection
@@ -402,7 +395,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     true, ///< synchronousLoading
     &observer5,
@@ -418,7 +410,6 @@ int UtcTextureManagerEncodedImageBuffer(void)
   pixelBuffer = textureManager.LoadPixelBuffer(
     url3,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     false, ///< synchronousLoading
     &observer6,
@@ -570,7 +561,6 @@ int UtcTextureManagerExternalTexture(void)
     TextureSet texture1 = textureManager.LoadTexture(
       ToStdString(url),
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       maskInfo,
       synchronousLoading,
@@ -586,7 +576,6 @@ int UtcTextureManagerExternalTexture(void)
     TextureSet texture2 = textureManager.LoadTexture(
       ToStdString(url),
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       maskInfo,
       synchronousLoading,
@@ -631,7 +620,6 @@ int UtcTextureManagerExternalTexture(void)
     texture1 = textureManager.LoadTexture(
       ToStdString(url),
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       maskInfo,
       synchronousLoading,
@@ -647,7 +635,6 @@ int UtcTextureManagerExternalTexture(void)
     texture2 = textureManager.LoadTexture(
       ToStdString(url),
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       maskInfo,
       synchronousLoading,
@@ -717,7 +704,6 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
   TextureSet texture1 = textureManager.LoadTexture(
     ToStdString(url1),
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -748,7 +734,6 @@ int UtcTextureManagerRemoveExternalTextureAndLoadAgain(void)
   TextureSet texture2 = textureManager.LoadTexture(
     ToStdString(url2),
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -827,7 +812,6 @@ int UtcTextureManagerEncodedImageBufferReferenceCount(void)
   textureManager.RequestLoad(
     url1,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer1,
     true, ///< orientationCorrection
@@ -854,7 +838,6 @@ int UtcTextureManagerEncodedImageBufferReferenceCount(void)
   Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     false, ///< synchronousLoading
     &observer2,
@@ -905,7 +888,6 @@ int UtcTextureManagerCachingForDifferentLoadingType(void)
   textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer1,
     true,
@@ -931,7 +913,6 @@ int UtcTextureManagerCachingForDifferentLoadingType(void)
   Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     false,
     &observer2,
@@ -981,7 +962,6 @@ int UtcTextureManagerUseInvalidMask(void)
   textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -1036,7 +1016,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedFirst(void)
   textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -1091,7 +1070,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
   textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -1110,7 +1088,6 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
     Dali::Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
       filename,
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       true, ///< synchronousLoading
       nullptr,
@@ -1163,7 +1140,6 @@ int UtcTextureManagerSynchronousLoadingFail(void)
   TextureSet   textureSet = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     true, // synchronous loading.
@@ -1207,7 +1183,6 @@ int UtcTextureManagerCachingSynchronousLoading(void)
   TextureSet   textureSet = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     true, // synchronous loading.
@@ -1232,7 +1207,6 @@ int UtcTextureManagerCachingSynchronousLoading(void)
   TextureSet asyncTextureSet = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     false, // asynchronous loading.
@@ -1280,7 +1254,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
   TextureSet   asyncTextureSet1    = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     false, // asynchronous loading.
@@ -1305,7 +1278,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
   TextureSet   syncTextureSet    = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     true, // synchronous loading.
@@ -1335,7 +1307,6 @@ int UtcTextureManagerAsyncSyncAsync(void)
   TextureSet   asyncTextureSet2    = textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     false, // asynchronous loading.
@@ -1395,7 +1366,6 @@ int UtcTextureManagerQueueRemoveDuringObserve(void)
   TextureManager::TextureId textureId = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer,
     true,
@@ -1457,7 +1427,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -1491,7 +1460,6 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
   auto textureId2 = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer2,
     true, ///< orientationCorrection
@@ -1556,7 +1524,6 @@ int UtcTextureManagerMaskCacheTest(void)
   textureManager.LoadTexture(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -1582,7 +1549,6 @@ int UtcTextureManagerMaskCacheTest(void)
   textureManager.LoadTexture(
     filename2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo2,
     synchronousLoading,
@@ -1628,7 +1594,6 @@ int UtcTextureManagerMaskCacheTest(void)
     textureManager.LoadTexture(
       filename,
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       maskInfo,
       synchronousLoading,
@@ -1709,7 +1674,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   textureManager.LoadTexture(
     filename1,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo[0],
     synchronousLoading,
@@ -1723,7 +1687,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   textureManager.LoadTexture(
     filename2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo[1],
     synchronousLoading,
@@ -1737,7 +1700,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   textureManager.LoadTexture(
     filename3,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo[2],
     synchronousLoading,
@@ -1824,7 +1786,6 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
     (*data2.addTextureIdPtr) = data2.textureManagerPtr->RequestLoad(
       data2.addTextureUrl,
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       data2.addTextureObserver,
       true,
@@ -1962,7 +1923,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   textureId1 = textureManager.RequestLoad(
     filename1,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer1,
     true,
@@ -1972,7 +1932,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   textureId2 = textureManager.RequestLoad(
     filename2,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     observer2,
     true,
@@ -1982,7 +1941,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
   textureId3 = textureManager.RequestLoad(
     filename3,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer3,
     true,
@@ -2105,7 +2063,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     tempId = data1.textureManagerPtr->RequestLoad(
       data1.resendFilename,
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       data1.resendTextureObserver,
       true,
@@ -2119,7 +2076,6 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     tempId = data1.textureManagerPtr->RequestLoad(
       data1.newlyFilename,
       ImageDimensions(),
-      FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR,
       *data1.removeTextureObserver,
       true,
@@ -2269,7 +2225,6 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer1,
     true,
@@ -2283,7 +2238,6 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer2,
     true,
@@ -2305,7 +2259,6 @@ int UtcTextureManagerCachingForDifferentMultiplyOnLoad(void)
   textureManager.RequestLoad(
     filename,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     &observer3,
     true,
@@ -2380,7 +2333,6 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   TextureSet texture1 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2394,7 +2346,6 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   TextureSet texture2 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2428,7 +2379,6 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   texture1 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2442,7 +2392,6 @@ int UtcTextureManagerMaskByExternalTexture01(void)
   texture2 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2504,7 +2453,6 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   TextureSet texture1 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2518,7 +2466,6 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   TextureSet texture2 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2548,7 +2495,6 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   texture1 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,
@@ -2562,7 +2508,6 @@ int UtcTextureManagerMaskByExternalTexture02(void)
   texture2 = textureManager.LoadTexture(
     url,
     ImageDimensions(),
-    FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     maskInfo,
     synchronousLoading,

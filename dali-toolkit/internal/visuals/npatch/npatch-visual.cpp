@@ -110,7 +110,7 @@ void NPatchVisual::LoadImages()
     bool                               loadingStatus  = false;
 
     // Load the auxiliary image
-    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, loadingStatus, this, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
+    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, loadingStatus, this, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
 
     // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)

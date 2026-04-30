@@ -61,7 +61,6 @@ public:
    * @brief Constructor.
    * @param[in] textureManager    The texture manager
    * @param[in] size              The width and height to fit the loaded image to.
-   * @param[in] fittingMode       The FittingMode of the resource to load
    * @param[in] samplingMode      The SamplingMode of the resource to load
    * @param[in] observer          FrameReady observer
    * @param[in] maskingData       Masking data to be applied.
@@ -74,7 +73,6 @@ public:
    */
   ImageCache(TextureManager&                     textureManager,
              ImageDimensions                     size,
-             Dali::FittingMode::Type             fittingMode,
              Dali::SamplingMode::Type            samplingMode,
              TextureManager::MaskingDataPointer& maskingData,
              ImageCache::FrameReadyObserver&     observer,
@@ -154,7 +152,6 @@ protected:
   uint32_t                            mBatchSize;
   uint32_t                            mInterval;
   TextureManager::LoadState           mLoadState;
-  Dali::FittingMode::Type             mFittingMode : 4;
   Dali::SamplingMode::Type            mSamplingMode : 5;
   bool                                mRequestingLoad : 1;
   bool                                mPreMultiplyOnLoad : 1;

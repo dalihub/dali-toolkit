@@ -25,7 +25,6 @@ namespace Internal
 {
 ImageCache::ImageCache(TextureManager&                     textureManager,
                        ImageDimensions                     size,
-                       Dali::FittingMode::Type             fittingMode,
                        Dali::SamplingMode::Type            samplingMode,
                        TextureManager::MaskingDataPointer& maskingData,
                        ImageCache::FrameReadyObserver&     observer,
@@ -39,7 +38,6 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
   mBatchSize(batchSize),
   mInterval(interval),
   mLoadState(TextureManager::LoadState::NOT_STARTED),
-  mFittingMode(fittingMode),
   mSamplingMode(samplingMode),
   mRequestingLoad(false),
   mPreMultiplyOnLoad(preMultiplyOnLoad)

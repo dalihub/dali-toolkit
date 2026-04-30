@@ -72,7 +72,6 @@ public:
    * @param[in] animatedImageLoading The AnimatedImageLoading to load animated image
    * @param[in] frameIndex The frame index of a frame to be loaded frame
    * @param[in] dimensions The width and height to fit the loaded image to
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    * @param[in] loadPlanes true to load image planes or false to load bitmap image.
@@ -81,7 +80,6 @@ public:
   uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading               animatedImageLoading,
                              uint32_t                                 frameIndex,
                              Dali::ImageDimensions                    desiredSize,
-                             Dali::FittingMode::Type                  fittingMode,
                              Dali::SamplingMode::Type                 samplingMode,
                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                              bool                                     loadPlanes);
@@ -90,7 +88,6 @@ public:
    * @brief Starts an image loading task.
    * @param[in] url The URL of the image file to load
    * @param[in] dimensions The width and height to fit the loaded image to
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
@@ -99,7 +96,6 @@ public:
    */
   uint32_t Load(const VisualUrl&                         url,
                 ImageDimensions                          dimensions,
-                FittingMode::Type                        fittingMode,
                 SamplingMode::Type                       samplingMode,
                 bool                                     orientationCorrection,
                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
@@ -109,7 +105,6 @@ public:
    * @brief Starts an image loading task by encoded image buffer.
    * @param[in] encodedImageBuffer The encoded buffer of the image to load
    * @param[in] dimensions The width and height to fit the loaded image to
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
    * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
@@ -117,7 +112,6 @@ public:
    */
   uint32_t LoadEncodedImageBuffer(const EncodedImageBuffer&                encodedImageBuffer,
                                   ImageDimensions                          dimensions,
-                                  FittingMode::Type                        fittingMode,
                                   SamplingMode::Type                       samplingMode,
                                   bool                                     orientationCorrection,
                                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);

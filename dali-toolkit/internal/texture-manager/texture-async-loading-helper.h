@@ -49,7 +49,6 @@ public:
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
    * @param[in] desiredSize           The size the image is likely to appear at.
    *                                  This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    * @param[in] loadYuvPlanes         True if the image should be loaded as yuv planes
@@ -58,7 +57,6 @@ public:
                          Dali::AnimatedImageLoading                     animatedImageLoading,
                          const uint32_t                                 frameIndex,
                          const Dali::ImageDimensions&                   desiredSize,
-                         const Dali::FittingMode::Type                  fittingMode,
                          const Dali::SamplingMode::Type                 samplingMode,
                          const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                          const bool                                     loadYuvPlanes);
@@ -69,7 +67,6 @@ public:
    * @param[in] url                   The URL of the image to load
    * @param[in] desiredSize           The size the image is likely to appear at.
    *                                  This can be set to 0,0 for automatic
-   * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
    *                                  e.g., from portrait to landscape
@@ -79,7 +76,6 @@ public:
   void Load(const TextureManager::TextureId                textureId,
             const VisualUrl&                               url,
             const Dali::ImageDimensions&                   desiredSize,
-            const Dali::FittingMode::Type                  fittingMode,
             const Dali::SamplingMode::Type                 samplingMode,
             const bool                                     orientationCorrection,
             const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
