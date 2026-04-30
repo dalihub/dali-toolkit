@@ -116,7 +116,6 @@ private:
 
 private:
   RenderTask                           mRenderTask;
-  CameraActor                          mCamera;
   FrameBuffer                          mFrameBuffer;
   Dali::Texture                        mTexture; // saved when render once
   DevelControl::OffScreenRenderingType mType;
