@@ -184,7 +184,7 @@ private:
    * @param imageMetaDataMap The map of image files to their meta data
    * @return True if the texture was successfully processed, false otherwise.
    */
-  bool ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer& imageBuffer, const ImageMetadataMap& imageMetaDataMap);
+  bool ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer&& imageBuffer, const ImageMetadataMap& imageMetaDataMap);
 };
 } // namespace Dali::Scene3D::Loader
 

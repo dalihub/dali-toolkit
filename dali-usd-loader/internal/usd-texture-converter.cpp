@@ -186,7 +186,7 @@ bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTe
   }
 
   // Process the image buffer or path after extracting the texture attributes
-  return ProcessImageBuffer(materialDefinition, semantic, imagePath, imageBuffer, imageMetaDataMap);
+  return ProcessImageBuffer(materialDefinition, semantic, imagePath, std::move(imageBuffer), imageMetaDataMap);
 }
 
 void UsdTextureConverter::ProcessTextureFile(const UsdShadeInput& input, std::string& imagePath, UsdAssetBuffer& imageBuffer)
@@ -243,7 +243,7 @@ bool UsdTextureConverter::ProcessImageBuffer(
   MaterialDefinition&     materialDefinition,
   uint32_t                semantic,
   const std::string&      imagePath,
-  UsdAssetBuffer&         imageBuffer,
+  UsdAssetBuffer&&        imageBuffer,
   const ImageMetadataMap& imageMetaDataMap)
 {
   std::string imageFileName = std::filesystem::path(imagePath).filename().string();
