@@ -263,31 +263,28 @@ void GradientVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::GradientVisual::Property::STOP_OFFSET, offsets);
   map.Insert(Toolkit::GradientVisual::Property::STOP_COLOR, colors);
 
-  if(mGradient)
+  switch(mGradientType)
   {
-    switch(mGradientType)
+    case Type::LINEAR:
     {
-      case Type::LINEAR:
-      {
-        LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
-        map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
-        map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
-        break;
-      }
-      case Type::RADIAL:
-      {
-        RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
-        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-        map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
-        break;
-      }
-      case Type::CONIC:
-      {
-        ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
-        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-        map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
-        break;
-      }
+      LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
+      map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
+      map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
+      break;
+    }
+    case Type::RADIAL:
+    {
+      RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
+      map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+      map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
+      break;
+    }
+    case Type::CONIC:
+    {
+      ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+      map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+      map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
+      break;
     }
   }
 }
