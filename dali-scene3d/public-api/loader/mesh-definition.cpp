@@ -1592,7 +1592,7 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
       Dali::Integration::TextureUploadWithContent(meshGeometry.blendShapeGeometry,
                                                   raw.mBlendShapeData,
                                                   "Scene3D::BlendShapeData",
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1500));
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_BLENDSHAPE_DATA));
 #else
       meshGeometry.blendShapeGeometry.Upload(raw.mBlendShapeData);
 #endif

@@ -62,7 +62,7 @@ Texture EnvironmentMapData::GetTexture()
                 Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
                                                             side[iMipLevel],
                                                             "Scene3D::EnvironmentMapData(CUBEMAP)",
-                                                            static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1100));
+                                                            static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_CUBEMAP));
               }
               else
               {
@@ -84,7 +84,7 @@ Texture EnvironmentMapData::GetTexture()
       Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
                                                   mPixelData[0][0],
                                                   "Scene3D::EnvironmentMapData(EQUIRECTANGULAR)",
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1101));
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_EQUIRECTANGULAR));
 #else
       mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
 #endif
