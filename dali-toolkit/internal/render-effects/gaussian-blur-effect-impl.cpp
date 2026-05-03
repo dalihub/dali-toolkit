@@ -364,10 +364,12 @@ void GaussianBlurEffectImpl::OnActivate()
   auto&    blurShader             = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
   Renderer horizontalBlurRenderer = mHorizontalBlurActor.GetRendererAt(0);
   horizontalBlurRenderer.SetShader(blurShader);
+  SetRendererTexture(horizontalBlurRenderer, mInputFrameBuffer);
   horizontalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
 
   Renderer verticalBlurRenderer = mVerticalBlurActor.GetRendererAt(0);
   verticalBlurRenderer.SetShader(blurShader);
+  SetRendererTexture(verticalBlurRenderer, mTemporaryFrameBuffer);
   verticalBlurRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   // Inject blurred output to control
@@ -393,6 +395,8 @@ void GaussianBlurEffectImpl::OnDeactivate()
 
   Renderer targetRenderer = GetTargetRenderer();
   SetRendererTexture(targetRenderer, Dali::Texture());
+  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), Dali::Texture());
+  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), Dali::Texture());
 
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
@@ -509,7 +513,6 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder sc
   mSourceRenderTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, mInternalDownscaleFactor);
 
   // draw half-blurred output
-  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetExclusive(true);
@@ -522,7 +525,6 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder sc
   mHorizontalBlurTask.SetClearColor(Color::TRANSPARENT);
 
   // draw blurred output
-  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), mTemporaryFrameBuffer);
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
   mVerticalBlurTask.SetExclusive(true);
