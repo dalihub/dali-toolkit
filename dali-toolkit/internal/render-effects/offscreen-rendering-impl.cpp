@@ -24,6 +24,10 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -150,6 +154,16 @@ void OffScreenRenderingImpl::CreateFrameBuffer()
 
   mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::AUTO);
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "OffScreenRendering type:" << mType;
+
+    Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), ToDaliString(std::move(oss.str())), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+  }
+#endif
+
   mFrameBuffer.AttachColorTexture(texture);
 }
 

@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/math/math-utils.h>
@@ -29,6 +31,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace
 {
@@ -469,16 +473,29 @@ void GaussianBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsample
   // buffer to draw input texture
   mInputFrameBuffer              = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::AUTO);
   Texture inputBackgroundTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mInputFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 
   // buffer to draw half-blurred output
   mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture temporaryTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
 
   // buffer to draw blurred output
   mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture sourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "GaussianBlurEffect r:" << mBlurRadius << " d:" << mDownscaleFactor << " once: " << mBlurOnce;
+    std::string prefix = oss.str();
+
+    Dali::Integration::TextureUploadWithContent(inputBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(1)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+  }
+#endif
+
+  mInputFrameBuffer.AttachColorTexture(inputBackgroundTexture);
+  mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
   mBlurredOutputFrameBuffer.AttachColorTexture(sourceTexture);
 }
 

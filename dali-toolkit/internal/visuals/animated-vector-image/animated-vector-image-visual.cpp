@@ -773,7 +773,7 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
             if(useNativeImage)
             {
               // Call Upload API, only for add informations of GPU memory usage.
-              Dali::Integration::TextureUploadWithContent(texture, GetDummyRGBAPixelData(), ToDaliString(mImageUrl.GetUrl()), Dali::Integration::TextureContextTypeHint::NATIVE_LOTTIE_IMAGE);
+              Dali::Integration::TextureUploadWithContent(texture, GetDummyRGBAPixelData(), ToDaliString(mImageUrl.GetUrl()), Dali::Integration::TextureContextTypeHint::NATIVE_LOTTIE_IMAGE, true);
             }
 #endif
 
