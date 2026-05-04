@@ -227,6 +227,8 @@ const char* const CORNER_SQUARENESS("cornerSquareness");
 const char* const BLUR_RADIUS_NAME("blurRadius");
 const char* const CUTOUT_POLICY_NAME("cutoutPolicy");
 const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME("cutoutCornerRadius");
+const char* const CUTOUT_CORNER_RADIUS_POLICY_UNIFORM_NAME("cutoutCornerRadiusPolicy");
+const char* const CUTOUT_CORNER_SQUARENESS_UNIFORM_NAME("cutoutCornerSquareness");
 
 // Image visual
 const char* const IMAGE_URL_NAME("url");
