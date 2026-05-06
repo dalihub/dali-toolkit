@@ -46,7 +46,10 @@ const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "keyInputFocusChanged";
 KeyInputFocusManager::KeyInputFocusManager()
 : mSlotDelegate(this),
   mCurrentFocusControl(),
-  mCurrentWindowId(0)
+  mPendingLostControl(),
+  mPendingGainedControl(),
+  mCurrentWindowId(0),
+  mDeferredMode(false)
 {
   // Retrieve all the existing widnows
   Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
@@ -92,17 +95,31 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
 
   if(previousFocusControl)
   {
-    // Notify the control that it has lost key input focus
-    GetImplementation(previousFocusControl).OnKeyInputFocusLost();
+    if(mDeferredMode)
+    {
+      mPendingLostControl = previousFocusControl;
+    }
+    else
+    {
+      // Notify the control that it has lost key input focus
+      GetImplementation(previousFocusControl).OnKeyInputFocusLost();
+    }
   }
 
-  // Tell the new actor that it has gained focus.
-  GetImplementation(control).OnKeyInputFocusGained();
-
-  // Emit the signal to inform focus change to the application.
-  if(!mKeyInputFocusChangedSignal.Empty())
+  if(mDeferredMode)
   {
-    mKeyInputFocusChangedSignal.Emit(control, previousFocusControl);
+    mPendingGainedControl = control;
+  }
+  else
+  {
+    // Tell the new actor that it has gained focus.
+    GetImplementation(control).OnKeyInputFocusGained();
+
+    // Emit the signal to inform focus change to the application.
+    if(!mKeyInputFocusChangedSignal.Empty())
+    {
+      mKeyInputFocusChangedSignal.Emit(control, previousFocusControl);
+    }
   }
 }
 
@@ -116,9 +133,43 @@ void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
     mCurrentFocusControl.Reset();
     mCurrentWindowId = 0;
 
-    // Notify the control that it has lost key input focus
-    GetImplementation(control).OnKeyInputFocusLost();
+    if(mDeferredMode)
+    {
+      mPendingLostControl = control;
+    }
+    else
+    {
+      // Notify the control that it has lost key input focus
+      GetImplementation(control).OnKeyInputFocusLost();
+    }
   }
+}
+
+void KeyInputFocusManager::SetDeferredMode(bool deferred)
+{
+  if(mDeferredMode && !deferred)
+  {
+    // Turning off deferred mode: Emit pending signals
+    if(mPendingLostControl)
+    {
+      GetImplementation(mPendingLostControl).OnKeyInputFocusLost();
+    }
+
+    if(mPendingGainedControl)
+    {
+      GetImplementation(mPendingGainedControl).OnKeyInputFocusGained();
+    }
+
+    if(!mKeyInputFocusChangedSignal.Empty() && (mPendingLostControl || mPendingGainedControl))
+    {
+      mKeyInputFocusChangedSignal.Emit(mPendingGainedControl, mPendingLostControl);
+    }
+
+    mPendingLostControl.Reset();
+    mPendingGainedControl.Reset();
+  }
+
+  mDeferredMode = deferred;
 }
 
 Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
