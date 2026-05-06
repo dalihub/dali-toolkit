@@ -5,7 +5,7 @@
 precision highp float;
 
 INPUT highp vec2 aPosition;
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_CUTOUT)
 OUTPUT highp vec2 vPosition;
 FLAT OUTPUT highp vec2 vRectSize;
 FLAT OUTPUT highp vec2 vOptRectSize;
@@ -16,27 +16,32 @@ FLAT OUTPUT highp vec4 vCornerRadius;
 #endif
 #if defined(IS_REQUIRED_CUTOUT)
 OUTPUT highp vec2 vPositionFromCenter;
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
 FLAT OUTPUT highp vec4 vCutoutCornerRadius;
-#endif
 #endif
 
 UNIFORM_BLOCK VertBlock
 {
   UNIFORM highp mat4 uMvpMatrix;
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_CUTOUT)
   // Be used when we calculate anti-alias range near 1 pixel.
   UNIFORM highp vec3 uScale;
 #endif
 
 #ifdef IS_REQUIRED_ROUNDED_CORNER
   UNIFORM mediump float cornerRadiusPolicy;
+#endif
+
+#ifdef IS_REQUIRED_CUTOUT
+  UNIFORM mediump float cutoutCornerRadiusPolicy;
+#endif
+
+#ifdef IS_REQUIRED_ROUNDED_CORNER
   UNIFORM highp vec4 cornerRadius;
+#endif
 
 #ifdef IS_REQUIRED_CUTOUT
   UNIFORM highp vec4 cutoutCornerRadius;
-#endif
 #endif
 };
 
@@ -70,7 +75,7 @@ vec4 ComputeVertexPosition()
   highp vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   highp vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_CUTOUT)
   vRectSize = visualSize * 0.5;
   vOptRectSize = vRectSize;
 
@@ -127,13 +132,12 @@ vec4 ComputeVertexPosition()
 
 #if defined(IS_REQUIRED_CUTOUT)
   vPositionFromCenter = vPosition + pivot * visualSize + visualOffset + origin * uSize.xy;
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
-  // Reuse each parameters for cutout cases
-  minSize = min(uSize.x, uSize.y);
 
-  vCutoutCornerRadius = mix(cutoutCornerRadius * minSize, cutoutCornerRadius, cornerRadiusPolicy);
-  vCutoutCornerRadius = min(vCutoutCornerRadius, minSize * 0.5);
-#endif
+  highp float cutoutMinSize = min(uSize.x, uSize.y);
+
+  vCutoutCornerRadius = mix(cutoutCornerRadius * cutoutMinSize, cutoutCornerRadius, cutoutCornerRadiusPolicy);
+  vCutoutCornerRadius = min(vCutoutCornerRadius, cutoutMinSize * 0.5);
+
   return vec4(vPositionFromCenter, 0.0, 1.0);
 #else
   return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
