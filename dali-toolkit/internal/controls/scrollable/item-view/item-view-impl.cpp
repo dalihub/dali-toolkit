@@ -512,7 +512,7 @@ void ItemView::DeactivateCurrentLayout()
   }
 }
 
-void ItemView::OnRefreshNotification(PropertyNotification& source)
+void ItemView::OnRefreshNotification(PropertyNotification source)
 {
   if(mRefreshNotificationEnabled)
   {
@@ -1030,7 +1030,7 @@ void ItemView::OnChildAdd(Actor& child)
   Scrollable::OnChildAdd(child);
 }
 
-bool ItemView::OnWheelEvent(Actor actor, const WheelEvent& event)
+bool ItemView::OnWheelEvent(Actor actor, WheelEvent event)
 {
   // Respond the wheel event to scroll
   if(mActiveLayout)
@@ -1122,7 +1122,7 @@ float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targ
   return clamppedPosition;
 }
 
-bool ItemView::OnTouch(Actor actor, const TouchEvent& touch)
+bool ItemView::OnTouch(Actor actor, TouchEvent touch)
 {
   // Ignore events with multiple-touch points
   if(touch.GetPointCount() != 1)
@@ -1385,7 +1385,7 @@ Animation ItemView::DoAnchoring()
   return anchoringAnimation;
 }
 
-void ItemView::OnScrollFinished(Animation& source)
+void ItemView::OnScrollFinished(Animation source)
 {
   Actor self = Self();
 
@@ -1407,7 +1407,7 @@ void ItemView::OnScrollFinished(Animation& source)
   mScrollOvershoot = 0.0f;
 }
 
-void ItemView::OnLayoutActivationScrollFinished(Animation& source)
+void ItemView::OnLayoutActivationScrollFinished(Animation source)
 {
   RemoveAnimation(mScrollAnimation);
   mRefreshEnabled = true;
@@ -1417,7 +1417,7 @@ void ItemView::OnLayoutActivationScrollFinished(Animation& source)
   mLayoutActivatedSignal.Emit();
 }
 
-void ItemView::OnOvershootOnFinished(Animation& animation)
+void ItemView::OnOvershootOnFinished(Animation animation)
 {
   mAnimatingOvershootOn = false;
   mScrollOvershootAnimation.FinishedSignal().Disconnect(this, &ItemView::OnOvershootOnFinished);

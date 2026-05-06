@@ -181,14 +181,14 @@ private:
    * when mTargetMaskOnce is true and finished signal of the target render task(mMaskTargetRenderTask) is emitted.
    * @param[in] renderTask that emits target signal.
    */
-  void OnTargetRenderFinished(Dali::RenderTask& renderTask);
+  void OnTargetRenderFinished(Dali::RenderTask renderTask);
 
   /**
    * @brief Emits render finished signal of the source,
    * when mSourceMaskOnce is true and finished signal of the source render task(mMaskSourceRenderTask) is emitted.
    * @param[in] renderTask that emits source signal.
    */
-  void OnSourceRenderFinished(Dali::RenderTask& renderTask);
+  void OnSourceRenderFinished(Dali::RenderTask renderTask);
 
 private:
   MaskEffectImpl(const MaskEffectImpl&)            = delete;

@@ -146,7 +146,7 @@ public:
   /**
    * @brief callback when animation for placeholder or previous visual transition effect is finished
    */
-  void OnTransitionAnimationFinishedCallback(Animation& animation);
+  void OnTransitionAnimationFinishedCallback(Animation animation);
 
 private: // From Control
   /**

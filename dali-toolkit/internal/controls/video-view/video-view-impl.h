@@ -495,7 +495,7 @@ private:
    * This function is called the resize/move animation is finished,
    *
    */
-  void OnAnimationFinished(Dali::Animation& animation);
+  void OnAnimationFinished(Dali::Animation animation);
 
   /**
    * @brief Video player event callback function

@@ -1370,7 +1370,7 @@ void ScrollView::SetScrollUpdateNotification(bool enabled)
   }
 }
 
-void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
+void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification source)
 {
   // Guard against destruction during signal emission
   Toolkit::ScrollView handle(GetOwner());
@@ -1526,7 +1526,7 @@ bool ScrollView::OnTouchDownTimeout()
   return false;
 }
 
-bool ScrollView::OnTouch(Actor actor, const TouchEvent& touch)
+bool ScrollView::OnTouch(Actor actor, TouchEvent touch)
 {
   if(!mSensitive)
   {
@@ -1595,7 +1595,7 @@ bool ScrollView::OnTouch(Actor actor, const TouchEvent& touch)
   return false;
 }
 
-bool ScrollView::OnWheelEvent(Actor actor, const WheelEvent& event)
+bool ScrollView::OnWheelEvent(Actor actor, WheelEvent event)
 {
   if(!mSensitive)
   {
@@ -1735,7 +1735,7 @@ void ScrollView::AnimateInternalYTo(float position, float duration, AlphaFunctio
   }
 }
 
-void ScrollView::OnScrollAnimationFinished(Animation& source)
+void ScrollView::OnScrollAnimationFinished(Animation source)
 {
   // Guard against destruction during signal emission
   // Note that ScrollCompletedSignal is emitted from HandleSnapAnimationFinished()
@@ -1794,7 +1794,7 @@ void ScrollView::OnScrollAnimationFinished(Animation& source)
   }
 }
 
-void ScrollView::OnSnapInternalPositionFinished(Animation& source)
+void ScrollView::OnSnapInternalPositionFinished(Animation source)
 {
   Actor self = Self();
   UpdateLocalScrollProperties();

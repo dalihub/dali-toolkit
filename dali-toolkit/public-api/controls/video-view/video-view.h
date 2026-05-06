@@ -61,7 +61,7 @@ class DALI_TOOLKIT_API VideoView : public Control
 {
 public:
   // Signal
-  typedef Signal<void(VideoView&)> VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
+  typedef Signal<void(VideoView)> VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
 
 public:
   /**

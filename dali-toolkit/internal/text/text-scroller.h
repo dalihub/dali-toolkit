@@ -180,7 +180,7 @@ private: // Implementation
    * @brief Callback for end of animation
    * @param[in] animation Animation handle
    */
-  void AutoScrollAnimationFinished(Dali::Animation& animation);
+  void AutoScrollAnimationFinished(Dali::Animation animation);
 
   /**
    * @brief variables required to set up scrolling animation

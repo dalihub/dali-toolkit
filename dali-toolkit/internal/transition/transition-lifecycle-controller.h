@@ -42,7 +42,7 @@ public:
   void AddTransitions(Dali::Toolkit::TransitionSet transitions);
 
 private:
-  void RemoveTransitions(Dali::Toolkit::TransitionSet& transitions);
+  void RemoveTransitions(Dali::Toolkit::TransitionSet transitions);
 
   /**
    * Construct a new TransitionLifecycleController.

@@ -38,7 +38,7 @@ struct TransitionFinishCheck
   {
   }
 
-  void operator()(TransitionSet& transitionSet)
+  void operator()(TransitionSet transitionSet)
   {
     mSignalReceived = true;
   }

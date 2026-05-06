@@ -158,7 +158,7 @@ public:
    *
    * @SINCE_2_3.37
    */
-  typedef Signal<void(SceneView, int32_t, const Dali::Toolkit::ImageUrl&)> CaptureFinishedSignalType;
+  typedef Signal<void(SceneView, int32_t, Dali::Toolkit::ImageUrl)> CaptureFinishedSignalType;
 
   /**
    * @brief Typedef for camera transition finished signals sent by this class.

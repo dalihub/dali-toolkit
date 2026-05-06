@@ -285,7 +285,7 @@ void TextSelectionPopup::OnInitialize()
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::DIALOG);
 }
 
-void TextSelectionPopup::HideAnimationFinished(Animation& animation)
+void TextSelectionPopup::HideAnimationFinished(Animation animation)
 {
   Actor self = Self();
   if(!mPopupShowing) // During the Hide/Fade animation there could be a call to Show the Popup again, mPopupShowing will be true in this case.

@@ -489,7 +489,7 @@ private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -519,7 +519,7 @@ private: // Implementation
    * @param[in] actor TextEditor touched
    * @param[in] touch Touch information
    */
-  bool OnTouched(Actor actor, const TouchEvent& touch);
+  bool OnTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Callbacks called on idle.
@@ -565,7 +565,7 @@ private: // Implementation
    *
    * Emit ScrollBarStateChanged Signal and toggle mScrollStarted flag to false
    */
-  void OnScrollIndicatorAnimationFinished(Animation& animation);
+  void OnScrollIndicatorAnimationFinished(Animation animation);
 
   /**
    * @brief Callback function for when the layout is changed.
@@ -625,7 +625,7 @@ private: // Implementation
   /**
    * @brief Notifies when the font variation property changes to specific value.
    */
-  void OnVariationPropertyNotify(PropertyNotification& source);
+  void OnVariationPropertyNotify(PropertyNotification source);
 
 private: // Data
   // Signals

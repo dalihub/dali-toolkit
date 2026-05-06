@@ -626,7 +626,7 @@ DevelControl::ControlAccessible* Button::CreateAccessibleObject()
   return new ButtonAccessible(Self());
 }
 
-bool Button::OnTouch(Actor actor, const TouchEvent& touch)
+bool Button::OnTouch(Actor actor, TouchEvent touch)
 {
   if(!IsDisabled() && (actor == touch.GetHitActor(0)))
   {
@@ -978,7 +978,7 @@ void Button::OnRelayout(const Vector2& size, RelayoutContainer& container)
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "OnRelayout << \n");
 }
 
-void Button::OnTap(Actor actor, const TapGesture& tap)
+void Button::OnTap(Actor actor, TapGesture tap)
 {
   // Prevents Parent getting a tap event
 }

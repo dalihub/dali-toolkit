@@ -399,7 +399,7 @@ void MaskEffectImpl::SetShaderConstants(Toolkit::Control ownerControl)
   ownerControl.RegisterProperty(UNIFORM_MASK_SCALE_NAME, newMaskScale);
 }
 
-void MaskEffectImpl::OnTargetRenderFinished(Dali::RenderTask& renderTask)
+void MaskEffectImpl::OnTargetRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mMaskTargetRenderTask == renderTask))
   {
@@ -419,7 +419,7 @@ void MaskEffectImpl::OnTargetRenderFinished(Dali::RenderTask& renderTask)
   }
 }
 
-void MaskEffectImpl::OnSourceRenderFinished(Dali::RenderTask& renderTask)
+void MaskEffectImpl::OnSourceRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mMaskSourceRenderTask == renderTask))
   {

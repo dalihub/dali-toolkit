@@ -204,12 +204,12 @@ private:
   /**
    * @brief Callback when the world scale factor changes.
    */
-  void OnScaleNotification(PropertyNotification& source);
+  void OnScaleNotification(PropertyNotification source);
 
   /**
    * @brief Callback when the size changes.
    */
-  void OnSizeNotification(PropertyNotification& source);
+  void OnSizeNotification(PropertyNotification source);
 
   /**
    * @brief Callback when the visibility of the actor is changed.

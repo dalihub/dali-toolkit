@@ -1109,7 +1109,7 @@ void TextField::OnSceneConnect(Dali::Actor actor)
   }
 }
 
-InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(Dali::InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(Dali::InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
   return mController->OnInputMethodContextEvent(inputMethodContext, inputMethodContextEvent);
@@ -1189,7 +1189,7 @@ void TextField::OnSceneConnection(int depth)
   ControlImpl::OnSceneConnection(depth);
 }
 
-bool TextField::OnTouched(Actor actor, const TouchEvent& touch)
+bool TextField::OnTouched(Actor actor, TouchEvent touch)
 {
   return false;
 }
@@ -1316,7 +1316,7 @@ Dali::Property::Index TextField::RegisterFontVariationProperty(std::string tag)
   return index;
 }
 
-void TextField::OnVariationPropertyNotify(PropertyNotification& source)
+void TextField::OnVariationPropertyNotify(PropertyNotification source)
 {
   Property::Map map;
   mController->GetVariationsMap(map);

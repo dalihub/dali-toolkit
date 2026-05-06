@@ -117,7 +117,7 @@ Dali::Toolkit::Control DragAndDropDetector::GetAttachedControl(uint32_t index) c
   return control;
 }
 
-void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
+void DragAndDropDetector::OnPan(Dali::Actor actor, PanGesture gesture)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
 
@@ -160,7 +160,7 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
   }
 }
 
-bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data)
+bool DragAndDropDetector::OnDrag(Dali::Actor actor, Dali::TouchEvent data)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
   PointState::Type       type    = data.GetState(0);

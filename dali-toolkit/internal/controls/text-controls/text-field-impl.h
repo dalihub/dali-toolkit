@@ -461,7 +461,7 @@ private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -489,7 +489,7 @@ private: // Implementation
    * @param[in] actor TextField touched
    * @param[in] touch Touch information
    */
-  bool OnTouched(Actor actor, const TouchEvent& touch);
+  bool OnTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Emits TextChanged signal.
@@ -574,7 +574,7 @@ private: // Implementation
   /**
    * @brief Notifies when the font variation property changes to specific value.
    */
-  void OnVariationPropertyNotify(PropertyNotification& source);
+  void OnVariationPropertyNotify(PropertyNotification source);
 
 private: // Data
   // Signals

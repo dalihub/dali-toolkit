@@ -43,6 +43,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/wheel-event.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -1121,7 +1123,7 @@ void WebView::OnFrameRendered()
   }
 }
 
-void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
+void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification /*source*/)
 {
   if(!mWebEngine)
   {
@@ -1192,7 +1194,7 @@ void WebView::OnSceneDisconnection()
   ControlImpl::OnSceneDisconnection();
 }
 
-bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)
+bool WebView::OnTouchEvent(Actor actor, Dali::TouchEvent touch)
 {
   bool result = false;
 
@@ -1214,7 +1216,7 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
   return result;
 }
 
-bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
+bool WebView::OnHoverEvent(Actor actor, Dali::HoverEvent hover)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)
@@ -1224,7 +1226,7 @@ bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
   return result;
 }
 
-bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
+bool WebView::OnWheelEvent(Actor actor, Dali::WheelEvent wheel)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)

@@ -55,8 +55,8 @@ public:
   using WindowSize     = Int32Pair;
   using WindowPosition = Int32Pair;
 
-  using KeyEventSignalType   = Signal<void(const KeyEvent&)>;
-  using TouchEventSignalType = Signal<void(const TouchEvent&)>;
+  using KeyEventSignalType   = Signal<void(KeyEvent)>;
+  using TouchEventSignalType = Signal<void(TouchEvent)>;
   using ResizeSignalType     = Signal<void(Window, WindowSize)>;
 
   static Window New(PositionSize windowPosition, const Dali::String& name, bool isTransparent = false);
@@ -99,9 +99,9 @@ const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window);
 namespace DevelWindow
 {
 typedef Signal<void()>                  EventProcessingFinishedSignalType;
-typedef Signal<bool(const KeyEvent&)>   KeyEventGeneratedSignalType;
-typedef Signal<void(const WheelEvent&)> WheelEventSignalType;
-typedef Signal<bool(const WheelEvent&)> WheelEventGeneratedSignalType;
+typedef Signal<bool(KeyEvent)>   KeyEventGeneratedSignalType;
+typedef Signal<void(WheelEvent)> WheelEventSignalType;
+typedef Signal<bool(WheelEvent)> WheelEventGeneratedSignalType;
 typedef Signal<void(Window, bool)>      VisibilityChangedSignalType;
 
 Dali::Window Get(Actor actor);

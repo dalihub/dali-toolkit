@@ -222,7 +222,7 @@ public:
    *
    * @param[in] source the property notification that triggered this callback
    */
-  void OnOvershootNotification(PropertyNotification& source);
+  void OnOvershootNotification(PropertyNotification source);
 
   /**
    * @copydoc ScrollOvershootEffect::SetOvershoot()
@@ -234,7 +234,7 @@ public:
    *
    * @param[in] animation the animation instance that has finished
    */
-  void OnOvershootAnimFinished(Animation& animation);
+  void OnOvershootAnimFinished(Animation animation);
 
   /**
    * Creates a new ScrollOvershootEffectGradient objects and returns a pointer to it

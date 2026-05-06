@@ -812,7 +812,7 @@ Property::Value ImageView::GetProperty(BaseObject* object, Property::Index prope
   return value;
 }
 
-void ImageView::OnTransitionAnimationFinishedCallback(Animation& animation)
+void ImageView::OnTransitionAnimationFinishedCallback(Animation animation)
 {
   // Hide placeholder
   HidePlaceholderImage();

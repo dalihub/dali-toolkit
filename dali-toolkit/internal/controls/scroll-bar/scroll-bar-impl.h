@@ -241,7 +241,7 @@ private:
    * below the values specified by SetScrollPositionIntervals().
    * @param[in] source the property notification that triggered this callback
    */
-  void OnScrollPositionIntervalReached(PropertyNotification& source);
+  void OnScrollPositionIntervalReached(PropertyNotification source);
 
   /**
    * Process the pan gesture per predefined timeout until the gesture is finished.

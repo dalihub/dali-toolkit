@@ -253,7 +253,7 @@ private:
    * This will be called when a new scene holder is created
    * @param sceneHolder The new scene holder
    */
-  void OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder);
+  void OnSceneHolderCreated(Dali::Integration::SceneHolder sceneHolder);
 
   /**
    * Get configuration from StyleManager.
@@ -325,26 +325,26 @@ private:
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] event The KeyEvent event.
    */
-  void OnKeyEvent(const KeyEvent& event);
+  void OnKeyEvent(KeyEvent event);
 
   /**
    * Callback for the touch event when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
    * @param[in] touch The touch information
    */
-  void OnTouch(const TouchEvent& touch);
+  void OnTouch(TouchEvent touch);
 
   /**
    * Callback for the wheel event when the custom wheel event occurs.
    * @param[in] wheel The WheelEvent information
    */
-  bool OnCustomWheelEvent(const WheelEvent& wheel);
+  bool OnCustomWheelEvent(WheelEvent wheel);
 
   /**
    * Callback for the wheel event when the wheel event occurs.
    * @param[in] wheel The WheelEvent information
    */
-  void OnWheelEvent(const WheelEvent& wheel);
+  void OnWheelEvent(WheelEvent wheel);
 
   /**
    * Called when the window focus is changed.
@@ -378,7 +378,7 @@ private:
    * @param[in]  event  The WheelEvent.
    * @return True if WheelEvent is consumed.
    */
-  bool EmitCustomWheelSignals(Actor actor, const WheelEvent& event);
+  bool EmitCustomWheelSignals(Actor actor, WheelEvent event);
 
   /**
    * Clear the focus actor

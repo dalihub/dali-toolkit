@@ -113,7 +113,7 @@ private:
    * @brief Method used to connect to the control's Hovered signal.
    * @param[in]  hover  The hover event.
    */
-  bool OnHovered(Actor /* actor */, const HoverEvent& hover);
+  bool OnHovered(Actor /* actor */, HoverEvent hover);
 
   /**
    * @brief Method used to connect to the internal timer used by Tooltip.

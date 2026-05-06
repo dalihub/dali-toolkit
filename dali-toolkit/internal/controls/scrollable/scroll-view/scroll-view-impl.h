@@ -653,7 +653,7 @@ private: // private overridden functions from CustomActorImpl and Controls
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  bool OnWheelEvent(Actor actor, const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, WheelEvent event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -695,7 +695,7 @@ private:
    * @param[in] touch The touch information.
    * @return True if the event should be consumed.
    */
-  bool OnTouch(Actor actor, const TouchEvent& touch);
+  bool OnTouch(Actor actor, TouchEvent touch);
 
   /**
    * Start a timer which calls OnTouchDownTimeout()
@@ -757,14 +757,14 @@ private:
    * Called whenever a snap animation on the x-axis has completed
    * @param[in] source the Animation instance that has completed.
    */
-  void OnScrollAnimationFinished(Animation& source);
+  void OnScrollAnimationFinished(Animation source);
 
   /**
    * Called when either the X or Y internal scroll positions have finished snapping back to SCROLL_PRE_POSITION
    *
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapInternalPositionFinished(Animation& source);
+  void OnSnapInternalPositionFinished(Animation source);
 
   /**
    * Called whenever a snap animation on the x-axis has completed and we need to snap pre scroll
@@ -912,7 +912,7 @@ private:
    * Refresh the ScrollView (used when animating to update application developer of changes)
    * @return True if the refresh timer should be kept running.
    */
-  void OnScrollUpdateNotification(Dali::PropertyNotification& source);
+  void OnScrollUpdateNotification(Dali::PropertyNotification source);
 
 private:
   // Undefined

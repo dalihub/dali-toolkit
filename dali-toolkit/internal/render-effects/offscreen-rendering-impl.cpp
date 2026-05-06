@@ -188,7 +188,7 @@ void OffScreenRenderingImpl::DestroyRenderTask()
   mRenderTask.Reset();
 }
 
-void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask& task)
+void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask task)
 {
   if(DALI_LIKELY(mRenderTask == task))
   {

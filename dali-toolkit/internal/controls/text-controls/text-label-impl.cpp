@@ -1255,7 +1255,7 @@ DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
   return new TextLabelAccessible(Self());
 }
 
-bool TextLabel::OnInterceptTouched(Actor actor, const TouchEvent& touch)
+bool TextLabel::OnInterceptTouched(Actor actor, TouchEvent touch)
 {
   if(touch.GetState(0) == PointState::STARTED)
   {
@@ -2531,7 +2531,7 @@ Dali::Property::Index TextLabel::RegisterFontVariationProperty(std::string tag)
   return index;
 }
 
-void TextLabel::OnVariationPropertyNotify(PropertyNotification& source)
+void TextLabel::OnVariationPropertyNotify(PropertyNotification source)
 {
   Property::Map map;
   mController->GetVariationsMap(map);

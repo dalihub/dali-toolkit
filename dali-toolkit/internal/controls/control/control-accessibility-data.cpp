@@ -181,7 +181,7 @@ void Control::AccessibilityData::RegisterAccessibilityPositionPropertyNotificati
   CheckHighlightedObjectGeometry();
   mAccessibilityPositionNotification = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mAccessibilityPositionNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification&)
+  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification)
   { CheckHighlightedObjectGeometry(); });
   mIsAccessibilityPositionPropertyNotificationSet = true;
 }
@@ -212,7 +212,7 @@ void Control::AccessibilityData::UnregisterAccessibilityPropertySetSignal()
   mIsAccessibilityPropertySetSignalRegistered = false;
 }
 
-void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
+void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle handle, Dali::Property::Index index, const Dali::Property::Value& value)
 {
   auto accessible = GetAccessibleObject();
   if(DALI_LIKELY(accessible))

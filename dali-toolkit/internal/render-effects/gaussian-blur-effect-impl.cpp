@@ -568,7 +568,7 @@ void GaussianBlurEffectImpl::DestroyRenderTasks()
   mSourceRenderTask.Reset();
 }
 
-void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
+void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mVerticalBlurTask == renderTask))
   {

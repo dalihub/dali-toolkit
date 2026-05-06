@@ -364,7 +364,7 @@ private:
    * @param[in]  touch  The touch info.
    * @return true, if consumed, false otherwise.
    */
-  bool OnTouch(Actor actor, const TouchEvent& touch);
+  bool OnTouch(Actor actor, TouchEvent touch);
 
   /**
    * Handler for tap events.
@@ -374,7 +374,7 @@ private:
    * @param[in]  actor  The tapped actor.
    * @param[in]  tap    The tap gesture.
    */
-  void OnTap(Actor actor, const TapGesture& tap);
+  void OnTap(Actor actor, TapGesture tap);
 
   /**
    * @copydoc Control::OnTap

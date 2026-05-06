@@ -159,7 +159,7 @@ void CameraView::SetNativeImageTarget()
   mCameraPlayer.SetNativeImageRenderingTarget(nativeImagePtr);
 }
 
-void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
+void CameraView::UpdateDisplayArea(Dali::PropertyNotification source)
 {
   if(mDisplayType != Dali::Toolkit::CameraView::DisplayType::WINDOW)
   {
