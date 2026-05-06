@@ -63,6 +63,12 @@ public:
   void RemoveFocus(Toolkit::Control control);
 
   /**
+   * Sets whether to defer focus signals until requested.
+   * @param[in] deferred True to defer signals, false to emit any pending signals immediately.
+   */
+  void SetDeferredMode(bool deferred);
+
+  /**
    * @copydoc Toolkit::GetCurrentFocusControl
    */
   Toolkit::Control GetCurrentFocusControl() const;
@@ -134,8 +140,11 @@ private:
 
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
-  Toolkit::Control mCurrentFocusControl; ///< The current focused control
-  uint32_t         mCurrentWindowId;     ///< The native window id of current focused control
+  Toolkit::Control mCurrentFocusControl;   ///< The current focused control
+  Toolkit::Control mPendingLostControl;    ///< The control that is pending to lose focus
+  Toolkit::Control mPendingGainedControl;  ///< The control that is pending to gain focus
+  uint32_t         mCurrentWindowId;      ///< The native window id of current focused control
+  bool             mDeferredMode;          ///< Whether to defer signals
 };
 
 } // namespace Internal
