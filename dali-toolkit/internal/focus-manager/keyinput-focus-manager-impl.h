@@ -105,9 +105,10 @@ private:
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
+   * @param[in] sceneHolder The scene holder where the key event occurred
    * @param[in] event The KeyEvent event.
    */
-  bool OnKeyEvent(KeyEvent event);
+  bool OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, KeyEvent event);
 
   /**
    * Signal handler called when a focused Control is removed from Scene.
@@ -140,11 +141,11 @@ private:
 
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
-  Toolkit::Control mCurrentFocusControl;   ///< The current focused control
-  Toolkit::Control mPendingLostControl;    ///< The control that is pending to lose focus
-  Toolkit::Control mPendingGainedControl;  ///< The control that is pending to gain focus
+  Toolkit::Control mCurrentFocusControl;  ///< The current focused control
+  Toolkit::Control mPendingLostControl;   ///< The control that is pending to lose focus
+  Toolkit::Control mPendingGainedControl; ///< The control that is pending to gain focus
   uint32_t         mCurrentWindowId;      ///< The native window id of current focused control
-  bool             mDeferredMode;          ///< Whether to defer signals
+  bool             mDeferredMode;         ///< Whether to defer signals
 };
 
 } // namespace Internal

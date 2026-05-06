@@ -40,8 +40,8 @@
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/focus-finder.h>
-#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/internal/focus-manager/keyinput-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
@@ -305,8 +305,8 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor, const FocusChange
     // Update KeyInputFocus state before emitting the signal so that HasKeyInputFocus()
     // returns the correct value inside the FocusChangedSignal callback.
     // Use deferred mode to ensure the signal order: State update -> FocusChanged -> FocusLost -> FocusGained.
-    Toolkit::KeyInputFocusManager keyInputFocusManagerHandle = Toolkit::KeyInputFocusManager::Get();
-    Internal::KeyInputFocusManager& keyInputFocusManager = Toolkit::GetImpl(keyInputFocusManagerHandle);
+    Toolkit::KeyInputFocusManager   keyInputFocusManagerHandle = Toolkit::KeyInputFocusManager::Get();
+    Internal::KeyInputFocusManager& keyInputFocusManager       = Toolkit::GetImpl(keyInputFocusManagerHandle);
     keyInputFocusManager.SetDeferredMode(true);
 
     Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
@@ -771,8 +771,8 @@ void KeyboardFocusManager::ClearFocus(Actor actor)
     // Reset current focus actor and update KeyInputFocus state before emitting the signal
     // so that HasKeyInputFocus() returns false for the cleared actor inside the FocusChangedSignal callback.
     // Use deferred mode to ensure the signal order: State update -> FocusChanged -> FocusLost.
-    Toolkit::KeyInputFocusManager keyInputFocusManagerHandle = Toolkit::KeyInputFocusManager::Get();
-    Internal::KeyInputFocusManager& keyInputFocusManager = Toolkit::GetImpl(keyInputFocusManagerHandle);
+    Toolkit::KeyInputFocusManager   keyInputFocusManagerHandle = Toolkit::KeyInputFocusManager::Get();
+    Internal::KeyInputFocusManager& keyInputFocusManager       = Toolkit::GetImpl(keyInputFocusManagerHandle);
     keyInputFocusManager.SetDeferredMode(true);
 
     if(mCurrentFocusActor.GetHandle() == actor)
@@ -911,7 +911,7 @@ uint32_t KeyboardFocusManager::GetCurrentWindowId() const
   return mCurrentWindowId;
 }
 
-void KeyboardFocusManager::OnKeyEvent(KeyEvent event)
+void KeyboardFocusManager::OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, KeyEvent event)
 {
   if(mCurrentFocusedWindow.GetHandle())
   {
@@ -1120,7 +1120,7 @@ void KeyboardFocusManager::OnKeyEvent(KeyEvent event)
   }
 }
 
-void KeyboardFocusManager::OnTouch(TouchEvent touch)
+void KeyboardFocusManager::OnTouch(Dali::Integration::SceneHolder sceneHolder, TouchEvent touch)
 {
   // if mIsFocusIndicatorShown is UNKNOWN, it means Configuration is not loaded.
   // Try to load configuration.
@@ -1156,7 +1156,7 @@ void KeyboardFocusManager::OnTouch(TouchEvent touch)
   }
 }
 
-void KeyboardFocusManager::OnWheelEvent(WheelEvent event)
+void KeyboardFocusManager::OnWheelEvent(Dali::Integration::SceneHolder sceneHolder, WheelEvent event)
 {
   if(event.GetType() == Dali::WheelEvent::CUSTOM_WHEEL)
   {
@@ -1166,7 +1166,7 @@ void KeyboardFocusManager::OnWheelEvent(WheelEvent event)
   }
 }
 
-bool KeyboardFocusManager::OnCustomWheelEvent(WheelEvent event)
+bool KeyboardFocusManager::OnCustomWheelEvent(Dali::Integration::SceneHolder sceneHolder, WheelEvent event)
 {
   bool  consumed = false;
   Actor actor    = GetCurrentFocusActor();
