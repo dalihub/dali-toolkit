@@ -23,6 +23,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -34,6 +35,7 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
+using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 
 namespace
@@ -312,10 +314,22 @@ void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
 
   mMaskTargetFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
   mMaskTargetTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
-  mMaskTargetFrameBuffer.AttachColorTexture(mMaskTargetTexture);
 
   mMaskSourceFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
   mMaskSourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "MaskEffect m:" << mMaskMode << " once: " << mTargetMaskOnce << "/" << mSourceMaskOnce << " r:" << mReverseMaskDirection;
+    std::string prefix = oss.str();
+
+    Dali::Integration::TextureUploadWithContent(mMaskTargetTexture, Dali::PixelData(), ToDaliString(prefix + "(T)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(mMaskSourceTexture, Dali::PixelData(), ToDaliString(prefix + "(S)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+  }
+#endif
+
+  mMaskTargetFrameBuffer.AttachColorTexture(mMaskTargetTexture);
   mMaskSourceFrameBuffer.AttachColorTexture(mMaskSourceTexture);
 }
 

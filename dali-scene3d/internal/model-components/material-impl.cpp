@@ -856,7 +856,7 @@ void Material::TextureLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
       Dali::Integration::TextureUploadWithContent(textureInformation.mTexture,
                                                   pixelData,
                                                   ToDaliString(textureInformation.mUrl),
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1200));
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_MATERIAL_IMAGE));
 #else
       textureInformation.mTexture.Upload(pixelData);
 #endif

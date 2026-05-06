@@ -218,7 +218,7 @@ Dali::Texture CreateTextureFromPixelData(const Dali::PixelData& pixelData, bool 
     Dali::Integration::TextureUploadWithContent(texture,
                                                 pixelData,
                                                 Dali::Integration::ToDaliString(textureContext),
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(found ? Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1000 : Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1001));
+                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(found ? Dali::Integration::TextureContextTypeHint::SCENE3D_STANDARD_IMAGE : Dali::Integration::TextureContextTypeHint::SCENE3D_BUFFER_IMAGE));
 #else
     texture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
 #endif
@@ -599,7 +599,7 @@ Dali::Texture GetEmptyTextureWhiteRGB()
     Dali::Integration::TextureUploadWithContent(gEmptyTextureWhiteRGB,
                                                 emptyPixelData,
                                                 "Scene3D::EmptyTextureWhiteRGB",
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1010));
+                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE));
 #else
     gEmptyTextureWhiteRGB.Upload(emptyPixelData, 0, 0, 0, 0, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
 #endif
@@ -621,7 +621,7 @@ Dali::Texture GetEmptyCubeTextureWhiteRGB()
         Dali::Integration::TextureUploadWithContent(gEmptyCubeTextureWhiteRGB,
                                                     emptyPixelData,
                                                     "Scene3D::EmptyCubeTextureWhiteRGB",
-                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1011));
+                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE_CUBE));
       }
       else
       {
@@ -645,7 +645,7 @@ Dali::Texture GetDefaultBrdfTexture()
     Dali::Integration::TextureUploadWithContent(gDefaultBrdfTexture,
                                                 brdfPixelData,
                                                 "Scene3D::DefaultBrdfTexture",
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1020));
+                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_BRDF));
 #else
     gDefaultBrdfTexture.Upload(brdfPixelData, 0, 0, 0, 0, brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
 #endif
