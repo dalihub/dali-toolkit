@@ -198,6 +198,7 @@ struct DBusWrapper
   };
   virtual void        add_interface_impl(bool fallback, const std::string& pathName, const ConnectionPtr& connection, std::vector<std::function<void()>>& destructors, const std::string& interfaceName, std::vector<MethodInfo>& dscrMethods, std::vector<PropertyInfo>& dscrProperties, std::vector<SignalInfo>& dscrSignals) = 0;
   virtual void        add_property_changed_event_listener_impl(const ProxyPtr& proxy, const std::string& interface, const std::string& name, std::function<void(const _Eina_Value*)> cb)                                                                                                                                        = 0;
+  virtual bool        get_from_value_impl(const void* v, void* dst) = 0;
   static DBusWrapper* Installed();
   static void         Install(std::unique_ptr<DBusWrapper>);
 
@@ -569,6 +570,7 @@ struct TestDBusWrapper : public DBusWrapper
   ProxyPtr       eldbus_proxy_copy_impl(const ProxyPtr& ptr) override;
   void           add_property_changed_event_listener_impl(const ProxyPtr& proxy, const std::string& interface, const std::string& name, std::function<void(const _Eina_Value*)> cb) override;
   void           add_interface_impl(bool fallback, const std::string& pathName, const ConnectionPtr& connection, std::vector<std::function<void()>>& destructors, const std::string& interfaceName, std::vector<MethodInfo>& dscrMethods, std::vector<PropertyInfo>& dscrProperties, std::vector<SignalInfo>& dscrSignals) override;
+  bool           get_from_value_impl(const void* v, void* dst) override;
   static bool    completed(const MessageIterPtr& iter);
 
 private:
