@@ -48,7 +48,7 @@ class TransitionSet;
 class DALI_TOOLKIT_API TransitionSet : public BaseHandle
 {
 public:
-  using TransitionSetSignalType = Signal<void(TransitionSet&)>; ///< TransitionSet finished signal type
+  using TransitionSetSignalType = Signal<void(TransitionSet)>; ///< TransitionSet finished signal type
 
   /**
    * @brief Creates an uninitialized TransitionSet; this can be initialized with TransitionSet::New().

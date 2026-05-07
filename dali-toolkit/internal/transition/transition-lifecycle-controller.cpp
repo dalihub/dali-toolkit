@@ -47,7 +47,7 @@ void TransitionLifecycleController::AddTransitions(Dali::Toolkit::TransitionSet 
   transitions.FinishedSignal().Connect(this, &TransitionLifecycleController::RemoveTransitions);
 }
 
-void TransitionLifecycleController::RemoveTransitions(Dali::Toolkit::TransitionSet& transitions)
+void TransitionLifecycleController::RemoveTransitions(Dali::Toolkit::TransitionSet transitions)
 {
   mTransitionList.erase(std::remove(mTransitionList.begin(), mTransitionList.end(), transitions));
 }

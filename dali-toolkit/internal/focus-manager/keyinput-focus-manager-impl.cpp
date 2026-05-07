@@ -66,7 +66,7 @@ KeyInputFocusManager::~KeyInputFocusManager()
 {
 }
 
-void KeyInputFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder)
+void KeyInputFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder sceneHolder)
 {
   sceneHolder.KeyEventGeneratedSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
@@ -187,7 +187,7 @@ Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusMana
   return mKeyInputFocusChangedSignal;
 }
 
-bool KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
+bool KeyInputFocusManager::OnKeyEvent(KeyEvent event)
 {
   bool consumed = false;
 
@@ -221,7 +221,7 @@ bool KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
   return consumed;
 }
 
-bool KeyInputFocusManager::EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event)
+bool KeyInputFocusManager::EmitKeyEventSignal(Toolkit::Control control, KeyEvent event)
 {
   bool consumed = false;
 

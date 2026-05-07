@@ -387,7 +387,7 @@ void Tooltip::SetTail(const Property::Value& value)
   }
 }
 
-bool Tooltip::OnHovered(Actor /* actor */, const HoverEvent& hover)
+bool Tooltip::OnHovered(Actor /* actor */, HoverEvent hover)
 {
   const PointState::Type state = hover.GetState(0);
   switch(state)

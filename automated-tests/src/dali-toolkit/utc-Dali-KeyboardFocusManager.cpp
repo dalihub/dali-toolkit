@@ -240,13 +240,13 @@ public:
   {
   }
 
-  bool Callback(Control control, const KeyEvent& keyEvent)
+  bool Callback(Control control, KeyEvent keyEvent)
   {
     mIsCalled = true;
     return mConsumed;
   }
 
-  void Callback(const KeyEvent& keyEvent)
+  void Callback(KeyEvent keyEvent)
   {
     mIsCalled = true;
   }
@@ -268,13 +268,13 @@ public:
   {
   }
 
-  bool Callback(Actor actor, const WheelEvent& wheelEvent)
+  bool Callback(Actor actor, WheelEvent wheelEvent)
   {
     mIsCalled = true;
     return mConsumed;
   }
 
-  void Callback(const WheelEvent& wheelEvent)
+  void Callback(WheelEvent wheelEvent)
   {
     mIsCalled = true;
   }

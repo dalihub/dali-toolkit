@@ -2360,7 +2360,7 @@ enum class SortOrder : uint32_t
   LAST_DEFINED
 };
 
-static bool TestTouchCallback(Actor, const TouchEvent&)
+static bool TestTouchCallback(Actor, TouchEvent)
 {
   return true;
 }

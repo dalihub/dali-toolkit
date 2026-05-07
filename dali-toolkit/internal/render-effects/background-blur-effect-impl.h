@@ -198,7 +198,7 @@ private:
    * when mBlurOnce is true and finished signal of the last render task(mVerticalBlurTask) is emitted.
    * @param[in] renderTask that emits source signal.
    */
-  void OnRenderFinished(Dali::RenderTask& renderTask);
+  void OnRenderFinished(Dali::RenderTask renderTask);
 
   /**
    * @brief Calculate valid downscale factor and blur radius by given mBlurRadius and mDownscaleFactor.

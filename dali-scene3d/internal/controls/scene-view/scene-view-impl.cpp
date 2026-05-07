@@ -1714,7 +1714,7 @@ void SceneView::UpdateShadowMapBuffer(uint32_t shadowMapSize)
   }
 }
 
-void SceneView::OnCaptureFinished(Dali::RenderTask& task)
+void SceneView::OnCaptureFinished(Dali::RenderTask task)
 {
   auto iter = std::find_if(mCaptureContainer.begin(), mCaptureContainer.end(), [task](std::pair<Dali::RenderTask, std::shared_ptr<CaptureData>> item)
   { return item.first == task; });
@@ -1924,7 +1924,7 @@ void SceneView::ResetTransition()
   mInCameraTransition = false;
 }
 
-void SceneView::OnTransitionFinished(Animation& animation)
+void SceneView::OnTransitionFinished(Animation animation)
 {
   UpdateCamera(mTransitionDestinationCamera);
   ResetTransition();

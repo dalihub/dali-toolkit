@@ -227,8 +227,8 @@ public:
     bool        preeditResetRequired : 1; ///< flag if preedit reset is required.
   };
 
-  typedef Signal<void(InputMethodContext&)>                           ActivatedSignalType;     ///< Keyboard actived signal
-  typedef Signal<CallbackData(InputMethodContext&, const EventData&)> KeyboardEventSignalType; ///< keyboard events
+  typedef Signal<void(InputMethodContext)>                           ActivatedSignalType;     ///< Keyboard actived signal
+  typedef Signal<CallbackData(InputMethodContext, const EventData&)> KeyboardEventSignalType; ///< keyboard events
   typedef Signal<void()>                                              VoidSignalType;
   typedef Signal<void(bool)>                                          StatusSignalType;
 

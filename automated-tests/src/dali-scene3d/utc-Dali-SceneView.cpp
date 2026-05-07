@@ -1207,7 +1207,7 @@ static bool              gCaptureFinishedCalled{false};
 static int32_t           gCaptureId{-1};
 static Toolkit::ImageUrl gCapturedImageUrl;
 
-void OnCaptureFinished(Scene3D::SceneView sceneView, int32_t captureId, const Toolkit::ImageUrl& capturedImageUrl)
+void OnCaptureFinished(Scene3D::SceneView sceneView, int32_t captureId, Toolkit::ImageUrl capturedImageUrl)
 {
   gCaptureFinishedCalled = true;
   gCaptureId             = captureId;
@@ -1218,7 +1218,7 @@ static int32_t                        gCapturedCount{0};
 static std::vector<int32_t>           gCaptureIds;
 static std::vector<Toolkit::ImageUrl> gCapturedImageUrls;
 
-void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, int32_t captureId, const Toolkit::ImageUrl& capturedImageUrl)
+void OnCaptureMultipleFinished(Scene3D::SceneView sceneView, int32_t captureId, Toolkit::ImageUrl capturedImageUrl)
 {
   gCapturedCount++;
   gCaptureIds.push_back(captureId);

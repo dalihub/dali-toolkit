@@ -174,7 +174,7 @@ void TransitionSet::TransitionStart()
   mAnimation.Play();
 }
 
-void TransitionSet::TransitionFinished(Dali::Animation& source)
+void TransitionSet::TransitionFinished(Dali::Animation source)
 {
   // Call TransitionFinished() in reverse order.
   // This let the first copied original properties will be return again at the final.

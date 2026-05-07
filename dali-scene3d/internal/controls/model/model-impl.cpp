@@ -1182,7 +1182,7 @@ void Model::OnIblLoadComplete()
   NotifyResourceReady();
 }
 
-void Model::OnSizeNotification(Dali::PropertyNotification& source)
+void Model::OnSizeNotification(Dali::PropertyNotification source)
 {
   ScaleModel(true);
 }

@@ -842,7 +842,7 @@ Any VideoView::GetMediaPlayer()
   return mVideoPlayer.GetMediaPlayer();
 }
 
-void VideoView::OnAnimationFinished(Animation& animation)
+void VideoView::OnAnimationFinished(Animation animation)
 {
   // send desync
   // TODO: SR Video shell's designed is completed,

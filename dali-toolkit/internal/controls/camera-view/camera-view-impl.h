@@ -87,7 +87,7 @@ private:
    * @brief Updates camera display area for window rendering target
    * @param[in] source PropertyNotification
    */
-  void UpdateDisplayArea(Dali::PropertyNotification& source);
+  void UpdateDisplayArea(Dali::PropertyNotification source);
 
   /**
    * @brief SetWindowSurfaceTarget for underlay camera preview.

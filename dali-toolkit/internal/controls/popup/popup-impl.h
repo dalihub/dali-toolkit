@@ -405,7 +405,7 @@ private:
    * Signal occurs when the State animation (transition from hide <-> show) finishes.
    * @param[in] source The animation that just finished.
    */
-  void OnDisplayChangeAnimationFinished(Animation& source);
+  void OnDisplayChangeAnimationFinished(Animation source);
 
   /**
    * Signal occurs when the dimmed backing for the Popup is touched.
@@ -413,7 +413,7 @@ private:
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnBackingTouched(Actor actor, const TouchEvent& touch);
+  bool OnBackingTouched(Actor actor, TouchEvent touch);
 
   /**
    * Signal occurs when a mouse wheel event occurs on the dimmed backing.
@@ -421,7 +421,7 @@ private:
    * @param[in] event The Wheel Event.
    * @return Whether to consume event or not.
    */
-  bool OnBackingWheelEvent(Actor actor, const WheelEvent& event);
+  bool OnBackingWheelEvent(Actor actor, WheelEvent event);
 
   /**
    * Signal occurs when the dialog has been touched.
@@ -429,7 +429,7 @@ private:
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnDialogTouched(Actor actor, const TouchEvent& touch);
+  bool OnDialogTouched(Actor actor, TouchEvent touch);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

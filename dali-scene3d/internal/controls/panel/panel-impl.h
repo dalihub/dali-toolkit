@@ -246,7 +246,7 @@ private:
   /**
    * @brief Update model root scale when Panel size property is updated.
    */
-  void OnSizeNotification(Dali::PropertyNotification& source);
+  void OnSizeNotification(Dali::PropertyNotification source);
 
   /**
    * @brief Updates RenderTask apply new panel size

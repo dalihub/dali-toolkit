@@ -1282,7 +1282,7 @@ void TextEditor::UpdateScrollBar()
   mAnimation.FinishedSignal().Connect(this, &TextEditor::OnScrollIndicatorAnimationFinished);
 }
 
-void TextEditor::OnScrollIndicatorAnimationFinished(Animation& animation)
+void TextEditor::OnScrollIndicatorAnimationFinished(Animation animation)
 {
   // If animation is successfully ended, then emit ScrollStateChangedSignal
   if(Dali::EqualsZero(animation.GetCurrentProgress()))
@@ -1305,7 +1305,7 @@ void TextEditor::OnSceneConnect(Dali::Actor actor)
   }
 }
 
-InputMethodContext::CallbackData TextEditor::OnInputMethodContextEvent(Dali::InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+InputMethodContext::CallbackData TextEditor::OnInputMethodContextEvent(Dali::InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
   return mController->OnInputMethodContextEvent(inputMethodContext, inputMethodContextEvent);
@@ -1359,7 +1359,7 @@ void TextEditor::OnSceneConnection(int depth)
   ControlImpl::OnSceneConnection(depth);
 }
 
-bool TextEditor::OnTouched(Actor actor, const TouchEvent& touch)
+bool TextEditor::OnTouched(Actor actor, TouchEvent touch)
 {
   return false;
 }
@@ -1471,7 +1471,7 @@ Dali::Property::Index TextEditor::RegisterFontVariationProperty(std::string tag)
   return index;
 }
 
-void TextEditor::OnVariationPropertyNotify(PropertyNotification& source)
+void TextEditor::OnVariationPropertyNotify(PropertyNotification source)
 {
   Property::Map map;
   mController->GetVariationsMap(map);

@@ -93,7 +93,7 @@ public:
    * @param[in] index The index of property.
    * @param[in] value The value of property.
    */
-  void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
+  void OnAccessibilityPropertySet(Dali::Handle handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetAccessibleObject()

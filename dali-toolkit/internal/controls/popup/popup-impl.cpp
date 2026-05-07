@@ -539,7 +539,7 @@ void Popup::StartTransitionAnimation(bool transitionIn, bool instantaneous /* fa
   }
 }
 
-void Popup::OnDisplayChangeAnimationFinished(Animation& source)
+void Popup::OnDisplayChangeAnimationFinished(Animation source)
 {
   DisplayStateChangeComplete();
 }
@@ -1557,7 +1557,7 @@ bool Popup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* trac
   return connected;
 }
 
-bool Popup::OnBackingTouched(Actor actor, const TouchEvent& touch)
+bool Popup::OnBackingTouched(Actor actor, TouchEvent touch)
 {
   // Allow events to pass through if the backing isn't the hit-actor
   if((touch.GetHitActor(0) == actor) &&
@@ -1573,7 +1573,7 @@ bool Popup::OnBackingTouched(Actor actor, const TouchEvent& touch)
   return false;
 }
 
-bool Popup::OnBackingWheelEvent(Actor actor, const WheelEvent& event)
+bool Popup::OnBackingWheelEvent(Actor actor, WheelEvent event)
 {
   // Allow events to pass through if touch transparency is enabled.
   if(mTouchTransparent)
@@ -1584,7 +1584,7 @@ bool Popup::OnBackingWheelEvent(Actor actor, const WheelEvent& event)
   return true;
 }
 
-bool Popup::OnDialogTouched(Actor actor, const TouchEvent& touch)
+bool Popup::OnDialogTouched(Actor actor, TouchEvent touch)
 {
   // Only connecting this so the backing does not become the default hit-actor and inadvertently closes the popup
   return false;

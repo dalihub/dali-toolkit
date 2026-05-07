@@ -497,7 +497,7 @@ private:
    * @brief CaptureFinished Callback that is called the capture rendering is finished.
    * @param[in] task RenderTask that draws requested capture scene.
    */
-  void OnCaptureFinished(Dali::RenderTask& task);
+  void OnCaptureFinished(Dali::RenderTask task);
 
   /**
    * @brief Time out Callback to handle the case each capture request is not finished for long time.
@@ -532,7 +532,7 @@ private:
    * @brief Camera Transition finished callback.
    * @param[in] animation animation for this Transition
    */
-  void OnTransitionFinished(Animation& animation);
+  void OnTransitionFinished(Animation animation);
 
   /**
    * @brief Reset CaptureData when the capture is finished or failed.

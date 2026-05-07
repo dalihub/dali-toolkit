@@ -178,7 +178,7 @@ public:
   // Typedefs
 
   /// @brief Key Event signal type. @SINCE_1_0.0
-  typedef Signal<bool(Control, const KeyEvent&)> KeyEventSignalType;
+  typedef Signal<bool(Control, KeyEvent)> KeyEventSignalType;
 
   /// @brief Key InputFocusType signal type. @SINCE_1_0.0
   typedef Signal<void(Control)> KeyInputFocusSignalType;
@@ -450,7 +450,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(Control control, const KeyEvent& event);
+   *   bool YourCallbackName(Control control, KeyEvent event);
    * @endcode
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.

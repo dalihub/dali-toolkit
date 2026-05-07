@@ -191,7 +191,7 @@ void KeyboardFocusManager::OnAdaptorInit()
   }
 }
 
-void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder)
+void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder sceneHolder)
 {
   sceneHolder.KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
@@ -911,7 +911,7 @@ uint32_t KeyboardFocusManager::GetCurrentWindowId() const
   return mCurrentWindowId;
 }
 
-void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
+void KeyboardFocusManager::OnKeyEvent(KeyEvent event)
 {
   if(mCurrentFocusedWindow.GetHandle())
   {
@@ -1120,7 +1120,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   }
 }
 
-void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
+void KeyboardFocusManager::OnTouch(TouchEvent touch)
 {
   // if mIsFocusIndicatorShown is UNKNOWN, it means Configuration is not loaded.
   // Try to load configuration.
@@ -1156,7 +1156,7 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
   }
 }
 
-void KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
+void KeyboardFocusManager::OnWheelEvent(WheelEvent event)
 {
   if(event.GetType() == Dali::WheelEvent::CUSTOM_WHEEL)
   {
@@ -1166,7 +1166,7 @@ void KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
   }
 }
 
-bool KeyboardFocusManager::OnCustomWheelEvent(const WheelEvent& event)
+bool KeyboardFocusManager::OnCustomWheelEvent(WheelEvent event)
 {
   bool  consumed = false;
   Actor actor    = GetCurrentFocusActor();
@@ -1178,7 +1178,7 @@ bool KeyboardFocusManager::OnCustomWheelEvent(const WheelEvent& event)
   return consumed;
 }
 
-bool KeyboardFocusManager::EmitCustomWheelSignals(Actor actor, const WheelEvent& event)
+bool KeyboardFocusManager::EmitCustomWheelSignals(Actor actor, WheelEvent event)
 {
   bool consumed = false;
 

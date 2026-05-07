@@ -588,7 +588,7 @@ void BackgroundBlurEffectImpl::DestroyRenderTasks()
   mSourceRenderTask.Reset();
 }
 
-void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
+void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mVerticalBlurTask == renderTask))
   {

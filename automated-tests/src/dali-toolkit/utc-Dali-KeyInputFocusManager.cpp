@@ -93,13 +93,13 @@ public:
   {
   }
 
-  bool Callback(Control control, const KeyEvent& keyEvent)
+  bool Callback(Control control, KeyEvent keyEvent)
   {
     mIsCalled = true;
     return mConsumed;
   }
 
-  void Callback(const KeyEvent& keyEvent)
+  void Callback(KeyEvent keyEvent)
   {
     mIsCalled = true;
   }

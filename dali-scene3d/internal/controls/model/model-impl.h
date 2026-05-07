@@ -400,7 +400,7 @@ private:
   /**
    * @brief Update model root scale when Model size property is updated.
    */
-  void OnSizeNotification(Dali::PropertyNotification& source);
+  void OnSizeNotification(Dali::PropertyNotification source);
 
   /**
    * @brief Reset Resource loading tasks.

@@ -539,7 +539,7 @@ private:
   /**
    * @brief Notifies when the font variation property changes to specific value.
    */
-  void OnVariationPropertyNotify(PropertyNotification& source);
+  void OnVariationPropertyNotify(PropertyNotification source);
 
   /**
    * @brief Callback when TextLabel is intercept touched
@@ -547,7 +547,7 @@ private:
    * @param[in] actor TextLabel touched
    * @param[in] touch Touch information
    */
-  bool OnInterceptTouched(Actor actor, const TouchEvent& touch);
+  bool OnInterceptTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Returns the cached effective visibility of the TextLabel.

@@ -932,7 +932,7 @@ void AnimatedVectorImageVisual::TriggerVectorRasterization()
   }
 }
 
-void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification& source)
+void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification source)
 {
   Actor actor = mPlacementActor.GetHandle();
   if(actor)
@@ -960,7 +960,7 @@ void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification& source
   }
 }
 
-void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification& source)
+void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification source)
 {
   Actor actor = mPlacementActor.GetHandle();
   if(actor)

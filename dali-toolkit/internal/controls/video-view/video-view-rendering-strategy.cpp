@@ -179,7 +179,7 @@ bool WindowSurfaceStrategy::Initialize()
   return true;
 }
 
-void WindowSurfaceStrategy::UpdateDisplayArea(Dali::PropertyNotification& source)
+void WindowSurfaceStrategy::UpdateDisplayArea(Dali::PropertyNotification source)
 {
   VideoView* videoView = GetVideoViewImpl();
 
@@ -426,7 +426,7 @@ bool NativeImageStrategy::Initialize()
   return true;
 }
 
-void NativeImageStrategy::UpdateDisplayArea(Dali::PropertyNotification& source)
+void NativeImageStrategy::UpdateDisplayArea(Dali::PropertyNotification source)
 {
   // Nothing to do for NativeImageStrategy
 }

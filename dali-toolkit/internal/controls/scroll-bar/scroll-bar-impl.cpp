@@ -358,7 +358,7 @@ Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
   return mScrollPositionIntervals;
 }
 
-void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
+void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification source)
 {
   // Emit the signal to notify the scroll position crossing
   Handle scrollableHandle = mScrollableObject.GetHandle();

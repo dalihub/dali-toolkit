@@ -104,7 +104,7 @@ private:
   std::string GetSampleOffsetsPropertyName(unsigned int index) const;
   std::string GetSampleWeightsPropertyName(unsigned int index) const;
 
-  void OnRenderTaskFinished(Dali::RenderTask& renderTask);
+  void OnRenderTaskFinished(Dali::RenderTask renderTask);
 
   /////////////////////////////////////////////////////////////
   unsigned int  mPixelRadius;    // number of blur samples in each of horiz/vert directions
