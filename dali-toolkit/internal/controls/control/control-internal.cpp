@@ -2110,7 +2110,7 @@ bool Control::OnIdleCallback()
   return mIdleCallbackRegistered;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
+SharedPtr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
 {
   return GetOrCreateAccessibilityData().GetAccessibleObject();
 }

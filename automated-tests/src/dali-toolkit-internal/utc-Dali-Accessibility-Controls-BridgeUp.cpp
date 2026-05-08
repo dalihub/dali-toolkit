@@ -20,7 +20,6 @@
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-timer.h>
 #include <automated-tests/src/dali-toolkit/dali-toolkit-test-utils/toolkit-web-engine.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali/devel-api/object/property-array-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -35,6 +34,7 @@
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/property-array-devel.h>
 #include <dali/integration-api/string-utils.h>
 
 #include <algorithm>
@@ -2272,26 +2272,26 @@ int UtcDaliAccessibleRemovalOnActorDestoyed(void)
 
   auto control = Control::New();
 
-  std::weak_ptr<Accessibility::Accessible> layerAccessible   = Accessibility::Accessible::GetOwningPtr(layer);   // AdaptorAccessible
-  std::weak_ptr<Accessibility::Accessible> controlAccessible = Accessibility::Accessible::GetOwningPtr(control); // ControlAccessible
-  DALI_TEST_CHECK(layerAccessible.lock());
-  DALI_TEST_CHECK(controlAccessible.lock());
+  WeakPtr<Accessibility::Accessible> layerAccessible   = Accessibility::Accessible::GetOwningPtr(layer);   // AdaptorAccessible
+  WeakPtr<Accessibility::Accessible> controlAccessible = Accessibility::Accessible::GetOwningPtr(control); // ControlAccessible
+  DALI_TEST_CHECK(layerAccessible.Lock());
+  DALI_TEST_CHECK(controlAccessible.Lock());
 
   // Test Getting already added accessible from the map
-  DALI_TEST_CHECK(!layerAccessible.expired());
-  DALI_TEST_CHECK(!controlAccessible.expired());
-  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == layerAccessible.lock().get());
-  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == controlAccessible.lock().get());
+  DALI_TEST_CHECK(!layerAccessible.Expired());
+  DALI_TEST_CHECK(!controlAccessible.Expired());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == layerAccessible.Lock().Get());
+  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == controlAccessible.Lock().Get());
 
   // Test ControlAccessible Removal
   control.Reset();
-  DALI_TEST_CHECK(controlAccessible.expired());
-  DALI_TEST_CHECK(Accessibility::Accessible::Get(control) == nullptr);
+  DALI_TEST_CHECK(controlAccessible.Expired());
+  DALI_TEST_CHECK(!Accessibility::Accessible::Get(control));
 
   // Test AdaptorAccessible Removal
   layer.Reset();
-  DALI_TEST_CHECK(layerAccessible.expired());
-  DALI_TEST_CHECK(Accessibility::Accessible::Get(layer) == nullptr);
+  DALI_TEST_CHECK(layerAccessible.Expired());
+  DALI_TEST_CHECK(!Accessibility::Accessible::Get(layer));
 
   Dali::Accessibility::TestEnableSC(false);
 

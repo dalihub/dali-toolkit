@@ -24,6 +24,7 @@
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
@@ -31,7 +32,6 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/rendering/texture.h>
-#include <memory> // for std::shared_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -169,7 +169,7 @@ public:
    *
    * @see CreateAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  SharedPtr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
   // Gesture Detection
 

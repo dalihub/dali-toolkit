@@ -419,7 +419,7 @@ void ToggleButton::OnStateChange(State newState)
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
   if(newState == SELECTED_STATE || newState == UNSELECTED_STATE)
   {
-    auto accessible = std::dynamic_pointer_cast<Dali::Accessibility::ActorAccessible>(GetAccessibleObject());
+    auto accessible = DynamicPointerCast<Dali::Accessibility::ActorAccessible>(GetAccessibleObject());
     if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
       accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
