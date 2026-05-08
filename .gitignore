@@ -46,6 +46,7 @@ install_manifest.txt
 /build/tizen/.ninja_log
 /build/tizen/build.ninja
 /build/tizen/rules.ninja
+/build/tizen/generated/
 
 /build/tizen/dali-physics/*.cmake
 /build/tizen/dali-physics/Makefile
