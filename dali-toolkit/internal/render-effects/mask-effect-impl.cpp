@@ -207,12 +207,6 @@ void MaskEffectImpl::SetReverseMaskDirection(bool reverseMaskDirection)
 
 void MaskEffectImpl::OnInitialize()
 {
-  // Create CameraActors
-  mCamera = CameraActor::New();
-  mCamera.SetInvertYAxis(true);
-  mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-
   // renderer
   Renderer maskRenderer = GetTargetRenderer();
   if(!gMaskEffectShader)
@@ -227,8 +221,6 @@ void MaskEffectImpl::OnActivate()
 {
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
-
-  ownerControl.Add(mCamera);
 
   Renderer maskRenderer = GetTargetRenderer();
   ownerControl.AddCacheRenderer(maskRenderer);
@@ -256,8 +248,6 @@ void MaskEffectImpl::OnDeactivate()
     control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
   }
 
-  mCamera.Unparent();
-
   ResetMaskData();
 }
 
@@ -275,8 +265,6 @@ void MaskEffectImpl::CreateMaskData()
     DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
     Vector2 size = GetTargetSize();
-    mCamera.SetPerspectiveProjection(size);
-
     CreateFrameBuffers(ImageDimensions(size.x, size.y));
     CreateRenderTasks(ownerControl);
     SetShaderConstants(ownerControl);
@@ -338,7 +326,7 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
   RenderTaskList taskList = GetSceneHolder().GetRenderTaskList();
 
   mMaskTargetRenderTask = taskList.CreateTask();
-  mMaskTargetRenderTask.SetCameraActor(mCamera);
+  mMaskTargetRenderTask.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, GetTargetSize(), Property::Map().Add(Dali::Actor::Property::NAME, "MaskEffectAutoCamera").Add(Dali::CameraActor::Property::INVERT_Y_AXIS, true));
   mMaskTargetRenderTask.SetExclusive(true);
   mMaskTargetRenderTask.SetInputEnabled(true);
   mMaskTargetRenderTask.SetSourceActor(ownerControl);
@@ -358,8 +346,12 @@ void MaskEffectImpl::CreateRenderTasks(Toolkit::Control ownerControl)
     mMaskTargetRenderTask.SetRefreshRate(RenderTask::RefreshRate::REFRESH_ALWAYS);
   }
 
+  // TODO : We need to support feature to use source specified camera.
+  // For now, just re-use target camera for source render task.
+  CameraActor targetCamera = mMaskTargetRenderTask.GetCameraActor();
+
   mMaskSourceRenderTask = taskList.CreateTask();
-  mMaskSourceRenderTask.SetCameraActor(mCamera);
+  mMaskSourceRenderTask.SetCameraActor(targetCamera);
   mMaskSourceRenderTask.SetExclusive(true);
   mMaskSourceRenderTask.SetInputEnabled(false);
   mMaskSourceRenderTask.SetSourceActor(mMaskControl.GetHandle());

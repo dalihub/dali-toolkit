@@ -995,16 +995,9 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     captureData->mCaptureTask.SetClearColor(Color::TRANSPARENT);
     captureData->mCaptureTask.SetRefreshRate(Dali::RenderTask::REFRESH_ONCE);
 
-    captureData->mCaptureInvertCamera = Dali::CameraActor::New(size);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_X, size.x / 2.0f);
-    captureData->mCaptureInvertCamera.SetProperty(Dali::Actor::Property::POSITION_Y, size.y / 2.0f);
-
     captureData->mCaptureUrl       = Dali::Toolkit::ImageUrlUtils::GenerateUrl(captureData->mCaptureFrameBuffer, 0u);
     captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
     captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
-    captureData->mCaptureImageView.Add(captureData->mCaptureInvertCamera);
 
     Window window = DevelWindow::Get(Self());
     window.Add(captureData->mCaptureImageView);
@@ -1018,7 +1011,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     captureData->mCaptureInvertTask.SetExclusive(true);
     captureData->mCaptureInvertTask.SetCullMode(false);
     captureData->mCaptureInvertTask.SetOrderIndex(SCENE_ORDER_INDEX + 2);
-    captureData->mCaptureInvertTask.SetCameraActor(captureData->mCaptureInvertCamera);
+    captureData->mCaptureInvertTask.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, size);
     captureData->mCaptureInvertTask.SetFrameBuffer(captureData->mCaptureInvertFrameBuffer);
     captureData->mCaptureInvertTask.SetClearEnabled(true);
     captureData->mCaptureInvertTask.SetClearColor(Color::TRANSPARENT);
@@ -1952,8 +1945,6 @@ void SceneView::ResetCaptureData(std::shared_ptr<CaptureData> captureData)
   captureData->mCaptureUrl.Reset();
   captureData->mCaptureImageView.Unparent();
   captureData->mCaptureImageView.Reset();
-  captureData->mCaptureInvertCamera.Unparent();
-  captureData->mCaptureInvertCamera.Reset();
 }
 
 void SceneView::ResetCaptureTimer()
