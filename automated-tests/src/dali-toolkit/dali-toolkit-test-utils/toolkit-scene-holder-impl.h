@@ -25,6 +25,7 @@
 
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/signals/slot-delegate.h>
 
 namespace Dali
 {
@@ -65,6 +66,12 @@ public:
 
   Dali::Integration::SceneHolder::WheelEventGeneratedSignalType& WheelEventGeneratedSignal();
 
+  void OnSceneKeyEvent(Dali::KeyEvent event);
+  bool OnSceneKeyEventGenerated(Dali::KeyEvent event);
+  void OnSceneTouchEvent(Dali::TouchEvent event);
+  void OnSceneWheelEvent(Dali::WheelEvent event);
+  bool OnSceneWheelEventGenerated(Dali::WheelEvent event);
+
   Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType& FocusChangedGeneratedSignal();
 
   Dali::Integration::Scene GetScene();
@@ -88,6 +95,13 @@ public:
 
   std::unique_ptr<TestRenderSurface>                              mRenderSurface;
   Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType mFocusChangedGeneratedSignal;
+
+  Dali::Integration::SceneHolder::KeyEventSignalType            mSceneHolderKeyEventSignal;
+  Dali::Integration::SceneHolder::KeyEventGeneratedSignalType   mSceneHolderKeyEventGeneratedSignal;
+  Dali::Integration::SceneHolder::TouchEventSignalType          mSceneHolderTouchedSignal;
+  Dali::Integration::SceneHolder::WheelEventSignalType          mSceneHolderWheelEventSignal;
+  Dali::Integration::SceneHolder::WheelEventGeneratedSignalType mSceneHolderWheelEventGeneratedSignal;
+  Dali::SlotDelegate<SceneHolder>                               mSceneSignalBridgeSlot;
 };
 
 } // namespace Adaptor

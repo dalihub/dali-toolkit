@@ -323,28 +323,32 @@ private:
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
+   * @param[in] sceneHolder The scene holder where the key event occurred
    * @param[in] event The KeyEvent event.
    */
-  void OnKeyEvent(KeyEvent event);
+  void OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, KeyEvent event);
 
   /**
    * Callback for the touch event when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
+   * @param[in] sceneHolder The scene holder where the touch event occurred
    * @param[in] touch The touch information
    */
-  void OnTouch(TouchEvent touch);
+  void OnTouch(Dali::Integration::SceneHolder sceneHolder, TouchEvent touch);
 
   /**
    * Callback for the wheel event when the custom wheel event occurs.
+   * @param[in] sceneHolder The scene holder where the wheel event occurred
    * @param[in] wheel The WheelEvent information
    */
-  bool OnCustomWheelEvent(WheelEvent wheel);
+  bool OnCustomWheelEvent(Dali::Integration::SceneHolder sceneHolder, WheelEvent wheel);
 
   /**
    * Callback for the wheel event when the wheel event occurs.
+   * @param[in] sceneHolder The scene holder where the wheel event occurred
    * @param[in] wheel The WheelEvent information
    */
-  void OnWheelEvent(WheelEvent wheel);
+  void OnWheelEvent(Dali::Integration::SceneHolder sceneHolder, WheelEvent wheel);
 
   /**
    * Called when the window focus is changed.
