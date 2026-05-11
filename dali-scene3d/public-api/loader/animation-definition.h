@@ -17,6 +17,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/animated-property.h>
@@ -229,13 +232,13 @@ private: // DATA
   float                mSpeedFactor      = 1.f;
   Vector2              mPlayRange        = Vector2{0.f, 1.f};
 
-  std::vector<AnimatedProperty> mProperties;
+  Dali::Vector<AnimatedProperty> mProperties;
 };
 
 struct AnimationGroupDefinition
 {
   Dali::String              mName;
-  std::vector<Dali::String> mAnimations;
+  Dali::Vector<Dali::String> mAnimations;
 };
 
 } // namespace Dali::Scene3D::Loader

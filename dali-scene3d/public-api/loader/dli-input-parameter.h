@@ -18,6 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -32,7 +34,7 @@ public:
   using ConvertFontCode         = void (*)(const Dali::String& code, Dali::String& fontFamily, Dali::String& slant, Dali::String& weight, float& size);
   using ConvertColorCode        = Vector4 (*)(const Dali::String& code);
   using CategoryProcessor       = std::function<void(Property::Array&& categoryData, StringCallback onError)>;
-  using CategoryProcessorVector = std::vector<std::pair<Dali::String /*name*/, CategoryProcessor>>;
+  using CategoryProcessorVector = Dali::Vector<Dali::Pair<Dali::String /*name*/, CategoryProcessor>>;
   using NodeProcessor           = std::function<void(const Dali::Scene3D::Loader::NodeDefinition& nodeDef,
                                            Property::Map&&                              nodeData,
                                            StringCallback                               onError)>;

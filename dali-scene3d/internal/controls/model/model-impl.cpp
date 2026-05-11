@@ -125,11 +125,10 @@ struct BoundingVolume
 };
 
 void ConfigureBlendShapeShaders(
-  Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, std::vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
+  Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, Dali::Vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg)
-  { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -165,10 +164,10 @@ void AddModelTreeToAABB(BoundingVolume& AABB, const Dali::Scene3D::Loader::Scene
 
   if(node->mCustomization)
   {
-    if(!node->mChildren.empty())
+    if(!node->mChildren.Empty())
     {
       auto                         choice = choices.Get(node->mCustomization->mTag);
-      Dali::Scene3D::Loader::Index i      = std::min(choice != Dali::Scene3D::Loader::Customization::NONE ? choice : 0, static_cast<Dali::Scene3D::Loader::Index>(node->mChildren.size() - 1));
+      Dali::Scene3D::Loader::Index i      = std::min(choice != Dali::Scene3D::Loader::Customization::NONE ? choice : 0, static_cast<Dali::Scene3D::Loader::Index>(node->mChildren.Size() - 1));
 
       AddModelTreeToAABB(AABB, scene, choices, node->mChildren[i], nodeParams, nodeMatrix);
     }
@@ -194,7 +193,7 @@ void UpdateBlendShapeNodeMapRecursively(Model::BlendShapeModelNodeMap& resultMap
     UpdateBlendShapeNodeMapRecursively(resultMap, Scene3D::ModelNode::DownCast(node.GetChildAt(i)));
   }
 
-  std::vector<Dali::String> blendShapeNames;
+  Dali::Vector<Dali::String> blendShapeNames;
   node.RetrieveBlendShapeNames(blendShapeNames);
   for(const auto& iter : blendShapeNames)
   {
@@ -320,8 +319,7 @@ void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
 void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
 {
   auto id   = node.GetProperty<int>(Actor::Property::ID);
-  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item)
-  {
+  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item) {
     return item.first == id;
   });
   if(iter != mColliderMeshes.end())
@@ -567,16 +565,16 @@ void Model::RetrieveBlendShapeNames(std::vector<std::string>& blendShapeNames) c
   }
 }
 
-void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<Scene3D::ModelNode>& modelNodes) const
+void Model::RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, Dali::Vector<Scene3D::ModelNode>& modelNodes) const
 {
   auto iter = mBlendShapeModelNodeMap.find(std::string(blendShapeName));
   if(iter != mBlendShapeModelNodeMap.end())
   {
     const auto& modelNodeList = iter->second;
-    modelNodes.reserve(modelNodes.size() + modelNodeList.size());
+    modelNodes.Reserve(modelNodes.Count() + static_cast<uint32_t>(modelNodeList.size()));
     for(const auto& nodeIter : modelNodeList)
     {
-      modelNodes.push_back(nodeIter);
+      modelNodes.PushBack(nodeIter);
     }
   }
 }
@@ -652,7 +650,7 @@ Dali::Animation Model::GenerateMotionDataAnimation(Scene3D::MotionData motionDat
 
             if(keyFrames)
             {
-              std::vector<Scene3D::ModelNode> modelNodes;
+              Dali::Vector<Scene3D::ModelNode> modelNodes;
               RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeIndex.GetBlendShapeId().stringKey), modelNodes);
 
               for(auto& modelNode : modelNodes)
@@ -753,7 +751,7 @@ void Model::SetMotionData(Scene3D::MotionData motionData)
 
             if(value.GetType() != Property::Type::NONE)
             {
-              std::vector<Scene3D::ModelNode> modelNodes;
+              Dali::Vector<Scene3D::ModelNode> modelNodes;
               RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeIndex.GetBlendShapeId().stringKey), modelNodes);
 
               for(auto& modelNode : modelNodes)
@@ -1124,15 +1122,15 @@ void Model::OnModelLoadComplete()
     auto& scene     = mModelLoadTask->GetScene();
     CreateAnimations(scene);
     ResetCameraParameters();
-    if(!resources.mEnvironmentMaps.empty())
+    if(!resources.mEnvironmentMaps.Empty())
     {
-      if(resources.mEnvironmentMaps.front().second.mDiffuse)
+      if(resources.mEnvironmentMaps.Front().second.mDiffuse)
       {
-        mDefaultDiffuseTexture = resources.mEnvironmentMaps.front().second.mDiffuse;
+        mDefaultDiffuseTexture = resources.mEnvironmentMaps.Front().second.mDiffuse;
       }
-      if(resources.mEnvironmentMaps.front().second.mSpecular)
+      if(resources.mEnvironmentMaps.Front().second.mSpecular)
       {
-        mDefaultSpecularTexture = resources.mEnvironmentMaps.front().second.mSpecular;
+        mDefaultSpecularTexture = resources.mEnvironmentMaps.Front().second.mSpecular;
       }
     }
 
@@ -1251,10 +1249,9 @@ void Model::CreateModel()
 void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 {
   mAnimations.clear();
-  if(!mModelLoadTask->GetAnimations().empty())
+  if(!mModelLoadTask->GetAnimations().Empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
-    {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);
@@ -1278,7 +1275,7 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
 void Model::ResetCameraParameters()
 {
   mCameraParameters.clear();
-  if(!mModelLoadTask->GetCameras().empty())
+  if(!mModelLoadTask->GetCameras().Empty())
   {
     // Copy camera parameters.
     std::copy(mModelLoadTask->GetCameras().begin(), mModelLoadTask->GetCameras().end(), std::back_inserter(mCameraParameters));

@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>
@@ -64,7 +65,7 @@ public: // METHODS
    * @SINCE_2_0.7
    * @return List of scene root node IDs in the order of loading
    */
-  const std::vector<Index>& GetRoots() const;
+  const Dali::Vector<Index>& GetRoots() const;
 
   /**
    * @brief Removes scene root registration at the given index @a iRoot.
@@ -217,9 +218,9 @@ public: // METHODS
    * @brief Applies constraints from the given requests.
    * @SINCE_2_0.7
    */
-  void ApplyConstraints(Actor&                           root,
-                        std::vector<ConstraintRequest>&& constrainables,
-                        StringCallback                   onError = DefaultErrorCallback) const;
+  void ApplyConstraints(Actor&                            root,
+                        Dali::Vector<ConstraintRequest>&& constrainables,
+                        StringCallback                    onError = DefaultErrorCallback) const;
 
   /**
    * @brief Ensures that there is no overlap between shaders used by nodes that have meshes skinned to different skeletons.
@@ -247,9 +248,9 @@ public: // METHODS
    *   of separate instances need to be declared in the .dli to avoid clashing uniform
    *   definitions and constraints.
    */
-  void ConfigureSkinningShaders(const ResourceBundle&                             resources,
-                                Actor                                             root,
-                                std::vector<SkinningShaderConfigurationRequest>&& requests) const;
+  void ConfigureSkinningShaders(const ResourceBundle&                              resources,
+                                Actor                                              root,
+                                Dali::Vector<SkinningShaderConfigurationRequest>&& requests) const;
 
   /**
    * @brief Ensures there is no two meshes with blend shapes sharing the same shader.
@@ -269,19 +270,19 @@ public: // METHODS
    * @param[in] resources The resources bundle. Meshes need to be accessed to configure the blend shapes.
    * @param[in] onError The error callback.
    */
-  bool ConfigureBlendshapeShaders(const ResourceBundle&                               resources,
-                                  Actor                                               root,
-                                  std::vector<BlendshapeShaderConfigurationRequest>&& requests,
-                                  StringCallback                                      onError = DefaultErrorCallback) const;
+  bool ConfigureBlendshapeShaders(const ResourceBundle&                                resources,
+                                  Actor                                                root,
+                                  Dali::Vector<BlendshapeShaderConfigurationRequest>&& requests,
+                                  StringCallback                                       onError = DefaultErrorCallback) const;
 
   SceneDefinition& operator=(SceneDefinition&& other);
 
 private: // METHODS
   bool FindNode(const Dali::String& name, UniquePtr<NodeDefinition>** result);
 
-private:                                         // DATA
-  std::vector<UniquePtr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).
-  std::vector<Index>                     mRootNodeIds;
+private:                                          // DATA
+  Dali::Vector<UniquePtr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).
+  Dali::Vector<Index>                     mRootNodeIds;
 };
 
 } // namespace Dali::Scene3D::Loader

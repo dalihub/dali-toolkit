@@ -36,12 +36,12 @@ Texture EnvironmentMapData::GetTexture()
     return mEnvironmentMapTexture;
   }
 
-  if(!mPixelData.empty())
+  if(!mPixelData.Empty())
   {
     if(mEnvironmentMapType == Scene3D::EnvironmentMapType::CUBEMAP)
     {
       // Check for the default case, that we might share the graphic resources
-      if(mPixelData[0].size() > 0u)
+      if(mPixelData[0].Count() > 0u)
       {
         if(mPixelData[0][0] == Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB())
         {
@@ -50,10 +50,10 @@ Texture EnvironmentMapData::GetTexture()
         else
         {
           mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_CUBE, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
-          for(size_t iSide = 0u, iEndSize = mPixelData.size(); iSide < iEndSize; ++iSide)
+          for(uint32_t iSide = 0u, iEndSize = mPixelData.Count(); iSide < iEndSize; ++iSide)
           {
             auto& side = mPixelData[iSide];
-            for(size_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].size(); iMipLevel < iEndMipLevel; ++iMipLevel)
+            for(uint32_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].Count(); iMipLevel < iEndMipLevel; ++iMipLevel)
             {
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
               if(iSide == 0u && iMipLevel == 0u)
@@ -92,7 +92,7 @@ Texture EnvironmentMapData::GetTexture()
 
     // If mipmap is not defined explicitly, use GenerateMipmaps.
     // TODO: Maybe we can use better way to know it already has mipmap or not.
-    if(mPixelData.size() > 0u && mPixelData[0].size() == 1u)
+    if(mPixelData.Count() > 0u && mPixelData[0].Count() == 1u)
     {
       mEnvironmentMapTexture.GenerateMipmaps();
     }

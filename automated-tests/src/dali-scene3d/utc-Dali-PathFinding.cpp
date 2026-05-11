@@ -26,7 +26,7 @@ using namespace Dali::Scene3D::Loader;
 
 bool CompareResults(const std::vector<FaceIndex>& nodes, const WayPointList& waypoints)
 {
-  if(nodes.size() != waypoints.size())
+  if(nodes.size() != waypoints.Count())
   {
     std::ostringstream oss;
     oss << "expect indexs : [";
@@ -94,7 +94,7 @@ int UtcDaliPathFinderNewFail(void)
 
 void printWaypointForPython(WayPointList& waypoints)
 {
-  tet_printf("size: %d\n", waypoints.size());
+  tet_printf("size: %d\n", waypoints.Count());
   tet_printf("[");
   for(auto& wp : waypoints)
   {
@@ -123,7 +123,7 @@ int UtcDaliPathFinderFindShortestPath0(void)
 
     {
       auto waypoints = pathfinder->FindPath(18, 139);
-      DALI_TEST_NOT_EQUALS(int(waypoints.size()), 0, 0, TEST_LOCATION);
+      DALI_TEST_NOT_EQUALS(int(waypoints.Count()), 0, 0, TEST_LOCATION);
 
       // Results are verified in the Blender
       std::vector<FaceIndex> expectedResults =
@@ -137,7 +137,7 @@ int UtcDaliPathFinderFindShortestPath0(void)
       // Top floor middle to the tree
 
       auto waypoints = pathfinder->FindPath(18, 157);
-      DALI_TEST_NOT_EQUALS(int(waypoints.size()), 0, 0, TEST_LOCATION);
+      DALI_TEST_NOT_EQUALS(int(waypoints.Count()), 0, 0, TEST_LOCATION);
 
       //printWaypointForPython(waypoints);
 
@@ -177,7 +177,7 @@ int UtcDaliPathFinderFindShortestPath1(void)
       Vector3 to(-6.0767, -1.7268, 4.287);    // first floor
 
       auto waypoints = pathfinder->FindPath(from, to);
-      DALI_TEST_NOT_EQUALS(int(waypoints.size()), 0, 0, TEST_LOCATION);
+      DALI_TEST_NOT_EQUALS(int(waypoints.Count()), 0, 0, TEST_LOCATION);
 
       // Results are verified in the Blender
       std::vector<FaceIndex> expectedResults =
@@ -206,12 +206,12 @@ int UtcDaliPathFinderFindShortestPath1(void)
         auto      result      = navmesh->FindFloor(to, verifyPos, verifyIndex);
 
         DALI_TEST_EQUALS(result, true, TEST_LOCATION);
-        DALI_TEST_EQUALS(verifyPos, waypoints.back().GetScenePosition(), TEST_LOCATION);
-        DALI_TEST_EQUALS(verifyIndex, waypoints.back().GetNavigationMeshFaceIndex(), TEST_LOCATION);
+        DALI_TEST_EQUALS(verifyPos, waypoints[waypoints.Count()-1].GetScenePosition(), TEST_LOCATION);
+        DALI_TEST_EQUALS(verifyIndex, waypoints[waypoints.Count()-1].GetNavigationMeshFaceIndex(), TEST_LOCATION);
 
         // Verified with Blender
         Vector2 local(0.165907f, 0.142597f);
-        DALI_TEST_EQUALS(local, waypoints.back().GetFaceLocalSpacePosition(), TEST_LOCATION);
+        DALI_TEST_EQUALS(local, waypoints[waypoints.Count()-1].GetFaceLocalSpacePosition(), TEST_LOCATION);
       }
     }
   }

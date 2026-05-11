@@ -91,23 +91,21 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
                                   TextureDefinition& textureDefinition)
 {
   Dali::PixelData pixelData;
-  if(!textureDefinition.mTextureBuffer.empty())
+  if(!textureDefinition.mTextureBuffer.Empty())
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-    { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
-    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode, true);
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[s:" << textureDefinition.mTextureBuffer.Size() << "]"; });
+    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.Data(), textureDefinition.mTextureBuffer.Size(), textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode, true);
     if(pixelBuffer)
     {
       pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-    {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
       oss << "[";
       if(pixelData)
       {
         oss << "d:" << pixelData.GetWidth() << "x" << pixelData.GetHeight() << " f:" << pixelData.GetPixelFormat() << " ";
       }
-      oss << "s:" << textureDefinition.mTextureBuffer.size() << "]"; });
+      oss << "s:" << textureDefinition.mTextureBuffer.Size() << "]"; });
   }
   else
   {
@@ -123,15 +121,13 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
         Dali::Toolkit::DecodeBase64FromString(data, buffer);
         uint32_t bufferSize = buffer.size();
 
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-        { oss << "[embedded s:" << bufferSize << "]"; });
+        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) { oss << "[embedded s:" << bufferSize << "]"; });
         Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode, true);
         if(pixelBuffer)
         {
           pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
         }
-        DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
-        {
+        DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss) {
           oss << "[";
           if(pixelData)
           {
@@ -254,7 +250,7 @@ TextureDefinition::TextureDefinition(Dali::String&& imageUri, SamplerFlags::Type
 {
 }
 
-TextureDefinition::TextureDefinition(std::vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode, Matrix3 transform)
+TextureDefinition::TextureDefinition(Dali::Vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags, ImageDimensions minImageDimensions, SamplingMode::Type samplingMode, Matrix3 transform)
 : mImageUri(),
   mSamplerFlags(samplerFlags),
   mMinImageDimensions(minImageDimensions),
@@ -272,42 +268,41 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
 
   const bool hasTransparency = MaskMatch(mFlags, TRANSPARENCY);
   // Why we add additional count here?
-  uint32_t numBuffers = static_cast<uint32_t>(mTextureStages.size()) + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL)
-                                                                                        : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
+  uint32_t numBuffers = static_cast<uint32_t>(mTextureStages.Count()) + (hasTransparency ? !CheckTextures(ALBEDO) + !CheckTextures(METALLIC | ROUGHNESS) + !CheckTextures(NORMAL)
+                                                                                         : !CheckTextures(ALBEDO | METALLIC) + !CheckTextures(NORMAL | ROUGHNESS));
   if(numBuffers == 0)
   {
     return raw;
   }
-  raw.mTextures.reserve(numBuffers);
+  raw.mTextures.Reserve(numBuffers);
 
   // Load textures
-  auto iTexture   = mTextureStages.begin();
-  auto checkStage = [&](uint32_t flags)
-  {
-    return iTexture != mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
+  auto iTexture   = mTextureStages.Begin();
+  auto checkStage = [&](uint32_t flags) {
+    return iTexture != mTextureStages.End() && MaskMatch(iTexture->mSemantic, flags);
   };
 
   // Check for compulsory textures: Albedo, Metallic, Roughness, Normal
   if(checkStage(ALBEDO | METALLIC))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
 
     if(checkStage(NORMAL | ROUGHNESS))
     {
-      raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else // single value normal-roughness
     {
-      raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
+      raw.mTextures.PushBack({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
     }
   }
   else
   {
     if(checkStage(ALBEDO))
     {
-      raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedAlbedoTexture) // single value albedo, albedo-alpha or albedo-metallic
@@ -334,14 +329,14 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
       buffer[0] = static_cast<uint8_t>(mColor.r * 255.f);
       buffer[1] = static_cast<uint8_t>(mColor.g * 255.f);
       buffer[2] = static_cast<uint8_t>(mColor.b * 255.f);
-      raw.mTextures.push_back({Dali::PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
+      raw.mTextures.PushBack({Dali::PixelData::New(buffer, bufferSize, 1, 1, format, PixelData::DELETE_ARRAY), GetSingleValueSampler()});
     }
 
     // If we have transparency, or an image based albedo map, we will have to continue with separate metallicRoughness + normal.
-    const bool createMetallicRoughnessAndNormal = hasTransparency || std::distance(mTextureStages.begin(), iTexture) > 0;
+    const bool createMetallicRoughnessAndNormal = hasTransparency || std::distance(mTextureStages.Begin(), iTexture) > 0;
     if(checkStage(METALLIC | ROUGHNESS))
     {
-      raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(checkStage(METALLIC) || checkStage(ROUGHNESS))
@@ -356,24 +351,24 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
 
       if(checkStage(METALLIC))
       {
-        if(!iTexture->mTexture.mTextureBuffer.empty())
+        if(!iTexture->mTexture.mTextureBuffer.Empty())
         {
-          metallicTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
+          metallicTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.Data(), iTexture->mTexture.mTextureBuffer.Size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
           mMetallicSamplerFlags = iTexture->mTexture.mSamplingMode;
         }
 
-        iTexture = mTextureStages.erase(iTexture);
+        iTexture = mTextureStages.Erase(iTexture);
       }
 
       if(checkStage(ROUGHNESS))
       {
-        if(!iTexture->mTexture.mTextureBuffer.empty())
+        if(!iTexture->mTexture.mTextureBuffer.Empty())
         {
-          roughnessTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
+          roughnessTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.Data(), iTexture->mTexture.mTextureBuffer.Size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
           mRoughnessSamplerFlags = iTexture->mTexture.mSamplingMode;
         }
 
-        iTexture = mTextureStages.erase(iTexture);
+        iTexture = mTextureStages.Erase(iTexture);
       }
 
       if(metallicTexture && roughnessTexture)
@@ -385,28 +380,31 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
         uint32_t                 combinedBufferSize = CombineMetallicRoughnessTextures(metallicTexture, roughnessTexture, metallicRoughnessTexture);
 
         uint8_t* metallicRoughnessBufferPtr = metallicRoughnessTexture.GetBuffer();
-        iTexture                            = mTextureStages.insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, TextureDefinition{std::vector<uint8_t>(metallicRoughnessBufferPtr, metallicRoughnessBufferPtr + combinedBufferSize)}});
+        mTextureStages.Insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, [&] { Dali::Vector<uint8_t> v; v.Insert(v.End(), const_cast<uint8_t*>(metallicRoughnessBufferPtr), const_cast<uint8_t*>(metallicRoughnessBufferPtr + combinedBufferSize)); return TextureDefinition{std::move(v)}; }()});
+
         ++iTexture;
 
-        raw.mTextures.push_back({Devel::PixelBuffer::Convert(metallicRoughnessTexture), mRoughnessSamplerFlags});
+        raw.mTextures.PushBack({Devel::PixelBuffer::Convert(metallicRoughnessTexture), mRoughnessSamplerFlags});
       }
       else
       {
         if(metallicTexture)
         {
           const uint8_t* metallicBufferPtr = metallicTexture.GetBuffer();
-          iTexture                         = mTextureStages.insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, TextureDefinition{std::vector<uint8_t>(metallicBufferPtr, metallicBufferPtr + metallicTexture.GetWidth() * metallicTexture.GetHeight() * Pixel::GetBytesPerPixel(metallicTexture.GetPixelFormat()))}});
+          mTextureStages.Insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, [&] { Dali::Vector<uint8_t> v; v.Insert(v.End(), const_cast<uint8_t*>(metallicBufferPtr), const_cast<uint8_t*>(metallicBufferPtr + metallicTexture.GetWidth() * metallicTexture.GetHeight() * Pixel::GetBytesPerPixel(metallicTexture.GetPixelFormat()))); return TextureDefinition{std::move(v)}; }()});
+
           ++iTexture;
 
-          raw.mTextures.push_back({Devel::PixelBuffer::Convert(metallicTexture), mMetallicSamplerFlags});
+          raw.mTextures.PushBack({Devel::PixelBuffer::Convert(metallicTexture), mMetallicSamplerFlags});
         }
         else if(roughnessTexture)
         {
           const uint8_t* roughnessBufferPtr = roughnessTexture.GetBuffer();
-          iTexture                          = mTextureStages.insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, TextureDefinition{std::vector<uint8_t>(roughnessBufferPtr, roughnessBufferPtr + roughnessTexture.GetWidth() * roughnessTexture.GetHeight() * Pixel::GetBytesPerPixel(roughnessTexture.GetPixelFormat()))}});
+          mTextureStages.Insert(iTexture, {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, [&] { Dali::Vector<uint8_t> v; v.Insert(v.End(), const_cast<uint8_t*>(roughnessBufferPtr), const_cast<uint8_t*>(roughnessBufferPtr + roughnessTexture.GetWidth() * roughnessTexture.GetHeight() * Pixel::GetBytesPerPixel(roughnessTexture.GetPixelFormat()))); return TextureDefinition{std::move(v)}; }()});
+
           ++iTexture;
 
-          raw.mTextures.push_back({Devel::PixelBuffer::Convert(roughnessTexture), mRoughnessSamplerFlags});
+          raw.mTextures.PushBack({Devel::PixelBuffer::Convert(roughnessTexture), mRoughnessSamplerFlags});
         }
       }
     }
@@ -414,23 +412,23 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
     {
       // NOTE: we want to set both metallic and roughness to 1.0; dli uses the R & A channels,
       // glTF2 uses B & G, so we might as well just set all components to 1.0.
-      raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGBA(), GetSingleValueSampler()});
+      raw.mTextures.PushBack({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGBA(), GetSingleValueSampler()});
     }
 
     if(checkStage(NORMAL))
     {
-      raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+      raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
       ++iTexture;
     }
     else if(mNeedNormalTexture)
     {
       if(createMetallicRoughnessAndNormal)
       {
-        raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisRGB(), GetSingleValueSampler()});
+        raw.mTextures.PushBack({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisRGB(), GetSingleValueSampler()});
       }
       else // single-value normal-roughness
       {
-        raw.mTextures.push_back({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
+        raw.mTextures.PushBack({Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataZAxisAndAlphaRGBA(), GetSingleValueSampler()});
       }
     }
   }
@@ -438,31 +436,31 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
   // Extra textures.
   if(checkStage(SUBSURFACE))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(OCCLUSION))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(EMISSIVE))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
   if(checkStage(SPECULAR_COLOR))
   {
-    raw.mTextures.push_back({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
+    raw.mTextures.PushBack({LoadImageResource(stdImagesPath, iTexture->mTexture), iTexture->mTexture.mSamplerFlags});
     ++iTexture;
   }
 
@@ -495,7 +493,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
   }
 
   // Assign textures to slots -- starting with 2D ones, then cubemaps, if any.
-  if(mEnvironmentIdx < static_cast<Index>(environments.size()))
+  if(mEnvironmentIdx < static_cast<Index>(environments.Count()))
   {
     auto& envTextures = environments[mEnvironmentIdx].second;
     // If pre-computed brdf texture is defined, set the texture.
@@ -524,7 +522,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
   }
   else
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Environment index (" << mEnvironmentIdx << ") out of bounds (" << environments.size() << ").";
+    ExceptionFlinger(ASSERT_LOCATION) << "Environment index (" << mEnvironmentIdx << ") out of bounds (" << environments.Count() << ").";
   }
 
   return textureSet;
@@ -532,8 +530,7 @@ TextureSet MaterialDefinition::Load(const EnvironmentDefinition::Vector& environ
 
 bool MaterialDefinition::CheckTextures(uint32_t flags) const
 {
-  return std::find_if(mTextureStages.begin(), mTextureStages.end(), [flags](const TextureStage& ts)
-  { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.end();
+  return std::find_if(mTextureStages.Begin(), mTextureStages.End(), [flags](const TextureStage& ts) { return MaskMatch(ts.mSemantic, flags); }) != mTextureStages.End();
 }
 
 } // namespace Loader

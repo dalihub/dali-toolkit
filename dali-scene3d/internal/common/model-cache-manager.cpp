@@ -155,10 +155,10 @@ private:
     Dali::Scene3D::Loader::SceneDefinition scene{};     ///< The scene definition to populate.
     Dali::Scene3D::Loader::SceneMetadata   metaData{};  ///< The metadata of the scene.
 
-    std::vector<Dali::Scene3D::Loader::AnimationDefinition>      animationDefinitions{};      ///< The list of animation definitions, in lexicographical order of their names.
-    std::vector<Dali::Scene3D::Loader::AnimationGroupDefinition> amimationGroupDefinitions{}; ///< The list of animation group definitions, in lexicographical order of their names.
-    std::vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
-    std::vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
+    Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>      animationDefinitions{};      ///< The list of animation definitions, in lexicographical order of their names.
+    Dali::Vector<Dali::Scene3D::Loader::AnimationGroupDefinition> amimationGroupDefinitions{}; ///< The list of animation group definitions, in lexicographical order of their names.
+    Dali::Vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
+    Dali::Vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
 
     uint32_t   refCount{0};      ///< The reference count of this model cache.
     std::mutex loadSceneMutex{}; ///< The mutex instance used to synchronise the loading of the scene for the same model in different threads.

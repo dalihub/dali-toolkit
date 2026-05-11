@@ -59,11 +59,11 @@ bool UsdTextureConverter::ConvertTexture(const UsdShadeMaterial& usdMaterial, co
   // Map for handling various shaders
   std::unordered_map<std::string, std::function<void(const UsdShadeShader&)>> shaderProcessors = {
     {"UsdPrimvarReader_float2", [&](const UsdShadeShader& d)
-  { ProcessUvChannel(d); }},
+     { ProcessUvChannel(d); }},
     {"UsdTransform2d", [&](const UsdShadeShader& d)
-  { transformOffsetAuthored = Process2DTransform(d, uvTransformOffset, uvTransformRotation, uvTransformScale); }},
+     { transformOffsetAuthored = Process2DTransform(d, uvTransformOffset, uvTransformRotation, uvTransformScale); }},
     {"UsdUVTexture", [&](const UsdShadeShader& d)
-  { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, imageMetaDataMap, semantic); }}};
+     { textureProcessed = ProcessTextureAttributes(usdUvTexture, d, materialDefinition, imageMetaDataMap, semantic); }}};
 
   // Iterate over shader dependencies and process the shader IDs
   for(const auto& d : deps)
@@ -106,11 +106,11 @@ bool UsdTextureConverter::Process2DTransform(const UsdShadeShader& shader, GfVec
   // Map for processing different 2D transform attributes (translation, scale, rotation)
   std::unordered_map<std::string, std::function<void(const UsdShadeInput&)>> transformProcessors = {
     {"translation", [&](const UsdShadeInput& input)
-  { ProcessTransformTranslation(input, uvTransformOffset); }},
+     { ProcessTransformTranslation(input, uvTransformOffset); }},
     {"scale", [&](const UsdShadeInput& input)
-  { ProcessTransformScale(input, uvTransformScale); }},
+     { ProcessTransformScale(input, uvTransformScale); }},
     {"rotation", [&](const UsdShadeInput& input)
-  { ProcessTransformRotation(input, uvTransformRotation); }}};
+     { ProcessTransformRotation(input, uvTransformRotation); }}};
 
   bool transformOffsetAuthored = false;
 
@@ -160,19 +160,19 @@ bool UsdTextureConverter::ProcessTextureAttributes(const UsdShadeShader& usdUvTe
   // Map for processing texture attributes (file, wrapS, wrapT, scale, bias, etc.)
   std::unordered_map<std::string, std::function<void(const UsdShadeInput&)>> textureProcessors = {
     {"file", [&](const UsdShadeInput& input)
-  { ProcessTextureFile(input, imagePath, imageBuffer); }},
+     { ProcessTextureFile(input, imagePath, imageBuffer); }},
     {"wrapS", [&](const UsdShadeInput& input)
-  { ProcessTextureWrap(input); }},
+     { ProcessTextureWrap(input); }},
     {"wrapT", [&](const UsdShadeInput& input)
-  { ProcessTextureWrap(input); }},
+     { ProcessTextureWrap(input); }},
     {"scale", [&](const UsdShadeInput& input)
-  { ProcessTextureScale(input); }},
+     { ProcessTextureScale(input); }},
     {"bias", [&](const UsdShadeInput& input)
-  { ProcessTextureBias(input); }},
+     { ProcessTextureBias(input); }},
     {"st", [&](const UsdShadeInput& input)
-  { ProcessTextureST(input); }},
+     { ProcessTextureST(input); }},
     {"fallback", [&](const UsdShadeInput& input)
-  { ProcessTextureFallback(input); }}};
+     { ProcessTextureFallback(input); }}};
 
   // Process each input in the USD UV texture shader
   std::vector<UsdShadeInput> inputs = usdUvTexture.GetInputs();
@@ -263,7 +263,15 @@ bool UsdTextureConverter::ProcessImageBuffer(
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Image Buffer Processed: semantic: %u", semantic);
 
     // If the image buffer is valid, push it to the material definition as a texture stage
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{std::move(imageBuffer), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
+    Dali::Vector<uint8_t> daliBuffer;
+    daliBuffer.Resize(imageBuffer.size());
+    if(!imageBuffer.empty())
+    {
+      std::memcpy(daliBuffer.Begin(), imageBuffer.data(), imageBuffer.size());
+    }
+    MaterialDefinition::TextureStage stage{semantic, TextureDefinition{std::move(daliBuffer), SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}};
+    materialDefinition.mTextureStages.PushBack(std::move(stage));
+
     materialDefinition.mFlags |= semantic;
     return true;
   }
@@ -273,7 +281,7 @@ bool UsdTextureConverter::ProcessImageBuffer(
 
     // If we have a valid image path, push it to the material definition
     String imagePathStr = ToDaliString(imagePath); // copy.
-    materialDefinition.mTextureStages.push_back({semantic, TextureDefinition{imagePathStr, SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
+    materialDefinition.mTextureStages.PushBack({semantic, TextureDefinition{imagePathStr, SamplerFlags::DEFAULT, metaData.mMinSize, metaData.mSamplingMode}});
     materialDefinition.mFlags |= semantic;
     return true;
   }

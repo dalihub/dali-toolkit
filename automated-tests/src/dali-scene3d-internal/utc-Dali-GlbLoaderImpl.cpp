@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,10 @@ struct Context
   SceneDefinition scene;
   SceneMetadata   metaData;
 
-  std::vector<AnimationDefinition>      animations;
-  std::vector<AnimationGroupDefinition> animationGroups;
-  std::vector<CameraParameters>         cameras;
-  std::vector<LightParameters>          lights;
+  Dali::Vector<AnimationDefinition>      animations;
+  Dali::Vector<AnimationGroupDefinition> animationGroups;
+  Dali::Vector<CameraParameters>         cameras;
+  Dali::Vector<LightParameters>          lights;
 
   LoadResult loadResult{
     resources,
@@ -105,19 +105,19 @@ int UtcDaliGlbLoaderFailedToLoad(void)
 
   DALI_TEST_EQUAL(ctx.loader.LoadModel("non-existent.glb", ctx.loadResult), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0u, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0u, ctx.lights.Size());
+  DALI_TEST_EQUAL(0u, ctx.animations.Size());
+  DALI_TEST_EQUAL(0u, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -127,18 +127,18 @@ int UtcDaliGlbLoaderFailedToParse(void)
   Context ctx;
   DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/invalid.glb", ctx.loadResult), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0u, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0u, ctx.lights.Size());
+  DALI_TEST_EQUAL(0u, ctx.animations.Size());
+  DALI_TEST_EQUAL(0u, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -148,7 +148,7 @@ int UtcDaliGlbLoaderSuccess1(void)
   Context ctx;
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/BoxAnimated.glb", ctx.loadResult);
 
-  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(5u, ctx.scene.GetNodeCount());
 
   ToolkitTestApplication app;

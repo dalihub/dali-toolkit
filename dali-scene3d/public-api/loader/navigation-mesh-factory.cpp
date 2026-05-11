@@ -33,8 +33,8 @@ namespace Dali::Scene3D::Loader
 {
 UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali::String filename)
 {
-  std::string          stdFilename = ToStdString(filename);
-  std::vector<uint8_t> buffer;
+  std::string           stdFilename = ToStdString(filename);
+  Dali::Vector<uint8_t> buffer;
 
   Dali::FileStream fileStream(stdFilename, Dali::FileStream::READ | Dali::FileStream::BINARY);
   auto             fin = fileStream.GetFile();
@@ -71,8 +71,8 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali:
     return {};
   }
 
-  buffer.resize(size);
-  auto count = fread(buffer.data(), 1, fileSize, fin);
+  buffer.ResizeUninitialized(size_t(size));
+  auto count = fread(buffer.Data(), 1, fileSize, fin);
   if(DALI_UNLIKELY(count != fileSize))
   {
     DALI_LOG_ERROR("NavigationMesh: Error reading file: %s\n", stdFilename.c_str());
@@ -81,7 +81,7 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali:
   return CreateFromBuffer(buffer);
 }
 
-UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const std::vector<uint8_t>& buffer)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromBuffer(const Dali::Vector<uint8_t>& buffer)
 {
   auto impl = new Scene3D::Internal::Algorithm::NavigationMesh(buffer);
   return MakeUnique<Algorithm::NavigationMesh>(impl);
@@ -164,14 +164,14 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFace
     ++i;
   }
 
-  std::vector<uint8_t> navigationMeshBinary;
+  Dali::Vector<uint8_t> navigationMeshBinary;
 
   // Build navigationMeshBinary binary
-  navigationMeshBinary.insert(navigationMeshBinary.end(),
+  navigationMeshBinary.Insert(navigationMeshBinary.End(),
                               reinterpret_cast<uint8_t*>(&header),
                               reinterpret_cast<uint8_t*>(&header) + sizeof(Internal::Algorithm::NavigationMeshHeader_V10));
 
-  auto& h = *reinterpret_cast<decltype(header)*>(navigationMeshBinary.data());
+  auto& h = *reinterpret_cast<decltype(header)*>(navigationMeshBinary.Data());
 
   h.dataOffset       = sizeof(header);
   h.edgeCount        = meshEdges.size();
@@ -186,25 +186,25 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFace
   h.polyDataOffset   = h.edgeDataOffset + meshEdges.size() * sizeof(NavigationMesh::Edge);
 
   // Copy data
-  navigationMeshBinary.insert(navigationMeshBinary.end(),
+  navigationMeshBinary.Insert(navigationMeshBinary.End(),
                               reinterpret_cast<uint8_t*>(meshVertices.data()),
                               reinterpret_cast<uint8_t*>(meshVertices.data()) + (meshVertices.size() * sizeof(NavigationMesh::Vertex)));
-  navigationMeshBinary.insert(navigationMeshBinary.end(),
+  navigationMeshBinary.Insert(navigationMeshBinary.End(),
                               reinterpret_cast<uint8_t*>(meshEdges.data()),
                               reinterpret_cast<uint8_t*>(meshEdges.data()) + (meshEdges.size() * sizeof(NavigationMesh::Edge)));
-  navigationMeshBinary.insert(navigationMeshBinary.end(),
+  navigationMeshBinary.Insert(navigationMeshBinary.End(),
                               reinterpret_cast<uint8_t*>(meshFaces.data()),
                               reinterpret_cast<uint8_t*>(meshFaces.data()) + (meshFaces.size() * sizeof(NavigationMesh::Face)));
 
   return NavigationMeshFactory::CreateFromBuffer(navigationMeshBinary);
 }
 
-UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals, const std::vector<uint32_t>& faceIndices)
+UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromVertexFaceList(const Dali::Vector<Vector3>& vertices, const Dali::Vector<Vector3>& normals, const Dali::Vector<uint32_t>& faceIndices)
 {
-  return CreateFromVertexFaceList(vertices.data(), normals.data(), vertices.size(), faceIndices.data(), faceIndices.size());
+  return CreateFromVertexFaceList(vertices.Data(), normals.Data(), vertices.Count(), faceIndices.Data(), faceIndices.Count());
 }
 
-std::vector<uint8_t> NavigationMeshFactory::GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh)
+Dali::Vector<uint8_t> NavigationMeshFactory::GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh)
 {
   auto& meshImpl = Internal::Algorithm::GetImplementation(navigationMesh);
 

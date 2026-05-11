@@ -170,7 +170,7 @@ ModelNode NodeDefinition::CreateModelNode(CreateParams& params)
 
   for(auto& c : mConstraints)
   {
-    params.mConstrainables.push_back(ConstraintRequest{&c, node});
+    params.mConstrainables.PushBack(ConstraintRequest{&c, node});
   }
 
   return node;
@@ -200,7 +200,7 @@ Dali::StringView NodeDefinition::GetIblMaxLodUniformName()
 
 bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
 {
-  if(mRenderables.empty())
+  if(mRenderables.Empty())
   {
     return false;
   }
@@ -234,8 +234,8 @@ bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, V
 bool ModelRenderable::GetExtents(const ResourceBundle& resources, Vector3& min, Vector3& max) const
 {
   auto&    mesh    = resources.mMeshes[mMeshIdx];
-  uint32_t minSize = mesh.first.mPositions.mBlob.mMin.size();
-  uint32_t maxSize = mesh.first.mPositions.mBlob.mMax.size();
+  uint32_t minSize = mesh.first.mPositions.mBlob.mMin.Count();
+  uint32_t maxSize = mesh.first.mPositions.mBlob.mMax.Count();
   if(minSize == maxSize && minSize >= 2u && maxSize >= 2u)
   {
     min = Vector3(mesh.first.mPositions.mBlob.mMin[0], mesh.first.mPositions.mBlob.mMin[1], 0.0f);
@@ -338,12 +338,12 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   auto shader = renderer.GetShader();
   if(mesh.first.IsSkinned())
   {
-    params.mSkinnables.push_back(SkinningShaderConfigurationRequest{mesh.first.mSkeletonIdx, shader, mesh.first.mModelPrimitive});
+    params.mSkinnables.PushBack(SkinningShaderConfigurationRequest{mesh.first.mSkeletonIdx, shader, mesh.first.mModelPrimitive});
   }
 
   if(mesh.first.HasBlendShapes())
   {
-    params.mBlendshapeRequests.push_back(BlendshapeShaderConfigurationRequest{nodeDefinition.mName, mMeshIdx, shader, mesh.first.mModelPrimitive});
+    params.mBlendshapeRequests.PushBack(BlendshapeShaderConfigurationRequest{nodeDefinition.mName, mMeshIdx, shader, mesh.first.mModelPrimitive});
   }
 
   auto& matDef = resources.mMaterials[mMaterialIdx].first;
@@ -374,10 +374,10 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty("uOcclusionTextureTransform", Matrix3::IDENTITY);
   renderer.RegisterProperty("uEmissiveTextureTransform", Matrix3::IDENTITY);
 
-  auto iTexture   = matDef.mTextureStages.begin();
+  auto iTexture   = matDef.mTextureStages.Begin();
   auto checkStage = [&](uint32_t flags)
   {
-    return iTexture != matDef.mTextureStages.end() && MaskMatch(iTexture->mSemantic, flags);
+    return iTexture != matDef.mTextureStages.End() && MaskMatch(iTexture->mSemantic, flags);
   };
 
   if(checkStage(MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC))

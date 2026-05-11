@@ -387,7 +387,7 @@ void ModelNode::SetBlendShapeData(Scene3D::Loader::BlendShapes::BlendShapeData&&
 {
   // Update mBlendShapeIndexMap
   mBlendShapeIndexMap.clear();
-  const auto blendShapeCount = data.names.size();
+  const auto blendShapeCount = data.names.Size();
   for(Loader::BlendShapes::Index index = 0u; index < blendShapeCount; ++index)
   {
     auto& name = data.names[index];

@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <vector>
+#include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
@@ -28,7 +28,7 @@
 
 namespace Dali::Scene3D::Algorithm
 {
-using WayPointList = std::vector<Scene3D::Algorithm::WayPoint>;
+using WayPointList = Dali::Vector<Scene3D::Algorithm::WayPoint>;
 
 /**
  * List of enums to be used when not using custom implementation

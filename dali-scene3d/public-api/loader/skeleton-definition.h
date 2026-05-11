@@ -21,6 +21,7 @@
 #include <dali-scene3d/public-api/loader/index.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/matrix.h>
 
 namespace Dali::Scene3D::Loader
@@ -40,10 +41,10 @@ struct DALI_SCENE3D_API SkeletonDefinition
     Matrix mInverseBindMatrix;
   };
 
-  using Vector = std::vector<SkeletonDefinition>;
+  using Vector = Dali::Vector<SkeletonDefinition, false>;
 
-  Index              mRootNodeIdx = INVALID_INDEX;
-  std::vector<Joint> mJoints;
+  Index               mRootNodeIdx = INVALID_INDEX;
+  Dali::Vector<Joint> mJoints;
 };
 
 } // namespace Dali::Scene3D::Loader

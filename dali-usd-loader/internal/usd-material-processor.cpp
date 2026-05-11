@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,19 +60,19 @@ UsdMaterialProcessor::UsdMaterialProcessor(const UsdStageRefPtr& stage, Material
   mShaderInputHandlers =
     {
       {MaterialDefinition::Flags::ALBEDO, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessDiffuseColor(input, materialDefinition, material, uvTexture); }},
+       { ProcessDiffuseColor(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::METALLIC, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessMetallic(input, materialDefinition, material, uvTexture); }},
+       { ProcessMetallic(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::ROUGHNESS, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessRoughness(input, materialDefinition, material, uvTexture); }},
+       { ProcessRoughness(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::NORMAL, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessNormal(input, materialDefinition, material, uvTexture); }},
+       { ProcessNormal(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::OCCLUSION, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessOcclusion(input, materialDefinition, material, uvTexture); }},
+       { ProcessOcclusion(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::EMISSIVE, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessEmissiveColor(input, materialDefinition, material, uvTexture); }},
+       { ProcessEmissiveColor(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::SPECULAR_COLOR, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-  { ProcessSpecularColor(input, materialDefinition, material, uvTexture); }}};
+       { ProcessSpecularColor(input, materialDefinition, material, uvTexture); }}};
 }
 
 void UsdMaterialProcessor::TraverseMaterials(LoadResult& output)
@@ -192,7 +192,7 @@ void UsdMaterialProcessor::TraverseMaterials(LoadResult& output)
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TraverseMaterials: materialDefinition.mFlags: %u. needAlbedoTexture: %d, needMetallicRoughnessTexture: %d, needNormalTexture: %d\n", materialDefinition.mFlags, materialDefinition.mNeedAlbedoTexture, materialDefinition.mNeedMetallicRoughnessTexture, materialDefinition.mNeedNormalTexture);
 
       // Add the processed material to the output materials list
-      outMaterials.emplace_back(std::move(materialDefinition), TextureSet());
+      outMaterials.PushBack({std::move(materialDefinition), TextureSet()});
     }
   }
 }

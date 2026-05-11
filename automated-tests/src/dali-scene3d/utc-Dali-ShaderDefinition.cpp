@@ -41,14 +41,14 @@ int UtcDaliShaderDefinitionFailedToLoad(void)
 
   shaderDef.mFragmentShaderPath = "dli_pbr.fsh";
 
-  shaderDef.mHints.push_back("MODIFIES_GEOMETRY");
-  shaderDef.mHints.push_back("OUTPUT_IS_TRANSPARENT");
+  shaderDef.mHints.PushBack("MODIFIES_GEOMETRY");
+  shaderDef.mHints.PushBack("OUTPUT_IS_TRANSPARENT");
 
   auto raw = shaderDef.LoadRaw(shaderPath);
 
   ToolkitTestApplication application;
-  shaderDef.mUniformBlocks.push_back(Dali::UniformBlock::New("UniformBlock0"));
-  shaderDef.mUniformBlocks.push_back(Dali::UniformBlock::New("UniformBlock1"));
+  shaderDef.mUniformBlocks.PushBack(Dali::UniformBlock::New("UniformBlock0"));
+  shaderDef.mUniformBlocks.PushBack(Dali::UniformBlock::New("UniformBlock1"));
   auto shader = shaderDef.Load(std::move(raw));
   DALI_TEST_CHECK(shader);
 

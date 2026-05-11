@@ -54,52 +54,41 @@ const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)>& GetCons
 {
   static const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
     {Property::Type::BOOLEAN,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs)
-    { current = inputs[0]->GetBoolean(); });
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetBoolean(); });
+     }},
     {Property::Type::INTEGER,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs)
-    { current = inputs[0]->GetInteger(); });
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetInteger(); });
+     }},
     {Property::Type::FLOAT,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<float>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<float>(a, i, EqualToConstraint());
+     }},
     {Property::Type::VECTOR2,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Vector2>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector2>(a, i, EqualToConstraint());
+     }},
     {Property::Type::VECTOR3,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Vector3>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector3>(a, i, EqualToConstraint());
+     }},
     {Property::Type::VECTOR4,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Vector4>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Vector4>(a, i, EqualToConstraint());
+     }},
     {Property::Type::MATRIX,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Matrix>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix>(a, i, EqualToConstraint());
+     }},
     {Property::Type::MATRIX3,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Matrix3>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Matrix3>(a, i, EqualToConstraint());
+     }},
     {Property::Type::ROTATION,
-     [](Actor& a, Property::Index i)
-  {
-    return Constraint::New<Quaternion>(a, i, EqualToConstraint());
-  }},
+     [](Actor& a, Property::Index i) {
+       return Constraint::New<Quaternion>(a, i, EqualToConstraint());
+     }},
   };
   return sConstraintFactory;
 }
@@ -220,7 +209,7 @@ private:
 };
 
 template<typename RequestType>
-void SortAndDeduplicateRequests(std::vector<RequestType>& requests)
+void SortAndDeduplicateRequests(Dali::Vector<RequestType>& requests)
 {
   // Sort requests by shaders and primitives.
   std::sort(requests.begin(), requests.end());
@@ -251,8 +240,7 @@ void SortAndDeduplicateRequests(std::vector<RequestType>& requests)
     ++iter;
   } while(true);
 
-  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const RequestType& sscr)
-  { return !sscr.mShader; }),
+  requests.Erase(std::remove_if(requests.begin(), requests.end(), [](const RequestType& sscr) { return !sscr.mShader; }),
                  requests.end());
 }
 
@@ -271,10 +259,10 @@ void VisitInternal(Index iNode, const Customization::Choices& choices, Visitor& 
 
   if(node.mCustomization)
   {
-    if(!node.mChildren.empty())
+    if(!node.mChildren.Empty())
     {
       auto  choice = choices.Get(node.mCustomization->mTag);
-      Index i      = std::min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.size() - 1));
+      Index i      = std::min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.Size() - 1));
       sd.Visit(node.mChildren[i], choices, v);
     }
   }
@@ -293,7 +281,7 @@ void VisitInternal(Index iNode, const Customization::Choices& choices, Visitor& 
 
 SceneDefinition::SceneDefinition()
 {
-  mNodes.reserve(128);
+  mNodes.Reserve(128);
 
 #ifdef DEBUG_JOINTS
   EnsureJointDebugShaderCreated();
@@ -322,10 +310,10 @@ SceneDefinition::~SceneDefinition()
 
 uint32_t Dali::Scene3D::Loader::SceneDefinition::AddRootNode(Index iNode)
 {
-  if(iNode < mNodes.size())
+  if(iNode < mNodes.Count())
   {
-    uint32_t result = mRootNodeIds.size();
-    mRootNodeIds.push_back(iNode);
+    uint32_t result = mRootNodeIds.Count();
+    mRootNodeIds.PushBack(iNode);
     return result;
   }
   else
@@ -335,16 +323,16 @@ uint32_t Dali::Scene3D::Loader::SceneDefinition::AddRootNode(Index iNode)
   }
 }
 
-const std::vector<Index>& SceneDefinition::GetRoots() const
+const Dali::Vector<Index>& SceneDefinition::GetRoots() const
 {
   return mRootNodeIds;
 }
 
 void SceneDefinition::RemoveRootNode(Index iRoot)
 {
-  if(iRoot < mRootNodeIds.size())
+  if(iRoot < mRootNodeIds.Count())
   {
-    mRootNodeIds.erase(mRootNodeIds.begin() + iRoot);
+    mRootNodeIds.Erase(mRootNodeIds.Begin() + iRoot);
   }
   else
   {
@@ -354,7 +342,7 @@ void SceneDefinition::RemoveRootNode(Index iRoot)
 
 uint32_t SceneDefinition::GetNodeCount() const
 {
-  return mNodes.size();
+  return mNodes.Count();
 }
 
 const NodeDefinition* SceneDefinition::GetNode(Index iNode) const
@@ -364,7 +352,7 @@ const NodeDefinition* SceneDefinition::GetNode(Index iNode) const
 
 NodeDefinition* SceneDefinition::GetNode(Index iNode)
 {
-  if(iNode != Scene3D::Loader::INVALID_INDEX && iNode < mNodes.size())
+  if(iNode != Scene3D::Loader::INVALID_INDEX && iNode < mNodes.Count())
   {
     return mNodes[iNode].Get();
   }
@@ -452,9 +440,9 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
         {
           customization = options->Set(tag, {});
         }
-        customization->nodes.push_back(ToStdString(n.mName));
+        customization->nodes.PushBack(n.mName);
         customization->numOptions = std::max(customization->numOptions,
-                                             static_cast<uint32_t>(n.mChildren.size()));
+                                             static_cast<uint32_t>(n.mChildren.Size()));
       }
     }
 
@@ -478,12 +466,12 @@ NodeDefinition* SceneDefinition::AddNode(UniquePtr<NodeDefinition>&& nodeDef)
   // add next index (to which we're about to push) as a child to the designated parent, if any.
   if(nodeDef->mParentIdx != INVALID_INDEX)
   {
-    mNodes[nodeDef->mParentIdx]->mChildren.push_back(mNodes.size());
+    mNodes[nodeDef->mParentIdx]->mChildren.PushBack(mNodes.Count());
   }
 
-  mNodes.push_back(std::move(nodeDef));
+  mNodes.PushBack(std::move(nodeDef));
 
-  return mNodes.back().Get();
+  return mNodes.Back().Get();
 }
 
 bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String& newParentName, Index siblingOrder)
@@ -498,10 +486,9 @@ bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String&
   }
 
   auto& node  = *nodePtr;
-  auto  iNode = std::distance(mNodes.data(), nodePtr);
+  auto  iNode = std::distance(mNodes.Data(), nodePtr);
 
-  DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n)
-  {
+  DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n) {
     std::ostringstream stream;
     stream << n.mName.CStr() << " (" << n.mParentIdx << "):";
     for(auto i : n.mChildren)
@@ -517,7 +504,7 @@ bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String&
     DEBUG_ONLY(dumpNode(*mNodes[node->mParentIdx]);)
 
     auto& children = mNodes[node->mParentIdx]->mChildren;
-    children.erase(std::remove(children.begin(), children.end(), iNode), children.end());
+    children.Erase(std::remove(children.begin(), children.end(), iNode), children.end());
 
     DEBUG_ONLY(dumpNode(*mNodes[node->mParentIdx]);)
   }
@@ -526,17 +513,18 @@ bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String&
   LOGD(("new parent:"));
   DEBUG_ONLY(dumpNode(**newParentPtr);)
   auto& children = (*newParentPtr)->mChildren;
-  if(siblingOrder > children.size())
+  if(siblingOrder > children.Size())
   {
-    siblingOrder = children.size();
+    siblingOrder = children.Size();
   }
-  children.insert(children.begin() + siblingOrder, 1, iNode);
+  uint32_t iNodeU = static_cast<uint32_t>(iNode);
+  children.Insert(children.Begin() + siblingOrder, &iNodeU, &iNodeU + 1);
   DEBUG_ONLY(dumpNode(**newParentPtr);)
 
   // Update parent index.
   LOGD(("node:"));
   DEBUG_ONLY(dumpNode(*node);)
-  auto iParent     = std::distance(mNodes.data(), newParentPtr);
+  auto iParent     = std::distance(mNodes.Data(), newParentPtr);
   node->mParentIdx = iParent;
   DEBUG_ONLY(dumpNode(*node);)
   return true;
@@ -554,16 +542,15 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
   auto&                                           thisNodes = mNodes;
   unsigned int                                    numReset  = 0;
   std::function<void(UniquePtr<NodeDefinition>&)> resetFn =
-    [&thisNodes, &resetFn, &numReset](UniquePtr<NodeDefinition>& nd)
-  {
-    LOGD(("resetting %d", &nd - thisNodes.data()));
-    for(auto i : nd->mChildren)
-    {
-      resetFn(thisNodes[i]);
-    }
-    nd.Reset();
-    ++numReset;
-  };
+    [&thisNodes, &resetFn, &numReset](UniquePtr<NodeDefinition>& nd) {
+      LOGD(("resetting %d", &nd - thisNodes.Data()));
+      for(auto i : nd->mChildren)
+      {
+        resetFn(thisNodes[i]);
+      }
+      nd.Reset();
+      ++numReset;
+    };
 
   resetFn(*node);
 
@@ -574,20 +561,37 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
   {
     if(!n)
     {
-      offsets.push_back(std::distance(mNodes.data(), &n));
+      offsets.push_back(std::distance(mNodes.Data(), &n));
     }
   }
 
   // Erase dead nodes as they don't have to be processed anymore.
-  mNodes.erase(std::remove(mNodes.begin(), mNodes.end(), decltype(mNodes)::value_type()), mNodes.end());
+  {
+    uint32_t writeIdx = 0;
+    for(uint32_t readIdx = 0; readIdx < mNodes.Count(); ++readIdx)
+    {
+      if(mNodes[readIdx])
+      {
+        if(writeIdx != readIdx)
+        {
+          mNodes[writeIdx] = std::move(mNodes[readIdx]);
+        }
+        ++writeIdx;
+      }
+    }
+    // Resize to remove the null elements at the end
+    while(mNodes.Count() > writeIdx)
+    {
+      mNodes.Erase(mNodes.End() - 1);
+    }
+  }
 
   // Offset all indices (parent and child) by the index they'd sort into in offsets.
   enum
   {
     INDEX_FOR_REMOVAL = INVALID_INDEX
   };
-  auto offsetter = [&offsets](Index& i)
-  {
+  auto offsetter = [&offsets](Index& i) {
     auto iFind = std::lower_bound(offsets.begin(), offsets.end(), i);
     if(iFind != offsets.end() && *iFind == i)
     {
@@ -618,7 +622,7 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
       offsetter(*i0);
     }
 
-    children.erase(std::remove(children.begin(), children.end(), INDEX_FOR_REMOVAL), children.end());
+    children.Erase(std::remove(children.begin(), children.end(), INDEX_FOR_REMOVAL), children.end());
   }
 
   return true;
@@ -627,8 +631,7 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
 void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
 {
   auto&                    thisNodes  = mNodes;
-  std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i)
-  {
+  std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i) {
     auto node = thisNodes[i].Get();
     if(node->mParentIdx != INVALID_INDEX)
     {
@@ -643,8 +646,7 @@ NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index* outIn
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
-   { return nd->mName == name; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd) { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
@@ -658,8 +660,7 @@ const NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index*
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
-   { return nd->mName == name; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd) { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
@@ -673,8 +674,7 @@ Index SceneDefinition::FindNodeIndex(const NodeDefinition& node) const
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&node](const UniquePtr<NodeDefinition>& n)
-   { return n.Get() == &node; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&node](const UniquePtr<NodeDefinition>& n) { return n.Get() == &node; });
   return iFind != iEnd ? std::distance(iBegin, iFind) : INVALID_INDEX;
 }
 
@@ -712,9 +712,9 @@ void SceneDefinition::FindNodes(NodePredicate predicate, ConstNodeConsumer consu
   }
 }
 
-void SceneDefinition::ApplyConstraints(Actor&                           root,
-                                       std::vector<ConstraintRequest>&& constrainables,
-                                       StringCallback                   onError) const
+void SceneDefinition::ApplyConstraints(Actor&                            root,
+                                       Dali::Vector<ConstraintRequest>&& constrainables,
+                                       StringCallback                    onError) const
 {
   for(auto& cr : constrainables)
   {
@@ -800,13 +800,13 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
     // skipping the first skeleton.
     ++iterSkeleton;
 
-    resources.mShaders.reserve(resources.mShaders.size() + std::distance(iterSkeleton, skeletons.end()));
+    resources.mShaders.Reserve(resources.mShaders.Size() + std::distance(iterSkeleton, skeletons.end()));
     const ShaderDefinition& shaderDef = resources.mShaders[users.first].first;
 
     while(iterSkeleton != skeletons.end())
     {
-      Index iShader = resources.mShaders.size();
-      resources.mShaders.push_back({shaderDef, Shader()});
+      Index iShader = resources.mShaders.Size();
+      resources.mShaders.PushBack({shaderDef, Shader()});
 
       for(auto& i : iterSkeleton->second)
       {
@@ -817,11 +817,11 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
   }
 }
 
-void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&                             resources,
-                                               Actor                                             rootActor,
-                                               std::vector<SkinningShaderConfigurationRequest>&& requests) const
+void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&                              resources,
+                                               Actor                                              rootActor,
+                                               Dali::Vector<SkinningShaderConfigurationRequest>&& requests) const
 {
-  if(requests.empty())
+  if(requests.Empty())
   {
     return;
   }
@@ -831,7 +831,7 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
   for(auto& request : requests)
   {
     auto& skeleton = resources.mSkeletons[request.mSkeletonIdx];
-    if(skeleton.mJoints.empty())
+    if(skeleton.mJoints.Empty())
     {
       LOGD(("Skeleton %d has no joints.", request.mSkeletonIdx));
       continue;
@@ -851,12 +851,12 @@ void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&            
   }
 }
 
-bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&                               resources,
-                                                 Actor                                               rootActor,
-                                                 std::vector<BlendshapeShaderConfigurationRequest>&& requests,
-                                                 StringCallback                                      onError) const
+bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&                                resources,
+                                                 Actor                                                rootActor,
+                                                 Dali::Vector<BlendshapeShaderConfigurationRequest>&& requests,
+                                                 StringCallback                                       onError) const
 {
-  if(requests.empty())
+  if(requests.Empty())
   {
     return true;
   }
@@ -887,14 +887,14 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
         data.components = 0x0;
         for(auto&& blendShape : mesh.first.mBlendShapes)
         {
-          data.names.push_back(blendShape.name);
-          data.weights.push_back(blendShape.weight);
+          data.names.PushBack(blendShape.name);
+          data.weights.PushBack(blendShape.weight);
           data.components |= (blendShape.deltas.IsDefined() * BlendShapes::Component::POSITIONS) |
                              (blendShape.normals.IsDefined() * BlendShapes::Component::NORMALS) | (blendShape.tangents.IsDefined() * BlendShapes::Component::TANGENTS);
         }
         for(auto&& factor : mesh.second.blendShapeUnnormalizeFactor)
         {
-          data.unnormalizeFactors.push_back(factor);
+          data.unnormalizeFactors.PushBack(factor);
         }
         data.version      = mesh.first.mBlendShapeVersion;
         data.bufferOffset = mesh.second.blendShapeBufferOffset;
@@ -930,7 +930,7 @@ void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& reso
 
   for(auto& users : blendShapeShaderUsers)
   {
-    resources.mShaders.reserve(resources.mShaders.size() + users.second.size() - 1u);
+    resources.mShaders.Reserve(resources.mShaders.Size() + users.second.size() - 1u);
     const ShaderDefinition& shaderDef = resources.mShaders[users.first].first;
 
     auto nodesIt    = users.second.begin();
@@ -939,8 +939,8 @@ void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& reso
     ++nodesIt;
     while(nodesIt != nodesEndIt)
     {
-      Index iShader = resources.mShaders.size();
-      resources.mShaders.push_back({shaderDef, Shader()});
+      Index iShader = resources.mShaders.Size();
+      resources.mShaders.PushBack({shaderDef, Shader()});
 
       auto& nodes = *nodesIt;
       for(auto& shader : nodes.second)
@@ -963,20 +963,21 @@ SceneDefinition& SceneDefinition::operator=(SceneDefinition&& other)
 bool SceneDefinition::FindNode(const Dali::String& name, UniquePtr<NodeDefinition>** result)
 {
   // We're searching from the end assuming a higher probability of operations targeting
-  // recently added nodes. (conf.: root, which is immovable, cannot be removed, and was
+  // recently added nodes. (conf., root, which is immovable, cannot be removed, and was
   // the first to be added, is index 0.)
-  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const UniquePtr<NodeDefinition>& nd)
-  { return nd->mName == name; })
-                 .base();
-
-  const bool success = iFind != mNodes.begin();
-  if(success && result)
+  const uint32_t count = mNodes.Count();
+  for(int32_t i = static_cast<int32_t>(count) - 1; i >= 0; --i)
   {
-    --iFind;
-    *result = &*iFind;
+    if(mNodes[i]->mName == name)
+    {
+      if(result)
+      {
+        *result = &mNodes[i];
+      }
+      return true;
+    }
   }
-
-  return success;
+  return false;
 }
 
 } // namespace Dali::Scene3D::Loader

@@ -41,7 +41,7 @@ int UtcDaliEnvironmentMapLoaderSuccess01(void)
   auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 64;
@@ -65,7 +65,7 @@ int UtcDaliEnvironmentMapLoaderAutoType01(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::CUBEMAP);
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 512;
@@ -85,7 +85,7 @@ int UtcDaliEnvironmentMapLoaderAutoType02(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::CUBEMAP);
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 256;
@@ -105,7 +105,7 @@ int UtcDaliEnvironmentMapLoaderAutoType03(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::CUBEMAP);
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 100;
@@ -125,7 +125,7 @@ int UtcDaliEnvironmentMapLoaderAutoType04(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::CUBEMAP);
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 100;
@@ -145,7 +145,7 @@ int UtcDaliEnvironmentMapLoaderAutoType05(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
-  DALI_TEST_EQUAL(1u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(1u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     DALI_TEST_EQUAL(20, face[0].GetWidth());
@@ -165,7 +165,7 @@ int UtcDaliEnvironmentMapLoaderEquirectangularMapType01(void)
   DALI_TEST_CHECK(LoadEnvironmentMap(path, environmentMapData));
 
   DALI_TEST_EQUAL(environmentMapData.GetEnvironmentMapType(), Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
-  DALI_TEST_EQUAL(1u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(1u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     DALI_TEST_EQUAL(2048, face[0].GetWidth());

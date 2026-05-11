@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <functional>
@@ -57,7 +58,7 @@ struct DALI_SCENE3D_API ResourceType
  */
 DALI_SCENE3D_API const char* GetResourceTypeName(ResourceType::Value type);
 
-using ResourceRefCounts = std::vector<Vector<uint32_t>>;
+using ResourceRefCounts = Dali::Vector<Dali::Vector<uint32_t>>;
 
 /**
  * @brief Stores all resource definitions along with the DALi resources that

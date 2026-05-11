@@ -78,13 +78,13 @@ public:
    * @brief Retrieves loaded AnimationDefinition
    * @return AnimationDefinition that is loaded from file
    */
-  std::vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations() const;
+  Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations() const;
 
   /**
    * @brief Retrieves loaded CameraParameters
    * @return CameraParameters list that is loaded from file
    */
-  std::vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras() const;
+  Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras() const;
 
   /**
    * @brief Retrieves ResourceChoices

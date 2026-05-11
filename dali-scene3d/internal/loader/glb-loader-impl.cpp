@@ -128,11 +128,13 @@ bool GlbLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::Lo
   Gltf2Util::ConversionContext context{result, path, INVALID_INDEX};
 
   auto& outBuffers = context.mOutput.mResources.mBuffers;
-  outBuffers.reserve(document.mBuffers.size());
+  outBuffers.Reserve(document.mBuffers.size());
   if(!binaryChunkData.empty())
   {
-    BufferDefinition dataBuffer(std::move(binaryChunkData));
-    outBuffers.emplace_back(std::move(dataBuffer));
+    Dali::Vector<uint8_t> buffer;
+    buffer.Resize(binaryChunkData.size());
+    std::copy(binaryChunkData.begin(), binaryChunkData.end(), buffer.Begin());
+    outBuffers.PushBack(BufferDefinition(std::move(buffer)));
   }
 
   Gltf2Util::ConvertGltfToContext(document, context, isMRendererModel);

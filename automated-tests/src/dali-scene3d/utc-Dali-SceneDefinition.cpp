@@ -51,7 +51,7 @@ int UtcDaliSceneDefinitionAddNode(void)
   child->mName      = "Second";
   child->mParentIdx = 0;
 
-  DALI_TEST_CHECK(node->mChildren.empty()); // these are hooked up by AddNode, base on parent idx.
+  DALI_TEST_CHECK(node->mChildren.Empty()); // these are hooked up by AddNode, base on parent idx.  // Note: mChildren is Dali::Vector
 
   result = sceneDef.AddNode(UniquePtr<NodeDefinition>{child});
   DALI_TEST_EQUAL(result, child);
@@ -69,7 +69,7 @@ int UtcDaliSceneDefinitionAddRootsFail(void)
   SceneDefinition sceneDef;
 
   DALI_TEST_ASSERTION(sceneDef.AddRootNode(0), "index out of bounds");
-  DALI_TEST_CHECK(sceneDef.GetRoots().empty());
+  DALI_TEST_CHECK(sceneDef.GetRoots().Empty());
   DALI_TEST_EQUAL(sceneDef.GetNodeCount(), 0u);
 
   END_TEST;
@@ -166,11 +166,11 @@ int UtcDaliSceneDefinitionAddRemoveRootNode(void)
   TestContext ctx;
 
   DALI_TEST_EQUAL(ctx.sceneDef.AddRootNode(0), 0);
-  DALI_TEST_EQUAL(ctx.sceneDef.GetRoots().size(), 1u);
+  DALI_TEST_EQUAL(ctx.sceneDef.GetRoots().Count(), 1u);
   DALI_TEST_EQUAL(ctx.sceneDef.GetRoots()[0], 0);
 
   ctx.sceneDef.RemoveRootNode(0);
-  DALI_TEST_EQUAL(ctx.sceneDef.GetRoots().size(), 0);
+  DALI_TEST_EQUAL(ctx.sceneDef.GetRoots().Count(), 0u);
 
   DALI_TEST_EQUAL(ctx.sceneDef.GetNodeCount(), 3u);
 
@@ -295,10 +295,20 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
     Customization::OptionType choice;
   };
 
-  std::vector<TestOption> testOptions{
-    {"A/B", {2, {"Root"}}, 0},
-    {"hello", {0, {"A"}}, 0},
-  };
+  std::vector<TestOption> testOptions;
+  TestOption opt1;
+  opt1.name = "A/B";
+  opt1.customization.numOptions = 2;
+  opt1.customization.nodes.PushBack("Root");
+  opt1.choice = 0;
+  testOptions.push_back(opt1);
+
+  TestOption opt2;
+  opt2.name = "hello";
+  opt2.customization.numOptions = 0;
+  opt2.customization.nodes.PushBack("A");
+  opt2.choice = 0;
+  testOptions.push_back(opt2);
   for(auto& testOption : testOptions)
   {
     auto iFind = choices.Get(testOption.name);
@@ -307,7 +317,7 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
     auto iFindOption = options.Get(testOption.name);
     DALI_TEST_CHECK(iFindOption != nullptr);
     DALI_TEST_EQUAL(iFindOption->numOptions, testOption.customization.numOptions);
-    DALI_TEST_EQUAL(iFindOption->nodes.size(), testOption.customization.nodes.size());
+    DALI_TEST_EQUAL(iFindOption->nodes.Size(), testOption.customization.nodes.Size());
     DALI_TEST_CHECK(std::equal(iFindOption->nodes.begin(), iFindOption->nodes.end(),
                                testOption.customization.nodes.begin()));
   }
@@ -333,9 +343,9 @@ int UtcDaliSceneDefinitionGetCustomizationOptions(void)
     auto iFindOption = options.Get(testOption.name);
     DALI_TEST_CHECK(iFindOption != nullptr);
     DALI_TEST_EQUAL(iFindOption->numOptions, testOption.customization.numOptions);
-    DALI_TEST_EQUAL(iFindOption->nodes.size(), testOption.customization.nodes.size());
-    DALI_TEST_CHECK(std::equal(iFindOption->nodes.begin(), iFindOption->nodes.end(),
-                               testOption.customization.nodes.begin()));
+    DALI_TEST_EQUAL(iFindOption->nodes.Size(), testOption.customization.nodes.Size());
+    DALI_TEST_CHECK(std::equal(iFindOption->nodes.Begin(), iFindOption->nodes.End(),
+                               testOption.customization.nodes.Begin()));
   }
 
   END_TEST;
@@ -425,7 +435,7 @@ int UtcDaliSceneDefinitionRemoveNode(void)
 
   // pre-removing A
   DALI_TEST_EQUAL(ctx.sceneDef.GetNodeCount(), 3u);
-  DALI_TEST_EQUAL(ctx.root->mChildren.size(), 2u);
+  DALI_TEST_EQUAL(ctx.root->mChildren.Size(), 2u);
 
   Index result;
   DALI_TEST_EQUAL(ctx.sceneDef.FindNode("B", &result), ctx.childB);
@@ -443,7 +453,7 @@ int UtcDaliSceneDefinitionRemoveNode(void)
   DALI_TEST_EQUAL(ctx.sceneDef.FindNode("B", &result), ctx.childB);
   DALI_TEST_EQUAL(result, 1); // dropped
 
-  DALI_TEST_EQUAL(ctx.root->mChildren.size(), 1u);
+  DALI_TEST_EQUAL(ctx.root->mChildren.Size(), 1u);
   DALI_TEST_EQUAL(ctx.root->mChildren[0], 1u);
 
   // removing root
@@ -460,7 +470,7 @@ int UtcDaliSceneDefinitionReparentNode(void)
   ctx.sceneDef.ReparentNode("B", "A", 0);
 
   DALI_TEST_EQUAL(ctx.childB->mParentIdx, ctx.sceneDef.FindNodeIndex(*ctx.childA));
-  DALI_TEST_EQUAL(ctx.childA->mChildren.size(), 1u);
+  DALI_TEST_EQUAL(ctx.childA->mChildren.Size(), 1u);
   DALI_TEST_EQUAL(ctx.childA->mChildren[0], ctx.sceneDef.FindNodeIndex(*ctx.childB));
 
   END_TEST;

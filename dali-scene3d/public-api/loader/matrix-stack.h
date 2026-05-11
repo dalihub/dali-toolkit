@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/matrix.h>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -44,7 +44,7 @@ public:
   void          PopAll(); // clears the stack, but retains the storage.
 
 private:
-  std::vector<Matrix> mStack;
+  Dali::Vector<Matrix> mStack;
 };
 
 } // namespace Dali::Scene3D::Loader

@@ -68,7 +68,7 @@ private:
   /**
    * Constructor
    */
-  NavigationMesh(const std::vector<uint8_t>& buffer);
+  NavigationMesh(const Dali::Vector<uint8_t>& buffer);
 
 public:
   /**
@@ -169,13 +169,13 @@ public:
    * @brief Returns binary data of the mesh
    * @return Reference to the binary buffer
    */
-  [[nodiscard]] const std::vector<uint8_t>& GetData() const
+  [[nodiscard]] const Dali::Vector<uint8_t>& GetData() const
   {
     return mBuffer;
   }
 
 private:
-  std::vector<uint8_t>     mBuffer;           //< Data buffer
+  Dali::Vector<uint8_t>    mBuffer;           //< Data buffer
   NavigationMeshHeader_V10 mHeader;           //< Navigation mesh header
   FaceIndex                mCurrentFace;      //< Current face (last floor position)
   Dali::Matrix             mTransform;        //< Transform matrix

@@ -17,6 +17,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/animation-definition.h>
@@ -57,25 +60,25 @@ struct DALI_SCENE3D_API LoadResult
    * @brief The list of animation definitions, in lexicographical order of their names.
    * @SINCE_2_0.7
    */
-  std::vector<AnimationDefinition>& mAnimationDefinitions;
+  Dali::Vector<AnimationDefinition>& mAnimationDefinitions;
 
   /**
    * @brief The list of animation group definitions, in lexicographical order of their names.
    * @SINCE_2_0.7
    */
-  std::vector<AnimationGroupDefinition>& mAnimationGroupDefinitions;
+  Dali::Vector<AnimationGroupDefinition>& mAnimationGroupDefinitions;
 
   /**
    * @brief The camera parameters that were loaded from the scene.
    * @SINCE_2_0.7
    */
-  std::vector<CameraParameters>& mCameraParameters;
+  Dali::Vector<CameraParameters>& mCameraParameters;
 
   /**
    * @brief The light parameters that were loaded from the scene.
    * @SINCE_2_0.7
    */
-  std::vector<LightParameters>& mLightParameters;
+  Dali::Vector<LightParameters>& mLightParameters;
 };
 
 } // namespace Dali::Scene3D::Loader

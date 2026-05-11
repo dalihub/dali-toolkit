@@ -80,13 +80,13 @@ static bool RayTriangleIntersect(
   return false; // this ray hits the triangle
 }
 
-NavigationMesh::NavigationMesh(const std::vector<uint8_t>& buffer)
+NavigationMesh::NavigationMesh(const Dali::Vector<uint8_t>& buffer)
 {
-  mBuffer.resize(buffer.size());
+  mBuffer.Resize(buffer.Size());
   std::copy(buffer.begin(), buffer.end(), mBuffer.begin());
 
   // Setup header from the buffer
-  mHeader      = *reinterpret_cast<NavigationMeshHeader_V10*>(mBuffer.data());
+  mHeader      = *reinterpret_cast<NavigationMeshHeader_V10*>(mBuffer.Data());
   mCurrentFace = Scene3D::Algorithm::NavigationMesh::NULL_FACE;
 }
 
@@ -215,8 +215,7 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
     return false;
   }
 
-  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs)
-  { return lhs.distance < rhs.distance; });
+  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs) { return lhs.distance < rhs.distance; });
 
   outPosition  = PointLocalToScene(results.front().point);
   outFaceIndex = results.front().faceIndex;
@@ -227,19 +226,19 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
 
 const Poly* NavigationMesh::GetFace(FaceIndex index) const
 {
-  auto* basePtr = reinterpret_cast<const Poly*>(mBuffer.data() + mHeader.dataOffset + mHeader.polyDataOffset);
+  auto* basePtr = reinterpret_cast<const Poly*>(mBuffer.Data() + mHeader.dataOffset + mHeader.polyDataOffset);
   return &basePtr[index];
 }
 
 const Edge* NavigationMesh::GetEdge(EdgeIndex index) const
 {
-  auto* basePtr = reinterpret_cast<const Edge*>(mBuffer.data() + mHeader.dataOffset + mHeader.edgeDataOffset);
+  auto* basePtr = reinterpret_cast<const Edge*>(mBuffer.Data() + mHeader.dataOffset + mHeader.edgeDataOffset);
   return &basePtr[index];
 }
 
 const Vertex* NavigationMesh::GetVertex(VertexIndex index) const
 {
-  auto* basePtr = reinterpret_cast<const Vertex*>(mBuffer.data() + mHeader.dataOffset + mHeader.vertexDataOffset);
+  auto* basePtr = reinterpret_cast<const Vertex*>(mBuffer.Data() + mHeader.dataOffset + mHeader.vertexDataOffset);
   return &basePtr[index];
 }
 
