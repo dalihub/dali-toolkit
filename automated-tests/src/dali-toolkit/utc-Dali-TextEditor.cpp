@@ -878,8 +878,8 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<Vector4>(TextEditor::Property::SELECTION_HIGHLIGHT_COLOR), Color::GREEN, TEST_LOCATION);
 
   // Decoration bounding box
-  editor.SetProperty(TextEditor::Property::DECORATION_BOUNDING_BOX, Rect<int>(0, 0, 1, 1));
-  DALI_TEST_EQUALS(editor.GetProperty<Rect<int> >(TextEditor::Property::DECORATION_BOUNDING_BOX), Rect<int>(0, 0, 1, 1), TEST_LOCATION);
+  editor.SetProperty(TextEditor::Property::DECORATION_BOUNDING_BOX, BoundsInteger(0, 0, 1, 1));
+  DALI_TEST_EQUALS(editor.GetProperty<BoundsInteger>(TextEditor::Property::DECORATION_BOUNDING_BOX), BoundsInteger(0, 0, 1, 1), TEST_LOCATION);
 
   // Check the enable markup property.
   DALI_TEST_CHECK(!editor.GetProperty<bool>(TextEditor::Property::ENABLE_MARKUP));

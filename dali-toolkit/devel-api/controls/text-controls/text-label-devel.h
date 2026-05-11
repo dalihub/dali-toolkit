@@ -399,7 +399,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint
  * @param[in] endIndex end index(included) of the text requested to get bounding box to.
  * @return bounding box of the requested text.
  */
-DALI_TOOLKIT_API Rect<float> GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
+DALI_TOOLKIT_API Bounds GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Set text fit array to text label.

@@ -2257,12 +2257,12 @@ Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-Rect<float> TextLabel::GetLineBoundingRectangle(const uint32_t lineIndex) const
+Bounds TextLabel::GetLineBoundingRectangle(const uint32_t lineIndex) const
 {
   return mController->GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> TextLabel::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+Bounds TextLabel::GetCharacterBoundingRectangle(const uint32_t charIndex) const
 {
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
@@ -2272,7 +2272,7 @@ int TextLabel::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
-Rect<float> TextLabel::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+Bounds TextLabel::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
 {
   return mController->GetTextBoundingRectangle(startIndex, endIndex);
 }

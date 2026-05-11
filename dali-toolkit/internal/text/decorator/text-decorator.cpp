@@ -92,7 +92,7 @@ typedef Dali::Vector<Dali::Vector4> QuadContainer;
  * @param[in] boundingRectangle local bounding
  * @param[out] Vector4 World coordinate bounding Box.
  */
-void LocalToWorldCoordinatesBoundingBox(const Dali::Rect<int>& boundingRectangle, Dali::Vector4& boundingBox)
+void LocalToWorldCoordinatesBoundingBox(const Dali::BoundsInteger& boundingRectangle, Dali::Vector4& boundingBox)
 {
   // Convert to world coordinates and store as a Vector4 to be compatible with Property Notifications.
   Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
@@ -106,7 +106,7 @@ void LocalToWorldCoordinatesBoundingBox(const Dali::Rect<int>& boundingRectangle
                               originY + boundingRectangle.height);
 }
 
-void WorldToLocalCoordinatesBoundingBox(const Dali::Vector4& boundingBox, Dali::Rect<int>& boundingRectangle)
+void WorldToLocalCoordinatesBoundingBox(const Dali::Vector4& boundingBox, Dali::BoundsInteger& boundingRectangle)
 {
   // Convert to local coordinates and store as a Dali::Rect.
   Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
@@ -1999,12 +1999,12 @@ DecoratorPtr Decorator::New(ControllerInterface&                 controller,
                                     callbackInterface));
 }
 
-void Decorator::SetBoundingBox(const Rect<int>& boundingBox)
+void Decorator::SetBoundingBox(const BoundsInteger& boundingBox)
 {
   LocalToWorldCoordinatesBoundingBox(boundingBox, mImpl->mBoundingBox);
 }
 
-void Decorator::GetBoundingBox(Rect<int>& boundingBox) const
+void Decorator::GetBoundingBox(BoundsInteger& boundingBox) const
 {
   WorldToLocalCoordinatesBoundingBox(mImpl->mBoundingBox, boundingBox);
 }

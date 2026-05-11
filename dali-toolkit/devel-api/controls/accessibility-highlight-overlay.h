@@ -3,7 +3,7 @@
 #define DALI_TOOLKIT_ACCESSIBILITY_HIGHLIGHT_OVERLAY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,9 +102,9 @@ private:
    * @brief Returns the size and position of the screen overlay based on the given SceneView and the previous highlight actor.
    * @param sceneView The SceneView for which the screen overlay extents will be calculated.
    * @param highlight The previously used highlight actor.
-   * @return A Rect<float> representing the extents of the screen overlay.
+   * @return A Dali::Bounds representing the extents of the screen overlay.
    */
-  Rect<float> GetOverlayExtents(Dali::Actor& sceneView, Dali::Actor& highlight);
+  Bounds GetOverlayExtents(Dali::Actor& sceneView, Dali::Actor& highlight);
 
 private:
   bool                          mHasOverlayActor;

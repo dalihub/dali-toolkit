@@ -219,13 +219,13 @@ void AccessibilityHighlightOverlay::UpdateOverlayPosition(Dali::Actor& sceneView
   }
 }
 
-Rect<float> AccessibilityHighlightOverlay::GetOverlayExtents(Dali::Actor& sceneView, Actor& highlight)
+Bounds AccessibilityHighlightOverlay::GetOverlayExtents(Dali::Actor& sceneView, Actor& highlight)
 {
   auto model = highlight.GetParent();
   if(!model)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "model is null\n");
-    return Rect<float>(-1.0f, -1.0f, -1.0f, -1.0f);
+    return Bounds(-1.0f, -1.0f, -1.0f, -1.0f);
   }
 
   auto actualSceneExtent = DevelActor::CalculateScreenExtents(sceneView);
@@ -233,7 +233,7 @@ Rect<float> AccessibilityHighlightOverlay::GetOverlayExtents(Dali::Actor& sceneV
   auto x                 = actualExtent.x - actualSceneExtent.x + (actualExtent.width / 2);
   auto y                 = actualExtent.y - actualSceneExtent.y + (actualExtent.height / 2);
 
-  return Rect<float>(x, y, actualExtent.width, actualExtent.height);
+  return Bounds(x, y, actualExtent.width, actualExtent.height);
 }
 
 } // namespace Dali::Toolkit::DevelControl

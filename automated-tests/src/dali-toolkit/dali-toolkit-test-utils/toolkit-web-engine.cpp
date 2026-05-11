@@ -1455,11 +1455,11 @@ public:
   void AddDynamicCertificatePath(const std::string& host, const std::string& certPath) override
   {
   }
-  Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor) override
+  Dali::PixelData GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor) override
   {
     return Dali::PixelData();
   }
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, ScreenshotCapturedCallback callback) override
+  bool GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, ScreenshotCapturedCallback callback) override
   {
     return false;
   }
@@ -1470,7 +1470,7 @@ public:
   void RegisterGeolocationPermissionCallback(GeolocationPermissionCallback callback) override
   {
   }
-  void UpdateDisplayArea(Dali::Rect<int32_t> displayArea) override
+  void UpdateDisplayArea(Dali::BoundsInteger displayArea) override
   {
   }
   void EnableVideoHole(bool enabled) override
@@ -1988,7 +1988,7 @@ public:
     mAccessibilityAddress = gWebAccessibleActivatedAddress;
   }
 
-  Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
+  Dali::PixelData GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor)
   {
     uint32_t bufferSize = viewArea.width * viewArea.height * 4;
     uint8_t* pixel      = new uint8_t[bufferSize];
@@ -1996,7 +1996,7 @@ public:
     return Dali::PixelData::New(pixel, bufferSize, viewArea.width, viewArea.height, Dali::Pixel::Format::RGBA8888, Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
   }
 
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+  bool GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
   {
     if(callback)
     {
@@ -2930,12 +2930,12 @@ void WebEngine::AddDynamicCertificatePath(const std::string& host, const std::st
 {
 }
 
-Dali::PixelData WebEngine::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
+Dali::PixelData WebEngine::GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor)
 {
   return Internal::Adaptor::GetImplementation(*this).GetScreenshot(viewArea, scaleFactor);
 }
 
-bool WebEngine::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+bool WebEngine::GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
 {
   return Internal::Adaptor::GetImplementation(*this).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
 }
@@ -3068,7 +3068,7 @@ float WebEngine::GetLoadProgressPercentage() const
   return Internal::Adaptor::GetImplementation(*this).GetLoadProgressPercentage();
 }
 
-void WebEngine::UpdateDisplayArea(Dali::Rect<int32_t> displayArea)
+void WebEngine::UpdateDisplayArea(Dali::BoundsInteger displayArea)
 {
 }
 

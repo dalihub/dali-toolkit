@@ -85,7 +85,7 @@ Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, 
   return GetImpl(textField).GetTextPosition(startIndex, endIndex);
 }
 
-Rect<float> GetTextBoundingRectangle(TextField textField, uint32_t startIndex, uint32_t endIndex)
+Bounds GetTextBoundingRectangle(TextField textField, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textField).GetTextBoundingRectangle(startIndex, endIndex);
 }

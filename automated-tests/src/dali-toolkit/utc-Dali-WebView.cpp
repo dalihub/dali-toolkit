@@ -1272,7 +1272,7 @@ int UtcDaliWebViewGetScreenshotSyncAndAsync(void)
   DALI_TEST_CHECK(view);
 
   // Check GetScreenshot
-  Dali::Rect<int> viewArea;
+  Dali::BoundsInteger viewArea;
   viewArea.x                          = 100;
   viewArea.y                          = 100;
   viewArea.width                      = 10;

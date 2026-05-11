@@ -50,7 +50,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
  * @param[in] lineIndex line index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex);
+Bounds GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex);
 
 /**
  * @brief Get the left point of the line (x).
@@ -81,7 +81,7 @@ float GetLineTop(const Vector<LineRun>& lines, const LineRun& lineRun);
  * @param[in] charIndex character index to which we want to calculate the geometry for.
  * @return Rect {x, y, width, height}.
  */
-Rect<float> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex);
+Bounds GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex);
 
 /**
  * @brief Get the character index.

@@ -643,7 +643,7 @@ public:
    *
    * @return image view of screen shot
    */
-  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor);
+  Dali::Toolkit::ImageView GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor);
 
   /**
    * @brief Request to get snapshot of the specified viewArea of page asynchronously.
@@ -654,7 +654,7 @@ public:
    *
    * @return true if requested successfully, false otherwise
    */
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, WebViewScreenshotCapturedCallback callback);
+  bool GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, WebViewScreenshotCapturedCallback callback);
 
   /**
    * @brief Asynchronous request to check if there is a video playing in the given view.

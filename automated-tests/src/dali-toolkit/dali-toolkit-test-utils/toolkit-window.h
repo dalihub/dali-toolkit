@@ -35,7 +35,7 @@ class KeyEvent;
 class TouchEvent;
 class WheelEvent;
 
-typedef Dali::Rect<int> PositionSize;
+typedef Dali::BoundsInteger PositionSize;
 
 namespace Internal
 {

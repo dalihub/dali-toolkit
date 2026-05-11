@@ -329,12 +329,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshot()
    */
-  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor);
+  Dali::Toolkit::ImageView GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshotAsynchronously()
    */
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
+  bool GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CheckVideoPlayingAsynchronously()
@@ -802,7 +802,7 @@ private:
    *
    * @param[in] displayArea The display area for current webview want to show.
    */
-  void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
+  void SetDisplayArea(const Dali::BoundsInteger& displayArea);
 
 protected:
   class WebViewAccessible : public DevelControl::ControlAccessible
@@ -850,7 +850,7 @@ private:
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
-  Dali::Rect<int32_t>        mWebViewArea;
+  Dali::BoundsInteger        mWebViewArea;
   bool                       mVideoHoleEnabled;
   bool                       mMouseEventsEnabled;
   bool                       mKeyEventsEnabled;

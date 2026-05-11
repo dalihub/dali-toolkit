@@ -40,11 +40,11 @@ static constexpr const char* READING_INFO_TYPE_DESCRIPTION    = "description";
 static constexpr const char* READING_INFO_TYPE_STATE          = "state";
 static constexpr const char* READING_INFO_TYPE_SEPARATOR      = "|";
 
-Dali::Rect<float> GetShowingGeometry(Dali::Rect<float> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
+Dali::Bounds GetShowingGeometry(Dali::Bounds rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
 {
-  Rect<float> parentRect;
-  Vector2     currentPosition;
-  auto        parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
+  Bounds  parentRect;
+  Vector2 currentPosition;
+  auto    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
 
   while(parent)
   {
@@ -68,7 +68,7 @@ Dali::Rect<float> GetShowingGeometry(Dali::Rect<float> rect, Dali::Toolkit::Deve
 
   return rect;
 }
-static bool IsShowingGeometryOnScreen(Dali::Rect<float> rect)
+static bool IsShowingGeometryOnScreen(Dali::Bounds rect)
 {
   return rect.width > 0 && rect.height > 0;
 }

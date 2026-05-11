@@ -891,8 +891,8 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS(field.GetProperty<Vector4>(TextField::Property::SELECTION_HIGHLIGHT_COLOR), Color::GREEN, TEST_LOCATION);
 
   // Decoration bounding box
-  field.SetProperty(TextField::Property::DECORATION_BOUNDING_BOX, Rect<int>(0, 0, 1, 1));
-  DALI_TEST_EQUALS(field.GetProperty<Rect<int> >(TextField::Property::DECORATION_BOUNDING_BOX), Rect<int>(0, 0, 1, 1), TEST_LOCATION);
+  field.SetProperty(TextField::Property::DECORATION_BOUNDING_BOX, BoundsInteger(0, 0, 1, 1));
+  DALI_TEST_EQUALS(field.GetProperty<BoundsInteger>(TextField::Property::DECORATION_BOUNDING_BOX), BoundsInteger(0, 0, 1, 1), TEST_LOCATION);
 
   // Check the input method setting
   Property::Map                   propertyMap;

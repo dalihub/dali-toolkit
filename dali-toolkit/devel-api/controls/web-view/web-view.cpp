@@ -334,12 +334,12 @@ void WebView::AddDynamicCertificatePath(const std::string& host, const std::stri
   Dali::Toolkit::GetImpl(*this).AddDynamicCertificatePath(host, certPath);
 }
 
-Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor)
 {
   return Dali::Toolkit::GetImpl(*this).GetScreenshot(viewArea, scaleFactor);
 }
 
-bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+bool WebView::GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
 {
   return Dali::Toolkit::GetImpl(*this).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
 }

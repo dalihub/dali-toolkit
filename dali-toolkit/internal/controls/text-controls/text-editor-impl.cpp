@@ -371,12 +371,12 @@ Vector<Vector2> TextEditor::GetTextPosition(const uint32_t startIndex, const uin
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-Rect<float> TextEditor::GetLineBoundingRectangle(const uint32_t lineIndex) const
+Bounds TextEditor::GetLineBoundingRectangle(const uint32_t lineIndex) const
 {
   return mController->GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> TextEditor::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+Bounds TextEditor::GetCharacterBoundingRectangle(const uint32_t charIndex) const
 {
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
@@ -386,7 +386,7 @@ int TextEditor::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
-Rect<float> TextEditor::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+Bounds TextEditor::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
 {
   return mController->GetTextBoundingRectangle(startIndex, endIndex);
 }
@@ -602,13 +602,13 @@ void TextEditor::OnInitialize()
   self.TouchedSignal().Connect(this, &TextEditor::OnTouched);
 
   // Set BoundingBox to stage size if not already set.
-  Rect<int> boundingBox;
+  BoundsInteger boundingBox;
   mDecorator->GetBoundingBox(boundingBox);
 
   if(boundingBox.IsEmpty())
   {
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-    mDecorator->SetBoundingBox(Rect<int>(0.0f, 0.0f, stageSize.width, stageSize.height));
+    mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(std::roundf(stageSize.width)), static_cast<int32_t>(std::roundf(stageSize.height))));
   }
 
   // Whether to flip the selection handles as soon as they cross.
