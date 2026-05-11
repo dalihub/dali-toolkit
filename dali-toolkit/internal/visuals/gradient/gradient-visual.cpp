@@ -321,7 +321,7 @@ void GradientVisual::OnInitialize()
   }
 
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT + (mGradientType == Type::CONIC ? 1 : 0));
   mImpl->mRenderer.SetTextures(textureSet);
 
   // If opaque and then no need to have blending
