@@ -99,7 +99,6 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
   dali-toolkit-test-utils/toolkit-input-method-options.cpp
   dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
-  dali-toolkit-test-utils/toolkit-orientation.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
   dali-toolkit-test-utils/toolkit-test-application.cpp

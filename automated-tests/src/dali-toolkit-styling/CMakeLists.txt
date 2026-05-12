@@ -24,7 +24,6 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-options.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-sound-player.cpp

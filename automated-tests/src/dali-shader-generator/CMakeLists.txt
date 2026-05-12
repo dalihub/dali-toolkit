@@ -26,7 +26,6 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/toolkit-input-method-context.cpp
   ${TEST_HARNESS_DIR}/toolkit-input-method-options.cpp
   ${TEST_HARNESS_DIR}/toolkit-lifecycle-controller.cpp
-  ${TEST_HARNESS_DIR}/toolkit-orientation.cpp
   ${TEST_HARNESS_DIR}/toolkit-style-monitor.cpp
   ${TEST_HARNESS_DIR}/toolkit-test-application.cpp
   ${TEST_HARNESS_DIR}/toolkit-timer.cpp
