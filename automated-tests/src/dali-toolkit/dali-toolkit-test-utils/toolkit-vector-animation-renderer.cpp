@@ -226,6 +226,16 @@ public:
     mEnableFixedCache = true;
   }
 
+  void SetEnableAspectFit(bool enable)
+  {
+    mEnableAspectFit = enable;
+  }
+
+  bool IsEnableAspectFit() const
+  {
+    return mEnableAspectFit;
+  }
+
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
   {
     return mUploadCompletedSignal;
@@ -283,6 +293,7 @@ public:
   bool     mNeedTrigger{true};
   bool     mEnableFixedCache{false};
   bool     mUseNativeImage{false};
+  bool     mEnableAspectFit{true};
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr<EventThreadCallback>                     mEventThreadCallback;
@@ -421,6 +432,16 @@ void VectorAnimationRenderer::AddPropertyValueCallback(const std::string& keyPat
 void VectorAnimationRenderer::KeepRasterizedBuffer()
 {
   Internal::Adaptor::GetImplementation(*this).KeepRasterizedBuffer();
+}
+
+void VectorAnimationRenderer::SetEnableAspectFit(bool enable)
+{
+  Internal::Adaptor::GetImplementation(*this).SetEnableAspectFit(enable);
+}
+
+bool VectorAnimationRenderer::IsEnableAspectFit() const
+{
+  return Internal::Adaptor::GetImplementation(*this).IsEnableAspectFit();
 }
 
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
