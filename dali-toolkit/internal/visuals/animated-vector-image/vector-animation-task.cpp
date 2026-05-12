@@ -115,7 +115,8 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mMarkerInfoCached(false),
   mEnableFrameCache(false),
   mNotifyAfterRasterization(false),
-  mSizeUpdated(false)
+  mSizeUpdated(false),
+  mEnableAspectFit(true)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }

@@ -269,6 +269,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION, mNotifyAfterRasterization);
   map.Insert(Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR, mFrameSpeedFactor);
   map.Insert(Toolkit::DevelImageVisual::Property::RENDER_SCALE, mRenderScale);
+  map.Insert(Toolkit::DevelImageVisual::Property::ENABLE_ASPECT_FIT, mVectorAnimationTask->IsEnableAspectFit());
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -486,6 +487,19 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
       {
         mRenderScale = renderScale;
         SetVectorImageSize();
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::ENABLE_ASPECT_FIT:
+    {
+      bool enableAspectFit = true;
+      if(value.Get(enableAspectFit))
+      {
+        if(mVectorAnimationTask)
+        {
+          mVectorAnimationTask->SetEnableAspectFit(enableAspectFit);
+        }
       }
       break;
     }

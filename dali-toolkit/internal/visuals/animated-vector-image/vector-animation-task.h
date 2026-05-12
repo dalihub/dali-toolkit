@@ -276,6 +276,17 @@ public:
     return mEnableFrameCache;
   }
 
+  void SetEnableAspectFit(bool enable)
+  {
+    mEnableAspectFit = enable;
+    mVectorRenderer.SetEnableAspectFit(enable);
+  }
+
+  bool IsEnableAspectFit() const
+  {
+    return mEnableAspectFit;
+  }
+
 public: // Implementation of AsyncTask
   /**
    * @copydoc Dali::AsyncTask::Process()
@@ -433,6 +444,7 @@ private:
   bool                                 mEnableFrameCache : 1;
   bool                                 mNotifyAfterRasterization : 1;
   bool                                 mSizeUpdated : 1;
+  bool                                 mEnableAspectFit : 1;
 };
 
 } // namespace Internal
