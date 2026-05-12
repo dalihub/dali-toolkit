@@ -29,7 +29,7 @@
 
 namespace Dali
 {
-using PositionSize = Dali::Rect<int>;
+using PositionSize = Dali::BoundsInteger;
 
 namespace Internal
 {

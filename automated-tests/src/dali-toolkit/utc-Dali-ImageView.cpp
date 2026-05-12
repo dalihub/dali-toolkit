@@ -5225,7 +5225,7 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   textureCallStack.Enable(true);
   textureCallStack.EnableLogging(true);
 
-  auto TestBorderImage = [&](int index, const String& normalImageUrl, const Rect<int> border, const char* location)
+  auto TestBorderImage = [&](int index, const String& normalImageUrl, const Extents border, const char* location)
   {
     Property::Map map;
     map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::N_PATCH;
@@ -5238,7 +5238,7 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
     application.GetScene().Add(imageView[index]);
   };
 
-  TestBorderImage(0, gImage_34_RGBA, Rect<int>(0, 0, 0, 0), TEST_LOCATION);
+  TestBorderImage(0, gImage_34_RGBA, Extents(0, 0, 0, 0), TEST_LOCATION);
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   application.SendNotification();
@@ -5253,8 +5253,8 @@ int UtcDaliImageViewNpatchImageCacheTest02(void)
   // Let we use cached textures
   for(int i = 0; i < 10; i++)
   {
-    TestBorderImage(0, gImage_34_RGBA, Rect<int>(i, i + 1, i + 2, i + 3), TEST_LOCATION);
-    TestBorderImage(1, gImage_34_RGBA, Rect<int>(i + 1, i, i + 3, i + 2), TEST_LOCATION);
+    TestBorderImage(0, gImage_34_RGBA, Extents(i, i + 1, i + 2, i + 3), TEST_LOCATION);
+    TestBorderImage(1, gImage_34_RGBA, Extents(i + 1, i, i + 3, i + 2), TEST_LOCATION);
   }
 
   application.SendNotification();

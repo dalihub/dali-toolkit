@@ -1753,12 +1753,12 @@ Vector<Vector2> Controller::GetTextPosition(CharacterIndex startIndex, Character
   return positionsList;
 }
 
-Rect<float> Controller::GetLineBoundingRectangle(const uint32_t lineIndex)
+Bounds Controller::GetLineBoundingRectangle(const uint32_t lineIndex)
 {
   return GetLineBoundingRect(mImpl->mModel, lineIndex);
 }
 
-Rect<float> Controller::GetCharacterBoundingRectangle(const uint32_t charIndex)
+Bounds Controller::GetCharacterBoundingRectangle(const uint32_t charIndex)
 {
   return GetCharacterBoundingRect(mImpl->mModel, charIndex);
 }
@@ -1768,7 +1768,7 @@ int Controller::GetCharacterIndexAtPosition(float visualX, float visualY)
   return GetCharIndexAtPosition(mImpl->mModel, visualX, visualY);
 }
 
-Rect<float> Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
+Bounds Controller::GetTextBoundingRectangle(CharacterIndex startIndex, CharacterIndex endIndex)
 {
   return Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(mImpl->mModel, startIndex, endIndex);
 }

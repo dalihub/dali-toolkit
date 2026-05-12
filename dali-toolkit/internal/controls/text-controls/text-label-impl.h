@@ -147,7 +147,7 @@ public:
    * @param[in] lineIndex line index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
+  Bounds GetLineBoundingRectangle(const uint32_t lineIndex) const;
 
   /**
    * @brief Get the character bounding rectangle.
@@ -156,7 +156,7 @@ public:
    * @param[in] charIndex character index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+  Bounds GetCharacterBoundingRectangle(const uint32_t charIndex) const;
 
   /**
    * @brief Get the character index.
@@ -175,7 +175,7 @@ public:
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
+  Bounds GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
 
   /**
    * @brief Set the @p spannedText into current textLabel

@@ -57,7 +57,7 @@ bool ValidateRange(const std::string& string, std::size_t begin, std::size_t end
   return true;
 }
 } //namespace
-Rect<float> CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex)
+Bounds CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstraction::CharacterIndex startIndex, TextAbstraction::CharacterIndex endIndex)
 {
   Vector<Vector2> sizeList;
   Vector<Vector2> positionList;
@@ -248,7 +248,7 @@ std::size_t TextControlAccessible::GetCursorOffset() const
   return 0u;
 }
 
-Rect<float> TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type)
+Bounds TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type)
 {
   if(!ValidateRange(GetWholeText(), startOffset, endOffset))
   {

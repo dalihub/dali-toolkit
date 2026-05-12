@@ -593,7 +593,7 @@ int UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad2(void)
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(2, 2, 2, 2));
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   {
     tet_infoline("whole grid");
@@ -637,7 +637,7 @@ int UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(1, 1, 1, 1));
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   {
     tet_infoline("whole grid");
@@ -735,7 +735,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(2, 2, 2, 2));
   {
     tet_infoline("whole grid (2,2,2,2) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -778,7 +778,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(2, 2, 2, 2));
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   {
     tet_infoline("whole grid (2,2,2,2) sync");
@@ -802,7 +802,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(1, 1, 1, 1));
   propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
   {
     tet_infoline("whole grid (1,1,1,1) sync : for testing same image, different border");
@@ -826,7 +826,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(1, 1, 1, 1));
   {
     tet_infoline("whole grid (1,1,1,1) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -849,7 +849,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(3, 3, 3, 3));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(3, 3, 3, 3));
   {
     tet_infoline("whole grid (3,3,3,3) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -1269,7 +1269,7 @@ int UtcDaliVisualFactoryGetNPatchVisual10(void)
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(2, 2, 2, 2));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(2, 2, 2, 2));
   {
     tet_infoline("whole grid (2,2,2,2) async");
     Visual::Base visual = factory.CreateVisual(propertyMap);
@@ -1292,7 +1292,7 @@ int UtcDaliVisualFactoryGetNPatchVisual10(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 1, 1, 1));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(1, 1, 1, 1));
   {
     tet_infoline("whole grid (1,1,1,1) async. Check whether we use cached texture");
     // We don't use dummyControl here
@@ -1316,7 +1316,7 @@ int UtcDaliVisualFactoryGetNPatchVisual10(void)
   propertyMap.Clear();
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::N_PATCH);
   propertyMap.Insert(ImageVisual::Property::URL, gImage_34_RGBA);
-  propertyMap.Insert(ImageVisual::Property::BORDER, Rect<int>(1, 2, 1, 2));
+  propertyMap.Insert(ImageVisual::Property::BORDER, Extents(1, 2, 1, 2));
   {
     tet_infoline("whole grid (1,2,1,2) async. Check whether we use cached texture");
     // We don't use dummyControl here

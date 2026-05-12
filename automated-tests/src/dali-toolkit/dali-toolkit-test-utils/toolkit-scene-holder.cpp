@@ -80,7 +80,7 @@ private:
   bool&     mAdaptorStarted;
 };
 
-SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
+SceneHolder::SceneHolder(const Dali::BoundsInteger& positionSize)
 : mId(0),
   mRenderSurface(new TestRenderSurface(positionSize)),
   mFocusChangedGeneratedSignal(),

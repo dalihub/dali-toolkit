@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_DECORATOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ public:
    *
    * @param[in] boundingBox Vector( x coordinate, y coordinate, width, height )
    */
-  void SetBoundingBox(const Rect<int>& boundingBox);
+  void SetBoundingBox(const BoundsInteger& boundingBox);
 
   /**
    * @brief Retrieve the bounding box origin and dimensions.
@@ -187,7 +187,7 @@ public:
    * default is set once control is added to stage, before this the return vector will be Vector4:ZERO
    * @param[out] boundingBox The bounding box origin, width and height.
    */
-  void GetBoundingBox(Rect<int>& boundingBox) const;
+  void GetBoundingBox(BoundsInteger& boundingBox) const;
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
