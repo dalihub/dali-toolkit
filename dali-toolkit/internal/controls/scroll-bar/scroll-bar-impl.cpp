@@ -887,7 +887,7 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 void ScrollBar::ScrollBarAccessible::InitDefaultFeatures()
 {
   DevelControl::ControlAccessible::InitDefaultFeatures();
-  AddFeature<Dali::Accessibility::Value>(shared_from_this());
+  AddFeature<Dali::Accessibility::Value>(SharedFromThis());
 }
 
 double ScrollBar::ScrollBarAccessible::GetMinimum() const

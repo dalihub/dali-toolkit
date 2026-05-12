@@ -710,7 +710,7 @@ void WebView::ActivateAccessibility(bool activated)
   mWebEngine.ActivateAccessibility(activated);
 
   auto accessible = GetAccessibleObject();
-  if(auto webviewAccessible = std::dynamic_pointer_cast<WebViewAccessible>(accessible))
+  if(auto webviewAccessible = DynamicPointerCast<WebViewAccessible>(accessible))
   {
     if(!activated)
     {

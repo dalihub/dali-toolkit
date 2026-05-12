@@ -439,7 +439,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  SharedPtr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::IsAccessibleCreated()

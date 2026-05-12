@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-internal.h>
+#include <dali/public-api/common/shared-ptr.h>
 
 namespace Dali::Toolkit::Internal
 {
@@ -98,7 +99,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  SharedPtr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
 public:
   /**
