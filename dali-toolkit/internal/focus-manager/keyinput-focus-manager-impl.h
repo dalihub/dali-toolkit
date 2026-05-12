@@ -63,6 +63,12 @@ public:
   void RemoveFocus(Toolkit::Control control);
 
   /**
+   * Sets whether to defer focus signals until requested.
+   * @param[in] deferred True to defer signals, false to emit any pending signals immediately.
+   */
+  void SetDeferredMode(bool deferred);
+
+  /**
    * @copydoc Toolkit::GetCurrentFocusControl
    */
   Toolkit::Control GetCurrentFocusControl() const;
@@ -95,13 +101,14 @@ private:
    * This will be called when a new scene holder is created
    * @param sceneHolder The new scene holder
    */
-  void OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder);
+  void OnSceneHolderCreated(Dali::Integration::SceneHolder sceneHolder);
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
+   * @param[in] sceneHolder The scene holder where the key event occurred
    * @param[in] event The KeyEvent event.
    */
-  bool OnKeyEvent(const KeyEvent& event);
+  bool OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, KeyEvent event);
 
   /**
    * Signal handler called when a focused Control is removed from Scene.
@@ -115,7 +122,7 @@ private:
    * @param[in]  event    The KeyEvent.
    * @return True if KeyEvent is consumed.
    */
-  bool EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event);
+  bool EmitKeyEventSignal(Toolkit::Control control, KeyEvent event);
 
   /**
    * Gets the current native window id
@@ -134,8 +141,11 @@ private:
 
   SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
-  Toolkit::Control mCurrentFocusControl; ///< The current focused control
-  uint32_t         mCurrentWindowId;     ///< The native window id of current focused control
+  Toolkit::Control mCurrentFocusControl;  ///< The current focused control
+  Toolkit::Control mPendingLostControl;   ///< The control that is pending to lose focus
+  Toolkit::Control mPendingGainedControl; ///< The control that is pending to gain focus
+  uint32_t         mCurrentWindowId;      ///< The native window id of current focused control
+  bool             mDeferredMode;         ///< Whether to defer signals
 };
 
 } // namespace Internal

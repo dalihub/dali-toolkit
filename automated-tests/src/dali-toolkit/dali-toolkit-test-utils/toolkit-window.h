@@ -35,7 +35,7 @@ class KeyEvent;
 class TouchEvent;
 class WheelEvent;
 
-typedef Dali::Rect<int> PositionSize;
+typedef Dali::BoundsInteger PositionSize;
 
 namespace Internal
 {
@@ -46,17 +46,17 @@ class Window;
 } // namespace Internal
 
 class Window;
-typedef Signal<void(Window, bool)>       FocusChangeSignalType;
-typedef Signal<void(Window, Uint16Pair)> ResizeSignalType;
+typedef Signal<void(Window, bool)>      FocusChangeSignalType;
+typedef Signal<void(Window, Int32Pair)> ResizeSignalType;
 
 class Window : public BaseHandle
 {
 public:
-  using WindowSize     = Uint16Pair;
+  using WindowSize     = Int32Pair;
   using WindowPosition = Int32Pair;
 
-  using KeyEventSignalType   = Signal<void(const KeyEvent&)>;
-  using TouchEventSignalType = Signal<void(const TouchEvent&)>;
+  using KeyEventSignalType   = Signal<void(Window, KeyEvent)>;
+  using TouchEventSignalType = Signal<void(Window, TouchEvent)>;
   using ResizeSignalType     = Signal<void(Window, WindowSize)>;
 
   static Window New(PositionSize windowPosition, const Dali::String& name, bool isTransparent = false);
@@ -98,11 +98,11 @@ const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window);
 
 namespace DevelWindow
 {
-typedef Signal<void()>                  EventProcessingFinishedSignalType;
-typedef Signal<bool(const KeyEvent&)>   KeyEventGeneratedSignalType;
-typedef Signal<void(const WheelEvent&)> WheelEventSignalType;
-typedef Signal<bool(const WheelEvent&)> WheelEventGeneratedSignalType;
-typedef Signal<void(Window, bool)>      VisibilityChangedSignalType;
+typedef Signal<void()>                   EventProcessingFinishedSignalType;
+typedef Signal<bool(Window, KeyEvent)>   KeyEventGeneratedSignalType;
+typedef Signal<void(Window, WheelEvent)> WheelEventSignalType;
+typedef Signal<bool(Window, WheelEvent)> WheelEventGeneratedSignalType;
+typedef Signal<void(Window, bool)>       VisibilityChangedSignalType;
 
 Dali::Window Get(Actor actor);
 void         SetPositionSize(Window window, PositionSize positionSize);

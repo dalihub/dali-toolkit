@@ -214,7 +214,7 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
 
   loader.Load(gImage_34_RGBA);                                                                                                             // Trigger 1
   uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));                                                                    // Trigger 2
-  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true); // Trigger 3
+  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), SamplingMode::BOX_THEN_LINEAR, true); // Trigger 3
 
   // Try load animted image
   Dali::AnimatedImageLoading animatedImageLoading = Dali::AnimatedImageLoading::New(gImage_gif, true);
@@ -249,7 +249,7 @@ int UtcDaliAsyncImageLoaderCancel01(void)
 
   uint32_t id01 = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
   uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));
-  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
+  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), SamplingMode::BOX_THEN_LINEAR, true);
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(3), true, TEST_LOCATION);
 
@@ -302,7 +302,7 @@ int UtcDaliAsyncImageLoaderCancelAll(void)
 
   uint32_t id01 = loader.Load(gImage_34_RGBA, ImageDimensions(34, 34));
   uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));
-  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, true);
+  uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), SamplingMode::BOX_THEN_LINEAR, true);
   loader.CancelAll();
 
   // Test that cancelling a non-existing loading task will return false

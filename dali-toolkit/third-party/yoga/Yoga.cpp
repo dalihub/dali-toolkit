@@ -2106,8 +2106,11 @@ static float YGDistributeFreeSpaceSecondPass(
         performLayout && !requiresStretchLayout,
         "flex",
         config);
+
+    // Change code to use || instead of | to remove Yoga.cpp:2110:9: warning: use of bitwise '|' with boolean operands [-Wbitwise-instead-of-logical]
+    // 2026-04-23 eunkiki.hong@samsung.com
     node->setLayoutHadOverflow(
-        node->getLayout().hadOverflow |
+        node->getLayout().hadOverflow ||
         currentRelativeChild->getLayout().hadOverflow);
   }
   return deltaFreeSpace;

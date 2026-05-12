@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/math/math-utils.h>
@@ -29,6 +31,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace
 {
@@ -367,10 +371,12 @@ void BackgroundBlurEffectImpl::OnActivate()
   auto&    blurShader         = GaussianBlurAlgorithm::GetGaussianBlurShader(mDownscaledBlurRadius);
   Renderer horizontalRenderer = mHorizontalBlurActor.GetRendererAt(0u);
   horizontalRenderer.SetShader(blurShader);
+  SetRendererTexture(horizontalRenderer, mInputBackgroundFrameBuffer);
   horizontalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(1.0f / downsampledWidth, 0.0f));
 
   Renderer verticalRenderer = mVerticalBlurActor.GetRendererAt(0u);
   verticalRenderer.SetShader(blurShader);
+  SetRendererTexture(verticalRenderer, mTemporaryFrameBuffer);
   verticalRenderer.RegisterProperty(UNIFORM_BLUR_OFFSET_DIRECTION_NAME.data(), Vector2(0.0f, 1.0f / downsampledHeight));
 
   // Inject blurred output to control
@@ -395,6 +401,8 @@ void BackgroundBlurEffectImpl::OnDeactivate()
   }
   Renderer renderer = GetTargetRenderer();
   SetRendererTexture(renderer, Dali::Texture());
+  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), Dali::Texture());
+  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), Dali::Texture());
 
   auto ownerControl = GetOwnerControl();
   if(DALI_LIKELY(ownerControl))
@@ -471,16 +479,29 @@ void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions downsamp
   // buffer to draw input texture
   mInputBackgroundFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::AUTO);
   Texture inputBackgroundTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
 
   // buffer to draw half-blurred output
   mTemporaryFrameBuffer    = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture temporaryTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
-  mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
 
   // buffer to draw blurred output
   mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture sourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "BackgroundBlurEffect r:" << mBlurRadius << " d:" << mDownscaleFactor << " once: " << mBlurOnce;
+    std::string prefix = oss.str();
+
+    Dali::Integration::TextureUploadWithContent(inputBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(1)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+  }
+#endif
+
+  mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
+  mTemporaryFrameBuffer.AttachColorTexture(temporaryTexture);
   mBlurredOutputFrameBuffer.AttachColorTexture(sourceTexture);
 }
 
@@ -510,7 +531,6 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder 
   mSourceRenderTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, mInternalDownscaleFactor);
 
   // draw half-blurred output
-  SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0), mInputBackgroundFrameBuffer);
   mHorizontalBlurTask = taskList.CreateTask();
   mHorizontalBlurTask.SetSourceActor(mHorizontalBlurActor);
   mHorizontalBlurTask.SetExclusive(true);
@@ -523,7 +543,6 @@ void BackgroundBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder 
   mHorizontalBlurTask.SetClearColor(Color::TRANSPARENT);
 
   // draw blurred output
-  SetRendererTexture(mVerticalBlurActor.GetRendererAt(0), mTemporaryFrameBuffer);
   mVerticalBlurTask = taskList.CreateTask();
   mVerticalBlurTask.SetSourceActor(mVerticalBlurActor);
   mVerticalBlurTask.SetExclusive(true);
@@ -569,7 +588,7 @@ void BackgroundBlurEffectImpl::DestroyRenderTasks()
   mSourceRenderTask.Reset();
 }
 
-void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
+void BackgroundBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mVerticalBlurTask == renderTask))
   {

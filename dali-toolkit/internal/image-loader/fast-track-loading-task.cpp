@@ -82,30 +82,13 @@ Dali::PixelData GetDummyAPixelData()
   return pixelDataA;
 }
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-Dali::PixelData GetDummyPixelDataByFormat(Pixel::Format format)
-{
-  static std::unordered_map<Pixel::Format, Dali::PixelData> gPixelDataCache;
-
-  auto& pixelData = gPixelDataCache[format];
-  if(!pixelData)
-  {
-    uint32_t bpp  = Pixel::GetBytesPerPixel(format);
-    uint8_t* data = new uint8_t[bpp];
-    pixelData     = PixelData::New(data, bpp, 1, 1, format, PixelData::DELETE_ARRAY);
-  }
-  return pixelData;
-}
-#endif
-
 } // namespace
 
-FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
 : AsyncTask(MakeCallback(this, &FastTrackLoadingTask::OnComplete), url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mUrl(url),
   mTextures(),
   mDimensions(dimensions),
-  mFittingMode(fittingMode),
   mSamplingMode(samplingMode),
   mPreMultiplyOnLoad(preMultiplyOnLoad),
   mCallback(),
@@ -165,7 +148,7 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
       {
         content += std::string("(") + ("YUVA"[index]) + ")";
       }
-      Dali::Integration::TextureUploadWithContent(mTextures[index], GetDummyPixelDataByFormat(mImageInformations[index].format), ToDaliString(content), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE);
+      Dali::Integration::TextureUploadWithContent(mTextures[index], Dali::PixelData(), ToDaliString(content), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE, true);
 #endif
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
@@ -212,16 +195,16 @@ void FastTrackLoadingTask::Load()
   {
     if(mLoadPlanesAvaliable)
     {
-      Dali::LoadImagePlanesFromFile(mUrl.GetUrl(), pixelBuffers, mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+      Dali::LoadImagePlanesFromFile(mUrl.GetUrl(), pixelBuffers, mDimensions, mSamplingMode, mOrientationCorrection);
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(mUrl.GetUrl(), mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(mUrl.GetUrl(), mDimensions, mSamplingMode, mOrientationCorrection);
     }
   }
   else if(mUrl.IsValid())
   {
-    pixelBuffer = Dali::DownloadImageSynchronously(mUrl.GetUrl(), mDimensions, mFittingMode, mSamplingMode, mOrientationCorrection);
+    pixelBuffer = Dali::DownloadImageSynchronously(mUrl.GetUrl(), mDimensions, mSamplingMode, mOrientationCorrection);
   }
 
   if(pixelBuffer)

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GEOMETRY_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace TextGeometry
  * @param[in] lineIndex line index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextEditor editor, const uint32_t lineIndex);
+DALI_TOOLKIT_API Bounds GetLineBoundingRectangle(TextEditor editor, const uint32_t lineIndex);
 
 /**
  * @brief Get the line bounding rectangle.
@@ -50,7 +50,7 @@ DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextEditor editor, const u
  * @param[in] lineIndex line index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextLabel label, const uint32_t lineIndex);
+DALI_TOOLKIT_API Bounds GetLineBoundingRectangle(TextLabel label, const uint32_t lineIndex);
 
 /**
  * @brief Get the line bounding rectangle.
@@ -60,7 +60,7 @@ DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextLabel label, const uin
  * @param[in] lineIndex line index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextField field, const uint32_t lineIndex);
+DALI_TOOLKIT_API Bounds GetLineBoundingRectangle(TextField field, const uint32_t lineIndex);
 
 /**
  * @brief Get the character bounding rectangle.
@@ -70,7 +70,7 @@ DALI_TOOLKIT_API Rect<float> GetLineBoundingRectangle(TextField field, const uin
  * @param[in] charIndex character index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex);
+DALI_TOOLKIT_API Bounds GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex);
 
 /**
  * @brief Get the character bounding rectangle.
@@ -80,7 +80,7 @@ DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextLabel label, cons
  * @param[in] charIndex character index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex);
+DALI_TOOLKIT_API Bounds GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex);
 
 /**
  * @brief Get the character bounding rectangle.
@@ -90,7 +90,7 @@ DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextField field, cons
  * @param[in] charIndex character index to which we want to calculate the geometry for.
  * @return bounding rectangle.
  */
-DALI_TOOLKIT_API Rect<float> GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex);
+DALI_TOOLKIT_API Bounds GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex);
 
 /**
  * @brief Get the character index.

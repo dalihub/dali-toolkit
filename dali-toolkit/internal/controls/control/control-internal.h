@@ -92,28 +92,28 @@ public:
    * @param[in] actor The actor the pinch occurred on
    * @param[in] pinch The pinch gesture details
    */
-  void PinchDetected(Actor actor, const PinchGesture& pinch);
+  void PinchDetected(Actor actor, PinchGesture pinch);
 
   /**
    * @brief Called when a pan is detected.
    * @param[in] actor The actor the pan occurred on
    * @param[in] pinch The pan gesture details
    */
-  void PanDetected(Actor actor, const PanGesture& pan);
+  void PanDetected(Actor actor, PanGesture pan);
 
   /**
    * @brief Called when a tap is detected.
    * @param[in] actor The actor the tap occurred on
    * @param[in] pinch The tap gesture details
    */
-  void TapDetected(Actor actor, const TapGesture& tap);
+  void TapDetected(Actor actor, TapGesture tap);
 
   /**
    * @brief Called when a long-press is detected.
    * @param[in] actor The actor the long-press occurred on
    * @param[in] pinch The long-press gesture details
    */
-  void LongPressDetected(Actor actor, const LongPressGesture& longPress);
+  void LongPressDetected(Actor actor, LongPressGesture longPress);
 
   /**
    * @brief Called when resources of control are ready.
@@ -439,7 +439,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::GetAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  SharedPtr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::IsAccessibleCreated()

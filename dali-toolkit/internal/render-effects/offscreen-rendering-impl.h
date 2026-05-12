@@ -112,11 +112,10 @@ private:
   /**
    * @brief Saves texture after render once is finished.
    */
-  void OnRenderFinished(Dali::RenderTask& task);
+  void OnRenderFinished(Dali::RenderTask task);
 
 private:
   RenderTask                           mRenderTask;
-  CameraActor                          mCamera;
   FrameBuffer                          mFrameBuffer;
   Dali::Texture                        mTexture; // saved when render once
   DevelControl::OffScreenRenderingType mType;

@@ -306,7 +306,7 @@ float GetLineWidth(const LineRun& lineRun)
   return lineRun.width;
 }
 
-Rect<float> GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
+Bounds GetLineBoundingRect(ModelPtr textModel, const uint32_t lineIndex)
 {
   if(textModel->mVisualModel == nullptr)
   {
@@ -359,7 +359,7 @@ float GetCharacterWidth(const GlyphInfo& glyph)
   return glyph.advance;
 }
 
-Rect<float> GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
+Bounds GetCharacterBoundingRect(ModelPtr textModel, const uint32_t charIndex)
 {
   if(textModel->mVisualModel == nullptr)
   {

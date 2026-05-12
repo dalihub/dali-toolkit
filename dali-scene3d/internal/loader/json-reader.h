@@ -196,7 +196,7 @@ struct Read
     auto i = ja.start;
     while(i)
     {
-      result.push_back(std::move(readElement(*i->value)));
+      result.push_back(readElement(*i->value));
       i = i->next;
     }
     return result;

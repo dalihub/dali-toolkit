@@ -47,7 +47,7 @@ typedef IntrusivePtr<ScrollInternalConstraints> ScrollInternalConstraintsPtr;
 class ScrollOvershootIndicator;
 typedef IntrusivePtr<ScrollOvershootIndicator> ScrollOvershootIndicatorPtr;
 
-class ScrollViewPropertyHandler;
+struct ScrollViewPropertyHandler;
 
 /**
  * @copydoc Toolkit::ScrollView
@@ -452,7 +452,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentScrollPosition
    */
-  Vector2 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const override;
 
   /**
    * @copydoc ScrollTo(const Vector2&)
@@ -474,7 +474,7 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector2& position, float duration);
+  void ScrollTo(const Vector2& position, float duration) override;
 
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
@@ -572,22 +572,22 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
    */
-  void AddOverlay(Actor actor);
+  void AddOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::RemoveOverlay()
    */
-  void RemoveOverlay(Actor actor);
+  void RemoveOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootSize
    */
-  void SetOvershootSize(const Vector2& size);
+  void SetOvershootSize(const Vector2& size) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
-  void SetOvershootEffectColor(const Vector4& color);
+  void SetOvershootEffectColor(const Vector4& color) override;
 
   //properties
 
@@ -653,7 +653,7 @@ private: // private overridden functions from CustomActorImpl and Controls
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  bool OnWheelEvent(Actor actor, const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, WheelEvent event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -695,7 +695,7 @@ private:
    * @param[in] touch The touch information.
    * @return True if the event should be consumed.
    */
-  bool OnTouch(Actor actor, const TouchEvent& touch);
+  bool OnTouch(Actor actor, TouchEvent touch);
 
   /**
    * Start a timer which calls OnTouchDownTimeout()
@@ -757,14 +757,14 @@ private:
    * Called whenever a snap animation on the x-axis has completed
    * @param[in] source the Animation instance that has completed.
    */
-  void OnScrollAnimationFinished(Animation& source);
+  void OnScrollAnimationFinished(Animation source);
 
   /**
    * Called when either the X or Y internal scroll positions have finished snapping back to SCROLL_PRE_POSITION
    *
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapInternalPositionFinished(Animation& source);
+  void OnSnapInternalPositionFinished(Animation source);
 
   /**
    * Called whenever a snap animation on the x-axis has completed and we need to snap pre scroll
@@ -797,7 +797,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(const PanGesture& pan);
+  void OnPan(const PanGesture& pan) override;
 
   /**
    * Extension of the above gestures.
@@ -912,7 +912,7 @@ private:
    * Refresh the ScrollView (used when animating to update application developer of changes)
    * @return True if the refresh timer should be kept running.
    */
-  void OnScrollUpdateNotification(Dali::PropertyNotification& source);
+  void OnScrollUpdateNotification(Dali::PropertyNotification source);
 
 private:
   // Undefined

@@ -24,6 +24,10 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -88,17 +92,6 @@ void OffScreenRenderingImpl::OnActivate()
   Toolkit::Control ownerControl = GetOwnerControl();
   DALI_ASSERT_ALWAYS(ownerControl && "Set the owner of RenderEffect before you activate.");
 
-  if(!mCamera)
-  {
-    mCamera = CameraActor::New();
-    mCamera.SetInvertYAxis(true);
-    mCamera.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    mCamera.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-    mCamera.SetType(Dali::Camera::FREE_LOOK);
-  }
-  mCamera.SetPerspectiveProjection(GetTargetSize());
-  ownerControl.Add(mCamera);
-
   CreateFrameBuffer();
   CreateRenderTask();
   SetType(mType);
@@ -125,8 +118,6 @@ void OffScreenRenderingImpl::OnDeactivate()
   {
     control.RemoveCacheRenderer(renderer);
     control.GetImplementation().UnregisterOffScreenRenderableType(GetOffScreenRenderableType());
-
-    mCamera.Unparent();
   }
 
   DestroyFrameBuffer();
@@ -137,7 +128,7 @@ void OffScreenRenderingImpl::OnRefresh()
 {
   DestroyFrameBuffer();
 
-  mCamera.SetPerspectiveProjection(GetTargetSize());
+  mRenderTask.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, GetTargetSize(), Property::Map().Add(Dali::Actor::Property::NAME, "OffScreenAutoCamera").Add(Dali::CameraActor::Property::INVERT_Y_AXIS, true));
 
   CreateFrameBuffer();
   SetRendererTexture(GetTargetRenderer(), mFrameBuffer);
@@ -150,6 +141,16 @@ void OffScreenRenderingImpl::CreateFrameBuffer()
 
   mFrameBuffer    = FrameBuffer::New(size.width, size.height, FrameBuffer::Attachment::AUTO);
   Texture texture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height);
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  {
+    std::ostringstream oss;
+    oss << "OffScreenRendering type:" << mType;
+
+    Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), ToDaliString(std::move(oss.str())), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+  }
+#endif
+
   mFrameBuffer.AttachColorTexture(texture);
 }
 
@@ -166,7 +167,7 @@ void OffScreenRenderingImpl::CreateRenderTask()
 
   mRenderTask = taskList.CreateTask();
   mRenderTask.SetSourceActor(control);
-  mRenderTask.SetCameraActor(mCamera);
+  mRenderTask.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, GetTargetSize(), Property::Map().Add(Dali::Actor::Property::NAME, "OffScreenAutoCamera").Add(Dali::CameraActor::Property::INVERT_Y_AXIS, true));
   mRenderTask.SetExclusive(true);
   mRenderTask.SetInputEnabled(true);
   mRenderTask.SetFrameBuffer(mFrameBuffer);
@@ -188,7 +189,7 @@ void OffScreenRenderingImpl::DestroyRenderTask()
   mRenderTask.Reset();
 }
 
-void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask& task)
+void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask task)
 {
   if(DALI_LIKELY(mRenderTask == task))
   {

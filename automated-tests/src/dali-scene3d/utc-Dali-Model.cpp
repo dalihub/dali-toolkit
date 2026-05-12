@@ -100,7 +100,7 @@ const char* TEST_DIFFUSE_TEXTURE  = TEST_RESOURCE_DIR "/forest_irradiance.ktx";
 const char* TEST_SPECULAR_TEXTURE = TEST_RESOURCE_DIR "/forest_radiance.ktx";
 
 bool gTouchCallBackCalled = false;
-bool TestTouchCallback(Actor, const TouchEvent&)
+bool TestTouchCallback(Actor, TouchEvent)
 {
   gTouchCallBackCalled = true;
   return true;

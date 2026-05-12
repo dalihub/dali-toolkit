@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-internal.h>
+#include <dali/public-api/common/shared-ptr.h>
 
 namespace Dali::Toolkit::Internal
 {
@@ -93,12 +94,12 @@ public:
    * @param[in] index The index of property.
    * @param[in] value The value of property.
    */
-  void OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value);
+  void OnAccessibilityPropertySet(Dali::Handle handle, Dali::Property::Index index, const Dali::Property::Value& value);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetAccessibleObject()
    */
-  std::shared_ptr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
+  SharedPtr<Toolkit::DevelControl::ControlAccessible> GetAccessibleObject();
 
 public:
   /**

@@ -314,7 +314,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
     }
     case Toolkit::TextEditor::Property::DECORATION_BOUNDING_BOX:
     {
-      const Rect<int>& box = value.Get<Rect<int> >();
+      const BoundsInteger& box = value.Get<BoundsInteger>();
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p DECORATION_BOUNDING_BOX %d,%d %dx%d\n", impl.mController.Get(), box.x, box.y, box.width, box.height);
 
       impl.mDecorator->SetBoundingBox(box);
@@ -940,7 +940,7 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     }
     case Toolkit::TextEditor::Property::DECORATION_BOUNDING_BOX:
     {
-      Rect<int> boundingBox;
+      BoundsInteger boundingBox;
       impl.mDecorator->GetBoundingBox(boundingBox);
       value = boundingBox;
       break;

@@ -99,8 +99,8 @@ enum class AccessibilityRole : uint32_t
  * @see Dali::Accessibility::Text
  * @see Dali::Accessibility::EditableText
  */
-struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible,
-                                            public Dali::Accessibility::Action
+class DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible,
+                                           public Dali::Accessibility::Action
 {
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};

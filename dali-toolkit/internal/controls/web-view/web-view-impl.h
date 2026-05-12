@@ -329,12 +329,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshot()
    */
-  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor);
+  Dali::Toolkit::ImageView GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshotAsynchronously()
    */
-  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
+  bool GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CheckVideoPlayingAsynchronously()
@@ -754,7 +754,7 @@ private:
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
+  bool OnTouchEvent(Actor actor, Dali::TouchEvent touch);
 
   /**
    * @brief Signal occurs when the Web View has been hovered.
@@ -762,7 +762,7 @@ private:
    * @param[in] hover The Hover Data.
    * @return Whether to consume event or not.
    */
-  bool OnHoverEvent(Actor actor, const Dali::HoverEvent& hover);
+  bool OnHoverEvent(Actor actor, Dali::HoverEvent hover);
 
   /**
    * @brief Signal occurs when the Web View receives wheel event.
@@ -770,7 +770,7 @@ private:
    * @param[in] wheel The Wheel Data.
    * @return Whether to consume event or not.
    */
-  bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel);
+  bool OnWheelEvent(Actor actor, Dali::WheelEvent wheel);
 
   /**
    * @brief Callback function to be called when frame is rendered.
@@ -781,7 +781,7 @@ private:
    * @brief Callback for updating display area of web view.
    * @param[in] source The soource triggers Notification.
    */
-  void OnDisplayAreaUpdated(Dali::PropertyNotification& source);
+  void OnDisplayAreaUpdated(Dali::PropertyNotification source);
 
   /**
    * @brief Callback function to be called when visibility is changed.
@@ -802,7 +802,7 @@ private:
    *
    * @param[in] displayArea The display area for current webview want to show.
    */
-  void SetDisplayArea(const Dali::Rect<int32_t>& displayArea);
+  void SetDisplayArea(const Dali::BoundsInteger& displayArea);
 
 protected:
   class WebViewAccessible : public DevelControl::ControlAccessible
@@ -850,7 +850,7 @@ private:
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
-  Dali::Rect<int32_t>        mWebViewArea;
+  Dali::BoundsInteger        mWebViewArea;
   bool                       mVideoHoleEnabled;
   bool                       mMouseEventsEnabled;
   bool                       mKeyEventsEnabled;

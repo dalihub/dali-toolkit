@@ -175,7 +175,7 @@ TextAnchor::~TextAnchor()
 void TextAnchor::TextAnchorAccessible::InitDefaultFeatures()
 {
   DevelControl::ControlAccessible::InitDefaultFeatures();
-  AddFeature<Dali::Accessibility::Hyperlink>(shared_from_this());
+  AddFeature<Dali::Accessibility::Hyperlink>(SharedFromThis());
 }
 
 int32_t TextAnchor::TextAnchorAccessible::GetEndIndex() const

@@ -43,6 +43,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/wheel-event.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -123,7 +125,7 @@ enum class DisplayAreaCalculateOption
  * @param[in] option Option of this calculation. Let we decide what kind of property will be used.
  * @return DisplayArea for this view.
  */
-Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption option)
+BoundsInteger CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption option)
 {
   bool    positionUsesPivot = self.GetProperty<bool>(Actor::Property::POSITION_USES_PIVOT);
   Vector3 actorSize         = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE)
@@ -132,11 +134,11 @@ Rect<int32_t> CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
   Vector2 screenPosition    = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
                                                                                        : Dali::DevelActor::CalculateScreenPosition(self);
 
-  Dali::Rect<int32_t> displayArea;
-  displayArea.x      = screenPosition.x - pivotOffSet.x;
-  displayArea.y      = screenPosition.y - pivotOffSet.y;
-  displayArea.width  = actorSize.x;
-  displayArea.height = actorSize.y;
+  Dali::BoundsInteger displayArea;
+  displayArea.x      = static_cast<int32_t>(std::roundf(screenPosition.x - pivotOffSet.x));
+  displayArea.y      = static_cast<int32_t>(std::roundf(screenPosition.y - pivotOffSet.y));
+  displayArea.width  = static_cast<int32_t>(std::roundf(actorSize.x));
+  displayArea.height = static_cast<int32_t>(std::roundf(actorSize.y));
 
   return displayArea;
 }
@@ -708,7 +710,7 @@ void WebView::ActivateAccessibility(bool activated)
   mWebEngine.ActivateAccessibility(activated);
 
   auto accessible = GetAccessibleObject();
-  if(auto webviewAccessible = std::dynamic_pointer_cast<WebViewAccessible>(accessible))
+  if(auto webviewAccessible = DynamicPointerCast<WebViewAccessible>(accessible))
   {
     if(!activated)
     {
@@ -735,7 +737,7 @@ void WebView::AddDynamicCertificatePath(const std::string& host, const std::stri
   }
 }
 
-Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::BoundsInteger viewArea, float scaleFactor)
 {
   Dali::Toolkit::ImageView imageView;
   if(mWebEngine)
@@ -746,7 +748,7 @@ Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, fl
   return imageView;
 }
 
-bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+bool WebView::GetScreenshotAsynchronously(Dali::BoundsInteger viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
 {
   mScreenshotCapturedCallback = std::move(callback);
   return mWebEngine ? mWebEngine.GetScreenshotAsynchronously(viewArea, scaleFactor, std::bind(&WebView::OnScreenshotCaptured, this, std::placeholders::_1)) : false;
@@ -1121,7 +1123,7 @@ void WebView::OnFrameRendered()
   }
 }
 
-void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification& /*source*/)
+void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification /*source*/)
 {
   if(!mWebEngine)
   {
@@ -1147,7 +1149,7 @@ void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
   }
 }
 
-void WebView::SetDisplayArea(const Dali::Rect<int32_t>& displayArea)
+void WebView::SetDisplayArea(const Dali::BoundsInteger& displayArea)
 {
   Size displaySize = Size(displayArea.width, displayArea.height);
   if(mWebViewSize != displaySize)
@@ -1192,7 +1194,7 @@ void WebView::OnSceneDisconnection()
   ControlImpl::OnSceneDisconnection();
 }
 
-bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)
+bool WebView::OnTouchEvent(Actor actor, Dali::TouchEvent touch)
 {
   bool result = false;
 
@@ -1214,7 +1216,7 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
   return result;
 }
 
-bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
+bool WebView::OnHoverEvent(Actor actor, Dali::HoverEvent hover)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)
@@ -1224,7 +1226,7 @@ bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
   return result;
 }
 
-bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
+bool WebView::OnWheelEvent(Actor actor, Dali::WheelEvent wheel)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)

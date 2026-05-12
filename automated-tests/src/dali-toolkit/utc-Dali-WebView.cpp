@@ -240,7 +240,7 @@ static bool OnGeolocationPermission(const std::string&, const std::string&)
   return true;
 }
 
-static bool OnTouched(Actor actor, const Dali::TouchEvent& touch)
+static bool OnTouched(Actor actor, Dali::TouchEvent touch)
 {
   gTouched = true;
   return true;
@@ -251,13 +251,13 @@ static void OnChangesWatch()
   gCookieManagerChangsWatchCallbackCalled++;
 }
 
-static bool OnHovered(Actor actor, const Dali::HoverEvent& hover)
+static bool OnHovered(Actor actor, Dali::HoverEvent hover)
 {
   gHovered = true;
   return true;
 }
 
-static bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
+static bool OnWheelEvent(Actor actor, Dali::WheelEvent wheel)
 {
   gWheelEventHandled = true;
   return true;
@@ -1272,7 +1272,7 @@ int UtcDaliWebViewGetScreenshotSyncAndAsync(void)
   DALI_TEST_CHECK(view);
 
   // Check GetScreenshot
-  Dali::Rect<int> viewArea;
+  Dali::BoundsInteger viewArea;
   viewArea.x                          = 100;
   viewArea.y                          = 100;
   viewArea.width                      = 10;

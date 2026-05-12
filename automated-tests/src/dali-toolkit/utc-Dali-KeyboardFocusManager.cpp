@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -239,13 +240,13 @@ public:
   {
   }
 
-  bool Callback(Control control, const KeyEvent& keyEvent)
+  bool Callback(Control control, KeyEvent keyEvent)
   {
     mIsCalled = true;
     return mConsumed;
   }
 
-  void Callback(const KeyEvent& keyEvent)
+  void Callback(KeyEvent keyEvent)
   {
     mIsCalled = true;
   }
@@ -267,13 +268,13 @@ public:
   {
   }
 
-  bool Callback(Actor actor, const WheelEvent& wheelEvent)
+  bool Callback(Actor actor, WheelEvent wheelEvent)
   {
     mIsCalled = true;
     return mConsumed;
   }
 
-  void Callback(const WheelEvent& wheelEvent)
+  void Callback(WheelEvent wheelEvent)
   {
     mIsCalled = true;
   }
@@ -3068,6 +3069,167 @@ int UtcDaliKeyboardFocusManagerRemoveScene(void)
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
   focusChangedCallback.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerHasKeyInputFocusInFocusChangedCallback(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Verify HasKeyInputFocus() returns correct status in FocusChangedSignal callback");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+
+  PushButton buttonA = PushButton::New();
+  PushButton buttonB = PushButton::New();
+  application.GetScene().Add(buttonA);
+  application.GetScene().Add(buttonB);
+
+  buttonA.SetKeyInputFocus();
+
+  bool callbackCalled = false;
+  ConnectionTracker tracker;
+  manager.FocusChangedSignal().Connect(&tracker, [&](Actor oldActor, Actor newActor) {
+    callbackCalled = true;
+    if(newActor == buttonB)
+    {
+      DALI_TEST_CHECK(buttonB.HasKeyInputFocus());
+      DALI_TEST_CHECK(!buttonA.HasKeyInputFocus());
+    }
+  });
+
+  manager.SetCurrentFocusActor(buttonB);
+
+  DALI_TEST_CHECK(callbackCalled);
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerHasKeyInputFocusInClearFocusCallback(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Verify HasKeyInputFocus() returns false in FocusChangedSignal callback during ClearFocus");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+
+  PushButton buttonA = PushButton::New();
+  application.GetScene().Add(buttonA);
+
+  manager.SetCurrentFocusActor(buttonA);
+  DALI_TEST_CHECK(buttonA.HasKeyInputFocus());
+
+  bool callbackCalled = false;
+  ConnectionTracker tracker;
+  manager.FocusChangedSignal().Connect(&tracker, [&](Actor oldActor, Actor newActor) {
+    callbackCalled = true;
+    if(oldActor == buttonA && !newActor)
+    {
+      DALI_TEST_CHECK(!buttonA.HasKeyInputFocus());
+    }
+  });
+
+  manager.ClearFocus();
+
+  DALI_TEST_CHECK(callbackCalled);
+
+  END_TEST;
+}
+
+struct FocusSignalOrderTracker : public ConnectionTracker
+{
+  FocusSignalOrderTracker(uint32_t& counter)
+  : mCounter(counter),
+    mFocusChangedOrder(0),
+    mKeyInputFocusLostOrder(0),
+    mKeyInputFocusGainedOrder(0),
+    mKeyInputFocusChangedOrder(0)
+  {
+  }
+
+  void OnFocusChanged(Actor oldActor, Actor newActor)
+  {
+    mFocusChangedOrder = ++mCounter;
+    tet_printf("FocusChangedSignal received: order %u\n", mFocusChangedOrder);
+  }
+
+  void OnKeyInputFocusLost(Toolkit::Control control)
+  {
+    mKeyInputFocusLostOrder = ++mCounter;
+    tet_printf("KeyInputFocusLostSignal received: order %u\n", mKeyInputFocusLostOrder);
+  }
+
+  void OnKeyInputFocusGained(Toolkit::Control control)
+  {
+    mKeyInputFocusGainedOrder = ++mCounter;
+    tet_printf("KeyInputFocusGainedSignal received: order %u\n", mKeyInputFocusGainedOrder);
+  }
+
+  void OnKeyInputFocusChanged(Toolkit::Control newControl, Toolkit::Control oldControl)
+  {
+    mKeyInputFocusChangedOrder = ++mCounter;
+    tet_printf("KeyInputFocusChangedSignal received: order %u\n", mKeyInputFocusChangedOrder);
+  }
+
+  uint32_t& mCounter;
+  uint32_t  mFocusChangedOrder;
+  uint32_t  mKeyInputFocusLostOrder;
+  uint32_t  mKeyInputFocusGainedOrder;
+  uint32_t  mKeyInputFocusChangedOrder;
+};
+
+int UtcDaliKeyboardFocusManagerSignalOrder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Verify the sequence: FocusChanged -> FocusLost -> FocusGained");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  KeyInputFocusManager keyInputManager = KeyInputFocusManager::Get();
+
+  uint32_t globalCounter = 0;
+  FocusSignalOrderTracker tracker(globalCounter);
+
+  manager.FocusChangedSignal().Connect(&tracker, &FocusSignalOrderTracker::OnFocusChanged);
+  keyInputManager.KeyInputFocusChangedSignal().Connect(&tracker, &FocusSignalOrderTracker::OnKeyInputFocusChanged);
+
+  PushButton buttonA = PushButton::New();
+  PushButton buttonB = PushButton::New();
+  application.GetScene().Add(buttonA);
+  application.GetScene().Add(buttonB);
+
+  buttonA.KeyInputFocusLostSignal().Connect(&tracker, &FocusSignalOrderTracker::OnKeyInputFocusLost);
+  buttonB.KeyInputFocusGainedSignal().Connect(&tracker, &FocusSignalOrderTracker::OnKeyInputFocusGained);
+
+  // 1. Initial focus set to A
+  tet_infoline("Setting initial focus to A");
+  manager.SetCurrentFocusActor(buttonA);
+
+  // Reset tracker for the transition A -> B
+  globalCounter = 0;
+  tracker.mFocusChangedOrder = 0;
+  tracker.mKeyInputFocusLostOrder = 0;
+  tracker.mKeyInputFocusGainedOrder = 0;
+  tracker.mKeyInputFocusChangedOrder = 0;
+
+  // 2. Transition A -> B
+  tet_infoline("Transitioning focus from A to B");
+  manager.SetCurrentFocusActor(buttonB);
+
+  tet_printf("Orders: FocusChanged(%u), FocusLost(%u), FocusGained(%u), KeyInputFocusChanged(%u)\n",
+             tracker.mFocusChangedOrder, tracker.mKeyInputFocusLostOrder, tracker.mKeyInputFocusGainedOrder, tracker.mKeyInputFocusChangedOrder);
+
+  // Expected sequence:
+  // 1. FocusChangedSignal
+  // 2. KeyInputFocusLost (buttonA)
+  // 3. KeyInputFocusGained (buttonB)
+  // 4. KeyInputFocusChangedSignal
+  DALI_TEST_CHECK(tracker.mFocusChangedOrder > 0);
+  DALI_TEST_CHECK(tracker.mKeyInputFocusLostOrder > 0);
+  DALI_TEST_CHECK(tracker.mKeyInputFocusGainedOrder > 0);
+  DALI_TEST_CHECK(tracker.mKeyInputFocusChangedOrder > 0);
+
+  DALI_TEST_CHECK(tracker.mFocusChangedOrder < tracker.mKeyInputFocusLostOrder);
+  DALI_TEST_CHECK(tracker.mKeyInputFocusLostOrder < tracker.mKeyInputFocusGainedOrder);
+  DALI_TEST_CHECK(tracker.mKeyInputFocusGainedOrder < tracker.mKeyInputFocusChangedOrder);
 
   END_TEST;
 }

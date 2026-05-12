@@ -79,6 +79,8 @@ extern const char* const CORNER_SQUARENESS;
 extern const char* const BLUR_RADIUS_NAME;
 extern const char* const CUTOUT_POLICY_NAME;
 extern const char* const CUTOUT_CORNER_RADIUS_UNIFORM_NAME;
+extern const char* const CUTOUT_CORNER_RADIUS_POLICY_UNIFORM_NAME;
+extern const char* const CUTOUT_CORNER_SQUARENESS_UNIFORM_NAME;
 
 // Image visual
 extern const char* const IMAGE_URL_NAME;

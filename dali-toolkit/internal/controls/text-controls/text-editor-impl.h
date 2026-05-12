@@ -368,7 +368,7 @@ public:
    * @param[in] lineIndex line index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
+  Bounds GetLineBoundingRectangle(const uint32_t lineIndex) const;
 
   /**
    * @brief Get the character bounding rectangle.
@@ -377,7 +377,7 @@ public:
    * @param[in] charIndex character index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+  Bounds GetCharacterBoundingRectangle(const uint32_t charIndex) const;
 
   /**
    * @brief Get the character index.
@@ -396,7 +396,7 @@ public:
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
+  Bounds GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
 
   /**
    * @brief Set the @p spannedText into current textEditor
@@ -489,7 +489,7 @@ private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -519,7 +519,7 @@ private: // Implementation
    * @param[in] actor TextEditor touched
    * @param[in] touch Touch information
    */
-  bool OnTouched(Actor actor, const TouchEvent& touch);
+  bool OnTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Callbacks called on idle.
@@ -565,7 +565,7 @@ private: // Implementation
    *
    * Emit ScrollBarStateChanged Signal and toggle mScrollStarted flag to false
    */
-  void OnScrollIndicatorAnimationFinished(Animation& animation);
+  void OnScrollIndicatorAnimationFinished(Animation animation);
 
   /**
    * @brief Callback function for when the layout is changed.
@@ -625,7 +625,7 @@ private: // Implementation
   /**
    * @brief Notifies when the font variation property changes to specific value.
    */
-  void OnVariationPropertyNotify(PropertyNotification& source);
+  void OnVariationPropertyNotify(PropertyNotification source);
 
 private: // Data
   // Signals

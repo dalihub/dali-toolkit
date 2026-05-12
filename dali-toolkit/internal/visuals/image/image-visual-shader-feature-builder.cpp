@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,9 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_YUV_AND_RGB,
   VisualFactoryCache::IMAGE_SHADER_SQUIRCLE_BORDERLINE_YUV_AND_RGB,
 };
+#if defined(DEBUG_ENABLED)
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
+#endif
 } // unnamed namespace
 
 namespace ImageVisualShaderFeature

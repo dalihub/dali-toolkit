@@ -52,7 +52,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 const float    ZERO(0.0f);
 const float    HALF(0.5f);
-const float    ONE(1.0f);
 const float    ONE_AND_A_HALF(1.5f);
 const uint32_t DOUBLE_PIXEL_PADDING = 4u; //Padding will be added twice to Atlas
 const uint16_t NO_OUTLINE           = 0u;

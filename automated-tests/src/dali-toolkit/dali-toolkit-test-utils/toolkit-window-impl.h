@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/public-api/signals/slot-delegate.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -28,7 +29,7 @@
 
 namespace Dali
 {
-using PositionSize = Dali::Rect<int>;
+using PositionSize = Dali::BoundsInteger;
 
 namespace Internal
 {
@@ -49,11 +50,23 @@ public:
 
   void SetPositionSize(PositionSize positionSize);
 
-  FocusChangeSignalType                    mFocusChangeSignal;
-  ResizeSignalType                         mResizeSignal;
-  int                                      mRotationAngle;
-  bool                                     mVisible;
-  DevelWindow::VisibilityChangedSignalType mVisibilityChangedSignal;
+  Dali::Window::KeyEventSignalType&   KeyEventSignal();
+  Dali::Window::TouchEventSignalType& TouchedSignal();
+
+  void OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, Dali::KeyEvent event);
+  void OnTouchEvent(Dali::Integration::SceneHolder sceneHolder, Dali::TouchEvent event);
+
+  FocusChangeSignalType                      mFocusChangeSignal;
+  ResizeSignalType                           mResizeSignal;
+  int                                        mRotationAngle;
+  bool                                       mVisible;
+  DevelWindow::VisibilityChangedSignalType   mVisibilityChangedSignal;
+  Dali::Window::KeyEventSignalType           mKeyEventSignal;
+  Dali::Window::TouchEventSignalType         mTouchEventSignal;
+  DevelWindow::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
+  DevelWindow::WheelEventSignalType          mWheelEventSignal;
+  DevelWindow::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
+  Dali::SlotDelegate<Window>                 mSlotDelegate;
 };
 
 } // namespace Adaptor

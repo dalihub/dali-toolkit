@@ -160,7 +160,7 @@ int UtcDaliCanvasViewAddP(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -409,7 +409,7 @@ int UtcDaliCanvasViewSetSizeAndAddDrawable(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -442,7 +442,7 @@ int UtcDaliCanvasViewSetSizeAndAddDrawableAsync(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -540,7 +540,7 @@ int UtcDaliCanvasViewRasterizationRequestManually(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -554,11 +554,11 @@ int UtcDaliCanvasViewRasterizationRequestManually(void)
   bool isRasterizationManually = canvasView.GetProperty(Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY).Get<bool>();
   DALI_TEST_EQUALS(isRasterizationManually, false, TEST_LOCATION);
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
   application.SendNotification();
   application.Render();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
   application.SendNotification();
   application.Render();
 
@@ -582,7 +582,7 @@ int UtcDaliCanvasViewRasterizationRequestManually(void)
   isRasterizationManually = canvasView.GetProperty(Toolkit::CanvasView::Property::RASTERIZATION_REQUEST_MANUALLY).Get<bool>();
   DALI_TEST_EQUALS(isRasterizationManually, true, TEST_LOCATION);
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
   application.SendNotification();
   application.Render();
 
@@ -592,7 +592,7 @@ int UtcDaliCanvasViewRasterizationRequestManually(void)
 
   Dali::CanvasRenderer::Shape shape2 = Dali::CanvasRenderer::Shape::New();
 
-  shape2.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape2.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape2);
 
@@ -634,7 +634,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed01(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -656,7 +656,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed01(void)
   // Make rasterization failed.
   Test::CanvasRenderer::MarkRasterizationResult(false);
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -723,7 +723,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
 
   Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 
@@ -748,7 +748,7 @@ int UtcDaliCanvasViewRasterizationRequestIfRasterizeFailed02(void)
   // Make rasterization failed.
   Test::CanvasRenderer::MarkRasterizationResult(false);
 
-  shape.AddRect(Rect<float>(10, 10, 10, 10), Vector2(0, 0));
+  shape.AddRect(Bounds(10, 10, 10, 10), Vector2(0, 0));
 
   canvasView.AddDrawable(shape);
 

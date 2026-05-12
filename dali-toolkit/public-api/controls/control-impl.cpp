@@ -95,21 +95,21 @@ void RegisterControlAccessibleGetter()
   if(DALI_UNLIKELY(!onceFlag))
   {
     onceFlag = true;
-    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<std::shared_ptr<Accessibility::Accessible>, bool>
+    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<SharedPtr<Accessibility::Accessible>, bool>
     {
       auto control = Toolkit::Control::DownCast(actor);
       if(!control)
       {
-        return {nullptr, true};
+        return {SharedPtr<Accessibility::Accessible>(), true};
       }
 
       if(Toolkit::DevelControl::IsCreateAccessibleEnabled(control))
       {
         auto& controlImpl = Toolkit::GetImplementation(control);
-        return {std::shared_ptr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
+        return {SharedPtr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
       }
 
-      return {nullptr, false}; });
+      return {SharedPtr<Accessibility::Accessible>(), false}; });
   }
 }
 } // unnamed namespace
@@ -256,7 +256,7 @@ bool ControlImpl::IsOffScreenRenderTaskExclusive()
   return false;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> ControlImpl::GetAccessibleObject()
+SharedPtr<Toolkit::DevelControl::ControlAccessible> ControlImpl::GetAccessibleObject()
 {
   return mInternal->GetAccessibleObject();
 }
@@ -630,7 +630,7 @@ void ControlImpl::EmitKeyInputFocusSignal(bool focusGained)
       auto parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
       if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
       {
-        parent->EmitActiveDescendantChanged(accessible.get());
+        parent->EmitActiveDescendantChanged(accessible.Get());
       }
     }
   }

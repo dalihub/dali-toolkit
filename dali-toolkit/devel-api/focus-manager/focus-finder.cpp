@@ -39,7 +39,7 @@ namespace
 {
 static constexpr float FULLY_TRANSPARENT(0.01f); ///< Alpha values must rise above this, before an object is considered to be visible.
 
-static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
+static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
   switch(direction)
   {
@@ -71,12 +71,12 @@ static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction
  *   of source to the edge nearest in the given direction of dest.
  *   If the dest is not in the direction from source, return 0.
  */
-static int MajorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
+static int MajorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
   return std::max(0, MajorAxisDistanceRaw(direction, source, dest));
 }
 
-static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
+static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
   switch(direction)
   {
@@ -108,7 +108,7 @@ static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::
  *   edge of source to the far edge of dest.
  *   If the dest is not in the direction from source, return 1
  */
-static int MajorAxisDistanceToFarEdge(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
+static int MajorAxisDistanceToFarEdge(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
   return std::max(1, MajorAxisDistanceToFarEdgeRaw(direction, source, dest));
 }
@@ -121,7 +121,7 @@ static int MajorAxisDistanceToFarEdge(Dali::Toolkit::Control::KeyboardFocus::Dir
  * @param dest The destination rect.
  * @return The distance.
  */
-static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
+static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
   switch(direction)
   {
@@ -164,7 +164,7 @@ static uint64_t GetWeightedDistanceFor(int majorAxisDistance, int minorAxisDista
  * @param direction The direction (up, down, left, right)
  * @return Whether destRect is a candidate.
  */
-static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, Dali::Toolkit::Control::KeyboardFocus::Direction direction)
+static bool IsCandidate(Dali::Bounds srcRect, Dali::Bounds destRect, Dali::Toolkit::Control::KeyboardFocus::Direction direction)
 {
   switch(direction)
   {
@@ -198,7 +198,7 @@ static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, D
  * @param src The source rect
  * @param dest The dest rect
  */
-static bool IsToDirectionOf(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> src, Dali::Rect<float> dest)
+static bool IsToDirectionOf(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds src, Dali::Bounds dest)
 {
   switch(direction)
   {
@@ -232,7 +232,7 @@ static bool IsToDirectionOf(Dali::Toolkit::Control::KeyboardFocus::Direction dir
  * @param rect2 The second rect
  * @return whether the beams overlap
  */
-static bool BeamsOverlap(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> rect1, Dali::Rect<float> rect2)
+static bool BeamsOverlap(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds rect1, Dali::Bounds rect2)
 {
   switch(direction)
   {
@@ -261,7 +261,7 @@ static bool BeamsOverlap(Dali::Toolkit::Control::KeyboardFocus::Direction direct
  * @param rect2 The second rect
  * @return Whether rect1 is a better candidate than rect2 by virtue of it being in src's beam
  */
-static bool BeamBeats(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> rect1, Dali::Rect<float> rect2)
+static bool BeamBeats(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds rect1, Dali::Bounds rect2)
 {
   const bool rect1InSrcBeam = BeamsOverlap(direction, source, rect1);
   const bool rect2InSrcBeam = BeamsOverlap(direction, source, rect2);
@@ -291,7 +291,7 @@ static bool BeamBeats(Dali::Toolkit::Control::KeyboardFocus::Direction direction
   return (MajorAxisDistance(direction, source, rect1) < MajorAxisDistanceToFarEdge(direction, source, rect2));
 }
 
-bool IsBetterCandidate(Toolkit::Control::KeyboardFocus::Direction direction, Rect<float>& focusedRect, Rect<float>& candidateRect, Rect<float>& bestCandidateRect)
+bool IsBetterCandidate(Toolkit::Control::KeyboardFocus::Direction direction, Bounds& focusedRect, Bounds& candidateRect, Bounds& bestCandidateRect)
 {
   // to be a better candidate, need to at least be a candidate in the first place
   if(!IsCandidate(focusedRect, candidateRect, direction))
@@ -331,7 +331,7 @@ bool IsFocusable(Actor& actor)
           actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a > FULLY_TRANSPARENT);
 }
 
-Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect, Rect<float>& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)
+Actor FindNextFocus(Actor& actor, Actor& focusedActor, Bounds& focusedRect, Bounds& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
   if(actor &&
@@ -346,7 +346,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
       Dali::Actor child = actor.GetChildAt(i - 1);
       if(child && child != focusedActor && IsFocusable(child))
       {
-        Rect<float> candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
+        Bounds candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
 
         if(IsBetterCandidate(direction, focusedRect, candidateRect, bestCandidateRect))
         {
@@ -374,12 +374,12 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
     return nearestActor;
   }
 
-  Rect<float> focusedRect;
+  Bounds focusedRect;
   if(!focusedActor)
   {
     // If there is no currently focused actor, it is searched based on the upper left corner of the current window.
-    Rect<float> rootRect = DevelActor::CalculateCurrentScreenExtents(rootActor);
-    focusedRect          = Rect<float>(rootRect.x, rootRect.y, 0.f, 0.f);
+    Bounds rootRect = DevelActor::CalculateCurrentScreenExtents(rootActor);
+    focusedRect     = Bounds(rootRect.x, rootRect.y, 0.f, 0.f);
   }
   else
   {
@@ -388,7 +388,7 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
 
   // initialize the best candidate to something impossible
   // (so the first plausible actor will become the best choice)
-  Rect<float> bestCandidateRect = focusedRect;
+  Bounds bestCandidateRect = focusedRect;
   switch(direction)
   {
     case Toolkit::Control::KeyboardFocus::LEFT:

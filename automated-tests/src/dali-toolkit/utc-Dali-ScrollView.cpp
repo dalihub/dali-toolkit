@@ -166,7 +166,7 @@ static void OnSnapStart(const ScrollView::SnapEvent& event)
  * @param[in] event The wheel event
  * @return True if the event should be consumed
  */
-static bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheelEvent)
+static bool OnWheelEvent(Actor actor, Dali::WheelEvent wheelEvent)
 {
   gOnWheelEventCalled = true;
   return false;

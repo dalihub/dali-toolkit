@@ -352,7 +352,6 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
   int         pntAcum = 0, texAcum = 0, nrmAcum = 0;
   bool        iniObj     = false;
   bool        hasTexture = false;
-  int         face       = 0;
 
   //Init AABB for the file
   mSceneAABB.Init();
@@ -503,7 +502,6 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           triangle.textureIndex[i] = texIdx[i] - 1 - texAcum;
         }
         mTriangles.PushBack(triangle);
-        face++;
       }
       //If on the other hand it is a quad, we will create two triangles
       else if(numIndices == 4)
@@ -515,7 +513,6 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           triangle.textureIndex[i] = texIdx[i] - 1 - texAcum;
         }
         mTriangles.PushBack(triangle);
-        face++;
 
         for(int i = 0; i < 3; i++)
         {
@@ -525,7 +522,6 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           triangle2.textureIndex[i] = texIdx[idx] - 1 - texAcum;
         }
         mTriangles.PushBack(triangle2);
-        face++;
       }
     }
     else if(tag == "usemtl")

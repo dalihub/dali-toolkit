@@ -17,6 +17,8 @@
 
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/wheel-event.h>
 
 #include <toolkit-scene-holder-impl.h>
 
@@ -56,33 +58,44 @@ private: // Adaptor::LifeCycleObserver interface
   virtual void OnStart()
   {
     mAdaptorStarted = true;
-  };
-  virtual void OnPause() {};
-  virtual void OnResume() {};
+  }
+  virtual void OnPause()
+  {
+  }
+  virtual void OnResume()
+  {
+  }
   virtual void OnStop()
   {
     // Mark adaptor as stopped;
     mAdaptorStarted = false;
-  };
+  }
   virtual void OnDestroy()
   {
     mAdaptor = nullptr;
-  };
+  }
 
 private:
   Adaptor*& mAdaptor;
   bool&     mAdaptorStarted;
 };
 
-SceneHolder::SceneHolder(const Dali::Rect<int>& positionSize)
+SceneHolder::SceneHolder(const Dali::BoundsInteger& positionSize)
 : mId(0),
   mRenderSurface(new TestRenderSurface(positionSize)),
-  mFocusChangedGeneratedSignal()
+  mFocusChangedGeneratedSignal(),
+  mSceneSignalBridgeSlot(this)
 {
   Graphics::RenderTargetCreateInfo createInfo;
   createInfo.SetExtent({static_cast<uint16_t>(positionSize.width), static_cast<uint16_t>(positionSize.height)});
   createInfo.SetSurface(mRenderSurface.get());
   mScene = Dali::Integration::Scene::New(createInfo, Dali::Size(static_cast<float>(positionSize.width), static_cast<float>(positionSize.height)));
+
+  mScene.KeyEventSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneKeyEvent);
+  mScene.KeyEventGeneratedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneKeyEventGenerated);
+  mScene.TouchedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneTouchEvent);
+  mScene.WheelEventSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneWheelEvent);
+  mScene.WheelEventGeneratedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneWheelEventGenerated);
 }
 
 SceneHolder::~SceneHolder()
@@ -142,27 +155,57 @@ void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
 
 Dali::Integration::SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
 {
-  return mScene.KeyEventSignal();
+  return mSceneHolderKeyEventSignal;
 }
 
 Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
 {
-  return mScene.KeyEventGeneratedSignal();
+  return mSceneHolderKeyEventGeneratedSignal;
 }
 
 Dali::Integration::SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
 {
-  return mScene.TouchedSignal();
+  return mSceneHolderTouchedSignal;
 }
 
 Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
 {
-  return mScene.WheelEventSignal();
+  return mSceneHolderWheelEventSignal;
 }
 
 Dali::Integration::SceneHolder::WheelEventGeneratedSignalType& SceneHolder::WheelEventGeneratedSignal()
 {
-  return mScene.WheelEventGeneratedSignal();
+  return mSceneHolderWheelEventGeneratedSignal;
+}
+
+void SceneHolder::OnSceneKeyEvent(Dali::KeyEvent event)
+{
+  Dali::Integration::SceneHolder handle(this);
+  mSceneHolderKeyEventSignal.Emit(handle, event);
+}
+
+bool SceneHolder::OnSceneKeyEventGenerated(Dali::KeyEvent event)
+{
+  Dali::Integration::SceneHolder handle(this);
+  return mSceneHolderKeyEventGeneratedSignal.Emit(handle, event);
+}
+
+void SceneHolder::OnSceneTouchEvent(Dali::TouchEvent event)
+{
+  Dali::Integration::SceneHolder handle(this);
+  mSceneHolderTouchedSignal.Emit(handle, event);
+}
+
+void SceneHolder::OnSceneWheelEvent(Dali::WheelEvent event)
+{
+  Dali::Integration::SceneHolder handle(this);
+  mSceneHolderWheelEventSignal.Emit(handle, event);
+}
+
+bool SceneHolder::OnSceneWheelEventGenerated(Dali::WheelEvent event)
+{
+  Dali::Integration::SceneHolder handle(this);
+  return mSceneHolderWheelEventGeneratedSignal.Emit(handle, event);
 }
 
 Dali::Integration::Scene SceneHolder::GetScene()

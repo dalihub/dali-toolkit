@@ -33,7 +33,7 @@ namespace Dali::Scene3D::Loader
  * @brief Factory to create a NavigationMesh from various sources.
  * @SINCE_2_2.12
  */
-struct DALI_SCENE3D_API NavigationMeshFactory
+class DALI_SCENE3D_API NavigationMeshFactory
 {
 public:
   /**

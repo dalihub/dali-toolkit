@@ -189,8 +189,8 @@ public: // Signals
   }
 
 public:
-  bool OnDrag(Dali::Actor actor, const Dali::TouchEvent& data);
-  void OnPan(Dali::Actor actor, const PanGesture& gesture);
+  bool OnDrag(Dali::Actor actor, Dali::TouchEvent data);
+  void OnPan(Dali::Actor actor, PanGesture gesture);
 
 private:
   // Construction & Destruction

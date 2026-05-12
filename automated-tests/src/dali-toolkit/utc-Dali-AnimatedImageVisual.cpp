@@ -165,7 +165,6 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(ImageVisual::Property::PIXEL_AREA, Vector4())
       .Add(ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT)
       .Add(ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT)
-      .Add(ImageVisual::Property::FITTING_MODE, FittingMode::FIT_WIDTH)
       .Add(ImageVisual::Property::SAMPLING_MODE, SamplingMode::NEAREST)
       .Add(ImageVisual::Property::DESIRED_WIDTH, 154)
       .Add(ImageVisual::Property::DESIRED_HEIGHT, 79)
@@ -201,10 +200,6 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_V, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == WrapMode::DEFAULT);
-
-  value = resultMap.Find(Toolkit::ImageVisual::Property::FITTING_MODE, Property::INTEGER);
-  DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<int>() == FittingMode::FIT_WIDTH);
 
   value = resultMap.Find(Toolkit::ImageVisual::Property::SAMPLING_MODE, Property::INTEGER);
   DALI_TEST_CHECK(value);
@@ -317,7 +312,6 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("pixelArea", Vector4())
       .Add("wrapModeU", WrapMode::REPEAT)
       .Add("wrapModeV", WrapMode::DEFAULT)
-      .Add("fittingMode", FittingMode::FIT_WIDTH)
       .Add("samplingMode", SamplingMode::NEAREST)
       .Add("desiredWidth", 154)
       .Add("desiredHeight", 79)
@@ -375,10 +369,6 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_V, "wrapModeV");
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == WrapMode::DEFAULT);
-
-  value = resultMap.Find(Toolkit::ImageVisual::Property::FITTING_MODE, "fittingMode");
-  DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<int>() == FittingMode::FIT_WIDTH);
 
   value = resultMap.Find(Toolkit::ImageVisual::Property::SAMPLING_MODE, "samplingMode");
   DALI_TEST_CHECK(value);

@@ -67,7 +67,7 @@ public:
   /**
    * @brief Update the display area when the actor's transform changes
    */
-  virtual void UpdateDisplayArea(Dali::PropertyNotification& source) = 0;
+  virtual void UpdateDisplayArea(Dali::PropertyNotification source) = 0;
 
   /**
    * @brief Hook for when Play is called, allowing strategy to trigger animations/continuous rendering
@@ -160,7 +160,7 @@ public:
    *
    * @param[in] source The property notification that triggered this update.
    */
-  void UpdateDisplayArea(Dali::PropertyNotification& source) override;
+  void UpdateDisplayArea(Dali::PropertyNotification source) override;
 
   /**
    * @brief Hook for when Play is called.
@@ -262,7 +262,7 @@ public:
    *
    * @param[in] source The property notification that triggered this update.
    */
-  void UpdateDisplayArea(Dali::PropertyNotification& source) override;
+  void UpdateDisplayArea(Dali::PropertyNotification source) override;
 
   /**
    * @brief Hook for when Play is called.

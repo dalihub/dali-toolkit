@@ -4,7 +4,7 @@
 
 precision highp float;
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_CUTOUT)
 INPUT highp vec2 vPosition;
 FLAT INPUT highp vec2 vRectSize;
 FLAT INPUT highp vec2 vOptRectSize;
@@ -15,9 +15,7 @@ FLAT INPUT highp vec4 vCornerRadius;
 #endif
 #if defined(IS_REQUIRED_CUTOUT)
 INPUT highp vec2 vPositionFromCenter;
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
 FLAT INPUT highp vec4 vCutoutCornerRadius;
-#endif
 #endif
 
 UNIFORM_BLOCK FragBlock
@@ -36,8 +34,14 @@ UNIFORM_BLOCK FragBlock
     UNIFORM lowp vec4 borderlineColor;
 #endif
 
+#ifdef IS_REQUIRED_ROUNDED_CORNER
 #ifdef IS_REQUIRED_SQUIRCLE_CORNER
     UNIFORM highp vec4 cornerSquareness;
+#endif
+#endif
+
+#if defined(IS_REQUIRED_CUTOUT)
+    UNIFORM highp vec4 cutoutCornerSquareness;
 #endif
 };
 
@@ -55,12 +59,12 @@ UNIFORM_BLOCK SharedBlock
 };
 
 
-#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR)
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_BORDERLINE) || defined(IS_REQUIRED_BLUR) || defined(IS_REQUIRED_CUTOUT)
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
 highp float gRadius = 0.0;
-#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+#if defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_CUTOUT)
 highp float gSquareness = 0.0;
 #endif
 
@@ -82,21 +86,21 @@ highp float gMaxInlinePotential = 0.0;
 highp float gMinInlinePotential = 0.0;
 #endif
 
-void calculateCornerRadius(highp vec4 cornerRadius, highp vec2 position)
+void calculateCornerRadius(highp vec4 cornerRadius, highp vec4 currentCornerSquareness, highp vec2 position)
 {
-#ifdef IS_REQUIRED_ROUNDED_CORNER
+#if defined(IS_REQUIRED_ROUNDED_CORNER) || defined(IS_REQUIRED_CUTOUT)
   gRadius =
   mix(
     mix(cornerRadius.x, cornerRadius.y, sign(position.x) * 0.5 + 0.5),
     mix(cornerRadius.w, cornerRadius.z, sign(position.x) * 0.5 + 0.5),
     sign(position.y) * 0.5 + 0.5
   );
-#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+#if defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_CUTOUT)
   gSquareness = clamp(
   mix(
-    mix(cornerSquareness.x, cornerSquareness.y, sign(vPosition.x) * 0.5 + 0.5),
-    mix(cornerSquareness.w, cornerSquareness.z, sign(vPosition.x) * 0.5 + 0.5),
-    sign(vPosition.y) * 0.5 + 0.5
+    mix(currentCornerSquareness.x, currentCornerSquareness.y, sign(position.x) * 0.5 + 0.5),
+    mix(currentCornerSquareness.w, currentCornerSquareness.z, sign(position.x) * 0.5 + 0.5),
+    sign(position.y) * 0.5 + 0.5
   ), 0.0, 1.0);
 #endif
 #endif
@@ -117,11 +121,17 @@ void calculatePosition(highp float currentBorderlineWidth)
 
 void calculatePotential()
 {
-#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+#if defined(IS_REQUIRED_SQUIRCLE_CORNER) || defined(IS_REQUIRED_CUTOUT)
   // If gSquareness is near 1.0, it make some numeric error. Let we avoid this situation by heuristic value.
   if(gSquareness > 0.99)
   {
     gPotential = max(gDiff.x, gDiff.y);
+    return;
+  }
+  // If gSquareness is near 0.0, it is similar with normal rounded corner cases. Let we fast-out by heuristic value.
+  if(gSquareness < 0.01)
+  {
+    gPotential = length(max(gDiff, 0.0)) + min(0.0, max(gDiff.x, gDiff.y));
     return;
   }
 
@@ -167,9 +177,9 @@ void setupMinMaxPotential(highp float currentBorderlineWidth, float heuristicFac
   gMinOutlinePotential += heuristicEdgeCasePotential;
 }
 
-void PreprocessPotential(highp vec4 cornerRadius, highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth, float heuristicFactor)
+void PreprocessPotential(highp vec4 cornerRadius, highp vec4 currentCornerSquareness, highp vec2 position, highp vec2 halfSizeOfRect, highp float currentBorderlineWidth, float heuristicFactor)
 {
-  calculateCornerRadius(cornerRadius, position);
+  calculateCornerRadius(cornerRadius, currentCornerSquareness, position);
   calculateFragmentPosition(position, halfSizeOfRect);
   calculatePosition(currentBorderlineWidth);
   calculatePotential();
@@ -510,20 +520,17 @@ void main()
   mediump float discardOpacity = 1.0;
 
   mediump float cutoutVertexMargin = 0.0;
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
   if(uCutoutWithCornerRadius == 1)
   {
     cutoutVertexMargin += vAliasMargin * float(uCutoutOutside) * 1.5;
   }
-#endif
 
   if(abs(vPositionFromCenter.x) <= uSize.x * 0.5 + cutoutVertexMargin && abs(vPositionFromCenter.y) <= uSize.y * 0.5 + cutoutVertexMargin)
   {
-#if defined(IS_REQUIRED_ROUNDED_CORNER)
     if(uCutoutWithCornerRadius == 1)
     {
       // Ignore borderline width
-      PreprocessPotential(vCutoutCornerRadius, vPositionFromCenter, uSize.xy * 0.5, 0.0, 0.0);
+      PreprocessPotential(vCutoutCornerRadius, cutoutCornerSquareness, vPositionFromCenter, uSize.xy * 0.5, 0.0, 0.0);
 
       // Decrease potential range, to avoid alias make some hole.
       // For cutout case, move hole insde 1 pixels
@@ -537,9 +544,6 @@ void main()
     {
       discardOpacity = 0.0;
     }
-#else
-    discardOpacity = 0.0;
-#endif
   }
 
   // discardOpacity = 1.0 mean it is outside of the view.
@@ -565,11 +569,15 @@ void main()
   else
   {
     highp vec4 tempCornerRadius = vec4(0.0);
+    highp vec4 tempCornerSquareness = vec4(0.0);
     highp float tempBorderlineWidth = 0.0;
 #ifdef IS_REQUIRED_ROUNDED_CORNER
     tempCornerRadius = vCornerRadius;
+#ifdef IS_REQUIRED_SQUIRCLE_CORNER
+    tempCornerSquareness = cornerSquareness;
 #endif
-    calculateCornerRadius(tempCornerRadius, vPosition);
+#endif
+    calculateCornerRadius(tempCornerRadius, tempCornerSquareness, vPosition);
     calculateFragmentPosition(vPosition, vRectSize);
 #endif
 

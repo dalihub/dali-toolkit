@@ -61,7 +61,6 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
-  fittingMode(FittingMode::SCALE_TO_FILL),
   samplingMode(SamplingMode::BOX_THEN_LINEAR),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(),
@@ -75,14 +74,13 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
   encodedImageBuffer(),
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(dimensions),
-  fittingMode(fittingMode),
   samplingMode(samplingMode),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(),
@@ -96,14 +94,13 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
 : AsyncTask(callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   url(url),
   encodedImageBuffer(),
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(dimensions),
-  fittingMode(fittingMode),
   samplingMode(samplingMode),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(),
@@ -117,14 +114,13 @@ LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dime
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
   encodedImageBuffer(encodedImageBuffer),
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(dimensions),
-  fittingMode(fittingMode),
   samplingMode(samplingMode),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(),
@@ -145,7 +141,6 @@ LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pix
   id(id),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
-  fittingMode(),
   samplingMode(),
   preMultiplyOnLoad(preMultiplyOnLoad),
   maskPixelBuffer(maskPixelBuffer),
@@ -224,12 +219,12 @@ void LoadingTask::Load()
     }
     if(!planeLoaded)
     {
-      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
+      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, samplingMode);
     }
   }
   else if(encodedImageBuffer)
   {
-    pixelBuffer = Dali::LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), dimensions, fittingMode, samplingMode, orientationCorrection);
+    pixelBuffer = Dali::LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), dimensions, samplingMode, orientationCorrection);
 
     // We don't need to hold image buffer anymore.
     encodedImageBuffer.Reset();
@@ -238,16 +233,16 @@ void LoadingTask::Load()
   {
     if(loadPlanes)
     {
-      Dali::LoadImagePlanesFromFile(url.GetUrl(), pixelBuffers, dimensions, fittingMode, samplingMode, orientationCorrection);
+      Dali::LoadImagePlanesFromFile(url.GetUrl(), pixelBuffers, dimensions, samplingMode, orientationCorrection);
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, samplingMode, orientationCorrection);
     }
   }
   else if(url.IsValid())
   {
-    pixelBuffer = Dali::DownloadImageSynchronously(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
+    pixelBuffer = Dali::DownloadImageSynchronously(url.GetUrl(), dimensions, samplingMode, orientationCorrection);
   }
 
   if(pixelBuffer)

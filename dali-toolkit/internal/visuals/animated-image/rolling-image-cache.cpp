@@ -57,7 +57,6 @@ namespace Internal
 {
 RollingImageCache::RollingImageCache(TextureManager&                     textureManager,
                                      ImageDimensions                     size,
-                                     Dali::FittingMode::Type             fittingMode,
                                      Dali::SamplingMode::Type            samplingMode,
                                      UrlList&                            urlList,
                                      TextureManager::MaskingDataPointer& maskingData,
@@ -66,7 +65,7 @@ RollingImageCache::RollingImageCache(TextureManager&                     texture
                                      uint16_t                            batchSize,
                                      uint32_t                            interval,
                                      bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -167,7 +166,7 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+      url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
 
     mRequestingLoad = false;

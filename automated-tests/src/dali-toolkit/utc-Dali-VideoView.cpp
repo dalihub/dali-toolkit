@@ -744,7 +744,7 @@ struct AnimationFinishCheck
   {
   }
 
-  void operator()(Animation& animation)
+  void operator()(Animation animation)
   {
     mSignalReceived = true;
   }

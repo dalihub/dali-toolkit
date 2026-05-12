@@ -85,16 +85,16 @@ enum Type
 
 } // namespace CircularAlignment
 
-const float TO_POINT_26_DOT_6 = 64.f;
-const float TO_FLOAT          = 1.f / 255.f;
-const float TO_UCHAR          = 255.f;
-const bool  RTL               = true;
-const float TWO_PI            = 2.f * Dali::Math::PI;    ///< 360 degrees in radians
-const float RAD_135           = Math::PI_2 + Math::PI_4; ///< 135 degrees in radians;
-const float RAD_225           = RAD_135 + Math::PI_2;    ///< 225 degrees in radians;
-const float RAD_270           = 3.f * Math::PI_2;        ///< 270 degrees in radians;
-const float RAD_315           = RAD_225 + Math::PI_2;    ///< 315 degrees in radians;
-const float MAX_INT           = std::numeric_limits<int>::max();
+const float    TO_POINT_26_DOT_6 = 64.f;
+const float    TO_FLOAT          = 1.f / 255.f;
+const float    TO_UCHAR          = 255.f;
+const bool     RTL               = true;
+const float    TWO_PI            = 2.f * Dali::Math::PI;                                       ///< 360 degrees in radians
+const float    RAD_135           = Math::PI_2 + Math::PI_4;                                    ///< 135 degrees in radians;
+const float    RAD_225           = RAD_135 + Math::PI_2;                                       ///< 225 degrees in radians;
+const float    RAD_270           = 3.f * Math::PI_2;                                           ///< 270 degrees in radians;
+const float    RAD_315           = RAD_225 + Math::PI_2;                                       ///< 315 degrees in radians;
+const uint32_t MAX_INT           = static_cast<uint32_t>(std::numeric_limits<int32_t>::max()); ///< Keep it as maximum varaible of signed integer, for calculation safety.
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(LAYOUT_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(DevelText::Layout, SINGLELINE)

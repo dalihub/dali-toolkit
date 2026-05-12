@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,32 +32,32 @@ namespace Text
 namespace TextGeometry
 {
 
-Rect<float> GetLineBoundingRectangle(TextEditor editor, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextEditor editor, const uint32_t lineIndex)
 {
   return GetImpl(editor).GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> GetLineBoundingRectangle(TextLabel label, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextLabel label, const uint32_t lineIndex)
 {
   return GetImpl(label).GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> GetLineBoundingRectangle(TextField field, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextField field, const uint32_t lineIndex)
 {
   return GetImpl(field).GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex)
 {
   return GetImpl(label).GetCharacterBoundingRectangle(charIndex);
 }
 
-Rect<float> GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex)
 {
   return GetImpl(editor).GetCharacterBoundingRectangle(charIndex);
 }
 
-Rect<float> GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex)
 {
   return GetImpl(field).GetCharacterBoundingRectangle(charIndex);
 }

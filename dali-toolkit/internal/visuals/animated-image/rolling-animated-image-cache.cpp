@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 
 RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
                                                      ImageDimensions                     size,
-                                                     Dali::FittingMode::Type             fittingMode,
                                                      Dali::SamplingMode::Type            samplingMode,
                                                      AnimatedImageLoading&               animatedImageLoading,
                                                      TextureManager::MaskingDataPointer& maskingData,
@@ -75,11 +74,10 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      const Dali::WrapMode::Type&         wrapModeV,
                                                      bool                                isSynchronousLoading,
                                                      bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
-  mFrameIndex(FIRST_FRAME_INDEX),
   mCacheSize(cacheSize),
   mQueue(cacheSize),
   mWrapModeU(wrapModeU),
@@ -221,7 +219,6 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                                      loadTextureId,
                                                                                      mMaskingData,
                                                                                      mDesiredSize,
-                                                                                     mFittingMode,
                                                                                      mSamplingMode,
                                                                                      synchronousLoading,
                                                                                      this,

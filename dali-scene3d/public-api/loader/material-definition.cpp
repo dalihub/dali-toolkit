@@ -95,7 +95,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
     { oss << "[s:" << textureDefinition.mTextureBuffer.size() << "]"; });
-    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
+    Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(textureDefinition.mTextureBuffer.data(), textureDefinition.mTextureBuffer.size(), textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode, true);
     if(pixelBuffer)
     {
       pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
@@ -125,7 +125,7 @@ Dali::PixelData LoadImageResource(const std::string& resourcePath,
 
         DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_BUFFER", [&](std::ostringstream& oss)
         { oss << "[embedded s:" << bufferSize << "]"; });
-        Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, FittingMode::DEFAULT, textureDefinition.mSamplingMode, true);
+        Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromBuffer(reinterpret_cast<uint8_t*>(buffer.data()), bufferSize, textureDefinition.mMinImageDimensions, textureDefinition.mSamplingMode, true);
         if(pixelBuffer)
         {
           pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, true);
@@ -358,7 +358,7 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
       {
         if(!iTexture->mTexture.mTextureBuffer.empty())
         {
-          metallicTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true);
+          metallicTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
           mMetallicSamplerFlags = iTexture->mTexture.mSamplingMode;
         }
 
@@ -369,7 +369,7 @@ MaterialDefinition::LoadRaw(const Dali::String& imagesPath)
       {
         if(!iTexture->mTexture.mTextureBuffer.empty())
         {
-          roughnessTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, FittingMode::DEFAULT, iTexture->mTexture.mSamplingMode, true);
+          roughnessTexture       = Dali::LoadImageFromBuffer(iTexture->mTexture.mTextureBuffer.data(), iTexture->mTexture.mTextureBuffer.size(), iTexture->mTexture.mMinImageDimensions, iTexture->mTexture.mSamplingMode, true);
           mRoughnessSamplerFlags = iTexture->mTexture.mSamplingMode;
         }
 

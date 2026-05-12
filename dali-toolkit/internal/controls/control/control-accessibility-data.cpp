@@ -40,11 +40,11 @@ static constexpr const char* READING_INFO_TYPE_DESCRIPTION    = "description";
 static constexpr const char* READING_INFO_TYPE_STATE          = "state";
 static constexpr const char* READING_INFO_TYPE_SEPARATOR      = "|";
 
-Dali::Rect<float> GetShowingGeometry(Dali::Rect<float> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
+Dali::Bounds GetShowingGeometry(Dali::Bounds rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
 {
-  Rect<float> parentRect;
-  Vector2     currentPosition;
-  auto        parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
+  Bounds  parentRect;
+  Vector2 currentPosition;
+  auto    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
 
   while(parent)
   {
@@ -68,7 +68,7 @@ Dali::Rect<float> GetShowingGeometry(Dali::Rect<float> rect, Dali::Toolkit::Deve
 
   return rect;
 }
-static bool IsShowingGeometryOnScreen(Dali::Rect<float> rect)
+static bool IsShowingGeometryOnScreen(Dali::Bounds rect)
 {
   return rect.width > 0 && rect.height > 0;
 }
@@ -117,7 +117,7 @@ void Control::AccessibilityData::CheckHighlightedObjectGeometry()
   {
     auto lastPosition   = accessible->GetLastPosition();
     auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-    auto rect           = GetShowingGeometry(accessibleRect, accessible.get());
+    auto rect           = GetShowingGeometry(accessibleRect, accessible.Get());
 
     switch(mAccessibilityLastScreenRelativeMoveType)
     {
@@ -181,7 +181,7 @@ void Control::AccessibilityData::RegisterAccessibilityPositionPropertyNotificati
   CheckHighlightedObjectGeometry();
   mAccessibilityPositionNotification = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mAccessibilityPositionNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification&)
+  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification)
   { CheckHighlightedObjectGeometry(); });
   mIsAccessibilityPositionPropertyNotificationSet = true;
 }
@@ -212,7 +212,7 @@ void Control::AccessibilityData::UnregisterAccessibilityPropertySetSignal()
   mIsAccessibilityPropertySetSignalRegistered = false;
 }
 
-void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle& handle, Dali::Property::Index index, const Dali::Property::Value& value)
+void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle handle, Dali::Property::Index index, const Dali::Property::Value& value)
 {
   auto accessible = GetAccessibleObject();
   if(DALI_LIKELY(accessible))
@@ -334,9 +334,9 @@ void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Acc
   AppendAccessibilityAttribute(READING_INFO_TYPE_ATTRIBUTE_NAME, value);
 }
 
-std::shared_ptr<DevelControl::ControlAccessible> Control::AccessibilityData::GetAccessibleObject()
+SharedPtr<DevelControl::ControlAccessible> Control::AccessibilityData::GetAccessibleObject()
 {
-  return std::dynamic_pointer_cast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
+  return DynamicPointerCast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
 }
 
 Accessibility::ReadingInfoTypes Control::AccessibilityData::GetDefaultReadingInfoTypes()

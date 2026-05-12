@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,8 +270,7 @@ inline OptionalRect IsRect(const OptionalChild& node)
   {
     if((*node).Size() >= 4)
     {
-      TreeNode::ConstIterator iter((*node).CBegin());
-      float                   v[4];
+      float v[4];
       if(CopyNumbers((*node).CBegin(), v))
       {
         ret = OptionalRect(Dali::Rect<int>(static_cast<int>(v[0]), static_cast<int>(v[1]), static_cast<int>(v[2]), static_cast<int>(v[3])));
@@ -288,8 +287,7 @@ inline OptionalExtents IsExtents(const OptionalChild& node)
   {
     if((*node).Size() >= 4)
     {
-      TreeNode::ConstIterator iter((*node).CBegin());
-      float                   v[4];
+      float v[4];
       if(CopyNumbers((*node).CBegin(), v))
       {
         extents = OptionalExtents(Dali::Extents(static_cast<uint16_t>(v[0]), static_cast<uint16_t>(v[1]), static_cast<uint16_t>(v[2]), static_cast<uint16_t>(v[3])));

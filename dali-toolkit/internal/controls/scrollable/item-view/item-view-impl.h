@@ -215,32 +215,32 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::GetCurrentScrollPosition
    */
-  Vector2 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const override;
 
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
    */
-  void AddOverlay(Actor actor);
+  void AddOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::RemoveOverlay()
    */
-  void RemoveOverlay(Actor actor);
+  void RemoveOverlay(Actor actor) override;
 
   /**
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector2& position, float duration);
+  void ScrollTo(const Vector2& position, float duration) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootSize
    */
-  void SetOvershootSize(const Vector2& size);
+  void SetOvershootSize(const Vector2& size) override;
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
-  void SetOvershootEffectColor(const Vector4& color);
+  void SetOvershootEffectColor(const Vector4& color) override;
 
   /**
    * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
@@ -410,7 +410,7 @@ private: // From CustomActorImpl
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  bool OnWheelEvent(Actor actor, const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, WheelEvent event);
 
 private: // From Control
   /**
@@ -519,14 +519,14 @@ private:
    * @param[in] touch The touch information.
    * @return True if the event should be consumed.
    */
-  bool OnTouch(Actor actor, const TouchEvent& touch);
+  bool OnTouch(Actor actor, TouchEvent touch);
 
   /**
    * Called upon pan gesture event.
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(const PanGesture& pan);
+  void OnPan(const PanGesture& pan) override;
 
   /**
    * Helper to handle anchoring animations.
@@ -538,20 +538,20 @@ private:
    * Callback from scroll animations
    * @param[in] animation The scroll-animation which has finished.
    */
-  void OnScrollFinished(Animation& animation);
+  void OnScrollFinished(Animation animation);
 
   /**
    * Callback from layout activation scroll animations
    * @param[in] animation The scroll-animation which has finished.
    */
-  void OnLayoutActivationScrollFinished(Animation& animation);
+  void OnLayoutActivationScrollFinished(Animation animation);
 
   /**
    * Called by animation system when overshoot has finished animating to maximum (either -1.0f or 1.0f)
    *
    * @param[in] animation the animation that has finished
    */
-  void OnOvershootOnFinished(Animation& animation);
+  void OnOvershootOnFinished(Animation animation);
 
   /**
    * This is called after a timeout when no new wheel event is received for a certain period of time.
@@ -610,7 +610,7 @@ private:
    * newly visible items.
    * @param[in] source the property notification that triggered this callback
    */
-  void OnRefreshNotification(PropertyNotification& source);
+  void OnRefreshNotification(PropertyNotification source);
 
 private:
   Property::Array mlayoutArray;

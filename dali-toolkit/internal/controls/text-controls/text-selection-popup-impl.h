@@ -151,7 +151,7 @@ private: // From Control
   void OnInitialize() override;
 
 private: // Implementation
-  void HideAnimationFinished(Animation& animation);
+  void HideAnimationFinished(Animation animation);
 
   /**
    * @brief When the cut button is pressed.

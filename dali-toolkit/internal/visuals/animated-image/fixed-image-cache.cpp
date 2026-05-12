@@ -55,7 +55,6 @@ constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 
 FixedImageCache::FixedImageCache(TextureManager&                     textureManager,
                                  ImageDimensions                     size,
-                                 Dali::FittingMode::Type             fittingMode,
                                  Dali::SamplingMode::Type            samplingMode,
                                  UrlList&                            urlList,
                                  TextureManager::MaskingDataPointer& maskingData,
@@ -63,7 +62,7 @@ FixedImageCache::FixedImageCache(TextureManager&                     textureMana
                                  uint32_t                            batchSize,
                                  uint32_t                            interval,
                                  bool                                preMultiplyOnLoad)
-: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, interval, preMultiplyOnLoad),
   mImageUrls(urlList),
   mCurrentFrameIndex(FIRST_FRAME_INDEX)
 {
@@ -160,7 +159,7 @@ void FixedImageCache::LoadBatch()
                                                    : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
-    mTextureManager.LoadTexture(url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+    mTextureManager.LoadTexture(url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[frameIndex].mTextureId = loadTextureId;
     mRequestingLoad                   = false;
   }

@@ -147,7 +147,7 @@ public:
    * @param[in] lineIndex line index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetLineBoundingRectangle(const uint32_t lineIndex) const;
+  Bounds GetLineBoundingRectangle(const uint32_t lineIndex) const;
 
   /**
    * @brief Get the character bounding rectangle.
@@ -156,7 +156,7 @@ public:
    * @param[in] charIndex character index to which we want to calculate the geometry for.
    * @return bounding rectangle.
    */
-  Rect<float> GetCharacterBoundingRectangle(const uint32_t charIndex) const;
+  Bounds GetCharacterBoundingRectangle(const uint32_t charIndex) const;
 
   /**
    * @brief Get the character index.
@@ -175,7 +175,7 @@ public:
    * @param[in] endIndex end index(included) of the text requested to get bounding box to.
    * @return bounding box of the requested text.
    */
-  Rect<float> GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
+  Bounds GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const;
 
   /**
    * @brief Set the @p spannedText into current textLabel
@@ -422,12 +422,12 @@ private: // from AsyncTextInterface
   /**
    * @copydoc Text::AsyncTextInterface::AsyncLoadComplete()
    */
-  void AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo);
+  void AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo) override;
 
   /**
    * @copydoc Text::AsyncTextInterface::AsyncSizeComputed()
    */
-  void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo);
+  void AsyncSizeComputed(Text::AsyncTextRenderInfo renderInfo) override;
 
 private: // Implementation
   /**
@@ -539,7 +539,7 @@ private:
   /**
    * @brief Notifies when the font variation property changes to specific value.
    */
-  void OnVariationPropertyNotify(PropertyNotification& source);
+  void OnVariationPropertyNotify(PropertyNotification source);
 
   /**
    * @brief Callback when TextLabel is intercept touched
@@ -547,7 +547,7 @@ private:
    * @param[in] actor TextLabel touched
    * @param[in] touch Touch information
    */
-  bool OnInterceptTouched(Actor actor, const TouchEvent& touch);
+  bool OnInterceptTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Returns the cached effective visibility of the TextLabel.

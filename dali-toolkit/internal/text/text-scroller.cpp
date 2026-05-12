@@ -300,7 +300,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   mScrollAnimation.SetCurrentProgress(animationProgress);
 }
 
-void TextScroller::AutoScrollAnimationFinished(Dali::Animation& animation)
+void TextScroller::AutoScrollAnimationFinished(Dali::Animation animation)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextScroller::AutoScrollAnimationFinished\n");
   mIsStop = false;

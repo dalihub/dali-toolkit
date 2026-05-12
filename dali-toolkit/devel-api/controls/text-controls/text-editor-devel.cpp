@@ -95,7 +95,7 @@ Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex
   return GetImpl(textEditor).GetTextPosition(startIndex, endIndex);
 }
 
-Rect<float> GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
+Bounds GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textEditor).GetTextBoundingRectangle(startIndex, endIndex);
 }

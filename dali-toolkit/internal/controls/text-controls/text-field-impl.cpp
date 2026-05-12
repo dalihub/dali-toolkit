@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/common/stage.h>
@@ -30,6 +29,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -525,13 +525,13 @@ void TextField::OnInitialize()
   self.TouchedSignal().Connect(this, &TextField::OnTouched);
 
   // Set BoundingBox to stage size if not already set.
-  Rect<int> boundingBox;
+  BoundsInteger boundingBox;
   mDecorator->GetBoundingBox(boundingBox);
 
   if(boundingBox.IsEmpty())
   {
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-    mDecorator->SetBoundingBox(Rect<int>(0.0f, 0.0f, stageSize.width, stageSize.height));
+    mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(std::roundf(stageSize.width)), static_cast<int32_t>(std::roundf(stageSize.height))));
   }
 
   // Flip vertically the 'left' selection handle
@@ -1109,7 +1109,7 @@ void TextField::OnSceneConnect(Dali::Actor actor)
   }
 }
 
-InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(Dali::InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(Dali::InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
   return mController->OnInputMethodContextEvent(inputMethodContext, inputMethodContextEvent);
@@ -1189,7 +1189,7 @@ void TextField::OnSceneConnection(int depth)
   ControlImpl::OnSceneConnection(depth);
 }
 
-bool TextField::OnTouched(Actor actor, const TouchEvent& touch)
+bool TextField::OnTouched(Actor actor, TouchEvent touch)
 {
   return false;
 }
@@ -1236,12 +1236,12 @@ Vector<Vector2> TextField::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-Rect<float> TextField::GetLineBoundingRectangle(const uint32_t lineIndex) const
+Bounds TextField::GetLineBoundingRectangle(const uint32_t lineIndex) const
 {
   return mController->GetLineBoundingRectangle(lineIndex);
 }
 
-Rect<float> TextField::GetCharacterBoundingRectangle(const uint32_t charIndex) const
+Bounds TextField::GetCharacterBoundingRectangle(const uint32_t charIndex) const
 {
   return mController->GetCharacterBoundingRectangle(charIndex);
 }
@@ -1251,7 +1251,7 @@ int TextField::GetCharacterIndexAtPosition(float visualX, float visualY) const
   return mController->GetCharacterIndexAtPosition(visualX, visualY);
 }
 
-Rect<float> TextField::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
+Bounds TextField::GetTextBoundingRectangle(uint32_t startIndex, uint32_t endIndex) const
 {
   return mController->GetTextBoundingRectangle(startIndex, endIndex);
 }
@@ -1316,7 +1316,7 @@ Dali::Property::Index TextField::RegisterFontVariationProperty(std::string tag)
   return index;
 }
 
-void TextField::OnVariationPropertyNotify(PropertyNotification& source)
+void TextField::OnVariationPropertyNotify(PropertyNotification source)
 {
   Property::Map map;
   mController->GetVariationsMap(map);

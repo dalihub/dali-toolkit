@@ -80,8 +80,6 @@ namespace Text
 {
 namespace Internal
 {
-const float TO_POINT_26_DOT_6 = 64.f;
-
 AsyncTextLoader::AsyncTextLoader()
 : mModule(),
   mTextModel(),

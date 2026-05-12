@@ -98,7 +98,7 @@ NPatchData::NPatchDataId NPatchLoader::Load(TextureManager& textureManager, Text
     auto preMultiplyOnLoading = preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                   : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data.Get(), true, preMultiplyOnLoading);
+    Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(url, Dali::ImageDimensions(), SamplingMode::BOX_THEN_LINEAR, synchronousLoading, data.Get(), true, preMultiplyOnLoading);
 
     if(pixelBuffer)
     {

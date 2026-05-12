@@ -17,10 +17,13 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali/integration-api/debug.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -56,7 +59,9 @@ constexpr VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::COLOR_SHADER_CUTOUT_ROUNDED_BORDERLINE_BLUR_EDGE,
   VisualFactoryCache::COLOR_SHADER_CUTOUT_SQUIRCLE_BORDERLINE_BLUR_EDGE,
 };
+#if defined(DEBUG_ENABLED)
 constexpr uint32_t SHADER_TYPE_TABLE_COUNT = sizeof(SHADER_TYPE_TABLE) / sizeof(SHADER_TYPE_TABLE[0]);
+#endif
 
 // enum of required list when we select shader
 enum ColorVisualRequireFlag
@@ -71,6 +76,8 @@ enum ColorVisualRequireFlag
 };
 
 static constexpr auto PREDEFINED_SHADER_TYPE_COUNT = 2u;
+
+constexpr int CUSTOM_CUTOUT_CORNER_PROPERTY_COUNT(3); // CutoutCornerRadius, CutoutCornerRadiusPolicy, CutoutCornerSquareness
 
 // constexpr std::string_view VertexPredefines[PREDEFINED_SHADER_TYPE_COUNT]{
 //   "",                                     // VisualFactoryCache::COLOR_SHADER
@@ -242,7 +249,10 @@ Shader ColorVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
 
     if(featureBuilder.IsCutoutEnabled())
     {
+      shader.ReserveCustomProperties(CUSTOM_CUTOUT_CORNER_PROPERTY_COUNT);
       shader.RegisterUniqueProperty(CUTOUT_CORNER_RADIUS_UNIFORM_NAME, Vector4::ZERO);
+      shader.RegisterUniqueProperty(CUTOUT_CORNER_RADIUS_POLICY_UNIFORM_NAME, Property::Value(static_cast<float>(Toolkit::Visual::Transform::Policy::ABSOLUTE)));
+      shader.RegisterUniqueProperty(CUTOUT_CORNER_SQUARENESS_UNIFORM_NAME, Vector4::ZERO);
     }
   }
   return shader;

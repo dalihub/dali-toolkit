@@ -36,7 +36,6 @@ namespace Dali::Scene3D::Loader
 {
 namespace
 {
-constexpr std::string_view OBJ_EXTENSION      = ".obj";
 constexpr std::string_view GLTF_EXTENSION     = ".gltf";
 constexpr std::string_view GLB_EXTENSION      = ".glb";
 constexpr std::string_view DLI_EXTENSION      = ".dli";

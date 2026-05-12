@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
@@ -48,8 +49,16 @@ Window::Window(const PositionSize& positionSize)
   mResizeSignal(),
   mRotationAngle(90), // dummy angle for test coverage
   mVisible(true),
-  mVisibilityChangedSignal()
+  mVisibilityChangedSignal(),
+  mKeyEventSignal(),
+  mTouchEventSignal(),
+  mKeyEventGeneratedSignal(),
+  mWheelEventSignal(),
+  mWheelEventGeneratedSignal(),
+  mSlotDelegate(this)
 {
+  SceneHolder::KeyEventSignal().Connect(mSlotDelegate, &Window::OnKeyEvent);
+  SceneHolder::TouchedSignal().Connect(mSlotDelegate, &Window::OnTouchEvent);
 }
 
 Window* Window::New(const PositionSize& positionSize, const Dali::String& name, const Dali::String& className, bool isTransparent)
@@ -76,11 +85,33 @@ Dali::Window::WindowSize Window::GetSize() const
   return Dali::Window::WindowSize(positionSize.width, positionSize.height);
 }
 
+Dali::Window::KeyEventSignalType& Window::KeyEventSignal()
+{
+  return mKeyEventSignal;
+}
+
+Dali::Window::TouchEventSignalType& Window::TouchedSignal()
+{
+  return mTouchEventSignal;
+}
+
+void Window::OnKeyEvent(Dali::Integration::SceneHolder /*sceneHolder*/, Dali::KeyEvent event)
+{
+  Dali::Window window(this);
+  mKeyEventSignal.Emit(window, event);
+}
+
+void Window::OnTouchEvent(Dali::Integration::SceneHolder /*sceneHolder*/, Dali::TouchEvent event)
+{
+  Dali::Window window(this);
+  mTouchEventSignal.Emit(window, event);
+}
+
 void Window::SetPositionSize(PositionSize positionSize)
 {
   mRenderSurface->MoveResize(positionSize);
 
-  Uint16Pair   newSize(positionSize.width, positionSize.height);
+  Int32Pair    newSize(positionSize.width, positionSize.height);
   Dali::Window handle(this);
   mResizeSignal.Emit(handle, newSize);
 }
@@ -287,17 +318,17 @@ EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window)
 
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal(Window window)
 {
-  return GetImplementation(window).KeyEventGeneratedSignal();
+  return GetImplementation(window).mKeyEventGeneratedSignal;
 }
 
 WheelEventSignalType& WheelEventSignal(Window window)
 {
-  return GetImplementation(window).WheelEventSignal();
+  return GetImplementation(window).mWheelEventSignal;
 }
 
 WheelEventGeneratedSignalType& WheelEventGeneratedSignal(Window window)
 {
-  return GetImplementation(window).WheelEventGeneratedSignal();
+  return GetImplementation(window).mWheelEventGeneratedSignal;
 }
 
 VisibilityChangedSignalType& VisibilityChangedSignal(Window window)

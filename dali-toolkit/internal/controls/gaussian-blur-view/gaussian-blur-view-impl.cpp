@@ -629,7 +629,7 @@ Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal& GaussianBlurView::Finis
   return mFinishedSignal;
 }
 
-void GaussianBlurView::OnRenderTaskFinished(Dali::RenderTask& renderTask)
+void GaussianBlurView::OnRenderTaskFinished(Dali::RenderTask renderTask)
 {
   Toolkit::GaussianBlurView handle(GetOwner());
   mFinishedSignal.Emit(handle);

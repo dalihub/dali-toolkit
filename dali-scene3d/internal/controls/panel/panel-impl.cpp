@@ -164,7 +164,11 @@ void Panel::SetContent(Dali::Actor rootActor)
 
 Dali::Actor Panel::GetContent() const
 {
-  return (mRootLayer.GetChildCount() > 1) ? ((mRootLayer.GetChildAt(0u) == mCamera) ? mRootLayer.GetChildAt(1u) : mRootLayer.GetChildAt(0u)) : Dali::Actor();
+  if(mRootLayer.GetChildCount() > 1u)
+  {
+    return (mRootLayer.GetChildAt(0u) == mCamera) ? mRootLayer.GetChildAt(1u) : ((mRootLayer.GetChildAt(0u) != mCamera) ? mRootLayer.GetChildAt(0u) : Dali::Actor());
+  }
+  return ((mRootLayer.GetChildCount() > 0u) && (mRootLayer.GetChildAt(0u) != mCamera)) ? mRootLayer.GetChildAt(0u) : Dali::Actor();
 }
 
 void Panel::ClearPanel()
@@ -656,24 +660,19 @@ void Panel::UpdateRenderTask()
       mFrameBuffer.Reset();
     }
 
-    mCamera = Dali::CameraActor::New(mPanelResolution);
-    mCamera.SetProperty(Dali::Actor::Property::NAME, "PanelCamera");
-    mCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-    mCamera.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
-    mCamera.SetProperty(Dali::Actor::Property::POSITION_X, mPanelResolution.x / 2.0f);
-    mCamera.SetProperty(Dali::Actor::Property::POSITION_Y, mPanelResolution.y / 2.0f);
-    mRootLayer.Add(mCamera);
-
     mRootLayer.SetProperty(Dali::Actor::Property::SIZE, mPanelResolution);
 
     mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, mPanelResolution.width, mPanelResolution.height);
     mFrameBuffer = Dali::FrameBuffer::New(mTexture.GetWidth(), mTexture.GetHeight(), Dali::FrameBuffer::Attachment::AUTO);
     mFrameBuffer.AttachColorTexture(mTexture);
 
-    mRenderTask.SetCameraActor(mCamera);
+    mRenderTask.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, mPanelResolution, Property::Map().Add(Dali::Actor::Property::NAME, "PanelAutoCamera"));
     mRenderTask.SetFrameBuffer(mFrameBuffer);
     mRenderTask.SetClearEnabled(true);
     mRenderTask.SetClearColor(mIsTransparent ? Color::TRANSPARENT : Color::WHITE);
+
+    // Keep the camera actor to get contents.
+    mCamera = mRenderTask.GetCameraActor();
 
     mContentPlaneMaterial.SetTexture(Dali::Scene3D::Material::TextureType::BASE_COLOR, mTexture);
   }

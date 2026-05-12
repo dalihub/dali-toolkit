@@ -153,8 +153,8 @@ private:
 private:
   float mBlurRadius; ///< The blur radius
 
-  Constraint      mCutoutCornerRadiusConstraint{};
-  Property::Index mCuroutCornerRadiusIndex; ///< The index of cutout corner radius property
+  struct CutoutCornerContext;
+  std::unique_ptr<CutoutCornerContext> mCutoutCornerContext; ///< The infomations relative about cutout with corner radius.
 
   DevelColorVisual::CutoutPolicy::Type mCutoutPolicy : 3;          ///< The policy of cutout
   bool                                 mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.

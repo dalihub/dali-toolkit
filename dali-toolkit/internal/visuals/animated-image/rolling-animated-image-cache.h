@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ public:
    * @brief Constructor.
    * @param[in] textureManager       The texture manager
    * @param[in] size                 The width and height to fit the loaded image to.
-   * @param[in] fittingMode          The FittingMode of the resource to load
    * @param[in] samplingMode         The SamplingMode of the resource to load
    * @param[in] animatedImageLoading The loaded animated image
    * @param[in] maskingData          Masking data to be applied.
@@ -60,7 +59,6 @@ public:
    */
   RollingAnimatedImageCache(TextureManager&                     textureManager,
                             ImageDimensions                     size,
-                            Dali::FittingMode::Type             fittingMode,
                             Dali::SamplingMode::Type            samplingMode,
                             AnimatedImageLoading&               animatedImageLoading,
                             TextureManager::MaskingDataPointer& maskingData,
@@ -200,7 +198,6 @@ private:
   VisualUrl                  mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading;
   uint32_t                   mFrameCount;
-  uint32_t                   mFrameIndex;
   uint32_t                   mCacheSize;
   std::vector<int32_t>       mIntervals;
   std::vector<uint32_t>      mLoadWaitingQueue;

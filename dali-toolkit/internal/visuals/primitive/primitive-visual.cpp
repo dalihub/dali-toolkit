@@ -74,15 +74,6 @@ const float MAX_BEVEL_PERCENTAGE = 1.0; ///< Maximum bevel percentage for bevell
 const float MIN_SMOOTHNESS       = 0.0; ///< Minimum bevel smoothness for bevelled cubes
 const float MAX_SMOOTHNESS       = 1.0; ///< Maximum bevel smoothness for bevelled cubes
 
-//Specific shape labels.
-const char* const SPHERE_LABEL("SPHERE");
-const char* const CONE_LABEL("CONE");
-const char* const CYLINDER_LABEL("CYLINDER");
-const char* const CUBE_LABEL("CUBE");
-const char* const OCTAHEDRON_LABEL("OCTAHEDRON");
-const char* const BEVELLED_CUBE_LABEL("BEVELLED_CUBE");
-const char* const CONICAL_FRUSTUM_LABEL("CONICAL_FRUSTUM");
-
 //Shader properties
 const char* const OBJECT_MATRIX_UNIFORM_NAME("uObjectMatrix");
 const char* const OBJECT_DIMENSIONS_UNIFORM_NAME("uObjectDimensions");
@@ -91,7 +82,6 @@ const char* const STAGE_OFFSET_UNIFORM_NAME("uStageOffset");
 //Vertex properties
 const char* const POSITION("aPosition");
 const char* const NORMAL("aNormal");
-const char* const INDICES("aIndices");
 
 } // unnamed namespace
 

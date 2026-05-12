@@ -66,7 +66,7 @@ static void OnScrollUpdate(const Vector2& position)
   gOnScrollUpdateCalled = true;
 }
 
-static bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheelEvent)
+static bool OnWheelEvent(Actor actor, Dali::WheelEvent wheelEvent)
 {
   gOnWheelEventCalled = true;
   return false;

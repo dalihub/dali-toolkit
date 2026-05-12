@@ -92,7 +92,7 @@ typedef Dali::Vector<Dali::Vector4> QuadContainer;
  * @param[in] boundingRectangle local bounding
  * @param[out] Vector4 World coordinate bounding Box.
  */
-void LocalToWorldCoordinatesBoundingBox(const Dali::Rect<int>& boundingRectangle, Dali::Vector4& boundingBox)
+void LocalToWorldCoordinatesBoundingBox(const Dali::BoundsInteger& boundingRectangle, Dali::Vector4& boundingBox)
 {
   // Convert to world coordinates and store as a Vector4 to be compatible with Property Notifications.
   Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
@@ -106,7 +106,7 @@ void LocalToWorldCoordinatesBoundingBox(const Dali::Rect<int>& boundingRectangle
                               originY + boundingRectangle.height);
 }
 
-void WorldToLocalCoordinatesBoundingBox(const Dali::Vector4& boundingBox, Dali::Rect<int>& boundingRectangle)
+void WorldToLocalCoordinatesBoundingBox(const Dali::Vector4& boundingBox, Dali::BoundsInteger& boundingRectangle)
 {
   // Convert to local coordinates and store as a Dali::Rect.
   Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
@@ -1392,7 +1392,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  void OnPan(Actor actor, const PanGesture& gesture)
+  void OnPan(Actor actor, PanGesture gesture)
   {
     HandleImpl& grabHandle               = mHandle[GRAB_HANDLE];
     HandleImpl& primarySelectionHandle   = mHandle[LEFT_SELECTION_HANDLE];
@@ -1412,7 +1412,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  bool OnGrabHandleTouched(Actor actor, const TouchEvent& touch)
+  bool OnGrabHandleTouched(Actor actor, TouchEvent touch)
   {
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
 
@@ -1438,7 +1438,7 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
-  bool OnHandleOneTouched(Actor actor, const TouchEvent& touch)
+  bool OnHandleOneTouched(Actor actor, TouchEvent touch)
   {
     HandleImpl& primarySelectionHandle = mHandle[LEFT_SELECTION_HANDLE];
 
@@ -1468,7 +1468,7 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
-  bool OnHandleTwoTouched(Actor actor, const TouchEvent& touch)
+  bool OnHandleTwoTouched(Actor actor, TouchEvent touch)
   {
     HandleImpl& secondarySelectionHandle = mHandle[RIGHT_SELECTION_HANDLE];
 
@@ -1498,7 +1498,7 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
-  void HandleResetPosition(PropertyNotification& source)
+  void HandleResetPosition(PropertyNotification source)
   {
     const HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
 
@@ -1748,7 +1748,7 @@ struct Decorator::Impl : public ConnectionTracker
     return alternativePosition;
   }
 
-  void PopUpLeavesTopBoundary(PropertyNotification& source)
+  void PopUpLeavesTopBoundary(PropertyNotification source)
   {
     const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT);
 
@@ -1756,7 +1756,7 @@ struct Decorator::Impl : public ConnectionTracker
     mCopyPastePopup.actor.SetProperty(Actor::Property::POSITION_Y, floorf(CalculateVerticalPopUpPosition(0.5f * popupHeight, true)));
   }
 
-  void PopUpLeavesBottomBoundary(PropertyNotification& source)
+  void PopUpLeavesBottomBoundary(PropertyNotification source)
   {
     const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT);
 
@@ -1999,12 +1999,12 @@ DecoratorPtr Decorator::New(ControllerInterface&                 controller,
                                     callbackInterface));
 }
 
-void Decorator::SetBoundingBox(const Rect<int>& boundingBox)
+void Decorator::SetBoundingBox(const BoundsInteger& boundingBox)
 {
   LocalToWorldCoordinatesBoundingBox(boundingBox, mImpl->mBoundingBox);
 }
 
-void Decorator::GetBoundingBox(Rect<int>& boundingBox) const
+void Decorator::GetBoundingBox(BoundsInteger& boundingBox) const
 {
   WorldToLocalCoordinatesBoundingBox(mImpl->mBoundingBox, boundingBox);
 }

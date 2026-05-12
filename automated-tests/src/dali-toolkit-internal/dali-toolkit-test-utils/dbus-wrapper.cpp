@@ -765,6 +765,11 @@ struct DefaultDBusWrapper : public DBusWrapper
                                     listenerEventChangedCallback, callbackLambdaPtr);
     eldbus_proxy_free_cb_add(p, ProxyEventCallbackDelCb, callbackLambdaPtr);
   }
+
+  bool get_from_value_impl(const void* v, void* dst) override
+  {
+    return eina_value_get(static_cast<Eina_Value*>(const_cast<void*>(v)), dst);
+  }
 };
 
 std::unordered_map<const Eldbus_Service_Interface*, std::unique_ptr<DefaultDBusWrapper::Implementation>> DefaultDBusWrapper::globalEntries;
@@ -1190,6 +1195,10 @@ void TestDBusWrapper::add_property_changed_event_listener_impl(const ProxyPtr& p
 {
   auto p                                                                                               = get(proxy);
   propertyChangeListeners[std::tuple<std::string, std::string, std::string>{p->path, interface, name}] = cb;
+}
+bool TestDBusWrapper::get_from_value_impl(const void* v, void* dst)
+{
+  return eina_value_get(static_cast<Eina_Value*>(const_cast<void*>(v)), dst);
 }
 void TestDBusWrapper::add_interface_impl(bool fallback, const std::string& path_,
                                          const ConnectionPtr&                connection,

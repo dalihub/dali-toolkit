@@ -582,7 +582,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextEditor textEditor, const ui
  * @param[in] endIndex end index(included) of the text requested to get bounding box to.
  * @return bounding box of the requested text.
  */
-DALI_TOOLKIT_API Rect<float> GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex);
+DALI_TOOLKIT_API Bounds GetTextBoundingRectangle(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Copy and return the selected text of TextEditor.

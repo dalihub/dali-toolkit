@@ -98,7 +98,7 @@ private:
    * @brief Remove each finished TransitionBase from play list.
    * If all transitions are finished emit Finished signal.
    */
-  void TransitionFinished(Dali::Animation& source);
+  void TransitionFinished(Dali::Animation source);
 
   /**
    * Emit the Finished signal

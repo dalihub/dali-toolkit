@@ -252,7 +252,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFA::OptimizeWaypoints(WayP
   auto startIndex = 1u;
 
   bool finished = false;
-  for(auto j = 0; !finished; ++j)
+  while(!finished)
   {
     auto&       startWaypoint     = optimizedWaypoints.back();
     const auto& startWaypointData = static_cast<const WayPointData&>(startWaypoint);

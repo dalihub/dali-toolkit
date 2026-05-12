@@ -19,6 +19,7 @@
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
 #include <dali-scene3d/public-api/loader/utils.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -302,7 +303,7 @@ std::vector<std::map<gltf2::Attribute::Type, gltf2::Ref<gltf2::Accessor>>> ReadM
   auto element = jsonObject.start;
   while(element)
   {
-    result.push_back(std::move(ReadMeshPrimitiveAttributes2(*element->value)));
+    result.push_back(ReadMeshPrimitiveAttributes2(*element->value));
     element = element->next;
   }
 
@@ -630,15 +631,15 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
   materialDefinition.mFlags |= semantic;
 }
 
-void ConvertMaterial(const gltf2::Material& material, const std::unordered_map<Dali::String, ImageMetadata>& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
+void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const std::unordered_map<Dali::String, ImageMetadata>& metaData, const gltf2::TextureInfo& info)
+  auto getTextureMetaData = [](const ImageMetadataMap& metaData, const gltf2::TextureInfo& info)
   {
     if(!info.mTexture->mSource->mUri.empty())
     {
-      if(auto search = metaData.find(Dali::String(info.mTexture->mSource->mUri.data())); search != metaData.end())
+      if(auto* found = metaData.Find(Dali::String(info.mTexture->mSource->mUri.data())))
       {
-        return search->second;
+        return *found;
       }
     }
     return ImageMetadata();
@@ -781,7 +782,7 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
       {},
       {});
 
-    sparseBlob = std::move(MeshDefinition::SparseBlob(std::move(indicesBlob), std::move(valuesBlob), accessor.mSparse->mCount));
+    sparseBlob = MeshDefinition::SparseBlob(std::move(indicesBlob), std::move(valuesBlob), accessor.mSparse->mCount);
   }
 
   uint32_t bufferViewOffset = 0u;
@@ -793,12 +794,12 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
   }
 
   return MeshDefinition::Accessor{
-    std::move(MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
-                                   accessor.GetBytesLength(),
-                                   static_cast<uint16_t>(bufferViewStride),
-                                   static_cast<uint16_t>(accessor.GetElementSizeBytes()),
-                                   accessor.mMin,
-                                   accessor.mMax}),
+    MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
+                         accessor.GetBytesLength(),
+                         static_cast<uint16_t>(bufferViewStride),
+                         static_cast<uint16_t>(accessor.GetElementSizeBytes()),
+                         accessor.mMin,
+                         accessor.mMax},
     std::move(sparseBlob),
     accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
     accessor.mNormalized};

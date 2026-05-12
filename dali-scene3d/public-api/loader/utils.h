@@ -58,7 +58,7 @@ public:
 
   ExceptionFlinger(const char* location) noexcept(true);
 
-  [[noreturn]] ~ExceptionFlinger() noexcept(false);
+  ~ExceptionFlinger() noexcept(false);
 
   template<typename T>
   ExceptionFlinger& operator<<(const T& rhs) noexcept(true)
@@ -78,7 +78,7 @@ private:
   {
     const char* mLocation;
 
-    [[noreturn]] ~Impl() noexcept(false);
+    ~Impl() noexcept(false);
   };
 
   static char* GetMessageBuffer() noexcept(true);

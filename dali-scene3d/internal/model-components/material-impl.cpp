@@ -62,13 +62,10 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::Material, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
 
-static constexpr uint32_t         OFFSET_FOR_SHADOW_MAP_TEXTURE    = 4u;
-static constexpr uint32_t         OFFSET_FOR_DIFFUSE_CUBE_TEXTURE  = 2u;
-static constexpr uint32_t         OFFSET_FOR_SPECULAR_CUBE_TEXTURE = 1u;
-static constexpr uint32_t         INVALID_INDEX                    = 0u;
-static constexpr uint32_t         ALPHA_CUTOFF_FLAG                = Scene3D::Loader::MaterialDefinition::Flags::SUBSURFACE << 1;
-static constexpr std::string_view THREE_TEX_KEYWORD                = "THREE_TEX";
-static constexpr std::string_view GLTF_CHANNELS_KEYWORD            = "GLTF_CHANNELS";
+static constexpr uint32_t OFFSET_FOR_SHADOW_MAP_TEXTURE    = 4u;
+static constexpr uint32_t OFFSET_FOR_DIFFUSE_CUBE_TEXTURE  = 2u;
+static constexpr uint32_t OFFSET_FOR_SPECULAR_CUBE_TEXTURE = 1u;
+static constexpr uint32_t INVALID_INDEX                    = 0u;
 
 static constexpr Vector3 IBL_BASIS(1.0f, -1.0f, 1.0f);
 
@@ -859,7 +856,7 @@ void Material::TextureLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
       Dali::Integration::TextureUploadWithContent(textureInformation.mTexture,
                                                   pixelData,
                                                   ToDaliString(textureInformation.mUrl),
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE + 1200));
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_MATERIAL_IMAGE));
 #else
       textureInformation.mTexture.Upload(pixelData);
 #endif

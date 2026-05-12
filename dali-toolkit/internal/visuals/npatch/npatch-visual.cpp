@@ -49,10 +49,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-namespace
-{
-const int CUSTOM_PROPERTY_COUNT(0); // fixed(3),stretch,aux,pre-muliplied alpha
-}
 
 /////////////////NPatchVisual////////////////
 
@@ -110,7 +106,7 @@ void NPatchVisual::LoadImages()
     bool                               loadingStatus  = false;
 
     // Load the auxiliary image
-    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, loadingStatus, this, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
+    mAuxiliaryTextureSet = textureManager.LoadTexture(mAuxiliaryUrl, Dali::ImageDimensions(), SamplingMode::BOX_THEN_LINEAR, maskingDataPtr, synchronousLoading, mAuxiliaryTextureId, loadingStatus, this, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad);
 
     // If synchronousLoading is true, we can check the auxiliaryResource's status now.
     if(synchronousLoading)
@@ -377,7 +373,6 @@ void NPatchVisual::OnInitialize()
     imageVisualShaderFeatureBuilder);
 
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);

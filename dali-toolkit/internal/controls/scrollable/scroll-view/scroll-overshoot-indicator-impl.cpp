@@ -270,7 +270,7 @@ void ScrollOvershootEffectRipple::UpdateVisibility(bool visible)
   }
 }
 
-void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
+void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification source)
 {
   Actor self = mAttachedScrollView.Self();
   mOvershoot = self.GetCurrentProperty<float>(mOvershootProperty);
@@ -336,7 +336,7 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
   }
 }
 
-void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation& animation)
+void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation animation)
 {
   bool animateOff = false;
   if(mAnimationStateFlags & AnimatingOut)

@@ -27,22 +27,21 @@ namespace SyncImageLoader
 {
 PixelData Load(const Dali::String& url)
 {
-  return Load(url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true);
+  return Load(url, ImageDimensions(), SamplingMode::BOX_THEN_LINEAR, true);
 }
 
 PixelData Load(const Dali::String& url, ImageDimensions dimensions)
 {
-  return Load(url, dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true);
+  return Load(url, dimensions, SamplingMode::BOX_THEN_LINEAR, true);
 }
 
 PixelData Load(const Dali::String& url,
                ImageDimensions     dimensions,
-               FittingMode::Type   fittingMode,
                SamplingMode::Type  samplingMode,
                bool                orientationCorrection)
 {
   // Load the image synchronously (block the thread here).
-  Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToStdString(url), dimensions, fittingMode, samplingMode, orientationCorrection);
+  Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToStdString(url), dimensions, samplingMode, orientationCorrection);
   if(pixelBuffer)
   {
     return Devel::PixelBuffer::Convert(pixelBuffer);

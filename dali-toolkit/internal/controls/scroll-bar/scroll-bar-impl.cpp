@@ -358,7 +358,7 @@ Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
   return mScrollPositionIntervals;
 }
 
-void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
+void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification source)
 {
   // Emit the signal to notify the scroll position crossing
   Handle scrollableHandle = mScrollableObject.GetHandle();
@@ -887,7 +887,7 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 void ScrollBar::ScrollBarAccessible::InitDefaultFeatures()
 {
   DevelControl::ControlAccessible::InitDefaultFeatures();
-  AddFeature<Dali::Accessibility::Value>(shared_from_this());
+  AddFeature<Dali::Accessibility::Value>(SharedFromThis());
 }
 
 double ScrollBar::ScrollBarAccessible::GetMinimum() const

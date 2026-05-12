@@ -584,22 +584,22 @@ const Control& Control::Get(const ControlImpl& controlImpl)
 }
 
 // Gesture Detection Methods
-void Control::PinchDetected(Actor actor, const PinchGesture& pinch)
+void Control::PinchDetected(Actor actor, PinchGesture pinch)
 {
   mControlImpl.OnPinch(pinch);
 }
 
-void Control::PanDetected(Actor actor, const PanGesture& pan)
+void Control::PanDetected(Actor actor, PanGesture pan)
 {
   mControlImpl.OnPan(pan);
 }
 
-void Control::TapDetected(Actor actor, const TapGesture& tap)
+void Control::TapDetected(Actor actor, TapGesture tap)
 {
   mControlImpl.OnTap(tap);
 }
 
-void Control::LongPressDetected(Actor actor, const LongPressGesture& longPress)
+void Control::LongPressDetected(Actor actor, LongPressGesture longPress)
 {
   mControlImpl.OnLongPress(longPress);
 }
@@ -2110,7 +2110,7 @@ bool Control::OnIdleCallback()
   return mIdleCallbackRegistered;
 }
 
-std::shared_ptr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
+SharedPtr<Toolkit::DevelControl::ControlAccessible> Control::GetAccessibleObject()
 {
   return GetOrCreateAccessibilityData().GetAccessibleObject();
 }

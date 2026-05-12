@@ -186,14 +186,15 @@ int UtcDaliGltfLoaderSuccess1(void)
   imageMetadataGroundTruth["AnimatedCube_BaseColor.png"]         = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::BOX_THEN_NEAREST};
   imageMetadataGroundTruth["AnimatedCube_MetallicRoughness.png"] = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::NEAREST};
 
-  auto metaData = ctx.metaData.mImageMetadata.begin();
-  for(auto& groundTruth : imageMetadataGroundTruth)
-  {
-    DALI_TEST_EQUAL(groundTruth.first, metaData->first);
-    DALI_TEST_EQUAL(groundTruth.second.mMinSize, metaData->second.mMinSize);
-    DALI_TEST_EQUAL(groundTruth.second.mSamplingMode, metaData->second.mSamplingMode);
-    ++metaData;
-  }
+  ctx.metaData.mImageMetadata.ForEach([&](const Dali::String& key, const ImageMetadata& value) {
+    auto it = imageMetadataGroundTruth.find(std::string(key.CStr()));
+    DALI_TEST_CHECK(it != imageMetadataGroundTruth.end());
+    if(it != imageMetadataGroundTruth.end())
+    {
+      DALI_TEST_EQUAL(it->second.mMinSize, value.mMinSize);
+      DALI_TEST_EQUAL(it->second.mSamplingMode, value.mSamplingMode);
+    }
+  });
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCube.gltf", ctx.loadResult);
 
@@ -380,7 +381,6 @@ int UtcDaliGltfLoaderSuccess1(void)
   };
 
   auto iMaterial = materials.begin();
-  auto iMetadata = ctx.metaData.mImageMetadata.begin();
   for(auto& m : materialGroundTruth)
   {
     printf("material %ld\n", iMaterial - materials.begin());
@@ -421,7 +421,6 @@ int UtcDaliGltfLoaderSuccess1(void)
       ++iTexture;
     }
     ++iMaterial;
-    ++iMetadata;
   }
 
   auto& meshes = ctx.resources.mMeshes;

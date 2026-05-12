@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,34 +44,6 @@ namespace
 {
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE3D_MODEL_PRIMITIVE");
-
-inline Property::Map GetMap(Shader shader)
-{
-  Property::Value program = shader[Shader::Property::PROGRAM];
-  Property::Map*  map{nullptr};
-  if(program.GetType() == Property::ARRAY)
-  {
-    Property::Array* array = program.GetArray();
-    if(array)
-    {
-      Property::Value& value = array->GetElementAt(0);
-      if(value.GetType() == Property::MAP)
-      {
-        map = value.GetMap();
-      }
-    }
-  }
-  else if(program.GetType() == Property::MAP)
-  {
-    map = program.GetMap();
-  }
-  if(map)
-  {
-    return *map;
-  }
-  return Property::Map();
-}
-
 #endif
 /**
  * Creates control through type registry
@@ -84,8 +56,6 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Scene3D::ModelPrimitive, Dali::BaseHandle, Create);
 DALI_TYPE_REGISTRATION_END()
-
-static constexpr uint32_t INDEX_FOR_LIGHT_CONSTRAINT_TAG = 10;
 
 } // unnamed namespace
 
