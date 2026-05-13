@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/update/frame-callback-interface.h>
-#include <dali/devel-api/update/update-proxy.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
 
 #include <functional>
 #include <mutex>
