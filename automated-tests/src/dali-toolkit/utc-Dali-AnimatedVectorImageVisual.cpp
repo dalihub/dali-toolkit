@@ -3542,7 +3542,7 @@ int UtcDaliAnimatedVectorImageVisualEnableAspectFit(void)
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Verify that CreatePropertyMap() has ENABLE_ASPECT_FIT as true
-    Property::Map resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+    Property::Map    resultMap            = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
     Property::Value* enableAspectFitValue = resultMap.Find(DevelImageVisual::Property::ENABLE_ASPECT_FIT);
     DALI_TEST_CHECK(enableAspectFitValue);
     bool enableAspectFit = false;
@@ -3580,7 +3580,45 @@ int UtcDaliAnimatedVectorImageVisualEnableAspectFit(void)
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Verify that CreatePropertyMap() has ENABLE_ASPECT_FIT as false
-    Property::Map resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+    Property::Map    resultMap            = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+    Property::Value* enableAspectFitValue = resultMap.Find(DevelImageVisual::Property::ENABLE_ASPECT_FIT);
+    DALI_TEST_CHECK(enableAspectFitValue);
+    bool enableAspectFit = true;
+    enableAspectFitValue->Get(enableAspectFit);
+    DALI_TEST_EQUALS(enableAspectFit, false, TEST_LOCATION);
+  }
+
+  // Test with ENABLE_ASPECT_FIT set to false by string key
+  {
+    Property::Map propertyMap;
+    propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
+      .Add("enableAspectFit", false);
+
+    Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+    DALI_TEST_CHECK(visual);
+
+    DummyControl      actor     = DummyControl::New(true);
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+    Vector2 controlSize(20.f, 30.f);
+    actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+    WaitForAsyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
+
+    // Verify the visual is created and renderer is added
+    DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    // Verify that CreatePropertyMap() has ENABLE_ASPECT_FIT as false
+    Property::Map    resultMap            = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
     Property::Value* enableAspectFitValue = resultMap.Find(DevelImageVisual::Property::ENABLE_ASPECT_FIT);
     DALI_TEST_CHECK(enableAspectFitValue);
     bool enableAspectFit = true;
@@ -3617,7 +3655,7 @@ int UtcDaliAnimatedVectorImageVisualEnableAspectFit(void)
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
 
     // Verify that CreatePropertyMap() has ENABLE_ASPECT_FIT as true (default value)
-    Property::Map resultMap = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+    Property::Map    resultMap            = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
     Property::Value* enableAspectFitValue = resultMap.Find(DevelImageVisual::Property::ENABLE_ASPECT_FIT);
     DALI_TEST_CHECK(enableAspectFitValue);
     bool enableAspectFit = false;

@@ -102,6 +102,7 @@ const NameIndexMatch NAME_INDEX_MATCH_TABLE[] =
     {NOTIFY_AFTER_RASTERIZATION, Toolkit::DevelImageVisual::Property::NOTIFY_AFTER_RASTERIZATION},
     {FRAME_SPEED_FACTOR, Toolkit::DevelImageVisual::Property::FRAME_SPEED_FACTOR},
     {RENDER_SCALE_NAME, Toolkit::DevelImageVisual::Property::RENDER_SCALE},
+    {ENABLE_ASPECT_FIT_NAME, Toolkit::DevelImageVisual::Property::ENABLE_ASPECT_FIT},
 };
 const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(NAME_INDEX_MATCH_TABLE[0]);
 
