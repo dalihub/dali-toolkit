@@ -386,6 +386,14 @@ struct DefaultDBusWrapper : public DBusWrapper
     return eldbus_message_signature_get(get(msg));
   }
 
+  void eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg) override
+  {
+  }
+
+  void eldbus_message_iter_container_close_impl(const MessageIterPtr& it) override
+  {
+  }
+
   static void callAsyncCb(void* data, const Eldbus_Message* msg, Eldbus_Pending* pending)
   {
     auto d = static_cast<SendCallback*>(data);
@@ -1085,6 +1093,15 @@ std::string TestDBusWrapper::eldbus_message_signature_get_impl(const MessagePtr&
     calculate_signature(ostr, q);
   return ostr.str();
 }
+
+void TestDBusWrapper::eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg)
+{
+}
+
+void TestDBusWrapper::eldbus_message_iter_container_close_impl(const MessageIterPtr& it)
+{
+}
+
 TestDBusWrapper::PendingPtr TestDBusWrapper::eldbus_proxy_send_impl(const ProxyPtr& proxy, const MessagePtr& msg, const SendCallback& callback)
 {
   // BART
