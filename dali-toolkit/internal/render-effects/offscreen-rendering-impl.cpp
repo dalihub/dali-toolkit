@@ -147,7 +147,7 @@ void OffScreenRenderingImpl::CreateFrameBuffer()
     std::ostringstream oss;
     oss << "OffScreenRendering type:" << mType;
 
-    Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), ToDaliString(std::move(oss.str())), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), ToDaliString(oss.str()), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
   }
 #endif
 
