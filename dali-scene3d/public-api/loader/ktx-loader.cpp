@@ -229,10 +229,10 @@ bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapDat
   header.pixelHeight           = std::max(header.pixelHeight, 1u);
   environmentMapData.SetMipmapLevels(header.numberOfMipmapLevels);
 
-  environmentMapData.mPixelData.resize(header.numberOfFaces);
+  environmentMapData.mPixelData.Resize(header.numberOfFaces);
   for(uint32_t face = 0u; face < header.numberOfFaces; ++face)
   {
-    environmentMapData.mPixelData[face].resize(header.numberOfMipmapLevels);
+    environmentMapData.mPixelData[face].Resize(header.numberOfMipmapLevels);
   }
 
   Pixel::Format daliformat = Pixel::RGB888;

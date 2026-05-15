@@ -334,7 +334,7 @@ bool UsdLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::Lo
   EnvironmentDefinition environmentDefinition;
   environmentDefinition.mUseBrdfTexture = true;
   environmentDefinition.mIblIntensity   = Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
-  result.mResources.mEnvironmentMaps.push_back({std::move(environmentDefinition), EnvironmentDefinition::Textures()});
+  result.mResources.mEnvironmentMaps.PushBack({std::move(environmentDefinition), EnvironmentDefinition::Textures()});
 
   return true;
 }
@@ -428,7 +428,7 @@ NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, cons
 {
   // Add the node to the scene graph
   auto weakNode = scene.AddNode([&]()
-  {
+                                {
     UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
@@ -447,8 +447,7 @@ NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, cons
       nodeDefinition->mScale       = scale;
     }
 
-    return nodeDefinition;
-  }());
+    return nodeDefinition; }());
 
   if(!weakNode)
   {
@@ -537,9 +536,9 @@ void UsdLoaderImpl::Impl::ProcessMeshIndices(MeshDefinition& meshDefinition, std
   }
 
   // To store the final triangulated indices, we need space for uint32_t.
-  meshDefinition.mRawData->mIndices.resize(indexArrayTriangulated.size() * 2);
+  meshDefinition.mRawData->mIndices.Resize(indexArrayTriangulated.size() * 2);
 
-  auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.data());
+  auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.Data());
   for(size_t i = 0; i < indexArrayTriangulated.size(); i++)
   {
     indicesData[i] = indexArrayTriangulated[i];
@@ -557,15 +556,16 @@ void UsdLoaderImpl::Impl::ProcessMeshPositions(MeshDefinition& meshDefinition, c
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "subIndexArray: %lu, worldPosition: %lu, ", subIndexArray.size(), worldPosition.size());
 
   // Add vertex positions into the mesh definition
-  std::vector<uint8_t> bufferPositions(worldPosition.size() * sizeof(GfVec3f));
+  Dali::Vector<uint8_t> bufferPositions(worldPosition.size() * sizeof(GfVec3f));
 
   std::copy(reinterpret_cast<const uint8_t*>(worldPosition.data()),
             reinterpret_cast<const uint8_t*>(worldPosition.data() + worldPosition.size()),
             bufferPositions.begin());
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "bufferPositions.size: %lu, ", bufferPositions.size());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "bufferPositions.size: %lu, ", bufferPositions.Size());
 
-  meshDefinition.mRawData->mAttribs.push_back({"aPosition", Property::VECTOR3, static_cast<uint32_t>(worldPosition.size()), std::move(bufferPositions)});
+  MeshDefinition::RawData::Attrib attrib{"aPosition", Property::VECTOR3, static_cast<uint32_t>(worldPosition.size()), std::move(bufferPositions)};
+  meshDefinition.mRawData->mAttribs.PushBack(std::move(attrib));
 }
 
 void UsdLoaderImpl::Impl::ProcessMeshNormals(MeshDefinition& meshDefinition, UsdGeomMesh& usdMesh, VtArray<GfVec3f>& normals, std::vector<uint32_t>& subIndexArray, std::vector<uint32_t>& flattenedSubTriangulatedIndices, VtArray<int>& faceVertexCounts, bool isLeftHanded)
@@ -605,14 +605,15 @@ void UsdLoaderImpl::Impl::ProcessMeshNormals(MeshDefinition& meshDefinition, Usd
 
     if(normals.size() > 0)
     {
-      std::vector<uint8_t> bufferNormals(normals.size() * sizeof(GfVec3f));
+      Dali::Vector<uint8_t> bufferNormals(normals.size() * sizeof(GfVec3f));
 
       std::copy(reinterpret_cast<const uint8_t*>(normals.data()),
                 reinterpret_cast<const uint8_t*>(normals.data() + normals.size()),
                 bufferNormals.begin());
 
       // Add normal attribute to the mesh definition
-      meshDefinition.mRawData->mAttribs.push_back({"aNormal", Property::VECTOR3, static_cast<uint32_t>(normals.size()), std::move(bufferNormals)});
+      MeshDefinition::RawData::Attrib attrib{"aNormal", Property::VECTOR3, static_cast<uint32_t>(normals.size()), std::move(bufferNormals)};
+      meshDefinition.mRawData->mAttribs.PushBack(std::move(attrib));
     }
   }
 }
@@ -622,16 +623,16 @@ void UsdLoaderImpl::Impl::GenerateNormal(MeshDefinition& meshDefinition)
   auto& attribs = meshDefinition.mRawData->mAttribs;
 
   // Determine the number of indices. If indices are not defined, use the number of vertices in the position attribute.
-  const uint32_t numIndices = meshDefinition.mRawData->mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(meshDefinition.mRawData->mIndices.size() / 2);
+  const uint32_t numIndices = meshDefinition.mRawData->mIndices.Empty() ? attribs[0].mNumElements : static_cast<uint32_t>(meshDefinition.mRawData->mIndices.Size() / 2);
 
   // Pointer to the vertex positions
-  auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
+  auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.Data());
 
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 normals = reinterpret_cast<Vector3*>(buffer.data());
+  Dali::Vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
+  auto                  normals = reinterpret_cast<Vector3*>(buffer.Data());
 
   // Pointer to the index data
-  auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.data());
+  auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.Data());
 
   // Loop through each triangle (3 indices at a time)
   for(uint32_t i = 0; i < numIndices; i += 3)
@@ -661,7 +662,8 @@ void UsdLoaderImpl::Impl::GenerateNormal(MeshDefinition& meshDefinition)
   }
 
   // Add generated normals to the mesh definition
-  attribs.push_back({"aNormal", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
+  MeshDefinition::RawData::Attrib attrib{"aNormal", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)};
+  attribs.PushBack(std::move(attrib));
 }
 
 void UsdLoaderImpl::Impl::ProcessMeshTexcoords(MeshDefinition& meshDefinition, std::vector<UsdGeomPrimvar>& texcoords, std::vector<uint32_t>& subIndexArray, std::vector<uint32_t>& flattenedSubTriangulatedIndices, VtArray<int>& faceVertexCounts, bool isLeftHanded)
@@ -736,14 +738,15 @@ void UsdLoaderImpl::Impl::ProcessMeshTexcoords(MeshDefinition& meshDefinition, s
           flipyUVs.push_back(GfVec2f(uv[0], 1.0f - uv[1]));
         }
 
-        std::vector<uint8_t> bufferTexCoords(flipyUVs.size() * sizeof(GfVec2f));
+        Dali::Vector<uint8_t> bufferTexCoords(flipyUVs.size() * sizeof(GfVec2f));
 
         std::copy(reinterpret_cast<const uint8_t*>(flipyUVs.data()),
                   reinterpret_cast<const uint8_t*>(flipyUVs.data() + flipyUVs.size()),
                   bufferTexCoords.begin());
 
         // Add texcoord attribute to the mesh definition
-        meshDefinition.mRawData->mAttribs.push_back({"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(flipyUVs.size()), std::move(bufferTexCoords)});
+        MeshDefinition::RawData::Attrib attrib{"aTexCoord", Property::VECTOR2, static_cast<uint32_t>(flipyUVs.size()), std::move(bufferTexCoords)};
+        meshDefinition.mRawData->mAttribs.PushBack(std::move(attrib));
       }
     }
   }
@@ -754,23 +757,23 @@ void UsdLoaderImpl::Impl::GenerateTangents(MeshDefinition& meshDefinition, std::
   auto& attribs = meshDefinition.mRawData->mAttribs;
 
   // Required positions, normals, uvs (if we have them).
-  std::vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
-  auto                 tangentsData = reinterpret_cast<Vector3*>(buffer.data());
+  Dali::Vector<uint8_t> buffer(attribs[0].mNumElements * sizeof(Vector3));
+  auto                  tangentsData = reinterpret_cast<Vector3*>(buffer.Data());
 
   // Check if UVs are present. Tangents require UV coordinates for calculation.
-  bool hasUVs = texcoords.size() > 0 && attribs.size() == 3;
+  bool hasUVs = texcoords.size() > 0 && attribs.Size() == 3;
 
   if(hasUVs)
   {
     // Number of indices (each triangle face has 3 indices).
-    const uint32_t numIndices = meshDefinition.mRawData->mIndices.empty() ? attribs[0].mNumElements : static_cast<uint32_t>(meshDefinition.mRawData->mIndices.size() / 2);
+    const uint32_t numIndices = meshDefinition.mRawData->mIndices.Empty() ? attribs[0].mNumElements : static_cast<uint32_t>(meshDefinition.mRawData->mIndices.Size() / 2);
 
     // Pointers to the vertex positions and UV coordinates.
-    auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.data());
-    auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.data());
+    auto* positions = reinterpret_cast<const Vector3*>(attribs[0].mData.Data());
+    auto* uvs       = reinterpret_cast<const Vector2*>(attribs[2].mData.Data());
 
     // Pointer to the index data.
-    auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.data());
+    auto indicesData = reinterpret_cast<uint32_t*>(meshDefinition.mRawData->mIndices.Data());
 
     // Loop over each triangle (three indices at a time).
     for(uint32_t i = 0; i < numIndices; i += 3)
@@ -814,7 +817,7 @@ void UsdLoaderImpl::Impl::GenerateTangents(MeshDefinition& meshDefinition, std::
   }
 
   // Normalize the accumulated tangents.
-  auto* normalsData = reinterpret_cast<const Vector3*>(attribs[1].mData.data());
+  auto* normalsData = reinterpret_cast<const Vector3*>(attribs[1].mData.Data());
   auto  iEnd        = normalsData + attribs[1].mNumElements;
   while(normalsData != iEnd)
   {
@@ -850,7 +853,8 @@ void UsdLoaderImpl::Impl::GenerateTangents(MeshDefinition& meshDefinition, std::
   }
 
   // Add tangent attribute to the mesh definition
-  attribs.push_back({"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)});
+  MeshDefinition::RawData::Attrib attrib{"aTangent", Property::VECTOR3, attribs[0].mNumElements, std::move(buffer)};
+  attribs.PushBack(std::move(attrib));
 }
 
 void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std::vector<UsdGeomPrimvar>& colors, VtArray<GfVec3f>& worldPosition, std::vector<uint32_t>& subIndexArray, std::vector<uint32_t>& flattenedSubTriangulatedIndices, VtArray<int>& faceVertexCounts, bool isLeftHanded)
@@ -944,21 +948,22 @@ void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std:
 
       // COLOR_0
 
-      std::vector<uint8_t> bufferColors(convertedColors.size() * sizeof(GfVec3f));
+      Dali::Vector<uint8_t> bufferColors(convertedColors.size() * sizeof(GfVec3f));
 
       std::copy(reinterpret_cast<const uint8_t*>(convertedColors.data()),
                 reinterpret_cast<const uint8_t*>(convertedColors.data() + convertedColors.size()),
                 bufferColors.begin());
 
       // Add color attribute to the mesh definition
-      meshDefinition.mRawData->mAttribs.push_back({"aVertexColor", Property::VECTOR3, static_cast<uint32_t>(convertedColors.size()), std::move(bufferColors)});
+      MeshDefinition::RawData::Attrib attrib{"aVertexColor", Property::VECTOR3, static_cast<uint32_t>(convertedColors.size()), std::move(bufferColors)};
+      meshDefinition.mRawData->mAttribs.PushBack(std::move(attrib));
     }
   }
   else if(worldPosition.size() > 0)
   {
     // If no colors are defined, use white color (Vector4::ONE)
-    std::vector<uint8_t> buffer(worldPosition.size() * sizeof(Vector4));
-    auto                 bufferColors = reinterpret_cast<Vector4*>(buffer.data());
+    Dali::Vector<uint8_t> buffer(worldPosition.size() * sizeof(Vector4));
+    auto                  bufferColors = reinterpret_cast<Vector4*>(buffer.Data());
 
     for(uint32_t i = 0; i < worldPosition.size(); i++)
     {
@@ -966,7 +971,8 @@ void UsdLoaderImpl::Impl::ProcessMeshColors(MeshDefinition& meshDefinition, std:
     }
 
     // Add default white color attribute
-    meshDefinition.mRawData->mAttribs.push_back({"aVertexColor", Property::VECTOR4, static_cast<uint32_t>(worldPosition.size()), std::move(buffer)});
+    MeshDefinition::RawData::Attrib attrib{"aVertexColor", Property::VECTOR4, static_cast<uint32_t>(worldPosition.size()), std::move(buffer)};
+    meshDefinition.mRawData->mAttribs.PushBack(std::move(attrib));
   }
 }
 
@@ -1006,7 +1012,7 @@ void UsdLoaderImpl::Impl::ProcessMaterialBinding(LoadResult& output, const UsdPr
     // The default material is used when a mesh does not specify a material
     if(mDefaultMaterial == INVALID_INDEX)
     {
-      mDefaultMaterial = outMaterials.size();
+      mDefaultMaterial = outMaterials.Size();
 
       MaterialDefinition materialDefinition;
       materialDefinition.mFlags |= MaterialDefinition::GLTF_CHANNELS;
@@ -1015,7 +1021,7 @@ void UsdLoaderImpl::Impl::ProcessMaterialBinding(LoadResult& output, const UsdPr
       materialDefinition.mNeedMetallicRoughnessTexture = false;
       materialDefinition.mNeedNormalTexture            = false;
 
-      outMaterials.emplace_back(std::move(materialDefinition), TextureSet());
+      outMaterials.PushBack({std::move(materialDefinition), TextureSet()});
     }
 
     meshMaterialId = mDefaultMaterial;
@@ -1167,7 +1173,7 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
     size_t numSubsets = subsets.size();
 
     // Reserve space for the mesh renderables
-    weakNode->mRenderables.reserve(numSubsets);
+    weakNode->mRenderables.Reserve(numSubsets);
 
     // Prepare subset indices
     std::vector<VtIntArray> subsetIndices(numSubsets, VtIntArray());
@@ -1212,7 +1218,7 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
       ProcessMeshNormals(meshDefinition, usdMesh, normals, subIndexArray, flattenedSubTriangulatedIndices, faceVertexCounts, isLeftHanded);
 
       // Generate normals if not provided
-      if(normals.size() == 0 && meshDefinition.mRawData->mAttribs.size() > 0) // Check if normals are missing but positions are available
+      if(normals.size() == 0 && meshDefinition.mRawData->mAttribs.Size() > 0) // Check if normals are missing but positions are available
       {
         GenerateNormal(meshDefinition);
       }
@@ -1227,9 +1233,9 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
       ProcessMeshColors(meshDefinition, colors, worldPosition, subIndexArray, flattenedSubTriangulatedIndices, faceVertexCounts, isLeftHanded);
 
       // Add the processed meshes to the output meshes list
-      outMeshes.emplace_back(std::move(meshDefinition), MeshGeometry{});
+      outMeshes.PushBack({std::move(meshDefinition), MeshGeometry{}});
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "outMeshes: mIndices: %lu, mAttribs: %lu, ", outMeshes.back().first.mRawData->mIndices.size(), outMeshes.back().first.mRawData->mAttribs.size());
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "outMeshes: mIndices: %lu, mAttribs: %lu, ", outMeshes[outMeshes.Size() - 1].first.mRawData->mIndices.Size(), outMeshes[outMeshes.Size() - 1].first.mRawData->mAttribs.Size());
 
       // Process material binding
       int meshSubMaterialId;
@@ -1244,9 +1250,9 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
       modelRenderable->mMaterialIdx = meshSubMaterialId;
 
       renderable.Reset(modelRenderable);
-      weakNode->mRenderables.push_back(std::move(renderable));
+      weakNode->mRenderables.PushBack(std::move(renderable));
 
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "weakNode %s->mRenderables.push_back, ", ToStdString(weakNode->mName).c_str());
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "weakNode %s->mRenderables.PushBack, ", ToStdString(weakNode->mName).c_str());
     }
   }
 
@@ -1286,9 +1292,9 @@ void UsdLoaderImpl::Impl::ConvertCamera(LoadResult& output, const UsdPrim& prim)
   auto& cameraParameters = output.mCameraParameters;
 
   // Initialize camera parameters with default values if not present
-  if(cameraParameters.empty())
+  if(cameraParameters.Empty())
   {
-    cameraParameters.push_back(CameraParameters());
+    cameraParameters.PushBack(CameraParameters());
     cameraParameters[0].matrix.SetTranslation(CAMERA_DEFAULT_POSITION);
   }
 
@@ -1454,7 +1460,7 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
 
     animationDefinition.SetName(ToDaliStringView(animationName));
 
-    output.mAnimationDefinitions.push_back(std::move(animationDefinition));
+    output.mAnimationDefinitions.PushBack(std::move(animationDefinition));
   }
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n");

@@ -362,8 +362,8 @@ private:
   void ParseShaders(const Toolkit::TreeNode* shaders, Dali::Scene3D::Loader::ResourceBundle& resources);
   void ParseMeshes(const Toolkit::TreeNode* meshes, Dali::Scene3D::Loader::ResourceBundle& resources);
 
-  void GetCameraParameters(std::vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const;
-  void GetLightParameters(std::vector<Dali::Scene3D::Loader::LightParameters>& lights) const;
+  void GetCameraParameters(Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const;
+  void GetLightParameters(Dali::Vector<Dali::Scene3D::Loader::LightParameters>& lights) const;
 };
 
 DliLoaderImpl::DliLoaderImpl()
@@ -493,7 +493,7 @@ void DliLoaderImpl::Impl::ParseScene(LoadParams& params)
       ParseAnimations(animations, params);
     }
 
-    if(!output.mAnimationDefinitions.empty())
+    if(!output.mAnimationDefinitions.Empty())
     {
       if(auto animationGroups = docRoot->GetChild("animationGroups"))
       {
@@ -583,7 +583,7 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
         SkeletonDefinition skeleton;
         if(!scene.FindNode(ToDaliString(skeletonRootName), &skeleton.mRootNodeIdx))
         {
-          ExceptionFlinger(ASSERT_LOCATION) << FormatString("Skeleton %d: node '%s' not defined.", resources.mSkeletons.size(), skeletonRootName.c_str());
+          ExceptionFlinger(ASSERT_LOCATION) << FormatString("Skeleton %d: node '%s' not defined.", resources.mSkeletons.Size(), skeletonRootName.c_str());
         }
 
         uint32_t                   jointCount = 0;
@@ -603,18 +603,18 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
 
         if(jointCount > Skinning::MAX_JOINTS)
         {
-          mOnError(ToStdString(FormatString("Skeleton %d: joint count exceeds supported limit.", resources.mSkeletons.size())));
+          mOnError(ToStdString(FormatString("Skeleton %d: joint count exceeds supported limit.", resources.mSkeletons.Size())));
           jointCount = Skinning::MAX_JOINTS;
         }
 
-        skeleton.mJoints.reserve(jointCount);
+        skeleton.mJoints.Reserve(jointCount);
 
         visitFn = [&](Index id)
         {
           auto iFind = ibms.find(id);
-          if(iFind != ibms.end() && skeleton.mJoints.size() < Skinning::MAX_JOINTS)
+          if(iFind != ibms.end() && skeleton.mJoints.Size() < Skinning::MAX_JOINTS)
           {
-            skeleton.mJoints.push_back({id, iFind->second});
+            skeleton.mJoints.PushBack({id, iFind->second});
           }
 
           auto node = scene.GetNode(id);
@@ -625,7 +625,7 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
         };
         visitFn(skeleton.mRootNodeIdx);
 
-        resources.mSkeletons.push_back(std::move(skeleton));
+        resources.mSkeletons.PushBack(std::move(skeleton));
       }
       else
       {
@@ -661,13 +661,13 @@ void DliLoaderImpl::Impl::ParseEnvironments(const TreeNode* environments, Dali::
       envDef.mCubeOrientation = Quaternion(cubeOrientation);
     }
 
-    resources.mEnvironmentMaps.emplace_back(std::move(envDef), EnvironmentDefinition::Textures());
+    resources.mEnvironmentMaps.PushBack({std::move(envDef), EnvironmentDefinition::Textures()});
   }
 
   // NOTE: guarantees environmentMaps to have an empty environment.
-  if(resources.mEnvironmentMaps.empty())
+  if(resources.mEnvironmentMaps.Empty())
   {
-    resources.mEnvironmentMaps.emplace_back(EnvironmentDefinition(), EnvironmentDefinition::Textures());
+    resources.mEnvironmentMaps.PushBack({EnvironmentDefinition(), EnvironmentDefinition::Textures()});
   }
 }
 
@@ -681,17 +681,17 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
     {
       std::vector<std::string> definesStd;
       ReadStringVector(node.GetChild("defines"), definesStd);
-      shaderDef.mDefines.reserve(definesStd.size());
+      shaderDef.mDefines.Reserve(definesStd.size());
       for(auto& d : definesStd)
       {
-        shaderDef.mDefines.push_back(ToDaliString(d));
+        shaderDef.mDefines.PushBack(ToDaliString(d));
       }
     }
     auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](Dali::String& item)
-    { return (item == "SSS"); });
+                                { return (item == "SSS"); });
     if(sssIter != shaderDef.mDefines.end())
     {
-      shaderDef.mDefines.erase(sssIter);
+      shaderDef.mDefines.Erase(sssIter);
     }
 
     // Read shader hints. Possible values are:
@@ -702,10 +702,10 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
     {
       std::vector<std::string> hintsStd;
       ReadStringVector(node.GetChild(HINTS), hintsStd);
-      shaderDef.mHints.reserve(hintsStd.size());
+      shaderDef.mHints.Reserve(hintsStd.size());
       for(auto& h : hintsStd)
       {
-        shaderDef.mHints.push_back(ToDaliString(h));
+        shaderDef.mHints.PushBack(ToDaliString(h));
       }
     }
 
@@ -808,7 +808,7 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
           }
         }
 
-        resources.mShaders.emplace_back(std::move(shaderDef), Shader());
+        resources.mShaders.PushBack({std::move(shaderDef), Shader()});
       }
       else
       {
@@ -829,7 +829,7 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
       std::string meshUri;
       if(!ReadString(node.GetChild(URI), meshUri))
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "mesh " << resources.mMeshes.size() << ": Missing required attribute '" << URI << "'.";
+        ExceptionFlinger(ASSERT_LOCATION) << "mesh " << resources.mMeshes.Size() << ": Missing required attribute '" << URI << "'.";
       }
       meshDef.mUri = ToDaliString(meshUri);
     }
@@ -851,7 +851,7 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
       {
         mOnError(ToStdString(FormatString(
           "mesh %d: Using TRIANGLES instead of unsupported primitive type '%s'.",
-          resources.mMeshes.size(),
+          resources.mMeshes.Size(),
           primitive.c_str())));
       }
     }
@@ -863,7 +863,7 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
          !ReadAttribAccessor(node.GetChild("indices"), meshDef.mIndices))
       {
         ExceptionFlinger(ASSERT_LOCATION) << FormatString("mesh %d: Failed to read %s.",
-                                                          resources.mMeshes.size(),
+                                                          resources.mMeshes.Size(),
                                                           "indices");
       }
 
@@ -871,29 +871,29 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
          !ReadAttribAccessor(node.GetChild("positions"), meshDef.mPositions))
       {
         ExceptionFlinger(ASSERT_LOCATION) << FormatString("mesh %d: Failed to read %s.",
-                                                          resources.mMeshes.size(),
+                                                          resources.mMeshes.Size(),
                                                           "positions");
       }
 
       if(MaskMatch(attributes, MeshDefinition::NORMALS) &&
          !ReadAttribAccessor(node.GetChild("normals"), meshDef.mNormals))
       {
-        mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "normals")));
+        mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.Size(), "normals")));
       }
 
       if(MaskMatch(attributes, MeshDefinition::TEX_COORDS))
       {
-        meshDef.mTexCoords.emplace_back(MeshDefinition::Accessor{});
+        meshDef.mTexCoords.PushBack(MeshDefinition::Accessor{});
         if(!ReadAttribAccessor(node.GetChild("textures"), meshDef.mTexCoords[0]))
         {
-          mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "textures")));
+          mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.Size(), "textures")));
         }
       }
 
       if(MaskMatch(attributes, MeshDefinition::TANGENTS) &&
          !ReadAttribAccessor(node.GetChild("tangents"), meshDef.mTangents))
       {
-        mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.size(), "tangents")));
+        mOnError(ToStdString(FormatString("mesh %d: Failed to read %s.", resources.mMeshes.Size(), "tangents")));
       }
 
       // NOTE: we're no longer reading bitangents as these are calculated in the shaders.
@@ -903,17 +903,17 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
            !MaskMatch(attributes, MeshDefinition::WEIGHTS_0))
         {
           mOnError(ToStdString(FormatString("mesh %d: Expected joints0 / weights0 attribute(s) missing.",
-                                            resources.mMeshes.size())));
+                                            resources.mMeshes.Size())));
         }
         else
         {
-          meshDef.mJoints.emplace_back(MeshDefinition::Accessor{});
-          meshDef.mWeights.emplace_back(MeshDefinition::Accessor{});
+          meshDef.mJoints.PushBack(MeshDefinition::Accessor{});
+          meshDef.mWeights.PushBack(MeshDefinition::Accessor{});
           if(!ReadAttribAccessor(node.GetChild("joints0"), meshDef.mJoints[0]) ||
              !ReadAttribAccessor(node.GetChild("weights0"), meshDef.mWeights[0]))
           {
             mOnError(ToStdString(FormatString("mesh %d: Failed to read skinning information.",
-                                              resources.mMeshes.size())));
+                                              resources.mMeshes.Size())));
           }
         }
       }
@@ -950,7 +950,11 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
 
       if(auto blendShapes = node.GetChild(BLEND_SHAPES))
       {
-        meshDef.mBlendShapes.resize(blendShapes->Size());
+        meshDef.mBlendShapes.Reserve(blendShapes->Size());
+        for(uint32_t i = 0; i < blendShapes->Size(); ++i)
+        {
+          meshDef.mBlendShapes.PushBack(MeshDefinition::BlendShape{});
+        }
 
         auto index = 0u;
         for(auto it = blendShapes->CBegin(), endIt = blendShapes->CEnd(); it != endIt; ++it, ++index)
@@ -987,7 +991,7 @@ void DliLoaderImpl::Impl::ParseMeshes(const TreeNode* meshes, Dali::Scene3D::Loa
         meshDef.mFlags |= flipV * MeshDefinition::FLIP_UVS_VERTICAL;
       }
 
-      resources.mMeshes.emplace_back(std::move(meshDef), MeshGeometry());
+      resources.mMeshes.PushBack({std::move(meshDef), MeshGeometry()});
     }
   }
 }
@@ -1002,9 +1006,9 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
     if(auto eEnvironment = node.GetChild("environment"))
     {
       ReadIndex(eEnvironment, materialDef.mEnvironmentIdx);
-      if(static_cast<unsigned int>(materialDef.mEnvironmentIdx) >= resources.mEnvironmentMaps.size())
+      if(static_cast<unsigned int>(materialDef.mEnvironmentIdx) >= resources.mEnvironmentMaps.Size())
       {
-        ExceptionFlinger(ASSERT_LOCATION) << "material " << resources.mMaterials.size() << ": Environment index " << materialDef.mEnvironmentIdx << " out of bounds (" << resources.mEnvironmentMaps.size() << ").";
+        ExceptionFlinger(ASSERT_LOCATION) << "material " << resources.mMaterials.Size() << ": Environment index " << materialDef.mEnvironmentIdx << " out of bounds (" << resources.mEnvironmentMaps.Size() << ").";
       }
     }
 
@@ -1020,7 +1024,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
           texturePath = ToStdString(tmp);
         }
         const auto semantic = MaterialDefinition::ALBEDO;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic | MaterialDefinition::TRANSPARENCY; // NOTE: only in dli does single / separate ALBEDO texture mean TRANSPARENCY.
       }
     }
@@ -1036,11 +1040,11 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
 
         if(MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO))
         {
-          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "albedo")));
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.Size(), "albedo")));
         }
 
         const auto semantic = MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic;
       }
     }
@@ -1057,11 +1061,11 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
 
         if(MaskMatch(materialDef.mFlags, MaterialDefinition::METALLIC))
         {
-          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "metallic")));
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.Size(), "metallic")));
         }
 
         const auto semantic = MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic |
                               // We have a metallic-roughhness map and the first texture did not have albedo semantics - we're in the transparency workflow.
                               (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
@@ -1079,7 +1083,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
         }
 
         const auto semantic = MaterialDefinition::NORMAL;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic |
                               // We have a standalone normal map and the first texture did not have albedo semantics - we're in the transparency workflow.
                               (MaskMatch(materialDef.mFlags, MaterialDefinition::ALBEDO) * MaterialDefinition::TRANSPARENCY);
@@ -1098,21 +1102,21 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
 
         if(MaskMatch(materialDef.mFlags, MaterialDefinition::NORMAL))
         {
-          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "normal")));
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.Size(), "normal")));
         }
 
         if(MaskMatch(materialDef.mFlags, MaterialDefinition::ROUGHNESS))
         {
-          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "roughness")));
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.Size(), "roughness")));
         }
 
         if(MaskMatch(materialDef.mFlags, MaterialDefinition::TRANSPARENCY))
         {
-          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.size(), "transparency")));
+          mOnError(ToStdString(FormatString("material %d: conflicting semantics; already set %s.", resources.mMaterials.Size(), "transparency")));
         }
 
         const auto semantic = MaterialDefinition::NORMAL | MaterialDefinition::ROUGHNESS;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic;
       }
     }
@@ -1142,7 +1146,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
           texturePath = ToStdString(tmp);
         }
         const auto semantic = MaterialDefinition::OCCLUSION;
-        materialDef.mTextureStages.push_back({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
+        materialDef.mTextureStages.PushBack({semantic, TextureDefinition{ToDaliString(std::move(texturePath))}});
         materialDef.mFlags |= semantic;
       }
     }
@@ -1165,7 +1169,7 @@ void DliLoaderImpl::Impl::ParseMaterials(const TreeNode* materials, DliInputPara
       }
     }
 
-    resources.mMaterials.emplace_back(std::move(materialDef), TextureSet());
+    resources.mMaterials.PushBack({std::move(materialDef), TextureSet()});
   }
 }
 
@@ -1199,7 +1203,7 @@ void DliLoaderImpl::Impl::ParseNodes(const TreeNode* const nodes, Index index, L
     virtual unsigned int Resolve(Index iDli) override
     {
       auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli)
-      { return idx.iDli < iDli; });
+                                    { return idx.iDli < iDli; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }
@@ -1344,7 +1348,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
           }
         }
 
-        nodeDef.mRenderables.push_back(std::move(renderable));
+        nodeDef.mRenderables.PushBack(std::move(renderable));
       }
     }
 
@@ -1356,15 +1360,15 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
       switch(idRes.type)
       {
         case ResourceType::Shader:
-          iCheck = output->mResources.mShaders.size();
+          iCheck = output->mResources.mShaders.Size();
           break;
 
         case ResourceType::Mesh:
-          iCheck = output->mResources.mMeshes.size();
+          iCheck = output->mResources.mMeshes.Size();
           break;
 
         case ResourceType::Material:
-          iCheck = output->mResources.mMaterials.size();
+          iCheck = output->mResources.mMaterials.Size();
           break;
 
         default:
@@ -1395,7 +1399,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
     if(auto eExtras = node->GetChild("extras"))
     {
       auto& extras = nodeDef.mExtras;
-      extras.reserve(eExtras->Size());
+      extras.Reserve(eExtras->Size());
 
       for(auto i0 = eExtras->CBegin(), i1 = eExtras->CEnd(); i0 != i1; ++i0)
       {
@@ -1407,7 +1411,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
         {
           mOnError(ToStdString(FormatString("node %d: empty string is invalid for name of extra %d; ignored.",
                                             index,
-                                            extras.size())));
+                                            extras.Size())));
           continue;
         }
 
@@ -1432,7 +1436,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
           }
           else
           {
-            extras.insert(iInsert, e);
+            extras.Insert(iInsert, e);
           }
         }
       }
@@ -1442,7 +1446,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
     if(auto eConstraints = node->GetChild("constraints"))
     {
       auto& constraints = nodeDef.mConstraints;
-      constraints.reserve(eConstraints->Size());
+      constraints.Reserve(eConstraints->Size());
 
       ConstraintDefinition cDef;
       for(auto i0 = eConstraints->CBegin(), i1 = eConstraints->CEnd(); i0 != i1; ++i0)
@@ -1453,7 +1457,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
           mOnError(ToStdString(FormatString("node %d: node ID %s for constraint %d is invalid; ignored.",
                                             index,
                                             eConstraint.second.GetString(),
-                                            constraints.size())));
+                                            constraints.Size())));
         }
         else
         {
@@ -1469,7 +1473,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
           }
           else
           {
-            constraints.insert(iInsert, cDef);
+            constraints.Insert(iInsert, cDef);
           }
         }
       }
@@ -1499,7 +1503,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
       {
         inOutParentStack.push_back(myIndex);
 
-        rawDef->mChildren.reserve(children->Size());
+        rawDef->mChildren.Reserve(children->Size());
 
         uint32_t iChild = 0;
         for(auto j0 = children->CBegin(), j1 = children->CEnd(); j0 != j1; ++j0, ++iChild)
@@ -1540,7 +1544,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
 void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& params)
 {
   auto& definitions = params.output->mAnimationDefinitions;
-  definitions.reserve(definitions.size() + tnAnimations->Size());
+  definitions.Reserve(definitions.Size() + tnAnimations->Size());
 
   for(TreeNode::ConstIterator iAnim = tnAnimations->CBegin(), iAnimEnd = tnAnimations->CEnd();
       iAnim != iAnimEnd;
@@ -1556,7 +1560,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     }
 
     auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1)
-              { return ad0.GetName() < ad1.GetName(); });
+                                  { return ad0.GetName() < ad1.GetName(); });
     const bool overwrite = iFind != definitions.end() && iFind->GetName() == animDef.GetName();
     if(overwrite)
     {
@@ -1806,7 +1810,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     }
     else
     {
-      iFind = definitions.insert(iFind, std::move(animDef));
+      definitions.Insert(iFind, std::move(animDef));
     }
   }
 }
@@ -1831,14 +1835,16 @@ void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimat
 
     Dali::String daliGroupName = ToDaliString(std::move(groupName));
     auto         iFind         = std::lower_bound(animGroups.begin(), animGroups.end(), daliGroupName, [](const AnimationGroupDefinition& group, const Dali::String& name)
-                    { return group.mName < name; });
+                                  { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == daliGroupName)
     {
       mOnError(ToStdString(FormatString("Animation group with name '%s' already exists; new entries will be merged.", daliGroupName.CStr())));
     }
     else
     {
-      iFind = animGroups.insert(iFind, AnimationGroupDefinition{});
+      auto insertIdx = static_cast<Dali::VectorBase::SizeType>(iFind - animGroups.Begin());
+      animGroups.Insert(iFind, AnimationGroupDefinition{});
+      iFind = animGroups.Begin() + insertIdx;
     }
 
     iFind->mName = daliGroupName;
@@ -1847,16 +1853,16 @@ void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimat
     if(tnAnims && tnAnims->Size() > 0)
     {
       auto& anims = iFind->mAnimations;
-      anims.reserve(anims.size() + tnAnims->Size());
+      anims.Reserve(anims.Size() + tnAnims->Size());
       for(auto iAnims = tnAnims->CBegin(), iAnimsEnd = tnAnims->CEnd(); iAnims != iAnimsEnd; ++iAnims)
       {
-        anims.push_back((*iAnims).second.GetString());
+        anims.PushBack((*iAnims).second.GetString());
       }
     }
   }
 }
 
-void DliLoaderImpl::Impl::GetCameraParameters(std::vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const
+void DliLoaderImpl::Impl::GetCameraParameters(Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& cameras) const
 {
   if(mParser.GetRoot())
   {
@@ -1864,8 +1870,8 @@ void DliLoaderImpl::Impl::GetCameraParameters(std::vector<Dali::Scene3D::Loader:
     {
       float dummyFloatArray[4];
 
-      cameras.resize(jsonCameras->Size());
-      auto iCamera = cameras.begin();
+      cameras.Resize(jsonCameras->Size());
+      auto iCamera = cameras.Begin();
       for(auto i0 = jsonCameras->CBegin(), i1 = jsonCameras->CEnd(); i0 != i1; ++i0)
       {
         auto& jsonCamera = (*i0).second;
@@ -1892,14 +1898,14 @@ void DliLoaderImpl::Impl::GetCameraParameters(std::vector<Dali::Scene3D::Loader:
   }
 }
 
-void DliLoaderImpl::Impl::GetLightParameters(std::vector<Dali::Scene3D::Loader::LightParameters>& lights) const
+void DliLoaderImpl::Impl::GetLightParameters(Dali::Vector<Dali::Scene3D::Loader::LightParameters>& lights) const
 {
   if(mParser.GetRoot())
   {
     if(const TreeNode* jsonLights = mParser.GetRoot()->GetChild("lights"))
     {
-      lights.resize(jsonLights->Size());
-      auto iLight = lights.begin();
+      lights.Resize(jsonLights->Size());
+      auto iLight = lights.Begin();
       for(auto i0 = jsonLights->CBegin(), i1 = jsonLights->CEnd(); i0 != i1; ++i0)
       {
         auto& jsonLight = (*i0).second;

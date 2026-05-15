@@ -182,10 +182,10 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
       float faceWidth = imageWidth, faceHeight = imageHeight;
       faceWidth /= NUMBER_OF_CUBE_FACE[static_cast<uint32_t>(cubeType)].x;
       faceHeight /= NUMBER_OF_CUBE_FACE[static_cast<uint32_t>(cubeType)].y;
-      environmentMapData.mPixelData.resize(6);
+      environmentMapData.mPixelData.Resize(6);
       for(uint32_t i = 0; i < 6; ++i)
       {
-        environmentMapData.mPixelData[i].resize(1);
+        environmentMapData.mPixelData[i].Resize(1);
       }
       for(uint32_t i = 0; i < 6; ++i)
       {
@@ -195,13 +195,13 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
     }
     else
     {
-      environmentMapData.mPixelData.resize(1);
-      environmentMapData.mPixelData[0].resize(1);
+      environmentMapData.mPixelData.Resize(1);
+      environmentMapData.mPixelData[0].Resize(1);
       environmentMapData.mPixelData[0][0] = pixelData;
       environmentMapData.SetEnvironmentMapType(Scene3D::EnvironmentMapType::EQUIRECTANGULAR);
     }
 
-    if(!environmentMapData.mPixelData.empty() && !environmentMapData.mPixelData[0].empty() && environmentMapData.mPixelData[0][0])
+    if(!environmentMapData.mPixelData.Empty() && !environmentMapData.mPixelData[0].Empty() && environmentMapData.mPixelData[0][0])
     {
       const uint32_t pixelDataWidth  = environmentMapData.mPixelData[0][0].GetWidth();
       const uint32_t pixelDataHeight = environmentMapData.mPixelData[0][0].GetHeight();

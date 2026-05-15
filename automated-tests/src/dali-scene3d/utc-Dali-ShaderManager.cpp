@@ -64,8 +64,8 @@ struct PermutationSet
 int UtcDaliShaderManagerProduceShader(void)
 {
   Context ctx;
-  ctx.resources.mMaterials.push_back({});
-  ctx.resources.mMeshes.push_back({});
+  ctx.resources.mMaterials.PushBack({});
+  ctx.resources.mMeshes.PushBack({});
 
   Permutation permutations[]{
     {
@@ -87,21 +87,21 @@ int UtcDaliShaderManagerProduceShader(void)
      [](ShaderParameters& p)
   {
     p.materialDefinition.mFlags |= MaterialDefinition::ALBEDO;
-    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::ALBEDO, {}});
+    p.materialDefinition.mTextureStages.PushBack({MaterialDefinition::ALBEDO, {}});
   },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::BASE_COLOR_TEXTURE}},
     {// 3
      [](ShaderParameters& p)
   {
     p.materialDefinition.mFlags |= MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS;
-    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
+    p.materialDefinition.mTextureStages.PushBack({MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {}});
   },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::METALLIC_ROUGHNESS_TEXTURE}},
     {// 4
      [](ShaderParameters& p)
   {
     p.materialDefinition.mFlags |= MaterialDefinition::NORMAL;
-    p.materialDefinition.mTextureStages.push_back({MaterialDefinition::NORMAL, {}});
+    p.materialDefinition.mTextureStages.PushBack({MaterialDefinition::NORMAL, {}});
   },
      {ShaderOption::Type::THREE_TEXTURE, ShaderOption::Type::NORMAL_TEXTURE}},
     {// 5
@@ -145,35 +145,35 @@ int UtcDaliShaderManagerProduceShader(void)
       // 11
       [](ShaderParameters& p)
   {
-    p.meshDefinition.mBlendShapes.push_back({});
+    p.meshDefinition.mBlendShapes.PushBack({});
   },
     },
     {// 12
      [](ShaderParameters& p)
   {
-    p.meshDefinition.mBlendShapes.back().deltas.mBlob.mOffset = 0;
+    p.meshDefinition.mBlendShapes.Back().deltas.mBlob.mOffset = 0;
   },
      {ShaderOption::Type::MORPH_POSITION}},
     {// 13
      [](ShaderParameters& p)
   {
-    p.meshDefinition.mBlendShapes.back().normals.mBlob.mOffset = 0;
+    p.meshDefinition.mBlendShapes.Back().normals.mBlob.mOffset = 0;
   },
      {ShaderOption::Type::MORPH_NORMAL}},
     {// 14
      [](ShaderParameters& p)
   {
-    p.meshDefinition.mBlendShapes.back().tangents.mBlob.mOffset = 0;
+    p.meshDefinition.mBlendShapes.Back().tangents.mBlob.mOffset = 0;
   },
      {ShaderOption::Type::MORPH_TANGENT}},
     {// 15
      [](ShaderParameters& p)
   {
     auto& blendShapes = p.meshDefinition.mBlendShapes;
-    DALI_ASSERT_ALWAYS(!blendShapes.empty() &&
-                       (blendShapes.back().deltas.mBlob.mOffset != MeshDefinition::INVALID ||
-                        blendShapes.back().normals.mBlob.mOffset != MeshDefinition::INVALID ||
-                        blendShapes.back().tangents.mBlob.mOffset != MeshDefinition::INVALID));
+    DALI_ASSERT_ALWAYS(!blendShapes.Empty() &&
+                       (blendShapes.Back().deltas.mBlob.mOffset != MeshDefinition::INVALID ||
+                        blendShapes.Back().normals.mBlob.mOffset != MeshDefinition::INVALID ||
+                        blendShapes.Back().tangents.mBlob.mOffset != MeshDefinition::INVALID));
     p.meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
   },
      {ShaderOption::Type::MORPH_VERSION_2_0}},
@@ -270,7 +270,7 @@ int UtcDaliShaderManagerProduceShader(void)
     NodeDefinition                        nodeDefinition;
     UniquePtr<NodeDefinition::Renderable> renderable;
     renderable.Reset(modelRenderable);
-    nodeDefinition.mRenderables.push_back(std::move(renderable));
+    nodeDefinition.mRenderables.PushBack(std::move(renderable));
 
     MeshDefinition     meshDefinition;
     MaterialDefinition materialDefinition;
@@ -283,8 +283,8 @@ int UtcDaliShaderManagerProduceShader(void)
       if(auto search = checkP->options.find(ShaderOption::Type::SKINNING);
          search != checkP->options.end())
       {
-        meshDefinition.mJoints.push_back(MeshDefinition::Accessor{MeshDefinition::Blob{0, 0}, {}});
-        meshDefinition.mWeights.push_back(MeshDefinition::Accessor{MeshDefinition::Blob{0, 0}, {}});
+        meshDefinition.mJoints.PushBack(MeshDefinition::Accessor{MeshDefinition::Blob{0, 0}, {}});
+        meshDefinition.mWeights.PushBack(MeshDefinition::Accessor{MeshDefinition::Blob{0, 0}, {}});
       }
     }
     std::set<std::string> defines;

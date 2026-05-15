@@ -1763,11 +1763,11 @@ int UtcDaliModelRetrieveBlendShapeNames(void)
     {Dali::String("Target_1"), 1u},
   };
 
-  std::vector<Dali::String> blendShapeNameList;
+  Dali::Vector<Dali::String> blendShapeNameList;
   model.RetrieveBlendShapeNames(blendShapeNameList);
 
-  DALI_TEST_EQUALS(blendShapeNameList.size(), expectBlendShapeNames.size(), TEST_LOCATION);
-  for(auto i = 0u; i < blendShapeNameList.size(); ++i)
+  DALI_TEST_EQUALS(blendShapeNameList.Count(), expectBlendShapeNames.size(), TEST_LOCATION);
+  for(auto i = 0u; i < blendShapeNameList.Count(); ++i)
   {
     const auto& name = blendShapeNameList[i];
     tet_printf("Check retrieved blendshape name : %s\n", name.CStr());
@@ -1775,9 +1775,9 @@ int UtcDaliModelRetrieveBlendShapeNames(void)
     const auto& iter = expectBlendShapeNames.find(name);
     DALI_TEST_CHECK(iter != expectBlendShapeNames.end());
 
-    std::vector<Scene3D::ModelNode> nodeList;
+    Dali::Vector<Scene3D::ModelNode> nodeList;
     model.RetrieveModelNodesByBlendShapeName(name, nodeList);
-    DALI_TEST_EQUALS(nodeList.size(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(nodeList.Count(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(nodeList[0], expectNode, TEST_LOCATION);
     DALI_TEST_EQUALS(nodeList[0].GetBlendShapeIndexByName(name), iter->second, TEST_LOCATION);
   }

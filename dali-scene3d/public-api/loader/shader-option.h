@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -109,7 +109,7 @@ public:
    * @SINCE_2_2.33
    * @param[out] defines A list of define keywords those are used in this option.
    */
-  void GetDefines(std::vector<Dali::String>& defines) const;
+  void GetDefines(Dali::Vector<Dali::String>& defines) const;
 
   /**
    * @brief Retrieves a single shader define keyword of input type.
@@ -124,12 +124,12 @@ public:
    * @brief Get any macro definitions.
    * @SINCE_2_2.52
    */
-  const std::vector<MacroDefinition>& GetMacroDefinitions() const;
+  const Dali::Vector<MacroDefinition>& GetMacroDefinitions() const;
 
 private:
   HashType mOptionHash{0u};
 
-  std::vector<MacroDefinition> mMacros;
+  Dali::Vector<MacroDefinition> mMacros;
 };
 
 } // namespace Dali::Scene3D::Loader

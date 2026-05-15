@@ -17,14 +17,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/unique-ptr.h>
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/loader/load-result.h>
 #include <dali-scene3d/public-api/loader/scene-definition.h>
-
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/unique-ptr.h>
-#include <string>
 
 namespace Dali::Scene3D::Loader
 {
@@ -92,14 +93,14 @@ public:
    * @SINCE_2_2.17
    * @return AnimationDefinition that is loaded from file
    */
-  std::vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations();
+  Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>& GetAnimations();
 
   /**
    * @brief Retrieves loaded CameraParameters.
    * @SINCE_2_2.17
    * @return CameraParameters list that is loaded from file
    */
-  std::vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras();
+  Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& GetCameras();
 
   /**
    * @brief Retrieves ResourceChoices.

@@ -73,7 +73,7 @@ ShaderOption::ShaderOption(const ShaderOption& rhs)
   mOptionHash = rhs.mOptionHash;
   for(auto& macroDef : rhs.mMacros)
   {
-    mMacros.emplace_back(macroDef);
+    mMacros.PushBack(macroDef);
   }
 }
 
@@ -84,7 +84,7 @@ ShaderOption& ShaderOption::operator=(const ShaderOption& rhs)
     mOptionHash = rhs.mOptionHash;
     for(auto& macroDef : rhs.mMacros)
     {
-      mMacros.emplace_back(macroDef);
+      mMacros.PushBack(macroDef);
     }
   }
   return *this;
@@ -130,19 +130,18 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
 
 void ShaderOption::AddMacroDefinition(Dali::String macro, Dali::String definition)
 {
-  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [&macro](ShaderOption::MacroDefinition& md)
-  { return md.macro == macro; });
-  if(iter != mMacros.end())
+  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [&macro](ShaderOption::MacroDefinition& md) { return md.macro == macro; });
+  if(iter != mMacros.End())
   {
     iter->definition = definition;
   }
   else
   {
-    mMacros.emplace_back(MacroDefinition{macro, definition});
+    mMacros.PushBack(MacroDefinition{macro, definition});
   }
 }
 
-const std::vector<ShaderOption::MacroDefinition>& ShaderOption::GetMacroDefinitions() const
+const Dali::Vector<ShaderOption::MacroDefinition>& ShaderOption::GetMacroDefinitions() const
 {
   return mMacros;
 }
@@ -150,7 +149,7 @@ const std::vector<ShaderOption::MacroDefinition>& ShaderOption::GetMacroDefiniti
 uint64_t ShaderOption::GetOptionHash() const
 {
   uint64_t optionHash = mOptionHash;
-  if(!mMacros.empty())
+  if(!mMacros.Empty())
   {
     uint64_t hash = 5381;
     for(auto& macroDef : mMacros)
@@ -163,14 +162,14 @@ uint64_t ShaderOption::GetOptionHash() const
   return optionHash;
 }
 
-void ShaderOption::GetDefines(std::vector<Dali::String>& defines) const
+void ShaderOption::GetDefines(Dali::Vector<Dali::String>& defines) const
 {
-  defines.clear();
+  defines.Clear();
   for(uint32_t i = 0; i < NUMBER_OF_OPTIONS; ++i)
   {
     if(mOptionHash & (1 << i))
     {
-      defines.push_back(ToDaliString(std::string(OPTION_KEYWORD[i].Data(), OPTION_KEYWORD[i].Size())));
+      defines.PushBack(ToDaliString(std::string(OPTION_KEYWORD[i].Data(), OPTION_KEYWORD[i].Size())));
     }
   }
 }

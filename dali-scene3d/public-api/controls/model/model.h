@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/texture.h>
 
@@ -354,7 +355,7 @@ public:
    * @param[in, out] blendShapeNames The name of blendShape list collected.
    * @note This method should be called after Model load finished.
    */
-  void RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const;
+  void RetrieveBlendShapeNames(Dali::Vector<Dali::String>& blendShapeNames) const;
 
   /**
    * @brief Retrieves the list of ModelNode that contains given blend shape name.
@@ -365,7 +366,7 @@ public:
    * @param[in, out] modelNodes The ModelNode list collected.
    * @note This method should be called after Model load finished.
    */
-  void RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, std::vector<ModelNode>& modelNodes) const;
+  void RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, Dali::Vector<ModelNode>& modelNodes) const;
 
   /**
    * @brief Generates specific animation of this Model by inputed MotionData.

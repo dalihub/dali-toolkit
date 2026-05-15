@@ -18,6 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/rendering/texture.h>
@@ -54,15 +56,15 @@ struct DALI_SCENE3D_API EnvironmentDefinition
     PixelData          mBrdf;
   };
 
-  using EnvironmentData = std::pair<EnvironmentDefinition, Textures>;
-  using Vector          = std::vector<EnvironmentData>;
+  using EnvironmentData = Dali::Pair<EnvironmentDefinition, Textures>;
+  using Vector          = Dali::Vector<EnvironmentData, false>;
 
   EnvironmentDefinition() = default;
 
-  EnvironmentDefinition(const EnvironmentDefinition&)            = delete;
+  EnvironmentDefinition(const EnvironmentDefinition&) = delete;
   EnvironmentDefinition& operator=(const EnvironmentDefinition&) = delete;
 
-  EnvironmentDefinition(EnvironmentDefinition&&)            = default;
+  EnvironmentDefinition(EnvironmentDefinition&&) = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**

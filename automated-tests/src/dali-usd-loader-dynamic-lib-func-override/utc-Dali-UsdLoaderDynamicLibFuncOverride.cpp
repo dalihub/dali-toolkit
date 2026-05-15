@@ -42,10 +42,10 @@ struct Context
   SceneDefinition scene;
   SceneMetadata   metaData;
 
-  std::vector<AnimationDefinition>      animations;
-  std::vector<AnimationGroupDefinition> animationGroups;
-  std::vector<CameraParameters>         cameras;
-  std::vector<LightParameters>          lights;
+  Dali::Vector<AnimationDefinition>      animations;
+  Dali::Vector<AnimationGroupDefinition> animationGroups;
+  Dali::Vector<CameraParameters>         cameras;
+  Dali::Vector<LightParameters>          lights;
 
   LoadResult loadResult{
     resources,
@@ -100,19 +100,19 @@ int UtcDaliUsdLoaderDlopenFail(void)
   ctx.loader = new Dali::Scene3D::Loader::ModelLoader(String(model.data()), String(resourceProvider.data()), ctx.loadResult);
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   delete ctx.loader;
 
@@ -133,19 +133,19 @@ int UtcDaliUsdLoaderDlsymFail(void)
 
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   delete ctx.loader;
 

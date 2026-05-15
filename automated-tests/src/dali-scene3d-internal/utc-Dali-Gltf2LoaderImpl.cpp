@@ -67,10 +67,10 @@ struct Context
   SceneDefinition scene;
   SceneMetadata   metaData;
 
-  std::vector<AnimationDefinition>      animations;
-  std::vector<AnimationGroupDefinition> animationGroups;
-  std::vector<CameraParameters>         cameras;
-  std::vector<LightParameters>          lights;
+  Dali::Vector<AnimationDefinition>      animations;
+  Dali::Vector<AnimationGroupDefinition> animationGroups;
+  Dali::Vector<CameraParameters>         cameras;
+  Dali::Vector<LightParameters>          lights;
 
   LoadResult loadResult{
     resources,
@@ -107,19 +107,19 @@ int UtcDaliGltfLoaderFailedToLoad1(void)
 
   DALI_TEST_EQUAL(ctx.loader.LoadModel("non-existent.gltf", ctx.loadResult), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -137,19 +137,19 @@ int UtcDaliGltfLoaderFailedToLoad2(void)
     printf("Unsupported glTF extension required.\n");
   }
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -160,18 +160,18 @@ int UtcDaliGltfLoaderFailedToParse(void)
 
   DALI_TEST_EQUAL(ctx.loader.LoadModel(TEST_RESOURCE_DIR "/invalid.gltf", ctx.loadResult), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -198,11 +198,11 @@ int UtcDaliGltfLoaderSuccess1(void)
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCube.gltf", ctx.loadResult);
 
-  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(9u, ctx.scene.GetNodeCount());
 
   // Default envmap is used
-  DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.size());
+  DALI_TEST_EQUAL(1u, ctx.resources.mEnvironmentMaps.Size());
 
   ToolkitTestApplication app;
 
@@ -217,168 +217,94 @@ int UtcDaliGltfLoaderSuccess1(void)
   }
 
   auto& materials = ctx.resources.mMaterials;
-  DALI_TEST_EQUAL(2u, materials.size());
-  const MaterialDefinition materialGroundTruth[]{
-    {{},
-     MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
-       MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
-       MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
-     0,
-     Color::WHITE,
-     1.f,
-     0.f,
-     Vector4(1.000, 0.766, 0.336, 1.0),
-     1.f,
-     1.f,
-     Vector3(0.2, 0.1, 0.0),
-     1.0f,
-     0.0f,
-     0.5f,
-     Vector3(0, 0, 1),
-     true,
-     false,
-     false,
-     false,
-     true,
-     false,
-     Scene3D::Material::AlphaModeType::MASK,
-     true,
-     true,
-     true,
-     {
-       {
-         MaterialDefinition::ALBEDO,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-       {
-         MaterialDefinition::NORMAL,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-       {
-         MaterialDefinition::OCCLUSION,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-       {
-         MaterialDefinition::EMISSIVE,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-       {
-         MaterialDefinition::SPECULAR,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-       {
-         MaterialDefinition::SPECULAR_COLOR,
-         {
-           "AnimatedCube_BaseColor.png",
-           SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-           ImageDimensions(256, 256),
-           SamplingMode::BOX_THEN_NEAREST,
-         },
-       },
-     },
-     nullptr},
-    {
-      {},
-      MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
-        MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION | MaterialDefinition::NORMAL |
-        MaterialDefinition::GLTF_CHANNELS,
-      0,
-      Color::WHITE,
-      1.f,
-      0.f,
-      Vector4(1.000, 0.766, 0.336, 1.0),
-      1.f,
-      1.f,
-      Vector3(0.2, 0.1, 0.0),
-      -1.0f,
-      0.04f,
-      1.0f,
-      Vector3::ONE,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      Scene3D::Material::AlphaModeType::OPAQUE,
-      true,
-      false,
-      true,
-      {
-        {
-          MaterialDefinition::ALBEDO,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS,
-          {
-            "AnimatedCube_MetallicRoughness.png",
-            SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::NORMAL,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::OCCLUSION,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-        {
-          MaterialDefinition::EMISSIVE,
-          {
-            "AnimatedCube_BaseColor.png",
-            SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT),
-            ImageDimensions(256, 256),
-            SamplingMode::BOX_THEN_NEAREST,
-          },
-        },
-      },
-      nullptr,
-    },
+  DALI_TEST_EQUAL(2u, materials.Size());
+  
+  // Helper function to create a TextureStage
+  auto makeTextureStage = [](uint32_t semantic, const char* uri, SamplerFlags::Type samplerFlags, ImageDimensions dims, SamplingMode::Type samplingMode) {
+    MaterialDefinition::TextureStage stage;
+    stage.mSemantic = semantic;
+    stage.mTexture.mImageUri = uri;
+    stage.mTexture.mSamplerFlags = samplerFlags;
+    stage.mTexture.mMinImageDimensions = dims;
+    stage.mTexture.mSamplingMode = samplingMode;
+    return stage;
   };
+  
+  // Helper function to create MaterialDefinition with texture stages
+  auto makeMaterial = [&](uint32_t flags, Index envIdx, const Vector4& color, float metallic, float roughness,
+                          const Vector4& baseColorFactor, float normalScale, float occlusionStrength,
+                          const Vector3& emissiveFactor, float ior, float dielectricSpecular,
+                          float specularFactor, const Vector3& specularColorFactor,
+                          bool needAlbedo, bool needMetallicRoughness, bool needMetallic, bool needRoughness,
+                          bool needNormal, bool doubleSided, Scene3D::Material::AlphaModeType alphaMode,
+                          bool isOpaque, bool isMask, bool shadowAvailable,
+                          std::vector<std::pair<uint32_t, std::tuple<const char*, SamplerFlags::Type, ImageDimensions, SamplingMode::Type>>> textureStages) {
+    MaterialDefinition m;
+    m.mFlags = flags;
+    m.mEnvironmentIdx = envIdx;
+    m.mColor = color;
+    m.mMetallic = metallic;
+    m.mRoughness = roughness;
+    m.mBaseColorFactor = baseColorFactor;
+    m.mNormalScale = normalScale;
+    m.mOcclusionStrength = occlusionStrength;
+    m.mEmissiveFactor = emissiveFactor;
+    m.mIor = ior;
+    m.mDielectricSpecular = dielectricSpecular;
+    m.mSpecularFactor = specularFactor;
+    m.mSpecularColorFactor = specularColorFactor;
+    m.mNeedAlbedoTexture = needAlbedo;
+    m.mNeedMetallicRoughnessTexture = needMetallicRoughness;
+    m.mNeedMetallicTexture = needMetallic;
+    m.mNeedRoughnessTexture = needRoughness;
+    m.mNeedNormalTexture = needNormal;
+    m.mDoubleSided = doubleSided;
+    m.mAlphaModeType = alphaMode;
+    m.mIsOpaque = isOpaque;
+    m.mIsMask = isMask;
+    m.mShadowAvailable = shadowAvailable;
+    for(auto& ts : textureStages)
+    {
+      m.mTextureStages.PushBack(makeTextureStage(ts.first, std::get<0>(ts.second), std::get<1>(ts.second), std::get<2>(ts.second), std::get<3>(ts.second)));
+    }
+    return m;
+  };
+  
+  const auto sampler1 = SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT);
+  const auto sampler2 = SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT);
+  const auto dims = ImageDimensions(256, 256);
+  
+  std::vector<MaterialDefinition> materialGroundTruth;
+  materialGroundTruth.push_back(makeMaterial(
+    MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
+      MaterialDefinition::NORMAL | MaterialDefinition::SPECULAR | MaterialDefinition::SPECULAR_COLOR |
+      MaterialDefinition::GLTF_CHANNELS | (0x80 << MaterialDefinition::ALPHA_CUTOFF_SHIFT),
+    0, Color::WHITE, 1.f, 0.f, Vector4(1.000, 0.766, 0.336, 1.0), 1.f, 1.f, Vector3(0.2, 0.1, 0.0),
+    1.0f, 0.0f, 0.5f, Vector3(0, 0, 1), true, false, false, false, true, false,
+    Scene3D::Material::AlphaModeType::MASK, true, true, true,
+    {
+      {MaterialDefinition::ALBEDO, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::NORMAL, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::OCCLUSION, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::EMISSIVE, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::SPECULAR, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::SPECULAR_COLOR, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+    }));
+  
+  materialGroundTruth.push_back(makeMaterial(
+    MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
+      MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION | MaterialDefinition::NORMAL |
+      MaterialDefinition::GLTF_CHANNELS,
+    0, Color::WHITE, 1.f, 0.f, Vector4(1.000, 0.766, 0.336, 1.0), 1.f, 1.f, Vector3(0.2, 0.1, 0.0),
+    -1.0f, 0.04f, 1.0f, Vector3::ONE, true, true, false, false, true, false,
+    Scene3D::Material::AlphaModeType::OPAQUE, true, false, true,
+    {
+      {MaterialDefinition::ALBEDO, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS, {"AnimatedCube_MetallicRoughness.png", sampler2, dims, SamplingMode::NEAREST}},
+      {MaterialDefinition::NORMAL, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::OCCLUSION, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+      {MaterialDefinition::EMISSIVE, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
+    }));
 
   auto iMaterial = materials.begin();
   for(auto& m : materialGroundTruth)
@@ -407,7 +333,7 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mIsOpaque, m.mIsOpaque);
     DALI_TEST_EQUAL(md.mIsMask, m.mIsMask);
 
-    DALI_TEST_EQUAL(md.mTextureStages.size(), m.mTextureStages.size());
+    DALI_TEST_EQUAL(md.mTextureStages.Size(), m.mTextureStages.Size());
     auto iTexture = md.mTextureStages.begin();
     for(auto& ts : m.mTextureStages)
     {
@@ -424,7 +350,7 @@ int UtcDaliGltfLoaderSuccess1(void)
   }
 
   auto& meshes = ctx.resources.mMeshes;
-  DALI_TEST_EQUAL(2u, meshes.size());
+  DALI_TEST_EQUAL(2u, meshes.Size());
 
   using Blob     = MeshDefinition::Blob;
   using Accessor = MeshDefinition::Accessor;
@@ -450,10 +376,10 @@ int UtcDaliGltfLoaderSuccess1(void)
       Accessor{Blob{0, 0}, {}},
     },
   };
-  meshGroundTruth[0].mColors.push_back(Accessor{Blob{0, 0}, {}});
-  meshGroundTruth[0].mTexCoords.push_back(Accessor{Blob{0, 0}, {}});
-  meshGroundTruth[1].mColors.push_back(Accessor{Blob{0, 0}, {}});
-  meshGroundTruth[1].mTexCoords.push_back(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[0].mColors.PushBack(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[0].mTexCoords.PushBack(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[1].mColors.PushBack(Accessor{Blob{0, 0}, {}});
+  meshGroundTruth[1].mTexCoords.PushBack(Accessor{Blob{0, 0}, {}});
 
   auto iMesh = meshes.begin();
   for(auto& m : meshGroundTruth)
@@ -476,23 +402,23 @@ int UtcDaliGltfLoaderSuccess1(void)
     DALI_TEST_EQUAL((md.mTangents).IsDefined(), (m.mTangents).IsDefined());
     DALI_TEST_EQUAL((md.mTangents).mBlob.IsDefined(), (m.mTangents).mBlob.IsDefined());
 
-    DALI_TEST_EQUAL(md.mTexCoords.empty(), m.mTexCoords.empty());
-    DALI_TEST_EQUAL(md.mColors.empty(), m.mColors.empty());
+    DALI_TEST_EQUAL(md.mTexCoords.Empty(), m.mTexCoords.Empty());
+    DALI_TEST_EQUAL(md.mColors.Empty(), m.mColors.Empty());
 
-    DALI_TEST_EQUAL(md.mJoints.empty(), (m.mJoints.empty()));
-    DALI_TEST_EQUAL(md.mWeights.empty(), (m.mWeights.empty()));
+    DALI_TEST_EQUAL(md.mJoints.Empty(), (m.mJoints.Empty()));
+    DALI_TEST_EQUAL(md.mWeights.Empty(), (m.mWeights.Empty()));
 
     DALI_TEST_EQUAL(md.mBlendShapeHeader.IsDefined(), m.mBlendShapeHeader.IsDefined());
 
     ++iMesh;
   }
 
-  DALI_TEST_EQUAL(0u, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0u, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(6u, ctx.cameras.size());
-  DALI_TEST_EQUAL(0u, ctx.lights.size());
-  DALI_TEST_EQUAL(1u, ctx.animations.size());
-  DALI_TEST_EQUAL(0u, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(6u, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0u, ctx.lights.Size());
+  DALI_TEST_EQUAL(1u, ctx.animations.Size());
+  DALI_TEST_EQUAL(0u, ctx.animationGroups.Size());
 
   END_TEST;
 }
@@ -503,7 +429,7 @@ int UtcDaliGltfLoaderSuccess2(void)
 
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AnimatedCubeStride.gltf", ctx.loadResult);
 
-  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(1u, ctx.scene.GetNodeCount());
 
   ToolkitTestApplication app;
@@ -583,7 +509,7 @@ int UtcDaliGltfLoaderSuccessShort(void)
     Context ctx;
 
     auto& resources = ctx.resources;
-    resources.mEnvironmentMaps.push_back({});
+    resources.mEnvironmentMaps.PushBack({});
 
     printf("%s\n", modelName);
     ctx.loader.LoadModel(ToDaliString(resourcePath + modelName + ".gltf"), ctx.loadResult);
@@ -619,15 +545,15 @@ int UtcDaliGltfLoaderSuccessShort(void)
         {
         }
       } visitor;
-      visitor.receiver.mCounts.resize(resources.mMeshes.size(), false);
+      visitor.receiver.mCounts.resize(resources.mMeshes.Size(), false);
 
       scene.Visit(iRoot, choices, visitor);
-      for(uint32_t i0 = 0, i1 = resources.mMeshes.size(); i0 < i1; ++i0)
+      for(uint32_t i0 = 0, i1 = resources.mMeshes.Size(); i0 < i1; ++i0)
       {
         if(visitor.receiver.mCounts[i0])
         {
           auto raw = resources.mMeshes[i0].first.LoadRaw(ToDaliString(resourcePath), resources.mBuffers);
-          DALI_TEST_CHECK(!raw.mAttribs.empty());
+          DALI_TEST_CHECK(!raw.mAttribs.Empty());
 
           resources.mMeshes[i0].second = resources.mMeshes[i0].first.Load(std::move(raw));
           DALI_TEST_CHECK(resources.mMeshes[i0].second.geometry);
@@ -648,7 +574,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
-  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(roots.Size(), 1u);
   DALI_TEST_EQUAL(scene.GetNode(roots[0])->mName, "RootNode");
   DALI_TEST_EQUAL(scene.GetNode(roots[0])->mScale, Vector3(1.0f, 1.0f, 1.0f));
 
@@ -711,7 +637,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
-  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(roots.Size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection                    viewProjection;
@@ -743,7 +669,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
     }
   }
 
-  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.size(), 1u);
+  DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions.Size(), 1u);
   DALI_TEST_EQUAL(ctx.loadResult.mAnimationDefinitions[0].GetPropertyCount(), 57u);
 
   uint32_t id = ctx.loadResult.mScene.GetNode(ctx.loadResult.mAnimationDefinitions[0].GetPropertyAt(0).mNodeIndex)->mNodeId;
@@ -762,7 +688,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
-  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(roots.Size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection                    viewProjection;
@@ -813,7 +739,7 @@ int UtcDaliGltfLoaderUint8Indices(void)
 
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
-  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(roots.Size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection                    viewProjection;
@@ -868,11 +794,11 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AvocadoQuantized.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
-  DALI_TEST_EQUAL(1u, scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, scene.GetRoots().Size());
   DALI_TEST_EQUAL(1u, scene.GetNodeCount());
 
   auto& roots = scene.GetRoots();
-  DALI_TEST_EQUAL(roots.size(), 1u);
+  DALI_TEST_EQUAL(roots.Size(), 1u);
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection                    viewProjection;
@@ -907,7 +833,7 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   }
 
   auto& meshes = ctx.resources.mMeshes;
-  DALI_TEST_EQUAL(1u, meshes.size());
+  DALI_TEST_EQUAL(1u, meshes.Size());
 
   auto& md = meshes[0u].first;
 
@@ -918,11 +844,11 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   DALI_TEST_EQUAL(sizeof(uint16_t) * 3, md.mPositions.mBlob.mElementSizeHint);
   DALI_TEST_EQUAL(true, md.mPositions.mBlob.IsDefined());
   DALI_TEST_EQUAL(2436, md.mPositions.mBlob.mLength);
-  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMin.size());
+  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMin.Size());
   DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[0]);
   DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[1]);
   DALI_TEST_EQUAL(0.0f, md.mPositions.mBlob.mMin[2]);
-  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMax.size());
+  DALI_TEST_EQUAL(3u, md.mPositions.mBlob.mMax.Size());
   DALI_TEST_EQUAL(11086.0f, md.mPositions.mBlob.mMax[0]);
   DALI_TEST_EQUAL(16383.0f, md.mPositions.mBlob.mMax[1]);
   DALI_TEST_EQUAL(7194.0f, md.mPositions.mBlob.mMax[2]);
@@ -932,8 +858,8 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   DALI_TEST_EQUAL(sizeof(int8_t) * 3, md.mNormals.mBlob.mElementSizeHint);
   DALI_TEST_EQUAL(true, md.mNormals.mBlob.IsDefined());
   DALI_TEST_EQUAL(1218, md.mNormals.mBlob.mLength);
-  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMin.size());
-  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMax.size());
+  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMin.Size());
+  DALI_TEST_EQUAL(0u, md.mNormals.mBlob.mMax.Size());
 
   DALI_TEST_EQUAL(true, md.mTangents.IsDefined());
   DALI_TEST_EQUAL(true, md.mTangents.mNormalized);
@@ -941,17 +867,17 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   DALI_TEST_EQUAL(sizeof(int8_t) * 4, md.mTangents.mBlob.mElementSizeHint);
   DALI_TEST_EQUAL(true, md.mTangents.mBlob.IsDefined());
   DALI_TEST_EQUAL(1624, md.mTangents.mBlob.mLength);
-  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMin.size());
-  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMax.size());
+  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMin.Size());
+  DALI_TEST_EQUAL(0u, md.mTangents.mBlob.mMax.Size());
 
-  DALI_TEST_EQUAL(false, md.mTexCoords.empty());
+  DALI_TEST_EQUAL(false, md.mTexCoords.Empty());
   DALI_TEST_EQUAL(true, md.mTexCoords[0].IsDefined());
   DALI_TEST_EQUAL(false, md.mTexCoords[0].mNormalized);
   DALI_TEST_EQUAL(sizeof(uint16_t) * 2, md.mTexCoords[0].mBlob.mElementSizeHint);
   DALI_TEST_EQUAL(true, md.mTexCoords[0].mBlob.IsDefined());
   DALI_TEST_EQUAL(1624, md.mTexCoords[0].mBlob.mLength);
-  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMin.size());
-  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMax.size());
+  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMin.Size());
+  DALI_TEST_EQUAL(0u, md.mTexCoords[0].mBlob.mMax.Size());
 
   END_TEST;
 }
@@ -970,7 +896,7 @@ int UtcDaliGltfLoaderTextureTransform(void)
   ctx.loader.LoadModel(TEST_RESOURCE_DIR "/AvocadoQuantized.gltf", ctx.loadResult);
 
   auto& scene = ctx.scene;
-  DALI_TEST_EQUAL(1u, scene.GetRoots().size());
+  DALI_TEST_EQUAL(1u, scene.GetRoots().Size());
   DALI_TEST_EQUAL(1u, scene.GetNodeCount());
 
   ToolkitTestApplication app;
@@ -986,12 +912,12 @@ int UtcDaliGltfLoaderTextureTransform(void)
   }
 
   auto& materials = resources.mMaterials;
-  DALI_TEST_EQUAL(1u, materials.size());
+  DALI_TEST_EQUAL(1u, materials.Size());
 
   auto  iMaterial = materials.begin();
   auto& md        = iMaterial->first;
 
-  DALI_TEST_EQUAL(3u, md.mTextureStages.size());
+  DALI_TEST_EQUAL(3u, md.mTextureStages.Size());
 
   Matrix3 textureTransformGroundTruth(0.000238f, 0.0f, 0.0f, 0.0f, 0.000242f, 0.0f, 0.00678f, 0.002982f, 1.0f);
   DALI_TEST_EQUALS(md.mTextureStages[0].mTexture.mTransform, textureTransformGroundTruth, 0.01f, TEST_LOCATION);

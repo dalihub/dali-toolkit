@@ -38,15 +38,15 @@ static constexpr std::string_view EMBEDDED_DATA_BASE64_ENCODING_TYPE   = "base64
 
 struct BufferDefinition::Impl
 {
-  std::vector<uint8_t>              buffer;
+  Dali::Vector<uint8_t>             buffer;
   std::shared_ptr<Dali::FileStream> stream;
 };
 
-BufferDefinition::BufferDefinition(std::vector<uint8_t>&& buffer)
+BufferDefinition::BufferDefinition(Dali::Vector<uint8_t>&& buffer)
 : mImpl{new BufferDefinition::Impl}
 {
   mImpl->buffer = std::move(buffer);
-  mImpl->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl->buffer.data()), mImpl->buffer.size(), FileStream::READ | FileStream::BINARY);
+  mImpl->stream = std::make_shared<Dali::FileStream>(mImpl->buffer.Data(), mImpl->buffer.Count(), FileStream::READ | FileStream::BINARY);
   mIsEmbedded   = true;
 }
 
@@ -96,9 +96,11 @@ void BufferDefinition::LoadBuffer()
       {
         position += EMBEDDED_DATA_BASE64_ENCODING_TYPE.length();
         std::string_view data = std::string_view(uri).substr(position);
-        mImpl->buffer.clear();
-        Dali::Toolkit::DecodeBase64FromString(data, mImpl->buffer);
-        mImpl->stream = std::make_shared<Dali::FileStream>(reinterpret_cast<uint8_t*>(mImpl->buffer.data()), mByteLength, FileStream::READ | FileStream::BINARY);
+        mImpl->buffer.Clear();
+        std::vector<uint8_t> tempBuffer;
+        Dali::Toolkit::DecodeBase64FromString(data, tempBuffer);
+        mImpl->buffer.Insert(mImpl->buffer.End(), const_cast<uint8_t*>(tempBuffer.data()), const_cast<uint8_t*>(tempBuffer.data() + tempBuffer.size()));
+        mImpl->stream = std::make_shared<Dali::FileStream>(mImpl->buffer.Data(), mByteLength, FileStream::READ | FileStream::BINARY);
         mIsEmbedded   = true;
       }
     }

@@ -53,14 +53,13 @@ EnvironmentDefinition::LoadRaw(const Dali::String& environmentsPath)
 {
   RawData     raw;
   std::string envPath = ToStdString(environmentsPath);
-  auto        loadFn  = [&envPath](const Dali::String& path, EnvironmentMapData& environmentMapData)
-  {
+  auto        loadFn  = [&envPath](const Dali::String& path, EnvironmentMapData& environmentMapData) {
     if(path.Empty())
     {
-      environmentMapData.mPixelData.resize(6);
+      environmentMapData.mPixelData.Resize(6);
       for(auto& face : environmentMapData.mPixelData)
       {
-        face.push_back(Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB());
+        face.PushBack(Dali::Scene3D::Internal::ImageResourceLoader::GetEmptyPixelDataWhiteRGB());
       }
       environmentMapData.SetEnvironmentMapType(Dali::Scene3D::EnvironmentMapType::CUBEMAP);
     }
@@ -85,13 +84,13 @@ EnvironmentDefinition::Textures EnvironmentDefinition::Load(RawData&& raw)
   Textures textures;
 
   // This texture should have 6 faces and only one mipmap
-  if(!raw.mDiffuse.mPixelData.empty())
+  if(!raw.mDiffuse.mPixelData.Empty())
   {
     textures.mDiffuse = raw.mDiffuse.GetTexture();
   }
 
   // This texture should have 6 faces and 6 mipmaps
-  if(!raw.mSpecular.mPixelData.empty())
+  if(!raw.mSpecular.mPixelData.Empty())
   {
     textures.mSpecular             = raw.mSpecular.GetTexture();
     textures.mSpecularMipmapLevels = raw.mSpecular.GetMipmapLevels();

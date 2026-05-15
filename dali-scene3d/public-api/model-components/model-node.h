@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
@@ -194,7 +195,7 @@ public: // Public Method
    * @SINCE_2_2.34
    * @param[in, out] blendShapeNames The name of blendShape list collected.
    */
-  void RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const;
+  void RetrieveBlendShapeNames(Dali::Vector<Dali::String>& blendShapeNames) const;
 
   /**
    * @brief Get the index of blend shape by given name.

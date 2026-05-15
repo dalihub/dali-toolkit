@@ -22,7 +22,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <fstream>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -37,14 +36,14 @@ namespace Dali::Scene3D::Loader
  */
 struct DALI_SCENE3D_API BufferDefinition
 {
-  using Vector = std::vector<BufferDefinition>;
+  using Vector = Dali::Vector<BufferDefinition, false>;
 
   BufferDefinition();
-  BufferDefinition(std::vector<uint8_t>&& buffer);
+  BufferDefinition(Dali::Vector<uint8_t>&& buffer);
 
   ~BufferDefinition();
 
-  BufferDefinition(const BufferDefinition& other)            = delete;
+  BufferDefinition(const BufferDefinition& other) = delete;
   BufferDefinition& operator=(const BufferDefinition& other) = delete;
 
   BufferDefinition(BufferDefinition&& other);

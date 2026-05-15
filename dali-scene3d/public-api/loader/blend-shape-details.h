@@ -19,11 +19,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/shader.h>
 #include <limits> ///< for std::numeric_limits
 #include <string>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -57,13 +57,13 @@ struct DALI_SCENE3D_API BlendShapes
 
   struct BlendShapeData
   {
-    std::vector<Dali::String> names;
-    std::vector<float>        weights;
-    std::vector<float>        unnormalizeFactors;
-    Version                   version{Scene3D::Loader::BlendShapes::Version::INVALID};
-    uint32_t                  bufferOffset{0};
-    int32_t                   components{0x0};
-    Dali::WeakHandle<Actor>   mActor;
+    Dali::Vector<Dali::String> names;
+    Dali::Vector<float>        weights;
+    Dali::Vector<float>        unnormalizeFactors;
+    Version                    version{Scene3D::Loader::BlendShapes::Version::INVALID};
+    uint32_t                   bufferOffset{0};
+    int32_t                    components{0x0};
+    Dali::WeakHandle<Actor>    mActor;
   };
 
   // shader properties - animatable (uniforms)

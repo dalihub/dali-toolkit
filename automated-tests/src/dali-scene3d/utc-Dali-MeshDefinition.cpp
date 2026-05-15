@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  *
  */
 
-#include <vector>
-
 #include <dali-scene3d/public-api/loader/buffer-definition.h>
 #include <dali-scene3d/public-api/loader/mesh-definition.h>
 #include <dali-test-suite-utils.h>
@@ -24,18 +22,34 @@
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
 
+namespace
+{
+/**
+ * @brief Helper to create a Dali::Vector<float> from initializer list
+ */
+Dali::Vector<float> MakeFloatVector(std::initializer_list<float> values)
+{
+  Dali::Vector<float> result;
+  result.Resize(values.size());
+  auto it = values.begin();
+  for(auto i = 0u; i < values.size(); ++i, ++it)
+  {
+    result[i] = *it;
+  }
+  return result;
+}
+} // namespace
+
 int UtcDaliMeshDefinitionBlobApplyMinMaxBothMinMaxApplied(void)
 {
-  using Container = std::vector<float>;
+  Dali::Vector<float> buffer    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 12.0f});
+  Dali::Vector<float> minValues = MakeFloatVector({5.0f});
+  Dali::Vector<float> maxValues = MakeFloatVector({10.0f});
+  Dali::Vector<float> result    = MakeFloatVector({5.0f, 6.0f, 8.0f, 10.0f, 10.0f});
 
-  Container buffer    = {4.0f, 6.0f, 8.0f, 10.0f, 12.0f};
-  Container minValues = {5.0f};
-  Container maxValues = {10.0f};
-  Container result    = {5.0f, 6.0f, 8.0f, 10.0f, 10.0f};
+  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.Begin());
 
-  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.data());
-
-  for(auto i = 0u; i < result.size(); ++i)
+  for(auto i = 0u; i < result.Size(); ++i)
   {
     DALI_TEST_EQUALS(buffer[i], result[i], TEST_LOCATION);
   }
@@ -45,16 +59,14 @@ int UtcDaliMeshDefinitionBlobApplyMinMaxBothMinMaxApplied(void)
 
 int UtcDaliMeshDefinitionBlobApplyMinMaxOnlyMin(void)
 {
-  using Container = std::vector<float>;
+  Dali::Vector<float> buffer    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 12.0f});
+  Dali::Vector<float> minValues = MakeFloatVector({5.0f});
+  Dali::Vector<float> maxValues;
+  Dali::Vector<float> result    = MakeFloatVector({5.0f, 6.0f, 8.0f, 10.0f, 12.0f});
 
-  Container buffer    = {4.0f, 6.0f, 8.0f, 10.0f, 12.0f};
-  Container minValues = {5.0f};
-  Container maxValues = {};
-  Container result    = {5.0f, 6.0f, 8.0f, 10.0f, 12.0f};
+  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.Begin());
 
-  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.data());
-
-  for(auto i = 0u; i < result.size(); ++i)
+  for(auto i = 0u; i < result.Size(); ++i)
   {
     DALI_TEST_EQUALS(buffer[i], result[i], TEST_LOCATION);
   }
@@ -64,16 +76,14 @@ int UtcDaliMeshDefinitionBlobApplyMinMaxOnlyMin(void)
 
 int UtcDaliMeshDefinitionBlobApplyMinMaxOnlyMax(void)
 {
-  using Container = std::vector<float>;
+  Dali::Vector<float> buffer    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 12.0f});
+  Dali::Vector<float> minValues;
+  Dali::Vector<float> maxValues = MakeFloatVector({10.0f});
+  Dali::Vector<float> result    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 10.0f});
 
-  Container buffer    = {4.0f, 6.0f, 8.0f, 10.0f, 12.0f};
-  Container minValues = {};
-  Container maxValues = {10.0f};
-  Container result    = {4.0f, 6.0f, 8.0f, 10.0f, 10.0f};
+  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.Begin());
 
-  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.data());
-
-  for(auto i = 0u; i < result.size(); ++i)
+  for(auto i = 0u; i < result.Size(); ++i)
   {
     DALI_TEST_EQUALS(buffer[i], result[i], TEST_LOCATION);
   }
@@ -83,16 +93,14 @@ int UtcDaliMeshDefinitionBlobApplyMinMaxOnlyMax(void)
 
 int UtcDaliMeshDefinitionBlobApplyMinMaxBothEmpty(void)
 {
-  using Container = std::vector<float>;
+  Dali::Vector<float> buffer    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 12.0f});
+  Dali::Vector<float> minValues;
+  Dali::Vector<float> maxValues;
+  Dali::Vector<float> result    = MakeFloatVector({4.0f, 6.0f, 8.0f, 10.0f, 12.0f});
 
-  Container buffer = {4.0f, 6.0f, 8.0f, 10.0f, 12.0f};
-  Container minValues;
-  Container maxValues;
-  Container result = {4.0f, 6.0f, 8.0f, 10.0f, 12.0f};
+  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.Begin());
 
-  MeshDefinition::Blob::ApplyMinMax(minValues, maxValues, 5, buffer.data());
-
-  for(auto i = 0u; i < result.size(); ++i)
+  for(auto i = 0u; i < result.Size(); ++i)
   {
     DALI_TEST_EQUALS(buffer[i], result[i], TEST_LOCATION);
   }
@@ -108,27 +116,27 @@ int UtcDaliMeshDefinitionByteSkinWeight(void)
   bufferDefinition.mUri        = "data:application/base64,ARBAGe+/ve+/vT9hc2RmYXNkZmFzZGZhc2RmYXNkZmE=";
   bufferDefinition.mByteLength = 32;
   BufferDefinition::Vector buffers;
-  buffers.push_back(std::move(bufferDefinition));
+  buffers.PushBack(std::move(bufferDefinition));
 
   MeshDefinition meshDefinition;
   meshDefinition.mFlags = MeshDefinition::U16_JOINT_IDS | MeshDefinition::U8_WEIGHT;
   MeshDefinition::SparseBlob sparseBlob;
   meshDefinition.mPositions =
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 12, 0, (uint16_t)12, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
-  meshDefinition.mJoints.push_back(
+      MeshDefinition::Blob(0, 12, 0, (uint16_t)12), std::move(sparseBlob), 0};
+  meshDefinition.mJoints.PushBack(
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0});
-  meshDefinition.mWeights.push_back(
+      MeshDefinition::Blob(0, 16, 0, (uint16_t)16), std::move(sparseBlob), 0});
+  meshDefinition.mWeights.PushBack(
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 8, 0, (uint16_t)8, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0});
+      MeshDefinition::Blob(0, 8, 0, (uint16_t)8), std::move(sparseBlob), 0});
 
   MeshDefinition::RawData rawData = meshDefinition.LoadRaw("", buffers);
 
-  DALI_TEST_EQUALS(rawData.mAttribs.size(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs.Size(), 4u, TEST_LOCATION);
   DALI_TEST_EQUALS(rawData.mAttribs[3].mName, "aWeights0", TEST_LOCATION);
-  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2, TEST_LOCATION);
-  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.data());
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2u, TEST_LOCATION);
+  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.Data());
   for(uint32_t i = 0; i < rawData.mAttribs[3].mNumElements * 4; ++i)
   {
     DALI_TEST_EQUALS(*value, data8[i], TEST_LOCATION);
@@ -145,27 +153,27 @@ int UtcDaliMeshDefinitionShortSkinWeight(void)
   bufferDefinition.mUri        = "data:application/base64,ARBAGe+/ve+/vT9hc2RmYXNkZmFzZGZhc2RmYXNkZmE=";
   bufferDefinition.mByteLength = 32;
   BufferDefinition::Vector buffers;
-  buffers.push_back(std::move(bufferDefinition));
+  buffers.PushBack(std::move(bufferDefinition));
 
   MeshDefinition meshDefinition;
   meshDefinition.mFlags = MeshDefinition::U16_JOINT_IDS | MeshDefinition::U16_WEIGHT;
   MeshDefinition::SparseBlob sparseBlob;
   meshDefinition.mPositions =
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 12, 0, (uint16_t)12, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0};
-  meshDefinition.mJoints.push_back(
+      MeshDefinition::Blob(0, 12, 0, (uint16_t)12), std::move(sparseBlob), 0};
+  meshDefinition.mJoints.PushBack(
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0});
-  meshDefinition.mWeights.push_back(
+      MeshDefinition::Blob(0, 16, 0, (uint16_t)16), std::move(sparseBlob), 0});
+  meshDefinition.mWeights.PushBack(
     MeshDefinition::Accessor{
-      std::move(MeshDefinition::Blob{0, 16, 0, (uint16_t)16, std::vector<float>(), std::vector<float>()}), std::move(sparseBlob), 0});
+      MeshDefinition::Blob(0, 16, 0, (uint16_t)16), std::move(sparseBlob), 0});
 
   MeshDefinition::RawData rawData = meshDefinition.LoadRaw("", buffers);
 
-  DALI_TEST_EQUALS(rawData.mAttribs.size(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mAttribs.Size(), 4u, TEST_LOCATION);
   DALI_TEST_EQUALS(rawData.mAttribs[3].mName, "aWeights0", TEST_LOCATION);
-  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2, TEST_LOCATION);
-  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.data());
+  DALI_TEST_EQUALS(rawData.mAttribs[3].mNumElements, 2u, TEST_LOCATION);
+  float* value = reinterpret_cast<float*>(rawData.mAttribs[3].mData.Data());
   for(uint32_t i = 0; i < rawData.mAttribs[3].mNumElements * 4; ++i)
   {
     DALI_TEST_EQUALS(*value, data8[i], TEST_LOCATION);
@@ -180,6 +188,6 @@ int UtcDaliMeshDefinitionInvalidUrl(void)
   meshDefinition.mUri = "invalid-uri/";
   BufferDefinition::Vector buffers;
   MeshDefinition::RawData  rawData = meshDefinition.LoadRaw("invalidModelPath", buffers);
-  DALI_TEST_EQUALS(rawData.mIndices.size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(rawData.mIndices.Size(), 0u, TEST_LOCATION);
   END_TEST;
 }

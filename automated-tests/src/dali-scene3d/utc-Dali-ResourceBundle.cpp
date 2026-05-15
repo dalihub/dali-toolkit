@@ -29,13 +29,27 @@ using namespace Dali::Scene3D::Loader;
 int UtcDaliResourceRefCounts(void)
 {
   ResourceBundle resourceBundle;
-  resourceBundle.mEnvironmentMaps.resize(4);
-  resourceBundle.mShaders.resize(13);
-  resourceBundle.mMeshes.resize(17);
-  resourceBundle.mMaterials.resize(19);
+  
+  // Use PushBack with correct Pair types
+  for(int i = 0; i < 4; ++i)
+  {
+    resourceBundle.mEnvironmentMaps.PushBack({EnvironmentDefinition{}, EnvironmentDefinition::Textures{}});
+  }
+  for(int i = 0; i < 13; ++i)
+  {
+    resourceBundle.mShaders.PushBack({ShaderDefinition{}, Shader()});
+  }
+  for(int i = 0; i < 17; ++i)
+  {
+    resourceBundle.mMeshes.PushBack({MeshDefinition{}, MeshGeometry{}});
+  }
+  for(int i = 0; i < 19; ++i)
+  {
+    resourceBundle.mMaterials.PushBack({MaterialDefinition{}, TextureSet()});
+  }
 
   int              i = 0;
-  std::vector<int> testEnvironmentReferences(resourceBundle.mEnvironmentMaps.size());
+  std::vector<int> testEnvironmentReferences(resourceBundle.mEnvironmentMaps.Count());
   for(auto& m : resourceBundle.mMaterials)
   {
     Index iEnv = 0;
@@ -50,12 +64,12 @@ int UtcDaliResourceRefCounts(void)
   }
 
   auto counter = resourceBundle.CreateRefCounter();
-  DALI_TEST_EQUAL(counter[ResourceType::Environment].Size(), resourceBundle.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(counter[ResourceType::Shader].Size(), resourceBundle.mShaders.size());
-  DALI_TEST_EQUAL(counter[ResourceType::Mesh].Size(), resourceBundle.mMeshes.size());
-  DALI_TEST_EQUAL(counter[ResourceType::Material].Size(), resourceBundle.mMaterials.size());
+  DALI_TEST_EQUAL(counter[ResourceType::Environment].Size(), resourceBundle.mEnvironmentMaps.Count());
+  DALI_TEST_EQUAL(counter[ResourceType::Shader].Size(), resourceBundle.mShaders.Count());
+  DALI_TEST_EQUAL(counter[ResourceType::Mesh].Size(), resourceBundle.mMeshes.Count());
+  DALI_TEST_EQUAL(counter[ResourceType::Material].Size(), resourceBundle.mMaterials.Count());
 
-  std::fill(counter[ResourceType::Material].begin(), counter[ResourceType::Material].end(), 1u);
+  std::fill(counter[ResourceType::Material].Begin(), counter[ResourceType::Material].End(), 1u);
   resourceBundle.mReferenceCounts = std::move(counter);
   resourceBundle.CountEnvironmentReferences();
 

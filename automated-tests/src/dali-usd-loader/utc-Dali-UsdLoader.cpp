@@ -45,10 +45,10 @@ struct Context
   SceneDefinition scene;
   SceneMetadata   metaData;
 
-  std::vector<AnimationDefinition>      animations;
-  std::vector<AnimationGroupDefinition> animationGroups;
-  std::vector<CameraParameters>         cameras;
-  std::vector<LightParameters>          lights;
+  Dali::Vector<AnimationDefinition>      animations;
+  Dali::Vector<AnimationGroupDefinition> animationGroups;
+  Dali::Vector<CameraParameters>         cameras;
+  Dali::Vector<LightParameters>          lights;
 
   LoadResult loadResult{
     resources,
@@ -88,19 +88,19 @@ int UtcDaliUsdLoaderFailedToLoad(void)
   ctx.loader = new Dali::Scene3D::Loader::ModelLoader(String(model.data()), String(resourcePath.data()), ctx.loadResult);
   DALI_TEST_EQUAL(ctx.loader->LoadModel(ctx.pathProvider, true), false);
 
-  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().size());
+  DALI_TEST_EQUAL(0, ctx.scene.GetRoots().Size());
   DALI_TEST_EQUAL(0, ctx.scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mShaders.size());
-  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0, ctx.resources.mEnvironmentMaps.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMaterials.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mMeshes.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mShaders.Size());
+  DALI_TEST_EQUAL(0, ctx.resources.mSkeletons.Size());
 
-  DALI_TEST_EQUAL(0, ctx.cameras.size());
-  DALI_TEST_EQUAL(0, ctx.lights.size());
-  DALI_TEST_EQUAL(0, ctx.animations.size());
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.cameras.Size());
+  DALI_TEST_EQUAL(0, ctx.lights.Size());
+  DALI_TEST_EQUAL(0, ctx.animations.Size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
   delete ctx.loader;
 
@@ -129,48 +129,48 @@ int UtcDaliUsdLoaderSuccess1(void)
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
 
-  DALI_TEST_EQUAL(1u, roots.size());
+  DALI_TEST_EQUAL(1u, roots.Size());
   DALI_TEST_EQUAL(7u, scene.GetNodeCount());
 
   // Default envmap is used
-  DALI_TEST_EQUAL(1u, resources.mEnvironmentMaps.size());
+  DALI_TEST_EQUAL(1u, resources.mEnvironmentMaps.Size());
 
   // Check meshes
   auto& meshes = resources.mMeshes;
-  DALI_TEST_EQUAL(1u, meshes.size());
+  DALI_TEST_EQUAL(1u, meshes.Size());
   {
     auto& md = meshes[0u].first;
     DALI_TEST_EQUAL(md.mFlags, uint32_t(MeshDefinition::U32_INDICES));
     DALI_TEST_EQUAL(md.mPrimitiveType, Geometry::TRIANGLES);
     DALI_TEST_CHECK(md.mRawData);
-    DALI_TEST_EQUAL(md.mRawData->mIndices.size(), 28032u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs.size(), 5u);
+    DALI_TEST_EQUAL(md.mRawData->mIndices.Size(), 28032u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs.Size(), 5u);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[0].mName, "aPosition");
     DALI_TEST_EQUAL(md.mRawData->mAttribs[0].mType, Property::VECTOR3);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[0].mNumElements, 14016u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs[0].mData.size(), 168192u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs[0].mData.Size(), 168192u);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[1].mName, "aNormal");
     DALI_TEST_EQUAL(md.mRawData->mAttribs[1].mType, Property::VECTOR3);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[1].mNumElements, 14016u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs[1].mData.size(), 168192u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs[1].mData.Size(), 168192u);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[2].mName, "aTexCoord");
     DALI_TEST_EQUAL(md.mRawData->mAttribs[2].mType, Property::VECTOR2);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[2].mNumElements, 14016u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs[2].mData.size(), 112128u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs[2].mData.Size(), 112128u);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[3].mName, "aTangent");
     DALI_TEST_EQUAL(md.mRawData->mAttribs[3].mType, Property::VECTOR3);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[3].mNumElements, 14016u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs[3].mData.size(), 168192u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs[3].mData.Size(), 168192u);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[4].mName, "aVertexColor");
     DALI_TEST_EQUAL(md.mRawData->mAttribs[4].mType, Property::VECTOR4);
     DALI_TEST_EQUAL(md.mRawData->mAttribs[4].mNumElements, 14016u);
-    DALI_TEST_EQUAL(md.mRawData->mAttribs[4].mData.size(), 224256u);
+    DALI_TEST_EQUAL(md.mRawData->mAttribs[4].mData.Size(), 224256u);
     DALI_TEST_CHECK(meshes[0u].second.geometry);
   }
 
   // Check materials
   auto& materials = resources.mMaterials;
-  DALI_TEST_EQUAL(1u, materials.size());
+  DALI_TEST_EQUAL(1u, materials.Size());
   {
     auto& md = materials[0u].first;
     DALI_TEST_EQUAL(md.mFlags, MaterialDefinition::ALBEDO | MaterialDefinition::GLTF_CHANNELS);
@@ -195,7 +195,7 @@ int UtcDaliUsdLoaderSuccess1(void)
     DALI_TEST_EQUAL(md.mIsOpaque, true);
     DALI_TEST_EQUAL(md.mIsMask, false);
 
-    DALI_TEST_EQUAL(md.mTextureStages.size(), 1u);
+    DALI_TEST_EQUAL(md.mTextureStages.Size(), 1u);
 
     auto iTexture = md.mTextureStages.begin();
     DALI_TEST_EQUAL(iTexture->mSemantic, uint32_t(MaterialDefinition::ALBEDO));
@@ -203,7 +203,7 @@ int UtcDaliUsdLoaderSuccess1(void)
     DALI_TEST_EQUAL(uint32_t(iTexture->mTexture.mSamplerFlags), uint32_t(SamplerFlags::DEFAULT)); // don't interpret it as a character
     DALI_TEST_EQUAL(iTexture->mTexture.mMinImageDimensions, ImageDimensions(512, 512));
     DALI_TEST_EQUAL(iTexture->mTexture.mSamplingMode, SamplingMode::BOX_THEN_LINEAR);
-    DALI_TEST_EQUAL(iTexture->mTexture.mTextureBuffer.size(), 209908u);
+    DALI_TEST_EQUAL(iTexture->mTexture.mTextureBuffer.Size(), 209908u);
 
     auto& ts = materials[0u].second;
     DALI_TEST_EQUAL(ts.GetTextureCount(), 5u);
@@ -219,8 +219,8 @@ int UtcDaliUsdLoaderSuccess1(void)
     DALI_TEST_EQUAL(ts.GetTexture(4).GetHeight(), 1);
   }
 
-  DALI_TEST_EQUAL(0u, resources.mShaders.size());
-  DALI_TEST_EQUAL(0u, resources.mSkeletons.size());
+  DALI_TEST_EQUAL(0u, resources.mShaders.Size());
+  DALI_TEST_EQUAL(0u, resources.mSkeletons.Size());
 
   Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
   ViewProjection                    viewProjection;
@@ -341,7 +341,7 @@ int UtcDaliUsdLoaderSuccess2(void)
     Context ctx;
 
     auto& resources = ctx.resources;
-    resources.mEnvironmentMaps.push_back({});
+    resources.mEnvironmentMaps.PushBack({});
 
     std::string model(TEST_RESOURCE_DIR "/usd/");
     model += modelName;
@@ -354,7 +354,7 @@ int UtcDaliUsdLoaderSuccess2(void)
 
     resources.GenerateResources();
 
-    DALI_TEST_CHECK(resources.mMaterials.size() > 0);
+    DALI_TEST_CHECK(resources.mMaterials.Size() > 0);
 
     for(auto iRoot : scene.GetRoots())
     {
@@ -386,15 +386,15 @@ int UtcDaliUsdLoaderSuccess2(void)
         }
       } visitor;
 
-      visitor.receiver.mCounts.resize(resources.mMeshes.size(), false);
+      visitor.receiver.mCounts.resize(resources.mMeshes.Size(), false);
 
       scene.Visit(iRoot, choices, visitor);
 
-      for(uint32_t i0 = 0, i1 = resources.mMeshes.size(); i0 < i1; ++i0)
+      for(uint32_t i0 = 0, i1 = resources.mMeshes.Size(); i0 < i1; ++i0)
       {
         if(visitor.receiver.mCounts[i0])
         {
-          DALI_TEST_CHECK(!resources.mMeshes[i0].first.mRawData->mAttribs.empty());
+          DALI_TEST_CHECK(!resources.mMeshes[i0].first.mRawData->mAttribs.Empty());
           DALI_TEST_CHECK(resources.mMeshes[i0].second.geometry);
         }
       }
@@ -423,12 +423,12 @@ int UtcDaliUsdLoaderAnimation01(void)
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
 
-  DALI_TEST_EQUAL(1u, roots.size());
+  DALI_TEST_EQUAL(1u, roots.Size());
   DALI_TEST_EQUAL(3u, scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
-  DALI_TEST_EQUAL(1, ctx.animations.size());
+  DALI_TEST_EQUAL(1, ctx.animations.Size());
   DALI_TEST_EQUAL("box_animation_xform_anim", ctx.animations[0].GetName());
   DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetDuration());
   DALI_TEST_EQUAL(1, ctx.animations[0].GetLoopCount());
@@ -491,7 +491,7 @@ int UtcDaliUsdLoaderAnimation01(void)
 
   std::vector<Dali::Animation> generatedAnimations;
 
-  generatedAnimations.reserve(ctx.animations.size());
+  generatedAnimations.reserve(ctx.animations.Size());
   auto getActor = [&](const AnimatedProperty& property)
   {
     Dali::Actor actor;
@@ -543,12 +543,12 @@ int UtcDaliUsdLoaderAnimation02(void)
   auto& scene = ctx.scene;
   auto& roots = scene.GetRoots();
 
-  DALI_TEST_EQUAL(1u, roots.size());
+  DALI_TEST_EQUAL(1u, roots.Size());
   DALI_TEST_EQUAL(3u, scene.GetNodeCount());
 
-  DALI_TEST_EQUAL(0, ctx.animationGroups.size());
+  DALI_TEST_EQUAL(0, ctx.animationGroups.Size());
 
-  DALI_TEST_EQUAL(1, ctx.animations.size());
+  DALI_TEST_EQUAL(1, ctx.animations.Size());
   DALI_TEST_EQUAL("box_animation_xform_anim", ctx.animations[0].GetName());
   DALI_TEST_EQUAL(4.95833f, ctx.animations[0].GetDuration());
   DALI_TEST_EQUAL(1, ctx.animations[0].GetLoopCount());
@@ -611,7 +611,7 @@ int UtcDaliUsdLoaderAnimation02(void)
 
   std::vector<Dali::Animation> generatedAnimations;
 
-  generatedAnimations.reserve(ctx.animations.size());
+  generatedAnimations.reserve(ctx.animations.Size());
   auto getActor = [&](const AnimatedProperty& property)
   {
     Dali::Actor actor;

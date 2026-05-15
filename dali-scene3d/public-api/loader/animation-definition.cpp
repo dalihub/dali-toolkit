@@ -55,7 +55,7 @@ AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)
   mEndAction        = tmp.mEndAction;
   mSpeedFactor      = tmp.mSpeedFactor;
   mPlayRange        = tmp.mPlayRange;
-  mProperties.swap(tmp.mProperties);
+  mProperties.Swap(tmp.mProperties);
   return *this;
 }
 
@@ -155,19 +155,19 @@ Vector2 AnimationDefinition::GetPlayRange() const
 
 void AnimationDefinition::ReserveSize(uint32_t size)
 {
-  mProperties.reserve(size);
+  mProperties.Reserve(size);
 }
 
 uint32_t AnimationDefinition::GetPropertyCount() const
 {
-  return static_cast<uint32_t>(mProperties.size());
+  return mProperties.Count();
 }
 
 void AnimationDefinition::SetProperty(uint32_t index, AnimatedProperty&& property)
 {
-  if(mProperties.size() <= index)
+  while(mProperties.Count() <= index)
   {
-    mProperties.resize(index + 1);
+    mProperties.PushBack(AnimatedProperty{});
   }
   mProperties[index] = std::move(property);
 }

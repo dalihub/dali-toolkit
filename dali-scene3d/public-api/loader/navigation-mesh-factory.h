@@ -18,10 +18,10 @@
 */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/texture.h>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
@@ -52,7 +52,7 @@ public:
    * @param[in] buffer buffer with data
    * @return Valid NavigationMesh or nullptr
    */
-  static UniquePtr<Algorithm::NavigationMesh> CreateFromBuffer(const std::vector<uint8_t>& buffer);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromBuffer(const Dali::Vector<uint8_t>& buffer);
 
   /**
    * @brief Creates new mesh from lists of vertices and faces
@@ -65,7 +65,7 @@ public:
    * @param[in] faceIndices List of faces
    * @return Valid NavigationMesh or nullptr
    */
-  static UniquePtr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const std::vector<Vector3>& vertices, const std::vector<Vector3>& vertexNormals, const std::vector<uint32_t>& faceIndices);
+  static UniquePtr<Algorithm::NavigationMesh> CreateFromVertexFaceList(const Dali::Vector<Vector3>& vertices, const Dali::Vector<Vector3>& vertexNormals, const Dali::Vector<uint32_t>& faceIndices);
 
   /**
    * @brief Creates new mesh from lists of vertices and faces
@@ -94,7 +94,7 @@ public:
    * @param[in] navigationMesh Navigation mesh to serialize
    * @return Buffer containing serialized mesh data
    */
-  static std::vector<uint8_t> GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh);
+  static Dali::Vector<uint8_t> GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh);
 };
 } // namespace Dali::Scene3D::Loader
 

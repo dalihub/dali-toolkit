@@ -19,6 +19,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/texture.h>
@@ -123,17 +125,17 @@ struct DALI_SCENE3D_API TextureDefinition
 {
   static const Matrix3 DEFAULT_TRANSFORM;
 
-  Dali::String         mImageUri; // When the texture is loaded from embedded resources, this URI is used as a data stream.
-  Dali::String         mDirectoryPath;
-  SamplerFlags::Type   mSamplerFlags;
-  ImageDimensions      mMinImageDimensions;
-  SamplingMode::Type   mSamplingMode;
-  Matrix3              mTransform{DEFAULT_TRANSFORM}; // Texture transform
-  std::vector<uint8_t> mTextureBuffer;
+  Dali::String          mImageUri; // When the texture is loaded from embedded resources, this URI is used as a data stream.
+  Dali::String          mDirectoryPath;
+  SamplerFlags::Type    mSamplerFlags;
+  ImageDimensions       mMinImageDimensions;
+  SamplingMode::Type    mSamplingMode;
+  Matrix3               mTransform{DEFAULT_TRANSFORM}; // Texture transform
+  Dali::Vector<uint8_t> mTextureBuffer;
 
   TextureDefinition(const Dali::String& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
   TextureDefinition(Dali::String&& imageUri, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
-  TextureDefinition(std::vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
+  TextureDefinition(Dali::Vector<uint8_t>&& textureBuffer, SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT, ImageDimensions minImageDimensions = ImageDimensions(), SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR, Matrix3 transform = DEFAULT_TRANSFORM);
 };
 
 /**
@@ -178,7 +180,7 @@ struct DALI_SCENE3D_API MaterialDefinition
     TextureDefinition mTexture;
   };
 
-  using Vector = std::vector<std::pair<MaterialDefinition, TextureSet>>;
+  using Vector = Dali::Vector<Dali::Pair<MaterialDefinition, TextureSet>, false>;
 
   struct RawData
   {
@@ -188,15 +190,15 @@ struct DALI_SCENE3D_API MaterialDefinition
       SamplerFlags::Type mSamplerFlags;
     };
 
-    std::vector<TextureData> mTextures;
+    Dali::Vector<TextureData> mTextures;
   };
 
   MaterialDefinition() = default;
 
-  MaterialDefinition(const MaterialDefinition&)            = delete;
+  MaterialDefinition(const MaterialDefinition&) = delete;
   MaterialDefinition& operator=(const MaterialDefinition&) = delete;
 
-  MaterialDefinition(MaterialDefinition&&)            = default;
+  MaterialDefinition(MaterialDefinition&&) = default;
   MaterialDefinition& operator=(MaterialDefinition&&) = default;
 
   /**
@@ -227,7 +229,7 @@ struct DALI_SCENE3D_API MaterialDefinition
                      bool                             isOpaque,
                      bool                             isMask,
                      bool                             shadowAvailable,
-                     std::vector<TextureStage>        textureStages,
+                     Dali::Vector<TextureStage>       textureStages,
                      Material                         material)
   : mRawData(std::move(rawData)),
     mFlags(flag),
@@ -334,8 +336,8 @@ public: // DATA
 
   bool mShadowAvailable = false;
 
-  std::vector<TextureStage> mTextureStages;
-  Material                  mMaterial;
+  Dali::Vector<TextureStage> mTextureStages;
+  Material                   mMaterial;
 };
 
 } // namespace Dali::Scene3D::Loader

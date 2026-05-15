@@ -175,12 +175,12 @@ Dali::Scene3D::Loader::ResourceBundle& ModelLoadTask::GetResources() const
   return mModelLoader->GetResources();
 }
 
-std::vector<Dali::Scene3D::Loader::AnimationDefinition>& ModelLoadTask::GetAnimations() const
+Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>& ModelLoadTask::GetAnimations() const
 {
   return mModelLoader->GetAnimations();
 }
 
-std::vector<Dali::Scene3D::Loader::CameraParameters>& ModelLoadTask::GetCameras() const
+Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& ModelLoadTask::GetCameras() const
 {
   return mModelLoader->GetCameras();
 }

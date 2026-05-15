@@ -27,6 +27,17 @@
 // include collider mesh data
 #include "collider-mesh-data.h"
 
+/**
+ * Helper to convert raw byte array to Dali::Vector<uint8_t>
+ */
+Dali::Vector<uint8_t> ToDaliVector(const unsigned char* data, unsigned int len)
+{
+  Dali::Vector<uint8_t> result;
+  result.Resize(len);
+  std::memcpy(result.Begin(), data, len);
+  return result;
+}
+
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;
 using namespace Dali::Scene3D::Loader;
@@ -268,9 +279,9 @@ int UtcDaliNavigationMeshCreateFromBufferP(void)
   [[maybe_unused]] auto err    = fseek(fin, 0, SEEK_END);
   auto                  length = ftell(fin);
   fseek(fin, 0, SEEK_SET);
-  std::vector<uint8_t> buffer;
-  buffer.resize(length);
-  fread(buffer.data(), 1, length, fin);
+  Dali::Vector<uint8_t> buffer;
+  buffer.Resize(length);
+  fread(buffer.Begin(), 1, length, fin);
   fclose(fin);
   auto result = NavigationMeshFactory::CreateFromBuffer(buffer);
   DALI_TEST_CHECK(result);
@@ -645,7 +656,9 @@ int UtcDaliNavigationMeshCreateFromVerticesAndFaces(void)
   // All calculations in the navmesh local space
   auto fn = [&](const auto& vertices, const auto& normals, const auto& indices)
   {
-    auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(vertices, normals, indices);
+    auto navmesh = NavigationMeshFactory::CreateFromVertexFaceList(
+        vertices.data(), normals.data(), static_cast<uint32_t>(vertices.size()),
+        indices.data(), static_cast<uint32_t>(indices.size()));
     navmesh->SetSceneTransform(Matrix(Matrix::IDENTITY));
     DALI_TEST_EQUALS(navmesh->GetVertexCount(), vertices.size(), TEST_LOCATION);
     DALI_TEST_EQUALS(navmesh->GetFaceCount(), indices.size() / 3, TEST_LOCATION);
@@ -737,7 +750,7 @@ int UtcDaliNavigationMeshGetBinaryTest(void)
   {
     auto colliderMesh = NavigationMeshFactory::CreateFromBuffer(GetTestColliderMesh(i));
     auto binary       = NavigationMeshFactory::GetMeshBinary(*colliderMesh);
-    DALI_TEST_EQUALS(binary.size() > 0, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(binary.Size() > 0, true, TEST_LOCATION);
 
     auto colliderMesh2 = NavigationMeshFactory::CreateFromBuffer(binary);
 

@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture.h>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -91,7 +91,7 @@ public:
   }
 
 public:
-  std::vector<std::vector<PixelData> > mPixelData;
+  Dali::Vector<Dali::Vector<PixelData>> mPixelData;
 
 private:
   Dali::Texture                     mEnvironmentMapTexture;

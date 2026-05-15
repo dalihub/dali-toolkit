@@ -18,9 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/unique-ptr.h>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -40,7 +41,7 @@ namespace Dali::Scene3D::Loader
  */
 struct DALI_SCENE3D_API MeshDefinition
 {
-  using Vector = std::vector<std::pair<MeshDefinition, MeshGeometry>>;
+  using Vector = Dali::Vector<Dali::Pair<MeshDefinition, MeshGeometry>, false>;
 
   enum : uint32_t
   {
@@ -103,16 +104,16 @@ struct DALI_SCENE3D_API MeshDefinition
    */
   struct Blob
   {
-    uint32_t           mOffset          = INVALID; // the default means that the blob is undefined.
-    uint32_t           mLength          = 0;       // if the blob is undefined, its data may still be generated. This is enabled by setting length to some non-0 value. Refer to MeshDefinition for details.
-    uint16_t           mStride          = 0;       // ignore if 0
-    uint16_t           mElementSizeHint = 0;       // ignore if 0 or stride == 0
-    std::vector<float> mMin;
-    std::vector<float> mMax;
+    uint32_t            mOffset          = INVALID; // the default means that the blob is undefined.
+    uint32_t            mLength          = 0;       // if the blob is undefined, its data may still be generated. This is enabled by setting length to some non-0 value. Refer to MeshDefinition for details.
+    uint16_t            mStride          = 0;       // ignore if 0
+    uint16_t            mElementSizeHint = 0;       // ignore if 0 or stride == 0
+    Dali::Vector<float> mMin;
+    Dali::Vector<float> mMax;
 
-    static void ComputeMinMax(std::vector<float>& min, std::vector<float>& max, uint32_t numComponents, uint32_t count, const float* values);
+    static void ComputeMinMax(Dali::Vector<float>& min, Dali::Vector<float>& max, uint32_t numComponents, uint32_t count, const float* values);
 
-    static void ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max, uint32_t count, float* values, std::vector<uint32_t>* sparseIndices = nullptr);
+    static void ApplyMinMax(const Dali::Vector<float>& min, const Dali::Vector<float>& max, uint32_t count, float* values, Dali::Vector<uint32_t>* sparseIndices = nullptr);
 
     Blob() = default;
 
@@ -122,7 +123,7 @@ struct DALI_SCENE3D_API MeshDefinition
     Blob(Blob&&)            = default;
     Blob& operator=(Blob&&) = default;
 
-    Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0, const std::vector<float>& min = {}, const std::vector<float>& max = {});
+    Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0, const Dali::Vector<float>& min = {}, const Dali::Vector<float>& max = {});
 
     /**
      * @brief Calculates the size of a tightly-packed buffer for the elements from the blob.
@@ -169,7 +170,7 @@ struct DALI_SCENE3D_API MeshDefinition
      * @param[in] values Data for the mesh that min / max values will be applied.
      * @param[in] sparseIndices Pointer to array of sparse indices (or nullptr if not provided)
      */
-    void ApplyMinMax(uint32_t count, float* values, std::vector<uint32_t>* sparseIndices = nullptr) const;
+    void ApplyMinMax(uint32_t count, float* values, Dali::Vector<uint32_t>* sparseIndices = nullptr) const;
   };
 
   /**
@@ -245,16 +246,16 @@ struct DALI_SCENE3D_API MeshDefinition
   {
     struct Attrib
     {
-      Dali::String         mName;
-      Property::Type       mType;
-      uint32_t             mNumElements;
-      std::vector<uint8_t> mData;
+      Dali::String          mName;
+      Property::Type        mType;
+      uint32_t              mNumElements;
+      Dali::Vector<uint8_t> mData;
 
       void AttachBuffer(Geometry& g) const;
     };
 
-    std::vector<uint16_t> mIndices;
-    std::vector<Attrib>   mAttribs;
+    Dali::Vector<uint16_t> mIndices;
+    Dali::Vector<Attrib>   mAttribs;
 
     unsigned int        mBlendShapeBufferOffset{0};
     Dali::Vector<float> mBlendShapeUnnormalizeFactor;
@@ -273,24 +274,24 @@ struct DALI_SCENE3D_API MeshDefinition
    * @brief Constructor for brace-enclosed initializer list
    * @SINCE_2_5.18
    */
-  MeshDefinition(SharedPtr<RawData>      rawData,
-                 uint32_t                flags,
-                 Geometry::Type          primitiveType,
-                 Dali::String            uri,
-                 Accessor                indices,
-                 Accessor                positions,
-                 Accessor                normals,
-                 Accessor                tangents,
-                 std::vector<Accessor>   texCoords,
-                 std::vector<Accessor>   colors,
-                 std::vector<Accessor>   joints,
-                 std::vector<Accessor>   weights,
-                 Property::Type          tangentType,
-                 Blob                    blendShapeHeader,
-                 std::vector<BlendShape> blendShapes,
-                 BlendShapes::Version    blendShapeVersion,
-                 Index                   skeletonIdx,
-                 ModelPrimitive          modelPrimitive)
+  MeshDefinition(SharedPtr<RawData>       rawData,
+                 uint32_t                 flags,
+                 Geometry::Type           primitiveType,
+                 Dali::String             uri,
+                 Accessor                 indices,
+                 Accessor                 positions,
+                 Accessor                 normals,
+                 Accessor                 tangents,
+                 Dali::Vector<Accessor>   texCoords,
+                 Dali::Vector<Accessor>   colors,
+                 Dali::Vector<Accessor>   joints,
+                 Dali::Vector<Accessor>   weights,
+                 Property::Type           tangentType,
+                 Blob                     blendShapeHeader,
+                 Dali::Vector<BlendShape> blendShapes,
+                 BlendShapes::Version     blendShapeVersion,
+                 Index                    skeletonIdx,
+                 ModelPrimitive           modelPrimitive)
   : mRawData(std::move(rawData)),
     mFlags(flags),
     mPrimitiveType(primitiveType),
@@ -405,23 +406,23 @@ struct DALI_SCENE3D_API MeshDefinition
   void RetrieveBlendShapeComponents(bool& hasPositions, bool& hasNormals, bool& hasTangents) const;
 
 public: // DATA
-  SharedPtr<RawData>    mRawData;
-  uint32_t              mFlags         = 0x0;
-  Geometry::Type        mPrimitiveType = Geometry::TRIANGLES;
-  Dali::String          mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
-  Accessor              mIndices;
-  Accessor              mPositions;
-  Accessor              mNormals;  // data can be generated based on positions
-  Accessor              mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  std::vector<Accessor> mTexCoords;
-  std::vector<Accessor> mColors;
-  std::vector<Accessor> mJoints;
-  std::vector<Accessor> mWeights;
-  Property::Type        mTangentType{Property::VECTOR3};
+  SharedPtr<RawData>     mRawData;
+  uint32_t               mFlags         = 0x0;
+  Geometry::Type         mPrimitiveType = Geometry::TRIANGLES;
+  Dali::String           mUri; // When the mesh data is loaded from embedded resources, this URI is used as a data stream.
+  Accessor               mIndices;
+  Accessor               mPositions;
+  Accessor               mNormals;  // data can be generated based on positions
+  Accessor               mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
+  Dali::Vector<Accessor> mTexCoords;
+  Dali::Vector<Accessor> mColors;
+  Dali::Vector<Accessor> mJoints;
+  Dali::Vector<Accessor> mWeights;
+  Property::Type         mTangentType{Property::VECTOR3};
 
-  Blob                    mBlendShapeHeader;
-  std::vector<BlendShape> mBlendShapes;
-  BlendShapes::Version    mBlendShapeVersion = BlendShapes::Version::INVALID;
+  Blob                     mBlendShapeHeader;
+  Dali::Vector<BlendShape> mBlendShapes;
+  BlendShapes::Version     mBlendShapeVersion = BlendShapes::Version::INVALID;
 
   Index          mSkeletonIdx = INVALID_INDEX;
   ModelPrimitive mModelPrimitive;
@@ -429,4 +430,4 @@ public: // DATA
 
 } // namespace Dali::Scene3D::Loader
 
-#endif //DALI_SCENE3D_LOADER_MESH_DEFINITION_H
+#endif // DALI_SCENE3D_LOADER_MESH_DEFINITION_H

@@ -78,7 +78,7 @@ int UtcDaliKtxLoaderSuccess(void)
   auto               path = TEST_RESOURCE_DIR "/forest_radiance.ktx";
   DALI_TEST_CHECK(LoadKtxData(path, environmentMapData));
 
-  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.size());
+  DALI_TEST_EQUAL(6u, environmentMapData.mPixelData.Count());
   for(auto& face : environmentMapData.mPixelData)
   {
     uint32_t size = 64;
@@ -133,10 +133,10 @@ int UtcDaliKtxLoaderEnvironmentMApDataCreateTexture1(void)
   uint8_t* pixelBuffer     = new uint8_t[pixelBufferSize];
 
   EnvironmentMapData environmentMapData;
-  environmentMapData.mPixelData.push_back({});
+  environmentMapData.mPixelData.PushBack(Dali::Vector<PixelData>());
 
   auto pixelData = PixelData::New(pixelBuffer, pixelBufferSize, 1, 1, Pixel::Format::RGB888, PixelData::DELETE_ARRAY);
-  environmentMapData.mPixelData[0].push_back(pixelData);
+  environmentMapData.mPixelData[0].PushBack(pixelData);
 
   ToolkitTestApplication app;
   auto                   texture = environmentMapData.GetTexture();
