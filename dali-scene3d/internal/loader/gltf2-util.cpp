@@ -638,7 +638,8 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
 
 void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& imageMetaData, decltype(ResourceBundle::mMaterials)& outMaterials, ConversionContext& context)
 {
-  auto getTextureMetaData = [](const ImageMetadataMap& metaData, const gltf2::TextureInfo& info) {
+  auto getTextureMetaData = [](const ImageMetadataMap& metaData, const gltf2::TextureInfo& info)
+  {
     if(!info.mTexture->mSource->mUri.empty())
     {
       if(auto* found = metaData.Find(Dali::String(info.mTexture->mSource->mUri.data())))
@@ -842,13 +843,13 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
     case gltf2::Attribute::TEXCOORD_N:
     {
       meshDefinition.mTexCoords.PushBack(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mTexCoords[meshDefinition.mTexCoords.Size() - 1];
+      accessorDest = &meshDefinition.mTexCoords.Back();
       break;
     }
     case gltf2::Attribute::COLOR_N:
     {
       meshDefinition.mColors.PushBack(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mColors[meshDefinition.mTexCoords.Size() - 1];
+      accessorDest = &meshDefinition.mColors.Back();
       break;
     }
     case gltf2::Attribute::JOINTS_N:
@@ -856,7 +857,7 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
       if(meshDefinition.mJoints.Size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
       {
         meshDefinition.mJoints.PushBack(MeshDefinition::Accessor{});
-        accessorDest = &meshDefinition.mJoints[meshDefinition.mTexCoords.Size() - 1];
+        accessorDest = &meshDefinition.mJoints.Back();
       }
       break;
     }
@@ -865,7 +866,7 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
       if(meshDefinition.mWeights.Size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
       {
         meshDefinition.mWeights.PushBack(MeshDefinition::Accessor{});
-        accessorDest = &meshDefinition.mWeights[meshDefinition.mTexCoords.Size() - 1];
+        accessorDest = &meshDefinition.mWeights.Back();
       }
       break;
     }
@@ -1181,7 +1182,8 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
   auto& resources = output.mResources;
 
   const auto index    = scene.GetNodeCount();
-  auto       weakNode = scene.AddNode([&]() {
+  auto       weakNode = scene.AddNode([&]()
+  {
     Dali::UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;

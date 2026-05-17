@@ -355,6 +355,12 @@ void UsdLoaderImpl::Impl::TraversePrims(LoadResult& output, const UsdPrim& prim,
 
   auto& scene = output.mScene;
 
+  if(DALI_UNLIKELY(scene.GetNodeCount() == 0))
+  {
+    DALI_LOG_ERROR("Scene must have at least one node (the root node) before traversing prims! (parentIndex: %u, level: %d)\n", parentIndex, level);
+    return;
+  }
+
   Index nodeIndex = scene.GetNodeCount() - 1;
 
   if(prim.IsA<UsdGeomMesh>())
@@ -428,7 +434,7 @@ NodeDefinition* UsdLoaderImpl::Impl::AddNodeToScene(SceneDefinition& scene, cons
 {
   // Add the node to the scene graph
   auto weakNode = scene.AddNode([&]()
-                                {
+  {
     UniquePtr<NodeDefinition> nodeDefinition{new NodeDefinition()};
 
     nodeDefinition->mParentIdx = parentIndex;
