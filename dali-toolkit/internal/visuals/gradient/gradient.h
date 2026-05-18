@@ -53,6 +53,11 @@ public:
     {
     }
 
+    GradientStop()
+    : GradientStop(-1.0f, Vector4::ZERO)
+    {
+    }
+
     bool operator<(const GradientStop& rhs) const
     {
       return mOffset < rhs.mOffset;
@@ -64,18 +69,20 @@ public:
 
 public:
   /**
-   * Add a gradient stop.
-   *
-   * @param[in] offset The position to place the stop.
-   * @param[in] color  The color to use at this stop.
-   */
-  void AddStop(float offset, const Vector4& color);
-
-  /**
    * Get the gradient stops.
    * @return The vector of gradient stops.
    */
-  const Vector<GradientStop>& GetStops();
+  const Vector<GradientStop>& GetStops() const;
+
+  /**
+   * Clear all added gradient stops.
+   */
+  void ClearStops();
+
+  /**
+   * Build GradientStop array by input parameters.
+   */
+  void ApplyStops(const Vector<float>& offsets, const Vector<Vector4>& colors);
 
   /**
    * Set the coordinate system used by the gradient attributes.

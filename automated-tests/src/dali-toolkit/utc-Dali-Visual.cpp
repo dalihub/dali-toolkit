@@ -3523,7 +3523,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   END_TEST;
 }
 
-int UtcDaliGradientVisualBlendMode(void)
+int UtcDaliGradientVisualTextureFormat(void)
 {
   ToolkitTestApplication application;
   VisualFactory          factory = VisualFactory::Get();
@@ -3545,10 +3545,10 @@ int UtcDaliGradientVisualBlendMode(void)
   application.SendNotification();
   application.Render();
 
-  // Control should have two renderers, the first one is opaque so our blending mode should be off, the second one has some alpha so should be set to automatic
+  // Control should have two renderers, the first one is opaque so texture type is RGB, the second one has some alpha so should be set RGBA
   DALI_TEST_EQUALS(2u, control.GetRendererCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetRendererAt(0).GetProperty(Renderer::Property::BLEND_MODE).Get<int>(), (int)BlendMode::OFF, TEST_LOCATION);
-  DALI_TEST_EQUALS(control.GetRendererAt(1).GetProperty(Renderer::Property::BLEND_MODE).Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetRendererAt(0).GetTextures().GetTexture(0u).GetPixelFormat(), Pixel::Format::RGB888, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetRendererAt(1).GetTextures().GetTexture(0u).GetPixelFormat(), Pixel::Format::RGBA8888, TEST_LOCATION);
 
   END_TEST;
 }
@@ -6819,6 +6819,160 @@ int UtcDaliVisualUpdateProperty02(void)
   END_TEST;
 }
 
+int UtcDaliVisualUpdateProperty03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdateProperty03: Test update property by DoAction for GradientVisual.");
+
+  Vector4 borderlineColor  = Color::BLUE;
+  float   borderlineOffset = 1.0f;
+  Vector4 cornerSquareness = Vector4::ZERO;
+
+  Vector2                            startPosition = Vector2(0.5f, 0.5f);
+  Vector2                            endPosition   = Vector2(-0.5f, -0.5f);
+  GradientVisual::Units::Type        units         = GradientVisual::Units::OBJECT_BOUNDING_BOX;
+  GradientVisual::SpreadMethod::Type spreadMethod  = GradientVisual::SpreadMethod::PAD;
+  float                              startOffset   = 0.5f;
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap[Visual::Property::TYPE] = Visual::Type::GRADIENT;
+
+  Property::Array stopOffsets;
+  stopOffsets.PushBack(0.0f);
+  stopOffsets.PushBack(0.5f);
+  propertyMap[GradientVisual::Property::STOP_OFFSET] = stopOffsets;
+
+  Property::Array stopColors;
+  stopColors.PushBack(Vector4(129.f, 198.f, 193.f, 255.f) / 255.f);
+  stopColors.PushBack(Vector4(196.f, 198.f, 71.f, 122.f) / 255.f);
+  stopColors.PushBack(Vector4(214.f, 37.f, 139.f, 191.f) / 255.f);
+  stopColors.PushBack(Vector4(129.f, 198.f, 193.f, 150.f) / 255.f);
+  stopColors.PushBack(Color::YELLOW);
+  propertyMap[GradientVisual::Property::STOP_COLOR] = stopColors;
+
+  // linear gradient with units as objectBoundingBox
+  propertyMap[GradientVisual::Property::START_POSITION] = startPosition;
+  propertyMap[GradientVisual::Property::END_POSITION]   = endPosition;
+  propertyMap[GradientVisual::Property::UNITS]          = units;
+  propertyMap[GradientVisual::Property::SPREAD_METHOD]  = spreadMethod;
+  propertyMap[GradientVisual::Property::START_OFFSET]   = startOffset;
+
+  propertyMap[Visual::Property::MIX_COLOR]                 = Color::BLUE;
+  propertyMap[DevelVisual::Property::CORNER_RADIUS]        = 0.0f;
+  propertyMap[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+  propertyMap[DevelVisual::Property::BORDERLINE_WIDTH]     = 0.0f;
+  propertyMap[DevelVisual::Property::BORDERLINE_COLOR]     = borderlineColor;
+  propertyMap[DevelVisual::Property::BORDERLINE_OFFSET]    = borderlineOffset;
+  propertyMap[DevelVisual::Property::CORNER_SQUARENESS]    = cornerSquareness;
+
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, gradientVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map originalMap;
+  gradientVisual.CreatePropertyMap(originalMap);
+
+  Vector4 targetCornerRadius    = Vector4(10.0f, 0.0f, 1.0f, 2.0f);
+  float   targetBorderlineWidth = 20.0f;
+
+  GradientVisual::Units::Type        targetUnits        = GradientVisual::Units::USER_SPACE;
+  GradientVisual::SpreadMethod::Type targetSpreadMethod = GradientVisual::SpreadMethod::REFLECT;
+  float                              targetStartOffset  = -0.5f;
+
+  Property::Map targetPropertyMap;
+  targetPropertyMap[DevelVisual::Property::CORNER_RADIUS]    = targetCornerRadius;
+  targetPropertyMap[DevelVisual::Property::BORDERLINE_WIDTH] = targetBorderlineWidth;
+
+  // Only for gradients
+  Property::Array targetStopOffsets;
+  targetStopOffsets.PushBack(0.0f);
+  targetStopOffsets.PushBack(0.3f);
+  targetStopOffsets.PushBack(1.0f);
+  targetPropertyMap[GradientVisual::Property::STOP_OFFSET] = targetStopOffsets;
+
+  Property::Array targetStopColors;
+  targetStopColors.PushBack(Color::RED);
+  targetStopColors.PushBack(Color::GREEN);
+  targetStopColors.PushBack(Color::BLUE);
+  targetPropertyMap[GradientVisual::Property::STOP_COLOR] = targetStopColors;
+
+  targetPropertyMap[GradientVisual::Property::UNITS]         = targetUnits;
+  targetPropertyMap[GradientVisual::Property::SPREAD_METHOD] = targetSpreadMethod;
+  targetPropertyMap[GradientVisual::Property::START_OFFSET]  = targetStartOffset;
+
+  // Update Properties
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  Property::Map resultMap;
+  gradientVisual.CreatePropertyMap(resultMap);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get<Vector4>(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* cornerRadiusPolicyValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER);
+  DALI_TEST_CHECK(cornerRadiusPolicyValue);
+  DALI_TEST_EQUALS(cornerRadiusPolicyValue->Get<int>(), static_cast<int>(Toolkit::Visual::Transform::Policy::RELATIVE), TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get<float>(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get<Vector4>(), borderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get<float>(), borderlineOffset, TEST_LOCATION);
+
+  Property::Value* cornerSquarenessValue = resultMap.Find(DevelVisual::Property::CORNER_SQUARENESS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerSquarenessValue);
+  DALI_TEST_EQUALS(cornerSquarenessValue->Get<Vector4>(), cornerSquareness, TEST_LOCATION);
+
+  // Only for gradients
+  Property::Value* startPositionValue = resultMap.Find(GradientVisual::Property::START_POSITION, Property::VECTOR2);
+  DALI_TEST_CHECK(startPositionValue);
+  DALI_TEST_EQUALS(startPositionValue->Get<Vector2>(), startPosition, TEST_LOCATION);
+
+  Property::Value* endPositionValue = resultMap.Find(GradientVisual::Property::END_POSITION, Property::VECTOR2);
+  DALI_TEST_CHECK(endPositionValue);
+  DALI_TEST_EQUALS(endPositionValue->Get<Vector2>(), endPosition, TEST_LOCATION);
+
+  Property::Value* unitsValue = resultMap.Find(GradientVisual::Property::UNITS, Property::INTEGER);
+  DALI_TEST_CHECK(unitsValue);
+  DALI_TEST_EQUALS(unitsValue->Get<GradientVisual::Units::Type>(), targetUnits, TEST_LOCATION);
+
+  Property::Value* spreadMethodValue = resultMap.Find(GradientVisual::Property::SPREAD_METHOD, Property::INTEGER);
+  DALI_TEST_CHECK(spreadMethodValue);
+  DALI_TEST_EQUALS(spreadMethodValue->Get<GradientVisual::SpreadMethod::Type>(), targetSpreadMethod, TEST_LOCATION);
+
+  Property::Value* startOffsetValue = resultMap.Find(GradientVisual::Property::START_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(startOffsetValue);
+  DALI_TEST_EQUALS(startOffsetValue->Get<float>(), targetStartOffset, TEST_LOCATION);
+
+  Property::Value* stopOffsetValue = resultMap.Find(GradientVisual::Property::STOP_OFFSET, Property::ARRAY);
+  DALI_TEST_CHECK(stopOffsetValue);
+  DALI_TEST_CHECK(stopOffsetValue->GetArray());
+  DALI_TEST_EQUALS(stopOffsetValue->GetArray()->Count(), targetStopOffsets.Count(), TEST_LOCATION);
+
+  Property::Value* stopColorValue = resultMap.Find(GradientVisual::Property::STOP_COLOR, Property::ARRAY);
+  DALI_TEST_CHECK(stopColorValue);
+  DALI_TEST_CHECK(stopColorValue->GetArray());
+  DALI_TEST_EQUALS(stopColorValue->GetArray()->Count(), targetStopColors.Count(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVisualUpdatePropertyInvalidType(void)
 {
   ToolkitTestApplication application;
@@ -7528,6 +7682,119 @@ int UtcDaliVisualUpdatePropertyChangeShader04(void)
   callStack.Enable(false);
   // Shader not changed
   DALI_TEST_CHECK(!callStack.FindMethod("CreateShader"));
+
+  END_TEST;
+}
+
+int UtcDaliVisualUpdatePropertyChangeShader05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdatePropertyChangeShader05: Test update property by DoAction for GradientVisual. Change the shader case");
+
+  TraceCallStack& callStack = application.GetGraphicsController().mCallStack;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap[Visual::Property::TYPE] = Visual::Type::GRADIENT;
+
+  Property::Array stopOffsets;
+  stopOffsets.PushBack(0.0f);
+  stopOffsets.PushBack(0.5f);
+  propertyMap[GradientVisual::Property::STOP_OFFSET] = stopOffsets;
+
+  Property::Array stopColors;
+  stopColors.PushBack(Vector4(129.f, 198.f, 193.f, 255.f) / 255.f);
+  stopColors.PushBack(Vector4(196.f, 198.f, 71.f, 122.f) / 255.f);
+  stopColors.PushBack(Vector4(214.f, 37.f, 139.f, 191.f) / 255.f);
+  stopColors.PushBack(Vector4(129.f, 198.f, 193.f, 150.f) / 255.f);
+  stopColors.PushBack(Color::YELLOW);
+  propertyMap[GradientVisual::Property::STOP_COLOR] = stopColors;
+
+  // linear gradient with units as objectBoundingBox
+  propertyMap[GradientVisual::Property::START_POSITION] = Vector2(0.5f, 0.5f);
+  propertyMap[GradientVisual::Property::END_POSITION]   = Vector2(-0.5f, -0.5f);
+  propertyMap[GradientVisual::Property::UNITS]          = GradientVisual::Units::OBJECT_BOUNDING_BOX;
+  propertyMap[GradientVisual::Property::SPREAD_METHOD]  = GradientVisual::SpreadMethod::PAD;
+
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, gradientVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
+      {"#define USER_SPACE", false},
+    },
+    TEST_LOCATION);
+
+  callStack.Reset();
+  callStack.Enable(true);
+
+  Property::Map targetPropertyMap;
+  targetPropertyMap[GradientVisual::Property::UNITS] = GradientVisual::Units::USER_SPACE;
+
+  // Update Properties with CornerRadius
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", false},
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
+      {"#define USER_SPACE", {true, false}},
+    },
+    TEST_LOCATION);
+
+  callStack.Reset();
+  callStack.Enable(true);
+
+  Vector4 targetCornerRadius = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
+      {"#define USER_SPACE", {true, false}},
+    },
+    TEST_LOCATION);
+
+  targetPropertyMap[GradientVisual::Property::UNITS] = GradientVisual::Units::OBJECT_BOUNDING_BOX;
+
+  // Update Properties with CornerRadius
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  TestShaderCodeContainSubstrings(
+    dummyControl,
+    {
+      {"#define IS_REQUIRED_BORDERLINE", false},
+      {"#define IS_REQUIRED_ROUNDED_CORNER", true}, // Note : mAlwaysUsingCornerRadius is true.
+      {"#define IS_REQUIRED_SQUIRCLE_CORNER", false},
+      {"#define USER_SPACE", false},
+    },
+    TEST_LOCATION);
+
+  callStack.Reset();
 
   END_TEST;
 }
