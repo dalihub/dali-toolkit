@@ -346,6 +346,12 @@ struct DefaultDBusWrapper : public DBusWrapper
     dst.value = q;
     return true;
   }
+  void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) override
+  {
+    auto entry = eldbus_message_iter_container_new(get(it), 'e', "");
+    eldbus_message_iter_arguments_append(entry, "s", v1.c_str());
+    eldbus_message_iter_arguments_append(entry, "s", v2.c_str());
+  }
 
   MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) override
   {
@@ -953,6 +959,18 @@ eldbus_message_iter_arguments_append_impl_basic(uint8_t, y)
 
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
+
+void TestDBusWrapper::eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2)
+{
+  auto m = get(it);
+  if(!m->write) throw error{};
+  if(!m->elem->isContainer()) throw error{};
+  auto& lst = m->elem->get<ElementList>();
+  lst.push_back({ElementList{}, 'e'});
+  auto& entryList = lst.back().get<ElementList>();
+  entryList.push_back(Element{std::string(v1)});
+  entryList.push_back(Element{std::string(v2)});
+}
 
                       TestDBusWrapper::MessageIterPtr TestDBusWrapper::eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig)
 {
