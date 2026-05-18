@@ -1650,11 +1650,13 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   TestGraphicsController& graphics = application.GetGraphicsController();
   graphics.AddCustomUniforms(customUniforms);
 
+  Vector4 borderColor = Vector4(1.0f, 0.0f, 1.0f, 0.4f);
+
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::BORDER);
   propertyMap.Insert(Visual::Property::MIX_COLOR, Vector4(1, 1, 1, 0.8f));
-  propertyMap.Insert(BorderVisual::Property::COLOR, Color::BLUE);
+  propertyMap.Insert(BorderVisual::Property::COLOR, borderColor);
   propertyMap.Insert(BorderVisual::Property::SIZE, 5.f);
   Visual::Base borderVisual = factory.CreateVisual(propertyMap);
 
@@ -1693,14 +1695,14 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   application.Render(2000u); // halfway point between blue and white
 
   Vector4 color     = renderer.GetCurrentProperty<Vector4>(borderColorIndex);
-  Vector4 testColor = (Color::BLUE + Color::WHITE) * 0.5f;
+  Vector4 testColor = (borderColor + Color::WHITE) * 0.5f;
   DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", testColor), true, TEST_LOCATION);
 
   color     = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
   testColor = Vector4(1, 1, 1, 0.45f);
   DALI_TEST_EQUALS(color, testColor, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(testColor)), true, TEST_LOCATION);
 
   application.Render(2000u);
 
@@ -1711,7 +1713,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   color     = renderer.GetCurrentProperty<Vector4>(mixColorIndex);
   testColor = Vector4(1, 1, 1, 0.1);
   DALI_TEST_EQUALS(color, testColor, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", testColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(testColor)), true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2750,6 +2752,39 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     Dali::Property::Map visualMap;
     colorVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+
+  // border visual ( premultiplied alpha by default is true, and cannot change value )
+  {
+    Visual::Base borderVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::BORDER)
+        .Add(BorderVisual::Property::COLOR, Color::AQUA)
+        .Add(BorderVisual::Property::SIZE, 10.0f));
+
+    Dali::Property::Map visualMap;
+    borderVisual.CreatePropertyMap(visualMap);
+    Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
+
+    // test values
+    DALI_TEST_CHECK(value);
+    DALI_TEST_EQUALS(value->Get<bool>(), true, TEST_LOCATION);
+  }
+  {
+    Visual::Base borderVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::BORDER)
+        .Add(BorderVisual::Property::COLOR, Color::AQUA)
+        .Add(BorderVisual::Property::SIZE, 10.0f)
+        .Add(Visual::Property::PREMULTIPLIED_ALPHA, false));
+
+    Dali::Property::Map visualMap;
+    borderVisual.CreatePropertyMap(visualMap);
     Property::Value* value = visualMap.Find(Visual::Property::PREMULTIPLIED_ALPHA);
 
     // test values
@@ -5691,6 +5726,65 @@ int UtcDaliVisualUpdateProperty02(void)
   Property::Value* transformExtraSizeValue = transformMap->Find(DevelVisual::Transform::Property::EXTRA_SIZE, Property::VECTOR2);
   DALI_TEST_CHECK(transformExtraSizeValue);
   DALI_TEST_EQUALS(transformExtraSizeValue->Get<Vector2>(), targetTransformExtraSize, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualUpdateProperty04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualUpdateProperty04: Test update property by DoAction for BorderVisual.");
+
+  Vector4 borderColor = Color::RED;
+  float   borderSize  = 30.0f;
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap[Visual::Property::TYPE]                = Visual::Type::BORDER;
+  propertyMap[BorderVisual::Property::COLOR]         = borderColor;
+  propertyMap[BorderVisual::Property::SIZE]          = borderSize;
+  propertyMap[BorderVisual::Property::ANTI_ALIASING] = false;
+
+  Visual::Base borderVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, borderVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map originalMap;
+  borderVisual.CreatePropertyMap(originalMap);
+
+  Vector4 targetBorderColor = Vector4(1.0f, 0.0f, 0.5f, 0.3f);
+  float   targetBorderSize  = 50.0f;
+
+  Property::Map targetPropertyMap;
+  targetPropertyMap[BorderVisual::Property::COLOR]         = targetBorderColor;
+  targetPropertyMap[BorderVisual::Property::SIZE]          = targetBorderSize;
+  targetPropertyMap[BorderVisual::Property::ANTI_ALIASING] = true;
+
+  // Update Properties
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  Property::Map resultMap;
+  borderVisual.CreatePropertyMap(resultMap);
+
+  Property::Value* borderColorValue = resultMap.Find(BorderVisual::Property::COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderColorValue);
+  DALI_TEST_EQUALS(borderColorValue->Get<Vector4>(), targetBorderColor, TEST_LOCATION);
+
+  Property::Value* borderSizeValue = resultMap.Find(BorderVisual::Property::SIZE, Property::FLOAT);
+  DALI_TEST_CHECK(borderSizeValue);
+  DALI_TEST_EQUALS(borderSizeValue->Get<float>(), targetBorderSize, TEST_LOCATION);
+
+  Property::Value* antiAliasingValue = resultMap.Find(BorderVisual::Property::ANTI_ALIASING, Property::BOOLEAN);
+  DALI_TEST_CHECK(antiAliasingValue);
+  DALI_TEST_EQUALS(antiAliasingValue->Get<bool>(), true, TEST_LOCATION);
 
   END_TEST;
 }

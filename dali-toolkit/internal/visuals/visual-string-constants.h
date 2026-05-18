@@ -149,8 +149,8 @@ extern const char* const AUXILIARY_IMAGE_NAME;
 extern const char* const AUXILIARY_IMAGE_ALPHA_NAME;
 
 // Border visual
-extern const char* const COLOR_NAME;
-extern const char* const SIZE_NAME;
+extern const char* const BORDER_COLOR_NAME;
+extern const char* const BORDER_SIZE_NAME;
 extern const char* const ANTI_ALIASING;
 
 // properties: radial gradient

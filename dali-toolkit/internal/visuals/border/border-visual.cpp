@@ -61,6 +61,8 @@ BorderVisual::BorderVisual(VisualFactoryCache& factoryCache)
   mBorderSizeIndex(Property::INVALID_INDEX),
   mAntiAliasing(false)
 {
+  // Enable the pre-multiplied alpha
+  mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
 BorderVisual::~BorderVisual()
@@ -78,11 +80,11 @@ void BorderVisual::DoSetProperties(const Property::Map& propertyMap)
     }
     else
     {
-      if(keyValue.first == COLOR_NAME)
+      if(keyValue.first == BORDER_COLOR_NAME)
       {
         DoSetProperty(Toolkit::BorderVisual::Property::COLOR, keyValue.second);
       }
-      else if(keyValue.first == SIZE_NAME)
+      else if(keyValue.first == BORDER_SIZE_NAME)
       {
         DoSetProperty(Toolkit::BorderVisual::Property::SIZE, keyValue.second);
       }
@@ -101,7 +103,19 @@ void BorderVisual::DoSetProperty(Dali::Property::Index        index,
   {
     case Toolkit::BorderVisual::Property::COLOR:
     {
-      if(!value.Get(mBorderColor))
+      if(value.Get(mBorderColor))
+      {
+        if(mImpl->mRenderer && mBorderColorIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mBorderColorIndex, mBorderColor);
+
+          if(mBorderColor.a < 1.f && mImpl->mRenderer.GetProperty<BlendMode::Type>(Renderer::Property::BLEND_MODE) == BlendMode::AUTO)
+          {
+            mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          }
+        }
+      }
+      else
       {
         DALI_LOG_ERROR("BorderVisual: borderColor property has incorrect type\n");
       }
@@ -109,7 +123,14 @@ void BorderVisual::DoSetProperty(Dali::Property::Index        index,
     }
     case Toolkit::BorderVisual::Property::SIZE:
     {
-      if(!value.Get(mBorderSize))
+      if(value.Get(mBorderSize))
+      {
+        if(mImpl->mRenderer && mBorderSizeIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mBorderSizeIndex, mBorderSize);
+        }
+      }
+      else
       {
         DALI_LOG_ERROR("BorderVisual: borderSize property has incorrect type\n");
       }
@@ -117,7 +138,19 @@ void BorderVisual::DoSetProperty(Dali::Property::Index        index,
     }
     case Toolkit::BorderVisual::Property::ANTI_ALIASING:
     {
-      if(!value.Get(mAntiAliasing))
+      if(value.Get(mAntiAliasing))
+      {
+        if(mImpl->mRenderer)
+        {
+          UpdateShader();
+
+          if(mAntiAliasing && mImpl->mRenderer.GetProperty<BlendMode::Type>(Renderer::Property::BLEND_MODE) == BlendMode::AUTO)
+          {
+            mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          }
+        }
+      }
+      else
       {
         DALI_LOG_ERROR("BorderVisual: antiAliasing property has incorrect type\n");
       }
@@ -128,19 +161,6 @@ void BorderVisual::DoSetProperty(Dali::Property::Index        index,
 
 void BorderVisual::DoSetOnScene(Actor& actor)
 {
-  if(mBorderColorIndex == Property::INVALID_INDEX)
-  {
-    mBorderColorIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor);
-  }
-  if(mBorderColor.a < 1.f || mAntiAliasing)
-  {
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
-  }
-  if(mBorderSizeIndex == Property::INVALID_INDEX)
-  {
-    mBorderSizeIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize);
-  }
-
   actor.AddRenderer(mImpl->mRenderer);
 
   // Border Visual Generated and ready to display
@@ -161,6 +181,15 @@ void BorderVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   // Do nothing
 }
 
+void BorderVisual::EnablePreMultipliedAlpha(bool preMultiplied)
+{
+  // Make always enable pre multiplied alpha whether preMultiplied value is false.
+  if(!preMultiplied)
+  {
+    DALI_LOG_WARNING("Note : BorderVisual cannot disable PreMultipliedAlpha\n");
+  }
+}
+
 void BorderVisual::OnSetTransform()
 {
   if(mImpl->mRenderer && mImpl->mTransformMapChanged)
@@ -178,15 +207,32 @@ void BorderVisual::OnInitialize()
     mFactoryCache.SaveGeometry(VisualFactoryCache::BORDER_GEOMETRY, geometry);
   }
 
-  Shader shader    = GetBorderShader();
+  Shader shader    = GenerateShader();
   mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+
+  mBorderColorIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::COLOR, BORDER_COLOR_NAME, mBorderColor);
+  mBorderSizeIndex  = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::SIZE, BORDER_SIZE_NAME, mBorderSize);
+
+  if(mBorderColor.a < 1.f || mAntiAliasing)
+  {
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+  }
 
   // Register transform properties
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
-Shader BorderVisual::GetBorderShader()
+void BorderVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GenerateShader();
+    mImpl->mRenderer.SetShader(shader);
+  }
+}
+
+Shader BorderVisual::GenerateShader() const
 {
   Shader shader;
   if(mAntiAliasing)

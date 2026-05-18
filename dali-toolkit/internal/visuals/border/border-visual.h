@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BORDER_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,17 +96,26 @@ protected:
   void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
   /**
+   * @copydoc Visual::Base::EnablePreMultipliedAlpha
+   */
+  void EnablePreMultipliedAlpha(bool preMultiplied) override;
+
+  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   void OnSetTransform() override;
 
-private:
   /**
-   * Request the border shader from the factory cache. If fail, create tha shader and add it to cache.
-   * @return The border shader.
+   * @copydoc Visual::Base::UpdateShader
    */
-  Shader GetBorderShader();
+  void UpdateShader() override;
 
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
+private:
   /**
    * Create the geometry which presents the border.
    * @return The border geometry
