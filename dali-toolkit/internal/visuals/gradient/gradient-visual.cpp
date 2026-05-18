@@ -165,8 +165,7 @@ GradientVisual::GradientVisual(VisualFactoryCache& factoryCache)
   mGradientTransform(),
   mGradient(nullptr),
   mGradientType(LINEAR),
-  mStartOffsetIndex(Property::INVALID_INDEX),
-  mIsOpaque(true)
+  mStartOffsetIndex(Property::INVALID_INDEX)
 {
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 }
@@ -177,34 +176,107 @@ GradientVisual::~GradientVisual()
 
 void GradientVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  if(!mGradient)
+  bool needShaderUpdated  = false;
+  bool needTextureUpdated = false;
+  // Mutable properties. Allow to call as UpdateProperty action
   {
-    Toolkit::GradientVisual::Units::Type gradientUnits = Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX;
+    // TODO : Currently we cannot change gradient type as mutable.
+    // Can we change it as mutable in future?
+    if(!mGradient)
+    {
+      mGradientType = Type::LINEAR;
+      if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
+      {
+        mGradientType = Type::RADIAL;
+      }
+      else if(propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME))
+      {
+        mGradientType = Type::CONIC;
+      }
 
-    Property::Value* unitsValue = propertyMap.Find(Toolkit::GradientVisual::Property::UNITS, UNITS_NAME);
-    if(unitsValue)
-    {
-      Scripting::GetEnumerationProperty(*unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits);
+      if(NewGradient(mGradientType, propertyMap))
+      {
+        mGradientTransform = mGradient->GetAlignmentTransform();
+
+        if(mImpl->mRenderer)
+        {
+          mImpl->mRenderer.RegisterProperty(ToDaliStringView(UNIFORM_ALIGNMENT_MATRIX_NAME), mGradientTransform);
+          if(DALI_LIKELY(mGradient) && mGradientType == Type::CONIC)
+          {
+            ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+            mImpl->mRenderer.RegisterProperty(ToDaliStringView(UNIFORM_START_ANGLE_NAME), gradient->GetStartAngle().radian);
+          }
+        }
+        needShaderUpdated  = true;
+        needTextureUpdated = true;
+      }
     }
 
-    mGradientType = Type::LINEAR;
-    if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
+    if(ApplyStopNodes(propertyMap))
     {
-      mGradientType = Type::RADIAL;
-    }
-    else if(propertyMap.Find(Toolkit::GradientVisual::Property::START_ANGLE, CONIC_START_ANGLE_NAME))
-    {
-      mGradientType = Type::CONIC;
+      needTextureUpdated = true;
     }
 
-    if(NewGradient(mGradientType, propertyMap))
+    Property::Value* startOffsetValue = propertyMap.Find(Toolkit::GradientVisual::Property::START_OFFSET, START_OFFSET_NAME);
+    float            startOffset;
+    if(startOffsetValue && startOffsetValue->Get(startOffset))
     {
-      mGradient->SetGradientUnits(gradientUnits);
-      mGradientTransform = mGradient->GetAlignmentTransform();
+      if(DALI_LIKELY(mGradient))
+      {
+        mGradient->SetStartOffset(startOffset);
+      }
+      if(mImpl->mRenderer && mStartOffsetIndex != Property::INVALID_INDEX)
+      {
+        mImpl->mRenderer.SetProperty(mStartOffsetIndex, startOffset);
+      }
     }
-    else
+
+    if(DALI_LIKELY(mGradient))
     {
-      DALI_LOG_ERROR("Fail to provide valid properties to create a GradientVisual object\n");
+      Property::Value*                            spreadValue  = propertyMap.Find(Toolkit::GradientVisual::Property::SPREAD_METHOD, SPREAD_METHOD_NAME);
+      Toolkit::GradientVisual::SpreadMethod::Type spreadMethod = mGradient->GetSpreadMethod();
+      if(spreadValue && Scripting::GetEnumerationProperty(*spreadValue, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod))
+      {
+        mGradient->SetSpreadMethod(spreadMethod);
+
+        needTextureUpdated = true;
+      }
+      Property::Value*                     unitsValue    = propertyMap.Find(Toolkit::GradientVisual::Property::UNITS, UNITS_NAME);
+      Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
+      if(unitsValue && Scripting::GetEnumerationProperty(*unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits))
+      {
+        mGradient->SetGradientUnits(gradientUnits);
+
+        needShaderUpdated = true;
+      }
+    }
+  }
+
+  if(DALI_LIKELY(mGradient) && mImpl->mRenderer)
+  {
+    if(needShaderUpdated)
+    {
+      UpdateShader();
+    }
+    if(needTextureUpdated)
+    {
+      // Set up the texture set
+      TextureSet    textureSet    = TextureSet::New();
+      Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
+      textureSet.SetTexture(0u, lookupTexture);
+      Dali::WrapMode::Type wrap = GetWrapMode(mGradient->GetSpreadMethod());
+      if(wrap != Dali::WrapMode::DEFAULT)
+      {
+        Sampler sampler = Sampler::New();
+        sampler.SetWrapMode(wrap, wrap);
+        textureSet.SetSampler(0u, sampler);
+      }
+
+      mImpl->mRenderer.SetTextures(textureSet);
+
+      float textureSize = static_cast<float>(lookupTexture.GetWidth());
+      mImpl->mRenderer.RegisterProperty(ToDaliStringView(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME),
+                                        (textureSize - 1.0f) / textureSize);
     }
   }
 }
@@ -238,54 +310,68 @@ void GradientVisual::DoCreatePropertyMap(Property::Map& map) const
 {
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::GRADIENT);
-  map.Insert(Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits());
-  map.Insert(Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod());
 
-  const Vector<Gradient::GradientStop>& stops(mGradient->GetStops());
-  Property::Array                       offsets;
-  Property::Array                       colors;
-  for(unsigned int i = 0; i < stops.Count(); i++)
+  if(DALI_LIKELY(mGradient))
   {
-    offsets.PushBack(stops[i].mOffset);
-    if(EqualsZero(stops[i].mStopColor.a))
+    if(mImpl->mRenderer && mStartOffsetIndex != Property::INVALID_INDEX)
     {
-      colors.PushBack(Vector4::ZERO);
+      mGradient->SetStartOffset(mImpl->mRenderer.GetProperty<float>(mStartOffsetIndex));
+    }
+    map.Insert(Toolkit::GradientVisual::Property::START_OFFSET, mGradient->GetStartOffset());
+    map.Insert(Toolkit::GradientVisual::Property::UNITS, mGradient->GetGradientUnits());
+    map.Insert(Toolkit::GradientVisual::Property::SPREAD_METHOD, mGradient->GetSpreadMethod());
+
+    const Vector<Gradient::GradientStop>& stops(mGradient->GetStops());
+    Property::Array                       offsets;
+    Property::Array                       colors;
+    offsets.Reserve(stops.Count());
+    colors.Reserve(stops.Count());
+    for(unsigned int i = 0; i < stops.Count(); i++)
+    {
+      offsets.PushBack(stops[i].mOffset);
+      colors.PushBack(stops[i].mStopColor);
+    }
+
+    map.Insert(Toolkit::GradientVisual::Property::STOP_OFFSET, offsets);
+    map.Insert(Toolkit::GradientVisual::Property::STOP_COLOR, colors);
+
+    switch(mGradientType)
+    {
+      case Type::LINEAR:
+      {
+        LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
+        map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
+        break;
+      }
+      case Type::RADIAL:
+      {
+        RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+        map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
+        break;
+      }
+      case Type::CONIC:
+      {
+        ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
+        map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
+        map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
+        break;
+      }
+    }
+  }
+  else
+  {
+    if(mImpl->mRenderer && mStartOffsetIndex != Property::INVALID_INDEX)
+    {
+      map.Insert(Toolkit::GradientVisual::Property::START_OFFSET, mImpl->mRenderer.GetProperty<float>(mStartOffsetIndex));
     }
     else
     {
-      colors.PushBack(Vector4(stops[i].mStopColor.r / stops[i].mStopColor.a,
-                              stops[i].mStopColor.g / stops[i].mStopColor.a,
-                              stops[i].mStopColor.b / stops[i].mStopColor.a,
-                              stops[i].mStopColor.a));
+      map.Insert(Toolkit::GradientVisual::Property::START_OFFSET, 0.0f);
     }
-  }
-
-  map.Insert(Toolkit::GradientVisual::Property::STOP_OFFSET, offsets);
-  map.Insert(Toolkit::GradientVisual::Property::STOP_COLOR, colors);
-
-  switch(mGradientType)
-  {
-    case Type::LINEAR:
-    {
-      LinearGradient* gradient = static_cast<LinearGradient*>(mGradient.Get());
-      map.Insert(Toolkit::GradientVisual::Property::START_POSITION, gradient->GetStartPosition());
-      map.Insert(Toolkit::GradientVisual::Property::END_POSITION, gradient->GetEndPosition());
-      break;
-    }
-    case Type::RADIAL:
-    {
-      RadialGradient* gradient = static_cast<RadialGradient*>(mGradient.Get());
-      map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-      map.Insert(Toolkit::GradientVisual::Property::RADIUS, gradient->GetRadius());
-      break;
-    }
-    case Type::CONIC:
-    {
-      ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
-      map.Insert(Toolkit::GradientVisual::Property::CENTER, gradient->GetCenter());
-      map.Insert(Toolkit::GradientVisual::Property::START_ANGLE, gradient->GetStartAngle().radian);
-      break;
-    }
+    map.Insert(Toolkit::GradientVisual::Property::UNITS, Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX);
+    map.Insert(Toolkit::GradientVisual::Property::SPREAD_METHOD, Toolkit::GradientVisual::SpreadMethod::PAD);
   }
 }
 
@@ -308,37 +394,34 @@ void GradientVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = GenerateShader();
 
-  // Set up the texture set
-  TextureSet    textureSet    = TextureSet::New();
-  Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
-  textureSet.SetTexture(0u, lookupTexture);
-  Dali::WrapMode::Type wrap = GetWrapMode(mGradient->GetSpreadMethod());
-  if(wrap != Dali::WrapMode::DEFAULT)
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(wrap, wrap);
-    textureSet.SetSampler(0u, sampler);
-  }
-
   mImpl->mRenderer = DecoratedVisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT + (mGradientType == Type::CONIC ? 1 : 0));
-  mImpl->mRenderer.SetTextures(textureSet);
 
-  // If opaque and then no need to have blending
-  if(mIsOpaque)
+  // Set up the texture set
+  if(DALI_LIKELY(mGradient))
   {
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
+    TextureSet    textureSet    = TextureSet::New();
+    Dali::Texture lookupTexture = mGradient->GenerateLookupTexture();
+    textureSet.SetTexture(0u, lookupTexture);
+    Dali::WrapMode::Type wrap = GetWrapMode(mGradient->GetSpreadMethod());
+    if(wrap != Dali::WrapMode::DEFAULT)
+    {
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(wrap, wrap);
+      textureSet.SetSampler(0u, sampler);
+    }
+    mImpl->mRenderer.SetTextures(textureSet);
+
+    float textureSize = static_cast<float>(lookupTexture.GetWidth());
+    mImpl->mRenderer.RegisterUniqueProperty(ToDaliStringView(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME), (textureSize - 1.0f) / textureSize);
   }
 
   mImpl->mRenderer.RegisterUniqueProperty(ToDaliStringView(UNIFORM_ALIGNMENT_MATRIX_NAME), mGradientTransform);
-  if(mGradientType == Type::CONIC)
+  if(DALI_LIKELY(mGradient) && mGradientType == Type::CONIC)
   {
     ConicGradient* gradient = static_cast<ConicGradient*>(mGradient.Get());
     mImpl->mRenderer.RegisterUniqueProperty(ToDaliStringView(UNIFORM_START_ANGLE_NAME), gradient->GetStartAngle().radian);
   }
-
-  float textureSize = static_cast<float>(lookupTexture.GetWidth());
-  mImpl->mRenderer.RegisterUniqueProperty(ToDaliStringView(UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME), (textureSize - 1.0f) / textureSize);
 
   float startOffset = mGradient->GetStartOffset();
   mStartOffsetIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::GradientVisual::Property::START_OFFSET, ToDaliStringView(UNIFORM_START_OFFSET_NAME), startOffset);
@@ -396,62 +479,42 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     }
   }
 
-  unsigned int     numValidStop    = 0u;
-  Property::Value* stopOffsetValue = propertyMap.Find(Toolkit::GradientVisual::Property::STOP_OFFSET, STOP_OFFSET_NAME);
-  Property::Value* stopColorValue  = propertyMap.Find(Toolkit::GradientVisual::Property::STOP_COLOR, STOP_COLOR_NAME);
-  if(stopColorValue)
-  {
-    Vector<float>    offsetArray;
-    Property::Array* colorArray = stopColorValue->GetArray();
-    if(colorArray)
-    {
-      GetStopOffsets(stopOffsetValue, offsetArray);
-      unsigned int numStop = offsetArray.Count() < colorArray->Count() ? offsetArray.Count() : colorArray->Count();
-      Vector4      color;
-      for(unsigned int i = 0; i < numStop; i++)
-      {
-        if((colorArray->GetElementAt(i)).Get(color))
-        {
-          mGradient->AddStop(offsetArray[i], Vector4(color.r * color.a, color.g * color.a, color.b * color.a, color.a));
-          numValidStop++;
-          if(!Equals(color.a, 1.0f, Math::MACHINE_EPSILON_1))
-          {
-            mIsOpaque = false;
-          }
-        }
-      }
-    }
-  }
+  return true;
+}
 
-  if(numValidStop < 1u) // no valid stop
+bool GradientVisual::ApplyStopNodes(const Property::Map& propertyMap)
+{
+  if(DALI_UNLIKELY(!mGradient))
   {
     return false;
   }
 
-  Property::Value* spread = propertyMap.Find(Toolkit::GradientVisual::Property::SPREAD_METHOD, SPREAD_METHOD_NAME);
-  // The default spread method is PAD. Only need to set new spread if it's anything else.
-  if(spread)
+  Property::Value* stopOffsetValue = propertyMap.Find(Toolkit::GradientVisual::Property::STOP_OFFSET, STOP_OFFSET_NAME);
+  Property::Value* stopColorValue  = propertyMap.Find(Toolkit::GradientVisual::Property::STOP_COLOR, STOP_COLOR_NAME);
+
+  if(stopOffsetValue == nullptr && stopColorValue == nullptr)
   {
-    Toolkit::GradientVisual::SpreadMethod::Type spreadMethod = Toolkit::GradientVisual::SpreadMethod::PAD;
-    if(Scripting::GetEnumerationProperty(*spread, SPREAD_METHOD_TABLE, SPREAD_METHOD_TABLE_COUNT, spreadMethod))
-    {
-      mGradient->SetSpreadMethod(spreadMethod);
-    }
+    return false;
   }
 
-  Property::Value* startOffset = propertyMap.Find(Toolkit::GradientVisual::Property::START_OFFSET, START_OFFSET_NAME);
-  float            startOffsetValue;
-  if(startOffset && startOffset->Get(startOffsetValue))
+  if(stopOffsetValue != nullptr && stopColorValue != nullptr)
   {
-    mGradient->SetStartOffset(startOffsetValue);
+    mGradient->ClearStops();
   }
+
+  Vector<float>   offsetArray;
+  Vector<Vector4> colorArray;
+  GetStopOffsets(stopOffsetValue, offsetArray);
+  GetStopColors(stopColorValue, colorArray);
+
+  mGradient->ApplyStops(offsetArray, colorArray);
 
   return true;
 }
 
 Shader GradientVisual::GenerateShader() const
 {
-  bool userspaceUnit  = (mGradient->GetGradientUnits() == Toolkit::GradientVisual::Units::USER_SPACE);
+  bool userspaceUnit  = (mGradient ? mGradient->GetGradientUnits() == Toolkit::GradientVisual::Units::USER_SPACE : false);
   bool roundedCorner  = IsRoundedCornerRequired();
   bool squircleCorner = IsSquircleCornerRequired();
   bool borderline     = IsBorderlineRequired();
@@ -589,12 +652,37 @@ void GradientVisual::GetStopOffsets(const Property::Value* value, Vector<float>&
       }
     }
   }
+}
 
-  if(stopOffsets.Empty())
+void GradientVisual::GetStopColors(const Property::Value* value, Vector<Vector4>& stopColors)
+{
+  if(value) // Only check valve type if a valid Property has been passed in
   {
-    // Set default offset if none set by Property system, need a minimum and maximum
-    stopOffsets.PushBack(DEFAULT_OFFSET_MINIMUM);
-    stopOffsets.PushBack(DEFAULT_OFFSET_MAXIMUM);
+    switch(value->GetType())
+    {
+      case Property::ARRAY:
+      {
+        const Property::Array* colorArray = value->GetArray();
+        if(colorArray)
+        {
+          uint32_t numStop = colorArray->Count();
+          Vector4  color;
+          for(uint32_t i = 0; i < numStop; i++)
+          {
+            if(colorArray->GetElementAt(i).Get(color))
+            {
+              stopColors.PushBack(color);
+            }
+          }
+        }
+        break;
+      }
+      default:
+      {
+        DALI_LOG_WARNING("GetStopColors passed unsupported Property Map\n");
+        // Unsupported Type
+      }
+    }
   }
 }
 

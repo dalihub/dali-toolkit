@@ -166,6 +166,13 @@ private:
   bool NewGradient(Type gradientType, const Property::Map& propertyMap);
 
   /**
+   * Apply gradient stop nodes with the given property map.
+   *
+   * @return True if some stop nodes informations be changed, to notify we need to update textrue. Otherwise, return false.
+   */
+  bool ApplyStopNodes(const Property::Map& propertyMap);
+
+  /**
    * Get the stop-offsets from the property.
    * The valid property type are ARRAY, VECTOR2, VECTOR3, VECTOR4.
    *
@@ -173,6 +180,14 @@ private:
    * @param[out] stopOffsets The vector contains the stop offset values.
    */
   static void GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
+
+  /**
+   * Get the stop-colors from the property.
+   *
+   * @param[in] value The property value of stop-colors
+   * @param[out] stopColors The vector contains the stop colors values.
+   */
+  static void GetStopColors(const Property::Value* value, Vector<Vector4>& stopColors);
 
   // Undefined
   GradientVisual(const GradientVisual& gradientVisual);
@@ -185,7 +200,6 @@ private:
   IntrusivePtr<Gradient> mGradient;
   Type                   mGradientType;
   Dali::Property::Index  mStartOffsetIndex;
-  bool                   mIsOpaque; ///< Set to false if any of the stop colors are not opaque
 };
 
 } // namespace Internal
