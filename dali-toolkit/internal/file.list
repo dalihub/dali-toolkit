@@ -155,6 +155,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/image-loader/fast-track-loading-task.cpp
    ${toolkit_src_dir}/image-loader/image-atlas-impl.cpp
    ${toolkit_src_dir}/image-loader/loading-task.cpp
+   ${toolkit_src_dir}/image-loader/remote-decode-task.cpp
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp
    ${toolkit_src_dir}/property-bridge/property-bridge-impl.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
