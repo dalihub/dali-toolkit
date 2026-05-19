@@ -270,7 +270,7 @@ int UtcDaliPhysics2DGetPhysicsAccessorP1(void)
 
   PhysicsAdaptor                           adaptor  = PhysicsAdaptor::New(transform, size);
   PhysicsAdaptor::ScopedPhysicsAccessorPtr accessor = adaptor.GetPhysicsAccessor();
-  DALI_TEST_CHECK(accessor.get() != nullptr);
+  DALI_TEST_CHECK(accessor.Get() != nullptr);
 
   Dali::Any world = accessor->GetNative();
   DALI_TEST_CHECK(!world.Empty());
@@ -288,7 +288,7 @@ int UtcDaliPhysics2DGetPhysicsAccessorN1(void)
   try
   {
     auto ptr = handle.GetPhysicsAccessor();
-    DALI_TEST_CHECK(ptr == nullptr);
+    DALI_TEST_CHECK(!ptr);
 
     tet_result(TET_FAIL);
   }
@@ -988,7 +988,7 @@ int UtcDaliPhysics2DAdaptorHitTestP(void)
     cpBodySetPosition(body, cpv(center.x, center.y));
 
     ballActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-    ballActor[Actor::Property::PIVOT]  = Pivot::CENTER;
+    ballActor[Actor::Property::PIVOT]         = Pivot::CENTER;
 
     auto physicsActor = adaptor.AddActorBody(ballActor, body);
   }

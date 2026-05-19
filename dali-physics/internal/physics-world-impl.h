@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
 
@@ -47,7 +48,7 @@ public:
   /**
    * Create a new physics world.
    */
-  static std::unique_ptr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
+  static UniquePtr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
 
   /**
    * Constructor which takes the root actor and a callback from the PhysicsAdaptor
@@ -88,7 +89,7 @@ public:
    * Get the current physics integration timestep
    * @return the current physics integration timestep
    */
-  float GetTimestep();
+  float GetTimestep() const;
 
   /**
    * Lock the mutex.
@@ -153,7 +154,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetIntegrationState
    */
-  Physics::PhysicsAdaptor::IntegrationState GetIntegrationState();
+  Physics::PhysicsAdaptor::IntegrationState GetIntegrationState() const;
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::SetDebugState
@@ -163,7 +164,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::GetDebugState
    */
-  Physics::PhysicsAdaptor::DebugState GetDebugState();
+  Physics::PhysicsAdaptor::DebugState GetDebugState() const;
 
 public:
   bool OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds);
@@ -174,10 +175,10 @@ protected:
 protected:
   std::mutex                            mMutex;
   std::queue<std::function<void(void)>> commandQueue;
-  Dali::UpdateProxy::NotifySyncPoint    mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
-  std::unique_ptr<Dali::CallbackBase>   mUpdateCallback{nullptr};
-  std::unique_ptr<FrameCallback>        mFrameCallback;
-  Dali::Actor                           mRootActor;
+  UpdateProxy::NotifySyncPoint          mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
+  UniquePtr<Dali::CallbackBase>         mUpdateCallback{nullptr};
+  UniquePtr<FrameCallback>              mFrameCallback;
+  Actor                                 mRootActor;
 
   float                                     mPhysicsTimeStep{1.0 / 180.0};
   Physics::PhysicsAdaptor::IntegrationState mPhysicsIntegrateState{Physics::PhysicsAdaptor::IntegrationState::ON};

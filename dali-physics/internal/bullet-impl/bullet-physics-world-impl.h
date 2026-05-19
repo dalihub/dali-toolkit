@@ -36,7 +36,7 @@ class FrameCallback;
 class BulletPhysicsWorld : public PhysicsWorld
 {
 public:
-  static std::unique_ptr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
+  static UniquePtr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
 
   BulletPhysicsWorld(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
   ~BulletPhysicsWorld();

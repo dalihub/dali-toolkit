@@ -59,9 +59,9 @@ static void PostBodyFree(cpBody* body, cpSpace* space)
 
 namespace Dali::Toolkit::Physics::Internal
 {
-std::unique_ptr<PhysicsWorld> ChipmunkPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
+UniquePtr<PhysicsWorld> ChipmunkPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
 {
-  std::unique_ptr<ChipmunkPhysicsWorld> world = std::make_unique<ChipmunkPhysicsWorld>(rootActor, updateCallback);
+  UniquePtr<ChipmunkPhysicsWorld> world = MakeUnique<ChipmunkPhysicsWorld>(rootActor, updateCallback);
   world->Initialize();
   return world;
 }
