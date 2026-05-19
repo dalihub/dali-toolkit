@@ -112,7 +112,7 @@ int UtcDaliNodeDefinitionProperties(void)
 
   Quaternion frobnicateFactor(0.f, 1.f, 2.f, 3.f);
   frobnicateFactor.Normalize(); // because it will be (by DALi) once it's set as a property.
-  nodeDef.mExtras.push_back(NodeDefinition::Extra{"frobnicateFactor", frobnicateFactor});
+  nodeDef.mExtras.PushBack(NodeDefinition::Extra{"frobnicateFactor", frobnicateFactor});
 
   Context ctx;
   auto    actor = nodeDef.CreateModelNode(ctx.createParams);
@@ -141,7 +141,7 @@ int UtcDaliNodeDefinitionRenderableRegisterResources(void)
   NodeDefinition nodeDef;
 
   UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
-  nodeDef.mRenderables.push_back(std::move(renderable));
+  nodeDef.mRenderables.PushBack(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 
   struct : IResourceReceiver
@@ -176,7 +176,7 @@ int UtcDaliNodeDefinitionRenderableReflectResources(void)
   NodeDefinition nodeDef;
 
   UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
-  nodeDef.mRenderables.push_back(std::move(renderable));
+  nodeDef.mRenderables.PushBack(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 
   struct : IResourceReflector
@@ -212,14 +212,14 @@ int UtcDaliNodeDefinitionRenderable(void)
   NodeDefinition         nodeDef;
 
   UniquePtr<NodeDefinition::Renderable> renderable = UniquePtr<NodeDefinition::Renderable>(new NodeDefinition::Renderable());
-  nodeDef.mRenderables.push_back(std::move(renderable));
+  nodeDef.mRenderables.PushBack(std::move(renderable));
   nodeDef.mRenderables[0]->mShaderIdx = 0;
 
   Context    ctx;
   const auto VSH    = "void main() { gl_Position = vec4(0.); }";
   const auto FSH    = "void main() { gl_FragColor = vec4(1.); }";
   auto       shader = Shader::New(VSH, FSH);
-  ctx.resources.mShaders.push_back({ShaderDefinition{}, shader});
+  ctx.resources.mShaders.PushBack({ShaderDefinition{}, shader});
 
   auto actor = nodeDef.CreateModelNode(ctx.createParams);
   DALI_TEST_EQUAL(1, actor.GetRendererCount());

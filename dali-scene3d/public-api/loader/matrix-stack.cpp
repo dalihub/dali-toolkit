@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,42 +25,42 @@ namespace Dali::Scene3D::Loader
 {
 MatrixStack::MatrixStack()
 {
-  mStack.reserve(16);
+  mStack.Reserve(16);
 }
 
 bool MatrixStack::IsEmpty() const
 {
-  return mStack.empty();
+  return mStack.Empty();
 }
 
 void MatrixStack::Push(const Matrix& model)
 {
-  if(mStack.empty())
+  if(mStack.Empty())
   {
-    mStack.push_back(model);
+    mStack.PushBack(model);
   }
   else
   {
     Matrix m{false};
-    Matrix::Multiply(m, model, mStack.back());
-    mStack.push_back(m);
+    Matrix::Multiply(m, model, mStack.Back());
+    mStack.PushBack(m);
   }
 }
 
 const Matrix& MatrixStack::Top() const
 {
-  return mStack.back();
+  return mStack.Back();
 }
 
 void MatrixStack::Pop()
 {
-  DALI_ASSERT_ALWAYS(mStack.size() > 0);
-  mStack.pop_back();
+  DALI_ASSERT_ALWAYS(mStack.Count() > 0);
+  mStack.Erase(mStack.End() - 1);
 }
 
 void MatrixStack::PopAll()
 {
-  mStack.clear();
+  mStack.Clear();
 }
 
 } // namespace Dali::Scene3D::Loader

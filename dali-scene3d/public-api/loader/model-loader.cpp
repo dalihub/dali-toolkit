@@ -100,7 +100,7 @@ bool ModelLoader::LoadModel(Dali::Scene3D::Loader::ResourceBundle::PathProvider&
 
   bool loadSucceeded = false;
 
-  mLoadResult.mAnimationDefinitions.clear();
+  mLoadResult.mAnimationDefinitions.Clear();
   std::filesystem::path metaDataUrl(Dali::Integration::ToStdString(mModelUrl));
   metaDataUrl.replace_extension(METADATA_EXTENSION.data());
 
@@ -126,12 +126,12 @@ Dali::Scene3D::Loader::ResourceBundle& ModelLoader::GetResources()
   return mLoadResult.mResources;
 }
 
-std::vector<Dali::Scene3D::Loader::AnimationDefinition>& ModelLoader::GetAnimations()
+Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>& ModelLoader::GetAnimations()
 {
   return mLoadResult.mAnimationDefinitions;
 }
 
-std::vector<Dali::Scene3D::Loader::CameraParameters>& ModelLoader::GetCameras()
+Dali::Vector<Dali::Scene3D::Loader::CameraParameters>& ModelLoader::GetCameras()
 {
   return mLoadResult.mCameraParameters;
 }

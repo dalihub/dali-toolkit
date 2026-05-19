@@ -114,6 +114,8 @@ struct DBusWrapper
   virtual MessagePtr     eldbus_proxy_send_and_block_impl(const ProxyPtr& proxy, const MessagePtr& msg)                                           = 0;
   virtual bool           eldbus_message_error_get_impl(const MessagePtr& msg, std::string& name, std::string& text)                               = 0;
   virtual std::string    eldbus_message_signature_get_impl(const MessagePtr& msg)                                                                 = 0;
+  virtual void           eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg)                                        = 0;
+  virtual void           eldbus_message_iter_container_close_impl(const MessageIterPtr& it)                                                       = 0;
 
   using SendCallback                                                                                                                                             = std::function<void(const MessagePtr& msg)>;
   virtual PendingPtr    eldbus_proxy_send_impl(const ProxyPtr& proxy, const MessagePtr& msg, const SendCallback& callback)                                       = 0;
@@ -554,6 +556,8 @@ struct TestDBusWrapper : public DBusWrapper
   MessagePtr     eldbus_proxy_send_and_block_impl(const ProxyPtr& proxy, const MessagePtr& msg) override;
   bool           eldbus_message_error_get_impl(const MessagePtr& msg, std::string& name, std::string& text) override;
   std::string    eldbus_message_signature_get_impl(const MessagePtr& msg) override;
+  void           eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg) override;
+  void           eldbus_message_iter_container_close_impl(const MessageIterPtr& it) override;
   PendingPtr     eldbus_proxy_send_impl(const ProxyPtr& proxy, const MessagePtr& msg, const SendCallback& callback) override;
   std::string    eldbus_proxy_interface_get_impl(const ProxyPtr&) override;
   void           eldbus_proxy_signal_handler_add_impl(const ProxyPtr& proxy, const std::string& member, const std::function<void(const MessagePtr&)>& cb) override;

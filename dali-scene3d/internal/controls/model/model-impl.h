@@ -24,6 +24,7 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/texture.h>
@@ -162,7 +163,7 @@ public:
   /**
    * @copydoc Model::RetrieveModelNodesByBlendShapeName()
    */
-  void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, std::vector<Scene3D::ModelNode>& modelNodes) const;
+  void RetrieveModelNodesByBlendShapeName(std::string_view blendShapeName, Dali::Vector<Scene3D::ModelNode>& modelNodes) const;
 
   /**
    * @copydoc Model::GenerateMotionDataAnimation()

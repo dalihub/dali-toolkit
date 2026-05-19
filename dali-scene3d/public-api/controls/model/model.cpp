@@ -148,18 +148,18 @@ ModelNode Model::FindChildModelNodeByName(Dali::StringView nodeName)
   return GetImpl(*this).FindChildModelNodeByName(ToStdStringView(nodeName));
 }
 
-void Model::RetrieveBlendShapeNames(std::vector<Dali::String>& blendShapeNames) const
+void Model::RetrieveBlendShapeNames(Dali::Vector<Dali::String>& blendShapeNames) const
 {
   std::vector<std::string> stdNames;
   GetImpl(*this).RetrieveBlendShapeNames(stdNames);
-  blendShapeNames.reserve(stdNames.size());
+  blendShapeNames.Reserve(static_cast<uint32_t>(stdNames.size()));
   for(auto& name : stdNames)
   {
-    blendShapeNames.emplace_back(name.c_str());
+    blendShapeNames.PushBack(Dali::String(name.c_str()));
   }
 }
 
-void Model::RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, std::vector<ModelNode>& modelNodes) const
+void Model::RetrieveModelNodesByBlendShapeName(Dali::StringView blendShapeName, Dali::Vector<ModelNode>& modelNodes) const
 {
   GetImpl(*this).RetrieveModelNodesByBlendShapeName(ToStdStringView(blendShapeName), modelNodes);
 }

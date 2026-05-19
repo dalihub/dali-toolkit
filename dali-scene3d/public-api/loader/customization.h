@@ -19,10 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <cstdint> ///< for uint32_t
 #include <string>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -128,8 +128,8 @@ struct DALI_SCENE3D_API Customization
 
   static const OptionType NONE = OptionType(-1);
 
-  OptionType               numOptions = 0;
-  std::vector<std::string> nodes; // to apply option to.
+  OptionType          numOptions = 0;
+  Dali::Vector<Dali::String> nodes; // to apply option to.
 };
 
 } // namespace Dali::Scene3D::Loader

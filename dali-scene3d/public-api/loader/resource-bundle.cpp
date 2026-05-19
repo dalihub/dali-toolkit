@@ -56,15 +56,16 @@ ResourceBundle::ResourceBundle()
 : mRawResourcesLoading(false),
   mResourcesGenerating(false),
   mRawResourcesLoaded(false),
-  mResourcesGenerated(false) {};
+  mResourcesGenerated(false){};
 
 ResourceRefCounts ResourceBundle::CreateRefCounter() const
 {
-  ResourceRefCounts refCounts(4);
-  refCounts[ResourceType::Environment].Resize(mEnvironmentMaps.size(), 0u);
-  refCounts[ResourceType::Shader].Resize(mShaders.size(), 0u);
-  refCounts[ResourceType::Mesh].Resize(mMeshes.size(), 0u);
-  refCounts[ResourceType::Material].Resize(mMaterials.size(), 0u);
+  ResourceRefCounts refCounts;
+  refCounts.Resize(4);
+  refCounts[ResourceType::Environment].Resize(mEnvironmentMaps.Count(), 0u);
+  refCounts[ResourceType::Shader].Resize(mShaders.Count(), 0u);
+  refCounts[ResourceType::Mesh].Resize(mMeshes.Count(), 0u);
+  refCounts[ResourceType::Material].Resize(mMaterials.Count(), 0u);
   return refCounts;
 }
 

@@ -272,6 +272,7 @@ const char* const ENABLE_FRAME_CACHE("enableFrameCache");
 const char* const NOTIFY_AFTER_RASTERIZATION("notifyAfterRasterization");
 const char* const SYNCHRONOUS_SIZING("synchronousSizing");
 const char* const FRAME_SPEED_FACTOR("frameSpeedFactor");
+const char* const ENABLE_ASPECT_FIT_NAME("enableAspectFit");
 
 // Text visual
 const char* const TEXT_PROPERTY("text");

@@ -81,7 +81,11 @@ void ApplyAccessorMinMax(const gltf2::Accessor& accessor, float* values)
 {
   DALI_ASSERT_ALWAYS(accessor.mMax.empty() || gltf2::AccessorType::ElementCount(accessor.mType) == accessor.mMax.size());
   DALI_ASSERT_ALWAYS(accessor.mMin.empty() || gltf2::AccessorType::ElementCount(accessor.mType) == accessor.mMin.size());
-  MeshDefinition::Blob::ApplyMinMax(accessor.mMin, accessor.mMax, accessor.mCount, values);
+
+  Dali::Vector<float> minVec, maxVec;
+  minVec.Insert(minVec.End(), const_cast<float*>(accessor.mMin.data()), const_cast<float*>(accessor.mMin.data() + accessor.mMin.size()));
+  maxVec.Insert(maxVec.End(), const_cast<float*>(accessor.mMax.data()), const_cast<float*>(accessor.mMax.data() + accessor.mMax.size()));
+  MeshDefinition::Blob::ApplyMinMax(minVec, maxVec, accessor.mCount, values);
 }
 
 const json::Reader<gltf2::Buffer>& GetBufferReader()
@@ -542,13 +546,13 @@ void ConvertBuffer(const gltf2::Buffer& buffer, decltype(ResourceBundle::mBuffer
   bufferDefinition.mUri          = ToDaliString(buffer.mUri);
   bufferDefinition.mByteLength   = buffer.mByteLength;
 
-  outBuffers.emplace_back(std::move(bufferDefinition));
+  outBuffers.PushBack(std::move(bufferDefinition));
 }
 
 void ConvertBuffers(const gltf2::Document& document, ConversionContext& context)
 {
   auto& outBuffers = context.mOutput.mResources.mBuffers;
-  outBuffers.reserve(document.mBuffers.size());
+  outBuffers.Reserve(document.mBuffers.size());
 
   for(auto& buffer : document.mBuffers)
   {
@@ -607,9 +611,10 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
       auto& stream = context.mOutput.mResources.mBuffers[bufferIndex].GetBufferStream();
       stream.clear();
       stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(textureInfo.mTexture->mSource->mBufferView->mByteOffset)), stream.beg);
-      std::vector<uint8_t> dataBuffer;
-      dataBuffer.resize(textureInfo.mTexture->mSource->mBufferView->mByteLength);
-      stream.read(reinterpret_cast<char*>(dataBuffer.data()), static_cast<std::streamsize>(static_cast<size_t>(textureInfo.mTexture->mSource->mBufferView->mByteLength)));
+      // Convert std::vector<uint8_t> to Dali::Vector<uint8_t>
+      Dali::Vector<uint8_t> dataBuffer;
+      dataBuffer.Resize(textureInfo.mTexture->mSource->mBufferView->mByteLength);
+      stream.read(reinterpret_cast<char*>(dataBuffer.Data()), static_cast<std::streamsize>(static_cast<size_t>(textureInfo.mTexture->mSource->mBufferView->mByteLength)));
       return TextureDefinition{std::move(dataBuffer), ConvertSampler(textureInfo.mTexture->mSampler), metaData.mMinSize, metaData.mSamplingMode, textureInfo.mTextureExtensions.mTextureTransform.GetTransform()};
     }
     return TextureDefinition();
@@ -627,7 +632,7 @@ void AddTextureStage(uint32_t semantic, MaterialDefinition& materialDefinition, 
   {
     textureInfo.mTexCoord = textureInfo.mTextureExtensions.mTextureTransform.mTexCoord;
   }
-  materialDefinition.mTextureStages.push_back({semantic, ConvertTextureInfo(textureInfo, context, metaData)});
+  materialDefinition.mTextureStages.PushBack({semantic, ConvertTextureInfo(textureInfo, context, metaData)});
   materialDefinition.mFlags |= semantic;
 }
 
@@ -666,7 +671,7 @@ void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& im
 
   materialDefinition.mBaseColorFactor = pbr.mBaseColorFactor;
 
-  materialDefinition.mTextureStages.reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!material.mNormalTexture + !!material.mOcclusionTexture + !!material.mEmissiveTexture);
+  materialDefinition.mTextureStages.Reserve(!!pbr.mBaseColorTexture + !!pbr.mMetallicRoughnessTexture + !!material.mNormalTexture + !!material.mOcclusionTexture + !!material.mEmissiveTexture);
   if(pbr.mBaseColorTexture)
   {
     AddTextureStage(MaterialDefinition::ALBEDO, materialDefinition, pbr.mBaseColorTexture, getTextureMetaData(imageMetaData, pbr.mBaseColorTexture), context);
@@ -734,7 +739,7 @@ void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& im
 
   materialDefinition.mDoubleSided = material.mDoubleSided;
 
-  outMaterials.emplace_back(std::move(materialDefinition), TextureSet());
+  outMaterials.PushBack({std::move(materialDefinition), TextureSet()});
 }
 
 void ConvertMaterials(const gltf2::Document& document, ConversionContext& context)
@@ -742,7 +747,7 @@ void ConvertMaterials(const gltf2::Document& document, ConversionContext& contex
   auto& imageMetaData = context.mOutput.mSceneMetadata.mImageMetadata;
 
   auto& outMaterials = context.mOutput.mResources.mMaterials;
-  outMaterials.reserve(document.mMaterials.size());
+  outMaterials.Reserve(document.mMaterials.size());
 
   for(auto& material : document.mMaterials)
   {
@@ -793,13 +798,17 @@ MeshDefinition::Accessor ConvertMeshPrimitiveAccessor(const gltf2::Accessor& acc
     bufferViewStride = accessor.mBufferView->mByteStride;
   }
 
+  Dali::Vector<float> minVec, maxVec;
+  minVec.Insert(minVec.End(), const_cast<float*>(accessor.mMin.data()), const_cast<float*>(accessor.mMin.data() + accessor.mMin.size()));
+  maxVec.Insert(maxVec.End(), const_cast<float*>(accessor.mMax.data()), const_cast<float*>(accessor.mMax.data() + accessor.mMax.size()));
+
   return MeshDefinition::Accessor{
     MeshDefinition::Blob{bufferViewOffset + accessor.mByteOffset,
                          accessor.GetBytesLength(),
                          static_cast<uint16_t>(bufferViewStride),
                          static_cast<uint16_t>(accessor.GetElementSizeBytes()),
-                         accessor.mMin,
-                         accessor.mMax},
+                         std::move(minVec),
+                         std::move(maxVec)},
     std::move(sparseBlob),
     accessor.mBufferView ? accessor.mBufferView->mBuffer.GetIndex() : 0,
     accessor.mNormalized};
@@ -833,31 +842,31 @@ MeshDefinition::Accessor* GetAccessorFromAttribute(gltf2::Attribute::HashType at
     }
     case gltf2::Attribute::TEXCOORD_N:
     {
-      meshDefinition.mTexCoords.emplace_back(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mTexCoords.back();
+      meshDefinition.mTexCoords.PushBack(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mTexCoords.Back();
       break;
     }
     case gltf2::Attribute::COLOR_N:
     {
-      meshDefinition.mColors.emplace_back(MeshDefinition::Accessor{});
-      accessorDest = &meshDefinition.mColors.back();
+      meshDefinition.mColors.PushBack(MeshDefinition::Accessor{});
+      accessorDest = &meshDefinition.mColors.Back();
       break;
     }
     case gltf2::Attribute::JOINTS_N:
     {
-      if(meshDefinition.mJoints.size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+      if(meshDefinition.mJoints.Size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
       {
-        meshDefinition.mJoints.emplace_back(MeshDefinition::Accessor{});
-        accessorDest = &meshDefinition.mJoints.back();
+        meshDefinition.mJoints.PushBack(MeshDefinition::Accessor{});
+        accessorDest = &meshDefinition.mJoints.Back();
       }
       break;
     }
     case gltf2::Attribute::WEIGHTS_N:
     {
-      if(meshDefinition.mWeights.size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
+      if(meshDefinition.mWeights.Size() < MeshDefinition::MAX_NUMBER_OF_JOINT_SETS)
       {
-        meshDefinition.mWeights.emplace_back(MeshDefinition::Accessor{});
-        accessorDest = &meshDefinition.mWeights.back();
+        meshDefinition.mWeights.PushBack(MeshDefinition::Accessor{});
+        accessorDest = &meshDefinition.mWeights.Back();
       }
       break;
     }
@@ -966,7 +975,7 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
   }
 
   auto& outMeshes = context.mOutput.mResources.mMeshes;
-  outMeshes.reserve(meshCount);
+  outMeshes.Reserve(meshCount);
   for(auto& mesh : document.mMeshes)
   {
     for(auto& primitive : mesh.mPrimitives)
@@ -1022,7 +1031,7 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
 
       if(!primitive.mTargets.empty())
       {
-        meshDefinition.mBlendShapes.reserve(primitive.mTargets.size());
+        meshDefinition.mBlendShapes.Reserve(primitive.mTargets.size());
         meshDefinition.mBlendShapeVersion = BlendShapes::Version::VERSION_2_0;
         uint32_t blendShapeIndex          = 0u;
         for(const auto& target : primitive.mTargets)
@@ -1075,7 +1084,7 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
 
           if(!mesh.mWeights.empty())
           {
-            blendShape.weight = mesh.mWeights[meshDefinition.mBlendShapes.size()];
+            blendShape.weight = mesh.mWeights[meshDefinition.mBlendShapes.Size()];
           }
 
           // Get blendshape name from extras / SXR_targets_names / avatar_shape_names.
@@ -1092,12 +1101,12 @@ void ConvertMeshes(const gltf2::Document& document, ConversionContext& context)
             blendShape.name = ToDaliString(mesh.mExtensions.mAvatarShapeNames[blendShapeIndex]);
           }
 
-          meshDefinition.mBlendShapes.push_back(std::move(blendShape));
+          meshDefinition.mBlendShapes.PushBack(std::move(blendShape));
           ++blendShapeIndex;
         }
       }
 
-      outMeshes.push_back({std::move(meshDefinition), MeshGeometry{}});
+      outMeshes.PushBack({std::move(meshDefinition), MeshGeometry{}});
     }
   }
 }
@@ -1115,7 +1124,7 @@ ModelRenderable* MakeModelRenderable(const gltf2::Mesh::Primitive& primitive, Co
       static const gltf2::Material sDefaultMaterial;
 
       auto& outMaterials       = context.mOutput.mResources.mMaterials;
-      context.mDefaultMaterial = outMaterials.size();
+      context.mDefaultMaterial = outMaterials.Size();
 
       ConvertMaterial(sDefaultMaterial, context.mOutput.mSceneMetadata.mImageMetadata, outMaterials, context);
     }
@@ -1211,7 +1220,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
     auto&    mesh           = *node.mMesh;
     uint32_t primitiveCount = mesh.mPrimitives.size();
     auto     meshIndex      = context.mMeshIds[node.mMesh.GetIndex()];
-    weakNode->mRenderables.reserve(primitiveCount);
+    weakNode->mRenderables.Reserve(primitiveCount);
     for(uint32_t i = 0; i < primitiveCount; ++i)
     {
       Dali::UniquePtr<NodeDefinition::Renderable> renderable;
@@ -1223,7 +1232,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
       resources.mMeshes[modelRenderable->mMeshIdx].first.mSkeletonIdx = skeletonIdx;
 
       renderable.Reset(modelRenderable);
-      weakNode->mRenderables.push_back(std::move(renderable));
+      weakNode->mRenderables.PushBack(std::move(renderable));
     }
   }
 
@@ -1233,7 +1242,7 @@ void ConvertNode(gltf2::Node const& node, const Index gltfIndex, Index parentInd
     ConvertCamera(*node.mCamera, cameraParameters);
 
     cameraParameters.matrix.SetTransformComponents(node.mScale, node.mRotation, node.mTranslation);
-    output.mCameraParameters.push_back(cameraParameters);
+    output.mCameraParameters.PushBack(cameraParameters);
   }
 
   for(auto& child : node.mChildren)
@@ -1259,7 +1268,7 @@ void ConvertSceneNodes(const gltf2::Scene& scene, ConversionContext& context, bo
     default:
     {
       Dali::UniquePtr<NodeDefinition> sceneRoot{new NodeDefinition()};
-      sceneRoot->mName = ToDaliString("GLTF_LOADER_SCENE_ROOT_" + std::to_string(outScene.GetRoots().size()));
+      sceneRoot->mName = ToDaliString("GLTF_LOADER_SCENE_ROOT_" + std::to_string(outScene.GetRoots().Size()));
 
       outScene.AddNode(std::move(sceneRoot));
       outScene.AddRootNode(rootIndex);
@@ -1299,7 +1308,7 @@ void ConvertNodes(const gltf2::Document& document, ConversionContext& context, b
 template<typename T>
 void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vector<T>& dataBuffer, uint32_t offset, uint32_t size)
 {
-  if(bufferIndex >= context.mOutput.mResources.mBuffers.size())
+  if(bufferIndex >= context.mOutput.mResources.mBuffers.Size())
   {
     DALI_LOG_ERROR("Invailid buffer index\n");
     return;
@@ -1423,7 +1432,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
 {
   auto& output = context.mOutput;
 
-  output.mAnimationDefinitions.reserve(output.mAnimationDefinitions.size() + document.mAnimations.size());
+  output.mAnimationDefinitions.Reserve(output.mAnimationDefinitions.Size() + document.mAnimations.size());
 
   for(const auto& animation : document.mAnimations)
   {
@@ -1490,7 +1499,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
     }
     animationDefinition.SetDuration(animationDuration);
 
-    output.mAnimationDefinitions.push_back(std::move(animationDefinition));
+    output.mAnimationDefinitions.PushBack(std::move(animationDefinition));
   }
 }
 
@@ -1541,7 +1550,7 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
   };
 
   auto& resources = context.mOutput.mResources;
-  resources.mSkeletons.reserve(document.mSkins.size());
+  resources.mSkeletons.Reserve(document.mSkins.size());
 
   for(auto& skin : document.mSkins)
   {
@@ -1561,7 +1570,7 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
       skeleton.mRootNodeIdx = context.mNodeIndices.GetRuntimeId(skin.mSkeleton.GetIndex());
     }
 
-    skeleton.mJoints.resize(skin.mJoints.size());
+    skeleton.mJoints.Resize(skin.mJoints.size());
     auto iJoint = skeleton.mJoints.begin();
     for(auto& joint : skin.mJoints)
     {
@@ -1572,7 +1581,7 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
       ++iJoint;
     }
 
-    resources.mSkeletons.push_back(std::move(skeleton));
+    resources.mSkeletons.PushBack(std::move(skeleton));
   }
 }
 
@@ -1616,7 +1625,7 @@ void SetDefaultEnvironmentMap(const gltf2::Document& document, ConversionContext
   EnvironmentDefinition environmentDefinition;
   environmentDefinition.mUseBrdfTexture = true;
   environmentDefinition.mIblIntensity   = Scene3D::Loader::EnvironmentDefinition::GetDefaultIntensity();
-  context.mOutput.mResources.mEnvironmentMaps.push_back({std::move(environmentDefinition), EnvironmentDefinition::Textures()});
+  context.mOutput.mResources.mEnvironmentMaps.PushBack({std::move(environmentDefinition), EnvironmentDefinition::Textures()});
 }
 
 void InitializeGltfLoader()

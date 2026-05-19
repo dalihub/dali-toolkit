@@ -80,11 +80,11 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(const Dal
       // Get waypoints
       waypoints = FindPath(polyIndexFrom, polyIndexTo);
 
-      if(!waypoints.empty())
+      if(!waypoints.Empty())
       {
         // replace first and last waypoint
         auto& wpFrom = static_cast<WayPointData&>(waypoints[0]);
-        auto& wpTo   = static_cast<WayPointData&>(waypoints.back());
+        auto& wpTo   = static_cast<WayPointData&>(waypoints.Back());
 
         Vector2 fromCenter(wpFrom.point3d.x, wpFrom.point3d.y);
         wpFrom.point3d = outPosFrom;
@@ -187,7 +187,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::FindPath(FaceIndex
   }
 
   WayPointList waypoints;
-  waypoints.resize(q.size());
+  waypoints.Resize(static_cast<uint32_t>(q.size()));
 
   auto index = 0u;
   auto prevN = 0u;
@@ -267,24 +267,24 @@ void PathFinderAlgorithmDijkstra::PrepareData()
 Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::OptimizeWaypoints(WayPointList& waypoints) const
 {
   WayPointList optimizedWaypoints;
-  optimizedWaypoints.emplace_back(waypoints[0]);
-  optimizedWaypoints.reserve(waypoints.size());
+  optimizedWaypoints.PushBack(waypoints[0]);
+  optimizedWaypoints.Reserve(waypoints.Count());
 
   auto startIndex = 1u;
 
   bool finished = false;
   while(!finished)
   {
-    auto&       startWaypoint     = optimizedWaypoints.back();
+    auto&       startWaypoint     = optimizedWaypoints.Back();
     const auto& startWaypointData = static_cast<const WayPointData&>(startWaypoint);
 
     // add new-last waypoint which will be overriden as long as intersection takes place
-    optimizedWaypoints.emplace_back();
-    for(auto wpIndex = startIndex; wpIndex < waypoints.size(); ++wpIndex)
+    optimizedWaypoints.PushBack(Dali::Scene3D::Algorithm::WayPoint());
+    for(auto wpIndex = startIndex; wpIndex < waypoints.Count(); ++wpIndex)
     {
-      if(wpIndex == waypoints.size() - 1)
+      if(wpIndex == waypoints.Count() - 1)
       {
-        optimizedWaypoints.back() = waypoints.back();
+        optimizedWaypoints.Back() = waypoints.Back();
         finished                  = true;
         continue;
       }
@@ -318,7 +318,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::OptimizeWaypoints(
 
       if(!doesIntersect)
       {
-        optimizedWaypoints.back() = waypoints[wpIndex - 1];
+        optimizedWaypoints.Back() = waypoints[wpIndex - 1];
         startIndex                = wpIndex - 1;
         break;
       }

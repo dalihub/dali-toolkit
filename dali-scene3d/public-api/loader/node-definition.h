@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/quaternion.h>
@@ -153,7 +154,7 @@ struct DALI_SCENE3D_API ConstraintRequest
 struct DALI_SCENE3D_API NodeDefinition
 {
 public: // TYPES
-  using Vector = std::vector<NodeDefinition>;
+  using Vector = Dali::Vector<NodeDefinition, false>;
 
   struct CreateParams
   {
@@ -163,9 +164,9 @@ public: // TYPES
     Dali::Scene3D::Loader::ShaderManagerPtr mShaderManager;
 
   public: // output
-    std::vector<ConstraintRequest>                    mConstrainables;
-    std::vector<SkinningShaderConfigurationRequest>   mSkinnables;
-    std::vector<BlendshapeShaderConfigurationRequest> mBlendshapeRequests;
+    Dali::Vector<ConstraintRequest>                    mConstrainables;
+    Dali::Vector<SkinningShaderConfigurationRequest>   mSkinnables;
+    Dali::Vector<BlendshapeShaderConfigurationRequest> mBlendshapeRequests;
   };
 
   class DALI_SCENE3D_API Renderable
@@ -193,7 +194,7 @@ public: // TYPES
     {
       auto choice = choices.Get(mTag);
       return std::min(choice != Customization::NONE ? choice : 0,
-                      static_cast<Index>(node.mChildren.size() - 1));
+                      static_cast<Index>(node.mChildren.Size() - 1));
     }
   };
 
@@ -293,13 +294,13 @@ public: // DATA
 
   bool mIsVisible = true;
 
-  std::vector<UniquePtr<Renderable>> mRenderables;
-  UniquePtr<CustomizationDefinition> mCustomization;
-  std::vector<Extra>                 mExtras;
-  std::vector<ConstraintDefinition>  mConstraints;
+  Dali::Vector<UniquePtr<Renderable>> mRenderables;
+  UniquePtr<CustomizationDefinition>  mCustomization;
+  Dali::Vector<Extra>                 mExtras;
+  Dali::Vector<ConstraintDefinition>  mConstraints;
 
-  std::vector<Index> mChildren;
-  Index              mParentIdx = INVALID_INDEX;
+  Dali::Vector<Index> mChildren;
+  Index               mParentIdx = INVALID_INDEX;
 };
 
 class DALI_SCENE3D_API ModelRenderable : public NodeDefinition::Renderable

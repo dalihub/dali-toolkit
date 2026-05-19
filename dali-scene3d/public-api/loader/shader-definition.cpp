@@ -247,7 +247,8 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Vert Shader src: \n%s\n", raw.mVertexShaderSource.CStr());
 
   // Create strong-connected ubo shader since shader definition could be removed after scene load completed.
-  Shader shader = Dali::Integration::ShaderNewWithUniformBlock(array, mUniformBlocks, true);
+  std::vector<Dali::UniformBlock> stdUniformBlocks(mUniformBlocks.Begin(), mUniformBlocks.End());
+  Shader                          shader = Dali::Integration::ShaderNewWithUniformBlock(array, std::move(stdUniformBlocks), true);
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {
     auto pair = mUniforms.GetKeyValue(i0);

@@ -18,10 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/uniform-block.h>
-#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/loader/renderer-state.h>
@@ -37,7 +38,7 @@ namespace Dali::Scene3D::Loader
  */
 struct DALI_SCENE3D_API ShaderDefinition
 {
-  using Vector = std::vector<std::pair<ShaderDefinition, Shader>>;
+  using Vector = Dali::Vector<Dali::Pair<ShaderDefinition, Shader>, false>;
 
   struct RawData
   {
@@ -52,7 +53,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other) = delete;
 
-  ShaderDefinition(ShaderDefinition&&)            = default;
+  ShaderDefinition(ShaderDefinition&&) = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /**
@@ -76,14 +77,14 @@ public: // DATA
   SharedPtr<RawData>  mRawData;
   RendererState::Type mRendererState = RendererState::NONE;
 
-  Dali::String                               mVertexShaderPath;
-  Dali::String                               mFragmentShaderPath;
-  std::vector<Dali::String>                  mDefines;
-  std::vector<ShaderOption::MacroDefinition> mMacros;
-  std::vector<Dali::String>                  mHints;
-  Property::Map                              mUniforms;
+  Dali::String                                mVertexShaderPath;
+  Dali::String                                mFragmentShaderPath;
+  Dali::Vector<Dali::String>                  mDefines;
+  Dali::Vector<ShaderOption::MacroDefinition> mMacros;
+  Dali::Vector<Dali::String>                  mHints;
+  Property::Map                               mUniforms;
 
-  std::vector<Dali::UniformBlock> mUniformBlocks{}; ///< Uniform blocks to be connected to shader.
+  Dali::Vector<Dali::UniformBlock> mUniformBlocks{}; ///< Uniform blocks to be connected to shader.
 
   uint64_t mShadowOptionHash{0u};
   bool     mUseBuiltInShader{false};

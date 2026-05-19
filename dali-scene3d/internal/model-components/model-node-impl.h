@@ -24,6 +24,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <string>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
