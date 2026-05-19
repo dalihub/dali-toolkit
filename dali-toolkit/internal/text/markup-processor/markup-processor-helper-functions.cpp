@@ -19,10 +19,12 @@
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/locale-numeric-guard.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/vector2.h>
 #include <stdlib.h>
 #include <iomanip>
+#include <locale>
 #include <sstream>
 
 namespace Dali
@@ -110,12 +112,15 @@ unsigned int StringToHex(const char* const uintStr)
 
 float StringToFloat(const char* const floatStr)
 {
+  // Ensure LC_NUMERIC is "C" so that strtod uses '.' as decimal separator
+  Dali::LocaleNumericGuard localeGuard;
   return static_cast<float>(strtod(floatStr, NULL));
 }
 
 void FloatToString(float value, std::string& floatStr)
 {
   std::stringstream ss;
+  ss.imbue(std::locale::classic());
   ss << value;
   floatStr = ss.str();
 }
