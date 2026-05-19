@@ -108,6 +108,12 @@ private:
    */
   void AsyncLoadComplete(LoadingTaskPtr task);
 
+  /**
+   * @brief Callback to be called when remote texture decoding is complete.
+   * @param[in] task RemoteDecodeTask as AsyncTaskPtr
+   */
+  void RemoteDecodeComplete(Dali::AsyncTaskPtr task);
+
 private: // Member Variables:
   TextureManager& mTextureManager;
   uint32_t        mLoadTaskId;
