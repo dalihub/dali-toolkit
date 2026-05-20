@@ -52,6 +52,9 @@ const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simpl
 const char* TEST_AUX_IMAGE            = TEST_RESOURCE_DIR "/folder_appicon_empty_bg.png";
 const char* TEST_IMAGE_FILE_NAME      = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
+const char* TEST_POINTS_AND_NORMAL_OBJ_FILE_NAME  = TEST_RESOURCE_DIR "/Cube-Points-And-Normal.obj";
+const char* TEST_POINTS_AND_TEXTURE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-And-Texture.obj";
+
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
@@ -1674,12 +1677,12 @@ void MeshVisualDoesNotLoadCorrectlyTest(Property::Map& propertyMap, ToolkitTestA
 } // namespace
 
 // Test if mesh loads correctly when supplied with only the bare minimum requirements, an object file.
-int UtcDaliVisualFactoryGetMeshVisual1(void)
+int UtcDaliVisualFactoryGetMeshVisual01(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual1:  Request mesh visual with a valid object file only");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual01:  Request mesh visual with a valid object file only");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1701,12 +1704,12 @@ int UtcDaliVisualFactoryGetMeshVisual1(void)
 }
 
 // Test if mesh loads correctly when supplied with an object file as well as a blank material file and images directory.
-int UtcDaliVisualFactoryGetMeshVisual2(void)
+int UtcDaliVisualFactoryGetMeshVisual02(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual2:  Request mesh visual with blank material file and images directory");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual02:  Request mesh visual with blank material file and images directory");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1730,12 +1733,12 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
 }
 
 // Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location, but duff optional parameters
-int UtcDaliVisualFactoryGetMeshVisual3b(void)
+int UtcDaliVisualFactoryGetMeshVisual03b(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual03b:  Request mesh visual with all parameters correct");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1762,12 +1765,12 @@ int UtcDaliVisualFactoryGetMeshVisual3b(void)
 }
 
 // Test if mesh loads correctly when supplied with all main parameters, an object file, a material file and a directory location.
-int UtcDaliVisualFactoryGetMeshVisual3(void)
+int UtcDaliVisualFactoryGetMeshVisual03(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual03:  Request mesh visual with all parameters correct");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1794,12 +1797,12 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
 }
 
 // Test if mesh visual can load a correctly supplied mesh without a normal map or gloss map in the material file.
-int UtcDaliVisualFactoryGetMeshVisual4(void)
+int UtcDaliVisualFactoryGetMeshVisual04(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual4:  Request mesh visual with diffuse texture but not normal or gloss.");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual04:  Request mesh visual with diffuse texture but not normal or gloss.");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1823,12 +1826,12 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
 }
 
 // Test if mesh visual can load when made to use diffuse textures only.
-int UtcDaliVisualFactoryGetMeshVisual5(void)
+int UtcDaliVisualFactoryGetMeshVisual05(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual and make it only use diffuse textures.");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual05:  Request mesh visual and make it only use diffuse textures.");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1856,12 +1859,12 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
 }
 
 // Test if mesh visual can load when made to not use the supplied textures.
-int UtcDaliVisualFactoryGetMeshVisual6(void)
+int UtcDaliVisualFactoryGetMeshVisual06(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual6:  Request mesh visual and make it not use any textures.");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual06:  Request mesh visual and make it not use any textures.");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1885,12 +1888,12 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
   END_TEST;
 }
 // Test if mesh visual loads correctly when light position is manually set.
-int UtcDaliVisualFactoryGetMeshVisual7(void)
+int UtcDaliVisualFactoryGetMeshVisual07(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual7:  Request mesh visual with custom light position.");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual07:  Request mesh visual with custom light position.");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1916,12 +1919,12 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
 
 // Test if mesh visual loads correctly when supplied an object file without face normals or texture points.
 // Note that this notably tests object loader functionality.
-int UtcDaliVisualFactoryGetMeshVisual8(void)
+int UtcDaliVisualFactoryGetMeshVisual08(void)
 {
   // Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual with normal-less object file.");
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual08:  Request mesh visual with normal-less object file.");
 
   static std::vector<UniformData> customUniforms =
     {
@@ -1935,6 +1938,62 @@ int UtcDaliVisualFactoryGetMeshVisual8(void)
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
   propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_SIMPLE_OBJ_FILE_NAME);
+  propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
+  propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
+
+  // Test to see if mesh loads correctly.
+  MeshVisualLoadsCorrectlyTest(propertyMap, application);
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetMeshVisual09(void)
+{
+  // Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual09:  Request mesh visual with points-and-normal object file.");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("uObjectMatrix", Property::Type::MATRIX),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  // Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
+  propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_POINTS_AND_NORMAL_OBJ_FILE_NAME);
+  propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
+  propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
+
+  // Test to see if mesh loads correctly.
+  MeshVisualLoadsCorrectlyTest(propertyMap, application);
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetMeshVisual10(void)
+{
+  // Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliVisualFactoryGetMeshVisual10:  Request mesh visual with points-and-texture object file.");
+
+  static std::vector<UniformData> customUniforms =
+    {
+      UniformData("uObjectMatrix", Property::Type::MATRIX),
+    };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  // Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::MESH);
+  propertyMap.Insert(MeshVisual::Property::OBJECT_URL, TEST_POINTS_AND_TEXTURE_OBJ_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME);
   propertyMap.Insert(MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
 

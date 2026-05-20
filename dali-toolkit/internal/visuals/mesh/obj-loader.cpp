@@ -368,7 +368,8 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
   while(std::getline(ss, line))
   {
     std::istringstream isline(line, std::istringstream::in);
-    std::string        tag;
+    isline.imbue(std::locale::classic());
+    std::string tag;
 
     isline >> tag;
 
@@ -455,6 +456,7 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           for(int i = 0; i < numIndices; i++)
           {
             std::istringstream isindex(vet[i]);
+            isindex.imbue(std::locale::classic());
             isindex >> ptIdx[i] >> separator >> separator2 >> nrmIdx[i];
             texIdx[i] = 0;
           }
@@ -464,6 +466,7 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           for(int i = 0; i < numIndices; i++)
           {
             std::istringstream isindex(vet[i]);
+            isindex.imbue(std::locale::classic());
             isindex >> ptIdx[i] >> separator >> texIdx[i] >> separator2 >> nrmIdx[i];
           }
 
@@ -474,6 +477,7 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
           for(int i = 0; i < numIndices; i++)
           {
             std::istringstream isindex(vet[i]);
+            isindex.imbue(std::locale::classic());
             isindex >> ptIdx[i] >> separator >> texIdx[i];
             nrmIdx[i] = 0;
           }
@@ -486,6 +490,7 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
         for(int i = 0; i < numIndices; i++)
         {
           std::istringstream isindex(vet[i]);
+          isindex.imbue(std::locale::classic());
           isindex >> ptIdx[i];
           texIdx[i] = 0;
           nrmIdx[i] = 0;
@@ -565,7 +570,8 @@ void ObjLoader::LoadMaterial(char* objBuffer, std::streampos fileSize, std::stri
   while(std::getline(ss, line))
   {
     std::istringstream isline(line, std::istringstream::in);
-    std::string        tag;
+    isline.imbue(std::locale::classic());
+    std::string tag;
 
     isline >> tag;
 
