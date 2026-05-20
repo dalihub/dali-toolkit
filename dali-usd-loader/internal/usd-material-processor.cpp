@@ -20,8 +20,8 @@
 #include <dali-usd-loader/internal/usd-material-processor.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/resource-bundle.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/resource-bundle.h>
 #include <dali-usd-loader/internal/utils.h>
 
 // EXTERNAL INCLUDES

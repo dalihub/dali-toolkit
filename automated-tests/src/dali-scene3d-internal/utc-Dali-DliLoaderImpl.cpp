@@ -20,9 +20,9 @@
 
 #include <dali-scene3d/internal/loader/dli-loader-impl.h>
 #include <dali-scene3d/internal/loader/json-util.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/resource-bundle.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/resource-bundle.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/string-utils.h>

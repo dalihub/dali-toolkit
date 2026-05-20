@@ -38,7 +38,7 @@
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <dali-scene3d/public-api/loader/shader-manager.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 
 namespace Dali
 {

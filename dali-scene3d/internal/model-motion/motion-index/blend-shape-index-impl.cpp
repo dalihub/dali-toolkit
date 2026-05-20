@@ -24,7 +24,7 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/blend-shape-details.h> ///< For BlendShapes::WEIGHTS_UNIFORM
+#include <dali-scene3d/integration-api/loader/blend-shape-details.h> ///< For BlendShapes::WEIGHTS_UNIFORM
 
 namespace Dali
 {

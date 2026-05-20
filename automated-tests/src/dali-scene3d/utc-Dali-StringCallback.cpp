@@ -20,7 +20,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/string-callback.h"
+#include "dali-scene3d/integration-api/loader/string-callback.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;

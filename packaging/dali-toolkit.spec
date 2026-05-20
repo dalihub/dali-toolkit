@@ -155,6 +155,14 @@ Requires:   %{dali2_scene3d} = %{version}-%{release}
 %description -n %{dali2_scene3d}-devel
 Development components for dali-scene3d.
 
+%package -n %{dali2_scene3d}-integration-devel
+Summary:    Integration development package for dali-scene3d
+Group:      Development/Building
+Requires:   %{dali2_scene3d}-devel = %{version}-%{release}
+
+%description -n %{dali2_scene3d}-integration-devel
+Integration development package for dali-scene3d - loader APIs for integrating with model loaders.
+
 ##############################
 # dali-physics-2d
 ##############################
@@ -215,6 +223,7 @@ Summary:    Development components for dali-usd-loader
 Group:      Development/Building
 Requires:   %{dali2_usdloader} = %{version}-%{release}
 Requires:   %{dali2_scene3d}-devel
+Requires:   %{dali2_scene3d}-integration-devel
 
 %description -n %{dali2_usdloader}-devel
 Development components for dali-usd-loader.
@@ -633,6 +642,11 @@ exit 0
 %{_includedir}/dali-scene3d/public-api/*
 %{_includedir}/dali-scene3d/dali-scene3d.h
 %{_libdir}/pkgconfig/dali2-scene3d.pc
+
+%files -n %{dali2_scene3d}-integration-devel
+%defattr(-,root,root,-)
+%{_includedir}/dali-scene3d/integration-api/*
+%{_libdir}/pkgconfig/dali2-scene3d-integration.pc
 
 %files -n %{dali2_physics2d}
 %if 0%{?enable_dali_smack_rules}

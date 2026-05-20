@@ -18,7 +18,7 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <dali-scene3d/public-api/loader/animated-property.h>
+#include <dali-scene3d/integration-api/loader/animated-property.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 

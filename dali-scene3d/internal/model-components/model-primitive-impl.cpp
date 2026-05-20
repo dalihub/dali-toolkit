@@ -28,7 +28,7 @@
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
-#include <dali-scene3d/public-api/loader/environment-definition.h>
+#include <dali-scene3d/integration-api/loader/environment-definition.h>
 
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>

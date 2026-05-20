@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/model-loader-impl.h>
+#include <dali-scene3d/integration-api/loader/model-loader-impl.h>
 
 namespace Dali::Scene3D::Loader::Internal
 {

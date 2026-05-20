@@ -39,7 +39,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/light/light.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
 namespace Dali

@@ -22,7 +22,7 @@
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 
 namespace Dali

@@ -20,7 +20,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include "dali-scene3d/public-api/loader/animation-definition.h"
+#include "dali-scene3d/integration-api/loader/animation-definition.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;

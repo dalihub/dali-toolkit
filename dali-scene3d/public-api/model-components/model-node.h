@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/blend-shape-details.h> ///< For Loader::BlendShapes::Index
+#include <dali-scene3d/public-api/common/blend-shape-types.h> ///< For BlendShapes::Index
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 namespace Dali
 {
@@ -204,7 +204,7 @@ public: // Public Method
    * @param[in] blendShapeName The name of blendshape that is not empty.
    * @return Index of blendshape, or return invalid if there is no blendshape with given name.
    */
-  Loader::BlendShapes::Index GetBlendShapeIndexByName(Dali::StringView blendShapeName) const;
+  BlendShapes::Index GetBlendShapeIndexByName(Dali::StringView blendShapeName) const;
 
   /**
    * @brief Sets collider mesh on the ModelNode

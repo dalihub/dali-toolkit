@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
 #include "dali-scene3d/public-api/algorithm/path-finder.h"
-#include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
+#include "dali-scene3d/integration-api/loader/navigation-mesh-factory.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Algorithm;

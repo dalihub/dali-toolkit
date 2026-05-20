@@ -40,13 +40,13 @@
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
-#include <dali-scene3d/public-api/loader/animation-definition.h>
-#include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/light-parameters.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/node-definition.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/shader-manager.h>
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/camera-parameters.h>
+#include <dali-scene3d/integration-api/loader/light-parameters.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/node-definition.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 

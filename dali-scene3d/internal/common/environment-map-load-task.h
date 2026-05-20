@@ -25,9 +25,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/common/environment-map.h>
-#include <dali-scene3d/public-api/loader/environment-map-data.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/environment-map-data.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 
 namespace Dali
 {

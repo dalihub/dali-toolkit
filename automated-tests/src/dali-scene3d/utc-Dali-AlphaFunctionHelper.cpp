@@ -20,7 +20,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/string-utils.h>
-#include "dali-scene3d/public-api/loader/alpha-function-helper.h"
+#include "dali-scene3d/integration-api/loader/alpha-function-helper.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;

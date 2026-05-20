@@ -24,8 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-util.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 
 using Dali::Integration::ToStdString;
 

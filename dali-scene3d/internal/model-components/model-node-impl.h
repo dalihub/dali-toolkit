@@ -30,10 +30,10 @@
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/light/light.h>
-#include <dali-scene3d/public-api/loader/mesh-definition.h>
-#include <dali-scene3d/public-api/loader/shader-manager.h>
-#include <dali-scene3d/public-api/loader/shader-option.h>
-#include <dali-scene3d/public-api/loader/skinning-details.h>
+#include <dali-scene3d/integration-api/loader/mesh-definition.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
+#include <dali-scene3d/integration-api/loader/shader-option.h>
+#include <dali-scene3d/integration-api/loader/skinning-details.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 #include "dali-scene3d/public-api/controls/model/model.h"

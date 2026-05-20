@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
-#include "dali-scene3d/public-api/loader/view-projection.h"
+#include "dali-scene3d/integration-api/loader/view-projection.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;

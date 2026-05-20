@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_PRIMITIVE_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@
 #include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
 #include <dali-scene3d/public-api/light/light.h>
-#include <dali-scene3d/public-api/loader/blend-shape-details.h>
-#include <dali-scene3d/public-api/loader/mesh-definition.h>
-#include <dali-scene3d/public-api/loader/shader-manager.h>
+#include <dali-scene3d/integration-api/loader/blend-shape-details.h>
+#include <dali-scene3d/integration-api/loader/mesh-definition.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-components/material.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 

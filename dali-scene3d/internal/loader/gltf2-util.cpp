@@ -19,8 +19,8 @@
 #include <dali-scene3d/internal/loader/gltf2-util.h>
 
 // EXTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
-#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/integration-api/loader/load-scene-metadata.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>

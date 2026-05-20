@@ -20,8 +20,8 @@
 
 #include <dali-test-suite-utils.h>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/resource-bundle.h"
-#include "dali-scene3d/public-api/loader/utils.h"
+#include "dali-scene3d/integration-api/loader/resource-bundle.h"
+#include "dali-scene3d/integration-api/loader/utils.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;
