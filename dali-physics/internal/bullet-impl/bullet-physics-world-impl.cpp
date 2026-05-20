@@ -20,7 +20,6 @@
 // EXTERNAL INCLDUES
 #include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
 #include <btBulletCollisionCommon.h>
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/stage-devel.h>
@@ -28,9 +27,9 @@
 
 namespace Dali::Toolkit::Physics::Internal
 {
-std::unique_ptr<PhysicsWorld> BulletPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
+UniquePtr<PhysicsWorld> BulletPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
 {
-  std::unique_ptr<BulletPhysicsWorld> world = std::make_unique<BulletPhysicsWorld>(rootActor, updateCallback);
+  UniquePtr<BulletPhysicsWorld> world = MakeUnique<BulletPhysicsWorld>(rootActor, updateCallback);
   world->Initialize();
   return world;
 }

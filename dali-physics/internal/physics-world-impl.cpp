@@ -69,7 +69,7 @@ void PhysicsWorld::Initialize()
   // Automatically start the frame callback. This means everything should
   // be accessed with a mutex lock, which is automatically locked when
   // ScopedAccessor is used.
-  mFrameCallback = std::make_unique<FrameCallback>(*this);
+  mFrameCallback = MakeUnique<FrameCallback>(*this);
   Dali::DevelStage::AddFrameCallback(Dali::Stage::GetCurrent(), *mFrameCallback, mRootActor);
   Dali::Stage::GetCurrent().KeepRendering(30); // @todo Remove!
 }
@@ -123,7 +123,7 @@ void PhysicsWorld::SetTimestep(float timeStep)
   mPhysicsTimeStep = timeStep;
 }
 
-float PhysicsWorld::GetTimestep()
+float PhysicsWorld::GetTimestep() const
 {
   return mPhysicsTimeStep;
 }
@@ -167,7 +167,7 @@ void PhysicsWorld::SetIntegrationState(Physics::PhysicsAdaptor::IntegrationState
   mPhysicsIntegrateState = state;
 }
 
-Physics::PhysicsAdaptor::IntegrationState PhysicsWorld::GetIntegrationState()
+Physics::PhysicsAdaptor::IntegrationState PhysicsWorld::GetIntegrationState() const
 {
   return mPhysicsIntegrateState;
 }
@@ -177,7 +177,7 @@ void PhysicsWorld::SetDebugState(Physics::PhysicsAdaptor::DebugState state)
   mPhysicsDebugState = state;
 }
 
-Physics::PhysicsAdaptor::DebugState PhysicsWorld::GetDebugState()
+Physics::PhysicsAdaptor::DebugState PhysicsWorld::GetDebugState() const
 {
   return mPhysicsDebugState;
 }

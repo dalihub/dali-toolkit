@@ -18,7 +18,7 @@
 
 // EXTERNAL INCLUDES
 #include <chipmunk/chipmunk.h>
-#include <memory>
+#include <dali/public-api/common/unique-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
@@ -29,7 +29,7 @@ namespace Dali::Toolkit::Physics::Internal
 class ChipmunkPhysicsWorld : public PhysicsWorld
 {
 public:
-  static std::unique_ptr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
+  static UniquePtr<PhysicsWorld> New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
 
   ChipmunkPhysicsWorld(Dali::Actor rootActor, Dali::CallbackBase* updateCallback);
   ~ChipmunkPhysicsWorld() override;
@@ -47,22 +47,22 @@ public:
    */
   void SetDebugRenderer(PhysicsDebugRenderer* renderer)
   {
-    mDebugRenderer.reset(renderer);
+    mDebugRenderer.Reset(renderer);
   }
 
   PhysicsDebugRenderer& GetDebugRenderer()
   {
-    return *mDebugRenderer.get();
+    return *mDebugRenderer.Get();
   }
 
   bool HasDebugRenderer()
   {
-    return mDebugRenderer.get() != nullptr;
+    return mDebugRenderer.Get() != nullptr;
   }
 
 private:
-  cpSpace*                              mSpace{nullptr};
-  std::unique_ptr<PhysicsDebugRenderer> mDebugRenderer;
+  cpSpace*                        mSpace{nullptr};
+  UniquePtr<PhysicsDebugRenderer> mDebugRenderer;
 };
 
 } //namespace Dali::Toolkit::Physics::Internal

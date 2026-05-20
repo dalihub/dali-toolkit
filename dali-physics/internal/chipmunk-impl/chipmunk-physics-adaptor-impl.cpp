@@ -88,7 +88,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   sizeConstraint.AddSource(Source(mRootActor, Actor::Property::SIZE));
   sizeConstraint.Apply();
 
-  auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.get());
+  auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.Get());
 
   UniquePtr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(windowSize.GetWidth(), windowSize.GetHeight(), renderTask.GetCameraActor(), this);
 
@@ -117,7 +117,7 @@ void ChipmunkPhysicsAdaptor::SetTransformAndSize(const Dali::Matrix& transform, 
 
   GetRootActor()[Actor::Property::SIZE] = Vector3(worldSize.GetWidth(), worldSize.GetHeight(), 0);
 
-  auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.get());
+  auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.Get());
   if(world->HasDebugRenderer() && mDebugActor)
   {
     Actor layer                  = mDebugActor.GetParent();
