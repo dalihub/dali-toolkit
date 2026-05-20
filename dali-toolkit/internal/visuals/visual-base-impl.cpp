@@ -20,9 +20,9 @@
 
 // EXTERNAL HEADER
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/rendering/visual-renderer.h>
@@ -167,7 +167,7 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 : mImpl(new Impl(fittingMode, type)),
   mFactoryCache(factoryCache)
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!Dali::Adaptor::IsEventThread()))
   {
     DALI_LOG_ERROR("Visual::Base[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
@@ -175,7 +175,7 @@ Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, To
 
 Visual::Base::~Base()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!Dali::Adaptor::IsEventThread()))
   {
     DALI_LOG_ERROR("Visual::~Base[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
