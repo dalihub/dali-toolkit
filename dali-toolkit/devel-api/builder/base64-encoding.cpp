@@ -17,6 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <iterator>
+#include <locale>
 #include <sstream>
 
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
@@ -123,6 +124,7 @@ bool DecodeBase64FromString(const std::string_view& encodedString, std::vector<u
 void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint32_t>& inputData)
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
 
   bn::encode_b64(reinterpret_cast<const char*>(&inputData[0]),
                  reinterpret_cast<const char*>(&inputData[0] + inputData.size()),
@@ -162,6 +164,7 @@ void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint32_t
 void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint8_t>& inputData)
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
 
   bn::encode_b64(reinterpret_cast<const uint8_t*>(&inputData[0]),
                  reinterpret_cast<const uint8_t*>(&inputData[0] + inputData.size()),

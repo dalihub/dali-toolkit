@@ -34,6 +34,7 @@ public:
 
     // Here we'll create an ImageView which uses the the itemId to parse the image in a particular directory.
     std::ostringstream imageName;
+    imageName.imbue(std::locale::classic());
     imageName << "my-image-folder/" << itemId << ".png"; // If item was 10, then this would result in my-image-folder/10.png
 
     // Create the Image View from the image and return

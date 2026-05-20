@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/locale-numeric-guard.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/vector2.h>
 #include <stdlib.h>
@@ -102,19 +101,29 @@ void JumpToWhiteSpace(const char*&      stringBuffer,
 
 unsigned int StringToUint(const char* const uintStr)
 {
-  return static_cast<unsigned int>(strtoul(uintStr, NULL, 10));
+  std::istringstream iss(uintStr);
+  iss.imbue(std::locale::classic());
+  unsigned int value = 0;
+  iss >> value;
+  return value;
 }
 
 unsigned int StringToHex(const char* const uintStr)
 {
-  return static_cast<unsigned int>(strtoul(uintStr, NULL, 16));
+  std::istringstream iss(uintStr);
+  iss.imbue(std::locale::classic());
+  unsigned int value = 0;
+  iss >> std::hex >> value;
+  return value;
 }
 
 float StringToFloat(const char* const floatStr)
 {
-  // Ensure LC_NUMERIC is "C" so that strtod uses '.' as decimal separator
-  Dali::LocaleNumericGuard localeGuard;
-  return static_cast<float>(strtod(floatStr, NULL));
+  std::istringstream iss(floatStr);
+  iss.imbue(std::locale::classic());
+  float value = 0.0f;
+  iss >> value;
+  return value;
 }
 
 void FloatToString(float value, std::string& floatStr)
@@ -128,6 +137,7 @@ void FloatToString(float value, std::string& floatStr)
 void UintToString(unsigned int value, std::string& uIntStr)
 {
   std::stringstream ss;
+  ss.imbue(std::locale::classic());
   ss << value;
   uIntStr = ss.str();
 }
@@ -262,7 +272,8 @@ void Vector4ToColorString(const Vector4& value, std::string& vector2Str)
   const unsigned int green = static_cast<unsigned int>(255.f * value.g);
   const unsigned int blue  = static_cast<unsigned int>(255.f * value.b);
 
-  std::stringstream  ss;
+  std::stringstream ss;
+  ss.imbue(std::locale::classic());
   const unsigned int size = 2u * sizeof(unsigned char);
 
   ss << "0x"

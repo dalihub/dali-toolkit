@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali/integration-api/debug.h>
+
+#include <locale>
 
 namespace Dali
 {
@@ -105,6 +107,7 @@ void NpatchShaderFactory::GetVertexShader(std::string& vertexShader) const
   else if(mNpatchXStretchCount > 0 || mNpatchYStretchCount > 0)
   {
     std::stringstream vertextShaderStream;
+    vertextShaderStream.imbue(std::locale::classic());
     vertextShaderStream << "#define FACTOR_SIZE_X " << mNpatchXStretchCount + 2 << "\n"
                         << "#define FACTOR_SIZE_Y " << mNpatchYStretchCount + 2 << "\n"
                         << SHADER_NPATCH_VISUAL_SHADER_VERT;
@@ -134,6 +137,7 @@ bool NpatchShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType sh
     if(mNpatchXStretchCount > 0 || mNpatchYStretchCount > 0)
     {
       std::stringstream shaderNameStream;
+      shaderNameStream.imbue(std::locale::classic());
       shaderNameStream << "NINE_PATCH_SHADER_" << mNpatchXStretchCount << "x" << mNpatchYStretchCount;
       shaderName = shaderNameStream.str();
     }

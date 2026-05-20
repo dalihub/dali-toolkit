@@ -28,6 +28,8 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 
+#include <locale>
+
 using Dali::Integration::ToDaliStringView;
 
 // INTERNAL INCLUDES
@@ -248,6 +250,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     if(DALI_UNLIKELY(!Scripting::GetEnumerationProperty(*cutoutPolicyValue, CUTOUT_POLICY_TABLE, CUTOUT_POLICY_TABLE_COUNT, cutoutPolicy)))
     {
       std::ostringstream oss;
+      oss.imbue(std::locale::classic());
       oss << *cutoutPolicyValue;
       DALI_LOG_ERROR("ColorVisual:DoSetProperties:: CUTOUT_POLICY property has incorrect type : %d, value : %s\n", cutoutPolicyValue->GetType(), oss.str().c_str());
     }

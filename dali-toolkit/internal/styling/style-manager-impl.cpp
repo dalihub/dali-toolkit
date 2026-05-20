@@ -28,6 +28,8 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/application.h>
 
+#include <locale>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/builder/builder-impl.h>
@@ -570,6 +572,7 @@ void StyleManager::ApplyStyle(Toolkit::Builder builder, Toolkit::Control control
   {
     // Apply the style for logical font size
     std::stringstream fontSizeQualifier;
+    fontSizeQualifier.imbue(std::locale::classic());
     fontSizeQualifier << styleName << FONT_SIZE_QUALIFIER << mDefaultFontSize;
     builder.ApplyStyle(fontSizeQualifier.str(), control);
   }

@@ -20,6 +20,7 @@
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/stream-operators.h>
+#include <locale>
 
 #if defined(DEBUG_ENABLED)
 
@@ -35,6 +36,7 @@ namespace Internal
   if(mappings)                                                                                     \
   {                                                                                                \
     std::ostringstream oss;                                                                        \
+    oss.imbue(std::locale::classic());                                                             \
     oss << "Mappings: {" << std::endl;                                                             \
     for(TreeNode::ConstIterator iter = (*mappings).CBegin(); iter != (*mappings).CEnd(); ++iter)   \
     {                                                                                              \

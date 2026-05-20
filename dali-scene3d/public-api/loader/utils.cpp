@@ -28,6 +28,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <locale>
 
 namespace Dali::Scene3D::Loader
 {
@@ -51,6 +52,7 @@ ExceptionFlinger::ExceptionFlinger(const char* location) noexcept(true)
   mStreamBuffer(GetMessageBuffer(), MESSAGE_BUFFER_SIZE - 1),
   mStream(&mStreamBuffer)
 {
+  mStream.imbue(std::locale::classic());
 }
 
 ExceptionFlinger::~ExceptionFlinger() noexcept(false)

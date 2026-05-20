@@ -27,6 +27,8 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 
+#include <locale>
+
 using Dali::Integration::ToDaliString;
 
 namespace Dali
@@ -145,6 +147,7 @@ void OffScreenRenderingImpl::CreateFrameBuffer()
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
   {
     std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     oss << "OffScreenRendering type:" << mType;
 
     Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), ToDaliString(oss.str()), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);

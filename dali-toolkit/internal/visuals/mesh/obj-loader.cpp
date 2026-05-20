@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <string.h>
+#include <locale>
 #include <sstream>
 #include <string>
 
@@ -360,7 +361,7 @@ bool ObjLoader::LoadObject(char* objBuffer, std::streampos fileSize)
 
   std::string        input(objBuffer, fileSize);
   std::istringstream ss(input);
-  ss.imbue(std::locale("C"));
+  ss.imbue(std::locale::classic());
 
   std::string line;
   std::getline(ss, line);
@@ -562,7 +563,7 @@ void ObjLoader::LoadMaterial(char* objBuffer, std::streampos fileSize, std::stri
 
   std::string        input(objBuffer, fileSize);
   std::istringstream ss(input);
-  ss.imbue(std::locale("C"));
+  ss.imbue(std::locale::classic());
 
   std::string line;
   std::getline(ss, line);

@@ -29,6 +29,8 @@
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <locale>
+
 // INTERNAL HEARDER
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
@@ -590,6 +592,7 @@ void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size cont
 
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << transform;
   DALI_LOG_INFO(gVisualBaseLogFilter, Debug::General, "Visual::Base::SetTransformAndSize(%s) - [\e[1;32mtransform: %s  controlSize: (%3.1f, %3.1f)]\e[0m\n", GetName().c_str(), oss.str().c_str(), controlSize.x, controlSize.y);
 #endif
@@ -1358,6 +1361,7 @@ void Visual::Base::AnimateProperty(
   if(gVisualBaseLogFilter->IsEnabledFor(Debug::General))
   {
     std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     oss << "Visual::Base::AnimateProperty(Visual:" << mImpl->mName << " Property:" << animator.propertyKey << " Target: " << animator.targetValue << std::endl;
     DALI_LOG_INFO(gVisualBaseLogFilter, Debug::General, oss.str().c_str());
   }

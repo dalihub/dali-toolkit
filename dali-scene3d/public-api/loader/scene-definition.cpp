@@ -23,6 +23,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <algorithm>
+#include <locale>
 
 // INTERNAL
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
@@ -54,41 +55,52 @@ const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)>& GetCons
 {
   static const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
     {Property::Type::BOOLEAN,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetBoolean(); });
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs)
+    { current = inputs[0]->GetBoolean(); });
+  }},
     {Property::Type::INTEGER,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) { current = inputs[0]->GetInteger(); });
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs)
+    { current = inputs[0]->GetInteger(); });
+  }},
     {Property::Type::FLOAT,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<float>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<float>(a, i, EqualToConstraint());
+  }},
     {Property::Type::VECTOR2,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Vector2>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Vector2>(a, i, EqualToConstraint());
+  }},
     {Property::Type::VECTOR3,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Vector3>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Vector3>(a, i, EqualToConstraint());
+  }},
     {Property::Type::VECTOR4,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Vector4>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Vector4>(a, i, EqualToConstraint());
+  }},
     {Property::Type::MATRIX,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Matrix>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Matrix>(a, i, EqualToConstraint());
+  }},
     {Property::Type::MATRIX3,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Matrix3>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Matrix3>(a, i, EqualToConstraint());
+  }},
     {Property::Type::ROTATION,
-     [](Actor& a, Property::Index i) {
-       return Constraint::New<Quaternion>(a, i, EqualToConstraint());
-     }},
+     [](Actor& a, Property::Index i)
+  {
+    return Constraint::New<Quaternion>(a, i, EqualToConstraint());
+  }},
   };
   return sConstraintFactory;
 }
@@ -240,7 +252,8 @@ void SortAndDeduplicateRequests(Dali::Vector<RequestType>& requests)
     ++iter;
   } while(true);
 
-  requests.Erase(std::remove_if(requests.begin(), requests.end(), [](const RequestType& sscr) { return !sscr.mShader; }),
+  requests.Erase(std::remove_if(requests.begin(), requests.end(), [](const RequestType& sscr)
+  { return !sscr.mShader; }),
                  requests.end());
 }
 
@@ -488,8 +501,10 @@ bool SceneDefinition::ReparentNode(const Dali::String& name, const Dali::String&
   auto& node  = *nodePtr;
   auto  iNode = std::distance(mNodes.Data(), nodePtr);
 
-  DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n) {
+  DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n)
+  {
     std::ostringstream stream;
+    stream.imbue(std::locale::classic());
     stream << n.mName.CStr() << " (" << n.mParentIdx << "):";
     for(auto i : n.mChildren)
     {
@@ -542,15 +557,16 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
   auto&                                           thisNodes = mNodes;
   unsigned int                                    numReset  = 0;
   std::function<void(UniquePtr<NodeDefinition>&)> resetFn =
-    [&thisNodes, &resetFn, &numReset](UniquePtr<NodeDefinition>& nd) {
-      LOGD(("resetting %d", &nd - thisNodes.Data()));
-      for(auto i : nd->mChildren)
-      {
-        resetFn(thisNodes[i]);
-      }
-      nd.Reset();
-      ++numReset;
-    };
+    [&thisNodes, &resetFn, &numReset](UniquePtr<NodeDefinition>& nd)
+  {
+    LOGD(("resetting %d", &nd - thisNodes.Data()));
+    for(auto i : nd->mChildren)
+    {
+      resetFn(thisNodes[i]);
+    }
+    nd.Reset();
+    ++numReset;
+  };
 
   resetFn(*node);
 
@@ -591,7 +607,8 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
   {
     INDEX_FOR_REMOVAL = INVALID_INDEX
   };
-  auto offsetter = [&offsets](Index& i) {
+  auto offsetter = [&offsets](Index& i)
+  {
     auto iFind = std::lower_bound(offsets.begin(), offsets.end(), i);
     if(iFind != offsets.end() && *iFind == i)
     {
@@ -631,7 +648,8 @@ bool SceneDefinition::RemoveNode(const Dali::String& name)
 void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
 {
   auto&                    thisNodes  = mNodes;
-  std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i) {
+  std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i)
+  {
     auto node = thisNodes[i].Get();
     if(node->mParentIdx != INVALID_INDEX)
     {
@@ -646,7 +664,8 @@ NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index* outIn
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd) { return nd->mName == name; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
+   { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
@@ -660,7 +679,8 @@ const NodeDefinition* SceneDefinition::FindNode(const Dali::String& name, Index*
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd) { return nd->mName == name; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const UniquePtr<NodeDefinition>& nd)
+   { return nd->mName == name; });
 
   auto result = iFind != iEnd ? iFind->Get() : nullptr;
   if(result && outIndex)
@@ -674,7 +694,8 @@ Index SceneDefinition::FindNodeIndex(const NodeDefinition& node) const
 {
   auto iBegin = mNodes.begin();
   auto iEnd   = mNodes.end();
-  auto iFind  = std::find_if(iBegin, iEnd, [&node](const UniquePtr<NodeDefinition>& n) { return n.Get() == &node; });
+  auto iFind  = std::find_if(iBegin, iEnd, [&node](const UniquePtr<NodeDefinition>& n)
+   { return n.Get() == &node; });
   return iFind != iEnd ? std::distance(iBegin, iFind) : INVALID_INDEX;
 }
 

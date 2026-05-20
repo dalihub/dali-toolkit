@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,17 +118,13 @@ void VectorAnimationManager::Process(bool postProcessor)
 {
   if(DALI_LIKELY(!mDestroyed))
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    if(mEventCallbacks.Count() > 0u)
     {
-      if(mEventCallbacks.Count() > 0u)
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", [&](std::ostringstream& oss)
       {
-        std::ostringstream oss;
         oss << "[" << mEventCallbacks.Count() << "]";
-        DALI_TRACE_BEGIN_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
-      }
+      });
     }
-#endif
 
     mProcessorRegistered = false;
 
@@ -137,17 +133,13 @@ void VectorAnimationManager::Process(bool postProcessor)
       CallbackBase::Execute(*iter);
     }
 
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    if(mEventCallbacks.Count() > 0u)
     {
-      if(mEventCallbacks.Count() > 0u)
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", [&](std::ostringstream& oss)
       {
-        std::ostringstream oss;
         oss << "[" << mEventCallbacks.Count() << "]";
-        DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_VECTOR_ANIMATION_MANAGER_PROCESS", oss.str().c_str());
-      }
+      });
     }
-#endif
     mEventCallbacks.Clear();
   }
 }

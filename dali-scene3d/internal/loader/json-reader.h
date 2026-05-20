@@ -21,6 +21,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <algorithm>
 #include <cstring>
+#include <locale>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -150,6 +151,7 @@ struct Read
   {
     auto&             jn = Cast<const json_number_s>(j);
     std::stringstream ss;
+    ss.imbue(std::locale::classic());
     for(auto i0 = jn.number, i1 = i0 + jn.number_size; i0 != i1; ++i0)
     {
       ss.put(*i0);
