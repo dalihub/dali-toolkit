@@ -5881,6 +5881,48 @@ int UtcDaliVisualUpdateProperty03(void)
   DALI_TEST_CHECK(stopColorValue->GetArray());
   DALI_TEST_EQUALS(stopColorValue->GetArray()->Count(), targetStopColors.Count(), TEST_LOCATION);
 
+  // Experimental UTC for test new-gradient generation by UpdateProperty
+  Vector2 centerPosition(0.5f, 3.0f);
+  Radian  startAngle(1.5f);
+  targetPropertyMap.Clear();
+  targetPropertyMap[GradientVisual::Property::CENTER]      = centerPosition;
+  targetPropertyMap[GradientVisual::Property::START_ANGLE] = startAngle.radian;
+
+  // Update Properties
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Action::UPDATE_PROPERTY, targetPropertyMap);
+
+  gradientVisual.CreatePropertyMap(resultMap);
+  Property::Value* centerValue = resultMap.Find(GradientVisual::Property::CENTER, Property::VECTOR2);
+  DALI_TEST_CHECK(centerValue);
+  DALI_TEST_EQUALS(centerValue->Get<Vector2>(), centerPosition, TEST_LOCATION);
+
+  Property::Value* startAngleValue = resultMap.Find(GradientVisual::Property::START_ANGLE, Property::FLOAT);
+  DALI_TEST_CHECK(startAngleValue);
+  DALI_TEST_EQUALS(startAngleValue->Get<float>(), startAngle.radian, TEST_LOCATION);
+
+  // Check other values kept.
+  unitsValue = resultMap.Find(GradientVisual::Property::UNITS, Property::INTEGER);
+  DALI_TEST_CHECK(unitsValue);
+  DALI_TEST_EQUALS(unitsValue->Get<GradientVisual::Units::Type>(), targetUnits, TEST_LOCATION);
+
+  spreadMethodValue = resultMap.Find(GradientVisual::Property::SPREAD_METHOD, Property::INTEGER);
+  DALI_TEST_CHECK(spreadMethodValue);
+  DALI_TEST_EQUALS(spreadMethodValue->Get<GradientVisual::SpreadMethod::Type>(), targetSpreadMethod, TEST_LOCATION);
+
+  startOffsetValue = resultMap.Find(GradientVisual::Property::START_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(startOffsetValue);
+  DALI_TEST_EQUALS(startOffsetValue->Get<float>(), targetStartOffset, TEST_LOCATION);
+
+  stopOffsetValue = resultMap.Find(GradientVisual::Property::STOP_OFFSET, Property::ARRAY);
+  DALI_TEST_CHECK(stopOffsetValue);
+  DALI_TEST_CHECK(stopOffsetValue->GetArray());
+  DALI_TEST_EQUALS(stopOffsetValue->GetArray()->Count(), targetStopOffsets.Count(), TEST_LOCATION);
+
+  stopColorValue = resultMap.Find(GradientVisual::Property::STOP_COLOR, Property::ARRAY);
+  DALI_TEST_CHECK(stopColorValue);
+  DALI_TEST_CHECK(stopColorValue->GetArray());
+  DALI_TEST_EQUALS(stopColorValue->GetArray()->Count(), targetStopColors.Count(), TEST_LOCATION);
+
   END_TEST;
 }
 

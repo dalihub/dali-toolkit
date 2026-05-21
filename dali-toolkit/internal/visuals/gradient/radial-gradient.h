@@ -39,8 +39,9 @@ public:
    * Contructor.
    * @param[in] center The center of the gradient circle onto which the 0% gradient stop is mapped.
    * @param[in] radius The radius of the outmost circle onto which the 100% gradient stop is mapped.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
    */
-  RadialGradient(const Vector2& center, float radius);
+  RadialGradient(const Vector2& center, float radius, IntrusivePtr<Gradient> oldGradient);
 
   /**
    * Destructor.

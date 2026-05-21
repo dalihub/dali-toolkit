@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONIC_GRADIENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ public:
    * Contructor.
    * @param[in] center The point around which the conic gradient rotates.
    * @param[in] startAngle The initial angle from which the gradient begins.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
    */
-  ConicGradient(const Vector2& center, Dali::Radian startAngle);
+  ConicGradient(const Vector2& center, Dali::Radian startAngle, IntrusivePtr<Gradient> oldGradient);
 
   /**
    * Destructor.

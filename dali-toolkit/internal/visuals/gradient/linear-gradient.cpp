@@ -23,8 +23,8 @@ namespace Toolkit
 {
 namespace Internal
 {
-LinearGradient::LinearGradient(const Vector2& startPosition, const Vector2& endPosition)
-: Gradient()
+LinearGradient::LinearGradient(const Vector2& startPosition, const Vector2& endPosition, IntrusivePtr<Gradient> oldGradient)
+: Gradient(oldGradient)
 {
   SetStartAndEndPosition(startPosition, endPosition);
 }

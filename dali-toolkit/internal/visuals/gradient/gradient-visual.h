@@ -173,6 +173,11 @@ private:
   bool ApplyStopNodes(const Property::Map& propertyMap);
 
   /**
+   * Generate new lookup table and apply it to renderer
+   */
+  void ApplyLookupTexture();
+
+  /**
    * Get the stop-offsets from the property.
    * The valid property type are ARRAY, VECTOR2, VECTOR3, VECTOR4.
    *

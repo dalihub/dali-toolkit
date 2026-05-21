@@ -148,7 +148,7 @@ protected:
    * Construct a new Gradient object
    * Called in the constructor of subclasses
    */
-  Gradient();
+  Gradient(IntrusivePtr<Gradient> oldGradient);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
