@@ -33,11 +33,18 @@ namespace Toolkit
 {
 namespace Internal
 {
-Gradient::Gradient()
+Gradient::Gradient(IntrusivePtr<Gradient> oldGradient)
 : mGradientUnits(Toolkit::GradientVisual::Units::OBJECT_BOUNDING_BOX),
   mSpreadMethod(Toolkit::GradientVisual::SpreadMethod::PAD),
   mStartOffset(0.f)
 {
+  if(oldGradient)
+  {
+    mGradientStops = oldGradient->GetStops();
+    mGradientUnits = oldGradient->GetGradientUnits();
+    mSpreadMethod  = oldGradient->GetSpreadMethod();
+    mStartOffset   = oldGradient->GetStartOffset();
+  }
 }
 
 Gradient::~Gradient()
