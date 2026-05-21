@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -571,14 +570,14 @@ void Control::InitializeVisualData()
 
 Control& Control::Get(ControlImpl& controlImpl)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread() && "Must be called from the event thread!");
 
   return *controlImpl.mInternal;
 }
 
 const Control& Control::Get(const ControlImpl& controlImpl)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread() && "Must be called from the event thread!");
 
   return *controlImpl.mInternal;
 }
@@ -606,7 +605,7 @@ void Control::LongPressDetected(Actor actor, LongPressGesture longPress)
 
 void Control::ResourceReady()
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread() && "Must be called from the event thread!");
 
   // Emit signal if all enabled visuals registered by the control are ready or there are no visuals.
   if(DALI_LIKELY(mVisualData) && mVisualData->IsResourceReady())
@@ -857,7 +856,7 @@ Dali::Animation Control::CreateTransition(const Toolkit::TransitionData& transit
 
 void Control::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread() && "Must be called from the event thread!");
 
   Toolkit::Control control = Toolkit::Control::DownCast(BaseHandle(object));
 
@@ -1351,7 +1350,7 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
 
 Property::Value Control::GetProperty(BaseObject* object, Property::Index index)
 {
-  DALI_ASSERT_ALWAYS(Stage::IsCoreThread() && "Core is not installed. Might call this API from worker thread?");
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread() && "Must be called from the event thread!");
 
   Property::Value value;
 
