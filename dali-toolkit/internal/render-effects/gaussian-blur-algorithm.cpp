@@ -22,6 +22,7 @@
 #include <dali/integration-api/shader-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <cstdint>
+#include <locale>
 #include <random>
 #include <vector>
 
@@ -245,11 +246,13 @@ Dali::Shader& GaussianBlurAlgorithm::GetGaussianBlurShader(const uint32_t blurRa
       {
         {
           std::stringstream oss;
+          oss.imbue(std::locale::classic());
           oss << "uSampleOffsets[" << i << "]";
           sharedUBO.RegisterProperty(ToDaliStringView(oss.str()), offsets[i]);
         }
         {
           std::stringstream oss;
+          oss.imbue(std::locale::classic());
           oss << "uSampleWeights[" << i << "]";
           sharedUBO.RegisterProperty(ToDaliStringView(oss.str()), weights[i]);
         }
@@ -258,9 +261,11 @@ Dali::Shader& GaussianBlurAlgorithm::GetGaussianBlurShader(const uint32_t blurRa
     }
 
     std::ostringstream shaderNameBuilder;
+    shaderNameBuilder.imbue(std::locale::classic());
     shaderNameBuilder << "GaussianBlurShader_" << numSamples;
 
     std::ostringstream fragmentStringStream;
+    fragmentStringStream.imbue(std::locale::classic());
     fragmentStringStream << "#define NUM_SAMPLES " << numSamples << "\n";
     fragmentStringStream << SHADER_BLUR_EFFECT_FRAG;
     std::string fragmentSource(fragmentStringStream.str());

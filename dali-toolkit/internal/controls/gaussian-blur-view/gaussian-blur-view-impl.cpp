@@ -32,6 +32,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 #include <iomanip>
+#include <locale>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -250,6 +251,7 @@ void GaussianBlurView::OnInitialize()
   // Create shaders
 
   std::ostringstream fragmentStringStream;
+  fragmentStringStream.imbue(std::locale::classic());
   fragmentStringStream << "#define NUM_SAMPLES " << (DALI_LIKELY(mPixelRadius > 1u) ? mPixelRadius : 2u) << "\n";
   fragmentStringStream << SHADER_GAUSSIAN_BLUR_VIEW_FRAG;
   std::string fragmentSource(fragmentStringStream.str());
@@ -613,6 +615,7 @@ void GaussianBlurView::SetShaderConstants()
 std::string GaussianBlurView::GetSampleOffsetsPropertyName(unsigned int index) const
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << "uSampleOffsets[" << index << "]";
   return oss.str();
 }
@@ -620,6 +623,7 @@ std::string GaussianBlurView::GetSampleOffsetsPropertyName(unsigned int index) c
 std::string GaussianBlurView::GetSampleWeightsPropertyName(unsigned int index) const
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << "uSampleWeights[" << index << "]";
   return oss.str();
 }

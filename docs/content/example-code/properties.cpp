@@ -17,6 +17,7 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/dali.h>
+#include <locale>
 #include <sstream>
 
 using namespace Dali;
@@ -108,6 +109,7 @@ public:
 
     // Set the text in the text-label
     std::stringstream valueText;
+    valueText.imbue(std::locale::classic());
     valueText << touchedCount;
     mTagText.SetProperty(TextLabel::Property::TEXT, valueText.str());
 

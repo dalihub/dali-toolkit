@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <dali/integration-api/string-utils.h>
+#include <locale>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -51,6 +52,8 @@ GlyphyShader GlyphyShader::New(const Dali::Vector4& atlasInfo)
 {
   std::ostringstream vertexShaderStringStream;
   std::ostringstream fragmentShaderStringStream;
+  vertexShaderStringStream.imbue(std::locale::classic());
+  fragmentShaderStringStream.imbue(std::locale::classic());
 
   vertexShaderStringStream << SHADER_GLYPHY_SHADER_EXTENTION_PREFIX_DEF.data() << SHADER_GLYPHY_SHADER_MAIN_VERT.data();
 

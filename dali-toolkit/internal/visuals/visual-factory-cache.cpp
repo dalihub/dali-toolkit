@@ -30,6 +30,8 @@
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/math/math-utils.h>
 
+#include <locale>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
@@ -472,9 +474,11 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
   else if(xStretchCount > 0 || yStretchCount > 0)
   {
     std::stringstream shaderName;
+    shaderName.imbue(std::locale::classic());
     shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
 
     std::stringstream vertexShader;
+    vertexShader.imbue(std::locale::classic());
     vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                  << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                  << SHADER_NPATCH_VISUAL_SHADER_VERT;

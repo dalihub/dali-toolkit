@@ -22,6 +22,7 @@
 #include <dali/integration-api/shader-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
+#include <locale>
 #include <regex>
 
 // INTERNAL INCLUDES
@@ -230,6 +231,7 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   if(mUseBuiltInShader)
   {
     std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     oss << "_0x" << std::hex << mShadowOptionHash;
     map[0]["name"] = ToPropertyValue(std::string("SCENE3D_PBR") + oss.str());
     map[1]["name"] = ToPropertyValue(std::string("SCENE3D_SHADOW_MAP") + oss.str());

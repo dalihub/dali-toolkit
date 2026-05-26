@@ -22,11 +22,11 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 
 #include <functional> ///< for std::function
-#include <memory>
 
 namespace Dali::Toolkit::Physics
 {
@@ -224,7 +224,7 @@ public:
    *
    * @SINCE_2_2.43
    */
-  using ScopedPhysicsAccessorPtr = std::unique_ptr<PhysicsAdaptor::ScopedPhysicsAccessor>;
+  using ScopedPhysicsAccessorPtr = UniquePtr<PhysicsAdaptor::ScopedPhysicsAccessor>;
 
   /**
    * @brief Returns an accessor to the physics world.

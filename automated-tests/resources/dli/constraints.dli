@@ -13,7 +13,10 @@
     "position": [ 1000.0, 1.0, -400.0 ],
     "angle": [ 10.0, 0.0, -90.0 ],
     "extras": {
-      "angularVelocity": [ -0.5, 0.0004 ]
+      "angularVelocity": [ -0.5, 0.0004 ],
+      "dummyInteger": 4,
+      "dummyMatrix3": [ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0 ],
+      "dummyMatrix4": [ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 4.0 ]
     }
   }, {
     "name": "Charlie",
@@ -22,10 +25,19 @@
       "orientation": 1,
       "position": 2,
       "angularVelocity": 2,
+      "opacity": 2,
+      "color": 1,
+      "visible": 1,
+      "dummyInteger": 2,
+      "dummyMatrix3": 2,
+      "dummyMatrix4": 2,
       "invalid": "zero"
     },
     "extras": {
-      "angularVelocity": [ 0.0, 0.0 ]
+      "angularVelocity": [ 0.0, 0.0 ],
+      "dummyInteger": 1,
+      "dummyMatrix3": [ 5.0, 2.0, 0.0, 1.0, 0.0, 3.0, 0.0, 4.0, 0.0 ],
+      "dummyMatrix4": [ 5.0, 2.0, 0.0, 1.0, 0.0, 3.0, 0.0, 4.0, 0.0, 0.0, 6.0, 7.0, 0.0, 3.0, 0.0, 1.0 ]
     }
   } ]
 }

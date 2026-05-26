@@ -15,6 +15,7 @@ UNIFORM_BLOCK FragBlock
 
 void main()
 {
-  gl_FragColor = borderColor * uColor;
-  gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha) * smoothstep( borderSize + 1.5, borderSize, vAlpha );
+  // Note that border color didn't pre-multiplied alpha. Apply alpha here
+  gl_FragColor = vec4(borderColor.r * borderColor.a, borderColor.g * borderColor.a, borderColor.b * borderColor.a, borderColor.a)  * uColor;
+  gl_FragColor *= smoothstep(0.0, 1.5, vAlpha) * smoothstep( borderSize + 1.5, borderSize, vAlpha );
 }

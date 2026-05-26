@@ -30,6 +30,7 @@
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <locale>
 #include <type_traits>
 
 using Dali::Integration::ToDaliString;
@@ -202,7 +203,7 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
         {
           // convert 8-bit indices into 32-bit
           std::transform(indicesBuffer.begin(), indicesBuffer.end(), sparseIndices->begin(), [](const uint8_t& value)
-                         { return uint32_t(value); });
+          { return uint32_t(value); });
         }
         break;
       }
@@ -216,9 +217,9 @@ bool ReadAccessor(const MeshDefinition::Accessor& accessor, std::istream& source
                          reinterpret_cast<uint16_t*>(indicesBuffer.data()) + accessor.mSparse->mCount,
                          sparseIndices->begin(),
                          [](const uint16_t& value)
-                         {
-                           return uint32_t(value);
-                         });
+          {
+            return uint32_t(value);
+          });
         }
         break;
       }
@@ -834,13 +835,16 @@ std::iostream& GetAvailableData(std::iostream* meshStream, const std::string& me
   if(meshStream)
   {
     availablePath = meshPath;
+    meshStream->imbue(std::locale::classic());
     return *meshStream;
   }
-  
+
   // Only access buffer when meshStream is null and bufferIdx is valid
   DALI_ASSERT_ALWAYS(bufferIdx != INVALID_INDEX && bufferIdx < buffers.Size());
   availablePath = ToStdString(buffers[bufferIdx].GetUri());
-  return buffers[bufferIdx].GetBufferStream();
+  auto& stream  = buffers[bufferIdx].GetBufferStream();
+  stream.imbue(std::locale::classic());
+  return stream;
 }
 
 template<bool needsNormalize>
@@ -850,7 +854,7 @@ void ReadTypedVectorAccessors(LoadAccessorListInputs loadAccessorListInputs, Loa
   for(auto& accessor : loadAccessorListInputs.accessors)
   {
     // Skip if accessor is not defined or has no valid buffer reference and no file stream
-    if(!accessor.IsDefined() || 
+    if(!accessor.IsDefined() ||
        (accessor.mBufferIdx == INVALID_INDEX && !loadAccessorListInputs.fileStream))
     {
       continue;
@@ -858,6 +862,7 @@ void ReadTypedVectorAccessors(LoadAccessorListInputs loadAccessorListInputs, Loa
     std::string        pathJoint;
     auto&              dataStream = GetAvailableData(loadAccessorListInputs.fileStream, loadAccessorListInputs.meshPath, loadAccessorListInputs.buffers, accessor.mBufferIdx, pathJoint);
     std::ostringstream name;
+    name.imbue(std::locale::classic());
     name << attributeName << setIndex++;
     std::vector<uint8_t> tmpBuf;
     ReadTypedVectorAccessor<needsNormalize>(loadDataType, accessor, dataStream, tmpBuf);
@@ -1402,11 +1407,11 @@ void MeshDefinition::Blob::ApplyMinMax(const Dali::Vector<float>& min, const Dal
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
   ClampFn clampFn = min.Empty() ? (max.Empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::min(max[i], value); })
+  { value = std::min(max[i], value); })
                                 : (max.Empty() ? [](const float* min, const float* max, uint32_t i, float& value)
-                                     { value = std::max(min[i], value); }
+  { value = std::max(min[i], value); }
                                                : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
-                                                                      { value = std::min(std::max(min[i], value), max[i]); }));
+  { value = std::min(std::max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {
@@ -1520,6 +1525,7 @@ MeshDefinition::LoadRaw(const Dali::String& modelsPath, BufferDefinition::Vector
   {
     daliFileStream.reset(new Dali::FileStream(meshPath, FileStream::READ | FileStream::BINARY));
     fileStream = &daliFileStream->GetStream();
+    fileStream->imbue(std::locale::classic());
     if(!fileStream->good() || !fileStream->rdbuf()->in_avail())
     {
       DALI_LOG_ERROR("Fail to open buffer from %s.\n", meshPath.c_str());

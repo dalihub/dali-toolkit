@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <limits> ///< for std::numeric_limits
+#include <locale>
 
 using namespace Dali::Scene3D::Loader;
 using Dali::Integration::ToDaliString;
@@ -609,6 +610,7 @@ TextureDefinition ConvertTextureInfo(const gltf2::TextureInfo& textureInfo, Conv
     if(bufferIndex != INVALID_INDEX && context.mOutput.mResources.mBuffers[bufferIndex].IsAvailable())
     {
       auto& stream = context.mOutput.mResources.mBuffers[bufferIndex].GetBufferStream();
+      stream.imbue(std::locale::classic());
       stream.clear();
       stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(textureInfo.mTexture->mSource->mBufferView->mByteOffset)), stream.beg);
       // Convert std::vector<uint8_t> to Dali::Vector<uint8_t>
@@ -1320,6 +1322,7 @@ void LoadDataFromAccessor(ConversionContext& context, uint32_t bufferIndex, Vect
     DALI_LOG_ERROR("Failed to load from buffer stream.\n");
   }
   auto& stream = buffer.GetBufferStream();
+  stream.imbue(std::locale::classic());
   stream.clear();
   stream.seekg(static_cast<std::streamoff>(static_cast<std::size_t>(offset)), stream.beg);
   stream.read(reinterpret_cast<char*>(dataBuffer.Begin()), static_cast<std::streamsize>(static_cast<size_t>(size)));
@@ -1525,6 +1528,7 @@ void ProcessSkins(const gltf2::Document& document, ConversionContext& context)
     : mStream(context.mOutput.mResources.mBuffers[accessor.mBufferView->mBuffer.GetIndex()].GetBufferStream()),
       mElementSizeBytes(accessor.GetElementSizeBytes())
     {
+      mStream.imbue(std::locale::classic());
       DALI_ASSERT_DEBUG(accessor.mType == gltf2::AccessorType::MAT4 && accessor.mComponentType == gltf2::Component::FLOAT);
 
       if(!mStream.rdbuf()->in_avail())

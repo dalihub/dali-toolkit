@@ -59,8 +59,8 @@ struct Context
     return TEST_RESOURCE_DIR "/";
   };
 
-  ResourceBundle                        resources;
-  SceneDefinition                       scene;
+  ResourceBundle                         resources;
+  SceneDefinition                        scene;
   Dali::Vector<CameraParameters>         cameraParameters;
   Dali::Vector<LightParameters>          lights;
   Dali::Vector<AnimationDefinition>      animations;
@@ -255,7 +255,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   std::vector<std::string> metadata;
   uint32_t                 metadataCount = 0;
   ctx.input.mPreNodeCategoryProcessors.PushBack({"metadata",
-                                                  [&](const Property::Array& array, StringCallback)
+                                                 [&](const Property::Array& array, StringCallback)
   {
     std::string key, value;
     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
@@ -277,7 +277,7 @@ int UtcDaliDliLoaderLoadSceneMorph(void)
   std::vector<std::string> behaviors;
   uint32_t                 behaviorCount = 0;
   ctx.input.mPostNodeCategoryProcessors.PushBack({"behaviors",
-                                                   [&](const Property::Array& array, StringCallback)
+                                                  [&](const Property::Array& array, StringCallback)
   {
     for(uint32_t i0 = 0, i1 = array.Count(); i0 < i1; ++i0)
     {
@@ -554,8 +554,15 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
   Actor bob     = root.FindChildByName("Bob");
   Actor charlie = root.FindChildByName("Charlie");
 
-  DALI_TEST_EQUAL(nodeParams.mConstrainables.Size(), 3u);
+  float   mv[16] = {0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f, 4.0f};
+  Matrix3 dummyMatrix3(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f);
+  Matrix  dummyMatrix(mv);
+
+  DALI_TEST_EQUAL(nodeParams.mConstrainables.Size(), 9u);
   DALI_TEST_EQUAL(bob.GetProperty(bob.GetPropertyIndex("angularVelocity")).Get<Vector2>(), Vector2(-0.5, 0.0004));
+  DALI_TEST_EQUAL(bob.GetProperty(bob.GetPropertyIndex("dummyInteger")).Get<int32_t>(), 4);
+  DALI_TEST_EQUAL(bob.GetProperty(bob.GetPropertyIndex("dummyMatrix3")).Get<Matrix3>(), dummyMatrix3);
+  DALI_TEST_EQUAL(bob.GetProperty(bob.GetPropertyIndex("dummyMatrix4")).Get<Matrix>(), dummyMatrix);
 
   ctx.errors.clear();
   scene.ApplyConstraints(root, std::move(nodeParams.mConstrainables), ctx.onError);
@@ -570,6 +577,9 @@ int UtcDaliDliLoaderLoadSceneConstraints(void)
   DALI_TEST_EQUAL(charlie.GetCurrentProperty(Actor::Property::ORIENTATION), alice.GetProperty(Actor::Property::ORIENTATION));
   DALI_TEST_EQUAL(charlie.GetCurrentProperty(Actor::Property::POSITION), bob.GetProperty(Actor::Property::POSITION));
   DALI_TEST_EQUAL(charlie.GetCurrentProperty(charlie.GetPropertyIndex("angularVelocity")), bob.GetProperty(bob.GetPropertyIndex("angularVelocity")));
+  DALI_TEST_EQUAL(charlie.GetCurrentProperty(charlie.GetPropertyIndex("dummyInteger")), bob.GetProperty(bob.GetPropertyIndex("dummyInteger")));
+  DALI_TEST_EQUAL(charlie.GetCurrentProperty(charlie.GetPropertyIndex("dummyMatrix3")), bob.GetProperty(bob.GetPropertyIndex("dummyMatrix3")));
+  DALI_TEST_EQUAL(charlie.GetCurrentProperty(charlie.GetPropertyIndex("dummyMatrix4")), bob.GetProperty(bob.GetPropertyIndex("dummyMatrix4")));
 
   END_TEST;
 }

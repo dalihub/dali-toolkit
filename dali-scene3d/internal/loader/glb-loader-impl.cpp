@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <locale>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-util.h>
@@ -60,6 +61,7 @@ bool GlbLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::Lo
   std::string      stdUrl = ToStdString(url);
   Dali::FileStream fileStream(stdUrl, FileStream::READ | FileStream::BINARY);
   auto&            stream = fileStream.GetStream();
+  stream.imbue(std::locale::classic());
   if(!stream.rdbuf()->in_avail())
   {
     DALI_LOG_ERROR("Load Model file is failed, url : %s\n", stdUrl.c_str());

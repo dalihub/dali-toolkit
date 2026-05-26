@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/string-utils.h>
 #include <algorithm>
+#include <locale>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -107,6 +108,8 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
   {
     std::ostringstream attributes;
     std::ostringstream weights;
+    attributes.imbue(std::locale::classic());
+    weights.imbue(std::locale::classic());
     for(size_t i = 1; i < numberOfJointSets; ++i)
     {
       attributes << "INPUT vec4 aJoints" << i << ";\n";
@@ -130,7 +133,8 @@ void ShaderOption::AddJointMacros(size_t numberOfJointSets)
 
 void ShaderOption::AddMacroDefinition(Dali::String macro, Dali::String definition)
 {
-  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [&macro](ShaderOption::MacroDefinition& md) { return md.macro == macro; });
+  auto iter = std::find_if(mMacros.begin(), mMacros.end(), [&macro](ShaderOption::MacroDefinition& md)
+  { return md.macro == macro; });
   if(iter != mMacros.End())
   {
     iter->definition = definition;

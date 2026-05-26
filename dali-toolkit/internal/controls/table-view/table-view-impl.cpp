@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <locale>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -1227,7 +1228,9 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       Property::Value& item     = map->GetValue(i);
       Property::Map*   childMap = item.GetMap();
 
-      std::istringstream(ToStdString(map->GetKey(i))) >> index;
+      auto iss = std::istringstream(ToStdString(map->GetKey(i)));
+      iss.imbue(std::locale::classic());
+      iss >> index;
       if(childMap)
       {
         Property::Value* policy = childMap->Find("policy");
@@ -1345,6 +1348,7 @@ void TableView::GetMapPropertyValue(const RowColumnArray& data, Property::Map& m
       }
     }
     std::ostringstream ss;
+    ss.imbue(std::locale::classic());
     ss << i;
     InsertToMap(map, ss.str(), Property::Value(item));
   }

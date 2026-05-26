@@ -17,14 +17,13 @@
 #include <dali-physics/integration-api/integ-physics-adaptor.h>
 
 #include <dali-physics/internal/physics-adaptor-impl.h>
-#include <memory>
 
 namespace Dali::Toolkit::Physics::Integration
 {
 PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle)
 {
-  std::unique_ptr<Internal::PhysicsWorld>& worldPtr = GetImplementation(adaptorHandle).GetPhysicsWorld();
-  return PhysicsWorld{worldPtr.get()};
+  UniquePtr<Internal::PhysicsWorld>& worldPtr = GetImplementation(adaptorHandle).GetPhysicsWorld();
+  return PhysicsWorld{worldPtr.Get()};
 }
 
 } // namespace Dali::Toolkit::Physics::Integration

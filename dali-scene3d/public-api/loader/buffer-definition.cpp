@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/file-stream.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <locale>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
@@ -69,7 +70,9 @@ BufferDefinition::BufferDefinition(BufferDefinition&& other)
 std::iostream& BufferDefinition::GetBufferStream()
 {
   LoadBuffer();
-  return mImpl->stream.get()->GetStream();
+  auto& stream = mImpl->stream.get()->GetStream();
+  stream.imbue(std::locale::classic());
+  return stream;
 }
 
 Dali::String BufferDefinition::GetUri()

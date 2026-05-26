@@ -22,6 +22,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <locale>
+
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 
@@ -1461,6 +1463,7 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
     }
 
     std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     oss << prim.GetName() << "_xform_anim";
     std::string animationName = oss.str();
 

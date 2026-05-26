@@ -38,7 +38,12 @@
 #include <dali/integration-api/string-utils.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <dlfcn.h>
+#include <mutex>
+#include <vector>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
@@ -66,6 +71,104 @@ static void Wait(ToolkitTestApplication& application)
 {
   application.SendNotification();
   application.Render(16);
+}
+
+/**
+ * If DumpTree returned lz4b64-prefixed wire payload, decompress to JSON for test comparison.
+ * (Matches aurum / Dali wire format: marker + base64([u32 origLen le][lz4 bytes]).)
+ */
+static std::string UtcNormalizeDumpTreeWireForCompare(const std::string& input)
+{
+  constexpr const char kMarker[] = "lz4b64:";
+  if(input.rfind(kMarker, 0) != 0)
+  {
+    return input;
+  }
+
+  auto base64Decode = [](const std::string& in) -> std::vector<uint8_t> {
+    auto decodeIndex = [](char c) -> int {
+      if(c >= 'A' && c <= 'Z') return c - 'A';
+      if(c >= 'a' && c <= 'z') return 26 + (c - 'a');
+      if(c >= '0' && c <= '9') return 52 + (c - '0');
+      if(c == '+') return 62;
+      if(c == '/') return 63;
+      return -1;
+    };
+    size_t len = in.size();
+    if(len % 4 != 0) return {};
+
+    size_t padding = 0;
+    if(len >= 1 && in[len - 1] == '=') padding++;
+    if(len >= 2 && in[len - 2] == '=') padding++;
+
+    size_t outLen = (len / 4) * 3 - padding;
+    std::vector<uint8_t> out;
+    out.resize(outLen);
+    size_t outI = 0;
+
+    for(size_t i = 0; i < len; i += 4)
+    {
+      int b0 = decodeIndex(in[i]);
+      int b1 = decodeIndex(in[i + 1]);
+      int b2 = in[i + 2] == '=' ? -1 : decodeIndex(in[i + 2]);
+      int b3 = in[i + 3] == '=' ? -1 : decodeIndex(in[i + 3]);
+      if(b0 < 0 || b1 < 0) return {};
+
+      uint32_t n = static_cast<uint32_t>(b0) << 18;
+      n |= static_cast<uint32_t>(b1) << 12;
+      if(b2 >= 0) n |= static_cast<uint32_t>(b2) << 6;
+      if(b3 >= 0) n |= static_cast<uint32_t>(b3);
+
+      if(outI < outLen) out[outI++] = (n >> 16) & 0xFF;
+      if(b2 >= 0 && outI < outLen) out[outI++] = (n >> 8) & 0xFF;
+      if(b3 >= 0 && outI < outLen) out[outI++] = n & 0xFF;
+    }
+    return out;
+  };
+
+  const std::string b64 = input.substr(sizeof(kMarker) - 1);
+  std::vector<uint8_t> payload = base64Decode(b64);
+  if(payload.size() < 4)
+  {
+    return input;
+  }
+
+  const uint32_t origLen = static_cast<uint32_t>(payload[0]) | (static_cast<uint32_t>(payload[1]) << 8) |
+                           (static_cast<uint32_t>(payload[2]) << 16) | (static_cast<uint32_t>(payload[3]) << 24);
+
+  using DecompressFn = int (*)(const char*, char*, int, int);
+  static std::once_flag once;
+  static DecompressFn decompressSafe = nullptr;
+  static void* lz4Handle = nullptr;
+  std::call_once(once, []() {
+    const char* names[] = {"liblz4.so.1", "liblz4.so"};
+    for(const char* name : names)
+    {
+      lz4Handle = dlopen(name, RTLD_LAZY);
+      if(lz4Handle) break;
+    }
+    if(!lz4Handle)
+    {
+      lz4Handle = RTLD_DEFAULT;
+    }
+    decompressSafe = reinterpret_cast<DecompressFn>(dlsym(lz4Handle, "LZ4_decompress_safe"));
+  });
+
+  if(!decompressSafe || origLen == 0)
+  {
+    return input;
+  }
+
+  const size_t compSize = payload.size() - 4;
+  std::string out;
+  out.resize(origLen);
+  const int dec = decompressSafe(reinterpret_cast<const char*>(payload.data() + 4), out.data(), static_cast<int>(compSize), static_cast<int>(origLen));
+  if(dec < 0)
+  {
+    return input;
+  }
+  out.resize(static_cast<size_t>(dec));
+  return out;
 }
 } // namespace
 
@@ -2640,6 +2743,41 @@ int UtcDaliAccessibleDumpTree(void)
     const std::string expected = R"({ "appname": "bus", "path": "/org/a11y/atspi/accessible/root", "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/1", "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "reading_info_type": "none", "resID": "123" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/2", "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/3", "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/4", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/5", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/6", "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/8", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/9", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/10", "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/12", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/13", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/14", "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/16", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/17", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/18", "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
 
     auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_SHOWING_ONLY);
+    CompareResultForDebug(result, expected);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "appname": "bus", "path": "/org/a11y/atspi/accessible/root", "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/1", "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "reading_info_type": "none", "resID": "123" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/2", "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/3", "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/4", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/5", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/6", "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/8", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/9", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/10", "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/12", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/13", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/14", "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/16", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/17", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/18", "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_EFFECTIVE_SHOWING_ONLY);
+    CompareResultForDebug(result, expected);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "appname": "bus", "path": "/org/a11y/atspi/accessible/root", "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/1", "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "reading_info_type": "none", "resID": "123" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/2", "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/3", "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/4", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/5", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/6", "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/7", "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t0_2", "x": 240, "y": 240, "w": 10, "h": 10 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/8", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/9", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/10", "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/11", "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n0_\t1_2", "x": 480, "y": 240, "w": 10, "h": 10 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/12", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/13", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/14", "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/15", "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t0_2", "x": 240, "y": 640, "w": 10, "h": 10 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/16", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/17", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/18", "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/19", "role": "unknown", "states": 256, "type" : "Control", "automationId" : "test_\n1_\t1_2", "x": 480, "y": 640, "w": 10, "h": 10 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_COMPRESSION);
+    result      = UtcNormalizeDumpTreeWireForCompare(result);
+    CompareResultForDebug(result, expected);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "appname": "bus", "path": "/org/a11y/atspi/accessible/root", "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/1", "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "reading_info_type": "none", "resID": "123" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/2", "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/3", "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/4", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/5", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/6", "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/8", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/9", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/10", "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/12", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/13", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/14", "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/16", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/17", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/18", "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_COMPRESSION_SHOWING_ONLY);
+    result      = UtcNormalizeDumpTreeWireForCompare(result);
+    CompareResultForDebug(result, expected);
+    DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
+  }
+
+  {
+    const std::string expected = R"({ "appname": "bus", "path": "/org/a11y/atspi/accessible/root", "role": "application", "states": 1107296514, "text": "TestApp", "x": 0, "y": 0, "w": 480, "h": 800, "toolkit": "dali", "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/1", "role": "window", "states": 1124073730, "text": "RootLayer", "type" : "Layer", "x": 0, "y": 0, "w": 480, "h": 800, "attributes": { "reading_info_type": "none", "resID": "123" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/2", "role": "redundant object", "states": 1107296256, "text": "DefaultCamera", "type" : "CameraActor", "x": 240, "y": 400, "w": 0, "h": 0 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/3", "role": "table", "states": 1107298560, "type" : "TableView", "x": 0, "y": 0, "w": 480, "h": 800, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/4", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/5", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t0_0", "x": 0, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/6", "role": "label", "states": 35185479385344, "text": "test_\n0_\t0", "type" : "TextLabel", "automationId" : "test_\n0_\t0_1", "x": 120, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/8", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 0, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/9", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n0_\t1_0", "x": 240, "y": 0, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/10", "role": "label", "states": 35185479385344, "text": "test_\n0_\t1", "type" : "TextLabel", "automationId" : "test_\n0_\t1_1", "x": 360, "y": 120, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/12", "role": "unknown", "states": 1107296512, "type" : "Control", "x": 0, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/13", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t0_0", "x": 0, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/14", "role": "label", "states": 35185479385344, "text": "test_\n1_\t0", "type" : "TextLabel", "automationId" : "test_\n1_\t0_1", "x": 120, "y": 520, "w": 240, "h": 64 }] }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/16", "role": "unknown", "states": 1124073728, "type" : "Control", "x": 240, "y": 400, "w": 240, "h": 240, "attributes": { "dummy": "i_am_dummy" }, "children": [ { "appname": "bus", "path": "/org/a11y/atspi/accessible/17", "role": "push button", "states": 35185500358912, "type" : "PushButton", "automationId" : "test_\n1_\t1_0", "x": 240, "y": 400, "w": 10, "h": 10 }, { "appname": "bus", "path": "/org/a11y/atspi/accessible/18", "role": "label", "states": 35185479385344, "text": "test_\n1_\t1", "type" : "TextLabel", "automationId" : "test_\n1_\t1_1", "x": 360, "y": 520, "w": 240, "h": 64 }] }] }] }] })";
+
+    auto result = appAccessible->DumpTree(Accessibility::Accessible::DumpDetailLevel::DUMP_FULL_COMPRESSION_EFFECTIVE_SHOWING_ONLY);
+    result      = UtcNormalizeDumpTreeWireForCompare(result);
     CompareResultForDebug(result, expected);
     DALI_TEST_EQUALS(result, expected, TEST_LOCATION);
   }

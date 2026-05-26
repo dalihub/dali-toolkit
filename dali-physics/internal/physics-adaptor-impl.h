@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_INTERNAL_ADAPTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-object.h>
-#include <memory>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -179,18 +179,21 @@ public:
    */
   void OnUpdateActors(Dali::UpdateProxy* updateProxy);
 
-  std::unique_ptr<PhysicsWorld>& GetPhysicsWorld();
+  /**
+   * Retrieves a reference to the physics world pointer
+   */
+  UniquePtr<PhysicsWorld>& GetPhysicsWorld();
 
 protected:
-  std::unique_ptr<PhysicsWorld>                 mPhysicsWorld;
+  UniquePtr<PhysicsWorld>                       mPhysicsWorld;
   std::unordered_map<uint32_t, PhysicsActorPtr> mPhysicsActors;
-  Dali::Actor                                   mRootActor;
+  Actor                                         mRootActor;
 
-  Dali::Matrix     mTransform;
-  Dali::Matrix     mInverseTransform;
-  Dali::Uint16Pair mSize;
+  Matrix     mTransform;
+  Matrix     mInverseTransform;
+  Uint16Pair mSize;
 
-  Dali::SlotDelegate<PhysicsAdaptor> mSlotDelegate;
+  SlotDelegate<PhysicsAdaptor> mSlotDelegate;
 };
 
 } //namespace Internal

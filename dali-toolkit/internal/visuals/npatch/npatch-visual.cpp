@@ -26,6 +26,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <locale>
+
 using Dali::Integration::ToDaliStringView;
 
 // INTERNAL INCLUDES
@@ -468,9 +470,11 @@ Shader NPatchVisual::CreateShader()
     else if(xStretchCount > 0 || yStretchCount > 0)
     {
       std::stringstream shaderName;
+      shaderName.imbue(std::locale::classic());
       shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
 
       std::stringstream vertexShader;
+      vertexShader.imbue(std::locale::classic());
       vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                    << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;
@@ -503,9 +507,11 @@ Shader NPatchVisual::CreateShader()
     else if(xStretchCount > 0 || yStretchCount > 0)
     {
       std::stringstream shaderName;
+      shaderName.imbue(std::locale::classic());
       shaderName << "N_PATCH_" << xStretchCount << "x" << yStretchCount;
 
       std::stringstream vertexShader;
+      vertexShader.imbue(std::locale::classic());
       vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
                    << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << SHADER_NPATCH_VISUAL_SHADER_VERT;

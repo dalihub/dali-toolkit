@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <locale>
 #include <memory>
 #include <sstream>
 #include <string_view>
@@ -101,7 +102,8 @@ bool ParseHierarchy(std::istream& file, std::shared_ptr<Joint>& joint)
   {
     trim(line);
     std::istringstream stream(line);
-    std::string        token;
+    stream.imbue(std::locale::classic());
+    std::string token;
     std::getline(stream, token, ' ');
 
     if(token == TOKEN_OFFSET.data())
@@ -234,7 +236,8 @@ bool ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t
   {
     trim(line);
     std::istringstream stream(line);
-    std::string        token;
+    stream.imbue(std::locale::classic());
+    std::string token;
     std::getline(stream, token, ':');
     trim(token);
     if(token == TOKEN_FRAMES.data())
@@ -270,6 +273,7 @@ bool ParseMotion(std::istream& file, std::shared_ptr<Joint>& hierarchy, uint32_t
       continue;
     }
     std::istringstream stream(line);
+    stream.imbue(std::locale::classic());
     if(DALI_UNLIKELY(++loadedFrameCount > frameCount))
     {
       // Parse failed. Just skip decoding, and get the number of line for debug.
@@ -336,21 +340,23 @@ bool ParseBvh(std::istream& file, uint32_t& frameCount, float& frameTime, std::s
   {
     trim(line);
     std::istringstream stream(line);
-    std::string        token;
+    stream.imbue(std::locale::classic());
+    std::string token;
     std::getline(stream, token, ' ');
     if(token == TOKEN_HIERARCHY.data())
     {
-      std::string line;
-      while(std::getline(file, line))
+      std::string line2;
+      while(std::getline(file, line2))
       {
-        trim(line);
-        std::istringstream stream(line);
-        std::string        token;
-        std::getline(stream, token, ' ');
-        if(token == TOKEN_ROOT.data())
+        trim(line2);
+        std::istringstream stream2(line2);
+        stream2.imbue(std::locale::classic());
+        std::string token2;
+        std::getline(stream2, token2, ' ');
+        if(token2 == TOKEN_ROOT.data())
         {
-          std::getline(stream, token, ' ');
-          rootJoint->name = token;
+          std::getline(stream2, token2, ' ');
+          rootJoint->name = token2;
           parseHierarchy  = ParseHierarchy(file, rootJoint);
           break;
         }
@@ -444,6 +450,7 @@ AnimationDefinition LoadBvh(const Dali::String& path, const Dali::String& animat
   std::string      stdPath = ToStdString(path);
   Dali::FileStream fileStream(stdPath);
   std::iostream&   stream = fileStream.GetStream();
+  stream.imbue(std::locale::classic());
 
   if(stream.fail())
   {
@@ -467,6 +474,7 @@ AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLen
 
   Dali::FileStream fileStream(const_cast<uint8_t*>(rawBuffer), static_cast<size_t>(static_cast<uint32_t>(rawBufferLength)));
   std::iostream&   stream = fileStream.GetStream();
+  stream.imbue(std::locale::classic());
 
   if(stream.fail())
   {

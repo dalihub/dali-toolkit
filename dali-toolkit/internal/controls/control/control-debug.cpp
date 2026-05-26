@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <locale>
 
 using Dali::Integration::ToStdString;
 
@@ -48,6 +49,7 @@ public:
   std::string ToString()
   {
     std::ostringstream stream;
+    stream.imbue(std::locale::classic());
     ToStream(stream);
     return stream.str();
   }
@@ -290,6 +292,7 @@ std::string DumpControl(const ControlImpl& controlImpl)
   auto& internalControl = Control::Get(controlImpl);
 
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << "{\n  ";
   const std::string name = ToStdString(controlImpl.Self().GetProperty(Dali::Actor::Property::NAME));
   if(!name.empty())
@@ -314,6 +317,7 @@ std::string DumpControl(const ControlImpl& controlImpl)
 std::string DumpActor(Actor actor)
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << "{\n  ";
   const std::string name = ToStdString(actor.GetProperty(Dali::Actor::Property::NAME));
   if(!name.empty())

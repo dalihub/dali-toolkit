@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
+#include <locale>
+
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -30,6 +32,7 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
   if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                                                                    \
   {                                                                                                                                                                      \
     std::ostringstream oss;                                                                                                                                              \
+    oss.imbue(std::locale::classic());                                                                                                                                   \
     oss << "Size:" << mQueue.Count() << " [ ";                                                                                                                           \
     for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                                                                   \
     {                                                                                                                                                                    \

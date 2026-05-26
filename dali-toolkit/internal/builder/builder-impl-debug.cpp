@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <cstring>
 #include <iostream>
+#include <locale>
 
 namespace Dali
 {
@@ -39,6 +40,7 @@ void LogTree(const Toolkit::JsonParser& parser)
          ((*iter).second.GetType() == TreeNode::STRING && strcmp((*iter).second.GetString(), "DUMP_TREE") == 0))
       {
         std::ostringstream oss;
+        oss.imbue(std::locale::classic());
         parser.Write(oss, 2);
         std::cout << oss.str() << std::endl;
       }
@@ -49,6 +51,7 @@ void LogTree(const Toolkit::JsonParser& parser)
 std::string PropertyValueToString(const Property::Value& value)
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << value;
 
   return oss.str();

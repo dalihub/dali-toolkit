@@ -25,6 +25,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/texture.h>
 #include <fstream>
+#include <locale>
 #include <memory>
 
 namespace Dali
@@ -195,6 +196,7 @@ bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapDat
   std::string      stdPath = ToStdString(path);
   Dali::FileStream fileStream(stdPath, FileStream::READ | FileStream::BINARY);
   auto&            stream = fileStream.GetStream();
+  stream.imbue(std::locale::classic());
   if(!stream.good() || !stream.rdbuf()->in_avail())
   {
     DALI_LOG_ERROR("Load ktx data failed, path : %s\n", stdPath.c_str());

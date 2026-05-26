@@ -22,6 +22,7 @@
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <locale>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -162,6 +163,7 @@ Dali::Scene3D::Loader::AnimationDefinition LoadFacialAnimationInternal(json::uni
       animatedProperty.mTimePeriod = Dali::TimePeriod(animationDefinition.GetDuration());
       animatedProperty.mNodeName   = Dali::Integration::ToDaliString(std::string(blendShape.mNodeName));
       std::stringstream weightPropertyStream;
+      weightPropertyStream.imbue(std::locale::classic());
       weightPropertyStream << Dali::Scene3D::Loader::BlendShapes::WEIGHTS_UNIFORM << "[" << morphTargetIndex << "]";
       animatedProperty.mPropertyName = Dali::Integration::ToDaliString(weightPropertyStream.str());
 

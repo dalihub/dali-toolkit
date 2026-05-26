@@ -22,9 +22,6 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 
-#include <memory>
-#include <utility>
-
 // INTERNAL INCLUDES
 #include <dali-physics/internal/physics-world-impl.h>
 
@@ -56,7 +53,7 @@ void PhysicsAdaptor::Initialize(const Dali::Matrix& transform, Uint16Pair worldS
   mRootActor[Layer::Property::BEHAVIOR]      = Layer::LAYER_3D;
   mRootActor[Layer::Property::DEPTH_TEST]    = true;
   mRootActor[Actor::Property::SIZE]          = Vector2(worldSize.GetWidth(), worldSize.GetHeight());
-  mRootActor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
+  mRootActor[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;
   mRootActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   // Initialize derived adaptor (and world)
@@ -75,7 +72,7 @@ float PhysicsAdaptor::GetTimestep() const
 
 Physics::PhysicsAdaptor::ScopedPhysicsAccessorPtr PhysicsAdaptor::GetPhysicsAccessor()
 {
-  return std::unique_ptr<Physics::PhysicsAdaptor::ScopedPhysicsAccessor>(new Physics::PhysicsAdaptor::ScopedPhysicsAccessor(*mPhysicsWorld.get()));
+  return UniquePtr<Physics::PhysicsAdaptor::ScopedPhysicsAccessor>(new Physics::PhysicsAdaptor::ScopedPhysicsAccessor(*mPhysicsWorld.Get()));
 }
 
 void PhysicsAdaptor::SetIntegrationState(Physics::PhysicsAdaptor::IntegrationState state)
@@ -125,7 +122,7 @@ void PhysicsAdaptor::CreateSyncPoint()
   mPhysicsWorld->CreateSyncPoint();
 }
 
-std::unique_ptr<PhysicsWorld>& PhysicsAdaptor::GetPhysicsWorld()
+UniquePtr<PhysicsWorld>& PhysicsAdaptor::GetPhysicsWorld()
 {
   return mPhysicsWorld;
 }

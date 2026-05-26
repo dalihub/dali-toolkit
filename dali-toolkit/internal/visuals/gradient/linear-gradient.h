@@ -39,8 +39,9 @@ public:
    * Constructor.
    * @param[in] startPosition The starting point onto which the 0% gradient stops are mapped.
    * @param[in] endPosition The ending point r onto which the 100% gradient stops are mapped.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
    */
-  LinearGradient(const Vector2& startPosition, const Vector2& endPosition);
+  LinearGradient(const Vector2& startPosition, const Vector2& endPosition, IntrusivePtr<Gradient> oldGradient);
 
   /**
    * Destructor.

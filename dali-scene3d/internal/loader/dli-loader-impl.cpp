@@ -31,6 +31,7 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <locale>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-util.h>
@@ -410,6 +411,7 @@ bool DliLoaderImpl::LoadModel(const Dali::String& uri, Dali::Scene3D::Loader::Lo
 std::string DliLoaderImpl::GetParseError() const
 {
   std::stringstream stream;
+  stream.imbue(std::locale::classic());
 
   auto& parser = mImpl->mParser;
   if(parser.ParseError())
@@ -688,7 +690,7 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
       }
     }
     auto sssIter = std::find_if(shaderDef.mDefines.begin(), shaderDef.mDefines.end(), [](Dali::String& item)
-                                { return (item == "SSS"); });
+    { return (item == "SSS"); });
     if(sssIter != shaderDef.mDefines.end())
     {
       shaderDef.mDefines.Erase(sssIter);
@@ -1203,7 +1205,7 @@ void DliLoaderImpl::Impl::ParseNodes(const TreeNode* const nodes, Index index, L
     virtual unsigned int Resolve(Index iDli) override
     {
       auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli)
-                                    { return idx.iDli < iDli; });
+      { return idx.iDli < iDli; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }
@@ -1560,7 +1562,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
     }
 
     auto       iFind     = std::lower_bound(definitions.begin(), definitions.end(), animDef, [](const AnimationDefinition& ad0, const AnimationDefinition& ad1)
-                                  { return ad0.GetName() < ad1.GetName(); });
+              { return ad0.GetName() < ad1.GetName(); });
     const bool overwrite = iFind != definitions.end() && iFind->GetName() == animDef.GetName();
     if(overwrite)
     {
@@ -1679,7 +1681,8 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
           DALI_ASSERT_ALWAYS(!animProp.mPropertyName.Empty() && "Animation must specify a property name");
 
           std::ifstream binAniFile;
-          std::string   animationFilename;
+          binAniFile.imbue(std::locale::classic());
+          std::string animationFilename;
           if(ReadString(tnKeyFramesBin->GetChild(URL), animationFilename))
           {
             std::string animationFullPath = ToStdString(params.input->mAnimationsPath) + animationFilename;
@@ -1835,7 +1838,7 @@ void DliLoaderImpl::Impl::ParseAnimationGroups(const Toolkit::TreeNode* tnAnimat
 
     Dali::String daliGroupName = ToDaliString(std::move(groupName));
     auto         iFind         = std::lower_bound(animGroups.begin(), animGroups.end(), daliGroupName, [](const AnimationGroupDefinition& group, const Dali::String& name)
-                                  { return group.mName < name; });
+                    { return group.mName < name; });
     if(iFind != animGroups.end() && iFind->mName == daliGroupName)
     {
       mOnError(ToStdString(FormatString("Animation group with name '%s' already exists; new entries will be merged.", daliGroupName.CStr())));

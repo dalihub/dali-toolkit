@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <locale>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -139,6 +140,8 @@ void GenerateHeaderFile(
 {
   cout << "  Generating \"" << shaderVariableName << "\" in " << outFilePath.filename();
   ofstream outFile(outFilePath);
+
+  outFile.imbue(std::locale::classic());
   if(outFile.is_open())
   {
     outFile << "#pragma once" << endl
@@ -234,6 +237,7 @@ private:
     ofstream outFile(filePath);
     if(outFile)
     {
+      outFile.imbue(std::locale::classic());
       outFile << header;
       for(auto& current : strings)
       {
@@ -302,6 +306,8 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
           const string    filename(path.filename().string());
           string          shaderVariableName(GetShaderVariableName(filename));
           ifstream        shaderFile(path);
+
+          shaderFile.imbue(std::locale::classic());
           if(shaderFile.is_open())
           {
             fs::path outFilePath(GetShaderOutputFilePath(outDir, filename));

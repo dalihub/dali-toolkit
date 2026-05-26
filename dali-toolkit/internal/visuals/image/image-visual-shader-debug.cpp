@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/style-monitor.h> ///< for load json file.
 #include <dali/devel-api/common/vector-wrapper.h>
 
+#include <locale>
 #include <regex> ///< for redefine shader
 #include <string_view>
 
@@ -171,6 +172,7 @@ bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentR
   if(!parser.Parse(stringOut))
   {
     std::ostringstream stream;
+    stream.imbue(std::locale::classic());
     if(parser.ParseError())
     {
       stream << "position: " << parser.GetErrorPosition() << ", line: " << parser.GetErrorLineNumber() << ", column: " << parser.GetErrorColumn() << ", description: " << parser.GetErrorDescription() << ".";
@@ -190,6 +192,7 @@ bool ParseScriptInfomation(Property::Map& vertexResult, Property::Map& fragmentR
   {
     std::ostringstream oss;
     oss.clear();
+    oss.imbue(std::locale::classic());
 
     if(node)
     {
