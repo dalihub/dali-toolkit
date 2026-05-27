@@ -112,9 +112,9 @@ void PhysicsAdaptor::OnUpdateActors(Dali::UpdateProxy* updateProxy)
   }
 }
 
-void PhysicsAdaptor::Queue(std::function<void()> function)
+void PhysicsAdaptor::Queue(UniquePtr<CallbackBase> callback)
 {
-  mPhysicsWorld->Queue(function);
+  mPhysicsWorld->Queue(Move(callback));
 }
 
 void PhysicsAdaptor::CreateSyncPoint()

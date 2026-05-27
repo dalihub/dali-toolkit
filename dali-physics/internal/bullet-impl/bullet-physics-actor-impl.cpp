@@ -72,8 +72,8 @@ void PhysicsActor::AsyncSetPhysicsPosition(Dali::Vector3 actorPosition)
   // Queue task
   btRigidBody* body = mBody.Get<btRigidBody*>();
   auto         pos  = fromVec3(mAdaptor.TranslateToPhysicsSpace(actorPosition));
-  mAdaptor.Queue([body, pos]
-  { body->getWorldTransform().setOrigin(pos); });
+  mAdaptor.Queue(MakePhysicsCallback([body, pos]()
+  { body->getWorldTransform().setOrigin(pos); }));
 }
 
 void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
@@ -81,8 +81,8 @@ void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
   // Queue task
   btRigidBody* body = mBody.Get<btRigidBody*>();
   auto         q    = fromQuat(mAdaptor.TranslateToPhysicsSpace(rotation));
-  mAdaptor.Queue([body, q]()
-  { body->getWorldTransform().setRotation(q); });
+  mAdaptor.Queue(MakePhysicsCallback([body, q]()
+  { body->getWorldTransform().setRotation(q); }));
 }
 
 Dali::Vector3 PhysicsActor::GetPhysicsPosition() const

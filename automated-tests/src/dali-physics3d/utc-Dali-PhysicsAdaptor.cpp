@@ -861,10 +861,10 @@ int UtcDaliPhysics3DAdaptorQueue(void)
   }
 
   tet_infoline("Test that Queue works without accessor");
-  adaptor.Queue([body]()
+  adaptor.Queue(MakePhysicsCallback([body]()
   {
     body->getWorldTransform().setOrigin(btVector3(100.0f, 20.0f, 20.0f));
-  });
+  }));
   adaptor.CreateSyncPoint();
 
   application.SendNotification();
@@ -905,10 +905,10 @@ int UtcDaliPhysics3DAdaptorCreateSyncPoint(void)
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
     tet_infoline("Test that Queue works with accessor");
-    adaptor.Queue([body]()
+    adaptor.Queue(MakePhysicsCallback([body]()
     {
       body->getWorldTransform().setOrigin(btVector3(100.0f, 20.0f, 20.0f));
-    });
+    }));
   }
 
   // Should trigger an Update without processing queue
