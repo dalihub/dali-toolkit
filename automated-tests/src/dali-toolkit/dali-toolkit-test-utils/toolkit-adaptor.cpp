@@ -213,6 +213,11 @@ void Adaptor::RequestProcessEventsOnIdle()
   }
 }
 
+void Adaptor::RequestProcessEventsAndUpdate()
+{
+  RequestProcessEventsOnIdle();
+}
+
 Dali::Integration::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   DALI_ASSERT_ALWAYS(!mWindows.empty());
@@ -310,6 +315,31 @@ void Adaptor::UnregisterProcessorOnce(Dali::Integration::Processor& processor, b
   Dali::Integration::Core& core = mTestApplication->GetCore();
   tet_printf("Adaptor::UnregisterProcessorOnce : %s\n", processor.GetProcessorName().data());
   core.UnregisterProcessorOnce(processor, postProcessor);
+}
+
+void Adaptor::AddFrameCallback(FrameCallbackInterface& frameCallback, Dali::Actor rootActor)
+{
+  if(mTestApplication)
+  {
+    mTestApplication->GetCore().AddFrameCallback(frameCallback, rootActor);
+  }
+}
+
+void Adaptor::RemoveFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  if(mTestApplication)
+  {
+    mTestApplication->GetCore().RemoveFrameCallback(frameCallback);
+  }
+}
+
+Dali::UpdateProxy::NotifySyncPoint Adaptor::NotifyFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  if(mTestApplication)
+  {
+    return mTestApplication->GetCore().NotifyFrameCallback(frameCallback);
+  }
+  return Dali::UpdateProxy::INVALID_SYNC;
 }
 
 void Adaptor::SetApplication(Dali::TestApplication& testApplication)
@@ -510,6 +540,11 @@ void Adaptor::FlushUpdateMessages()
 void Adaptor::RequestProcessEventsOnIdle()
 {
   mImpl->RequestProcessEventsOnIdle();
+}
+
+void Adaptor::RequestProcessEventsAndUpdate()
+{
+  mImpl->RequestProcessEventsAndUpdate();
 }
 
 class LogFactory : public LogFactoryInterface

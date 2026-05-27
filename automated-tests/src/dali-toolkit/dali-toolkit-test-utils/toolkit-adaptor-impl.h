@@ -19,6 +19,8 @@
  */
 
 #include <dali/integration-api/adaptor-framework/render-surface-interface.h>
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {
@@ -73,6 +75,7 @@ public:
 
   void RequestUpdateOnce();
   void RequestProcessEventsOnIdle();
+  void RequestProcessEventsAndUpdate();
 
   static Dali::Integration::Scene GetScene(Dali::Window window);
 
@@ -88,6 +91,10 @@ public:
   void UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
   void RegisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
   void UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
+
+  void                               AddFrameCallback(FrameCallbackInterface& frameCallback, Dali::Actor rootActor);
+  void                               RemoveFrameCallback(FrameCallbackInterface& frameCallback);
+  Dali::UpdateProxy::NotifySyncPoint NotifyFrameCallback(FrameCallbackInterface& frameCallback);
 
   void SetApplication(Dali::TestApplication& testApplication);
 

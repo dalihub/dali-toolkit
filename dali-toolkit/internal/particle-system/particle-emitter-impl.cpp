@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/particle-system/particle-source-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage-devel.h>
+#include <dali/public-api/adaptor-framework/ui-context.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <memory>
 #include <utility>
@@ -159,7 +159,7 @@ void ParticleEmitter::Start()
     // Attach renderer to an actor
     auto renderer = GetImplementation(mParticleRenderer).GetRenderer();
     mActor.AddRenderer(renderer);
-    DevelStage::AddFrameCallback(Stage::GetCurrent(), *mFrameCallback, mActor);
+    Dali::UiContext::Get().AddFrameCallback(*mFrameCallback, mActor);
   }
 }
 
@@ -172,7 +172,7 @@ void ParticleEmitter::Stop()
     mParticleStatusBits |= SIMULATION_STOPPED_STATUS_BIT;
     auto renderer = GetImplementation(mParticleRenderer).GetRenderer();
     mActor.RemoveRenderer(renderer);
-    DevelStage::RemoveFrameCallback(Stage::GetCurrent(), *mFrameCallback);
+    Dali::UiContext::Get().RemoveFrameCallback(*mFrameCallback);
   }
 }
 
