@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -938,12 +937,8 @@ void AnimatedVectorImageVisual::TriggerVectorRasterization()
     mEventCallback               = MakeCallback(this, &AnimatedVectorImageVisual::OnProcessEvents);
     auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
     vectorAnimationManager.RegisterEventCallback(mEventCallback);
-    Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
-    if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
-    {
-      // Request ProcessEvents on idle to make ensure Processor executed.
-      Dali::Adaptor::Get().RequestProcessEventsOnIdle();
-    }
+
+    Dali::Adaptor::Get().RequestProcessEventsAndUpdate(); // Trigger event processing
   }
 }
 
@@ -969,7 +964,7 @@ void AnimatedVectorImageVisual::OnScaleNotification(PropertyNotification source)
         SetVectorImageSize();
         SendAnimationData();
 
-        Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+        Dali::Adaptor::Get().RequestProcessEventsAndUpdate(); // Trigger event processing
       }
     }
   }
@@ -992,7 +987,7 @@ void AnimatedVectorImageVisual::OnSizeNotification(PropertyNotification source)
       SetVectorImageSize();
       SendAnimationData();
 
-      Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
+      Dali::Adaptor::Get().RequestProcessEventsAndUpdate(); // Trigger event processing
     }
   }
 }

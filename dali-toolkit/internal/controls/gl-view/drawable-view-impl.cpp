@@ -21,12 +21,12 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/ui-context.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
@@ -191,7 +191,7 @@ void DrawableView::Terminate()
       mFrameCallback = std::make_unique<FrameCallback>(mEventTrigger.get(), self, 2u);
 
       // Register global frame callbacks.
-      DevelStage::AddFrameCallback(Stage::GetCurrent(), *mFrameCallback, Dali::Actor());
+      Dali::UiContext::Get().AddFrameCallback(*mFrameCallback, Dali::Actor());
       Dali::Window window = DevelWindow::Get(Self());
       if(DALI_LIKELY(window))
       {
@@ -207,7 +207,7 @@ void DrawableView::OnTerminateCompleted()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable() && mFrameCallback))
   {
     // Unregister global frame callbacks.
-    DevelStage::RemoveFrameCallback(Stage::GetCurrent(), *mFrameCallback);
+    Dali::UiContext::Get().RemoveFrameCallback(*mFrameCallback);
     mFrameCallback.reset();
   }
 
