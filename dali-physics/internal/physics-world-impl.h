@@ -22,8 +22,8 @@
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
+#include <dali/public-api/signals/callback.h>
 
-#include <functional>
 #include <mutex>
 #include <queue>
 
@@ -120,7 +120,7 @@ public:
    * Queue a function for execution in the update thread, prior to the physics integration.
    * Enables syncronization of DALi properties and physics controlled properties.
    */
-  void Queue(std::function<void(void)> function);
+  void Queue(UniquePtr<CallbackBase> callback);
 
   /**
    * Create a sync point for queued functions.
@@ -173,12 +173,12 @@ protected:
   virtual void Integrate(float timestep) = 0;
 
 protected:
-  std::mutex                            mMutex;
-  std::queue<std::function<void(void)>> commandQueue;
-  UpdateProxy::NotifySyncPoint          mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
-  UniquePtr<Dali::CallbackBase>         mUpdateCallback{nullptr};
-  UniquePtr<FrameCallback>              mFrameCallback;
-  Actor                                 mRootActor;
+  std::mutex                          mMutex;
+  std::queue<UniquePtr<CallbackBase>> commandQueue;
+  UpdateProxy::NotifySyncPoint        mNotifySyncPoint{Dali::UpdateProxy::INVALID_SYNC};
+  UniquePtr<Dali::CallbackBase>       mUpdateCallback{nullptr};
+  UniquePtr<FrameCallback>            mFrameCallback;
+  Actor                               mRootActor;
 
   float                                     mPhysicsTimeStep{1.0 / 180.0};
   Physics::PhysicsAdaptor::IntegrationState mPhysicsIntegrateState{Physics::PhysicsAdaptor::IntegrationState::ON};

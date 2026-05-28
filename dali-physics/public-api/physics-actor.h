@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_ACTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class PhysicsActor;
  *
  * For example:
  *   btRigidBody* body = physicsActor.GetBody().Get<btRigidBody*>();
- *   mPhysicsImpl.Queue([body](){ body->clearForces(); });
+ *   mPhysicsImpl.Queue(MakePhysicsCallback([body](){ body->clearForces(); }));
  * This enables the developer to synchronize setting physics properties
  * and setting DALi actor properties.
  */

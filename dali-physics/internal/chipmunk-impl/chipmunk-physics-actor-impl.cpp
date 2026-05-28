@@ -67,8 +67,8 @@ void PhysicsActor::AsyncSetPhysicsPosition(Dali::Vector3 actorPosition)
   // Queue task
   cpBody* body = mBody.Get<cpBody*>();
   cpVect  pos  = fromVec3(mAdaptor.TranslateToPhysicsSpace(actorPosition));
-  mAdaptor.Queue([body, pos]
-  { cpBodySetPosition(body, pos); });
+  mAdaptor.Queue(MakePhysicsCallback([body, pos]()
+  { cpBodySetPosition(body, pos); }));
 }
 
 void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
@@ -79,8 +79,8 @@ void PhysicsActor::AsyncSetPhysicsRotation(Dali::Quaternion rotation)
   Vector3 axis;
   Radian  angle;
   q.ToAxisAngle(axis, angle);
-  mAdaptor.Queue([body, angle]()
-  { cpBodySetAngle(body, angle); });
+  mAdaptor.Queue(MakePhysicsCallback([body, angle]()
+  { cpBodySetAngle(body, angle); }));
 }
 
 Dali::Vector3 PhysicsActor::GetPhysicsPosition() const

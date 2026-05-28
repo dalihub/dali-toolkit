@@ -91,7 +91,7 @@ bool PhysicsWorld::OnUpdate(Dali::UpdateProxy& updateProxy, float elapsedSeconds
   {
     while(!commandQueue.empty())
     {
-      commandQueue.front()(); // Execute the queued methods
+      CallbackBase::Execute(*commandQueue.front()); // Execute the queued methods
       commandQueue.pop();
     }
 
@@ -150,10 +150,10 @@ void PhysicsWorld::Unlock()
   gLocked = false;
 }
 
-void PhysicsWorld::Queue(std::function<void(void)> function)
+void PhysicsWorld::Queue(UniquePtr<CallbackBase> callback)
 {
   ScopedLock lock(*this);
-  commandQueue.push(function);
+  commandQueue.push(Move(callback));
 }
 
 void PhysicsWorld::CreateSyncPoint()
