@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <limits>
-
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
@@ -36,7 +33,7 @@ using Index = uint32_t;
  * @brief Constant representing an invalid blend shape index.
  * @SINCE_2_5.23
  */
-static constexpr Index INVALID_INDEX = std::numeric_limits<Index>::max();
+static constexpr Index INVALID_INDEX = static_cast<Index>(~Index(0));
 
 } // namespace Dali::Scene3D::BlendShapes
 
