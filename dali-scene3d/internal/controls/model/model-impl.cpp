@@ -27,6 +27,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <algorithm>
 #include <filesystem>
@@ -92,13 +93,13 @@ struct BoundingVolume
 
   void ConsiderNewPointInVolume(const Vector3& position)
   {
-    pointMin.x = std::min(position.x, pointMin.x);
-    pointMin.y = std::min(position.y, pointMin.y);
-    pointMin.z = std::min(position.z, pointMin.z);
+    pointMin.x = Min(position.x, pointMin.x);
+    pointMin.y = Min(position.y, pointMin.y);
+    pointMin.z = Min(position.z, pointMin.z);
 
-    pointMax.x = std::max(position.x, pointMax.x);
-    pointMax.y = std::max(position.y, pointMax.y);
-    pointMax.z = std::max(position.z, pointMax.z);
+    pointMax.x = Max(position.x, pointMax.x);
+    pointMax.y = Max(position.y, pointMax.y);
+    pointMax.z = Max(position.z, pointMax.z);
   }
 
   Vector3 CalculateSize()
@@ -167,7 +168,7 @@ void AddModelTreeToAABB(BoundingVolume& AABB, const Dali::Scene3D::Loader::Scene
     if(!node->mChildren.Empty())
     {
       auto                         choice = choices.Get(node->mCustomization->mTag);
-      Dali::Scene3D::Loader::Index i      = std::min(choice != Dali::Scene3D::Loader::Customization::NONE ? choice : 0, static_cast<Dali::Scene3D::Loader::Index>(node->mChildren.Size() - 1));
+      Dali::Scene3D::Loader::Index i      = Min(choice != Dali::Scene3D::Loader::Customization::NONE ? choice : 0, static_cast<Dali::Scene3D::Loader::Index>(node->mChildren.Size() - 1));
 
       AddModelTreeToAABB(AABB, scene, choices, node->mChildren[i], nodeParams, nodeMatrix);
     }
@@ -973,8 +974,8 @@ void Model::ScaleModel(bool useCurrentSize)
   if(size.x > 0.0f && size.y > 0.0f)
   {
     scale = MAXFLOAT;
-    scale = std::min(size.x / mNaturalSize.x, scale);
-    scale = std::min(size.y / mNaturalSize.y, scale);
+    scale = Min(size.x / mNaturalSize.x, scale);
+    scale = Min(size.y / mNaturalSize.y, scale);
   }
   // Models in glTF and dli are defined as right hand coordinate system.
   // DALi uses left hand coordinate system. Scaling negative is for change winding order.

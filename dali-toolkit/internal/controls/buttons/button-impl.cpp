@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <cstring> // for strcmp
@@ -733,8 +734,8 @@ Vector3 Button::GetNaturalSize()
     if(visual)
     {
       visual.GetNaturalSize(visualSize);
-      largestProvidedVisual.width  = std::max(largestProvidedVisual.width, visualSize.width);
-      largestProvidedVisual.height = std::max(largestProvidedVisual.height, visualSize.height);
+      largestProvidedVisual.width  = Max(largestProvidedVisual.width, visualSize.width);
+      largestProvidedVisual.height = Max(largestProvidedVisual.height, visualSize.height);
       foreGroundVisualUsed         = true;
     }
   }
@@ -748,8 +749,8 @@ Vector3 Button::GetNaturalSize()
       if(visual)
       {
         visual.GetNaturalSize(visualSize);
-        largestProvidedVisual.width  = std::max(largestProvidedVisual.width, visualSize.width);
-        largestProvidedVisual.height = std::max(largestProvidedVisual.height, visualSize.height);
+        largestProvidedVisual.width  = Max(largestProvidedVisual.width, visualSize.width);
+        largestProvidedVisual.height = Max(largestProvidedVisual.height, visualSize.height);
       }
     }
   }
@@ -785,12 +786,12 @@ Vector3 Button::GetNaturalSize()
       if(horizontalAlignment)
       {
         size.width += labelSize.width;
-        size.height = std::max(size.height, labelSize.height);
+        size.height = Max(size.height, labelSize.height);
       }
       else
       {
         size.height += labelSize.height;
-        size.width = std::max(size.width, labelSize.width);
+        size.width = Max(size.width, labelSize.width);
       }
     }
   }

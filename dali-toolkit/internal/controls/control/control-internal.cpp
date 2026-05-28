@@ -32,6 +32,7 @@
 #include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/object-registry.h>
 #include <cstring>
@@ -135,7 +136,7 @@ static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInp
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minViewSize = std::min(visualSize.x, visualSize.y);
+    const float minViewSize = Min(visualSize.x, visualSize.y);
     viewCornerRadius *= minViewSize;
   }
 
@@ -153,7 +154,7 @@ static void BorderlineCornerRadiusConstraint(Vector4& current, const PropertyInp
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minVisualSize = std::min(visualSize.x + expendedRadius, visualSize.y + expendedRadius);
+    const float minVisualSize = Min(visualSize.x + expendedRadius, visualSize.y + expendedRadius);
     if(DALI_LIKELY(minVisualSize > Math::MACHINE_EPSILON_100))
     {
       current /= minVisualSize;
@@ -186,7 +187,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minViewSize = std::min(visualSize.x, visualSize.y);
+    const float minViewSize = Min(visualSize.x, visualSize.y);
     viewCornerRadius *= minViewSize;
   }
 
@@ -202,7 +203,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
 
   if(viewCornerRadiusPolicy == Toolkit::Visual::Transform::Policy::RELATIVE)
   {
-    const float minVisualSize = std::min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
+    const float minVisualSize = Min(visualSize.x + extraSize.x, visualSize.y + extraSize.y);
     if(DALI_LIKELY(minVisualSize > Math::MACHINE_EPSILON_100))
     {
       current /= minVisualSize;

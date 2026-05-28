@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
@@ -193,7 +194,7 @@ public: // TYPES
     Index GetChildId(const Customization::Choices& choices, const NodeDefinition& node)
     {
       auto choice = choices.Get(mTag);
-      return std::min(choice != Customization::NONE ? choice : 0,
+      return Min(choice != Customization::NONE ? choice : 0,
                       static_cast<Index>(node.mChildren.Size() - 1));
     }
   };

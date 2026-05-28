@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/object/property-key.h>
 #include <dali/public-api/object/property-map.h>
 
@@ -119,8 +120,8 @@ struct ItemRange
     if((begin < second.end && end > second.begin) ||
        (second.begin < end && second.end > begin))
     {
-      intersection.begin = std::max(begin, second.begin);
-      intersection.end   = std::min(end, second.end);
+      intersection.begin = Max(begin, second.begin);
+      intersection.end   = Min(end, second.end);
     }
 
     return intersection;

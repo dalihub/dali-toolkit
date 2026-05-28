@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <limits>
 
@@ -111,7 +112,7 @@ void SlideTransition::OnPlay()
   float yScale = (Dali::EqualsZero(mDirection.y)) ? std::numeric_limits<float>::max()
                                                   : ((mDirection.y < 0.0f) ? checkPosition.y : windowSize.y - checkPosition.y) / std::abs(mDirection.y);
 
-  Vector2 displacement = mDirection * std::min(xScale, yScale);
+  Vector2 displacement = mDirection * Min(xScale, yScale);
 
   Vector3 startPosition;
   Vector3 finishPosition;

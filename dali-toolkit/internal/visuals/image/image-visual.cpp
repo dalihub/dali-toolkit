@@ -31,6 +31,7 @@
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -1031,9 +1032,9 @@ void ImageVisual::OnSetTransform()
     Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
     uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
     uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
-    sizeWidth                        = std::min(sizeWidth, maximumNumber);
+    sizeWidth                        = Min(sizeWidth, maximumNumber);
     uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
-    sizeHeight                       = std::min(sizeHeight, maximumNumber);
+    sizeHeight                       = Min(sizeHeight, maximumNumber);
     Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
 
     // Reload if visual size is updated
@@ -1269,8 +1270,8 @@ void ImageVisual::ComputeTextureSize()
           Texture maskTexture = textureSet.GetTexture(1);
           if(maskTexture)
           {
-            mTextureSize.x = std::min(static_cast<uint32_t>(mTextureSize.x * mMaskingData->mContentScaleFactor), maskTexture.GetWidth());
-            mTextureSize.y = std::min(static_cast<uint32_t>(mTextureSize.y * mMaskingData->mContentScaleFactor), maskTexture.GetHeight());
+            mTextureSize.x = Min(static_cast<uint32_t>(mTextureSize.x * mMaskingData->mContentScaleFactor), maskTexture.GetWidth());
+            mTextureSize.y = Min(static_cast<uint32_t>(mTextureSize.y * mMaskingData->mContentScaleFactor), maskTexture.GetHeight());
           }
         }
       }
@@ -1294,10 +1295,10 @@ Vector2 ImageVisual::ComputeMaskTextureRatio()
           Texture maskTexture = textureSet.GetTexture(1);
           if(maskTexture)
           {
-            float textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-            float textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-            maskTextureRatio    = Vector2(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
-                                          std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+            float textureWidth  = Max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            float textureHeight = Max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            maskTextureRatio    = Vector2(Min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                                       Min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
           }
         }
       }

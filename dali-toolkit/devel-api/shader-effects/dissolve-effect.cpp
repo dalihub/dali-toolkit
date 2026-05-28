@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
@@ -59,7 +60,7 @@ void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const V
     float distanceTopLeft = fabsf(coefC) * inversedSqrtAABB;
     //distance from (1, 1 ) to the line
     float distanceBottomRight = fabsf(coefA + coefB + coefC) * inversedSqrtAABB;
-    saddleA                   = std::max(distanceTopLeft, distanceBottomRight);
+    saddleA                   = Max(distanceTopLeft, distanceBottomRight);
 
     //foot of a perpendicular: (1,0) to the line
     float footX1 = (coefB * coefB - coefA * coefC) * inversedAABB;
@@ -76,7 +77,7 @@ void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const V
     float distanceTopRight = fabsf(coefA + coefC) * inversedSqrtAABB;
     //distance from(0,1) to the line
     float distanceBottomLeft = fabsf(coefB + coefC) * inversedSqrtAABB;
-    saddleA                  = std::max(distanceTopRight, distanceBottomLeft);
+    saddleA                  = Max(distanceTopRight, distanceBottomLeft);
     //foot of a perpendicular: (0,0) to the line
     float footX3 = (-coefA * coefC) * inversedAABB;
     float footY3 = (-coefB * coefC) * inversedAABB;

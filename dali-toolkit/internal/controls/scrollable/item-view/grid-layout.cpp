@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
-#include <algorithm>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
@@ -399,8 +399,8 @@ ItemRange GridLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layout
   int itemsPerPage     = mImpl->mNumberOfColumns * ceil(layoutHeight / (itemSize.y + mImpl->mRowSpacing));
   int firstVisibleItem = -(static_cast<int>(firstItemPosition / mImpl->mNumberOfColumns)) * mImpl->mNumberOfColumns;
 
-  int firstItemIndex = std::max(0, firstVisibleItem - static_cast<int>(mImpl->mNumberOfColumns));
-  int lastItemIndex  = std::max(0, firstVisibleItem + itemsPerPage);
+  int firstItemIndex = Max(0, firstVisibleItem - static_cast<int>(mImpl->mNumberOfColumns));
+  int lastItemIndex  = Max(0, firstVisibleItem + itemsPerPage);
 
   return ItemRange(firstItemIndex, lastItemIndex);
 }

@@ -18,6 +18,7 @@
 #include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -77,10 +78,10 @@ Bounds CommonTextUtils::GetTextBoundingRectangle(Text::ModelPtr model, TextAbstr
 
   for(unsigned int i = 1; i < sizeList.Size(); i++)
   {
-    minX      = std::min(minX, positionList[i].x);
-    minY      = std::min(minY, positionList[i].y);
-    maxRight  = std::max(maxRight, positionList[i].x + sizeList[i].x);
-    maxBottom = std::max(maxBottom, positionList[i].y + sizeList[i].y);
+    minX      = Min(minX, positionList[i].x);
+    minY      = Min(minY, positionList[i].y);
+    maxRight  = Max(maxRight, positionList[i].x + sizeList[i].x);
+    maxBottom = Max(maxBottom, positionList[i].y + sizeList[i].y);
   }
 
   if(minX < 0.0f)

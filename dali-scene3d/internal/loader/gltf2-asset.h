@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector2.h>
@@ -741,7 +742,7 @@ inline T ReadDaliVector(const json_value_s& j)
 {
   std::vector<float> floats = json::Read::Array<float, json::Read::Number<float>>(j);
   T                  result;
-  std::copy(floats.begin(), std::min(floats.end(), floats.begin() + sizeof(T) / sizeof(float)), result.AsFloat());
+  std::copy(floats.begin(), Dali::Min(floats.end(), floats.begin() + sizeof(T) / sizeof(float)), result.AsFloat());
   return result;
 }
 

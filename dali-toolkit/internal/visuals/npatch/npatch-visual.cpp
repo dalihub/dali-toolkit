@@ -25,6 +25,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 
 #include <locale>
 
@@ -145,8 +146,8 @@ void NPatchVisual::GetNaturalSize(Vector2& naturalSize)
 
   if(mAuxiliaryTextureSet && mAuxiliaryTextureSet.GetTextureCount() > 0u)
   {
-    naturalSize.x = std::max(naturalSize.x, float(mAuxiliaryTextureSet.GetTexture(0u).GetWidth()));
-    naturalSize.y = std::max(naturalSize.y, float(mAuxiliaryTextureSet.GetTexture(0u).GetHeight()));
+    naturalSize.x = Max(naturalSize.x, float(mAuxiliaryTextureSet.GetTexture(0u).GetWidth()));
+    naturalSize.y = Max(naturalSize.y, float(mAuxiliaryTextureSet.GetTexture(0u).GetHeight()));
   }
 }
 

@@ -17,6 +17,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/animated-image/rolling-animated-image-cache.h>
 
+// EXTERNAL HEADERS
+#include <dali/public-api/common/dali-utility.h>
+
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -243,7 +246,7 @@ void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
   // Try and load up to mBatchSize images, until the cache is filled.
   // Once the cache is filled, as frames progress, the old frame is
   // removed, and another frame is loaded
-  uint32_t minimumSize = std::min(mCacheSize, mFrameCount);
+  uint32_t minimumSize = Min(mCacheSize, mFrameCount);
   for(uint32_t i = 0; i < mBatchSize && (mQueue.Count() + mLoadWaitingQueue.size()) < minimumSize; ++i)
   {
     if(mLoadState != TextureManager::LoadState::LOADING)

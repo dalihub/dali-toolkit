@@ -25,6 +25,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/property-notification.h>
@@ -494,7 +495,7 @@ struct Decorator::Impl : public ConnectionTracker
         const float primaryBelowY   = primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height;
         const float secondaryBelowY = secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height;
 
-        float maxY = std::max(primaryBelowY, secondaryBelowY);
+        float maxY = Max(primaryBelowY, secondaryBelowY);
 
         yPosition = halfHeight + maxY;
 
@@ -544,7 +545,7 @@ struct Decorator::Impl : public ConnectionTracker
         const float primaryTopY   = primaryHandle.position.y - primaryHandle.size.height;
         const float secondaryTopY = secondaryHandle.position.y - secondaryHandle.size.height;
 
-        float minY = std::min(primaryTopY, secondaryTopY);
+        float minY = Min(primaryTopY, secondaryTopY);
 
         yPosition = -halfHeight + minY;
       } // !preferBelow
@@ -611,15 +612,15 @@ struct Decorator::Impl : public ConnectionTracker
 
       if(primaryHandle.active || secondaryHandle.active)
       {
-        const float minHandleXPosition = std::min(primaryHandle.position.x, secondaryHandle.position.x);
-        const float maxHandleXPosition = std::max(primaryHandle.position.x, secondaryHandle.position.x);
+        const float minHandleXPosition = Min(primaryHandle.position.x, secondaryHandle.position.x);
+        const float maxHandleXPosition = Max(primaryHandle.position.x, secondaryHandle.position.x);
 
         mCopyPastePopup.position.x = minHandleXPosition + ((maxHandleXPosition - minHandleXPosition) * 0.5f);
 
         const float primaryY   = -popupHalfSize.height + primaryHandle.position.y - (primaryHandle.verticallyFlipped ? primaryHandle.size.height : POPUP_PADDING);
         const float secondaryY = -popupHalfSize.height + secondaryHandle.position.y - (secondaryHandle.verticallyFlipped ? secondaryHandle.size.height : POPUP_PADDING);
 
-        mCopyPastePopup.position.y = std::min(primaryY, secondaryY);
+        mCopyPastePopup.position.y = Min(primaryY, secondaryY);
       }
       else if(grabHandle.active)
       {
@@ -1597,7 +1598,7 @@ struct Decorator::Impl : public ConnectionTracker
         mHandleVerticalGreaterThanNotification.Reset();
 
         // The vertical distance from the center of the active layer to the top edje of the display.
-        const float topHeight = 0.5f * mControlSize.height + std::max(-primaryHandle.position.y + primaryHandle.size.height, -secondaryHandle.position.y + secondaryHandle.size.height);
+        const float topHeight = 0.5f * mControlSize.height + Max(-primaryHandle.position.y + primaryHandle.size.height, -secondaryHandle.position.y + secondaryHandle.size.height);
 
         mHandleVerticalLessThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_Y,
                                                                                    LessThanCondition(mBoundingBox.y + topHeight));
@@ -1614,7 +1615,7 @@ struct Decorator::Impl : public ConnectionTracker
         mHandleVerticalLessThanNotification.Reset();
 
         // The vertical distance from the center of the active layer to the bottom edje of the display.
-        const float bottomHeight = -0.5f * mControlSize.height + std::max(primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height,
+        const float bottomHeight = -0.5f * mControlSize.height + Max(primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height,
                                                                           secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height);
 
         mHandleVerticalGreaterThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_Y,
@@ -1674,7 +1675,7 @@ struct Decorator::Impl : public ConnectionTracker
     if(primaryHandle.active || secondaryHandle.active)
     {
       // The horizontal distance from the center of the active layer to the left edje of the display.
-      const float leftWidth = 0.5f * mControlSize.width + std::max(-primaryHandle.position.x + primaryHandle.size.width,
+      const float leftWidth = 0.5f * mControlSize.width + Max(-primaryHandle.position.x + primaryHandle.size.width,
                                                                    -secondaryHandle.position.x + secondaryHandle.size.width);
 
       mHandleHorizontalLessThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_X,
@@ -1687,7 +1688,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHandleHorizontalLessThanNotification.NotifySignal().Connect(this, &Decorator::Impl::HandleResetPosition);
 
       // The horizontal distance from the center of the active layer to the right edje of the display.
-      const float rightWidth = -0.5f * mControlSize.width + std::max(primaryHandle.position.x + primaryHandle.size.width,
+      const float rightWidth = -0.5f * mControlSize.width + Max(primaryHandle.position.x + primaryHandle.size.width,
                                                                      secondaryHandle.position.x + secondaryHandle.size.width);
 
       mHandleHorizontalGreaterThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_X,
@@ -1724,8 +1725,8 @@ struct Decorator::Impl : public ConnectionTracker
 
       if(primaryVisible && secondaryVisible)
       {
-        handleY         = std::max(primaryHandle.position.y, secondaryHandle.position.y);
-        maxHandleHeight = std::max(primaryHandle.size.height, secondaryHandle.size.height);
+        handleY         = Max(primaryHandle.position.y, secondaryHandle.position.y);
+        maxHandleHeight = Max(primaryHandle.size.height, secondaryHandle.size.height);
       }
       else if(primaryVisible && !secondaryVisible)
       {

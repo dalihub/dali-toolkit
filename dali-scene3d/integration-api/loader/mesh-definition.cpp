@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/compile-time-math.h>
 
 #include <algorithm>
@@ -488,7 +489,7 @@ void DequantizeData(Dali::Vector<uint8_t>& buffer, float* dequantizedValues, uin
 
   for(uint32_t i = 0; i < numValues; ++i)
   {
-    *dequantizedValues = normalized ? std::max((*values) * GetNormalizedScale<T>(), -1.0f) : *values;
+    *dequantizedValues = normalized ? Max((*values) * GetNormalizedScale<T>(), -1.0f) : *values;
 
     values++;
     dequantizedValues++;
@@ -554,12 +555,12 @@ void GetDequantizedMinMax(Dali::Vector<float>& min, Dali::Vector<float>& max, ui
   {
     for(float& value : min)
     {
-      value = std::max(value * scale, -1.0f);
+      value = Max(value * scale, -1.0f);
     }
 
     for(float& value : max)
     {
-      value = std::min(value * scale, 1.0f);
+      value = Min(value * scale, 1.0f);
     }
   }
 }
@@ -619,7 +620,7 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, Dali::Vector<MeshDefinit
         {
           Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
           delta                                                  = deltasBuffer[deltaIndex];
-          return std::max(maxDistanceSquared, delta.LengthSquared());
+          return Max(maxDistanceSquared, delta.LengthSquared());
         };
 
         if(sparseIndices.Empty())
@@ -1274,7 +1275,7 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, Dali::Vector<MeshDefiniti
   {
     if(accessor.IsDefined())
     {
-      blendShapesBlob.mOffset = std::min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
+      blendShapesBlob.mOffset = Min(blendShapesBlob.mOffset, accessor.mBlob.mOffset);
       blendShapesBlob.mLength += accessor.mBlob.mLength;
 
       totalTextureSize += accessor.mBlob.mLength / vector3Size;
@@ -1393,8 +1394,8 @@ void MeshDefinition::Blob::ComputeMinMax(Dali::Vector<float>& min, Dali::Vector<
   {
     for(uint32_t j = 0; j < numComponents; ++j)
     {
-      min[j] = std::min(min[j], *values);
-      max[j] = std::max(max[j], *values);
+      min[j] = Min(min[j], *values);
+      max[j] = Max(max[j], *values);
       values++;
     }
   }
@@ -1403,15 +1404,15 @@ void MeshDefinition::Blob::ComputeMinMax(Dali::Vector<float>& min, Dali::Vector<
 void MeshDefinition::Blob::ApplyMinMax(const Dali::Vector<float>& min, const Dali::Vector<float>& max, uint32_t count, float* values, Dali::Vector<uint32_t>* sparseIndices)
 {
   DALI_ASSERT_DEBUG(max.Size() == min.Size() || max.Size() * min.Size() == 0);
-  const auto numComponents = std::max(min.Size(), max.Size());
+  const auto numComponents = Max(min.Size(), max.Size());
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
   ClampFn clampFn = min.Empty() ? (max.Empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
-  { value = std::min(max[i], value); })
+  { value = Min(max[i], value); })
                                 : (max.Empty() ? [](const float* min, const float* max, uint32_t i, float& value)
-  { value = std::max(min[i], value); }
+  { value = Max(min[i], value); }
                                                : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
-  { value = std::min(std::max(min[i], value), max[i]); }));
+  { value = Min(Max(min[i], value), max[i]); }));
 
   if(!clampFn)
   {

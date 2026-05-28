@@ -24,6 +24,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -306,7 +307,7 @@ void RenderEffectImpl::UpdateTargetSize()
     const uint32_t maxTextureSize = Dali::GetMaxTextureSize();
     if(static_cast<uint32_t>(size.x) > maxTextureSize || static_cast<uint32_t>(size.y) > maxTextureSize)
     {
-      const uint32_t denominator = static_cast<uint32_t>(std::max(size.x, size.y));
+      const uint32_t denominator = static_cast<uint32_t>(Max(size.x, size.y));
 
       size.x = (size.x * maxTextureSize / denominator);
       size.y = (size.y * maxTextureSize / denominator);

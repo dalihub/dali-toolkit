@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
 #include <cstring> // for strcmp
@@ -85,7 +86,7 @@ struct IndicatorSizeConstraint
 
     float height = contentSize > parentHeightMinusPadding ? parentHeightMinusPadding * (parentHeightMinusPadding / contentSize) : parentHeightMinusPadding * ((parentHeightMinusPadding - contentSize * 0.5f) / parentHeightMinusPadding);
 
-    current.y = std::max(mMinimumHeight, height);
+    current.y = Max(mMinimumHeight, height);
   }
 
   float mMinimumHeight;
@@ -125,7 +126,7 @@ struct IndicatorPositionConstraint
     // Take into account padding that may exist at the beginning and end of the indicator.
     const float parentHeightMinusPadding = parentSize.height - (mStartPadding + mEndPadding);
 
-    float relativePosition = std::max(0.0f, std::min(1.0f, (scrollPosition - minimumScrollPosition) / (maximumScrollPosition - minimumScrollPosition)));
+    float relativePosition = Max(0.0f, Min(1.0f, (scrollPosition - minimumScrollPosition) / (maximumScrollPosition - minimumScrollPosition)));
     current.y              = mStartPadding + (parentHeightMinusPadding - indicatorSize.height) * relativePosition;
     current.z              = DEFAULT_SLIDER_DEPTH;
   }
@@ -502,7 +503,7 @@ void ScrollBar::OnPan(const PanGesture& gesture)
         float logicalSize = Self().GetCurrentProperty<Vector3>(Actor::Property::SIZE).y - (mIndicator.GetCurrentProperty<Vector3>(Actor::Property::SIZE).y + mIndicatorStartPadding + mIndicatorEndPadding);
 
         mCurrentScrollPosition = mScrollStart - ((mGestureDisplacement.y * domainSize) / logicalSize);
-        mCurrentScrollPosition = -std::min(maxScrollPosition, std::max(-mCurrentScrollPosition, minScrollPosition));
+        mCurrentScrollPosition = -Min(maxScrollPosition, Max(-mCurrentScrollPosition, minScrollPosition));
 
         break;
       }

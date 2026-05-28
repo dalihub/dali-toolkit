@@ -25,6 +25,7 @@
 #include <dali-usd-loader/internal/utils.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 #include <pxr/usd/usd/primRange.h>
 
 using namespace Dali;
@@ -179,7 +180,7 @@ void UsdMaterialProcessor::TraverseMaterials(LoadResult& output)
         {
           materialDefinition.mAlphaModeType = Scene3D::Material::AlphaModeType::MASK;
           materialDefinition.mIsMask        = true;
-          materialDefinition.SetAlphaCutoff(std::min(1.f, std::max(0.f, opacityThreshold)));
+          materialDefinition.SetAlphaCutoff(Min(1.f, Max(0.f, opacityThreshold)));
         }
         else
         {

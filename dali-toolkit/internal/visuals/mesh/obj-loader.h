@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <limits>
 
@@ -80,20 +81,20 @@ public:
 
     void ConsiderNewPointInVolume(const Vector3& position)
     {
-      pointMin.x = std::min(position.x, pointMin.x);
-      pointMin.y = std::min(position.y, pointMin.y);
-      pointMin.z = std::min(position.z, pointMin.z);
+      pointMin.x = Min(position.x, pointMin.x);
+      pointMin.y = Min(position.y, pointMin.y);
+      pointMin.z = Min(position.z, pointMin.z);
 
-      pointMax.x = std::max(position.x, pointMax.x);
-      pointMax.y = std::max(position.y, pointMax.y);
-      pointMax.z = std::max(position.z, pointMax.z);
+      pointMax.x = Max(position.x, pointMax.x);
+      pointMax.y = Max(position.y, pointMax.y);
+      pointMax.z = Max(position.z, pointMax.z);
     }
 
     Vector3 pointMin;
     Vector3 pointMax;
   };
 
-  //Defines bit masks to declare which properties are needed by anyone requesting a geometry.
+  // Defines bit masks to declare which properties are needed by anyone requesting a geometry.
   enum ObjectProperties
   {
     TEXTURE_COORDINATES = 1 << 0,
@@ -130,7 +131,7 @@ private:
   bool mMaterialLoaded;
   bool mHasTexturePoints;
 
-  //Material file properties.
+  // Material file properties.
   bool mHasDiffuseMap;
   bool mHasNormalMap;
   bool mHasSpecularMap;

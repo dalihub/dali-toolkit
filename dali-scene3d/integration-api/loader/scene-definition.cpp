@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <algorithm>
 #include <locale>
 
@@ -275,7 +276,7 @@ void VisitInternal(Index iNode, const Customization::Choices& choices, Visitor& 
     if(!node.mChildren.Empty())
     {
       auto  choice = choices.Get(node.mCustomization->mTag);
-      Index i      = std::min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.Size() - 1));
+      Index i      = Min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.Size() - 1));
       sd.Visit(node.mChildren[i], choices, v);
     }
   }
@@ -454,7 +455,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
           customization = options->Set(tag, {});
         }
         customization->nodes.PushBack(n.mName);
-        customization->numOptions = std::max(customization->numOptions,
+        customization->numOptions = Max(customization->numOptions,
                                              static_cast<uint32_t>(n.mChildren.Size()));
       }
     }

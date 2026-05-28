@@ -25,7 +25,7 @@
 #include <dali/devel-api/text-abstraction/text-renderer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <algorithm>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring>
 #include <limits>
 
@@ -933,7 +933,7 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
 
               const float characterSpacing = GetGlyphCharacterSpacing(index, characterSpacingGlyphRuns, modelCharacterSpacing);
               calculatedAdvance            = GetCalculatedAdvance(*(textModel->mLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyphToRemove.advance);
-              removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
+              removedGlypsWidth += Min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.
               const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
@@ -1042,7 +1042,7 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
         currentFontId = glyph.fontId;
         FontMetrics metrics;
         fontClient.GetFontMetrics(currentFontId, metrics);
-        maxAscenderDescender = std::max(maxAscenderDescender, isClockwise ? metrics.ascender : metrics.descender);
+        maxAscenderDescender = Max(maxAscenderDescender, isClockwise ? metrics.ascender : metrics.descender);
       }
     }
   }

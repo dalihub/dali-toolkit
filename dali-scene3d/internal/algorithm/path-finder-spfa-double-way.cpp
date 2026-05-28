@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <limits>
 #include <unordered_set>
 
@@ -237,7 +238,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(Face
             {
               const auto currentPos = Dali::Vector3(Face(nIndex)->center);
               Vector3    diff       = currentPos - targetPos;
-              priority[nIndex]      = std::max(0.0f, -direction.Dot(diff));
+              priority[nIndex]      = Max(0.0f, -direction.Dot(diff));
             }
           }
           else
@@ -247,7 +248,7 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::FindPath(Face
             {
               const auto currentPos = Dali::Vector3(Face(nIndex)->center);
               Vector3    diff       = currentPos - sourcePos;
-              priority[nIndex]      = std::max(0.0f, direction.Dot(diff));
+              priority[nIndex]      = Max(0.0f, direction.Dot(diff));
             }
           }
 

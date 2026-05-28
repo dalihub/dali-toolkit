@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 
 #include <locale>
 
@@ -1397,12 +1398,12 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
     {
       float gltfTime = sample / FPS;
 
-      minTime = std::min(minTime, gltfTime);
-      maxTime = std::max(maxTime, gltfTime);
+      minTime = Min(minTime, gltfTime);
+      maxTime = Max(maxTime, gltfTime);
     }
 
     // duration should not be zero!
-    float duration = std::max(maxTime - minTime, AnimationDefinition::MIN_DURATION_SECONDS);
+    float duration = Max(maxTime - minTime, AnimationDefinition::MIN_DURATION_SECONDS);
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "minTime: %f, maxTime: %f, animation duration: %f, ", minTime, maxTime, duration);
 
     animationDefinition.ReserveSize(3);

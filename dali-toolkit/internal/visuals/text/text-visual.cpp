@@ -29,6 +29,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -1047,8 +1048,8 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
         if(renderInfo.embossEnabled)
         {
-          float          sizeX             = std::max(layoutSize.x, Math::MACHINE_EPSILON_100);
-          float          sizeY             = std::max(std::min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
+          float          sizeX             = Max(layoutSize.x, Math::MACHINE_EPSILON_100);
+          float          sizeY             = Max(Min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
           const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
           const Vector2& embossDirection   = parameters.embossDirection;
           const float    embossStrength    = parameters.embossStrength;
@@ -1406,8 +1407,8 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
       if(embossEnabled)
       {
-        float          sizeX             = std::max(size.x, Math::MACHINE_EPSILON_100);
-        float          sizeY             = std::max(std::min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
+        float          sizeX             = Max(size.x, Math::MACHINE_EPSILON_100);
+        float          sizeY             = Max(Min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
         const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
         const Vector2& embossDirection   = mController->GetEmbossDirection();
         const float    embossStrength    = mController->GetEmbossStrength();

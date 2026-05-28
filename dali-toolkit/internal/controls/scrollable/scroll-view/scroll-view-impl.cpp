@@ -27,6 +27,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/object/property-map.h>
@@ -462,7 +463,7 @@ void SnapWithVelocity(
     u /= speed;
 
     // TODO: Change this to a decay function. (faster you flick, the slower it should be)
-    speed = std::min(speed, stageLength * scrollView.GetMaxFlickSpeed());
+    speed = Min(speed, stageLength * scrollView.GetMaxFlickSpeed());
     u *= speed;
     alphaFunction = ConstantDecelerationAlphaFunction;
 
@@ -484,8 +485,8 @@ void SnapWithVelocity(
     if((positionSnap - startPosition).LengthSquared() > Math::MACHINE_EPSILON_0)
     {
       clampDelta -= positionSnap;
-      clampDelta.x = clampDelta.x > 0.0f ? std::min(clampDelta.x, maxOvershoot.x) : std::max(clampDelta.x, -maxOvershoot.x);
-      clampDelta.y = clampDelta.y > 0.0f ? std::min(clampDelta.y, maxOvershoot.y) : std::max(clampDelta.y, -maxOvershoot.y);
+      clampDelta.x = clampDelta.x > 0.0f ? Min(clampDelta.x, maxOvershoot.x) : Max(clampDelta.x, -maxOvershoot.x);
+      clampDelta.y = clampDelta.y > 0.0f ? Min(clampDelta.y, maxOvershoot.y) : Max(clampDelta.y, -maxOvershoot.y);
     }
     else
     {
@@ -1135,8 +1136,8 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
 
   if(positionChanged)
   {
-    totalDuration = std::max(totalDuration, positionDuration.x);
-    totalDuration = std::max(totalDuration, positionDuration.y);
+    totalDuration = Max(totalDuration, positionDuration.x);
+    totalDuration = Max(totalDuration, positionDuration.y);
   }
   else
   {
@@ -1827,7 +1828,7 @@ void ScrollView::SnapInternalXTo(float position)
   mScrollStateFlags &= ~SCROLL_X_STATE_MASK;
 
   // if internal x not equal to inputed parameter, animate it
-  float duration = std::min(fabsf((position - mScrollPrePosition.x) / mMaxOvershoot.x) * mSnapOvershootDuration, mSnapOvershootDuration);
+  float duration = Min(fabsf((position - mScrollPrePosition.x) / mMaxOvershoot.x) * mSnapOvershootDuration, mSnapOvershootDuration);
   DALI_LOG_SCROLL_STATE("[0x%X] duration[%.2f]", this, duration);
   if(duration > Math::MACHINE_EPSILON_1)
   {
@@ -1853,7 +1854,7 @@ void ScrollView::SnapInternalYTo(float position)
   mScrollStateFlags &= ~SCROLL_Y_STATE_MASK;
 
   // if internal y not equal to inputed parameter, animate it
-  float duration = std::min(fabsf((position - mScrollPrePosition.y) / mMaxOvershoot.y) * mSnapOvershootDuration, mSnapOvershootDuration);
+  float duration = Min(fabsf((position - mScrollPrePosition.y) / mMaxOvershoot.y) * mSnapOvershootDuration, mSnapOvershootDuration);
   DALI_LOG_SCROLL_STATE("[0x%X] duration[%.2f]", this, duration);
   if(duration > Math::MACHINE_EPSILON_1)
   {

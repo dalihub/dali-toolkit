@@ -25,6 +25,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/object/property-array.h>
 
@@ -448,8 +449,8 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
   }
 
   // Make sure the range specified is between 0 and the total frame number
-  startFrame = std::min(startFrame, mTotalFrame - 1);
-  endFrame   = std::min(endFrame, mTotalFrame - 1);
+  startFrame = Min(startFrame, mTotalFrame - 1);
+  endFrame   = Min(endFrame, mTotalFrame - 1);
 
   // If the range is not in order swap values
   if(startFrame > endFrame)

@@ -43,6 +43,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/wheel-event.h>
 
@@ -1169,8 +1170,8 @@ void WebView::SetDisplayArea(const Dali::BoundsInteger& displayArea)
     {
       const Vector2 textureRatio = CalculateTextureRatio(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
 
-      const Vector4 pixelArea(0.0f, 0.0f, std::min(1.0f, textureRatio.x), std::min(1.0f, textureRatio.y));
-      const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.y));
+      const Vector4 pixelArea(0.0f, 0.0f, Min(1.0f, textureRatio.x), Min(1.0f, textureRatio.y));
+      const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : Min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : Min(1.0f, 1.0f / textureRatio.y));
 
       Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY,
                                                    CreatePropertyValue({{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea},

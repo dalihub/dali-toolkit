@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_RUN_CONTAINER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
@@ -208,7 +211,7 @@ void UpdateCharacterRuns(CharacterIndex index,
           if(run.characterRun.characterIndex < index)
           {
             // Remove characters starting from a character within the run.
-            run.characterRun.numberOfCharacters -= std::min(numberOfRemovedCharacters, 1u + lastRunIndex - index);
+            run.characterRun.numberOfCharacters -= Min(numberOfRemovedCharacters, 1u + lastRunIndex - index);
           }
           else
           {

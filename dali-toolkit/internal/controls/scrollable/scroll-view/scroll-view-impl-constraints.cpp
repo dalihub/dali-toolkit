@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/constraint-integ.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
@@ -302,7 +303,7 @@ struct OvershootXConstraint
       const Vector2& scrollPrePosition  = inputs[0]->GetVector2();
       const Vector2& scrollPostPosition = inputs[1]->GetVector2();
       float          newOvershoot       = scrollPrePosition.x - scrollPostPosition.x;
-      current                           = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+      current                           = (newOvershoot > 0.0f ? Min(newOvershoot, mMaxOvershoot) : Max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
     else
     {
@@ -331,7 +332,7 @@ struct OvershootYConstraint
       const Vector2& scrollPrePosition  = inputs[0]->GetVector2();
       const Vector2& scrollPostPosition = inputs[1]->GetVector2();
       float          newOvershoot       = scrollPrePosition.y - scrollPostPosition.y;
-      current                           = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+      current                           = (newOvershoot > 0.0f ? Min(newOvershoot, mMaxOvershoot) : Max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
     else
     {
