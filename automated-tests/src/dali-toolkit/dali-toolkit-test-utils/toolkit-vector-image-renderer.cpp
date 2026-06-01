@@ -78,7 +78,7 @@ public:
   {
   }
 
-  bool Load(const Vector<uint8_t>& data, float dpi)
+  bool Load(const Vector<uint8_t>& data)
   {
     mLoadCount++;
     if(strncmp(reinterpret_cast<char*>(data.Begin()), "invalid", 7) == 0)
@@ -171,9 +171,9 @@ VectorImageRenderer::VectorImageRenderer(Internal::Adaptor::VectorImageRenderer*
 {
 }
 
-bool VectorImageRenderer::Load(const Vector<uint8_t>& data, float dpi)
+bool VectorImageRenderer::Load(const Vector<uint8_t>& data)
 {
-  return Internal::Adaptor::GetImplementation(*this).Load(data, dpi);
+  return Internal::Adaptor::GetImplementation(*this).Load(data);
 }
 
 bool VectorImageRenderer::IsLoaded() const

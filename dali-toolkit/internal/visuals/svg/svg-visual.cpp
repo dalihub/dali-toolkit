@@ -27,7 +27,6 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -150,13 +149,10 @@ void SvgVisual::OnInitialize()
 
   if(mSvgLoadId == SvgLoader::INVALID_SVG_LOAD_ID)
   {
-    const Vector2 dpi     = Stage::GetCurrent().GetDpi();
-    const float   meanDpi = (dpi.height + dpi.width) * 0.5f;
-
     const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
 
     // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
-    mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
+    mSvgLoadId = mSvgLoader.Load(mImageUrl, this, synchronousLoading);
   }
 }
 
@@ -186,13 +182,10 @@ void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
   // Load image immediately if LOAD_POLICY requires it
   if(mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE)
   {
-    const Vector2 dpi     = Stage::GetCurrent().GetDpi();
-    const float   meanDpi = (dpi.height + dpi.width) * 0.5f;
-
     const bool synchronousLoading = IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
 
     // It will call SvgVisual::LoadComplete() synchronously if it required, or we already loaded same svg before.
-    mSvgLoadId = mSvgLoader.Load(mImageUrl, meanDpi, this, synchronousLoading);
+    mSvgLoadId = mSvgLoader.Load(mImageUrl, this, synchronousLoading);
 
     AddRasterizationTask(mDesiredSize);
   }
@@ -284,7 +277,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   {
     if(mImpl->mEventObserver)
     {
-      // SVG visual needs it's size set before it can be rasterized hence request relayout once on stage
+      // SVG visual needs it's size set before it can be rasterized hence request relayout once on scene
       mImpl->mEventObserver->RelayoutRequest(*this);
     }
 
@@ -313,7 +306,7 @@ void SvgVisual::DoSetOffScene(Actor& actor)
   // Remove rasterizing task
   if(mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED && mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
   {
-    // When adding the actor back to stage the SVG rasterization should be forced again. (To emit ResourceReady signal at SceneOn).
+    // When adding the actor back to scene the SVG rasterization should be forced again. (To emit ResourceReady signal at SceneOn).
     mRasterizeForcibly     = true;
     mRasterizeCompleted    = false;
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;

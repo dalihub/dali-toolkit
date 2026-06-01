@@ -66,7 +66,6 @@ const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg"
 const char* TEST_SVG_INVALID_RASTERIZE_FILE_NAME = TEST_RESOURCE_DIR "/invalid1.svg"; ///< Load succes but rasterize fail.
 
 constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-constexpr float         DEFAULT_DPI(218.5f);
 
 class TestObserver : public Dali::Toolkit::Internal::SvgLoaderObserver
 {
@@ -224,7 +223,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
         TestObserver observer;
         std::string  filename(fileNames[fileType]);
 
-        SvgLoader::SvgLoadId      loadId      = svgLoader.Load(filename, DEFAULT_DPI, &observer, synchronousLoading == 1);
+        SvgLoader::SvgLoadId      loadId      = svgLoader.Load(filename, &observer, synchronousLoading == 1);
         SvgLoader::SvgRasterizeId rasterizeId = svgLoader.Rasterize(loadId, rasterizeSizes[sizeType].first, rasterizeSizes[sizeType].second, &observer, synchronousLoading == 1);
         DALI_TEST_CHECK(loadId != SvgLoader::INVALID_SVG_LOAD_ID);
         DALI_TEST_CHECK(rasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID);
@@ -300,8 +299,8 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   TestObserver observer4;
   TestObserver observer5;
 
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer2, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer2, false);
 
   tet_printf("Test Load cached well\n");
   DALI_TEST_EQUALS(loadId1, loadId2, TEST_LOCATION);
@@ -316,24 +315,25 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   observer1.CheckLoadTest(true, true, TEST_LOCATION);
   observer2.CheckLoadTest(true, true, TEST_LOCATION);
 
-  tet_printf("Test difference url and dpi return not equal id\n");
-  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, &observer3, false);
-  auto loadId4 = svgLoader.Load(std::string(TEST_SVG_INVALID_RASTERIZE_FILE_NAME), DEFAULT_DPI, &observer4, false);
-  DALI_TEST_CHECK(loadId1 != loadId3);
+  tet_printf("Test difference url return not equal id\n");
+  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer3, false);
+  auto loadId4 = svgLoader.Load(std::string(TEST_SVG_INVALID_RASTERIZE_FILE_NAME), &observer4, false);
+  DALI_TEST_EQUALS(loadId1, loadId3, TEST_LOCATION);
   DALI_TEST_CHECK(loadId1 != loadId4);
   DALI_TEST_CHECK(loadId3 != loadId4);
 
-  observer3.CheckLoadTest(false, false, TEST_LOCATION);
+  // loadId3 == loadId1, already loaded, so observer3 is notified immediately
+  observer3.CheckLoadTest(true, true, TEST_LOCATION);
   observer4.CheckLoadTest(false, false, TEST_LOCATION);
 
-  // Wait async load complete 2 times : loadId3 loadId4
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Wait async load complete 1 time : loadId4
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
   observer3.CheckLoadTest(true, true, TEST_LOCATION);
   observer4.CheckLoadTest(true, true, TEST_LOCATION);
 
   tet_printf("Test Load cached well even after load completed\n");
-  auto loadId5 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer5, false);
+  auto loadId5 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer5, false);
 
   DALI_TEST_EQUALS(loadId1, loadId5, TEST_LOCATION);
   // Check observer5 loaded.
@@ -356,18 +356,20 @@ int UtcSvgLoaderCacheLoadAndRasterize01(void)
   observer1.CheckRasterizeTest(true, true, TEST_LOCATION);
   observer2.CheckRasterizeTest(true, true, TEST_LOCATION);
 
-  tet_printf("Test difference loadId and size return not equal id\n");
+  tet_printf("Test difference size return not equal id\n");
   auto rasterizeId3 = svgLoader.Rasterize(loadId1, 200u, 200u, &observer3, false);
   auto rasterizeId4 = svgLoader.Rasterize(loadId3, 100u, 100u, &observer4, false);
   DALI_TEST_CHECK(rasterizeId1 != rasterizeId3);
-  DALI_TEST_CHECK(rasterizeId1 != rasterizeId4);
+  // loadId3 == loadId1 and same size (100x100), so rasterizeId4 == rasterizeId1
+  DALI_TEST_EQUALS(rasterizeId1, rasterizeId4, TEST_LOCATION);
   DALI_TEST_CHECK(rasterizeId3 != rasterizeId4);
 
   observer3.CheckRasterizeTest(false, false, TEST_LOCATION);
-  observer4.CheckRasterizeTest(false, false, TEST_LOCATION);
+  // rasterizeId4 == rasterizeId1, already rasterized, so observer4 is notified immediately
+  observer4.CheckRasterizeTest(true, true, TEST_LOCATION);
 
-  // Wait async rasterize complete 2 times : rasterizeId3 and rasterizeId4
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  // Wait async rasterize complete 1 time : rasterizeId3
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
   observer3.CheckRasterizeTest(true, true, TEST_LOCATION);
   observer4.CheckRasterizeTest(true, true, TEST_LOCATION);
 
@@ -394,7 +396,7 @@ int UtcSvgLoaderCacheLoadAndRasterize02(void)
   TestObserver observer3;
 
   tet_printf("load request for loadId1\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
 
   // Wait async load complete 1 time : loadId1
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
@@ -417,7 +419,7 @@ int UtcSvgLoaderCacheLoadAndRasterize02(void)
 
   observer1.CheckRasterizeTest(true, true, TEST_LOCATION);
 
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer2, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer2, false);
 
   tet_printf("Test rasterize request increase the reference count of loadId1\n");
 
@@ -434,7 +436,7 @@ int UtcSvgLoaderCacheLoadAndRasterize02(void)
   svgLoader.RequestRasterizeRemove(rasterizeId1, &observer1, true);
 
   tet_printf("Test loadId3 is not cached.\n");
-  [[maybe_unused]] auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer3, false);
+  [[maybe_unused]] auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer3, false);
   observer3.CheckLoadTest(false, false, TEST_LOCATION);
 
   // Wait async load complete 1 time : loadId3
@@ -457,9 +459,9 @@ int UtcSvgLoaderCacheLoadAndRasterize03(void)
   TestObserver observer3;
 
   tet_printf("Load request async / sync / and async again\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer2, true);
-  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer3, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer2, true);
+  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer3, false);
 
   tet_printf("Test Load cached well\n");
   DALI_TEST_EQUALS(loadId1, loadId2, TEST_LOCATION);
@@ -517,7 +519,7 @@ int UtcSvgLoaderLoadCancel(void)
   TestObserver observer2;
   TestObserver observer3;
 
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
 
   observer1.CheckLoadTest(false, false, TEST_LOCATION);
 
@@ -534,7 +536,7 @@ int UtcSvgLoaderLoadCancel(void)
   tet_printf("load request for loadId1 not notify\n");
   observer1.CheckLoadTest(false, false, TEST_LOCATION);
 
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer2, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer2, false);
 
   observer2.CheckLoadTest(false, false, TEST_LOCATION);
 
@@ -545,7 +547,7 @@ int UtcSvgLoaderLoadCancel(void)
 
   // load task is not finished yet.
   // But during loading task running, request same item again
-  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer3, false);
+  auto loadId3 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer3, false);
   DALI_TEST_EQUALS(loadId2, loadId3, TEST_LOCATION);
 
   // Wait async load complete 1 time : loadId1
@@ -604,8 +606,8 @@ int UtcSvgLoaderDestructDuringObserver01(void)
 
     tet_result(TET_FAIL); });
   tet_printf("load request for loadId1 and loadId2. observer1 should be called first.\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer1, false);
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer1, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer2, false);
   DALI_TEST_EQUALS(loadId1, loadId2, TEST_LOCATION);
 
   observer1->CheckLoadTest(false, false, TEST_LOCATION);
@@ -666,8 +668,8 @@ int UtcSvgLoaderDestructDuringObserver02(void)
 
     tet_result(TET_FAIL); });
   tet_printf("load request for loadId1 and loadId2. observer1 should be called first.\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer1, false);
-  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer1, false);
+  auto loadId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer2, false);
   DALI_TEST_EQUALS(loadId1, loadId2, TEST_LOCATION);
 
   observer1->CheckLoadTest(false, false, TEST_LOCATION);
@@ -695,7 +697,7 @@ int UtcSvgLoaderDestructDuringObserver02(void)
   END_TEST;
 }
 
-int UtcSvgLoaderReqestDuringObserver01(void)
+int UtcSvgLoaderRequestDuringObserver01(void)
 {
   tet_infoline("Test request load observer during load observer\n");
 
@@ -750,26 +752,26 @@ int UtcSvgLoaderReqestDuringObserver01(void)
     DALI_TEST_CHECK(observer5);
     DALI_TEST_CHECK(observer6);
 
-    tet_printf("Request for observer2(cached) and observer3, observer4(non-cached)\n");
-    customData->cachedId     = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
-    customData->nonCachedId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer3, false);
-    customData->nonCachedId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer4, false);
+    tet_printf("Request for observer2, observer3, observer4 (all cached same URL)\n");
+    customData->cachedId     = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer2, false);
+    customData->nonCachedId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer3, false);
+    customData->nonCachedId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer4, false);
 
-    tet_printf("Test observer2 still not notify yet even if it is cached\n");
+    tet_printf("Test observers still not notify yet even if it is cached\n");
     observer2->CheckLoadTest(false, false, TEST_LOCATION);
     observer3->CheckLoadTest(false, false, TEST_LOCATION);
     observer4->CheckLoadTest(false, false, TEST_LOCATION);
 
     tet_printf("Test observer5 load request and cancel\n");
-    auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer5, false);
+    auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer5, false);
     svgLoader.RequestLoadRemove(loadId, observer5);
 
     tet_printf("Test observer6 load request and destruct\n");
-    loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer6, false);
+    loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer6, false);
     delete observer6; });
 
   tet_printf("load request for loadId1.\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
 
   observer1.CheckLoadTest(false, false, TEST_LOCATION);
   observer2.CheckLoadTest(false, false, TEST_LOCATION);
@@ -783,19 +785,11 @@ int UtcSvgLoaderReqestDuringObserver01(void)
 
   observer1.CheckLoadTest(true, true, TEST_LOCATION);
 
-  tet_printf("Test observer2 notify after observer1 notify finished\n");
+  tet_printf("Test all observers notified after observer1 notify finished\n");
   DALI_TEST_EQUALS(loadId1, mData.cachedId, TEST_LOCATION);
-  DALI_TEST_CHECK(loadId1 != mData.nonCachedId1);
+  DALI_TEST_EQUALS(loadId1, mData.nonCachedId1, TEST_LOCATION);
   DALI_TEST_EQUALS(mData.nonCachedId1, mData.nonCachedId2, TEST_LOCATION);
   observer2.CheckLoadTest(true, true, TEST_LOCATION);
-  observer3.CheckLoadTest(false, false, TEST_LOCATION);
-  observer4.CheckLoadTest(false, false, TEST_LOCATION);
-  observer5.CheckLoadTest(false, false, TEST_LOCATION);
-
-  // Wait async load complete 1 time : mData.nonCachedId1
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
-  tet_printf("Test observer5 not notify\n");
   observer3.CheckLoadTest(true, true, TEST_LOCATION);
   observer4.CheckLoadTest(true, true, TEST_LOCATION);
   observer5.CheckLoadTest(false, false, TEST_LOCATION);
@@ -803,7 +797,7 @@ int UtcSvgLoaderReqestDuringObserver01(void)
   END_TEST;
 }
 
-int UtcSvgLoaderReqestDuringObserver02(void)
+int UtcSvgLoaderRequestDuringObserver02(void)
 {
   tet_infoline("Test request load observer during load observer\n");
 
@@ -847,21 +841,20 @@ int UtcSvgLoaderReqestDuringObserver02(void)
     DALI_TEST_CHECK(observer3);
     DALI_TEST_CHECK(observer4);
 
-    tet_printf("Request for observer2(cached) and observer3, observer4(non-cached)\n");
-    tet_printf("For here, let we request observer4 as sync!\n");
-    customData->cachedId     = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, observer2, false);
-    customData->nonCachedId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer3, false);
-    customData->nonCachedId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI + 2.0f, observer4, true);
+    tet_printf("Request for observer2, observer3 (cached async), observer4 (cached sync)\n");
+    customData->cachedId     = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer2, false);
+    customData->nonCachedId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer3, false);
+    customData->nonCachedId2 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), observer4, true);
 
     tet_printf("Test observer2 still not notify yet even if it is cached\n");
     observer2->CheckLoadTest(false, false, TEST_LOCATION);
 
-    tet_printf("Test observer4 notify, but observer3 yet\n");
+    tet_printf("Test observer4 (sync) notified immediately, observer3 (async) not yet\n");
     observer3->CheckLoadTest(false, false, TEST_LOCATION);
     observer4->CheckLoadTest(true, true, TEST_LOCATION); });
 
   tet_printf("load request for loadId1.\n");
-  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, &observer1, false);
+  auto loadId1 = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), &observer1, false);
 
   observer1.CheckLoadTest(false, false, TEST_LOCATION);
   observer2.CheckLoadTest(false, false, TEST_LOCATION);
@@ -873,20 +866,19 @@ int UtcSvgLoaderReqestDuringObserver02(void)
 
   observer1.CheckLoadTest(true, true, TEST_LOCATION);
 
-  tet_printf("Test observer2 notify after observer1 notify finished\n");
+  tet_printf("Test all observers notified after observer1 notify finished\n");
   DALI_TEST_EQUALS(loadId1, mData.cachedId, TEST_LOCATION);
-  DALI_TEST_CHECK(loadId1 != mData.nonCachedId1);
+  DALI_TEST_EQUALS(loadId1, mData.nonCachedId1, TEST_LOCATION);
   DALI_TEST_EQUALS(mData.nonCachedId1, mData.nonCachedId2, TEST_LOCATION);
   observer2.CheckLoadTest(true, true, TEST_LOCATION);
 
-  tet_printf("Test observer3 notify due to we load it synchronously already\n");
   observer3.CheckLoadTest(true, true, TEST_LOCATION);
   observer4.CheckLoadTest(true, true, TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcSvgLoaderReqestDuringObserver03(void)
+int UtcSvgLoaderRequestDuringObserver03(void)
 {
   tet_infoline("Test request rasterize observer during rasterize observer\n");
 
@@ -924,7 +916,7 @@ int UtcSvgLoaderReqestDuringObserver03(void)
   mData.rasterizeAndDestruct = observer6;
 
   // Sync load and cache it.
-  auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, nullptr, true);
+  auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), nullptr, true);
 
   observer1.mRasterizeData = &mData;
   observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
@@ -997,7 +989,7 @@ int UtcSvgLoaderReqestDuringObserver03(void)
   END_TEST;
 }
 
-int UtcSvgLoaderReqestDuringObserver04(void)
+int UtcSvgLoaderRequestDuringObserver04(void)
 {
   tet_infoline("Test request rasterize observer during rasterize observer\n");
 
@@ -1028,7 +1020,7 @@ int UtcSvgLoaderReqestDuringObserver04(void)
   mData.rasterizeNonCached2 = &observer4;
 
   // Sync load and cache it.
-  auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), DEFAULT_DPI, nullptr, true);
+  auto loadId = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), nullptr, true);
 
   observer1.mRasterizeData = &mData;
   observer1.ConnectRasterizeFunction([&svgLoader, &loadId](void* data)
