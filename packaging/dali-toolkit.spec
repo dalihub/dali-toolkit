@@ -29,6 +29,7 @@ BuildRequires:  pkgconfig(glesv2)
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  dali2-integration-devel
 BuildRequires:  dali2-adaptor-integration-devel
+BuildRequires:  python3
 
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)

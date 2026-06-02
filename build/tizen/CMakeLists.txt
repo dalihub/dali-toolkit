@@ -384,6 +384,52 @@ ADD_CUSTOM_COMMAND(OUTPUT ${GLES_ADDON_BUILT_IN_SHADER_GEN_CPP}
                    DEPENDS ${SHADER_GENERATOR_NAME} ${GLES_ADDON_SHADERS_SRC}
                    COMMAND ${SHADER_GENERATOR_BINARY} ${GLES_ADDON_SHADER_SOURCE_DIR} ${GLES_ADDON_SHADER_GENERATED_DIR})
 
+OPTION(ENABLE_INVOKE_METHOD_WRAPPERS "Generate InvokeMethod wrappers for exported public API handle methods" ON)
+
+IF(ENABLE_INVOKE_METHOD_WRAPPERS)
+  FIND_PROGRAM(INVOKE_METHOD_GENERATOR
+               NAMES dali-invoke-method-generator dali-invoke-method-generator.py
+               PATHS ${BIN_DIR} $ENV{DESKTOP_PREFIX}/bin ${ROOT_SRC_DIR}/../dali-core/scripts)
+
+  IF(NOT INVOKE_METHOD_GENERATOR)
+    MESSAGE(FATAL_ERROR "dali-invoke-method-generator not found. Build and install dali-core first.")
+  ENDIF()
+
+  SET(INVOKE_METHOD_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/invoke-method)
+  SET(INVOKE_METHOD_PUBLIC_API_CPP ${INVOKE_METHOD_GENERATED_DIR}/public-api-invoke-methods.cpp)
+  FILE(GLOB_RECURSE INVOKE_METHOD_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/dali-toolkit/public-api/*.h)
+  FILE(GLOB_RECURSE INVOKE_METHOD_CORE_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/../dali-core/dali/public-api/*.h)
+  FILE(GLOB_RECURSE INVOKE_METHOD_ADAPTOR_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/../dali-adaptor/dali/public-api/*.h)
+  FILE(GLOB_RECURSE INVOKE_METHOD_REGISTRATION_SCAN_FILES CONFIGURE_DEPENDS
+       ${ROOT_SRC_DIR}/dali-toolkit/*.cpp
+       ${ROOT_SRC_DIR}/dali-toolkit/*.h
+       ${ROOT_SRC_DIR}/dali-toolkit/*.hpp)
+
+  ADD_CUSTOM_COMMAND(OUTPUT ${INVOKE_METHOD_PUBLIC_API_CPP}
+                     COMMAND ${INVOKE_METHOD_GENERATOR}
+                             --scan-root ${ROOT_SRC_DIR}/dali-toolkit/public-api
+                             --include-prefix dali-toolkit/public-api
+                             --dependency-scan-root ${ROOT_SRC_DIR}/../dali-core/dali/public-api
+                             --dependency-include-prefix dali/public-api
+                             --dependency-scan-root ${ROOT_SRC_DIR}/../dali-adaptor/dali/public-api
+                             --dependency-include-prefix dali/public-api
+                             --dependency-export-api DALI_CORE_API
+                             --dependency-export-api DALI_ADAPTOR_API
+                             --registration-scan-root ${ROOT_SRC_DIR}/dali-toolkit
+                             --namespace Dali::Toolkit
+                             --auto-export-api DALI_TOOLKIT_API
+                             --output ${INVOKE_METHOD_PUBLIC_API_CPP}
+                     DEPENDS ${INVOKE_METHOD_GENERATOR}
+                             ${INVOKE_METHOD_PUBLIC_API_HEADERS}
+                             ${INVOKE_METHOD_CORE_PUBLIC_API_HEADERS}
+                             ${INVOKE_METHOD_ADAPTOR_PUBLIC_API_HEADERS}
+                             ${INVOKE_METHOD_REGISTRATION_SCAN_FILES}
+                     COMMENT "Generating DALi invoke-method wrappers for exported toolkit public API"
+                     VERBATIM)
+
+  LIST(APPEND SOURCES ${INVOKE_METHOD_PUBLIC_API_CPP})
+ENDIF()
+
 IF( WIN32 OR APPLE )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
