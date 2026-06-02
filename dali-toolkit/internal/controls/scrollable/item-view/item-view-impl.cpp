@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -334,6 +333,7 @@ ItemView::ItemView(ItemFactory& factory)
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
   mWheelScrollDistanceStep(0.0f),
+  mWheelScrollDistanceStepSet(false),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mScrollOvershoot(0.0f),
@@ -356,9 +356,6 @@ void ItemView::OnInitialize()
 
   Actor self = Self();
 
-  Vector2 stageSize        = Stage::GetCurrent().GetSize();
-  mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
-
   self.TouchedSignal().Connect(this, &ItemView::OnTouch);
   EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
@@ -371,6 +368,16 @@ void ItemView::OnInitialize()
   self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+void ItemView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+{
+  if(!mWheelScrollDistanceStepSet)
+  {
+    mWheelScrollDistanceStep = size.height * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  }
+
+  Scrollable::OnRelayout(size, container);
 }
 
 DevelControl::ControlAccessible* ItemView::CreateAccessibleObject()
@@ -573,7 +580,8 @@ float ItemView::GetMinimumSwipeDistance() const
 
 void ItemView::SetWheelScrollDistanceStep(float step)
 {
-  mWheelScrollDistanceStep = step;
+  mWheelScrollDistanceStep    = step;
+  mWheelScrollDistanceStepSet = true;
 }
 
 float ItemView::GetWheelScrollDistanceStep() const

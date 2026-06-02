@@ -19,7 +19,7 @@
 #include "primitive-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -302,14 +302,6 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       mLightPosition = Vector3::ZERO;
     }
   }
-  else
-  {
-    // Default behaviour is to place the light directly in front of the object,
-    //  at a reasonable distance to light everything on screen.
-    Stage stage = Stage::GetCurrent();
-
-    mLightPosition = Vector3(stage.GetSize().width / 2, stage.GetSize().height / 2, stage.GetSize().width * 5);
-  }
 }
 
 void PrimitiveVisual::GetNaturalSize(Vector2& naturalSize)
@@ -326,6 +318,14 @@ void PrimitiveVisual::GetNaturalSize(Vector2& naturalSize)
 void PrimitiveVisual::DoSetOnScene(Actor& actor)
 {
   actor.AddRenderer(mImpl->mRenderer);
+
+  Window window = DevelWindow::Get(actor);
+  if(window)
+  {
+    auto    winSize = window.GetSize();
+    Vector2 windowSize(static_cast<float>(winSize.GetWidth()), static_cast<float>(winSize.GetHeight()));
+    UpdateShaderUniforms(windowSize);
+  }
 
   // Primitive generated and ready to display
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -379,17 +379,20 @@ void PrimitiveVisual::OnInitialize()
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
-void PrimitiveVisual::UpdateShaderUniforms()
+void PrimitiveVisual::UpdateShaderUniforms(Vector2 windowSize)
 {
-  Stage stage  = Stage::GetCurrent();
-  float width  = stage.GetSize().width;
-  float height = stage.GetSize().height;
+  if(mLightPosition == Vector3::ZERO)
+  {
+    // Default behaviour is to place the light directly in front of the object,
+    // at a reasonable distance to light everything on screen.
+    mLightPosition = Vector3(windowSize.width / 2, windowSize.height / 2, windowSize.width * 5);
+  }
 
   // Flip model to account for DALi starting with (0, 0) at the top left.
   Matrix scaleMatrix;
   scaleMatrix.SetIdentityAndScale(Vector3(1.0, -1.0, 1.0));
 
-  mShader.RegisterProperty(STAGE_OFFSET_UNIFORM_NAME, Vector2(width, height) / 2.0f);
+  mShader.RegisterProperty(STAGE_OFFSET_UNIFORM_NAME, windowSize / 2.0f);
   mShader.RegisterProperty(LIGHT_POSITION_UNIFORM_NAME, mLightPosition);
   mShader.RegisterProperty(OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix);
   mShader.RegisterProperty(OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions);
@@ -398,7 +401,6 @@ void PrimitiveVisual::UpdateShaderUniforms()
 void PrimitiveVisual::CreateShader()
 {
   mShader = Shader::New(ToDaliStringView(SHADER_PRIMITIVE_VISUAL_SHADER_VERT), ToDaliStringView(SHADER_PRIMITIVE_VISUAL_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PRIMITIVE_VISUAL");
-  UpdateShaderUniforms();
 }
 
 void PrimitiveVisual::CreateGeometry()

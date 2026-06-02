@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -224,7 +223,7 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
 
 void NPatchVisual::DoSetOnScene(Actor& actor)
 {
-  // load when first go on stage
+  // load when first go on scene
   LoadImages();
 
   // Set mPlacementActor now, because some case, LoadImages can use this information in LoadComplete API.

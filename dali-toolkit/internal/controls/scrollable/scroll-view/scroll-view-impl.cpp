@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -455,11 +455,12 @@ void SnapWithVelocity(
     // u = Initial Velocity (Flick velocity)
     // v = 0 (Final Velocity)
     // t = Time (Velocity / Deceleration)
-    Vector2 stageSize   = Stage::GetCurrent().GetSize();
-    float   stageLength = Vector3(stageSize.x, stageSize.y, 0.0f).Length();
-    float   a           = (stageLength * scrollView.GetFrictionCoefficient());
-    Vector3 u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
-    float   speed       = u.Length();
+    // SnapWithVelocity is called during gesture handling, so the window is guaranteed to be available.
+    Dali::Window::WindowSize ws          = DevelWindow::Get(scrollView.Self()).GetSize();
+    float                    stageLength = Vector3(ws.GetWidth(), ws.GetHeight(), 0.0f).Length();
+    float                    a           = (stageLength * scrollView.GetFrictionCoefficient());
+    Vector3                  u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
+    float                    speed       = u.Length();
     u /= speed;
 
     // TODO: Change this to a decay function. (faster you flick, the slower it should be)
@@ -635,6 +636,7 @@ ScrollView::ScrollView()
   mFlickSpeedCoefficient(DEFAULT_FLICK_SPEED_COEFFICIENT),
   mMaxFlickSpeed(DEFAULT_MAX_FLICK_SPEED),
   mWheelScrollDistanceStep(Vector2::ZERO),
+  mWheelScrollDistanceStepSet(false),
   mInAccessibilityPan(false),
   mScrolling(false),
   mScrollInterrupted(false),
@@ -670,8 +672,6 @@ void ScrollView::OnInitialize()
 
   mScrollPostPosition = mScrollPrePosition = Vector2::ZERO;
 
-  mWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
-
   mGestureStackDepth = 0;
 
   self.TouchedSignal().Connect(this, &ScrollView::OnTouch);
@@ -698,6 +698,16 @@ void ScrollView::OnInitialize()
 DevelControl::ControlAccessible* ScrollView::CreateAccessibleObject()
 {
   return new ScrollViewAccessible(Self());
+}
+
+void ScrollView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+{
+  if(!mWheelScrollDistanceStepSet)
+  {
+    mWheelScrollDistanceStep = size * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  }
+
+  ScrollBase::OnRelayout(size, container);
 }
 
 void ScrollView::OnSceneConnection(int depth)

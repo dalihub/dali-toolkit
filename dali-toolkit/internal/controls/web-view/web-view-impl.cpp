@@ -33,7 +33,6 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -181,7 +180,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
 : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
-  mWebViewSize(Stage::GetCurrent().GetSize()),
+  mWebViewSize(Vector2(1.0f, 1.0f)),
   mWebEngine(),
   mLastRenderedNativeImageWidth(0u),
   mLastRenderedNativeImageHeight(0u),
@@ -205,7 +204,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
 : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
-  mWebViewSize(Stage::GetCurrent().GetSize()),
+  mWebViewSize(Vector2(1.0f, 1.0f)),
   mWebEngine(),
   mLastRenderedNativeImageWidth(0u),
   mLastRenderedNativeImageHeight(0u),

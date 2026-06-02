@@ -16,7 +16,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-utility.h>
@@ -155,7 +156,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
 {
   float durationSum = 0.f;
 
-  Dali::Actor searchActor = searchRoot ? searchRoot : Dali::Stage::GetCurrent().GetRootLayer();
+  Dali::Actor searchActor = searchRoot ? searchRoot : Dali::Adaptor::Get().GetSceneHolders()[0].GetRootLayer();
 
   Animation animation(Animation::New(0.f));
 
@@ -381,7 +382,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
 Animation CreateAnimation(const TreeNode& child, Builder* const builder)
 {
   Replacement replacement;
-  return CreateAnimation(child, replacement, Stage::GetCurrent().GetRootLayer(), builder);
+  return CreateAnimation(child, replacement, Dali::Adaptor::Get().GetSceneHolders()[0].GetRootLayer(), builder);
 }
 
 } // namespace Internal

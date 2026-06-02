@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -687,7 +686,7 @@ void ControlImpl::OnChildRemove(Actor& child)
 void ControlImpl::OnPropertySet(Property::Index index, const Property::Value& propertyValue)
 {
   // If the clipping mode has been set, we may need to create a renderer.
-  // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
+  // Only do this if we are already on-scene as the OnSceneConnection will handle the off-scene clipping controls.
   switch(index)
   {
     case Actor::Property::CLIPPING_MODE:

@@ -22,7 +22,6 @@
 #include <btBulletCollisionCommon.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
 namespace Dali::Toolkit::Physics::Internal
