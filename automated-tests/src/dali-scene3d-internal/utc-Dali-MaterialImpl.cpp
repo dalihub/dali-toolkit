@@ -23,7 +23,7 @@
 
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
-#include <dali-scene3d/public-api/loader/shader-option.h>
+#include <dali-scene3d/integration-api/loader/shader-option.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

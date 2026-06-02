@@ -101,12 +101,11 @@ public:
    * @note If we meat cached svg load, notify LoadComplete first, and then API function finished.
    *
    * @param[in] url to retrieve
-   * @param[in] dpi The DPI of the screen.
    * @param[in] svgObserver The SvgVisual that requested loading.
    * @param[in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the load request.
    */
-  SvgLoadId Load(const VisualUrl& url, float dpi, SvgLoaderObserver* svgObserver, bool synchronousLoading);
+  SvgLoadId Load(const VisualUrl& url, SvgLoaderObserver* svgObserver, bool synchronousLoading);
 
   /**
    * @brief Request to rasterize an SVG file.
@@ -176,7 +175,7 @@ private:
 
   SvgCacheIndex GetCacheIndexFromRasterizeCacheById(const SvgRasterizeId rasterizeId) const;
 
-  SvgCacheIndex FindCacheIndexFromLoadCache(const VisualUrl& imageUrl, float dpi) const;
+  SvgCacheIndex FindCacheIndexFromLoadCache(const VisualUrl& imageUrl) const;
 
   SvgCacheIndex FindCacheIndexFromRasterizeCache(const SvgLoadId loadId, uint32_t width, uint32_t height) const;
 
@@ -206,11 +205,10 @@ public:
    */
   struct SvgLoadInfo
   {
-    SvgLoadInfo(SvgLoadId loadId, const VisualUrl& url, float dpi)
+    SvgLoadInfo(SvgLoadId loadId, const VisualUrl& url)
     : mId(loadId),
       mTask(),
       mImageUrl(url),
-      mDpi(dpi),
       mLoadState(LoadState::NOT_STARTED),
       mVectorImageRenderer(Dali::VectorImageRenderer::New()),
       mObservers(),
@@ -225,7 +223,6 @@ public:
     : mId(info.mId),
       mTask(std::move(info.mTask)),
       mImageUrl(std::move(info.mImageUrl)),
-      mDpi(info.mDpi),
       mLoadState(info.mLoadState),
       mVectorImageRenderer(std::move(info.mVectorImageRenderer)),
       mObservers(std::move(info.mObservers)),
@@ -243,8 +240,6 @@ public:
         mTask = std::move(info.mTask);
 
         mImageUrl = std::move(info.mImageUrl);
-
-        mDpi = info.mDpi;
 
         mLoadState           = info.mLoadState;
         mVectorImageRenderer = std::move(info.mVectorImageRenderer);
@@ -270,7 +265,6 @@ public:
     SvgLoadingTaskPtr mTask; ///< Async task. It would be deleted when loading completed.
 
     VisualUrl mImageUrl;
-    float     mDpi;
 
     LoadState           mLoadState;
     VectorImageRenderer mVectorImageRenderer;

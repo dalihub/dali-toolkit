@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali-scene3d/public-api/loader/buffer-definition.h>
-#include <dali-scene3d/public-api/loader/mesh-definition.h>
+#include <dali-scene3d/integration-api/loader/buffer-definition.h>
+#include <dali-scene3d/integration-api/loader/mesh-definition.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;

@@ -23,7 +23,7 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/material-definition.h>
+#include <dali-scene3d/integration-api/loader/material-definition.h>
 #include <dali-usd-loader/internal/utils.h>
 #include <dali/integration-api/string-utils.h>
 

@@ -25,7 +25,6 @@
 
 #include <cinttypes>
 #include <cstdio>
-#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
@@ -261,8 +260,8 @@ public:
    */
   [[nodiscard]] FaceIndex RayFaceIntersect(const Vector3& origin, const Vector3& direction) const;
 
-  static constexpr FaceIndex NULL_FACE{std::numeric_limits<FaceIndex>::max()}; ///< Represents null face
-  static constexpr EdgeIndex NULL_EDGE{std::numeric_limits<EdgeIndex>::max()}; ///< Represents null edge
+  static constexpr FaceIndex NULL_FACE{static_cast<FaceIndex>(~FaceIndex(0))}; ///< Represents null face
+  static constexpr EdgeIndex NULL_EDGE{static_cast<EdgeIndex>(~EdgeIndex(0))}; ///< Represents null edge
 
 public:
   DALI_INTERNAL explicit NavigationMesh(NavigationMeshImpl* impl);

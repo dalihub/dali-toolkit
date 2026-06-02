@@ -35,7 +35,7 @@
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
 
-#include <dali-scene3d/public-api/loader/node-definition.h>
+#include <dali-scene3d/integration-api/loader/node-definition.h>
 
 #include <dali/devel-api/actors/camera-actor-devel.h>
 

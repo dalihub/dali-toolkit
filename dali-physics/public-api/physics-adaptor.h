@@ -25,8 +25,7 @@
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
-
-#include <functional> ///< for std::function
+#include <dali/public-api/signals/callback.h>
 
 namespace Dali::Toolkit::Physics
 {
@@ -440,18 +439,24 @@ public:
   Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance);
 
   /**
-   * @brief Queue a function to be executed before the physics integration in the update thread.
+   * @brief Queue a callback to be executed before the physics integration in the update thread.
    *
    * @SINCE_2_2.43
-   * Multiple functions can be queued up. They are executed in the update frame
+   * Multiple callbacks can be queued up. They are executed in the update frame
    * callback when the next sync point is seen, so CreateSyncPoint() should be called
    * afterwards for this to be executed.
    *
-   * @param[in] function to execute. This can be any method, and it can work fine with
+   * @param[in] callback to execute. This can be any method, and it can work fine with
    * physics bodies etc, but it must not be used with DALI event side objects, as this
    * will very likely cause the update thread to crash.
+   *
+   * @note Use MakePhysicsCallback() to create a callback from a lambda or functor.
+   *
+   * Example:
+   *   btRigidBody* body = physicsActor.GetBody().Get<btRigidBody*>();
+   *   physicsAdaptor.Queue(MakePhysicsCallback([body](){ body->clearForces(); }));
    */
-  void Queue(std::function<void(void)> function);
+  void Queue(UniquePtr<CallbackBase> callback);
 
   /**
    * @brief Create a sync point for queued functions.
@@ -469,10 +474,10 @@ public:
    *   auto boxPhysicsActor = physicsAdaptor.AddActorBody(boxActor, boxBody);
    *   boxActor.SetProperty(Actor::Property::VISIBLE, true);
    *   boxActor.SetProperty(Actor::Property::OPACITY, 0.5f);
-   *   physicsAdaptor.Queue([boxBody](){ boxBody->activate(true);});
+   *   physicsAdaptor.Queue(MakePhysicsCallback([boxBody](){ boxBody->activate(true);}));
    *   btVector3 impulse(4, 5, 6);
    *   btVector3 position();
-   *   physicsAdaptor.Queue([boxBody](){ boxBody->applyImpulse(impulse, position);});
+   *   physicsAdaptor.Queue(MakePhysicsCallback([boxBody](){ boxBody->applyImpulse(impulse, position);}));
    *   physicsAdaptor.CreateSyncPoint();
    *
    * Ensures that the box has both render properties and physics properties applied
@@ -492,6 +497,26 @@ public: // Not intended for developer use
   explicit DALI_INTERNAL PhysicsAdaptor(Internal::PhysicsAdaptor* impl);
   /// @endcond
 };
+
+/**
+ * @brief Helper function to create a physics callback from a lambda/functor.
+ *
+ * @SINCE_2_5.24
+ * @tparam T The functor type (automatically deduced)
+ * @param functor The functor to wrap
+ * @return A UniquePtr to a CallbackBase
+ *
+ * Example:
+ * @code
+ * btRigidBody* body = physicsActor.GetBody().Get<btRigidBody*>();
+ * physicsAdaptor.Queue(MakePhysicsCallback([body](){ body->clearForces(); }));
+ * @endcode
+ */
+template<typename T>
+UniquePtr<CallbackBase> MakePhysicsCallback(T&& functor)
+{
+  return UniquePtr<CallbackBase>(new CallbackFunctor0<typename DecayType<T>::type>(Forward<T>(functor)));
+}
 
 } // namespace Dali::Toolkit::Physics
 

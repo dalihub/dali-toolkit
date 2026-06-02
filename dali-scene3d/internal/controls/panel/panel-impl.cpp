@@ -38,8 +38,8 @@
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
 #include <dali-scene3d/public-api/controls/panel/panel.h>
-#include <dali-scene3d/public-api/loader/light-parameters.h>
-#include <dali-scene3d/public-api/loader/shader-manager.h>
+#include <dali-scene3d/integration-api/loader/light-parameters.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 
 using namespace Dali;
 

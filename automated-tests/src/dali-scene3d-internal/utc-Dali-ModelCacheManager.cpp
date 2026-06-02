@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
-#include <dali-scene3d/public-api/loader/resource-bundle.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/resource-bundle.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>

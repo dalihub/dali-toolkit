@@ -32,7 +32,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/load-scene-metadata.h>
+#include <dali-scene3d/integration-api/loader/load-scene-metadata.h>
 #include <dali-usd-loader/internal/utils.h>
 
 namespace Dali::Scene3D::Loader

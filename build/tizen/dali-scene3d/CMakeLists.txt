@@ -72,11 +72,14 @@ if (ENABLE_PKG_CONFIGURE)
 
 	set(core_pkg_cfg_file dali2-scene3d.pc)
 	configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file}.in ${core_pkg_cfg_file} @ONLY)
+	set(integration_pkg_cfg_file dali2-scene3d-integration.pc)
+	configure_file(${CMAKE_CURRENT_LIST_DIR}/${integration_pkg_cfg_file}.in ${integration_pkg_cfg_file} @ONLY)
 endif()
 
 set(scene3d_src_files "")
 include("${scene3d_dir}/internal/file.list")
 include("${scene3d_dir}/public-api/file.list")
+include("${scene3d_dir}/integration-api/file.list")
 
 set(prefix_include_dir "${prefix}/include")
 include_directories(${repo_root_dir}
@@ -179,11 +182,17 @@ ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 # Install headers using lists defined by ADD_SUBDIRECTORY
 INSTALL_HEADERS_WITH_DIRECTORY(SCENE3D_PUBLIC_API_HEADERS ${repo_root_dir}/dali-scene3d "dali-scene3d")
 
+# Install integration-api headers
+INSTALL_HEADERS_WITH_DIRECTORY(SCENE3D_INTEGRATION_API_HEADERS ${repo_root_dir}/dali-scene3d "dali-scene3d")
+
 # Install dali-scene3d.h
 INSTALL( FILES ${scene3d_dir}/dali-scene3d.h DESTINATION ${INCLUDE_DIR}/dali-scene3d )
 
 if (ENABLE_PKG_CONFIGURE)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file}
+		DESTINATION ${LIB_DIR}/pkgconfig
+	)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${integration_pkg_cfg_file}
 		DESTINATION ${LIB_DIR}/pkgconfig
 	)
 endif()

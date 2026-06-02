@@ -22,8 +22,8 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/string-utils.h>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/node-definition.h"
-#include "dali-scene3d/public-api/loader/view-projection.h"
+#include "dali-scene3d/integration-api/loader/node-definition.h"
+#include "dali-scene3d/integration-api/loader/view-projection.h"
 
 using namespace Dali;
 using namespace Dali::Scene3D::Loader;

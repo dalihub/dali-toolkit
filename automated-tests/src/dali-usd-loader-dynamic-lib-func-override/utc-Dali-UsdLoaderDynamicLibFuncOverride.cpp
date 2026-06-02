@@ -18,10 +18,10 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/model-loader.h>
-#include <dali-scene3d/public-api/loader/resource-bundle.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/model-loader.h>
+#include <dali-scene3d/integration-api/loader/resource-bundle.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-test-suite-utils.h>
 #include <dlfcn.h>
 #include <string_view>

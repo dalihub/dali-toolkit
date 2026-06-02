@@ -78,12 +78,11 @@ VectorImageRenderer SvgTask::GetRenderer()
   return mVectorRenderer;
 }
 
-SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback)
+SvgLoadingTask::SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, CallbackBase* callback)
 : SvgTask(vectorRenderer, id, callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
   mImageUrl(url),
   mEncodedImageBuffer(encodedImageBuffer),
-  mNotifyRequiredTasks(),
-  mDpi(dpi)
+  mNotifyRequiredTasks()
 {
 }
 
@@ -147,7 +146,7 @@ void SvgLoadingTask::Process()
     buffer.Reserve(buffer.Count() + 1u);
     buffer.PushBack('\0');
 
-    if(!mVectorRenderer.Load(buffer, mDpi))
+    if(!mVectorRenderer.Load(buffer))
     {
       DALI_LOG_ERROR("Failed to load data! [%s]\n", mImageUrl.GetUrl().c_str());
       loadFailed = true;

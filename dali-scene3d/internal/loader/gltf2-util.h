@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_GLTF2_UTIL_H
 #define DALI_SCENE3D_LOADER_GLTF2_UTIL_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/gltf2-asset.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/resource-bundle.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/resource-bundle.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 
 namespace gt = gltf2;
 namespace js = json;

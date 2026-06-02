@@ -26,9 +26,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/model-cache-manager.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/model-loader.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/model-loader.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 
 namespace Dali

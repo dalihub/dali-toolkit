@@ -25,7 +25,7 @@
 #include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/index.h>
+#include <dali-scene3d/integration-api/loader/index.h>
 
 namespace Dali::Scene3D::Loader
 {

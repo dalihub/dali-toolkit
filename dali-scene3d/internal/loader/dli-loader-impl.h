@@ -23,13 +23,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/loader/animation-definition.h>
-#include <dali-scene3d/public-api/loader/customization.h>
-#include <dali-scene3d/public-api/loader/dli-input-parameter.h>
-#include <dali-scene3d/public-api/loader/index.h>
-#include <dali-scene3d/public-api/loader/model-loader-impl.h>
-#include <dali-scene3d/public-api/loader/node-definition.h>
-#include <dali-scene3d/public-api/loader/string-callback.h>
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/customization.h>
+#include <dali-scene3d/integration-api/loader/dli-input-parameter.h>
+#include <dali-scene3d/integration-api/loader/index.h>
+#include <dali-scene3d/integration-api/loader/model-loader-impl.h>
+#include <dali-scene3d/integration-api/loader/node-definition.h>
+#include <dali-scene3d/integration-api/loader/string-callback.h>
 
 namespace Dali::Scene3D::Loader::Internal
 {

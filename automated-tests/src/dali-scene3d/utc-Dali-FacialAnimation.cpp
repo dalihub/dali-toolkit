@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali-scene3d/public-api/loader/animation-definition.h>
-#include <dali-scene3d/public-api/loader/facial-animation-loader.h>
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/facial-animation-loader.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/animation/key-frames-devel.h>

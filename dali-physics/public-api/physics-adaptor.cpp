@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,9 +149,9 @@ Dali::Vector3 PhysicsAdaptor::ProjectPoint(Dali::Vector3 origin, Dali::Vector3 d
   return GetImplementation(*this).ProjectPoint(origin, direction, distance);
 }
 
-void PhysicsAdaptor::Queue(std::function<void(void)> function)
+void PhysicsAdaptor::Queue(UniquePtr<CallbackBase> callback)
 {
-  GetImplementation(*this).Queue(function);
+  GetImplementation(*this).Queue(Move(callback));
 }
 
 void PhysicsAdaptor::CreateSyncPoint()

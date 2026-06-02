@@ -22,7 +22,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dlfcn.h>
 #include "dali-scene3d/public-api/algorithm/navigation-mesh.h"
-#include "dali-scene3d/public-api/loader/navigation-mesh-factory.h"
+#include "dali-scene3d/integration-api/loader/navigation-mesh-factory.h"
 
 // include collider mesh data
 #include "collider-mesh-data.h"

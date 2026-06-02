@@ -18,7 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <string_view>
-#include "dali-scene3d/public-api/loader/shader-option.h"
+#include "dali-scene3d/integration-api/loader/shader-option.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;

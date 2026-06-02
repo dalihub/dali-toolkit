@@ -46,8 +46,8 @@ using Dali::Integration::ToDaliStringView;
 #pragma GCC diagnostic pop
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 #include <dali-usd-loader/internal/usd-material-processor.h>
 #include <dali-usd-loader/internal/utils.h>
 

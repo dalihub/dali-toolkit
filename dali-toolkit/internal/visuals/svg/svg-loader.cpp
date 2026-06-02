@@ -154,17 +154,17 @@ SvgLoader::SvgRasterizeId SvgLoader::GenerateUniqueSvgRasterizeId()
   return mCurrentSvgRasterizeId++;
 }
 
-SvgLoader::SvgLoadId SvgLoader::Load(const VisualUrl& url, float dpi, SvgLoaderObserver* svgObserver, bool synchronousLoading)
+SvgLoader::SvgLoadId SvgLoader::Load(const VisualUrl& url, SvgLoaderObserver* svgObserver, bool synchronousLoading)
 {
   SvgLoadId loadId     = SvgLoader::INVALID_SVG_LOAD_ID;
-  auto      cacheIndex = FindCacheIndexFromLoadCache(url, dpi);
+  auto      cacheIndex = FindCacheIndexFromLoadCache(url);
 
   // Newly append cache now.
   if(cacheIndex == SvgLoader::INVALID_SVG_CACHE_INDEX)
   {
     loadId     = GenerateUniqueSvgLoadId();
     cacheIndex = static_cast<SvgCacheIndex>(static_cast<uint32_t>(mLoadCache.size()));
-    mLoadCache.push_back(SvgLoadInfo(loadId, url, dpi));
+    mLoadCache.push_back(SvgLoadInfo(loadId, url));
 
     if(url.IsBufferResource())
     {
@@ -175,14 +175,14 @@ SvgLoader::SvgLoadId SvgLoader::Load(const VisualUrl& url, float dpi, SvgLoaderO
         textureManager.UseExternalResource(url);
       }
     }
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Load( url=%s dpi=%f observer=%p ) New cached index:%d loadId@%d\n", url.GetUrl().c_str(), dpi, svgObserver, cacheIndex, loadId);
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Load( url=%s observer=%p ) New cached index:%d loadId@%d\n", url.GetUrl().c_str(), svgObserver, cacheIndex, loadId);
   }
   else
   {
     DALI_ASSERT_ALWAYS(static_cast<size_t>(cacheIndex) < mLoadCache.size() && "Invalid cache index");
     loadId = mLoadCache[cacheIndex].mId;
     ++mLoadCache[cacheIndex].mReferenceCount;
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Load( url=%s dpi=%f observer=%p ) Using cached index:%d loadId@%d\n", url.GetUrl().c_str(), dpi, svgObserver, cacheIndex, loadId);
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Load( url=%s observer=%p ) Using cached index:%d loadId@%d\n", url.GetUrl().c_str(), svgObserver, cacheIndex, loadId);
   }
 
   auto& loadInfo = mLoadCache[cacheIndex];
@@ -473,7 +473,7 @@ SvgLoader::SvgCacheIndex SvgLoader::GetCacheIndexFromRasterizeCacheById(const Sv
   return SvgLoader::INVALID_SVG_CACHE_INDEX;
 }
 
-SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromLoadCache(const VisualUrl& imageUrl, float dpi) const
+SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromLoadCache(const VisualUrl& imageUrl) const
 {
   const uint32_t size = static_cast<uint32_t>(mLoadCache.size());
 
@@ -481,8 +481,7 @@ SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromLoadCache(const VisualUrl&
 
   for(uint32_t i = 0; i < size; ++i)
   {
-    if(mLoadCache[i].mImageUrl.GetUrl() == imageUrl.GetUrl() &&
-       Dali::Equals(mLoadCache[i].mDpi, dpi))
+    if(mLoadCache[i].mImageUrl.GetUrl() == imageUrl.GetUrl())
     {
       return static_cast<SvgCacheIndex>(i);
     }
@@ -518,7 +517,7 @@ void SvgLoader::RemoveLoad(SvgLoader::SvgLoadId loadId)
     auto& loadInfo(mLoadCache[cacheIndex]);
 
     --loadInfo.mReferenceCount;
-    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::RemoveLoad( url=%s dpi=%f ) cached index:%d loadId@%d, state:%s, refCount=%d\n", loadInfo.mImageUrl.GetUrl().c_str(), loadInfo.mDpi, cacheIndex, loadId, GET_LOAD_STATE_STRING(loadInfo.mLoadState), static_cast<int>(loadInfo.mReferenceCount));
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::RemoveLoad( url=%s ) cached index:%d loadId@%d, state:%s, refCount=%d\n", loadInfo.mImageUrl.GetUrl().c_str(), cacheIndex, loadId, GET_LOAD_STATE_STRING(loadInfo.mLoadState), static_cast<int>(loadInfo.mReferenceCount));
 
     if(loadInfo.mReferenceCount <= 0)
     {
@@ -632,7 +631,7 @@ void SvgLoader::LoadRequest(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObserver*
     }
   }
 
-  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, MakeCallback(this, &SvgLoader::AsyncLoadComplete));
+  loadInfo.mTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, MakeCallback(this, &SvgLoader::AsyncLoadComplete));
 
   Dali::AsyncTaskManager::Get().AddTask(loadInfo.mTask);
 }
@@ -653,7 +652,7 @@ void SvgLoader::LoadSynchronously(SvgLoader::SvgLoadInfo& loadInfo, SvgLoaderObs
   }
 
   // Note, we will not store this task after this API called.
-  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, loadInfo.mDpi, nullptr);
+  SvgTaskPtr loadingTask = new SvgLoadingTask(loadInfo.mVectorImageRenderer, loadInfo.mId, loadInfo.mImageUrl, encodedImageBuffer, nullptr);
   loadingTask->Process();
   if(!loadingTask->HasSucceeded())
   {

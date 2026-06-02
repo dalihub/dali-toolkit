@@ -107,7 +107,8 @@ struct DBusWrapper
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
 
-                        virtual MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) = 0;
+  virtual void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) = 0;
+  virtual MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) = 0;
   virtual MessageIterPtr eldbus_message_iter_get_and_next_by_type_impl(const MessageIterPtr& it, int type)                                        = 0;
   virtual MessageIterPtr eldbus_message_iter_get_impl(const MessagePtr& it, bool write)                                                           = 0;
   virtual MessagePtr     eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName)                                    = 0;
@@ -549,7 +550,8 @@ struct TestDBusWrapper : public DBusWrapper
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
 
-                        MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) override;
+  void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) override;
+  MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) override;
   MessageIterPtr eldbus_message_iter_get_and_next_by_type_impl(const MessageIterPtr& it, int type) override;
   MessageIterPtr eldbus_message_iter_get_impl(const MessagePtr& it, bool write) override;
   MessagePtr     eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName) override;

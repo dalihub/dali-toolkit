@@ -52,7 +52,7 @@ typedef IntrusivePtr<SvgRasterizingTask> SvgRasterizingTaskPtr;
  * 1. Created by SvgVisual in the main thread
  * 2. Queued in the worked thread waiting to be processed.
  * 3. If this task gets its turn to do the rasterization, it triggers main thread to apply the rasterized image to material then been deleted in main thread call back
- *    Or if this task is been removed ( new image/size set to the visual or actor off stage) before its turn to be processed, it then been deleted in the worker thread.
+ *    Or if this task is been removed ( new image/size set to the visual or actor off scene) before its turn to be processed, it then been deleted in the worker thread.
  */
 class SvgTask : public AsyncTask
 {
@@ -120,10 +120,9 @@ public:
    * @param[in] id The id of this task.
    * @param[in] url The URL to svg resource to use.
    * @param[in] encodedImageBuffer The resource buffer if required.
-   * @param[in] dpi The DPI of the screen.
    * @param[in] callback The callback that is called when the operation is completed.
    */
-  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, float dpi, CallbackBase* callback);
+  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, CallbackBase* callback);
 
   /**
    * Destructor.
@@ -169,8 +168,6 @@ private:
 
   Dali::Mutex                        mMutex;
   std::vector<SvgRasterizingTaskPtr> mNotifyRequiredTasks;
-
-  float mDpi;
 };
 
 class SvgRasterizingTask : public SvgTask

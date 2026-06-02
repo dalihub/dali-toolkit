@@ -28,8 +28,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
 
 namespace Dali::Scene3D::Internal
 {

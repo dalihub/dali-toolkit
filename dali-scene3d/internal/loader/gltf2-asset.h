@@ -29,8 +29,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-reader.h>
-#include <dali-scene3d/public-api/loader/index.h>
-#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/integration-api/loader/index.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 
 #define ENUM_STRING_MAPPING(t, x) \
   {                               \

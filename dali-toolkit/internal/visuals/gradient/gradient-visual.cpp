@@ -72,10 +72,6 @@ static constexpr std::string_view UNIFORM_TEXTURE_COORDINATE_SCALE_FACTOR_NAME("
 static constexpr std::string_view UNIFORM_START_ANGLE_NAME("uStartAngle");
 static constexpr std::string_view UNIFORM_START_OFFSET_NAME("uGradientOffset");
 
-// default offset value
-static constexpr float DEFAULT_OFFSET_MINIMUM = 0.0f;
-static constexpr float DEFAULT_OFFSET_MAXIMUM = 1.0f;
-
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[] = {
   VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
   VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,

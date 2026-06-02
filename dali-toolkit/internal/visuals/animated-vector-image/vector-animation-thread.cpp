@@ -502,10 +502,8 @@ void VectorAnimationThread::OnEventCallbackTriggered()
       {
         // Request to remove pending tasks at AsyncTaskManager side.
         mAsyncTaskManager.AddTask(nullptr);
-        Stage::GetCurrent().KeepRendering(0.0f); // Trigger event processing
 
-        // Request ProcessEvents on idle to make ensure Processor executed.
-        Dali::Adaptor::Get().RequestProcessEventsOnIdle();
+        Dali::Adaptor::Get().RequestProcessEventsAndUpdate(); // Trigger event processing
       }
       if(mForceRenderOnce)
       {

@@ -131,7 +131,7 @@ void ModelNode::RetrieveBlendShapeNames(Dali::Vector<Dali::String>& blendShapeNa
   }
 }
 
-Loader::BlendShapes::Index ModelNode::GetBlendShapeIndexByName(Dali::StringView blendShapeName) const
+BlendShapes::Index ModelNode::GetBlendShapeIndexByName(Dali::StringView blendShapeName) const
 {
   return Internal::GetImplementation(*this).GetBlendShapeIndexByName(Dali::Integration::ToStdStringView(blendShapeName));
 }

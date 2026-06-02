@@ -35,17 +35,17 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-util.h>
-#include <dali-scene3d/public-api/loader/alpha-function-helper.h>
-#include <dali-scene3d/public-api/loader/animation-definition.h>
-#include <dali-scene3d/public-api/loader/blend-shape-details.h>
-#include <dali-scene3d/public-api/loader/camera-parameters.h>
-#include <dali-scene3d/public-api/loader/ktx-loader.h>
-#include <dali-scene3d/public-api/loader/light-parameters.h>
-#include <dali-scene3d/public-api/loader/load-result.h>
-#include <dali-scene3d/public-api/loader/parse-renderer-state.h>
-#include <dali-scene3d/public-api/loader/scene-definition.h>
-#include <dali-scene3d/public-api/loader/skinning-details.h>
-#include <dali-scene3d/public-api/loader/utils.h>
+#include <dali-scene3d/integration-api/loader/alpha-function-helper.h>
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/blend-shape-details.h>
+#include <dali-scene3d/integration-api/loader/camera-parameters.h>
+#include <dali-scene3d/integration-api/loader/ktx-loader.h>
+#include <dali-scene3d/integration-api/loader/light-parameters.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/parse-renderer-state.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/skinning-details.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 
 #define DLI_0_1_COMPATIBILITY
 

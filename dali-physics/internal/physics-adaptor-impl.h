@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/signals/callback.h>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -167,7 +168,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::Queue
    */
-  void Queue(std::function<void(void)> function);
+  void Queue(UniquePtr<CallbackBase> callback);
 
   /**
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::Queue

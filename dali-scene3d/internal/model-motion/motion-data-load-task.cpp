@@ -23,8 +23,8 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/loader/bvh-loader.h>
-#include <dali-scene3d/public-api/loader/facial-animation-loader.h>
+#include <dali-scene3d/integration-api/loader/bvh-loader.h>
+#include <dali-scene3d/integration-api/loader/facial-animation-loader.h>
 
 using Dali::Integration::ToDaliString;
 
