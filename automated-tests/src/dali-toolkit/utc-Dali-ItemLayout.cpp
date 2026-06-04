@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,6 +237,34 @@ public: // From ItemLayout
   {
     return Vector3::ZERO;
   }
+};
+
+/// @brief Overrides OnLayoutPropertiesSet to ensure that is called
+class TestItemLayout2 : public TestItemLayout
+{
+public:
+  /**
+   * Create a new grid layout.
+   */
+  static TestItemLayoutPtr New(bool& onLayoutPropertiesSetCalled)
+  {
+    return TestItemLayoutPtr(new TestItemLayout2(onLayoutPropertiesSetCalled));
+  }
+
+private:
+  TestItemLayout2(bool& onLayoutProperiesSetCalled)
+  : TestItemLayout(),
+    mOnLayoutPropertiesSetCalled(onLayoutProperiesSetCalled)
+  {
+  }
+
+  void OnLayoutPropertiesSet(const Property::Map& properties) override
+  {
+    mOnLayoutPropertiesSetCalled = true;
+  }
+
+public:
+  bool& mOnLayoutPropertiesSetCalled;
 };
 
 } // namespace
@@ -608,6 +636,28 @@ int UtcDaliItemRangeIntersection(void)
 
   bOutOfThisRange = itmInterSect.Within(uInterEndCheck);
   DALI_TEST_EQUALS(bOutOfThisRange, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliItemLayoutOnLayoutPropertiesSet(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView        view = ItemView::New(factory);
+
+  // Create a grid layout without this method overridden and call SetLayoutProperties (for coverage)
+  ItemLayoutPtr layout = TestItemLayout::New();
+  layout->SetLayoutProperties(Property::Map());
+
+  // Create a grid layout with the method overridden and call SetLayoutProperties to ensure it is called
+  bool          onSetLayoutPropertiesCalled(false);
+  ItemLayoutPtr layout2 = TestItemLayout2::New(onSetLayoutPropertiesCalled);
+  DALI_TEST_EQUALS(onSetLayoutPropertiesCalled, false, TEST_LOCATION);
+  layout2->SetLayoutProperties(Property::Map());
+  DALI_TEST_EQUALS(onSetLayoutPropertiesCalled, true, TEST_LOCATION);
 
   END_TEST;
 }

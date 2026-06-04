@@ -151,6 +151,7 @@ void ItemLayout::SetLayoutProperties(const Property::Map& properties)
     }
   }
   mImpl->mProperties = properties;
+  OnLayoutPropertiesSet(properties);
 }
 
 Property::Map ItemLayout::GetLayoutProperties()
