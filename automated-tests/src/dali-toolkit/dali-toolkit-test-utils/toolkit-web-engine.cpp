@@ -609,47 +609,47 @@ public:
     return "test:abc";
   }
 
-  Dali::WebEnginePolicyDecision::DecisionType GetDecisionType() const
+  Dali::WebEnginePolicyDecision::DecisionType GetDecisionType() const override
   {
     return Dali::WebEnginePolicyDecision::DecisionType::USE;
   }
 
-  std::string GetResponseMime() const
+  std::string GetResponseMime() const override
   {
     return "txt/xml";
   }
 
-  int32_t GetResponseStatusCode() const
+  int32_t GetResponseStatusCode() const override
   {
     return 500;
   }
 
-  Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const
+  Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const override
   {
     return Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
   }
 
-  Dali::WebEngineFrame& GetFrame() const
+  Dali::WebEngineFrame& GetFrame() const override
   {
     return *(Dali::WebEngineFrame*)(&mockWebFrame);
   }
 
-  std::string GetScheme() const
+  std::string GetScheme() const override
   {
     return "test";
   }
 
-  bool Use()
+  bool Use() override
   {
     return true;
   }
 
-  bool Ignore()
+  bool Ignore() override
   {
     return true;
   }
 
-  bool Suspend()
+  bool Suspend() override
   {
     return true;
   }
@@ -1618,7 +1618,7 @@ public:
   {
   }
 
-  Dali::WebEnginePlugin* GetWebEngine() const
+  Dali::WebEnginePlugin* GetWebEngine() const override
   {
     return GetWebEnginePlugin();
   }

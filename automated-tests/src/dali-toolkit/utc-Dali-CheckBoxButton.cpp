@@ -36,8 +36,7 @@ bool        CheckBoxButtonClicked(Button button)
   return true;
 }
 
-static const char* TEST_IMAGE_ONE  = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const Vector2      TEST_IMAGE_SIZE = Vector2(66.0f, 66.0f);
+static const char* TEST_IMAGE_ONE = TEST_RESOURCE_DIR "/gallery-small-1.jpg"; // 66x66
 
 static Dali::String GetButtonText(Button button)
 {

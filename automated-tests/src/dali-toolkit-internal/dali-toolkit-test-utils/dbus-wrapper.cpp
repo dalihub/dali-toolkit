@@ -368,7 +368,7 @@ struct DefaultDBusWrapper : public DBusWrapper
   {
     return create(eldbus_message_iter_get(get(msg)), nullptr, false);
   }
-  MessagePtr eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName)
+  MessagePtr eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName) override
   {
     return create(eldbus_proxy_method_call_new(get(proxy), funcName.c_str()));
   }
@@ -960,7 +960,7 @@ eldbus_message_iter_arguments_append_impl_basic(uint8_t, y)
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
 
-void TestDBusWrapper::eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2)
+                      void TestDBusWrapper::eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2)
 {
   auto m = get(it);
   if(!m->write) throw error{};
@@ -972,7 +972,7 @@ void TestDBusWrapper::eldbus_message_iter_arguments_append_impl(const MessageIte
   entryList.push_back(Element{std::string(v2)});
 }
 
-                      TestDBusWrapper::MessageIterPtr TestDBusWrapper::eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig)
+TestDBusWrapper::MessageIterPtr TestDBusWrapper::eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig)
 {
   auto m = get(it);
   if(!m->write) throw error{};

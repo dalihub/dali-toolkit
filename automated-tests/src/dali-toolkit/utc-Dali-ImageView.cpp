@@ -2769,7 +2769,6 @@ int UtcDaliImageViewCustomShader(void)
 namespace
 {
 static int gFailCounter = 0;
-const int  MAX_RETRIES(3);
 
 void ReloadImage(ImageView imageView)
 {

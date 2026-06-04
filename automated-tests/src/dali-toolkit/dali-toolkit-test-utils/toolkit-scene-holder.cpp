@@ -54,6 +54,10 @@ public:
   {
   }
 
+  virtual ~SceneHolderLifeCycleObserver()
+  {
+  }
+
 private: // Adaptor::LifeCycleObserver interface
   virtual void OnStart()
   {

@@ -187,34 +187,9 @@ ________________________________________________________________________________
 ### Touch, Hover & Wheel Events {#creating-controls-events}
 
 + A **touch event** is when any touch occurs within the bounds of the custom actor. Connect to Dali::Actor::TouchedSignal().
-+ A **hover event** is when a pointer moves within the bounds of a custom actor (e.g. mouse pointer or hover pointer).
-+ A **wheel event** is when the mouse wheel (or similar) is moved while hovering over an actor (via a mouse pointer or hover pointer).
- 
-If the control needs to utilize hover and wheel events, then the correct behaviour flag should be used when constructing the control and then the appropriate method should be overridden.
-~~~{.cpp}
-// C++
-bool Internal::MyUIControl::OnHoverEvent( const HoverEvent& event )
-{
-  bool consumed = false;
++ A **hover event** is when a pointer moves within the bounds of a custom actor (e.g. mouse pointer or hover pointer). Connect to Dali::Actor::HoveredSignal().
++ A **wheel event** is when the mouse wheel (or similar) is moved while hovering over an actor (via a mouse pointer or hover pointer). Connect to Dali::Actor::WheelEventSignal().
 
-  // Handle hover event
-
-  // Return true if handled/consumed, false otherwise
-  return consumed;
-}
-~~~
-~~~{.cpp}
-// C++
-bool Internal::MyUIControl::OnWheelEvent( const WheelEvent& event )
-{
-  bool consumed = false;
-
-  // Handle wheel event
-
-  // Return true if handled/consumed, false otherwise
-  return consumed;
-}
-~~~
 ___________________________________________________________________________________________________
 
 ### Gestures {#creating-controls-gestures}

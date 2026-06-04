@@ -220,7 +220,7 @@ bool TextureUploadManager::ProcessUploadQueue(RequestUploadQueue&& queue)
 
 void TextureUploadManager::RequestUpload(Dali::Devel::TextureUploadManager::ResourceId resourceId, Dali::PixelData pixelData)
 {
-  mRequestUploadQueue.push_back(std::move(UploadRequestItem(resourceId, pixelData)));
+  mRequestUploadQueue.push_back(UploadRequestItem(resourceId, pixelData));
 }
 
 } // namespace Adaptor

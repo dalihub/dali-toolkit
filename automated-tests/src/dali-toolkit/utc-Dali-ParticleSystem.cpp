@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ static void                      AdvanceTimeByMs(uint32_t ms)
 namespace Dali::Toolkit::ParticleSystem::Internal
 {
 // Create fake time getter
-struct ParticleEmitter
+class ParticleEmitter
 {
   [[nodiscard]] std::chrono::milliseconds GetCurrentTimeMillis() const;
 };

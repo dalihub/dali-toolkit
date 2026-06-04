@@ -129,11 +129,6 @@ const char* const PROPERTY_NAME_FONT_VARIATIONS          = "fontVariations";
 const char* const PROPERTY_NAME_ENABLE_CURSOR_INSET      = "enableCursorInset";
 const char* const PROPERTY_NAME_ENABLE_DEFERRED_RELAYOUT = "enableDeferredRelayout";
 
-const Vector4       PLACEHOLDER_TEXT_COLOR(0.8f, 0.8f, 0.8f, 0.8f);
-const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f); // The text highlight color.
-
-const float RENDER_FRAME_INTERVAL = 16.66f;
-
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 

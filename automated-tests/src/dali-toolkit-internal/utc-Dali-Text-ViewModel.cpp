@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ namespace
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
 
 const Size  CONTROL_SIZE(200.f, 400.f);
-const Size  CONTROL_SMALL_SIZE(50.f, 100.f);
 const char* LOREM_IPSUM =
   "Lorem ipsum dolor sit amet, aeque definiebas ea mei, posse iracundia ne cum.\n"
   "Usu ne nisl maiorum iudicabit, veniam epicurei oporteat eos an.\n"

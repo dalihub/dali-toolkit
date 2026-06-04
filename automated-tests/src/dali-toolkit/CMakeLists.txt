@@ -161,6 +161,15 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
+# Ignore some warning options
+# TODO : Why it is not be ignored at root CMakeLists.txt?
+INCLUDE(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG(-Wno-self-assign-overloaded HAVE_NO_SELF_ASSIGN_OVERLOADED)
+IF (HAVE_NO_SELF_ASSIGN_OVERLOADED)
+  ADD_COMPILE_OPTIONS( -Wno-self-assign-overloaded )
+ENDIF()
+
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})

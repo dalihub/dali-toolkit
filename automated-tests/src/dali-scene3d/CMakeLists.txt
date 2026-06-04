@@ -101,6 +101,15 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
+# Ignore some warning options
+# TODO : Why it is not be ignored at root CMakeLists.txt?
+INCLUDE(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG(-Wno-pessimizing-move HAVE_NO_PESSIMIZING_MOVE)
+IF (HAVE_NO_PESSIMIZING_MOVE)
+  ADD_COMPILE_OPTIONS( -Wno-pessimizing-move )
+ENDIF()
+
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
