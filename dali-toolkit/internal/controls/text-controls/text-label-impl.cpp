@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -1218,11 +1218,6 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
-  // Sets layoutDirection value
-  Dali::Stage                 stage           = Dali::Stage::GetCurrent();
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  mController->SetLayoutDirection(layoutDirection);
-
   self.InheritedVisibilityChangedSignal().Connect(this, &TextLabel::OnControlInheritedVisibilityChanged);
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
@@ -1249,6 +1244,19 @@ bool TextLabel::IsVisible()
     mIsVisibleInitialized = true;
   }
   return mIsVisible;
+}
+
+void TextLabel::OnSceneConnection(int depth)
+{
+  ControlImpl::OnSceneConnection(depth);
+
+  Dali::Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    // Sets layoutDirection value
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+    mController->SetLayoutDirection(layoutDirection);
+  }
 }
 
 DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()

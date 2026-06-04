@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
@@ -93,29 +93,16 @@ typedef Dali::Vector<Dali::Vector4> QuadContainer;
  * @param[in] boundingRectangle local bounding
  * @param[out] Vector4 World coordinate bounding Box.
  */
-void LocalToWorldCoordinatesBoundingBox(const Dali::BoundsInteger& boundingRectangle, Dali::Vector4& boundingBox)
+void LocalToWorldCoordinatesBoundingBox(const Dali::BoundsInteger& boundingRectangle, const Dali::Vector2& sceneSize, Dali::Vector4& boundingBox)
 {
   // Convert to world coordinates and store as a Vector4 to be compatible with Property Notifications.
-  Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-
-  const float originX = boundingRectangle.x - 0.5f * stageSize.width;
-  const float originY = boundingRectangle.y - 0.5f * stageSize.height;
+  const float originX = boundingRectangle.x - 0.5f * sceneSize.width;
+  const float originY = boundingRectangle.y - 0.5f * sceneSize.height;
 
   boundingBox = Dali::Vector4(originX,
                               originY,
                               originX + boundingRectangle.width,
                               originY + boundingRectangle.height);
-}
-
-void WorldToLocalCoordinatesBoundingBox(const Dali::Vector4& boundingBox, Dali::BoundsInteger& boundingRectangle)
-{
-  // Convert to local coordinates and store as a Dali::Rect.
-  Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-
-  boundingRectangle.x      = boundingBox.x + 0.5f * stageSize.width;
-  boundingRectangle.y      = boundingBox.y + 0.5f * stageSize.height;
-  boundingRectangle.width  = boundingBox.z - boundingBox.x;
-  boundingRectangle.height = boundingBox.w - boundingBox.y;
 }
 
 } // end of namespace
@@ -246,7 +233,8 @@ struct Decorator::Impl : public ConnectionTracker
     mVerticalScrollingEnabled(false),
     mSmoothHandlePanEnabled(false),
     mIsHighlightBoxActive(false),
-    mHidePrimaryCursorAndGrabHandle(false)
+    mHidePrimaryCursorAndGrabHandle(false),
+    mBoundingBoxDirty(false)
   {
     mQuadVertexFormat["aPosition"] = Property::VECTOR2;
     mHighlightShader               = Shader::New(ToDaliStringView(SHADER_TEXT_DECORATOR_SHADER_VERT), ToDaliStringView(SHADER_TEXT_DECORATOR_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "TEXT_DECORATOR");
@@ -262,6 +250,16 @@ struct Decorator::Impl : public ConnectionTracker
   void Relayout(const Vector2& size, RelayoutContainer& container)
   {
     mControlSize = size;
+
+    if(mBoundingBoxDirty)
+    {
+      Dali::Window window = DevelWindow::Get(mActiveLayer);
+      if(window)
+      {
+        LocalToWorldCoordinatesBoundingBox(mLocalBoundingBox, window.GetSize(), mBoundingBox);
+        mBoundingBoxDirty = false;
+      }
+    }
 
     mActiveLayer.RaiseToTop();
     mCursorLayer.RaiseToTop();
@@ -1616,7 +1614,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         // The vertical distance from the center of the active layer to the bottom edje of the display.
         const float bottomHeight = -0.5f * mControlSize.height + Max(primaryHandle.position.y + primaryHandle.lineHeight + primaryHandle.size.height,
-                                                                          secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height);
+                                                                     secondaryHandle.position.y + secondaryHandle.lineHeight + secondaryHandle.size.height);
 
         mHandleVerticalGreaterThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_Y,
                                                                                       GreaterThanCondition(mBoundingBox.w - bottomHeight));
@@ -1676,7 +1674,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       // The horizontal distance from the center of the active layer to the left edje of the display.
       const float leftWidth = 0.5f * mControlSize.width + Max(-primaryHandle.position.x + primaryHandle.size.width,
-                                                                   -secondaryHandle.position.x + secondaryHandle.size.width);
+                                                              -secondaryHandle.position.x + secondaryHandle.size.width);
 
       mHandleHorizontalLessThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_X,
                                                                                    LessThanCondition(mBoundingBox.x + leftWidth));
@@ -1689,7 +1687,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       // The horizontal distance from the center of the active layer to the right edje of the display.
       const float rightWidth = -0.5f * mControlSize.width + Max(primaryHandle.position.x + primaryHandle.size.width,
-                                                                     secondaryHandle.position.x + secondaryHandle.size.width);
+                                                                secondaryHandle.position.x + secondaryHandle.size.width);
 
       mHandleHorizontalGreaterThanNotification = mActiveLayer.AddPropertyNotification(Actor::Property::WORLD_POSITION_X,
                                                                                       GreaterThanCondition(mBoundingBox.z - rightWidth));
@@ -1954,12 +1952,13 @@ struct Decorator::Impl : public ConnectionTracker
   Geometry      mQuadGeometry;
   QuadContainer mHighlightQuadList; ///< Sub-selections that combine to create the complete selection highlight.
 
-  Vector4 mBoundingBox;            ///< The bounding box in world coords.
-  Vector4 mHighlightColor;         ///< Color of the highlight
-  Vector2 mHighlightPosition;      ///< The position of the highlight actor.
-  Size    mHighlightSize;          ///< The size of the highlighted text.
-  Size    mControlSize;            ///< The control's size. Set by the Relayout.
-  float   mHighlightOutlineOffset; ///< The outline's offset.
+  BoundsInteger mLocalBoundingBox;       ///< The bounding box in local (screen) coords.
+  Vector4       mBoundingBox;            ///< The bounding box in world coords.
+  Vector4       mHighlightColor;         ///< Color of the highlight
+  Vector2       mHighlightPosition;      ///< The position of the highlight actor.
+  Size          mHighlightSize;          ///< The size of the highlighted text.
+  Size          mControlSize;            ///< The control's size. Set by the Relayout.
+  float         mHighlightOutlineOffset; ///< The outline's offset.
 
   unsigned int    mActiveCursor;
   unsigned int    mCursorBlinkInterval;
@@ -1991,6 +1990,7 @@ struct Decorator::Impl : public ConnectionTracker
   bool mSmoothHandlePanEnabled : 1;            ///< Whether to pan smoothly the handles.
   bool mIsHighlightBoxActive : 1;              ///< Whether the highlight box is active.
   bool mHidePrimaryCursorAndGrabHandle : 1;    ///< Whether the primary cursor and grab are hidden always.
+  bool mBoundingBoxDirty : 1;                  ///< Whether mLocalBoundingBox needs converting to mBoundingBox.
 };
 
 DecoratorPtr Decorator::New(ControllerInterface&                 controller,
@@ -2002,12 +2002,23 @@ DecoratorPtr Decorator::New(ControllerInterface&                 controller,
 
 void Decorator::SetBoundingBox(const BoundsInteger& boundingBox)
 {
-  LocalToWorldCoordinatesBoundingBox(boundingBox, mImpl->mBoundingBox);
+  mImpl->mLocalBoundingBox = boundingBox;
+
+  Dali::Window window = DevelWindow::Get(mImpl->mActiveLayer);
+  if(window)
+  {
+    LocalToWorldCoordinatesBoundingBox(boundingBox, window.GetSize(), mImpl->mBoundingBox);
+    mImpl->mBoundingBoxDirty = false;
+  }
+  else
+  {
+    mImpl->mBoundingBoxDirty = true;
+  }
 }
 
 void Decorator::GetBoundingBox(BoundsInteger& boundingBox) const
 {
-  WorldToLocalCoordinatesBoundingBox(mImpl->mBoundingBox, boundingBox);
+  boundingBox = mImpl->mLocalBoundingBox;
 }
 
 void Decorator::Relayout(const Vector2& size, RelayoutContainer& container)
