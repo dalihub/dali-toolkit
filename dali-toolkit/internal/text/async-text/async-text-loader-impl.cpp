@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/color-glyph-helper.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
@@ -903,7 +904,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
     const Text::GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
 
     // Whether the current glyph is a color one.
-    if(mModule.GetFontClient().IsColorGlyph(glyphInfo->fontId, glyphInfo->index))
+    if(Internal::IsRenderableColorGlyph(mModule.GetFontClient(), glyphInfo->fontId, glyphInfo->index))
     {
       containsColorGlyph = true;
       break;

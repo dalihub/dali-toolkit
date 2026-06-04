@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/text/color-glyph-helper.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
@@ -649,7 +650,7 @@ void TextVisual::UpdateRenderer()
         const Text::GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
 
         // Whether the current glyph is a color one.
-        if(fontClient.IsColorGlyph(glyphInfo->fontId, glyphInfo->index))
+        if(Text::Internal::IsRenderableColorGlyph(fontClient, glyphInfo->fontId, glyphInfo->index))
         {
           containsColorGlyph = true;
           break;
