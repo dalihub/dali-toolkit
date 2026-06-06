@@ -33,72 +33,6 @@ namespace Toolkit
 namespace Text
 {
 /**
- * @brief Whether the sequence is a variation sequence consisting of an emoji character followed by a text presentation selector.
- *
- * @param[in] currentRunScript The script of current run.
- * @param[in] character The next character.
- *
- * @return @e true if the sequence is text presentation sequence.
- */
-bool IsTextPresentationSequence(const TextAbstraction::Script& currentRunScript, const TextAbstraction::Character& character);
-
-/**
- * @brief Whether the sequence is a variation sequence consisting of an emoji character followed by a emoji presentation selector.
- *
- * @param[in] currentRunScript The script of current run.
- * @param[in] character The next character.
- *
- * @return @e true if the sequence is emoji presentation sequence.
- */
-bool IsEmojiPresentationSequence(const TextAbstraction::Script&    currentRunScript,
-                                 const TextAbstraction::Character& character);
-
-/**
- * @brief Whether the sequence is an emoji sequence.
- *
- * @param[in] currentRunScript The script of current run.
- * @param[in] character The next character.
- * @param[in] characterScript The script of the next character.
- *
- * @return @e true if the sequence is an emoji sequence.
- */
-bool IsEmojiSequence(const TextAbstraction::Script&    currentRunScript,
-                     const TextAbstraction::Character& character,
-                     const TextAbstraction::Script&    characterScript);
-
-/**
- * @brief Whether the sequence is a keycap sequence and set script according to the case.
- *
- * @param[in] textBuffer The text.
- * @param[in] currentCharacterIndex The index of current character.
- * @param[in] lastCharacterIndex The index of last character.
- * @param[out] currentCharacterScript The current character script to update it in-case it's the Keycap sequence.
- *
- * @return @e true if @p currentRunScript is ASCII_DIGITS and @p character is COMBINING_ENCLOSING_KEYCAP
- */
-bool IsNewKeycapSequence(const Character* const   textBuffer,
-                         const Length&            currentCharacterIndex,
-                         const Length&            lastCharacterIndex,
-                         TextAbstraction::Script& currentCharacterScript);
-
-/**
- * @brief Whether the sequence is a variation selector sequence and set script according to the case.
- *
- * @param[in] textBuffer The text.
- * @param[in] currentRunScript The script of current run.
- * @param[in] currentCharacterIndex The index of current character.
- * @param[in] lastCharacterIndex The index of last character.
- * @param[out] currentCharacterScript The current character script to update it in-case it's the VariationSelector sequence.
- *
- * @return @e true if @p currentRunScript is ASCII_DIGITS and @p character is COMBINING_ENCLOSING_KEYCAP
- */
-bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
-                                    const TextAbstraction::Script& currentRunScript,
-                                    const Length&                  currentCharacterIndex,
-                                    const Length&                  lastCharacterIndex,
-                                    TextAbstraction::Script&       currentCharacterScript);
-
-/**
  * @brief Whether the case is a new sequence and set script according to the case.
  *
  * @param[in] textBuffer The text.
@@ -109,11 +43,30 @@ bool IsNewVariationSelectorSequence(const Character* const         textBuffer,
  *
  * @return @e true the case is a new sequence
  */
-bool IsNewSequence(const Character* const         textBuffer,
-                   const TextAbstraction::Script& currentRunScript,
-                   const Length&                  currentCharacterIndex,
-                   const Length&                  lastCharacterIndex,
-                   TextAbstraction::Script&       currentCharacterScript);
+bool IsNewSequence(const Character* const textBuffer, const TextAbstraction::Script& currentRunScript,
+                   const Length& currentCharacterIndex, const Length& lastCharacterIndex,
+                   TextAbstraction::Script& currentCharacterScript);
+
+/**
+ * @brief Finds an emoji sequence starting at @p currentCharacterIndex.
+ *
+ * This helper is used by script-run segmentation before shaping. Every character that belongs to the returned
+ * sequence should keep the returned script so HarfBuzz receives the whole emoji sequence as one shaping unit.
+ * It accepts both fully-qualified and common fallback forms, such as missing/wrong variation selectors around ZWJ
+ * chains.
+ *
+ * @param[in] textBuffer The text.
+ * @param[in] currentCharacterIndex The index of current character.
+ * @param[in] lastCharacterIndex The index of last character.
+ * @param[in] currentCharacterScript The script detected for the current character.
+ * @param[out] sequenceLength Number of characters in the emoji sequence.
+ * @param[out] sequenceScript Script to assign to every character in the sequence.
+ *
+ * @return @e true if an emoji sequence or emoji unit starts at @p currentCharacterIndex.
+ */
+bool GetEmojiSequence(const Character* const textBuffer, const Length& currentCharacterIndex,
+                      const Length& lastCharacterIndex, const TextAbstraction::Script& currentCharacterScript,
+                      Length& sequenceLength, TextAbstraction::Script& sequenceScript);
 
 /**
  * @brief Whether the character is ASCII digits | # Number Sign | * Asterisk.
@@ -134,30 +87,15 @@ bool IsStartForKeycapSequence(const TextAbstraction::Character& character);
  * @return @e true if the script is changed
  */
 bool IsScriptChangedToFollowSequence(const TextAbstraction::Script&    currentRunScript,
-                                     const TextAbstraction::Character& character,
-                                     TextAbstraction::Script&          script);
-
-/**
- * @brief Check sequence case and update script of character if needed.
- *
- * @param[in] currentRunScript The script of current run.
- * @param[in] character The next character.
- * @param[out] script The current character script to update according to sequence.
- *
- * @return @e true if the script is changed
- */
-bool HandleEmojiSequence(const Character* const         textBuffer,
-                         const Length&                  currentCharacterIndex,
-                         const Length&                  lastCharacterIndex,
-                         const TextAbstraction::Script& currentRunScript,
-                         TextAbstraction::Script&       currentCharacterScript);
+                                     const TextAbstraction::Character& character, TextAbstraction::Script& script);
 
 /**
  * @brief Determine the Variation Selector according to script.
  *
  * @param[in] script The script.
  *
- * @return CHAR_VARIATION_SELECTOR_15 in-case EMOJI_TEXT or CHAR_VARIATION_SELECTOR_16 in-case EMOJI_COLOR or 0 otherwise
+ * @return CHAR_VARIATION_SELECTOR_15 in-case EMOJI_TEXT or CHAR_VARIATION_SELECTOR_16 in-case EMOJI_COLOR or 0
+ * otherwise
  */
 Character GetVariationSelectorByScript(const TextAbstraction::Script& script);
 

@@ -22,6 +22,8 @@
 #include <dali/devel-api/text-abstraction/icu.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
+#include <cstddef>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/multi-language-support.h>
@@ -30,7 +32,7 @@ namespace Dali
 {
 namespace TextAbstraction
 {
-//Forward declaration
+// Forward declaration
 class FontClient;
 } // namespace TextAbstraction
 
@@ -115,10 +117,8 @@ struct DefaultFonts
    *
    * @return The font id of a default font for the given @p size. If there isn't any font cached it returns 0.
    */
-  FontId FindFont(TextAbstraction::FontClient&            fontClient,
-                  const TextAbstraction::FontDescription& description,
-                  PointSize26Dot6                         size,
-                  Character                               character) const;
+  FontId FindFont(TextAbstraction::FontClient& fontClient, const TextAbstraction::FontDescription& description,
+                  PointSize26Dot6 size, Character character) const;
 
   /**
    * @brief Cache a default font for the given @p size.
@@ -130,6 +130,18 @@ struct DefaultFonts
   void Cache(const TextAbstraction::FontDescription& description, FontId fontId);
 
   std::vector<CacheItem> mFonts;
+};
+
+/**
+ * @brief Stores font ids returned from FontClient::GetFontId().
+ */
+struct FontIdLookupCacheItem
+{
+  TextAbstraction::FontDescription fontDescription;
+  TextAbstraction::PointSize26Dot6 pointSize{0};
+  TextAbstraction::FaceIndex       faceIndex{0};
+  std::size_t                      variationsMapHash{0u};
+  FontId                           fontId{0u};
 };
 
 /**
@@ -158,25 +170,18 @@ public:
   /**
    * @copydoc Dali::MultilanguageSupport::SetScripts()
    */
-  void SetScripts(const Vector<Character>& text,
-                  CharacterIndex           startIndex,
-                  Length                   numberOfCharacters,
-                  Vector<ScriptRun>&       scripts);
+  void SetScripts(const Vector<Character>& text, CharacterIndex startIndex, Length numberOfCharacters,
+                  Vector<ScriptRun>& scripts);
 
   /**
    * @copydoc Dali::MultilanguageSupport::ValidateFonts()
    */
-  void ValidateFonts(TextAbstraction::FontClient&            fontClient,
-                     const Vector<Character>&                text,
-                     const Vector<ScriptRun>&                scripts,
-                     const Vector<FontDescriptionRun>&       fontDescriptions,
+  void ValidateFonts(TextAbstraction::FontClient& fontClient, const Vector<Character>& text,
+                     const Vector<ScriptRun>& scripts, const Vector<FontDescriptionRun>& fontDescriptions,
                      const TextAbstraction::FontDescription& defaultFontDescription,
-                     TextAbstraction::PointSize26Dot6        defaultFontPointSize,
-                     float                                   fontSizeScale,
-                     CharacterIndex                          startIndex,
-                     Length                                  numberOfCharacters,
-                     Vector<FontRun>&                        fonts,
-                     Property::Map*                          variationsMapPtr);
+                     TextAbstraction::PointSize26Dot6 defaultFontPointSize, float fontSizeScale,
+                     CharacterIndex startIndex, Length numberOfCharacters, Vector<FontRun>& fonts,
+                     Property::Map* variationsMapPtr);
 
   /**
    * @brief Callback function for when the locale is changed.
@@ -207,40 +212,55 @@ public:
   /**
    * @copydoc Dali::MultilanguageSupport::UpdateICULineBreak()
    */
-  void UpdateICULineBreak(const std::string&              text,
-                          TextAbstraction::Length         numberOfCharacters,
+  void UpdateICULineBreak(const std::string& text, TextAbstraction::Length numberOfCharacters,
                           TextAbstraction::LineBreakInfo* breakInfo);
 
 private:
-  TextAbstraction::ICU            mICU;                       ///< Handle to the dali ICU.
-  Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
-  Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+  TextAbstraction::ICU               mICU;                       ///< Handle to the dali ICU.
+  Vector<DefaultFonts*>              mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
+  Vector<ValidateFontsPerScript*>    mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+  std::vector<FontIdLookupCacheItem> mFontIdLookupCache;         ///< Caches font ids during this support object's lifetime.
 
   std::string mLocale;
   bool        mIsICUEnabled : 1;
   bool        mIsICULineBreakNeededForLocale : 1;
 
-  //Methods
+  // Methods
+
+  /**
+   * @brief Finds a cached font id returned from FontClient::GetFontId().
+   */
+  FontId FindCachedFontId(const TextAbstraction::FontDescription& fontDescription,
+                          TextAbstraction::PointSize26Dot6        pointSize,
+                          TextAbstraction::FaceIndex              faceIndex,
+                          std::size_t                             variationsMapHash);
+
+  /**
+   * @brief Caches a font id returned from FontClient::GetFontId().
+   */
+  void CacheFontId(const TextAbstraction::FontDescription& fontDescription,
+                   TextAbstraction::PointSize26Dot6        pointSize,
+                   TextAbstraction::FaceIndex              faceIndex,
+                   std::size_t                             variationsMapHash,
+                   FontId                                  fontId);
 
   /**
    * @brief Add the current script to scripts and create new script.
    *
    * @param[in] requestedScript The script of the new script run.
    * @param[in] isRightToLeft The direction of the new script run.
-   * @param[in] addScriptCharactersToNewScript Whether to add the pending characters to the new script run or to the current script run.
+   * @param[in] addScriptCharactersToNewScript Whether to add the pending characters to the new script run or to the
+   * current script run.
    * @param[inout] currentScriptRun The current character script run and it will be updated it to the new script run.
    * @param[inout] numberOfAllScriptCharacters The pending characters.
    * @param[inout] scripts The list of scripts.
    * @param[inout] scriptIndex The current index of scripts.
    *
    */
-  void AddCurrentScriptAndCreatNewScript(const Script       requestedScript,
-                                         const bool         isRightToLeft,
-                                         const bool         addScriptCharactersToNewScript,
-                                         ScriptRun&         currentScriptRun,
-                                         Length&            numberOfAllScriptCharacters,
-                                         Vector<ScriptRun>& scripts,
-                                         ScriptRunIndex&    scriptIndex);
+  void AddCurrentScriptAndCreatNewScript(const Script requestedScript, const bool isRightToLeft,
+                                         const bool addScriptCharactersToNewScript, ScriptRun& currentScriptRun,
+                                         Length& numberOfAllScriptCharacters, Vector<ScriptRun>& scripts,
+                                         ScriptRunIndex& scriptIndex);
 
   /**
    * @brief Checks if an ICU-based line break update is required for the current locale.

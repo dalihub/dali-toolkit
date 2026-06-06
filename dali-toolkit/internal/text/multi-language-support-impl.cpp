@@ -49,6 +49,8 @@ const char* DALI_TEXT_ENABLE_ICU("DALI_TEXT_ENABLE_ICU");
 const int   DEFAULT_ENABLE_ICU   = 0;
 const char* THAILAND_LOCALE_CODE = "th_TH";
 
+constexpr size_t MAX_FONT_ID_LOOKUP_CACHE_SIZE = 32u;
+
 } // namespace
 
 namespace Text
@@ -58,20 +60,208 @@ namespace Internal
 
 namespace
 {
-void CheckFontSupportsCharacter(
-  bool&                                   isValidFont,
-  bool&                                   isCommonScript,
-  const Character&                        character,
-  ValidateFontsPerScript**&               validFontsPerScriptCacheBuffer,
-  const Script&                           script,
-  FontId&                                 fontId,
-  TextAbstraction::FontClient&            fontClient,
-  const bool                              isValidCachedDefaultFont,
-  const FontId&                           cachedDefaultFontId,
-  const TextAbstraction::FontDescription& currentFontDescription,
-  const TextAbstraction::PointSize26Dot6& currentFontPointSize,
-  DefaultFonts**&                         defaultFontPerScriptCacheBuffer,
-  bool                                    findFallbackFont)
+struct KeycapSequenceInfo
+{
+  Length length{0u};
+  bool   hasColorSelector{false};
+  bool   hasTextSelector{false};
+};
+
+bool GetKeycapSequenceInfo(const Character* const textBuffer, const Length currentCharacterIndex,
+                           const Length lastCharacterIndex, KeycapSequenceInfo& sequenceInfo)
+{
+  if(!IsStartForKeycapSequence(*(textBuffer + currentCharacterIndex)))
+  {
+    return false;
+  }
+
+  Length index = currentCharacterIndex + 1u;
+  while(index <= lastCharacterIndex &&
+        (TextAbstraction::IsEmojiPresentationSelector(*(textBuffer + index)) ||
+         TextAbstraction::IsTextPresentationSelector(*(textBuffer + index))))
+  {
+    sequenceInfo.hasColorSelector =
+      sequenceInfo.hasColorSelector || TextAbstraction::IsEmojiPresentationSelector(*(textBuffer + index));
+    sequenceInfo.hasTextSelector =
+      sequenceInfo.hasTextSelector || TextAbstraction::IsTextPresentationSelector(*(textBuffer + index));
+    ++index;
+  }
+
+  if(index <= lastCharacterIndex && TextAbstraction::IsCombiningEnclosingKeycap(*(textBuffer + index)))
+  {
+    sequenceInfo.length = index - currentCharacterIndex + 1u;
+    return true;
+  }
+
+  return false;
+}
+
+bool IsSameFontDescription(const TextAbstraction::FontDescription& lhs,
+                           const TextAbstraction::FontDescription& rhs)
+{
+  return lhs.path == rhs.path &&
+         lhs.family == rhs.family &&
+         lhs.width == rhs.width &&
+         lhs.weight == rhs.weight &&
+         lhs.slant == rhs.slant &&
+         lhs.type == rhs.type;
+}
+
+struct LastFontIdLookupCache
+{
+  bool                  isValid{false};
+  FontIdLookupCacheItem item;
+};
+
+bool IsSameFontIdLookupCacheItem(const FontIdLookupCacheItem&            item,
+                                 const TextAbstraction::FontDescription& fontDescription,
+                                 const TextAbstraction::PointSize26Dot6  pointSize,
+                                 const TextAbstraction::FaceIndex        faceIndex,
+                                 const std::size_t                       variationsMapHash)
+{
+  return item.pointSize == pointSize &&
+         item.faceIndex == faceIndex &&
+         item.variationsMapHash == variationsMapHash &&
+         IsSameFontDescription(item.fontDescription, fontDescription);
+}
+
+void StoreFontIdLookupCacheItem(FontIdLookupCacheItem&                  item,
+                                const TextAbstraction::FontDescription& fontDescription,
+                                const TextAbstraction::PointSize26Dot6  pointSize,
+                                const TextAbstraction::FaceIndex        faceIndex,
+                                const std::size_t                       variationsMapHash,
+                                const FontId                            fontId)
+{
+  item.fontDescription   = fontDescription;
+  item.pointSize         = pointSize;
+  item.faceIndex         = faceIndex;
+  item.variationsMapHash = variationsMapHash;
+  item.fontId            = fontId;
+}
+
+bool FontSupportsKeycapTextSequence(TextAbstraction::FontClient& fontClient, FontId fontId,
+                                    const Character* const textBuffer, Length sequenceStart, Length sequenceLength)
+{
+  if(0u == fontId || fontClient.IsColorFont(fontId))
+  {
+    return false;
+  }
+
+  for(Length index = sequenceStart; index < sequenceStart + sequenceLength; ++index)
+  {
+    const Character character = *(textBuffer + index);
+    if(TextAbstraction::IsEmojiPresentationSelector(character) ||
+       TextAbstraction::IsTextPresentationSelector(character))
+    {
+      continue;
+    }
+
+    if(!fontClient.IsCharacterSupportedByFont(fontId, character))
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+FontId FindColorEmojiFontForSequence(TextAbstraction::FontClient&            fontClient,
+                                     const TextAbstraction::FontDescription& fontDescription,
+                                     const TextAbstraction::PointSize26Dot6& pointSize)
+{
+  FontId fontId = fontClient.FindFallbackFont(UTF32_EMOJI, fontDescription, pointSize, true);
+  if(0u != fontId && fontClient.IsColorFont(fontId))
+  {
+    return fontId;
+  }
+
+  fontId = fontClient.FindDefaultFont(UTF32_EMOJI, pointSize, true);
+  if(0u != fontId && fontClient.IsColorFont(fontId))
+  {
+    return fontId;
+  }
+
+  return 0u;
+}
+
+FontId FindTextFontForKeycapSequence(TextAbstraction::FontClient&            fontClient,
+                                     const Character* const                  textBuffer,
+                                     Length                                  sequenceStart,
+                                     Length                                  sequenceLength,
+                                     FontId                                  preferredFontId,
+                                     const TextAbstraction::FontDescription& fontDescription,
+                                     const TextAbstraction::PointSize26Dot6& pointSize)
+{
+  if(FontSupportsKeycapTextSequence(fontClient, preferredFontId, textBuffer, sequenceStart, sequenceLength))
+  {
+    return preferredFontId;
+  }
+
+  const Character keycap = *(textBuffer + sequenceStart + sequenceLength - 1u);
+  FontId          fontId = fontClient.FindFallbackFont(keycap, fontDescription, pointSize, false);
+  if(FontSupportsKeycapTextSequence(fontClient, fontId, textBuffer, sequenceStart, sequenceLength))
+  {
+    return fontId;
+  }
+
+  fontId = fontClient.FindDefaultFont(keycap, pointSize, false);
+  if(FontSupportsKeycapTextSequence(fontClient, fontId, textBuffer, sequenceStart, sequenceLength))
+  {
+    return fontId;
+  }
+
+  return 0u;
+}
+
+FontId FindTextPresentationFontForCharacter(TextAbstraction::FontClient&            fontClient,
+                                            Character                               character,
+                                            const TextAbstraction::FontDescription& fontDescription,
+                                            const TextAbstraction::PointSize26Dot6& pointSize)
+{
+  FontId fontId = fontClient.FindFallbackFont(character, fontDescription, pointSize, false);
+  if(0u != fontId && !fontClient.IsColorFont(fontId) && fontClient.IsCharacterSupportedByFont(fontId, character))
+  {
+    return fontId;
+  }
+
+  fontId = fontClient.FindDefaultFont(character, pointSize, false);
+  if(0u != fontId && !fontClient.IsColorFont(fontId) && fontClient.IsCharacterSupportedByFont(fontId, character))
+  {
+    return fontId;
+  }
+
+  return 0u;
+}
+
+bool CanReusePreviousEmojiFont(TextAbstraction::FontClient& fontClient, FontId previousFontId, Character character)
+{
+  if(0u == previousFontId)
+  {
+    return false;
+  }
+
+  if(TextAbstraction::IsEmojiPresentationSelector(character) ||
+     TextAbstraction::IsTextPresentationSelector(character) ||
+     TextAbstraction::IsZeroWidthJoiner(character) ||
+     TextAbstraction::IsEmojiModifier(character) ||
+     TextAbstraction::IsCombiningEnclosingKeycap(character) ||
+     TextAbstraction::IsTagSpec(character) ||
+     TextAbstraction::IsTagEnd(character))
+  {
+    return true;
+  }
+
+  return fontClient.IsCharacterSupportedByFont(previousFontId, character);
+}
+
+void CheckFontSupportsCharacter(bool& isValidFont, bool& isCommonScript, const Character& character,
+                                ValidateFontsPerScript**& validFontsPerScriptCacheBuffer, const Script& script,
+                                FontId& fontId, TextAbstraction::FontClient& fontClient,
+                                const bool isValidCachedDefaultFont, const FontId& cachedDefaultFontId,
+                                const TextAbstraction::FontDescription& currentFontDescription,
+                                const TextAbstraction::PointSize26Dot6& currentFontPointSize,
+                                DefaultFonts**& defaultFontPerScriptCacheBuffer, bool findFallbackFont,
+                                bool useFallbackFontCache)
 {
   // Need to check if the given font supports the current character.
   if(!isValidFont && !findFallbackFont) // (1)
@@ -88,7 +278,8 @@ void CheckFontSupportsCharacter(
     //
     //      Many fonts support 'white spaces' so probably the font set by the user or the platform's default
     //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
-    isCommonScript = TextAbstraction::IsCommonScript(character) || TextAbstraction::IsEmojiPresentationSelector(character);
+    isCommonScript =
+      TextAbstraction::IsCommonScript(character) || TextAbstraction::IsEmojiPresentationSelector(character);
 
     // Check in the valid fonts cache.
     ValidateFontsPerScript* validateFontsPerScript = *(validFontsPerScriptCacheBuffer + script);
@@ -151,10 +342,7 @@ void CheckFontSupportsCharacter(
           DefaultFonts* defaultFontsPerScript = NULL;
 
           // Find a fallback-font.
-          fontId = fontClient.FindFallbackFont(character,
-                                               currentFontDescription,
-                                               currentFontPointSize,
-                                               false);
+          fontId = fontClient.FindFallbackFont(character, currentFontDescription, currentFontPointSize, false);
 
           if(0u == fontId)
           {
@@ -163,22 +351,25 @@ void CheckFontSupportsCharacter(
 
           if(!isCommonScript && (script != TextAbstraction::UNKNOWN))
           {
-            // Cache the font if it is not an unknown script
-            if(NULL == defaultFontsPerScript)
+            if(useFallbackFontCache)
             {
-              defaultFontsPerScript = *(defaultFontPerScriptCacheBuffer + script);
-
+              // Cache the font if it is not an unknown script.
               if(NULL == defaultFontsPerScript)
               {
-                defaultFontsPerScript                       = new DefaultFonts();
-                *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
-              }
-            }
+                defaultFontsPerScript = *(defaultFontPerScriptCacheBuffer + script);
 
-            // the fontId is cached only if it has not been cached before.
-            if(!isValidCachedDefaultFont)
-            {
-              defaultFontsPerScript->Cache(currentFontDescription, fontId);
+                if(NULL == defaultFontsPerScript)
+                {
+                  defaultFontsPerScript                       = new DefaultFonts();
+                  *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
+                }
+              }
+
+              // the fontId is cached only if it has not been cached before.
+              if(!isValidCachedDefaultFont)
+              {
+                defaultFontsPerScript->Cache(currentFontDescription, fontId);
+              }
             }
 
             isValidFont = true;
@@ -190,10 +381,7 @@ void CheckFontSupportsCharacter(
   else if(!isValidFont && findFallbackFont)
   {
     // Find a fallback-font.
-    fontId = fontClient.FindFallbackFont(character,
-                                         currentFontDescription,
-                                         currentFontPointSize,
-                                         false);
+    fontId = fontClient.FindFallbackFont(character, currentFontDescription, currentFontPointSize, false);
 
     if(0u == fontId)
     {
@@ -206,10 +394,7 @@ void CheckFontSupportsCharacter(
 
 bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
 {
-  for(Vector<FontId>::ConstIterator it    = mValidFonts.Begin(),
-                                    endIt = mValidFonts.End();
-      it != endIt;
-      ++it)
+  for(Vector<FontId>::ConstIterator it = mValidFonts.Begin(), endIt = mValidFonts.End(); it != endIt; ++it)
   {
     if(fontId == *it)
     {
@@ -226,18 +411,15 @@ void ValidateFontsPerScript::Cache(FontId fontId)
 }
 
 FontId DefaultFonts::FindFont(TextAbstraction::FontClient&            fontClient,
-                              const TextAbstraction::FontDescription& description,
-                              PointSize26Dot6                         size,
-                              Character                               character) const
+                              const TextAbstraction::FontDescription& description, PointSize26Dot6 size,
+                              Character character) const
 {
-  for(std::vector<CacheItem>::const_iterator it    = mFonts.begin(),
-                                             endIt = mFonts.end();
-      it != endIt;
-      ++it)
+  for(std::vector<CacheItem>::const_iterator it = mFonts.begin(), endIt = mFonts.end(); it != endIt; ++it)
   {
     const CacheItem& item = *it;
 
-    if(((TextAbstraction::FontWeight::NONE == description.weight) || (description.weight == item.description.weight)) &&
+    if(((TextAbstraction::FontWeight::NONE == description.weight) ||
+        (description.weight == item.description.weight)) &&
        ((TextAbstraction::FontWidth::NONE == description.width) || (description.width == item.description.width)) &&
        ((TextAbstraction::FontSlant::NONE == description.slant) || (description.slant == item.description.slant)) &&
        (size == fontClient.GetPointSize(item.fontId)) &&
@@ -261,10 +443,64 @@ void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, Fo
   return;
 }
 
+FontId MultilanguageSupport::FindCachedFontId(const TextAbstraction::FontDescription& fontDescription,
+                                              TextAbstraction::PointSize26Dot6        pointSize,
+                                              TextAbstraction::FaceIndex              faceIndex,
+                                              std::size_t                             variationsMapHash)
+{
+  for(auto it = mFontIdLookupCache.begin(), endIt = mFontIdLookupCache.end(); it != endIt; ++it)
+  {
+    if(IsSameFontIdLookupCacheItem(*it, fontDescription, pointSize, faceIndex, variationsMapHash))
+    {
+      const FontId fontId = it->fontId;
+
+      if((it + 1) != endIt)
+      {
+        FontIdLookupCacheItem item = std::move(*it);
+        mFontIdLookupCache.erase(it);
+        mFontIdLookupCache.push_back(std::move(item));
+      }
+      return fontId;
+    }
+  }
+
+  return 0u;
+}
+
+void MultilanguageSupport::CacheFontId(const TextAbstraction::FontDescription& fontDescription,
+                                       TextAbstraction::PointSize26Dot6        pointSize,
+                                       TextAbstraction::FaceIndex              faceIndex,
+                                       std::size_t                             variationsMapHash,
+                                       FontId                                  fontId)
+{
+  if(0u == fontId)
+  {
+    return;
+  }
+
+  for(auto& item : mFontIdLookupCache)
+  {
+    if(IsSameFontIdLookupCacheItem(item, fontDescription, pointSize, faceIndex, variationsMapHash))
+    {
+      item.fontId = fontId;
+      return;
+    }
+  }
+
+  if(mFontIdLookupCache.size() >= MAX_FONT_ID_LOOKUP_CACHE_SIZE)
+  {
+    mFontIdLookupCache.erase(mFontIdLookupCache.begin());
+  }
+
+  mFontIdLookupCache.emplace_back();
+  StoreFontIdLookupCacheItem(mFontIdLookupCache.back(), fontDescription, pointSize, faceIndex, variationsMapHash, fontId);
+}
+
 MultilanguageSupport::MultilanguageSupport(bool connectLocaleChangedSignal)
 : mICU(),
   mDefaultFontPerScriptCache(),
   mValidFontsPerScriptCache(),
+  mFontIdLookupCache(),
   mLocale(),
   mIsICUEnabled(false),
   mIsICULineBreakNeededForLocale(false)
@@ -300,8 +536,7 @@ MultilanguageSupport::~MultilanguageSupport()
   // Destroy the default font per script cache.
   for(Vector<DefaultFonts*>::Iterator it    = mDefaultFontPerScriptCache.Begin(),
                                       endIt = mDefaultFontPerScriptCache.End();
-      it != endIt;
-      ++it)
+      it != endIt; ++it)
   {
     delete *it;
   }
@@ -309,8 +544,7 @@ MultilanguageSupport::~MultilanguageSupport()
   // Destroy the valid fonts per script cache.
   for(Vector<ValidateFontsPerScript*>::Iterator it    = mValidFontsPerScriptCache.Begin(),
                                                 endIt = mValidFontsPerScriptCache.End();
-      it != endIt;
-      ++it)
+      it != endIt; ++it)
   {
     delete *it;
   }
@@ -326,22 +560,21 @@ void MultilanguageSupport::ClearCache()
 {
   for(Vector<DefaultFonts*>::Iterator it    = mDefaultFontPerScriptCache.Begin(),
                                       endIt = mDefaultFontPerScriptCache.End();
-      it != endIt;
-      ++it)
+      it != endIt; ++it)
   {
     delete *it;
   }
 
   for(Vector<ValidateFontsPerScript*>::Iterator it    = mValidFontsPerScriptCache.Begin(),
                                                 endIt = mValidFontsPerScriptCache.End();
-      it != endIt;
-      ++it)
+      it != endIt; ++it)
   {
     delete *it;
   }
 
   mDefaultFontPerScriptCache.Clear();
   mValidFontsPerScriptCache.Clear();
+  mFontIdLookupCache.clear();
 
   mDefaultFontPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
   mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
@@ -363,8 +596,7 @@ bool MultilanguageSupport::IsICULineBreakNeeded()
   return mIsICUEnabled && mIsICULineBreakNeededForLocale;
 }
 
-void MultilanguageSupport::UpdateICULineBreak(const std::string&              text,
-                                              TextAbstraction::Length         numberOfCharacters,
+void MultilanguageSupport::UpdateICULineBreak(const std::string& text, TextAbstraction::Length numberOfCharacters,
                                               TextAbstraction::LineBreakInfo* breakInfo)
 {
   if(mIsICUEnabled && mICU)
@@ -398,10 +630,8 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
   return multilanguageSupportHandle;
 }
 
-void MultilanguageSupport::SetScripts(const Vector<Character>& text,
-                                      CharacterIndex           startIndex,
-                                      Length                   numberOfCharacters,
-                                      Vector<ScriptRun>&       scripts)
+void MultilanguageSupport::SetScripts(const Vector<Character>& text, CharacterIndex startIndex,
+                                      Length numberOfCharacters, Vector<ScriptRun>& scripts)
 {
   if(0u == numberOfCharacters)
   {
@@ -413,10 +643,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   ScriptRunIndex scriptIndex = 0u;
   if(0u != startIndex)
   {
-    for(Vector<ScriptRun>::ConstIterator it    = scripts.Begin(),
-                                         endIt = scripts.End();
-        it != endIt;
-        ++it, ++scriptIndex)
+    for(Vector<ScriptRun>::ConstIterator it = scripts.Begin(), endIt = scripts.End(); it != endIt; ++it, ++scriptIndex)
     {
       const ScriptRun& run = *it;
       if(startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
@@ -443,7 +670,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   bool isParagraphRTL = false;
 
   // Whether there is an RTL marker in the invalid script.
-  // This variable was added to solve the problem that autoscroll does not work properly when there are only RTL Marker and LTR Text.
+  // This variable was added to solve the problem that marquee does not work properly when there are only RTL Marker
+  // and LTR Text.
   bool hasRTLMarker = false;
 
   // Count the number of characters which are valid for all scripts. i.e. white spaces or '\n'.
@@ -458,12 +686,37 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   // Traverse all characters and set the scripts.
   const Length lastCharacter = startIndex + numberOfCharacters - 1u;
 
+  bool   isEmojiSequenceActive = false;
+  Length emojiSequenceEndIndex = 0u;
+  Script emojiSequenceScript   = TextAbstraction::UNKNOWN;
+
+  auto resolveEmojiSequenceScript = [&](Length characterIndex, Script characterScript) -> Script
+  {
+    if(!isEmojiSequenceActive || characterIndex > emojiSequenceEndIndex)
+    {
+      Length sequenceLength = 0u;
+      Script sequenceScript = characterScript;
+
+      isEmojiSequenceActive = GetEmojiSequence(textBuffer, characterIndex, lastCharacter, characterScript,
+                                               sequenceLength, sequenceScript);
+      if(isEmojiSequenceActive)
+      {
+        emojiSequenceEndIndex = characterIndex + sequenceLength - 1u;
+        emojiSequenceScript   = sequenceScript;
+      }
+    }
+
+    return (isEmojiSequenceActive && characterIndex <= emojiSequenceEndIndex) ? emojiSequenceScript : characterScript;
+  };
+
   for(Length index = startIndex; index <= lastCharacter; ++index)
   {
     Character character = *(textBuffer + index);
 
     // Get the script of the character.
-    Script script = TextAbstraction::GetCharacterScript(character);
+    Script script                    = TextAbstraction::GetCharacterScript(character);
+    script                           = resolveEmojiSequenceScript(index, script);
+    const bool isInsideEmojiSequence = isEmojiSequenceActive && index <= emojiSequenceEndIndex;
 
     // Some characters (like white spaces) are valid for many scripts. The rules to set a script
     // for them are:
@@ -476,18 +729,13 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     // Skip those characters valid for many scripts like white spaces or '\n'.
     bool endOfText = index > lastCharacter;
 
-    //Handle all Emoji Sequence cases
-    if(IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
+    // Handle all Emoji Sequence cases
+    if(!isInsideEmojiSequence && IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
     {
-      AddCurrentScriptAndCreatNewScript(script,
-                                        false,
-                                        false,
-                                        currentScriptRun,
-                                        numberOfAllScriptCharacters,
-                                        scripts,
+      AddCurrentScriptAndCreatNewScript(script, false, false, currentScriptRun, numberOfAllScriptCharacters, scripts,
                                         scriptIndex);
     }
-    else if(IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
+    else if(!isInsideEmojiSequence && IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
     {
       // To guarantee behavior of VARIATION_SELECTOR_15.
       if(currentScriptRun.script != TextAbstraction::EMOJI_TEXT)
@@ -498,17 +746,11 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     else if(IsOneOfEmojiScripts(currentScriptRun.script) && (TextAbstraction::COMMON == script))
     {
       // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
-      AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN,
-                                        false,
-                                        false,
-                                        currentScriptRun,
-                                        numberOfAllScriptCharacters,
-                                        scripts,
-                                        scriptIndex);
+      AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN, false, false, currentScriptRun,
+                                        numberOfAllScriptCharacters, scripts, scriptIndex);
     }
 
-    while(!endOfText &&
-          (TextAbstraction::COMMON == script))
+    while(!endOfText && (TextAbstraction::COMMON == script))
     {
       // Check if whether is right to left markup and Keeps true if the previous value was true.
       currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
@@ -525,13 +767,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
         // the same direction than the first script of the paragraph.
         isFirstScriptToBeSet = true;
 
-        AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN,
-                                          false,
-                                          false,
-                                          currentScriptRun,
-                                          numberOfAllScriptCharacters,
-                                          scripts,
-                                          scriptIndex);
+        AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN, false, false, currentScriptRun,
+                                          numberOfAllScriptCharacters, scripts, scriptIndex);
       }
 
       // Get the next character.
@@ -539,21 +776,20 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
       endOfText = index > lastCharacter;
       if(!endOfText)
       {
-        character = *(textBuffer + index);
-        script    = TextAbstraction::GetCharacterScript(character);
+        character                                   = *(textBuffer + index);
+        script                                      = TextAbstraction::GetCharacterScript(character);
+        script                                      = resolveEmojiSequenceScript(index, script);
+        const bool isInsideEmojiSequenceInCommonRun = isEmojiSequenceActive && index <= emojiSequenceEndIndex;
 
-        //Handle all Emoji Sequence cases
-        if(IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
+        // Handle all Emoji Sequence cases
+        if(!isInsideEmojiSequenceInCommonRun &&
+           IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
         {
-          AddCurrentScriptAndCreatNewScript(script,
-                                            false,
-                                            false,
-                                            currentScriptRun,
-                                            numberOfAllScriptCharacters,
-                                            scripts,
-                                            scriptIndex);
+          AddCurrentScriptAndCreatNewScript(script, false, false, currentScriptRun, numberOfAllScriptCharacters,
+                                            scripts, scriptIndex);
         }
-        else if(IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
+        else if(!isInsideEmojiSequenceInCommonRun &&
+                IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
         {
           currentScriptRun.script = script;
         }
@@ -568,13 +804,9 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     }
 
     // Check if it is the first character of a paragraph.
-    if(isFirstScriptToBeSet &&
-       (TextAbstraction::UNKNOWN != script) &&
-       (TextAbstraction::COMMON != script) &&
-       (TextAbstraction::EMOJI != script) &&
-       (TextAbstraction::EMOJI_TEXT != script) &&
-       (TextAbstraction::EMOJI_COLOR != script) &&
-       (!TextAbstraction::IsSymbolScript(script)))
+    if(isFirstScriptToBeSet && (TextAbstraction::UNKNOWN != script) && (TextAbstraction::COMMON != script) &&
+       (TextAbstraction::EMOJI != script) && (TextAbstraction::EMOJI_TEXT != script) &&
+       (TextAbstraction::EMOJI_COLOR != script) && (!TextAbstraction::IsSymbolScript(script)))
     {
       // Sets the direction of the first valid script.
       isParagraphRTL       = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftScript(script);
@@ -583,11 +815,10 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
 
     // If the current script run is ASCII_DIGITS and character is colon, include the colon in the same script run.
     // TODO : Use the same script for all ASCII_DIGITS and ASCII_PS.
-    bool isColonCase = (character == UTF32_COLON) && (TextAbstraction::ASCII_DIGITS == currentScriptRun.script) && (TextAbstraction::COMMON != script);
+    bool isColonCase = (character == UTF32_COLON) && (TextAbstraction::ASCII_DIGITS == currentScriptRun.script) &&
+                       (TextAbstraction::COMMON != script);
 
-    if((script != currentScriptRun.script) &&
-       (TextAbstraction::COMMON != script) &&
-       !isColonCase)
+    if((script != currentScriptRun.script) && (TextAbstraction::COMMON != script) && !isColonCase)
     {
       // Current run needs to be stored and a new one initialized.
 
@@ -599,7 +830,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
-      else if((TextAbstraction::IsRightToLeftScript(currentScriptRun.script) == TextAbstraction::IsRightToLeftScript(script)) &&
+      else if((TextAbstraction::IsRightToLeftScript(currentScriptRun.script) ==
+               TextAbstraction::IsRightToLeftScript(script)) &&
               (TextAbstraction::UNKNOWN != currentScriptRun.script))
       {
         // Current script and previous one have the same direction.
@@ -616,13 +848,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
 
       // Adds the white spaces which are at the begining of the script.
       numberOfAllScriptCharacters++;
-      AddCurrentScriptAndCreatNewScript(script,
-                                        hasRTLMarker ? true : TextAbstraction::IsRightToLeftScript(script),
-                                        true,
-                                        currentScriptRun,
-                                        numberOfAllScriptCharacters,
-                                        scripts,
-                                        scriptIndex);
+      AddCurrentScriptAndCreatNewScript(script, hasRTLMarker ? true : TextAbstraction::IsRightToLeftScript(script),
+                                        true, currentScriptRun, numberOfAllScriptCharacters, scripts, scriptIndex);
 
       hasRTLMarker = false;
     }
@@ -656,10 +883,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     const ScriptRun& run                = *(scripts.Begin() + scriptIndex - 1u);
     CharacterIndex   nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
 
-    for(Vector<ScriptRun>::Iterator it    = scripts.Begin() + scriptIndex,
-                                    endIt = scripts.End();
-        it != endIt;
-        ++it)
+    for(Vector<ScriptRun>::Iterator it = scripts.Begin() + scriptIndex, endIt = scripts.End(); it != endIt; ++it)
     {
       ScriptRun& run                  = *it;
       run.characterRun.characterIndex = nextCharacterIndex;
@@ -668,17 +892,13 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
   }
 }
 
-void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&            fontClient,
-                                         const Vector<Character>&                text,
+void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient& fontClient, const Vector<Character>& text,
                                          const Vector<ScriptRun>&                scripts,
                                          const Vector<FontDescriptionRun>&       fontDescriptions,
                                          const TextAbstraction::FontDescription& defaultFontDescription,
-                                         TextAbstraction::PointSize26Dot6        defaultFontPointSize,
-                                         float                                   fontSizeScale,
-                                         CharacterIndex                          startIndex,
-                                         Length                                  numberOfCharacters,
-                                         Vector<FontRun>&                        fonts,
-                                         Property::Map*                          variationsMapPtr)
+                                         TextAbstraction::PointSize26Dot6 defaultFontPointSize, float fontSizeScale,
+                                         CharacterIndex startIndex, Length numberOfCharacters, Vector<FontRun>& fonts,
+                                         Property::Map* variationsMapPtr)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n");
 
@@ -695,10 +915,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
   FontRunIndex fontIndex = 0u;
   if(0u != startIndex)
   {
-    for(Vector<FontRun>::ConstIterator it    = fonts.Begin(),
-                                       endIt = fonts.End();
-        it != endIt;
-        ++it, ++fontIndex)
+    for(Vector<FontRun>::ConstIterator it = fonts.Begin(), endIt = fonts.End(); it != endIt; ++it, ++fontIndex)
     {
       const FontRun& run = *it;
       if(startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
@@ -737,6 +954,39 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
   FontId                  previousFontId = 0u;
   TextAbstraction::Script previousScript = TextAbstraction::UNKNOWN;
 
+  bool   hasForcedEmojiSequenceFont  = false;
+  Length forcedEmojiSequenceEndIndex = 0u;
+  FontId forcedEmojiSequenceFontId   = 0u;
+
+  // Keep the fast path local first, then fall back to the support-owned cache cleared by ClearCache().
+  LastFontIdLookupCache fontIdLookupCache;
+  LastFontIdLookupCache fontIdWithoutBoldLookupCache;
+
+  auto getCachedFontId = [this, &fontClient](LastFontIdLookupCache&                  lastCache,
+                                             const TextAbstraction::FontDescription& fontDescription,
+                                             TextAbstraction::PointSize26Dot6        pointSize,
+                                             FaceIndex                               faceIndex,
+                                             Property::Map*                          variationsMapPtr)
+  {
+    const std::size_t variationsMapHash = variationsMapPtr ? variationsMapPtr->GetHash() : 0u;
+    if(lastCache.isValid &&
+       IsSameFontIdLookupCacheItem(lastCache.item, fontDescription, pointSize, faceIndex, variationsMapHash))
+    {
+      return lastCache.item.fontId;
+    }
+
+    FontId fontId = FindCachedFontId(fontDescription, pointSize, faceIndex, variationsMapHash);
+    if(0u == fontId)
+    {
+      fontId = fontClient.GetFontId(fontDescription, pointSize, faceIndex, variationsMapPtr);
+      CacheFontId(fontDescription, pointSize, faceIndex, variationsMapHash, fontId);
+    }
+
+    lastCache.isValid = true;
+    StoreFontIdLookupCacheItem(lastCache.item, fontDescription, pointSize, faceIndex, variationsMapHash, fontId);
+    return fontId;
+  };
+
   CharacterIndex lastCharacter = startIndex + numberOfCharacters - 1u;
   for(Length index = startIndex; index <= lastCharacter; ++index)
   {
@@ -749,17 +999,16 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     TextAbstraction::FontDescription currentFontDescription;
     TextAbstraction::PointSize26Dot6 currentFontPointSize = defaultFontPointSize;
     bool                             isDefaultFont        = true;
-    MergeFontDescriptions(fontDescriptions,
-                          defaultFontDescription,
-                          defaultFontPointSize,
-                          fontSizeScale,
-                          index,
-                          currentFontDescription,
-                          currentFontPointSize,
-                          isDefaultFont);
+
+    MergeFontDescriptions(fontDescriptions, defaultFontDescription, defaultFontPointSize, fontSizeScale, index,
+                          currentFontDescription, currentFontPointSize, isDefaultFont);
 
     // Get the font for the current character.
-    FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize, 0, variationsMapPtr);
+    FontId fontId = getCachedFontId(fontIdLookupCache,
+                                    currentFontDescription,
+                                    currentFontPointSize,
+                                    0,
+                                    variationsMapPtr);
 
     currentFontId = fontId;
 
@@ -768,21 +1017,23 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
 
     if(currentFontDescription.weight == TextAbstraction::FontWeight::BOLD)
     {
-      TextAbstraction::FontDescription currentFontDescriptionWithoutBold = TextAbstraction::FontDescription(currentFontDescription);
-      currentFontDescriptionWithoutBold.weight                           = TextAbstraction::FontWeight::NORMAL;
+      TextAbstraction::FontDescription currentFontDescriptionWithoutBold =
+        TextAbstraction::FontDescription(currentFontDescription);
+      currentFontDescriptionWithoutBold.weight = TextAbstraction::FontWeight::NORMAL;
 
-      FontId fontIdWithoutBold = fontClient.GetFontId(currentFontDescriptionWithoutBold, currentFontPointSize);
+      FontId fontIdWithoutBold = getCachedFontId(fontIdWithoutBoldLookupCache,
+                                                 currentFontDescriptionWithoutBold,
+                                                 currentFontPointSize,
+                                                 0,
+                                                 nullptr);
       if(fontId != fontIdWithoutBold)
       {
         // If a font is already changed by the bold feature, do not let Freetype further embolden it.
         isFontChangedByBold = true;
       }
     }
-
     // Get the script for the current character.
-    Script script = GetScript(index,
-                              scriptRunIt,
-                              scriptRunEndIt);
+    Script script = GetScript(index, scriptRunIt, scriptRunEndIt);
 
 #ifdef DEBUG_ENABLED
     if(gLogFilter->IsEnabledFor(Debug::Verbose))
@@ -790,12 +1041,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       Dali::TextAbstraction::FontDescription description;
       fontClient.GetDescription(fontId, description);
 
-      DALI_LOG_INFO(gLogFilter,
-                    Debug::Verbose,
-                    "  Initial font set\n  Character : %x, Script : %s, Font : %s \n",
-                    character,
-                    Dali::TextAbstraction::ScriptName[script],
-                    description.path.c_str());
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  Initial font set\n  Character : %x, Script : %s, Font : %s \n",
+                    character, Dali::TextAbstraction::ScriptName[script], description.path.c_str());
     }
 #endif
 
@@ -804,21 +1051,23 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
 
     // Check first in the cache of default fonts per script and size.
 
-    FontId        cachedDefaultFontId = 0u;
-    DefaultFonts* defaultFonts        = *(defaultFontPerScriptCacheBuffer + script);
-    if(NULL != defaultFonts)
+    FontId        cachedDefaultFontId  = 0u;
+    DefaultFonts* defaultFonts         = NULL;
+    const bool    useFallbackFontCache = TextAbstraction::EMOJI != script;
+    if(useFallbackFontCache)
     {
-      // This cache stores fall-back fonts.
-      cachedDefaultFontId = defaultFonts->FindFont(fontClient,
-                                                   currentFontDescription,
-                                                   currentFontPointSize,
-                                                   character);
+      defaultFonts = *(defaultFontPerScriptCacheBuffer + script);
+      if(NULL != defaultFonts)
+      {
+        // This cache stores fall-back fonts.
+        cachedDefaultFontId = defaultFonts->FindFont(fontClient, currentFontDescription, currentFontPointSize, character);
+      }
     }
-
     // Whether the cached default font is valid.
     const bool isValidCachedDefaultFont = 0u != cachedDefaultFontId;
 
-    // The font is valid if it matches with the default one for the current script and size and it's different than zero.
+    // The font is valid if it matches with the default one for the current script and size and it's different than
+    // zero.
     isValidFont = isValidCachedDefaultFont && (fontId == cachedDefaultFontId);
 
     if(isValidFont)
@@ -827,37 +1076,81 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
     }
 
-    bool isEmojiScript = IsEmojiColorScript(script) || IsEmojiTextScript(script);
+    bool isEmojiScript = IsOneOfEmojiScripts(script);
     bool isZWJ         = TextAbstraction::IsZeroWidthJoiner(character);
 
-    if((previousScript == script) &&
-       (isEmojiScript || isZWJ))
+    if(hasForcedEmojiSequenceFont && index > forcedEmojiSequenceEndIndex)
+    {
+      hasForcedEmojiSequenceFont = false;
+      forcedEmojiSequenceFontId  = 0u;
+    }
+
+    if(!hasForcedEmojiSequenceFont && isEmojiScript)
+    {
+      KeycapSequenceInfo keycapSequenceInfo;
+      if(GetKeycapSequenceInfo(textBuffer, index, lastCharacter, keycapSequenceInfo))
+      {
+        if(keycapSequenceInfo.hasColorSelector || !keycapSequenceInfo.hasTextSelector)
+        {
+          forcedEmojiSequenceFontId =
+            FindColorEmojiFontForSequence(fontClient, currentFontDescription, currentFontPointSize);
+        }
+        else if(TextAbstraction::EMOJI_TEXT == script)
+        {
+          forcedEmojiSequenceFontId =
+            FindTextFontForKeycapSequence(fontClient,
+                                          textBuffer,
+                                          index,
+                                          keycapSequenceInfo.length,
+                                          fontId,
+                                          currentFontDescription,
+                                          currentFontPointSize);
+        }
+
+        hasForcedEmojiSequenceFont = 0u != forcedEmojiSequenceFontId;
+        if(hasForcedEmojiSequenceFont)
+        {
+          forcedEmojiSequenceEndIndex = index + keycapSequenceInfo.length - 1u;
+        }
+      }
+    }
+    const bool useForcedEmojiSequenceFont =
+      hasForcedEmojiSequenceFont && index <= forcedEmojiSequenceEndIndex && 0u != forcedEmojiSequenceFontId;
+    if(useForcedEmojiSequenceFont)
+    {
+      fontId      = forcedEmojiSequenceFontId;
+      isValidFont = true;
+    }
+
+    if(!useForcedEmojiSequenceFont &&
+       (previousScript == script) && (isZWJ || (isEmojiScript && TextAbstraction::EMOJI != script)))
     {
       // This sequence should use the previous font.
-      if(0u != previousFontId)
+      if(CanReusePreviousEmojiFont(fontClient, previousFontId, character))
       {
         fontId      = previousFontId;
         isValidFont = true;
       }
     }
 
-    if(TextAbstraction::IsSpace(character) &&
-       TextAbstraction::HasLigatureMustBreak(script) &&
-       isValidCachedDefaultFont &&
-       (isDefaultFont || (currentFontId == previousFontId)))
+    if(TextAbstraction::IsSpace(character) && TextAbstraction::HasLigatureMustBreak(script) &&
+       isValidCachedDefaultFont && (isDefaultFont || (currentFontId == previousFontId)))
     {
       fontId      = cachedDefaultFontId;
       isValidFont = true;
     }
 
     bool findFallbackFont = false;
-    if(TextAbstraction::IsEmojiVariationSequences(character) && !TextAbstraction::IsASCIIDigits(character) && !TextAbstraction::IsASCIIPS(character))
+    if(TextAbstraction::IsEmojiVariationSequences(character) && !TextAbstraction::IsASCIIDigits(character) &&
+       !TextAbstraction::IsASCIIPS(character))
     {
       if(index + 1 <= lastCharacter)
       {
         const Character nextCharacter = *(textBuffer + index + 1);
-        findFallbackFont              = (!TextAbstraction::IsEmojiPresentationSelector(nextCharacter) && !TextAbstraction::IsTextPresentationSelector(nextCharacter) &&
-                            !TextAbstraction::IsZeroWidthJoiner(nextCharacter) && !TextAbstraction::IsEmojiModifier(nextCharacter));
+        findFallbackFont =
+          (!TextAbstraction::IsEmojiPresentationSelector(nextCharacter) &&
+           !TextAbstraction::IsTextPresentationSelector(nextCharacter) &&
+           !TextAbstraction::IsZeroWidthJoiner(nextCharacter) && !TextAbstraction::IsEmojiModifier(nextCharacter));
       }
       else if(index == lastCharacter)
       {
@@ -874,12 +1167,25 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     // - the platform default font is different than the default font for the current script.
 
     // Need to check if the given font supports the current character.
-    CheckFontSupportsCharacter(isValidFont, isCommonScript, character, validFontsPerScriptCacheBuffer, script, fontId, fontClient,
-                               isValidCachedDefaultFont, cachedDefaultFontId, currentFontDescription, currentFontPointSize, defaultFontPerScriptCacheBuffer, findFallbackFont);
+    CheckFontSupportsCharacter(isValidFont, isCommonScript, character, validFontsPerScriptCacheBuffer, script, fontId,
+                               fontClient, isValidCachedDefaultFont, cachedDefaultFontId, currentFontDescription,
+                               currentFontPointSize, defaultFontPerScriptCacheBuffer, findFallbackFont,
+                               useFallbackFontCache);
+
+    if(TextAbstraction::EMOJI_TEXT == script && (!isValidFont || fontClient.IsColorFont(fontId)))
+    {
+      const FontId textFontId =
+        FindTextPresentationFontForCharacter(fontClient, character, currentFontDescription, currentFontPointSize);
+      if(0u != textFontId)
+      {
+        fontId      = textFontId;
+        isValidFont = true;
+      }
+    }
 
     if(isEmojiScript && (previousScript != script))
     {
-      //New Emoji sequence should select font according to the variation selector (VS15 or VS16).
+      // New Emoji sequence should select font according to the variation selector (VS15 or VS16).
       if(0u != currentFontRun.characterRun.numberOfCharacters)
       {
         // Store the font run.
@@ -888,17 +1194,20 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       }
 
       // Initialize the new one.
-      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.characterIndex =
+        currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId                          = fontId;
       currentFontRun.isItalicRequired                = false;
       currentFontRun.isBoldRequired                  = false;
 
-      if(TextAbstraction::IsEmojiColorScript(script) || TextAbstraction::IsEmojiTextScript(script))
+      if(!useForcedEmojiSequenceFont &&
+         (TextAbstraction::IsEmojiColorScript(script) || TextAbstraction::IsEmojiTextScript(script)))
       {
         bool       isModifiedByVariationSelector = false;
         GlyphIndex glyphIndexChar                = fontClient.GetGlyphIndex(fontId, character);
-        GlyphIndex glyphIndexCharByVS            = fontClient.GetGlyphIndex(fontId, character, Text::GetVariationSelectorByScript(script));
+        GlyphIndex glyphIndexCharByVS =
+          fontClient.GetGlyphIndex(fontId, character, Text::GetVariationSelectorByScript(script));
 
         isModifiedByVariationSelector = glyphIndexChar != glyphIndexCharByVS;
 
@@ -907,15 +1216,11 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
           FontId requestedFontId = 0u;
           if(TextAbstraction::IsEmojiTextScript(script))
           {
-            // Find a fallback-font.
-            requestedFontId = fontClient.FindFallbackFont(character, currentFontDescription, currentFontPointSize, false);
-            if(fontClient.IsColorGlyph(requestedFontId, glyphIndexChar))
-            {
-              // Try to find text style glyph.
-              requestedFontId = 0;
-            }
+            requestedFontId =
+              FindTextPresentationFontForCharacter(fontClient, character, currentFontDescription, currentFontPointSize);
           }
-          else if(TextAbstraction::IsEmojiColorScript(script) && TextAbstraction::IsEmojiPresentationSelector(character))
+          else if(TextAbstraction::IsEmojiColorScript(script) &&
+                  TextAbstraction::IsEmojiPresentationSelector(character))
           {
             if(IsEmojiScript(previousScript) && fontClient.IsColorFont(previousFontId))
             {
@@ -923,8 +1228,10 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
             }
             else
             {
-              // There are Color emoji fonts that do not have Variation Selector glyphs. Search for fonts using the basic emoji unicode code point.
-              requestedFontId = fontClient.FindFallbackFont(UTF32_EMOJI, currentFontDescription, currentFontPointSize, true);
+              // There are Color emoji fonts that do not have Variation Selector glyphs. Search for fonts using the
+              // basic emoji unicode code point.
+              requestedFontId =
+                fontClient.FindFallbackFont(UTF32_EMOJI, currentFontDescription, currentFontPointSize, true);
             }
           }
           if(0u == requestedFontId)
@@ -939,28 +1246,21 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
         }
       }
     }
-
 #ifdef DEBUG_ENABLED
     if(gLogFilter->IsEnabledFor(Debug::Verbose))
     {
       Dali::TextAbstraction::FontDescription description;
       fontClient.GetDescription(fontId, description);
-      DALI_LOG_INFO(gLogFilter,
-                    Debug::Verbose,
-                    "  Validated font set\n  Character : %x, Script : %s, Font : %s \n",
-                    character,
-                    Dali::TextAbstraction::ScriptName[script],
-                    description.path.c_str());
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  Validated font set\n  Character : %x, Script : %s, Font : %s \n",
+                    character, Dali::TextAbstraction::ScriptName[script], description.path.c_str());
     }
 #endif
     if(!isValidFont && !isCommonScript)
     {
       Dali::TextAbstraction::FontDescription descriptionForLog;
       fontClient.GetDescription(fontId, descriptionForLog);
-      DALI_LOG_RELEASE_INFO("Validated font set fail : Character : %x, Script : %s, Font : %s \n",
-                            character,
-                            Dali::TextAbstraction::ScriptName[script],
-                            descriptionForLog.path.c_str());
+      DALI_LOG_RELEASE_INFO("Validated font set fail : Character : %x, Script : %s, Font : %s \n", character,
+                            Dali::TextAbstraction::ScriptName[script], descriptionForLog.path.c_str());
     }
 
     // Whether bols style is required.
@@ -970,10 +1270,10 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     isItalicRequired = (currentFontDescription.slant >= TextAbstraction::FontSlant::ITALIC);
 
     // The font is now validated.
-    if((fontId != currentFontRun.fontId) ||
-       isNewParagraphCharacter ||
+    if((fontId != currentFontRun.fontId) || isNewParagraphCharacter ||
        // If font id is same as previous but style is diffrent, initialize new one
-       ((fontId == currentFontRun.fontId) && ((isBoldRequired != currentFontRun.isBoldRequired) || (isItalicRequired != currentFontRun.isItalicRequired))))
+       ((fontId == currentFontRun.fontId) &&
+        ((isBoldRequired != currentFontRun.isBoldRequired) || (isItalicRequired != currentFontRun.isItalicRequired))))
     {
       // Current run needs to be stored and a new one initialized.
 
@@ -985,7 +1285,8 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
       }
 
       // Initialize the new one.
-      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.characterIndex =
+        currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId                          = fontId;
       currentFontRun.isBoldRequired                  = isBoldRequired;
@@ -1015,10 +1316,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
     const FontRun& run                = *(fonts.Begin() + fontIndex - 1u);
     CharacterIndex nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
 
-    for(Vector<FontRun>::Iterator it    = fonts.Begin() + fontIndex,
-                                  endIt = fonts.End();
-        it != endIt;
-        ++it)
+    for(Vector<FontRun>::Iterator it = fonts.Begin() + fontIndex, endIt = fonts.End(); it != endIt; ++it)
     {
       FontRun& run = *it;
 
@@ -1030,16 +1328,15 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient&           
   DALI_LOG_INFO(gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n");
 }
 
-void MultilanguageSupport::AddCurrentScriptAndCreatNewScript(const Script       requestedScript,
-                                                             const bool         isRightToLeft,
+void MultilanguageSupport::AddCurrentScriptAndCreatNewScript(const Script requestedScript, const bool isRightToLeft,
                                                              const bool         addScriptCharactersToNewScript,
                                                              ScriptRun&         currentScriptRun,
                                                              Length&            numberOfAllScriptCharacters,
-                                                             Vector<ScriptRun>& scripts,
-                                                             ScriptRunIndex&    scriptIndex)
+                                                             Vector<ScriptRun>& scripts, ScriptRunIndex& scriptIndex)
 {
   // Add the pending characters to the current script
-  currentScriptRun.characterRun.numberOfCharacters += (addScriptCharactersToNewScript ? 0u : numberOfAllScriptCharacters);
+  currentScriptRun.characterRun.numberOfCharacters +=
+    (addScriptCharactersToNewScript ? 0u : numberOfAllScriptCharacters);
 
   // In-case the current script is empty then no need to add it for scripts
   if(0u != currentScriptRun.characterRun.numberOfCharacters)
@@ -1050,10 +1347,12 @@ void MultilanguageSupport::AddCurrentScriptAndCreatNewScript(const Script       
   }
 
   // Initialize the new one by the requested script
-  currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
-  currentScriptRun.characterRun.numberOfCharacters = (addScriptCharactersToNewScript ? numberOfAllScriptCharacters : 0u);
-  currentScriptRun.script                          = requestedScript;
-  numberOfAllScriptCharacters                      = 0u;
+  currentScriptRun.characterRun.characterIndex =
+    currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+  currentScriptRun.characterRun.numberOfCharacters =
+    (addScriptCharactersToNewScript ? numberOfAllScriptCharacters : 0u);
+  currentScriptRun.script     = requestedScript;
+  numberOfAllScriptCharacters = 0u;
   // Initialize whether is right to left direction
   currentScriptRun.isRightToLeft = isRightToLeft;
 }
