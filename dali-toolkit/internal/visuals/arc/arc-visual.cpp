@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -181,7 +182,7 @@ void ArcVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 void ArcVisual::OnSetTransform()
 {
   Vector2 visualSize = mImpl->GetTransformVisualSize(mImpl->mControlSize);
-  mRadius            = (std::min(visualSize.width, visualSize.height) - mThickness) / 2.0f;
+  mRadius            = (Min(visualSize.width, visualSize.height) - mThickness) / 2.0f;
 
   if(mImpl->mRenderer)
   {

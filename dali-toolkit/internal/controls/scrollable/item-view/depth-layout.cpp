@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
-#include <algorithm>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
@@ -45,7 +45,7 @@ const float        DEFAULT_ITEM_FLICK_ANIMATION_DURATION = 0.03f;
 inline float GetColumnPosition(unsigned int numberOfColumns, unsigned int columnNumber, const Vector3& itemSize, float layoutWidth)
 {
   // Share the available space between margins & column spacings
-  float availableSpace = std::max(0.0f, (layoutWidth - itemSize.width * numberOfColumns));
+  float availableSpace = Max(0.0f, (layoutWidth - itemSize.width * numberOfColumns));
 
   float leftMargin = availableSpace / numberOfColumns * 0.5f;
 
@@ -196,7 +196,7 @@ struct DepthColorConstraint
 
     if(row < 0.0f)
     {
-      darkness = alpha = std::max(0.0f, 1.0f + row);
+      darkness = alpha = Max(0.0f, 1.0f + row);
     }
     else
     {
@@ -211,7 +211,7 @@ struct DepthColorConstraint
 
       if(row > (mNumberOfRows - 1.0f))
       {
-        alpha = std::max(0.0f, 1.0f - (row - (mNumberOfRows - 1.0f)));
+        alpha = Max(0.0f, 1.0f - (row - (mNumberOfRows - 1.0f)));
       }
     }
 
@@ -396,8 +396,8 @@ ItemRange DepthLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layou
   float firstRow = -(firstItemPosition / mImpl->mNumberOfColumns);
   float lastRow  = firstRow + mImpl->mNumberOfRows * 0.5f;
 
-  unsigned int firstItem = static_cast<unsigned int>(std::max(0.0f, firstRow * mImpl->mNumberOfColumns));
-  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, lastRow * mImpl->mNumberOfColumns));
+  unsigned int firstItem = static_cast<unsigned int>(Max(0.0f, firstRow * mImpl->mNumberOfColumns));
+  unsigned int lastItem  = static_cast<unsigned int>(Max(0.0f, lastRow * mImpl->mNumberOfColumns));
 
   return ItemRange(firstItem, lastItem + 1);
 }

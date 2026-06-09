@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cfloat>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
@@ -169,13 +170,13 @@ void TextSelectionToolbar::OnInitialize()
 
 void TextSelectionToolbar::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  float width = std::max(mTableOfButtons.GetNaturalSize().width, size.width);
+  float width = Max(mTableOfButtons.GetNaturalSize().width, size.width);
   mRulerX->SetDomain(RulerDomain(0.0, width, true));
   mScrollView.SetRulerX(mRulerX);
 
   if(mScrollBar)
   {
-    float barWidth = std::min(mTableOfButtons.GetNaturalSize().width, size.width) - 2.f * mScrollBarPadding.x;
+    float barWidth = Min(mTableOfButtons.GetNaturalSize().width, size.width) - 2.f * mScrollBarPadding.x;
     mScrollBar.SetProperty(Actor::Property::SIZE, Vector2(0.0f, barWidth));
   }
 }

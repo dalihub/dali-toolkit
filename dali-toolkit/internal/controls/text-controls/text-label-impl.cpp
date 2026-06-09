@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -29,6 +29,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -1217,11 +1218,6 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
-  // Sets layoutDirection value
-  Dali::Stage                 stage           = Dali::Stage::GetCurrent();
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  mController->SetLayoutDirection(layoutDirection);
-
   self.InheritedVisibilityChangedSignal().Connect(this, &TextLabel::OnControlInheritedVisibilityChanged);
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
@@ -1248,6 +1244,19 @@ bool TextLabel::IsVisible()
     mIsVisibleInitialized = true;
   }
   return mIsVisible;
+}
+
+void TextLabel::OnSceneConnection(int depth)
+{
+  ControlImpl::OnSceneConnection(depth);
+
+  Dali::Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    // Sets layoutDirection value
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+    mController->SetLayoutDirection(layoutDirection);
+  }
 }
 
 DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
@@ -1538,8 +1547,8 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float   width  = std::max(size.x - (padding.start + padding.end), 0.0f);
-  float   height = std::max(size.y - (padding.top + padding.bottom), 0.0f);
+  float   width  = Max(size.x - (padding.start + padding.end), 0.0f);
+  float   height = Max(size.y - (padding.top + padding.bottom), 0.0f);
   Vector2 contentSize(width, height);
 
   // Support Right-To-Left
@@ -1662,7 +1671,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     float outlineWidth = mController->GetTextModel()->GetOutlineWidth();
     layoutSize.y += outlineWidth * 2.0f;
-    layoutSize.y = std::min(layoutSize.y, contentSize.y);
+    layoutSize.y = Min(layoutSize.y, contentSize.y);
 
     // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
     Vector2 alignmentOffset;
@@ -1917,8 +1926,8 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
     DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::SetUpAutoScrolling textNaturalSize[%f,%f] controlSize[%f,%f]\n", textNaturalSize.x, textNaturalSize.y, controlSize.x, controlSize.y);
 
     // Calculate the actual gap before scrolling wraps.
-    int textPadding     = std::max(controlSize.x - textNaturalSize.x, 0.0f);
-    wrapGap             = std::max(mTextScroller->GetGap(), textPadding);
+    int textPadding     = Max(controlSize.x - textNaturalSize.x, 0.0f);
+    wrapGap             = Max(mTextScroller->GetGap(), textPadding);
     Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture
 
     // Create a texture of the text for scrolling
@@ -1935,7 +1944,7 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
       }
       float gap = static_cast<float>(mTextScroller->GetGap());
       mController->CalculateLayoutSize(verifiedSize.width - gap, controlSize.height, true);
-      wrapGap = std::max(maxTextureSize - textNaturalSize.width, gap);
+      wrapGap = Max(maxTextureSize - textNaturalSize.width, gap);
     }
   }
   else // AutoScroll::VERTICAL
@@ -1943,8 +1952,8 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
     const float textHeight = mController->GetHeightForWidth(controlSize.width);
 
     // Calculate the actual gap before scrolling wraps.
-    int textPadding = std::max(controlSize.height - textHeight, 0.0f);
-    wrapGap         = std::max(mTextScroller->GetGap(), textPadding);
+    int textPadding = Max(controlSize.height - textHeight, 0.0f);
+    wrapGap         = Max(mTextScroller->GetGap(), textPadding);
     Vector2 textureSize(controlSize.width, textHeight + wrapGap); // Add the gap as a part of the texture
 
     // Create a texture of the text for scrolling
@@ -1961,7 +1970,7 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
       }
 
       mController->CalculateLayoutSize(controlSize.width, maxTextureSize, true);
-      wrapGap = std::max(maxTextureSize - textHeight, 0.0f);
+      wrapGap = Max(maxTextureSize - textHeight, 0.0f);
       if(!mController->IsAutoScrollEnabled())
       {
         mController->SetAutoScrollEnabled(true, false, DevelText::AutoScroll::VERTICAL);
@@ -2382,8 +2391,8 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float contentWidth  = std::max(width - (padding.start + padding.end), 0.0f);
-  float contentHeight = std::max(height - (padding.top + padding.bottom), 0.0f);
+  float contentWidth  = Max(width - (padding.start + padding.end), 0.0f);
+  float contentHeight = Max(height - (padding.top + padding.bottom), 0.0f);
   Size  contentSize(contentWidth, contentHeight);
 
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
@@ -2414,8 +2423,8 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float contentWidth            = std::max(width - (padding.start + padding.end), 0.0f);
-  float contentHeightConstraint = std::max(heightConstraint - (padding.top + padding.bottom), 0.0f);
+  float contentWidth            = Max(width - (padding.start + padding.end), 0.0f);
+  float contentHeightConstraint = Max(heightConstraint - (padding.top + padding.bottom), 0.0f);
   Size  contentSize(contentWidth, contentHeightConstraint);
 
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
@@ -2446,8 +2455,8 @@ void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float h
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float contentWidthConstraint = std::max(widthConstraint - (padding.start + padding.end), 0.0f);
-  float contentHeight          = std::max(height - (padding.top + padding.bottom), 0.0f);
+  float contentWidthConstraint = Max(widthConstraint - (padding.start + padding.end), 0.0f);
+  float contentHeight          = Max(height - (padding.top + padding.bottom), 0.0f);
   Size  contentSize(contentWidthConstraint, contentHeight);
 
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
@@ -2478,8 +2487,8 @@ void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float he
   Extents padding;
   padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
-  float contentWidthConstraint  = std::max(widthConstraint - (padding.start + padding.end), 0.0f);
-  float contentHeightConstraint = std::max(heightConstraint - (padding.top + padding.bottom), 0.0f);
+  float contentWidthConstraint  = Max(widthConstraint - (padding.start + padding.end), 0.0f);
+  float contentHeightConstraint = Max(heightConstraint - (padding.top + padding.bottom), 0.0f);
   Size  contentSize(contentWidthConstraint, contentHeightConstraint);
 
   Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);

@@ -269,7 +269,7 @@ int UtcDaliAccessibilityPushButtonStates(void)
   auto accessible = Dali::Accessibility::Accessible::Get(pushbutton);
   DALI_TEST_CHECK(accessible);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   /* add to scene and remove from scene to touch AccessibilityDeregister */
   application.GetScene().Add(pushbutton);
@@ -296,7 +296,7 @@ int UtcDaliAccessibilityPushButtonStates(void)
   /* add to scene and remove from scene to touch AccessibilityDeregister */
   application.GetScene().Remove(pushbutton);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -326,7 +326,7 @@ int UtcDaliAccessibilityToggleButtonStates(void)
   auto accessible = Dali::Accessibility::Accessible::Get(togglebutton);
   DALI_TEST_CHECK(accessible);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   /* add to scene and remove from scene to touch AccessibilityDeregister */
   application.GetScene().Add(togglebutton);
@@ -353,7 +353,7 @@ int UtcDaliAccessibilityToggleButtonStates(void)
   /* add to scene and remove from scene to touch AccessibilityDeregister */
   application.GetScene().Remove(togglebutton);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 
@@ -414,7 +414,7 @@ int UtcDaliAccessibilityRadioButtonStates(void)
   auto accessible = Dali::Accessibility::Accessible::Get(radiobutton);
   DALI_TEST_CHECK(accessible);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   application.GetScene().Add(radiobutton);
 
@@ -437,7 +437,7 @@ int UtcDaliAccessibilityRadioButtonStates(void)
 
   application.GetScene().Remove(radiobutton);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -466,7 +466,7 @@ int UtcDaliAccessibilityCheckBoxButton(void)
   auto accessible = Dali::Accessibility::Accessible::Get(checkboxbutton);
   DALI_TEST_CHECK(accessible);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   application.GetScene().Add(checkboxbutton);
 
@@ -486,7 +486,7 @@ int UtcDaliAccessibilityCheckBoxButton(void)
 
   application.GetScene().Remove(checkboxbutton);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -577,7 +577,7 @@ int UtcDaliAccessibilityTextAnchor(void)
   auto textlabel = TextLabel::New();
   DALI_TEST_CHECK(textlabel);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   textlabel.Add(textanchor);
   auto accessible = Dali::Accessibility::Accessible::Get(textanchor);
@@ -627,7 +627,7 @@ int UtcDaliAccessibilityTextAnchor(void)
   DALI_TEST_EQUALS(hyperlink->IsValid(), false, TEST_LOCATION);
   DALI_TEST_CHECK(action->DoAction("activate"));
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -650,7 +650,7 @@ int UtcDaliAccessibilityTextField(void)
   auto states = accessible->GetStates();
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::EDITABLE]), true, TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   textfield.SetProperty(Toolkit::TextField::Property::TEXT, "test");
   auto text = accessible->GetFeature<Accessibility::Text>();
@@ -737,7 +737,7 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -761,7 +761,7 @@ int UtcDaliAccessibilityTextEditor(void)
   auto states = accessible->GetStates();
   DALI_TEST_EQUALS(static_cast<unsigned int>(states[Accessibility::State::EDITABLE]), true, TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   texteditor.SetProperty(Toolkit::TextEditor::Property::TEXT, "test");
   auto text = accessible->GetFeature<Accessibility::Text>();
@@ -848,7 +848,7 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }
@@ -886,7 +886,7 @@ int UtcDaliAccessibilityTextLabel(void)
   textlabel.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
   DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   textlabel.SetProperty(Toolkit::TextLabel::Property::TEXT, "test");
   auto text = accessible->GetFeature<Accessibility::Text>();
@@ -951,7 +951,7 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS(hyperlink->GetStartIndex(), 65, TEST_LOCATION);
   DALI_TEST_EQUALS(hyperlink->GetEndIndex(), 72, TEST_LOCATION);
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
 
   END_TEST;
 }

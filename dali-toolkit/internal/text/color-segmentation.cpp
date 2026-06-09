@@ -19,9 +19,7 @@
 #include <dali-toolkit/internal/text/color-segmentation.h>
 
 // EXTERNAL INCLUDES
-
-// INTERNAL INCLUDES
-
+#include <dali/public-api/common/dali-utility.h>
 #include <iostream>
 
 namespace Dali
@@ -110,9 +108,9 @@ void SetColorSegmentationInfo(const Vector<ColorRun>&   colorRuns,
         // Get the index to the last character of the run.
         const CharacterIndex lastIndex = colorRun.characterRun.characterIndex + colorRun.characterRun.numberOfCharacters - 1u;
 
-        const GlyphIndex glyphIndex = std::max(startGlyphIndex, *(charactersToGlyphBuffer + colorRun.characterRun.characterIndex)) - startGlyphIndex;
+        const GlyphIndex glyphIndex = Max(startGlyphIndex, *(charactersToGlyphBuffer + colorRun.characterRun.characterIndex)) - startGlyphIndex;
         // Get the number of glyphs of the run.
-        const Length lastGlyphIndexPlusOne = std::min(numberOfNewGlyphs, *(charactersToGlyphBuffer + lastIndex) + *(glyphsPerCharacterBuffer + lastIndex) - startGlyphIndex);
+        const Length lastGlyphIndexPlusOne = Min(numberOfNewGlyphs, *(charactersToGlyphBuffer + lastIndex) + *(glyphsPerCharacterBuffer + lastIndex) - startGlyphIndex);
 
         // Set the indices.
         for(GlyphIndex i = glyphIndex; i < lastGlyphIndexPlusOne; ++i)

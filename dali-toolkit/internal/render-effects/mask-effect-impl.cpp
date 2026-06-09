@@ -25,6 +25,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
@@ -402,8 +403,8 @@ void MaskEffectImpl::SetShaderConstants(Toolkit::Control ownerControl)
   ownerControl.RegisterProperty(UNIFORM_MASK_POSITION_NAME, newMaskPosition);
 
   Vector2 newMaskScale;
-  newMaskScale.x = 1.0f / std::max(Math::MACHINE_EPSILON_100, mMaskScale.x);
-  newMaskScale.y = 1.0f / std::max(Math::MACHINE_EPSILON_100, mMaskScale.y);
+  newMaskScale.x = 1.0f / Max(Math::MACHINE_EPSILON_100, mMaskScale.x);
+  newMaskScale.y = 1.0f / Max(Math::MACHINE_EPSILON_100, mMaskScale.y);
 
   ownerControl.RegisterProperty(UNIFORM_MASK_SCALE_NAME, newMaskScale);
 }

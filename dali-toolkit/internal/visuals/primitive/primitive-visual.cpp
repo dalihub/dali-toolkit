@@ -19,13 +19,14 @@
 #include "primitive-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 
@@ -54,7 +55,7 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(SHAPE_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTUM)
 DALI_ENUM_TO_STRING_TABLE_END(SHAPE_TYPE)
 
-//Primitive property defaults
+// Primitive property defaults
 const int     DEFAULT_SLICES              = 128;                         ///< For spheres and conics
 const int     DEFAULT_STACKS              = 128;                         ///< For spheres and conics
 const float   DEFAULT_SCALE_TOP_RADIUS    = 1.0;                         ///< For conical frustums
@@ -65,7 +66,7 @@ const float   DEFAULT_BEVEL_PERCENTAGE    = 0.0;                         ///< Fo
 const float   DEFAULT_BEVEL_SMOOTHNESS    = 0.0;                         ///< For bevelled cubes
 const Vector4 DEFAULT_COLOR               = Vector4(0.5, 0.5, 0.5, 1.0); ///< Grey, for all.
 
-//Property limits
+// Property limits
 const int   MIN_SLICES           = 3;   ///< Minimum number of slices for spheres and conics
 const int   MIN_STACKS           = 2;   ///< Minimum number of stacks for spheres and conics
 const int   MAX_PARTITIONS       = 255; ///< Maximum number of slices or stacks for spheres and conics
@@ -74,12 +75,12 @@ const float MAX_BEVEL_PERCENTAGE = 1.0; ///< Maximum bevel percentage for bevell
 const float MIN_SMOOTHNESS       = 0.0; ///< Minimum bevel smoothness for bevelled cubes
 const float MAX_SMOOTHNESS       = 1.0; ///< Maximum bevel smoothness for bevelled cubes
 
-//Shader properties
+// Shader properties
 const char* const OBJECT_MATRIX_UNIFORM_NAME("uObjectMatrix");
 const char* const OBJECT_DIMENSIONS_UNIFORM_NAME("uObjectDimensions");
 const char* const STAGE_OFFSET_UNIFORM_NAME("uStageOffset");
 
-//Vertex properties
+// Vertex properties
 const char* const POSITION("aPosition");
 const char* const NORMAL("aNormal");
 
@@ -115,7 +116,7 @@ PrimitiveVisual::~PrimitiveVisual()
 
 void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  //Find out which shape to renderer.
+  // Find out which shape to renderer.
   Property::Value* primitiveTypeValue = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SHAPE, PRIMITIVE_SHAPE);
   if(primitiveTypeValue)
   {
@@ -152,7 +153,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   {
     if(slices->Get(mSlices))
     {
-      //Clamp value.
+      // Clamp value.
       if(mSlices > MAX_PARTITIONS)
       {
         mSlices = MAX_PARTITIONS;
@@ -175,7 +176,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   {
     if(stacks->Get(mStacks))
     {
-      //Clamp value.
+      // Clamp value.
       if(mStacks > MAX_PARTITIONS)
       {
         mStacks = MAX_PARTITIONS;
@@ -222,7 +223,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   {
     if(dimensions->Get(mScaleDimensions))
     {
-      //If any dimension is invalid, set it to a sensible default.
+      // If any dimension is invalid, set it to a sensible default.
       if(mScaleDimensions.x <= 0.0)
       {
         mScaleDimensions.x = 1.0;
@@ -250,7 +251,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   {
     if(bevel->Get(mBevelPercentage))
     {
-      //Clamp value.
+      // Clamp value.
       if(mBevelPercentage < MIN_BEVEL_PERCENTAGE)
       {
         mBevelPercentage = MIN_BEVEL_PERCENTAGE;
@@ -273,7 +274,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   {
     if(smoothness->Get(mBevelSmoothness))
     {
-      //Clamp value.
+      // Clamp value.
       if(mBevelSmoothness < MIN_SMOOTHNESS)
       {
         mBevelSmoothness = MIN_SMOOTHNESS;
@@ -291,7 +292,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  //Read in light position.
+  // Read in light position.
   Property::Value* lightPosition = propertyMap.Find(Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, LIGHT_POSITION_UNIFORM_NAME);
   if(lightPosition)
   {
@@ -300,14 +301,6 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
       DALI_LOG_ERROR("Invalid value passed for light position in MeshVisual object.\n");
       mLightPosition = Vector3::ZERO;
     }
-  }
-  else
-  {
-    //Default behaviour is to place the light directly in front of the object,
-    // at a reasonable distance to light everything on screen.
-    Stage stage = Stage::GetCurrent();
-
-    mLightPosition = Vector3(stage.GetSize().width / 2, stage.GetSize().height / 2, stage.GetSize().width * 5);
   }
 }
 
@@ -325,6 +318,14 @@ void PrimitiveVisual::GetNaturalSize(Vector2& naturalSize)
 void PrimitiveVisual::DoSetOnScene(Actor& actor)
 {
   actor.AddRenderer(mImpl->mRenderer);
+
+  Window window = DevelWindow::Get(actor);
+  if(window)
+  {
+    auto    winSize = window.GetSize();
+    Vector2 windowSize(static_cast<float>(winSize.GetWidth()), static_cast<float>(winSize.GetHeight()));
+    UpdateShaderUniforms(windowSize);
+  }
 
   // Primitive generated and ready to display
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -378,17 +379,20 @@ void PrimitiveVisual::OnInitialize()
   mImpl->SetTransformUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
-void PrimitiveVisual::UpdateShaderUniforms()
+void PrimitiveVisual::UpdateShaderUniforms(Vector2 windowSize)
 {
-  Stage stage  = Stage::GetCurrent();
-  float width  = stage.GetSize().width;
-  float height = stage.GetSize().height;
+  if(mLightPosition == Vector3::ZERO)
+  {
+    // Default behaviour is to place the light directly in front of the object,
+    // at a reasonable distance to light everything on screen.
+    mLightPosition = Vector3(windowSize.width / 2, windowSize.height / 2, windowSize.width * 5);
+  }
 
-  //Flip model to account for DALi starting with (0, 0) at the top left.
+  // Flip model to account for DALi starting with (0, 0) at the top left.
   Matrix scaleMatrix;
   scaleMatrix.SetIdentityAndScale(Vector3(1.0, -1.0, 1.0));
 
-  mShader.RegisterProperty(STAGE_OFFSET_UNIFORM_NAME, Vector2(width, height) / 2.0f);
+  mShader.RegisterProperty(STAGE_OFFSET_UNIFORM_NAME, windowSize / 2.0f);
   mShader.RegisterProperty(LIGHT_POSITION_UNIFORM_NAME, mLightPosition);
   mShader.RegisterProperty(OBJECT_MATRIX_UNIFORM_NAME, scaleMatrix);
   mShader.RegisterProperty(OBJECT_DIMENSIONS_UNIFORM_NAME, mObjectDimensions);
@@ -397,7 +401,6 @@ void PrimitiveVisual::UpdateShaderUniforms()
 void PrimitiveVisual::CreateShader()
 {
   mShader = Shader::New(ToDaliStringView(SHADER_PRIMITIVE_VISUAL_SHADER_VERT), ToDaliStringView(SHADER_PRIMITIVE_VISUAL_SHADER_FRAG), static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "PRIMITIVE_VISUAL");
-  UpdateShaderUniforms();
 }
 
 void PrimitiveVisual::CreateGeometry()
@@ -414,25 +417,25 @@ void PrimitiveVisual::CreateGeometry()
     }
     case Toolkit::PrimitiveVisual::Shape::CONE:
     {
-      //Create a conic with zero top radius.
+      // Create a conic with zero top radius.
       CreateConic(vertices, indices, 0, mScaleBottomRadius, mScaleHeight, mSlices);
       break;
     }
     case Toolkit::PrimitiveVisual::Shape::CYLINDER:
     {
-      //Create a conic with equal radii on the top and bottom.
+      // Create a conic with equal radii on the top and bottom.
       CreateConic(vertices, indices, mScaleRadius, mScaleRadius, mScaleHeight, mSlices);
       break;
     }
     case Toolkit::PrimitiveVisual::Shape::CUBE:
     {
-      //Create a cube by creating a bevelled cube with minimum bevel.
+      // Create a cube by creating a bevelled cube with minimum bevel.
       CreateBevelledCube(vertices, indices, mScaleDimensions, 0.0, 0.0);
       break;
     }
     case Toolkit::PrimitiveVisual::Shape::OCTAHEDRON:
     {
-      //Create an octahedron by creating a bevelled cube with maximum bevel.
+      // Create an octahedron by creating a bevelled cube with maximum bevel.
       CreateBevelledCube(vertices, indices, mScaleDimensions, 1.0, mBevelSmoothness);
       break;
     }
@@ -450,7 +453,7 @@ void PrimitiveVisual::CreateGeometry()
 
   mGeometry = Geometry::New();
 
-  //Vertices
+  // Vertices
   Property::Map vertexFormat;
   vertexFormat[POSITION]       = Property::VECTOR3;
   vertexFormat[NORMAL]         = Property::VECTOR3;
@@ -459,7 +462,7 @@ void PrimitiveVisual::CreateGeometry()
 
   mGeometry.AddVertexBuffer(surfaceVertices);
 
-  //Indices for triangle formulation
+  // Indices for triangle formulation
   mGeometry.SetIndexBuffer(&indices[0], indices.Size());
 }
 
@@ -476,30 +479,30 @@ void PrimitiveVisual::CreateConic(Vector<Vertex>& vertices, Vector<unsigned shor
   ComputeConicVertices(vertices, scaleTopRadius, scaleBottomRadius, scaleHeight, slices);
   FormConicTriangles(indices, scaleTopRadius, scaleBottomRadius, slices);
 
-  //Determine object dimensions, and scale them to be between 0.0 and 1.0.
-  float xDimension       = std::max(scaleTopRadius, scaleBottomRadius) * 2.0f;
+  // Determine object dimensions, and scale them to be between 0.0 and 1.0.
+  float xDimension       = Max(scaleTopRadius, scaleBottomRadius) * 2.0f;
   float yDimension       = scaleHeight;
-  float largestDimension = std::max(xDimension, yDimension);
+  float largestDimension = Max(xDimension, yDimension);
 
   mObjectDimensions = Vector3(xDimension / largestDimension, yDimension / largestDimension, xDimension / largestDimension);
 }
 
 void PrimitiveVisual::CreateBevelledCube(Vector<Vertex>& vertices, Vector<unsigned short>& indices, Vector3 dimensions, float bevelPercentage, float bevelSmoothness)
 {
-  float maxDimension = std::max(std::max(dimensions.x, dimensions.y), dimensions.z);
+  float maxDimension = Max(Max(dimensions.x, dimensions.y), dimensions.z);
   dimensions         = dimensions / maxDimension;
 
-  if(bevelPercentage <= MIN_BEVEL_PERCENTAGE) //No bevel, form a cube.
+  if(bevelPercentage <= MIN_BEVEL_PERCENTAGE) // No bevel, form a cube.
   {
     ComputeCubeVertices(vertices, dimensions);
     FormCubeTriangles(indices);
   }
-  else if(bevelPercentage >= MAX_BEVEL_PERCENTAGE) //Max bevel, form an octahedron.
+  else if(bevelPercentage >= MAX_BEVEL_PERCENTAGE) // Max bevel, form an octahedron.
   {
     ComputeOctahedronVertices(vertices, dimensions, bevelSmoothness);
     FormOctahedronTriangles(indices);
   }
-  else //In between, form a bevelled cube.
+  else // In between, form a bevelled cube.
   {
     ComputeBevelledCubeVertices(vertices, dimensions, bevelPercentage, bevelSmoothness);
     FormBevelledCubeTriangles(indices);
@@ -529,7 +532,7 @@ void PrimitiveVisual::ComputeCircleTables(Vector<float>& sinTable, Vector<float>
 
 void PrimitiveVisual::ComputeSphereVertices(Vector<Vertex>& vertices, int slices, int stacks)
 {
-  //Tables for calculating slices angles and stacks angles, respectively.
+  // Tables for calculating slices angles and stacks angles, respectively.
   Vector<float> sinTable1;
   Vector<float> cosTable1;
   Vector<float> sinTable2;
@@ -541,17 +544,17 @@ void PrimitiveVisual::ComputeSphereVertices(Vector<Vertex>& vertices, int slices
   int numVertices = slices * (stacks - 1) + 2;
   vertices.Resize(numVertices);
 
-  int   vertexIndex = 0; //Track progress through vertices.
+  int   vertexIndex = 0; // Track progress through vertices.
   float x;
   float y;
   float z;
 
-  //Top stack.
+  // Top stack.
   vertices[vertexIndex].position = Vector3(0.0, 0.5, 0.0);
   vertices[vertexIndex].normal   = Vector3(0.0, 1.0, 0.0);
   vertexIndex++;
 
-  //Middle stacks.
+  // Middle stacks.
   for(int i = 1; i < stacks; i++)
   {
     for(int j = 0; j < slices; j++, vertexIndex++)
@@ -565,7 +568,7 @@ void PrimitiveVisual::ComputeSphereVertices(Vector<Vertex>& vertices, int slices
     }
   }
 
-  //Bottom stack.
+  // Bottom stack.
   vertices[vertexIndex].position = Vector3(0.0, -0.5, 0.0);
   vertices[vertexIndex].normal   = Vector3(0.0, -1.0, 0.0);
 }
@@ -574,8 +577,8 @@ void PrimitiveVisual::FormSphereTriangles(Vector<unsigned short>& indices, int s
 {
   if(stacks <= 1)
   {
-    //Set indices to placeholder "error" values.
-    //This will display nothing, which is the expected behaviour for this edge case.
+    // Set indices to placeholder "error" values.
+    // This will display nothing, which is the expected behaviour for this edge case.
     indices.Resize(3);
     return;
   }
@@ -584,17 +587,17 @@ void PrimitiveVisual::FormSphereTriangles(Vector<unsigned short>& indices, int s
 
   indices.Resize(3 * numTriangles);
 
-  int indiceIndex            = 0; //Used to keep track of progress through indices.
-  int previousCycleBeginning = 1; //Stores the index of the vertex that started the cycle of the previous stack.
+  int indiceIndex            = 0; // Used to keep track of progress through indices.
+  int previousCycleBeginning = 1; // Stores the index of the vertex that started the cycle of the previous stack.
   int currentCycleBeginning  = 1 + slices;
 
-  //Top stack. Loop from index 1 to index slices, as not counting the very first vertex.
+  // Top stack. Loop from index 1 to index slices, as not counting the very first vertex.
   for(int i = 1; i <= slices; i++, indiceIndex += 3)
   {
     indices[indiceIndex] = 0;
     if(i == slices)
     {
-      //End, so loop around.
+      // End, so loop around.
       indices[indiceIndex + 1] = 1;
     }
     else
@@ -604,14 +607,14 @@ void PrimitiveVisual::FormSphereTriangles(Vector<unsigned short>& indices, int s
     indices[indiceIndex + 2] = i;
   }
 
-  //Middle Stacks. Want to form triangles between the top and bottom stacks, so loop up to the number of stacks - 2.
+  // Middle Stacks. Want to form triangles between the top and bottom stacks, so loop up to the number of stacks - 2.
   for(int i = 0; i < stacks - 2; i++, previousCycleBeginning += slices, currentCycleBeginning += slices)
   {
     for(int j = 0; j < slices; j++, indiceIndex += 6)
     {
       if(j == slices - 1)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex]     = previousCycleBeginning + j;
         indices[indiceIndex + 1] = previousCycleBeginning;
         indices[indiceIndex + 2] = currentCycleBeginning + j;
@@ -631,14 +634,14 @@ void PrimitiveVisual::FormSphereTriangles(Vector<unsigned short>& indices, int s
     }
   }
 
-  //Bottom stack. Loop around the last stack from the previous loop, and go up to the penultimate vertex.
+  // Bottom stack. Loop around the last stack from the previous loop, and go up to the penultimate vertex.
   for(int i = 0; i < slices; i++, indiceIndex += 3)
   {
     indices[indiceIndex]     = previousCycleBeginning + slices;
     indices[indiceIndex + 1] = previousCycleBeginning + i;
     if(i == slices - 1)
     {
-      //End, so loop around.
+      // End, so loop around.
       indices[indiceIndex + 2] = previousCycleBeginning;
     }
     else
@@ -650,15 +653,15 @@ void PrimitiveVisual::FormSphereTriangles(Vector<unsigned short>& indices, int s
 
 void PrimitiveVisual::ComputeConicVertices(Vector<Vertex>& vertices, float scaleTopRadius, float scaleBottomRadius, float scaleHeight, int slices)
 {
-  int           vertexIndex = 0; //Track progress through vertices.
+  int           vertexIndex = 0; // Track progress through vertices.
   Vector<float> sinTable;
   Vector<float> cosTable;
 
   ComputeCircleTables(sinTable, cosTable, slices, false);
 
-  int numVertices = 2; //Always will have one at the top and one at the bottom.
+  int numVertices = 2; // Always will have one at the top and one at the bottom.
 
-  //Add vertices for each circle. Need two per point for different face normals.
+  // Add vertices for each circle. Need two per point for different face normals.
   if(scaleTopRadius > 0.0)
   {
     numVertices += 2 * slices;
@@ -670,35 +673,35 @@ void PrimitiveVisual::ComputeConicVertices(Vector<Vertex>& vertices, float scale
 
   vertices.Resize(numVertices);
 
-  //Scale to bounding region of -0.5 to 0.5 (i.e range of 1).
-  float biggestObjectDimension = std::max(std::max(scaleTopRadius * 2.0f, scaleBottomRadius * 2.0f), scaleHeight);
+  // Scale to bounding region of -0.5 to 0.5 (i.e range of 1).
+  float biggestObjectDimension = Max(Max(scaleTopRadius * 2.0f, scaleBottomRadius * 2.0f), scaleHeight);
   scaleTopRadius               = scaleTopRadius / biggestObjectDimension;
   scaleBottomRadius            = scaleBottomRadius / biggestObjectDimension;
 
-  //Dimensions for vertex coordinates. Y is constant, and so can be initialised now.
+  // Dimensions for vertex coordinates. Y is constant, and so can be initialised now.
   float x;
   float y = scaleHeight / biggestObjectDimension / 2.0f;
   float z;
 
-  //Top center.
+  // Top center.
   vertices[0].position = Vector3(0, y, 0);
   vertices[0].normal   = Vector3(0, 1, 0);
   vertexIndex++;
 
-  //Top circle.
+  // Top circle.
   if(scaleTopRadius > 0.0)
   {
-    //Loop around the circle.
+    // Loop around the circle.
     for(int i = 0; i < slices; i++, vertexIndex++)
     {
       x = sinTable[i] * scaleTopRadius;
       z = cosTable[i] * scaleTopRadius;
 
-      //Upward-facing normal.
+      // Upward-facing normal.
       vertices[vertexIndex].position = Vector3(x, y, z);
       vertices[vertexIndex].normal   = Vector3(0, 1, 0);
 
-      //Outward-facing normal.
+      // Outward-facing normal.
       vertices[vertexIndex + slices].position = Vector3(x, y, z);
       vertices[vertexIndex + slices].normal   = Vector3(x, 0, z);
     }
@@ -706,20 +709,20 @@ void PrimitiveVisual::ComputeConicVertices(Vector<Vertex>& vertices, float scale
     vertexIndex += slices;
   }
 
-  //Bottom circle.
+  // Bottom circle.
   if(scaleBottomRadius > 0.0)
   {
-    //Loop around the circle.
+    // Loop around the circle.
     for(int i = 0; i < slices; i++, vertexIndex++)
     {
       x = sinTable[i] * scaleBottomRadius;
       z = cosTable[i] * scaleBottomRadius;
 
-      //Outward-facing normal.
+      // Outward-facing normal.
       vertices[vertexIndex].position = Vector3(x, -y, z);
       vertices[vertexIndex].normal   = Vector3(x, 0, z);
 
-      //Downward-facing normal.
+      // Downward-facing normal.
       vertices[vertexIndex + slices].position = Vector3(x, -y, z);
       vertices[vertexIndex + slices].normal   = Vector3(0, -1, 0);
     }
@@ -727,7 +730,7 @@ void PrimitiveVisual::ComputeConicVertices(Vector<Vertex>& vertices, float scale
     vertexIndex += slices;
   }
 
-  //Bottom center.
+  // Bottom center.
   vertices[vertexIndex].position = Vector3(0, -y, 0);
   vertices[vertexIndex].normal   = Vector3(0, -1, 0);
   vertexIndex++;
@@ -735,15 +738,15 @@ void PrimitiveVisual::ComputeConicVertices(Vector<Vertex>& vertices, float scale
 
 void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float scaleTopRadius, float scaleBottomRadius, int slices)
 {
-  int  indiceIndex  = 0; //Track progress through indices.
+  int  indiceIndex  = 0; // Track progress through indices.
   int  numTriangles = 0;
   bool coneTop      = scaleTopRadius <= 0.0;
   bool coneBottom   = scaleBottomRadius <= 0.0;
 
   if(coneTop && coneBottom)
   {
-    //Set indices to placeholder "error" values.
-    //This will display nothing, which is the expected behaviour for this edge case.
+    // Set indices to placeholder "error" values.
+    // This will display nothing, which is the expected behaviour for this edge case.
     indices.Resize(3);
     return;
   }
@@ -759,17 +762,17 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
 
   indices.Resize(3 * numTriangles);
 
-  //Switch on the type of conic we have.
+  // Switch on the type of conic we have.
   if(!coneTop && !coneBottom)
   {
-    //Top circle. Start at index of first outer point and go around.
+    // Top circle. Start at index of first outer point and go around.
     for(int i = 1; i <= slices; i++, indiceIndex += 3)
     {
       indices[indiceIndex]     = 0;
       indices[indiceIndex + 1] = i;
       if(i == slices)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex + 2] = 1;
       }
       else
@@ -781,12 +784,12 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
     int topCycleBeginning    = slices + 1;
     int bottomCycleBeginning = topCycleBeginning + slices;
 
-    //Vertical edges.
+    // Vertical edges.
     for(int i = 0; i < slices; i++, indiceIndex += 6)
     {
       if(i == slices - 1)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex]     = topCycleBeginning + i;
         indices[indiceIndex + 1] = bottomCycleBeginning + i;
         indices[indiceIndex + 2] = topCycleBeginning;
@@ -807,13 +810,13 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
 
     int bottomFaceCycleBeginning = bottomCycleBeginning + slices;
 
-    //Bottom circle.
+    // Bottom circle.
     for(int i = 0; i < slices; i++, indiceIndex += 3)
     {
       indices[indiceIndex] = bottomFaceCycleBeginning;
       if(i == slices - 1)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex + 1] = bottomFaceCycleBeginning;
       }
       else
@@ -825,14 +828,14 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
   }
   else if(!coneTop || !coneBottom)
   {
-    //Top circle/edges. Start at index of first outer point and go around.
+    // Top circle/edges. Start at index of first outer point and go around.
     for(int i = 1; i <= slices; i++, indiceIndex += 3)
     {
       indices[indiceIndex]     = 0;
       indices[indiceIndex + 1] = i;
       if(i == slices)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex + 2] = 1;
       }
       else
@@ -841,13 +844,13 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
       }
     }
 
-    //Bottom circle/edges. Start at index of first outer point and go around.
+    // Bottom circle/edges. Start at index of first outer point and go around.
     for(int i = 1; i <= slices; i++, indiceIndex += 3)
     {
       indices[indiceIndex] = 2 * slices + 1;
       if(i == slices)
       {
-        //End, so loop around.
+        // End, so loop around.
         indices[indiceIndex + 1] = slices + 1;
       }
       else
@@ -861,17 +864,17 @@ void PrimitiveVisual::FormConicTriangles(Vector<unsigned short>& indices, float 
 
 void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dimensions)
 {
-  int   numVertices = 4 * 6; //Four per face.
-  int   vertexIndex = 0;     //Tracks progress through vertices.
+  int   numVertices = 4 * 6; // Four per face.
+  int   vertexIndex = 0;     // Tracks progress through vertices.
   float scaledX     = 0.5 * dimensions.x;
   float scaledY     = 0.5 * dimensions.y;
   float scaledZ     = 0.5 * dimensions.z;
 
   vertices.Resize(numVertices);
 
-  Vector<Vector3> positions; //Stores vertex positions, which are shared between vertexes at the same position but with a different normal.
+  Vector<Vector3> positions; // Stores vertex positions, which are shared between vertexes at the same position but with a different normal.
   positions.Resize(8);
-  Vector<Vector3> normals; //Stores normals, which are shared between vertexes of the same face.
+  Vector<Vector3> normals; // Stores normals, which are shared between vertexes of the same face.
   normals.Resize(6);
 
   positions[0] = Vector3(-scaledX, scaledY, -scaledZ);
@@ -890,14 +893,14 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
   normals[4] = Vector3(-1, 0, 0);
   normals[5] = Vector3(0, -1, 0);
 
-  //Top face, upward normals.
+  // Top face, upward normals.
   for(int i = 0; i < 4; i++, vertexIndex++)
   {
     vertices[vertexIndex].position = positions[i];
     vertices[vertexIndex].normal   = normals[0];
   }
 
-  //Top face, outward normals.
+  // Top face, outward normals.
   for(int i = 0; i < 4; i++, vertexIndex += 2)
   {
     vertices[vertexIndex].position = positions[i];
@@ -905,7 +908,7 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
 
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex + 1].position = positions[0];
     }
     else
@@ -915,7 +918,7 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
     vertices[vertexIndex + 1].normal = normals[i + 1];
   }
 
-  //Bottom face, outward normals.
+  // Bottom face, outward normals.
   for(int i = 0; i < 4; i++, vertexIndex += 2)
   {
     vertices[vertexIndex].position = positions[i + 4];
@@ -923,7 +926,7 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
 
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex + 1].position = positions[4];
     }
     else
@@ -933,7 +936,7 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
     vertices[vertexIndex + 1].normal = normals[i + 1];
   }
 
-  //Bottom face, downward normals.
+  // Bottom face, downward normals.
   for(int i = 0; i < 4; i++, vertexIndex++)
   {
     vertices[vertexIndex].position = positions[i + 4];
@@ -944,11 +947,11 @@ void PrimitiveVisual::ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dime
 void PrimitiveVisual::FormCubeTriangles(Vector<unsigned short>& indices)
 {
   int numTriangles  = 12;
-  int triangleIndex = 0; //Track progress through indices.
+  int triangleIndex = 0; // Track progress through indices.
 
   indices.Resize(3 * numTriangles);
 
-  //Top face.
+  // Top face.
   indices[triangleIndex]     = 0;
   indices[triangleIndex + 1] = 2;
   indices[triangleIndex + 2] = 1;
@@ -960,7 +963,7 @@ void PrimitiveVisual::FormCubeTriangles(Vector<unsigned short>& indices)
   int topFaceStart    = 4;
   int bottomFaceStart = 12;
 
-  //Side faces.
+  // Side faces.
   for(int i = 0; i < 8; i += 2, triangleIndex += 6)
   {
     indices[triangleIndex]     = i + topFaceStart;
@@ -971,7 +974,7 @@ void PrimitiveVisual::FormCubeTriangles(Vector<unsigned short>& indices)
     indices[triangleIndex + 5] = i + bottomFaceStart;
   }
 
-  //Bottom face.
+  // Bottom face.
   indices[triangleIndex]     = 20;
   indices[triangleIndex + 1] = 21;
   indices[triangleIndex + 2] = 22;
@@ -982,19 +985,19 @@ void PrimitiveVisual::FormCubeTriangles(Vector<unsigned short>& indices)
 
 void PrimitiveVisual::ComputeOctahedronVertices(Vector<Vertex>& vertices, Vector3 dimensions, float smoothness)
 {
-  int   numVertices = 3 * 8; //Three per face
-  int   vertexIndex = 0;     //Tracks progress through vertices.
+  int   numVertices = 3 * 8; // Three per face
+  int   vertexIndex = 0;     // Tracks progress through vertices.
   float scaledX     = 0.5 * dimensions.x;
   float scaledY     = 0.5 * dimensions.y;
   float scaledZ     = 0.5 * dimensions.z;
 
   vertices.Resize(numVertices);
 
-  Vector<Vector3> positions; //Stores vertex positions, which are shared between vertexes at the same position but with a different normal.
+  Vector<Vector3> positions; // Stores vertex positions, which are shared between vertexes at the same position but with a different normal.
   positions.Resize(6);
-  Vector<Vector3> normals; //Stores normals, which are shared between vertexes of the same face.
+  Vector<Vector3> normals; // Stores normals, which are shared between vertexes of the same face.
   normals.Resize(8);
-  Vector<Vector3> outerNormals; //Holds normals that point outwards at each vertex.
+  Vector<Vector3> outerNormals; // Holds normals that point outwards at each vertex.
   outerNormals.Resize(6);
 
   positions[0] = Vector3(0.0, scaledY, 0.0);
@@ -1020,12 +1023,12 @@ void PrimitiveVisual::ComputeOctahedronVertices(Vector<Vertex>& vertices, Vector
   outerNormals[4] = Vector3(0, 0, 1);
   outerNormals[5] = Vector3(0, -1, 0);
 
-  //Loop through top faces.
+  // Loop through top faces.
   for(int i = 0; i < 4; i++, vertexIndex += 3)
   {
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex].position     = positions[0];
       vertices[vertexIndex].normal       = outerNormals[0] * smoothness + normals[i] * (1 - smoothness);
       vertices[vertexIndex + 1].position = positions[1];
@@ -1044,12 +1047,12 @@ void PrimitiveVisual::ComputeOctahedronVertices(Vector<Vertex>& vertices, Vector
     }
   }
 
-  //Loop through bottom faces.
+  // Loop through bottom faces.
   for(int i = 0; i < 4; i++, vertexIndex += 3)
   {
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex].position     = positions[5];
       vertices[vertexIndex].normal       = outerNormals[5] * smoothness + normals[i + 4] * (1 - smoothness);
       vertices[vertexIndex + 1].position = positions[i + 1];
@@ -1087,38 +1090,38 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   int numPositions  = 24;
   int numFaces      = 26;
   int numOuterFaces = 6;
-  int numVertices   = 6 * 4 + 12 * 4 + 8 * 3; //Six outer faces, 12 slanting rectangles, 8 slanting triangles.
-  int vertexIndex   = 0;                      //Track progress through vertices.
-  int normalIndex   = 0;                      //Track progress through normals, as vertices are calculated per face.
+  int numVertices   = 6 * 4 + 12 * 4 + 8 * 3; // Six outer faces, 12 slanting rectangles, 8 slanting triangles.
+  int vertexIndex   = 0;                      // Track progress through vertices.
+  int normalIndex   = 0;                      // Track progress through normals, as vertices are calculated per face.
 
-  float minDimension = std::min(std::min(dimensions.x, dimensions.y), dimensions.z);
-  float bevelAmount  = 0.5 * std::min(bevelPercentage, minDimension); //Cap bevel amount if necessary.
+  float minDimension = Min(Min(dimensions.x, dimensions.y), dimensions.z);
+  float bevelAmount  = 0.5 * Min(bevelPercentage, minDimension); // Cap bevel amount if necessary.
 
-  //Distances from centre to outer edge points.
+  // Distances from centre to outer edge points.
   float outerX = 0.5 * dimensions.x;
   float outerY = 0.5 * dimensions.y;
   float outerZ = 0.5 * dimensions.z;
 
-  //Distances from centre to bevelled points.
+  // Distances from centre to bevelled points.
   float bevelX = outerX - bevelAmount;
   float bevelY = outerY - bevelAmount;
   float bevelZ = outerZ - bevelAmount;
 
-  Vector<Vector3> positions; //Holds object points, to be shared between vertexes.
+  Vector<Vector3> positions; // Holds object points, to be shared between vertexes.
   positions.Resize(numPositions);
-  Vector<Vector3> normals; //Holds face normals, to be shared between vertexes.
+  Vector<Vector3> normals; // Holds face normals, to be shared between vertexes.
   normals.Resize(numFaces);
-  Vector<Vector3> outerNormals; //Holds normals of the outermost faces specifically.
+  Vector<Vector3> outerNormals; // Holds normals of the outermost faces specifically.
   outerNormals.Resize(numOuterFaces);
   vertices.Resize(numVertices);
 
-  //Topmost face positions.
+  // Topmost face positions.
   positions[0] = Vector3(-bevelX, outerY, -bevelZ);
   positions[1] = Vector3(bevelX, outerY, -bevelZ);
   positions[2] = Vector3(bevelX, outerY, bevelZ);
   positions[3] = Vector3(-bevelX, outerY, bevelZ);
 
-  //Second layer positions.
+  // Second layer positions.
   positions[4]  = Vector3(-outerX, bevelY, -bevelZ);
   positions[5]  = Vector3(-bevelX, bevelY, -outerZ);
   positions[6]  = Vector3(bevelX, bevelY, -outerZ);
@@ -1128,7 +1131,7 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   positions[10] = Vector3(-bevelX, bevelY, outerZ);
   positions[11] = Vector3(-outerX, bevelY, bevelZ);
 
-  //Third layer positions.
+  // Third layer positions.
   positions[12] = Vector3(-outerX, -bevelY, -bevelZ);
   positions[13] = Vector3(-bevelX, -bevelY, -outerZ);
   positions[14] = Vector3(bevelX, -bevelY, -outerZ);
@@ -1138,16 +1141,16 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   positions[18] = Vector3(-bevelX, -bevelY, outerZ);
   positions[19] = Vector3(-outerX, -bevelY, bevelZ);
 
-  //Bottom-most face positions.
+  // Bottom-most face positions.
   positions[20] = Vector3(-bevelX, -outerY, -bevelZ);
   positions[21] = Vector3(bevelX, -outerY, -bevelZ);
   positions[22] = Vector3(bevelX, -outerY, bevelZ);
   positions[23] = Vector3(-bevelX, -outerY, bevelZ);
 
-  //Top face normal.
+  // Top face normal.
   normals[0] = Vector3(0, 1, 0);
 
-  //Top slope normals.
+  // Top slope normals.
   normals[1] = Vector3(-1, 1, -1);
   normals[2] = Vector3(0, 1, -1);
   normals[3] = Vector3(1, 1, -1);
@@ -1157,7 +1160,7 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   normals[7] = Vector3(-1, 1, 1);
   normals[8] = Vector3(-1, 1, 0);
 
-  //Side normals.
+  // Side normals.
   normals[9]  = Vector3(-1, 0, -1);
   normals[10] = Vector3(0, 0, -1);
   normals[11] = Vector3(1, 0, -1);
@@ -1167,7 +1170,7 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   normals[15] = Vector3(-1, 0, 1);
   normals[16] = Vector3(-1, 0, 0);
 
-  //Bottom slope normals.
+  // Bottom slope normals.
   normals[17] = Vector3(-1, -1, -1);
   normals[18] = Vector3(0, -1, -1);
   normals[19] = Vector3(1, -1, -1);
@@ -1177,10 +1180,10 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   normals[23] = Vector3(-1, -1, 1);
   normals[24] = Vector3(-1, -1, 0);
 
-  //Bottom face normal.
+  // Bottom face normal.
   normals[25] = Vector3(0, -1, 0);
 
-  //Top, back, right, front, left and bottom faces, respectively.
+  // Top, back, right, front, left and bottom faces, respectively.
   outerNormals[0] = Vector3(0, 1, 0);
   outerNormals[1] = Vector3(0, 0, -1);
   outerNormals[2] = Vector3(1, 0, 0);
@@ -1188,7 +1191,7 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   outerNormals[4] = Vector3(-1, 0, 0);
   outerNormals[5] = Vector3(0, -1, 0);
 
-  //Topmost face vertices.
+  // Topmost face vertices.
   for(int i = 0; i < 4; i++, vertexIndex++)
   {
     vertices[vertexIndex].position = positions[i];
@@ -1197,10 +1200,10 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
 
   normalIndex++;
 
-  //Top slope vertices.
+  // Top slope vertices.
   for(int i = 0; i < 4; i++, vertexIndex += 7, normalIndex += 2)
   {
-    //Triangle part
+    // Triangle part
     vertices[vertexIndex].position     = positions[i];
     vertices[vertexIndex].normal       = outerNormals[0] * bevelSmoothness + normals[normalIndex] * (1 - bevelSmoothness);
     vertices[vertexIndex + 1].position = positions[2 * i + 4];
@@ -1208,10 +1211,10 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
     vertices[vertexIndex + 2].position = positions[2 * i + 5];
     vertices[vertexIndex + 2].normal   = outerNormals[i + 1] * bevelSmoothness + normals[normalIndex] * (1 - bevelSmoothness);
 
-    //Rectangle part
+    // Rectangle part
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex + 3].position = positions[i];
       vertices[vertexIndex + 3].normal   = outerNormals[0] * bevelSmoothness + normals[normalIndex + 1] * (1 - bevelSmoothness);
       vertices[vertexIndex + 4].position = positions[0];
@@ -1238,12 +1241,12 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
   int thirdCycleBeginning  = secondCycleBeginning + 8;
   int bottomCycleBeginning = thirdCycleBeginning + 8;
 
-  //Side vertices.
+  // Side vertices.
   for(int i = 0; i < 8; i++, vertexIndex += 4, normalIndex++)
   {
     if(i == 7)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex].position     = positions[secondCycleBeginning + i];
       vertices[vertexIndex].normal       = normals[normalIndex];
       vertices[vertexIndex + 1].position = positions[secondCycleBeginning];
@@ -1279,10 +1282,10 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
     }
   }
 
-  //Bottom slope vertices.
+  // Bottom slope vertices.
   for(int i = 0; i < 4; i++, vertexIndex += 7, normalIndex += 2)
   {
-    //Triangle part
+    // Triangle part
     vertices[vertexIndex].position     = positions[thirdCycleBeginning + 2 * i];
     vertices[vertexIndex].normal       = outerNormals[(i == 0) ? 4 : i] * bevelSmoothness + normals[normalIndex] * (1 - bevelSmoothness);
     vertices[vertexIndex + 1].position = positions[thirdCycleBeginning + 2 * i + 1];
@@ -1290,10 +1293,10 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
     vertices[vertexIndex + 2].position = positions[bottomCycleBeginning + i];
     vertices[vertexIndex + 2].normal   = outerNormals[5] * bevelSmoothness + normals[normalIndex] * (1 - bevelSmoothness);
 
-    //Rectangle part
+    // Rectangle part
     if(i == 3)
     {
-      //End, so loop around.
+      // End, so loop around.
       vertices[vertexIndex + 3].position = positions[thirdCycleBeginning + 2 * i + 1];
       vertices[vertexIndex + 3].normal   = outerNormals[i + 1] * bevelSmoothness + normals[normalIndex + 1] * (1 - bevelSmoothness);
       vertices[vertexIndex + 4].position = positions[thirdCycleBeginning];
@@ -1316,7 +1319,7 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
     }
   }
 
-  //Bottom-most face vertices.
+  // Bottom-most face vertices.
   for(int i = 0; i < 4; i++, vertexIndex++)
   {
     vertices[vertexIndex].position = positions[bottomCycleBeginning + i];
@@ -1329,12 +1332,12 @@ void PrimitiveVisual::ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vect
 void PrimitiveVisual::FormBevelledCubeTriangles(Vector<unsigned short>& indices)
 {
   int numTriangles = 44; //(Going from top to bottom, that's 2 + 12 + 16 + 12 + 2)
-  int indiceIndex  = 0;  //Track progress through indices.
-  int vertexIndex  = 0;  //Track progress through vertices as they're processed.
+  int indiceIndex  = 0;  // Track progress through indices.
+  int vertexIndex  = 0;  // Track progress through vertices as they're processed.
 
   indices.Resize(3 * numTriangles);
 
-  //Top face.
+  // Top face.
   indices[indiceIndex]     = vertexIndex;
   indices[indiceIndex + 1] = vertexIndex + 2;
   indices[indiceIndex + 2] = vertexIndex + 1;
@@ -1344,15 +1347,15 @@ void PrimitiveVisual::FormBevelledCubeTriangles(Vector<unsigned short>& indices)
   indiceIndex += 6;
   vertexIndex += 4;
 
-  //Top slopes.
+  // Top slopes.
   for(int i = 0; i < 4; i++, indiceIndex += 9, vertexIndex += 7)
   {
-    //Triangle part.
+    // Triangle part.
     indices[indiceIndex]     = vertexIndex;
     indices[indiceIndex + 1] = vertexIndex + 2;
     indices[indiceIndex + 2] = vertexIndex + 1;
 
-    //Rectangle part.
+    // Rectangle part.
     indices[indiceIndex + 3] = vertexIndex + 3;
     indices[indiceIndex + 4] = vertexIndex + 4;
     indices[indiceIndex + 5] = vertexIndex + 5;
@@ -1361,7 +1364,7 @@ void PrimitiveVisual::FormBevelledCubeTriangles(Vector<unsigned short>& indices)
     indices[indiceIndex + 8] = vertexIndex + 5;
   }
 
-  //Side faces.
+  // Side faces.
   for(int i = 0; i < 8; i++, indiceIndex += 6, vertexIndex += 4)
   {
     indices[indiceIndex]     = vertexIndex;
@@ -1372,15 +1375,15 @@ void PrimitiveVisual::FormBevelledCubeTriangles(Vector<unsigned short>& indices)
     indices[indiceIndex + 5] = vertexIndex + 2;
   }
 
-  //Bottom slopes.
+  // Bottom slopes.
   for(int i = 0; i < 4; i++, indiceIndex += 9, vertexIndex += 7)
   {
-    //Triangle part.
+    // Triangle part.
     indices[indiceIndex]     = vertexIndex;
     indices[indiceIndex + 1] = vertexIndex + 1;
     indices[indiceIndex + 2] = vertexIndex + 2;
 
-    //Rectangle part.
+    // Rectangle part.
     indices[indiceIndex + 3] = vertexIndex + 3;
     indices[indiceIndex + 4] = vertexIndex + 4;
     indices[indiceIndex + 5] = vertexIndex + 5;
@@ -1389,7 +1392,7 @@ void PrimitiveVisual::FormBevelledCubeTriangles(Vector<unsigned short>& indices)
     indices[indiceIndex + 8] = vertexIndex + 5;
   }
 
-  //Bottom face.
+  // Bottom face.
   indices[indiceIndex]     = vertexIndex;
   indices[indiceIndex + 1] = vertexIndex + 1;
   indices[indiceIndex + 2] = vertexIndex + 2;

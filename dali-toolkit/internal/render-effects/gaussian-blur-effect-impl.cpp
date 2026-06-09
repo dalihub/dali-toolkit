@@ -25,6 +25,7 @@
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/animation/key-frames.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
@@ -333,8 +334,8 @@ void GaussianBlurEffectImpl::OnActivate()
   Vector2 size = GetTargetSize();
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[GaussianBlurEffect:%p] OnActivated! [ID:%d][size:%fx%f] [radius:%u, scale:%f, downscaledRadius:%u=%u*%f]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1, size.x, size.y, mBlurRadius, mDownscaleFactor, mDownscaledBlurRadius, mInternalBlurRadius, mInternalDownscaleFactor);
 
-  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
-  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledWidth  = Max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledHeight = Max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
 
   // Set size
   if(!mCamera)
@@ -434,8 +435,8 @@ void GaussianBlurEffectImpl::OnRefresh()
   DestroyFrameBuffers();
 
   Vector2  size              = GetTargetSize();
-  uint32_t downsampledWidth  = std::max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
-  uint32_t downsampledHeight = std::max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledWidth  = Max(static_cast<uint32_t>(size.width * mInternalDownscaleFactor), 1u);
+  uint32_t downsampledHeight = Max(static_cast<uint32_t>(size.height * mInternalDownscaleFactor), 1u);
 
   // Set size
   mCamera.SetPerspectiveProjection(size);
@@ -555,7 +556,7 @@ void GaussianBlurEffectImpl::CreateRenderTasks(Dali::Integration::SceneHolder sc
   // Clear sourceTexture as Transparent.
   mVerticalBlurTask.SetClearEnabled(true);
   mVerticalBlurTask.SetClearColor(Color::TRANSPARENT);
-  mVerticalBlurTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, 1.0f / std::max(mInternalDownscaleFactor, Dali::Math::MACHINE_EPSILON_1000));
+  mVerticalBlurTask.SetProperty(Dali::RenderTask::Property::RENDERED_SCALE_FACTOR, 1.0f / Max(mInternalDownscaleFactor, Dali::Math::MACHINE_EPSILON_1000));
 
   // Adjust refresh rate
   if(mBlurOnce)

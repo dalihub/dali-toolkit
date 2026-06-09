@@ -64,7 +64,6 @@ int UtcDaliVisualAction(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action on Visual directly");
-  Vector2 controlSize(20.f, 30.f);
 
   //Created DummyVisual
   Property::Map                     settings;
@@ -100,7 +99,6 @@ int UtcDaliVisualActionNotImplemented(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action on a Visual which does not support any Actions");
-  Vector2 controlSize(20.f, 30.f);
 
   //Created DummyVisual
   Property::Map                     settings;
@@ -140,7 +138,6 @@ int UtcDaliVisualActionExtension(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an Action with Any attributes on Visual directly");
-  Vector2 controlSize(20.f, 30.f);
 
   //Created DummyVisual
   Property::Map                     settings;
@@ -175,7 +172,6 @@ int UtcDaliVisualActionExtensionNotImplemented(void)
 {
   ToolkitTestApplication application;
   tet_infoline("Register an ImageVisual and and perform an ActionExtension on a Visual which does not support any Actions");
-  Vector2 controlSize(20.f, 30.f);
 
   //Created DummyVisual
   Property::Map                     settings;

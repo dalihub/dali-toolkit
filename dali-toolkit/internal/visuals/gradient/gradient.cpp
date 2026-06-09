@@ -15,9 +15,12 @@
  *
  */
 
+// CLASS HEADER
 #include "gradient.h"
 
+// EXTERNAL INCLUDES
 #include <dali/integration-api/texture-integ.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector4.h>
 #include <algorithm> // std::sort
 
@@ -63,7 +66,7 @@ void Gradient::ClearStops()
 
 void Gradient::ApplyStops(const Vector<float>& offsets, const Vector<Vector4>& colors)
 {
-  uint32_t numStops = std::max(mGradientStops.Count(), std::max(offsets.Count(), colors.Count()));
+  uint32_t numStops = Max(mGradientStops.Count(), Max(offsets.Count(), colors.Count()));
   mGradientStops.Resize(numStops);
 
   for(uint32_t i = 0; i < offsets.Count(); ++i)
@@ -229,7 +232,7 @@ Dali::Texture Gradient::GenerateLookupTexture()
   float length       = static_cast<float>(resolution);
   for(unsigned int i = 0; i < numStops - 1u; i++)
   {
-    const float offsetEnd = std::min(1.0f, std::max(0.0f, offsets[i + 1]));
+    const float offsetEnd = Min(1.0f, Max(0.0f, offsets[i + 1]));
 
     segmentEnd = floorf(offsetEnd * length + 0.5f);
     if(segmentEnd == segmentStart)

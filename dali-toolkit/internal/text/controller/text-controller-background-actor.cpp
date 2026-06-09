@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
@@ -152,7 +153,7 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
         {
           quad.x = position.x;
           quad.y = yLineOffset;
-          quad.z = quad.x + std::max(calculatedAdvance, glyph.xBearing + glyph.width);
+          quad.z = quad.x + Max(calculatedAdvance, glyph.xBearing + glyph.width);
           quad.w = lineHeight;
         }
         else if((lineIndex != prevLineIndex) || (i == 0u)) // The first glyph in the line
@@ -166,7 +167,7 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
         {
           quad.x = position.x - glyph.xBearing;
           quad.y = yLineOffset;
-          quad.z = quad.x + std::max(calculatedAdvance, glyph.xBearing + glyph.width);
+          quad.z = quad.x + Max(calculatedAdvance, glyph.xBearing + glyph.width);
           quad.w = quad.y + lineHeight;
         }
         else // The glyph in the middle of the text

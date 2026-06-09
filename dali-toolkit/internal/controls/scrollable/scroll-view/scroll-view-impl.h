@@ -441,7 +441,8 @@ public:
    */
   void SetWheelScrollDistanceStep(Vector2 step)
   {
-    mWheelScrollDistanceStep = step;
+    mWheelScrollDistanceStep    = step;
+    mWheelScrollDistanceStepSet = true;
   }
 
   /**
@@ -659,6 +660,7 @@ private: // private overridden functions from CustomActorImpl and Controls
    * @copydoc Toolkit::Control::OnInitialize()
    */
   void OnInitialize() override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
@@ -979,7 +981,8 @@ private:
   float mFlickSpeedCoefficient; ///< Flick velocity coefficient. Input touch velocity is multiplied by this.
   float mMaxFlickSpeed;         ///< Maximum flick speed. Maximum speed of flick in stage.lengths/sec.
 
-  Vector2 mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
+  Vector2 mWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
+  bool    mWheelScrollDistanceStepSet : 1; ///< Whether mWheelScrollDistanceStep was explicitly set by the user.
 
   ScrollOvershootIndicatorPtr    mOvershootIndicator;
   WeakHandle<Toolkit::ScrollBar> mScrollBar;

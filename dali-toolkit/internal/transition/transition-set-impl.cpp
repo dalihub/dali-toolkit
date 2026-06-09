@@ -23,6 +23,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -143,7 +144,7 @@ void TransitionSet::TransitionStart()
       {
         if(minimumDelays[index].first == transition->GetTarget())
         {
-          minimumDelays[index].second = std::min(minimumDelays[index].second, transition->GetTimePeriod().delaySeconds);
+          minimumDelays[index].second = Min(minimumDelays[index].second, transition->GetTimePeriod().delaySeconds);
           found                       = true;
           break;
         }

@@ -18,7 +18,6 @@
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-world-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
 namespace

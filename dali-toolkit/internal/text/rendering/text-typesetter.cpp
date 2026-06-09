@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <memory.h>
 #include <cmath>
@@ -73,7 +74,7 @@ inline uint8_t MultiplyAndSummationAndNormalizeColor(const uint8_t x1, const uin
 {
   const uint32_t xy1 = static_cast<const uint32_t>(x1) * y1;
   const uint32_t xy2 = static_cast<const uint32_t>(x2) * y2;
-  const uint32_t res = std::min(65025u, xy1 + xy2); // 65025 is 255 * 255.
+  const uint32_t res = Min(65025u, xy1 + xy2); // 65025 is 255 * 255.
   return ((res + ((res + 257) >> 8)) >> 8);         // fast divide by 255.
 }
 

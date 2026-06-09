@@ -19,7 +19,6 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <stdlib.h>
 #include <iostream>
@@ -144,7 +143,7 @@ int UtcDaliKeyInputFocusManagerGet(void)
 int UtcDaliKeyInputFocusManagerSetFocus01(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   tet_infoline(" Check that there is no focused control. Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal");
 
@@ -157,7 +156,7 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
   DummyControl        dummy     = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
   dummy.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy);
+  scene.Add(dummy);
   DALI_TEST_CHECK(!dummyImpl.keyInputFocusGained);
 
   manager.SetFocus(dummy);
@@ -174,7 +173,7 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
 int UtcDaliKeyInputFocusManagerSetFocus02(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   tet_infoline(" Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal. Set focuse to another control - check that the first control receives KeyInputFocusLost");
 
@@ -184,7 +183,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   DummyControl        dummy1     = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy1);
+  scene.Add(dummy1);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusGained);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusLost);
 
@@ -196,7 +195,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   DummyControl        dummy2     = DummyControl::New(true);
   Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy2);
+  scene.Add(dummy2);
   DALI_TEST_CHECK(!dummy2Impl.keyInputFocusGained);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusLost);
 
@@ -214,21 +213,21 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
 int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
-  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered to KeyboardFocusManager via Stage's KeyEventSignal");
+  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the scene is reached. In this case, KeyEvent is delivered to KeyboardFocusManager via scene's KeyEventSignal");
 
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
-  KeyEventCallback stageCallback(false);
-  stage.KeyEventSignal().Connect(&stageCallback, &KeyEventCallback::Callback);
+  KeyEventCallback sceneCallback(false);
+  scene.KeyEventSignal().Connect(&sceneCallback, &KeyEventCallback::Callback);
 
   DummyControl dummy1 = DummyControl::New(true);
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   KeyEventCallback callback1(false);
   dummy1.KeyEventSignal().Connect(&callback1, &KeyEventCallback::Callback);
-  stage.Add(dummy1);
+  scene.Add(dummy1);
 
   DummyControl dummy2 = DummyControl::New(true);
   dummy2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -254,7 +253,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   DALI_TEST_CHECK(callback1.mIsCalled);
   DALI_TEST_CHECK(callback2.mIsCalled);
   DALI_TEST_CHECK(callback3.mIsCalled);
-  DALI_TEST_CHECK(stageCallback.mIsCalled);
+  DALI_TEST_CHECK(sceneCallback.mIsCalled);
 
   END_TEST;
 }
@@ -262,9 +261,9 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
 int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
-  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered from dummy3 to dummy2");
+  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the scene is reached. In this case, KeyEvent is delivered from dummy3 to dummy2");
 
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
@@ -273,7 +272,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   KeyEventCallback callback1(false);
   dummy1.KeyEventSignal().Connect(&callback1, &KeyEventCallback::Callback);
-  stage.Add(dummy1);
+  scene.Add(dummy1);
 
   DummyControl dummy2 = DummyControl::New(true);
   dummy2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -306,7 +305,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
 int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   tet_infoline("Test KeyEvents propagation. If DISPATCH_KEY_EVENTS property is false, the KeyEvent is also not received.");
 
@@ -317,7 +316,7 @@ int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   KeyEventCallback callback1(false);
   dummy1.KeyEventSignal().Connect(&callback1, &KeyEventCallback::Callback);
-  stage.Add(dummy1);
+  scene.Add(dummy1);
 
   DummyControl dummy2 = DummyControl::New(true);
   dummy2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -352,7 +351,7 @@ int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
 int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   tet_infoline(" Add 2 controls, check they each get focused. Re-focus the first control - ensure it's now got focus (check signals)");
 
@@ -362,14 +361,14 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
   DummyControl        dummy1     = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy1);
+  scene.Add(dummy1);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusGained);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusLost);
 
   DummyControl        dummy2     = DummyControl::New(true);
   Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
   dummy2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy2);
+  scene.Add(dummy2);
   DALI_TEST_CHECK(!dummy2Impl.keyInputFocusGained);
   DALI_TEST_CHECK(!dummy2Impl.keyInputFocusLost);
 
@@ -404,7 +403,7 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
 int UtcDaliKeyInputFocusManagerRemoveFocus(void)
 {
   ToolkitTestApplication   application;
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   tet_infoline(" Add focus controls. Test that removing focus from control which has focus. ");
 
@@ -414,7 +413,7 @@ int UtcDaliKeyInputFocusManagerRemoveFocus(void)
   DummyControl        dummy1     = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
   dummy1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(dummy1);
+  scene.Add(dummy1);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusGained);
   DALI_TEST_CHECK(!dummy1Impl.keyInputFocusLost);
 
@@ -435,15 +434,15 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
 {
   ToolkitTestApplication   application;
   KeyInputFocusManager     manager = KeyInputFocusManager::Get();
-  Dali::Integration::Scene stage   = application.GetScene();
+  Dali::Integration::Scene scene   = application.GetScene();
 
   tet_infoline(" UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged");
 
   PushButton pushButton1 = PushButton::New();
   PushButton pushButton2 = PushButton::New();
 
-  stage.Add(pushButton1);
-  stage.Add(pushButton2);
+  scene.Add(pushButton1);
+  scene.Add(pushButton2);
 
   PushButton                   gainActor, lostActor;
   KeyInputFocusChangedCallback callback(gainActor, lostActor);
@@ -465,9 +464,9 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
   gainActor.Reset();
   lostActor.Reset();
 
-  // Removing the focus actor from the stage would also result in signal emission.
-  stage.Remove(pushButton1);
-  stage.Remove(pushButton2);
+  // Removing the focus actor from the scene would also result in signal emission.
+  scene.Remove(pushButton1);
+  scene.Remove(pushButton2);
 
   DALI_TEST_CHECK(gainActor == Control());
   DALI_TEST_CHECK(lostActor == Control());

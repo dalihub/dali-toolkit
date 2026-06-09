@@ -31,6 +31,7 @@
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -730,7 +731,7 @@ Vector3 VideoView::GetNaturalSize()
 
   if(size.x > 0 && size.y > 0)
   {
-    size.z = std::min(size.x, size.y);
+    size.z = Min(size.x, size.y);
     return size;
   }
   else
@@ -948,7 +949,7 @@ bool VideoView::IsLetterBoxEnabled() const
 
 void VideoView::SetFrameInterpolationInterval(float intervalSeconds)
 {
-  mInterpolationInterval = std::max(0.0f, intervalSeconds);
+  mInterpolationInterval = Max(0.0f, intervalSeconds);
   mVideoPlayer.SetFrameInterpolationInterval(intervalSeconds);
   // If not interpolating, just update the interval. It will be used on the next SetVideoFrameBuffer.
 }

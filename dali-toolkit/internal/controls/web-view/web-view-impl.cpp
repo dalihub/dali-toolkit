@@ -33,7 +33,6 @@
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-settings.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -43,6 +42,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/wheel-event.h>
 
@@ -180,7 +180,7 @@ Vector2 CalculateTextureRatio(const Size& viewSize, const uint32_t textureWidth,
 WebView::WebView(const std::string& locale, const std::string& timezoneId)
 : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
-  mWebViewSize(Stage::GetCurrent().GetSize()),
+  mWebViewSize(Vector2(1.0f, 1.0f)),
   mWebEngine(),
   mLastRenderedNativeImageWidth(0u),
   mLastRenderedNativeImageHeight(0u),
@@ -204,7 +204,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
 WebView::WebView(uint32_t argc, char** argv, int32_t type)
 : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mVisual(),
-  mWebViewSize(Stage::GetCurrent().GetSize()),
+  mWebViewSize(Vector2(1.0f, 1.0f)),
   mWebEngine(),
   mLastRenderedNativeImageWidth(0u),
   mLastRenderedNativeImageHeight(0u),
@@ -1169,8 +1169,8 @@ void WebView::SetDisplayArea(const Dali::BoundsInteger& displayArea)
     {
       const Vector2 textureRatio = CalculateTextureRatio(mWebViewSize, mLastRenderedNativeImageWidth, mLastRenderedNativeImageHeight);
 
-      const Vector4 pixelArea(0.0f, 0.0f, std::min(1.0f, textureRatio.x), std::min(1.0f, textureRatio.y));
-      const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : std::min(1.0f, 1.0f / textureRatio.y));
+      const Vector4 pixelArea(0.0f, 0.0f, Min(1.0f, textureRatio.x), Min(1.0f, textureRatio.y));
+      const Vector2 transformSize(DALI_UNLIKELY(Dali::EqualsZero(textureRatio.x)) ? 1.0f : Min(1.0f, 1.0f / textureRatio.x), DALI_UNLIKELY(Dali::EqualsZero(textureRatio.y)) ? 1.0f : Min(1.0f, 1.0f / textureRatio.y));
 
       Toolkit::GetImplementation(mVisual).DoAction(Toolkit::DevelVisual::Action::UPDATE_PROPERTY,
                                                    CreatePropertyValue({{Toolkit::ImageVisual::Property::PIXEL_AREA, pixelArea},

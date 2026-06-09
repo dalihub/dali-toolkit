@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
@@ -107,7 +108,7 @@ int TextScroller::GetGap() const
 
 void TextScroller::SetSpeed(int scrollSpeed)
 {
-  mScrollSpeed = std::max(MINIMUM_SCROLL_SPEED, scrollSpeed);
+  mScrollSpeed = Max(MINIMUM_SCROLL_SPEED, scrollSpeed);
 }
 
 int TextScroller::GetSpeed() const
@@ -288,7 +289,7 @@ void TextScroller::SetParameters(Actor scrollingTextActor, Renderer renderer, Te
   shader.RegisterProperty("uGap", wrapGap);
   mScrollDeltaIndex = shader.RegisterProperty("uDelta", 0.0f);
 
-  float scrollAmount   = isHorizontal ? std::max(textureSize.width, controlSize.width) : std::max(textureSize.height, controlSize.height);
+  float scrollAmount   = isHorizontal ? Max(textureSize.width, controlSize.width) : Max(textureSize.height, controlSize.height);
   float scrollDuration = scrollAmount / mScrollSpeed;
 
   if(isHorizontal && direction)

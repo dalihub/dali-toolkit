@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/light/light-impl.h>
@@ -215,12 +216,12 @@ bool NodeDefinition::GetExtents(const ResourceBundle& resources, Vector3& min, V
       break;
     }
     useModelExtents = true;
-    min.x           = std::min(min.x, renderableMin.x);
-    min.y           = std::min(min.y, renderableMin.y);
-    min.z           = std::min(min.z, renderableMin.z);
-    max.x           = std::max(max.x, renderableMax.x);
-    max.y           = std::max(max.y, renderableMax.y);
-    max.z           = std::max(max.z, renderableMax.z);
+    min.x           = Min(min.x, renderableMin.x);
+    min.y           = Min(min.y, renderableMin.y);
+    min.z           = Min(min.z, renderableMin.z);
+    max.x           = Max(max.x, renderableMax.x);
+    max.y           = Max(max.y, renderableMax.y);
+    max.z           = Max(max.z, renderableMax.z);
   }
   if(!useModelExtents)
   {

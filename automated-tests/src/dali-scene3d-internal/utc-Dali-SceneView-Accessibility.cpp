@@ -82,20 +82,20 @@ int UtcDaliSceneViewAccessibilityRole(void)
   sceneView.Add(model);
   application.GetScene().Add(sceneView);
 
-  model.SetProperty(Property::ACCESSIBILITY_ROLE, AccessibilityRole::MODEL);
-  sceneView.SetProperty(Property::ACCESSIBILITY_ROLE, AccessibilityRole::SCENE_3D);
+  model.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, AccessibilityRole::MODEL);
+  sceneView.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, AccessibilityRole::SCENE_3D);
 
   application.SendNotification();
   application.Render(1);
 
   int32_t sceneRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
-  if(sceneView.GetProperty(Property::ACCESSIBILITY_ROLE).Get(sceneRole))
+  if(sceneView.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get(sceneRole))
   {
     DALI_TEST_EQUALS(sceneRole, static_cast<uint32_t>(AccessibilityRole::SCENE_3D), TEST_LOCATION);
   }
 
   int32_t modelRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
-  if(model.GetProperty(Property::ACCESSIBILITY_ROLE).Get(modelRole))
+  if(model.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get(modelRole))
   {
     DALI_TEST_EQUALS(modelRole, static_cast<uint32_t>(AccessibilityRole::MODEL), TEST_LOCATION);
   }

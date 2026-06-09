@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -28,6 +27,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <algorithm>
@@ -333,6 +333,7 @@ ItemView::ItemView(ItemFactory& factory)
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
   mWheelScrollDistanceStep(0.0f),
+  mWheelScrollDistanceStepSet(false),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mScrollOvershoot(0.0f),
@@ -355,9 +356,6 @@ void ItemView::OnInitialize()
 
   Actor self = Self();
 
-  Vector2 stageSize        = Stage::GetCurrent().GetSize();
-  mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
-
   self.TouchedSignal().Connect(this, &ItemView::OnTouch);
   EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
@@ -370,6 +368,16 @@ void ItemView::OnInitialize()
   self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+}
+
+void ItemView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+{
+  if(!mWheelScrollDistanceStepSet)
+  {
+    mWheelScrollDistanceStep = size.height * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  }
+
+  Scrollable::OnRelayout(size, container);
 }
 
 DevelControl::ControlAccessible* ItemView::CreateAccessibleObject()
@@ -572,7 +580,8 @@ float ItemView::GetMinimumSwipeDistance() const
 
 void ItemView::SetWheelScrollDistanceStep(float step)
 {
-  mWheelScrollDistanceStep = step;
+  mWheelScrollDistanceStep    = step;
+  mWheelScrollDistanceStepSet = true;
 }
 
 float ItemView::GetWheelScrollDistanceStep() const
@@ -926,7 +935,7 @@ void ItemView::RemoveActorsOutsideRange(ItemRange range)
 
 void ItemView::AddActorsWithinRange(ItemRange range, const Vector3& layoutSize)
 {
-  range.end = std::min(mItemFactory.GetNumberOfItems(), range.end);
+  range.end = Min(mItemFactory.GetNumberOfItems(), range.end);
 
   // The order of addition depends on the scroll direction.
   if(mRefreshOrderHint)
@@ -1111,7 +1120,7 @@ float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targ
 {
   Actor self              = Self();
   float minLayoutPosition = layout.GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), targetSize);
-  float clamppedPosition  = std::min(0.0f, std::max(minLayoutPosition, targetPosition));
+  float clamppedPosition  = Min(0.0f, Max(minLayoutPosition, targetPosition));
   self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
 
   if(updateOvershoot)
@@ -1193,7 +1202,7 @@ void ItemView::OnPan(const PanGesture& gesture)
 
         RemoveAnimation(mScrollAnimation);
 
-        float flickAnimationDuration = Clamp(mActiveLayout->GetItemFlickAnimationDuration() * std::max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0))), DEFAULT_MINIMUM_SWIPE_DURATION, DEFAULT_MAXIMUM_SWIPE_DURATION);
+        float flickAnimationDuration = Clamp(mActiveLayout->GetItemFlickAnimationDuration() * Max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0))), DEFAULT_MINIMUM_SWIPE_DURATION, DEFAULT_MAXIMUM_SWIPE_DURATION);
 
         mScrollAnimation = Animation::New(flickAnimationDuration);
         mScrollAnimation.AnimateTo(Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, AlphaFunction::EASE_OUT);
@@ -1645,11 +1654,11 @@ float ItemView::CalculateScrollOvershoot()
     float positionDelta     = GetCurrentLayoutPosition(0) + scrollDistance;
     float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), Self().GetCurrentProperty<Vector3>(Actor::Property::SIZE));
     self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
-    float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, positionDelta));
+    float clamppedPosition = Min(0.0f, Max(minLayoutPosition, positionDelta));
     overshoot              = positionDelta - clamppedPosition;
   }
 
-  return overshoot > 0.0f ? std::min(overshoot, 1.0f) : std::max(overshoot, -1.0f);
+  return overshoot > 0.0f ? Min(overshoot, 1.0f) : Max(overshoot, -1.0f);
 }
 
 void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)

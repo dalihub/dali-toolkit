@@ -31,17 +31,17 @@ namespace
 const char* TEST_IMAGE_FILE_NAME    = TEST_RESOURCE_DIR "/application-icon-20.png";
 const char* TEST_IMAGE_FILE_NAME_9  = TEST_RESOURCE_DIR "/heartsframe.9.png";
 const char* TEST_IMAGE_FILE_NAME2_9 = TEST_RESOURCE_DIR "/button-up.9.png";
-int         CountFunctionCalls(const std::vector<std::string>& callstack, const std::string& function)
+
+int CountFunctionCalls(const std::vector<std::string>& callstack, const std::string& function)
 {
   int counter = 0;
-  std::find_if(callstack.begin(), callstack.end(), [&counter, &function](const std::string& item)
+  for(const auto& item : callstack)
   {
     if(item == function)
     {
       counter++;
     }
-    return false;
-  });
+  }
 
   return counter;
 }

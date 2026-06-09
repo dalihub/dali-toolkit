@@ -25,6 +25,7 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <limits> ///< for std::numeric_limits
 #include <locale>
@@ -668,7 +669,7 @@ void ConvertMaterial(const gltf2::Material& material, const ImageMetadataMap& im
   {
     materialDefinition.mAlphaModeType = Scene3D::Material::AlphaModeType::MASK;
     materialDefinition.mIsMask        = true;
-    materialDefinition.SetAlphaCutoff(std::min(1.f, std::max(0.f, material.mAlphaCutoff)));
+    materialDefinition.SetAlphaCutoff(Min(1.f, Max(0.f, material.mAlphaCutoff)));
   }
 
   materialDefinition.mBaseColorFactor = pbr.mBaseColorFactor;
@@ -1359,7 +1360,7 @@ float LoadKeyFrames(ConversionContext& context, const gltf2::Animation::Channel&
   Vector<float> inputDataBuffer;
   Vector<T>     outputDataBuffer;
 
-  const float duration = std::max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
+  const float duration = Max(LoadDataFromAccessors<T>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   if(IsFirstFrameValueEmpty(input.mCount, inputDataBuffer))
   {
@@ -1382,7 +1383,7 @@ float LoadBlendShapeKeyFrames(ConversionContext& context, const gltf2::Animation
   Vector<float> inputDataBuffer;
   Vector<float> outputDataBuffer;
 
-  const float duration = std::max(LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
+  const float duration = Max(LoadDataFromAccessors<float>(context, input, output, inputDataBuffer, outputDataBuffer), AnimationDefinition::MIN_DURATION_SECONDS);
 
   char        weightNameBuffer[32];
   auto        prefixSize    = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.data());
@@ -1497,7 +1498,7 @@ void ConvertAnimations(const gltf2::Document& document, ConversionContext& conte
         }
       }
 
-      animationDuration = std::max(animationDuration, duration);
+      animationDuration = Max(animationDuration, duration);
       ++propertyIndex;
     }
     animationDefinition.SetDuration(animationDuration);

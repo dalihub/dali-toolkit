@@ -21,7 +21,6 @@
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -31,6 +30,7 @@
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -795,10 +795,10 @@ void ImageVisual::InitializeRenderer()
   // mTextures is already set, the mTexture can be used to create Renderer.
   // There are two cases mTextures is empty.
   // 1. mTextureId == TextureManager::INVALID_TEXTURE_ID
-  //  - Visual is on stage with LoadPolicy::ATTACHED
+  //  - Visual is on scene with LoadPolicy::ATTACHED
   // 2. mTextureId != TextureManager::INVALID_TEXTURE_ID
-  //  - If ReleasePolicy is DESTROYED, InitializeRenderer called every on stage called.
-  //  - Then every resources those contained in Visual are Reset but mTextureId is remained when the Off stage time,
+  //  - If ReleasePolicy is DESTROYED, InitializeRenderer called every on scene called.
+  //  - Then every resources those contained in Visual are Reset but mTextureId is remained when the Off scene time,
   //  - So, mTextures needed to be get from texture manager to created resources like mImpl->mRenderer.
   if(!mTextures)
   {
@@ -902,7 +902,7 @@ void ImageVisual::DoSetOnScene(Actor& actor)
 
 void ImageVisual::DoSetOffScene(Actor& actor)
 {
-  // Visual::Base::SetOffScene only calls DoSetOffScene if mRenderer exists (is on onstage)
+  // Visual::Base::SetOffScene only calls DoSetOffScene if mRenderer exists (is on scene)
 
   // Image release is dependent on the ReleasePolicy, renderer is removed.
   actor.RemoveRenderer(mImpl->mRenderer);
@@ -1031,9 +1031,9 @@ void ImageVisual::OnSetTransform()
     Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
     uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
     uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
-    sizeWidth                        = std::min(sizeWidth, maximumNumber);
+    sizeWidth                        = Min(sizeWidth, maximumNumber);
     uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
-    sizeHeight                       = std::min(sizeHeight, maximumNumber);
+    sizeHeight                       = Min(sizeHeight, maximumNumber);
     Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
 
     // Reload if visual size is updated
@@ -1215,7 +1215,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     }
   }
 
-  // Storing TextureSet needed when renderer staged.
+  // Storing TextureSet needed when renderer is on scene.
   if(!mImpl->mRenderer)
   {
     mTextures = textureInformation.textureSet;
@@ -1223,7 +1223,7 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     UpdateNativeTextureInfomation(mTextures);
   }
 
-  // Image loaded, set status regardless of staged status.
+  // Image loaded, set status regardless of on-scene status.
   if(loadingSuccess)
   {
     resourceStatus = Toolkit::Visual::ResourceStatus::READY;
@@ -1269,8 +1269,8 @@ void ImageVisual::ComputeTextureSize()
           Texture maskTexture = textureSet.GetTexture(1);
           if(maskTexture)
           {
-            mTextureSize.x = std::min(static_cast<uint32_t>(mTextureSize.x * mMaskingData->mContentScaleFactor), maskTexture.GetWidth());
-            mTextureSize.y = std::min(static_cast<uint32_t>(mTextureSize.y * mMaskingData->mContentScaleFactor), maskTexture.GetHeight());
+            mTextureSize.x = Min(static_cast<uint32_t>(mTextureSize.x * mMaskingData->mContentScaleFactor), maskTexture.GetWidth());
+            mTextureSize.y = Min(static_cast<uint32_t>(mTextureSize.y * mMaskingData->mContentScaleFactor), maskTexture.GetHeight());
           }
         }
       }
@@ -1294,10 +1294,10 @@ Vector2 ImageVisual::ComputeMaskTextureRatio()
           Texture maskTexture = textureSet.GetTexture(1);
           if(maskTexture)
           {
-            float textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-            float textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-            maskTextureRatio    = Vector2(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
-                                          std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+            float textureWidth  = Max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            float textureHeight = Max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+            maskTextureRatio    = Vector2(Min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                                          Min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
           }
         }
       }

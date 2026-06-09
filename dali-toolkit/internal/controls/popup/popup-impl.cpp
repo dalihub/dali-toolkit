@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -72,7 +72,7 @@ BaseHandle Create()
 const int     DEFAULT_TOAST_AUTO_HIDE_DELAY = 3000;                    ///< Toast will auto-hide after 3000ms (3 seconds)
 const float   DEFAULT_TOAST_TRANSITION_TIME = 0.65f;                   ///< Default time the toast Popup will take to show and hide.
 const Vector3 DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN(0.5f, 0.94f, 0.5f);   ///< This is similar to BOTTOM_CENTER, but vertically higher up, as a ratio of parent height.
-const Vector3 DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO(0.75f, 0.75f, 0.75f); ///< Amount of the stage's width that the toast popup will take up.
+const Vector3 DEFAULT_TOAST_WIDTH_OF_SCENE_RATIO(0.75f, 0.75f, 0.75f); ///< Amount of the scene's width that the toast popup will take up.
 
 /**
  * Creation function for named type "popupToast".
@@ -83,7 +83,7 @@ BaseHandle CreateToast()
   Toolkit::Popup popup = Toolkit::Popup::New();
 
   // Setup for Toast Popup type.
-  popup.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO);
+  popup.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_TOAST_WIDTH_OF_SCENE_RATIO);
   popup.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
   popup.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
   popup.SetProperty(Toolkit::Popup::Property::CONTEXTUAL_MODE, Toolkit::Popup::NON_CONTEXTUAL);
@@ -194,7 +194,7 @@ const Vector3 DEFAULT_TAIL_POSITION(0.5f, 1.0f, 0.0f);               ///< Positi
 
 // Contextual defaults.
 const Vector2 DEFAULT_CONTEXTUAL_ADJACENCY_MARGIN(10.0f, 10.0f); ///< How close the Popup will be to it's contextual parent.
-const Vector2 DEFAULT_CONTEXTUAL_STAGE_BORDER(15.0f, 15.0f);     ///< How close the Popup can be to the stage edges.
+const Vector2 DEFAULT_CONTEXTUAL_SCENE_BORDER(15.0f, 15.0f);     ///< How close the Popup can be to the scene edges.
 
 // Popup style defaults.
 const char* DEFAULT_BACKGROUND_IMAGE_FILE_NAME = "00_popup_bg.9.webp";    ///< Background image.
@@ -331,7 +331,6 @@ void Popup::OnInitialize()
 
   mPopupLayout.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
   mPopupLayout.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
-  mPopupLayout.SetProperty(Actor::Property::SIZE, Vector2(Stage::GetCurrent().GetSize().x * DEFAULT_RELATIVE_PARENT_WIDTH, 0.0f));
 
   mPopupLayout.SetFitHeight(0); // Set row to fit.
   mPopupLayout.SetFitHeight(1); // Set row to fit.
@@ -546,7 +545,7 @@ void Popup::OnDisplayChangeAnimationFinished(Animation source)
 
 void Popup::DisplayStateChangeComplete()
 {
-  // Remove contents from stage if completely hidden.
+  // Remove contents from scene if completely hidden.
   if(mDisplayState == Toolkit::Popup::HIDING)
   {
     mDisplayState = Toolkit::Popup::HIDDEN;
@@ -939,12 +938,8 @@ Toolkit::Control Popup::CreateBacking()
                       Property::Map().Add(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR).Add(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f)));
   backing.SetProperty(Dali::Actor::Property::NAME, "popupBacking");
 
-  // Must always be positioned top-left of stage, regardless of parent.
+  // Must always be positioned top-left of scene, regardless of parent.
   backing.SetProperty(Actor::Property::INHERIT_POSITION, false);
-
-  // Always the full size of the stage.
-  backing.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  backing.SetProperty(Actor::Property::SIZE, Stage::GetCurrent().GetSize());
 
   // Catch events.
   backing.SetProperty(Actor::Property::SENSITIVE, true);
@@ -1593,6 +1588,21 @@ bool Popup::OnDialogTouched(Actor actor, TouchEvent touch)
 void Popup::OnSceneConnection(int depth)
 {
   mLayoutDirty = true;
+
+  // Set backing and popup layout sizes based on the window size, now that the window is available.
+  Dali::Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    Vector2 windowSize(window.GetSize().GetWidth(), window.GetSize().GetHeight());
+
+    // Backing must cover the full window.
+    mBacking.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    mBacking.SetProperty(Actor::Property::SIZE, windowSize);
+
+    // Popup layout default width is a fraction of the window width.
+    mPopupLayout.SetProperty(Actor::Property::SIZE, Vector2(windowSize.x * DEFAULT_RELATIVE_PARENT_WIDTH, 0.0f));
+  }
+
   RelayoutRequest();
 
   ControlImpl::OnSceneConnection(depth);
@@ -1630,11 +1640,13 @@ void Popup::LayoutContext(const Vector2& size)
   mPopupContainer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   // Setup with some pre-calculations for speed.
-  Vector3 halfStageSize(Stage().GetCurrent().GetSize() / 2.0f);
-  Vector3 parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
-  Vector2 halfSize(size / 2.0f);
-  Vector2 halfParentSize(parent.GetRelayoutSize(Dimension::WIDTH) / 2.0f, parent.GetRelayoutSize(Dimension::HEIGHT) / 2.0f);
-  Vector3 newPosition(Vector3::ZERO);
+  // LayoutContext is called from OnRelayout, so the window is guaranteed to be available.
+  Dali::Window::WindowSize windowSize = DevelWindow::Get(Self()).GetSize();
+  Vector3                  halfWindowSize(windowSize.GetWidth() / 2.0f, windowSize.GetHeight() / 2.0f, 0.0f);
+  Vector3                  parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
+  Vector2                  halfSize(size / 2.0f);
+  Vector2                  halfParentSize(parent.GetRelayoutSize(Dimension::WIDTH) / 2.0f, parent.GetRelayoutSize(Dimension::HEIGHT) / 2.0f);
+  Vector3                  newPosition(Vector3::ZERO);
 
   // Perform different positioning based on the specified contextual layout mode.
   switch(mContextualMode)
@@ -1674,24 +1686,24 @@ void Popup::LayoutContext(const Vector2& size)
   // Check new position is not too far right. If so, correct it.
   // Note: Check for right rather than left first, so if popup is too wide, the left check overrides
   // the right check and we at least see the left portion of the popup (as this is more useful).
-  if(newPosition.x >= (halfStageSize.x - parentPosition.x - halfSize.x - DEFAULT_CONTEXTUAL_STAGE_BORDER.x))
+  if(newPosition.x >= (halfWindowSize.x - parentPosition.x - halfSize.x - DEFAULT_CONTEXTUAL_SCENE_BORDER.x))
   {
-    newPosition.x = halfStageSize.x - parentPosition.x - halfSize.x - DEFAULT_CONTEXTUAL_STAGE_BORDER.x;
+    newPosition.x = halfWindowSize.x - parentPosition.x - halfSize.x - DEFAULT_CONTEXTUAL_SCENE_BORDER.x;
   }
   // Check new position is not too far left. If so, correct it.
-  if(newPosition.x < halfSize.x - (parentPosition.x + halfStageSize.x) + DEFAULT_CONTEXTUAL_STAGE_BORDER.x)
+  if(newPosition.x < halfSize.x - (parentPosition.x + halfWindowSize.x) + DEFAULT_CONTEXTUAL_SCENE_BORDER.x)
   {
-    newPosition.x = halfSize.x - (parentPosition.x + halfStageSize.x) + DEFAULT_CONTEXTUAL_STAGE_BORDER.x; // - parentSize.x;
+    newPosition.x = halfSize.x - (parentPosition.x + halfWindowSize.x) + DEFAULT_CONTEXTUAL_SCENE_BORDER.x; // - parentSize.x;
   }
   // Check new position is not too far down. If so, correct it.
-  if(newPosition.y >= (halfStageSize.y - parentPosition.y - halfSize.y - DEFAULT_CONTEXTUAL_STAGE_BORDER.y))
+  if(newPosition.y >= (halfWindowSize.y - parentPosition.y - halfSize.y - DEFAULT_CONTEXTUAL_SCENE_BORDER.y))
   {
-    newPosition.y = halfStageSize.y - parentPosition.y - halfSize.y - DEFAULT_CONTEXTUAL_STAGE_BORDER.y;
+    newPosition.y = halfWindowSize.y - parentPosition.y - halfSize.y - DEFAULT_CONTEXTUAL_SCENE_BORDER.y;
   }
   // Check new position is not too far up. If so, correct it.
-  if(newPosition.y < halfSize.y - (parentPosition.y + halfStageSize.y) + DEFAULT_CONTEXTUAL_STAGE_BORDER.y)
+  if(newPosition.y < halfSize.y - (parentPosition.y + halfWindowSize.y) + DEFAULT_CONTEXTUAL_SCENE_BORDER.y)
   {
-    newPosition.y = halfSize.y - (parentPosition.y + halfStageSize.y) + DEFAULT_CONTEXTUAL_STAGE_BORDER.y;
+    newPosition.y = halfSize.y - (parentPosition.y + halfWindowSize.y) + DEFAULT_CONTEXTUAL_SCENE_BORDER.y;
   }
 
   // Set the final position.

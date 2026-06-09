@@ -20,13 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/object/property-map.h>
@@ -454,15 +455,16 @@ void SnapWithVelocity(
     // u = Initial Velocity (Flick velocity)
     // v = 0 (Final Velocity)
     // t = Time (Velocity / Deceleration)
-    Vector2 stageSize   = Stage::GetCurrent().GetSize();
-    float   stageLength = Vector3(stageSize.x, stageSize.y, 0.0f).Length();
-    float   a           = (stageLength * scrollView.GetFrictionCoefficient());
-    Vector3 u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
-    float   speed       = u.Length();
+    // SnapWithVelocity is called during gesture handling, so the window is guaranteed to be available.
+    Dali::Window::WindowSize ws          = DevelWindow::Get(scrollView.Self()).GetSize();
+    float                    stageLength = Vector3(ws.GetWidth(), ws.GetHeight(), 0.0f).Length();
+    float                    a           = (stageLength * scrollView.GetFrictionCoefficient());
+    Vector3                  u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
+    float                    speed       = u.Length();
     u /= speed;
 
     // TODO: Change this to a decay function. (faster you flick, the slower it should be)
-    speed = std::min(speed, stageLength * scrollView.GetMaxFlickSpeed());
+    speed = Min(speed, stageLength * scrollView.GetMaxFlickSpeed());
     u *= speed;
     alphaFunction = ConstantDecelerationAlphaFunction;
 
@@ -484,8 +486,8 @@ void SnapWithVelocity(
     if((positionSnap - startPosition).LengthSquared() > Math::MACHINE_EPSILON_0)
     {
       clampDelta -= positionSnap;
-      clampDelta.x = clampDelta.x > 0.0f ? std::min(clampDelta.x, maxOvershoot.x) : std::max(clampDelta.x, -maxOvershoot.x);
-      clampDelta.y = clampDelta.y > 0.0f ? std::min(clampDelta.y, maxOvershoot.y) : std::max(clampDelta.y, -maxOvershoot.y);
+      clampDelta.x = clampDelta.x > 0.0f ? Min(clampDelta.x, maxOvershoot.x) : Max(clampDelta.x, -maxOvershoot.x);
+      clampDelta.y = clampDelta.y > 0.0f ? Min(clampDelta.y, maxOvershoot.y) : Max(clampDelta.y, -maxOvershoot.y);
     }
     else
     {
@@ -634,6 +636,7 @@ ScrollView::ScrollView()
   mFlickSpeedCoefficient(DEFAULT_FLICK_SPEED_COEFFICIENT),
   mMaxFlickSpeed(DEFAULT_MAX_FLICK_SPEED),
   mWheelScrollDistanceStep(Vector2::ZERO),
+  mWheelScrollDistanceStepSet(false),
   mInAccessibilityPan(false),
   mScrolling(false),
   mScrollInterrupted(false),
@@ -669,8 +672,6 @@ void ScrollView::OnInitialize()
 
   mScrollPostPosition = mScrollPrePosition = Vector2::ZERO;
 
-  mWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
-
   mGestureStackDepth = 0;
 
   self.TouchedSignal().Connect(this, &ScrollView::OnTouch);
@@ -697,6 +698,16 @@ void ScrollView::OnInitialize()
 DevelControl::ControlAccessible* ScrollView::CreateAccessibleObject()
 {
   return new ScrollViewAccessible(Self());
+}
+
+void ScrollView::OnRelayout(const Vector2& size, RelayoutContainer& container)
+{
+  if(!mWheelScrollDistanceStepSet)
+  {
+    mWheelScrollDistanceStep = size * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  }
+
+  ScrollBase::OnRelayout(size, container);
 }
 
 void ScrollView::OnSceneConnection(int depth)
@@ -1135,8 +1146,8 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
 
   if(positionChanged)
   {
-    totalDuration = std::max(totalDuration, positionDuration.x);
-    totalDuration = std::max(totalDuration, positionDuration.y);
+    totalDuration = Max(totalDuration, positionDuration.x);
+    totalDuration = Max(totalDuration, positionDuration.y);
   }
   else
   {
@@ -1827,7 +1838,7 @@ void ScrollView::SnapInternalXTo(float position)
   mScrollStateFlags &= ~SCROLL_X_STATE_MASK;
 
   // if internal x not equal to inputed parameter, animate it
-  float duration = std::min(fabsf((position - mScrollPrePosition.x) / mMaxOvershoot.x) * mSnapOvershootDuration, mSnapOvershootDuration);
+  float duration = Min(fabsf((position - mScrollPrePosition.x) / mMaxOvershoot.x) * mSnapOvershootDuration, mSnapOvershootDuration);
   DALI_LOG_SCROLL_STATE("[0x%X] duration[%.2f]", this, duration);
   if(duration > Math::MACHINE_EPSILON_1)
   {
@@ -1853,7 +1864,7 @@ void ScrollView::SnapInternalYTo(float position)
   mScrollStateFlags &= ~SCROLL_Y_STATE_MASK;
 
   // if internal y not equal to inputed parameter, animate it
-  float duration = std::min(fabsf((position - mScrollPrePosition.y) / mMaxOvershoot.y) * mSnapOvershootDuration, mSnapOvershootDuration);
+  float duration = Min(fabsf((position - mScrollPrePosition.y) / mMaxOvershoot.y) * mSnapOvershootDuration, mSnapOvershootDuration);
   DALI_LOG_SCROLL_STATE("[0x%X] duration[%.2f]", this, duration);
   if(duration > Math::MACHINE_EPSILON_1)
   {

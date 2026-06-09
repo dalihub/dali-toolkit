@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,7 +302,7 @@ int UtcDaliNPatchUtilityParseBordersN(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliNPatchUtilityParseBordersN");
 
-  for(const std::pair<uint32_t, uint32_t>& imageSizePair : std::initializer_list<std::pair<uint32_t, uint32_t>>({{1u, 1u}, {2u, 2u}, {0xFFFF, 0xFFFF}, {2u, 129u}}))
+  for(const std::pair<uint32_t, uint32_t>& imageSizePair : std::initializer_list<std::pair<uint32_t, uint32_t>>{{1u, 1u}, {2u, 2u}, {0xFFFF, 0xFFFF}, {2u, 129u}})
   {
     tet_printf("Parse for image size : %u x %u\n", imageSizePair.first, imageSizePair.second);
     Dali::Devel::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(imageSizePair.first, imageSizePair.second, Pixel::RGBA8888);

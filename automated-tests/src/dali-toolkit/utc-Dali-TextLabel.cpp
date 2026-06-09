@@ -3257,8 +3257,6 @@ int UtcDaliToolkitTextlabelLastCharacterIndex(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextlabelLastCharacterIndex");
 
-  Vector2 size(300.0f, 100.0f);
-
   Dali::Toolkit::DevelText::RendererParameters textParameters;
   textParameters.text              = "This is a sample text to get the last index.";
   textParameters.layout            = "multiLine";

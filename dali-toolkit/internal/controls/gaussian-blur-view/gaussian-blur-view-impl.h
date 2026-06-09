@@ -89,6 +89,8 @@ public:
 private:
   void OnInitialize() override;
   void OnSizeSet(const Vector3& targetSize) override;
+  void OnSceneConnection(int depth) override;
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Control::OnChildAdd()

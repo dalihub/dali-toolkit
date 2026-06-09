@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
@@ -447,7 +447,12 @@ void GaussianBlurView::AllocateResources()
 
 void GaussianBlurView::CreateRenderTasks()
 {
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  Dali::Window window = DevelWindow::Get(Self());
+  if(!window)
+  {
+    return;
+  }
+  RenderTaskList taskList = window.GetRenderTaskList();
 
   if(!mBlurUserImage)
   {
@@ -525,7 +530,12 @@ void GaussianBlurView::CreateRenderTasks()
 
 void GaussianBlurView::RemoveRenderTasks()
 {
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  Dali::Window window = DevelWindow::Get(Self());
+  if(!window)
+  {
+    return;
+  }
+  RenderTaskList taskList = window.GetRenderTaskList();
 
   taskList.RemoveTask(mRenderChildrenTask);
   taskList.RemoveTask(mHorizontalBlurTask);
@@ -540,8 +550,11 @@ void GaussianBlurView::Activate()
     // make sure resources are allocated and start the render tasks processing
     Self().Add(mInternalRoot);
     AllocateResources();
-    CreateRenderTasks();
     mActivated = true;
+    if(DevelWindow::Get(Self()))
+    {
+      CreateRenderTasks();
+    }
   }
 }
 
@@ -563,10 +576,31 @@ void GaussianBlurView::Deactivate()
     mBlurResultFrameBuffer.Reset();
     mRenderTarget1.Reset();
     mRenderTarget2.Reset();
-    RemoveRenderTasks();
+    if(DevelWindow::Get(Self()))
+    {
+      RemoveRenderTasks();
+    }
     mRenderOnce = false;
     mActivated  = false;
   }
+}
+
+void GaussianBlurView::OnSceneConnection(int depth)
+{
+  if(mActivated)
+  {
+    CreateRenderTasks();
+  }
+  ControlImpl::OnSceneConnection(depth);
+}
+
+void GaussianBlurView::OnSceneDisconnection()
+{
+  if(mActivated)
+  {
+    RemoveRenderTasks();
+  }
+  ControlImpl::OnSceneDisconnection();
 }
 
 void GaussianBlurView::SetShaderConstants()

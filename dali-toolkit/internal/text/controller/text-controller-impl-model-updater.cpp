@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <chrono>
 
@@ -713,7 +714,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 #endif
 
   // The estimated number of lines. Used to avoid reallocations when layouting.
-  impl.mTextUpdateInfo.mEstimatedNumberOfLines = std::max(impl.mModel->mVisualModel->mLines.Count(), impl.mModel->mLogicalModel->mParagraphInfo.Count());
+  impl.mTextUpdateInfo.mEstimatedNumberOfLines = Max(impl.mModel->mVisualModel->mLines.Count(), impl.mModel->mLogicalModel->mParagraphInfo.Count());
 
   // Set the previous number of characters for the next time the text is updated.
   impl.mTextUpdateInfo.mPreviousNumberOfCharacters = numberOfCharacters;

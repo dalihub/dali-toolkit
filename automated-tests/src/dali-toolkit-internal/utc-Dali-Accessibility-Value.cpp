@@ -21,7 +21,6 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali.h>
-#include <dali/devel-api/common/stage.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
@@ -53,7 +52,7 @@ int utcDaliAccessibilityScrollBarGetMinimum(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add(sourceActor);
+  application.GetScene().Add(sourceActor);
 
   // Register the scroll properties
   Property::Index propertyScrollPosition    = sourceActor.RegisterProperty("sourcePosition", 0.0f);
@@ -79,7 +78,7 @@ int utcDaliAccessibilityScrollBarGetMaximum(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add(sourceActor);
+  application.GetScene().Add(sourceActor);
 
   // Register the scroll properties
   Property::Index propertyScrollPosition    = sourceActor.RegisterProperty("sourcePosition", 0.0f);
@@ -104,8 +103,8 @@ int utcDaliAccessibilityScrollBarGetMinimumIncrement(void)
   ToolkitTestApplication application;
 
   Toolkit::ScrollBar scroll_bar = Toolkit::ScrollBar::New();
-  auto q = Dali::Accessibility::Accessible::Get(scroll_bar);
-  auto x = q->GetFeature<Accessibility::Value>();
+  auto               q          = Dali::Accessibility::Accessible::Get(scroll_bar);
+  auto               x          = q->GetFeature<Accessibility::Value>();
   DALI_TEST_CHECK(x);
   DALI_TEST_EQUALS(x->GetMinimumIncrement(), 1.0, TEST_LOCATION);
 
@@ -115,11 +114,11 @@ int utcDaliAccessibilityScrollBarGetMinimumIncrement(void)
 int utcDaliAccessibilityScrollBarGetSetCurrent(void)
 {
   ToolkitTestApplication application;
-  Dali::Accessibility::TestEnableSC(true);
+  Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add(sourceActor);
+  application.GetScene().Add(sourceActor);
 
   // Register the scroll properties
   Property::Index propertyScrollPosition    = sourceActor.RegisterProperty("sourcePosition", 0.0f);
@@ -143,6 +142,6 @@ int utcDaliAccessibilityScrollBarGetSetCurrent(void)
   DALI_TEST_EQUALS(x->GetCurrent(), 0.0, TEST_LOCATION);
   DALI_TEST_EQUALS(x->GetValueText().empty(), true, TEST_LOCATION); // not implemented
 
-  Dali::Accessibility::TestEnableSC(false);
+  Dali::Accessibility::TestEnableSC(false, application.GetScene());
   END_TEST;
 }

@@ -26,6 +26,7 @@
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/dali-utility.h>
 
 #include <algorithm>
 #include <unordered_set>
@@ -1410,7 +1411,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
             auto availableVisualSize = finalSize;
 
             // scale to fit the padded area
-            finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
+            finalSize = naturalSize * Min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
                                                (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
 
             // calculate final offset within the padded area
@@ -1424,7 +1425,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
           case Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
           {
             auto availableVisualSize = finalSize;
-            finalSize                = naturalSize * std::max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+            finalSize                = naturalSize * Max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
                                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
             auto originalOffset = finalOffset;
@@ -1453,7 +1454,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
             }
             else
             {
-              finalSize = naturalSize * std::min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
+              finalSize = naturalSize * Min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
                                                  (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
             }
 

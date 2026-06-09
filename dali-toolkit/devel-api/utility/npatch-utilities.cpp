@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -325,9 +326,9 @@ bool IsNinePatchUrl(const std::string& url)
 
 Dali::Uint16Pair GetValidStrechPointFromBorder(uint32_t maxRangeSize, uint32_t rangeFromZero, uint32_t rangeFromMax)
 {
-  maxRangeSize  = std::min(maxRangeSize, 0xFFFFu);
-  rangeFromZero = std::min(rangeFromZero, 0xFFFFu);
-  rangeFromMax  = std::min(rangeFromMax, 0xFFFFu);
+  maxRangeSize  = Min(maxRangeSize, 0xFFFFu);
+  rangeFromZero = Min(rangeFromZero, 0xFFFFu);
+  rangeFromMax  = Min(rangeFromMax, 0xFFFFu);
   if(DALI_UNLIKELY(rangeFromZero + rangeFromMax > maxRangeSize))
   {
     // Keep ratio and make ensure that sume of value didn't overflow the max range.

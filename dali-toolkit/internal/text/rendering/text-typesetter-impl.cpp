@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <memory.h>
 #include <cmath>
@@ -30,6 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/character-spacing-glyph-run.h>
+#include <dali-toolkit/internal/text/color-glyph-helper.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/line-helper-functions.h>
 #include <dali-toolkit/internal/text/line-run.h>
@@ -168,15 +170,15 @@ void TypesetGlyph(GlyphData& __restrict__ data,
   const int32_t xOffset = data.horizontalOffset + position->x;
 
   // Whether the given glyph is a color one.
-  const bool     isColorGlyph    = data.glyphBitmap.isColorEmoji || data.glyphBitmap.isColorBitmap;
+  const bool     isColorGlyph    = Internal::IsColorGlyphBuffer(data.glyphBitmap);
   const uint32_t glyphPixelSize  = Pixel::GetBytesPerPixel(data.glyphBitmap.format);
   const uint32_t glyphAlphaIndex = (glyphPixelSize > 0u) ? glyphPixelSize - 1u : 0u;
 
   // Determinate iterator range.
-  const int32_t lineIndexRangeMin = std::max(0, -yOffset);
-  const int32_t lineIndexRangeMax = std::min(static_cast<int32_t>(data.glyphBitmap.height), static_cast<int32_t>(data.height) - yOffset);
-  const int32_t indexRangeMin     = std::max(0, -xOffset);
-  const int32_t indexRangeMax     = std::min(static_cast<int32_t>(data.glyphBitmap.width), static_cast<int32_t>(data.width) - xOffset);
+  const int32_t lineIndexRangeMin = Max(0, -yOffset);
+  const int32_t lineIndexRangeMax = Min(static_cast<int32_t>(data.glyphBitmap.height), static_cast<int32_t>(data.height) - yOffset);
+  const int32_t indexRangeMin     = Max(0, -xOffset);
+  const int32_t indexRangeMax     = Min(static_cast<int32_t>(data.glyphBitmap.width), static_cast<int32_t>(data.width) - xOffset);
 
   // If current glyph don't need to be rendered, just ignore.
   if(lineIndexRangeMax <= lineIndexRangeMin || indexRangeMax <= indexRangeMin)
@@ -299,7 +301,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
             // semi-transparent gaps between joint glyphs with overlapped pixels, which could
             // happen, for example, in the RTL text when we copy glyphs from right to left).
             uint8_t currentAlpha = *(packedCurrentColorBuffer + 3u);
-            currentAlpha         = std::max(currentAlpha, alpha);
+            currentAlpha         = Max(currentAlpha, alpha);
             if(currentAlpha == 255)
             {
               // Fast-cut to avoid float type operation.
@@ -369,7 +371,7 @@ void TypesetGlyph(GlyphData& __restrict__ data,
             // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
             // semi-transparent gaps between joint glyphs with overlapped pixels, which could
             // happen, for example, in the RTL text when we copy glyphs from right to left).
-            currentAlpha = std::max(currentAlpha, alpha);
+            currentAlpha = Max(currentAlpha, alpha);
           }
         }
 
@@ -394,10 +396,10 @@ void DrawBackgroundColor(
   const float    lineExtentLeft,
   const float    lineExtentRight)
 {
-  const int32_t yRangeMin = std::max(0, static_cast<int32_t>(glyphData.verticalOffset + baseline - line.ascender));
-  const int32_t yRangeMax = std::min(static_cast<int32_t>(bufferHeight), static_cast<int32_t>(glyphData.verticalOffset + baseline - line.descender));
-  const int32_t xRangeMin = std::max(0, static_cast<int32_t>(glyphData.horizontalOffset + lineExtentLeft));
-  const int32_t xRangeMax = std::min(static_cast<int32_t>(bufferWidth), static_cast<int32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
+  const int32_t yRangeMin = Max(0, static_cast<int32_t>(glyphData.verticalOffset + baseline - line.ascender));
+  const int32_t yRangeMax = Min(static_cast<int32_t>(bufferHeight), static_cast<int32_t>(glyphData.verticalOffset + baseline - line.descender));
+  const int32_t xRangeMin = Max(0, static_cast<int32_t>(glyphData.horizontalOffset + lineExtentLeft));
+  const int32_t xRangeMax = Min(static_cast<int32_t>(bufferWidth), static_cast<int32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
 
   // If current glyph don't need to be rendered, just ignore.
   if(yRangeMax <= yRangeMin || xRangeMax <= xRangeMin)
@@ -467,9 +469,9 @@ void DrawUnderline(
   int32_t underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
 
   const uint32_t yRangeMin = underlineYOffset;
-  const uint32_t yRangeMax = std::min(bufferHeight, underlineYOffset + static_cast<uint32_t>(maxUnderlineHeight));
+  const uint32_t yRangeMax = Min(bufferHeight, underlineYOffset + static_cast<uint32_t>(maxUnderlineHeight));
   const uint32_t xRangeMin = static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentLeft);
-  const uint32_t xRangeMax = std::min(bufferWidth, static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
+  const uint32_t xRangeMax = Min(bufferWidth, static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
 
   // If current glyph don't need to be rendered, just ignore.
   if((underlineType != Text::Underline::DOUBLE && yRangeMax <= yRangeMin) || xRangeMax <= xRangeMin)
@@ -497,8 +499,8 @@ void DrawUnderline(
     if(underlineType == Text::Underline::DOUBLE)
     {
       int32_t        secondUnderlineYOffset = underlineYOffset - ONE_AND_A_HALF * maxUnderlineHeight;
-      const uint32_t secondYRangeMin        = static_cast<uint32_t>(std::max(0, secondUnderlineYOffset));
-      const uint32_t secondYRangeMax        = static_cast<uint32_t>(std::max(0, std::min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
+      const uint32_t secondYRangeMin        = static_cast<uint32_t>(Max(0, secondUnderlineYOffset));
+      const uint32_t secondYRangeMax        = static_cast<uint32_t>(Max(0, Min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
 
       // Rewind bitmapBuffer pointer, and skip secondYRangeMin line.
       bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + secondYRangeMin * glyphData.width;
@@ -562,8 +564,8 @@ void DrawUnderline(
     if(underlineType == Text::Underline::DOUBLE)
     {
       int32_t        secondUnderlineYOffset = underlineYOffset - ONE_AND_A_HALF * maxUnderlineHeight;
-      const uint32_t secondYRangeMin        = static_cast<uint32_t>(std::max(0, secondUnderlineYOffset));
-      const uint32_t secondYRangeMax        = static_cast<uint32_t>(std::max(0, std::min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
+      const uint32_t secondYRangeMin        = static_cast<uint32_t>(Max(0, secondUnderlineYOffset));
+      const uint32_t secondYRangeMax        = static_cast<uint32_t>(Max(0, Min(static_cast<int32_t>(bufferHeight), secondUnderlineYOffset + static_cast<int32_t>(maxUnderlineHeight))));
 
       // Rewind bitmapBuffer pointer, and skip secondYRangeMin line.
       bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer()) + secondYRangeMin * glyphData.width;
@@ -597,9 +599,9 @@ void DrawStrikethrough(const uint32_t                      bufferWidth,
   const Vector4& strikethroughColor = currentStrikethroughProperties.colorDefined ? currentStrikethroughProperties.color : commonStrikethroughProperties.color;
 
   const uint32_t yRangeMin = static_cast<uint32_t>(strikethroughStartingYPosition);
-  const uint32_t yRangeMax = std::min(bufferHeight, static_cast<uint32_t>(strikethroughStartingYPosition + maxStrikethroughHeight));
+  const uint32_t yRangeMax = Min(bufferHeight, static_cast<uint32_t>(strikethroughStartingYPosition + maxStrikethroughHeight));
   const uint32_t xRangeMin = static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentLeft);
-  const uint32_t xRangeMax = std::min(bufferWidth, static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
+  const uint32_t xRangeMax = Min(bufferWidth, static_cast<uint32_t>(glyphData.horizontalOffset + lineExtentRight + 1)); // Due to include last point, we add 1 here
 
   // If current glyph don't need to be rendered, just ignore.
   if(yRangeMax <= yRangeMin || xRangeMax <= xRangeMin)
@@ -967,9 +969,9 @@ void CreateImageBufferForEachLine(TextAbstraction::FontClient fontClient, GlyphD
   bool  addHyphen       = false;
 
   // Traverses the glyphs of the line.
-  const GlyphIndex startGlyphIndex = std::max(std::max(line.glyphRun.glyphIndex, inputParamsForLine.startIndexOfGlyphs), inputParamsForLine.fromGlyphIndex);
+  const GlyphIndex startGlyphIndex = Max(Max(line.glyphRun.glyphIndex, inputParamsForLine.startIndexOfGlyphs), inputParamsForLine.fromGlyphIndex);
   GlyphIndex       endGlyphIndex   = (line.isSplitToTwoHalves ? line.glyphRunSecondHalf.glyphIndex + line.glyphRunSecondHalf.numberOfGlyphs : line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs) - 1u;
-  endGlyphIndex                    = std::min(std::min(endGlyphIndex, inputParamsForLine.endIndexOfGlyphs), inputParamsForLine.toGlyphIndex);
+  endGlyphIndex                    = Min(Min(endGlyphIndex, inputParamsForLine.endIndexOfGlyphs), inputParamsForLine.toGlyphIndex);
 
   for(GlyphIndex glyphIndex = startGlyphIndex; glyphIndex <= endGlyphIndex; ++glyphIndex)
   {
@@ -1177,7 +1179,7 @@ void Typesetter::Impl::DrawGlyphsBackground(Devel::PixelBuffer& buffer, const ui
     float baseline = 0.0f;
 
     // Traverses the glyphs of the line.
-    const GlyphIndex endGlyphIndex = std::min(numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs);
+    const GlyphIndex endGlyphIndex = Min(numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs);
     for(GlyphIndex glyphIndex = line.glyphRun.glyphIndex; glyphIndex < endGlyphIndex; ++glyphIndex)
     {
       // Retrieve the glyph's info.

@@ -1072,8 +1072,7 @@ int UtcDaliLightShadowSoftFiltering(void)
 
 namespace
 {
-constexpr int32_t SCENE_ORDER_INDEX  = 100;
-constexpr int32_t SHADOW_ORDER_INDEX = 99;
+constexpr int32_t SCENE_ORDER_INDEX = 100;
 } // namespace
 
 int UtcDaliLightShadowRenderTask(void)

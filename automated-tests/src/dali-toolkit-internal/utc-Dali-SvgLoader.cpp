@@ -65,8 +65,6 @@ namespace
 const char* TEST_SVG_FILE_NAME                   = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_SVG_INVALID_RASTERIZE_FILE_NAME = TEST_RESOURCE_DIR "/invalid1.svg"; ///< Load succes but rasterize fail.
 
-constexpr Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
-
 class TestObserver : public Dali::Toolkit::Internal::SvgLoaderObserver
 {
 public:

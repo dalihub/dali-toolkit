@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <memory>
 
 using Dali::Integration::ToDaliStringView;
@@ -281,8 +282,8 @@ void AnimatedImageVisual::CreateImageCache()
     // Ensure the batch size and cache size are no bigger than the number of URLs,
     // and that the cache is at least as big as the batch size.
     uint16_t numUrls   = mImageUrls->size();
-    uint16_t batchSize = std::max(std::min(mBatchSize, numUrls), MINIMUM_CACHESIZE);
-    uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
+    uint16_t batchSize = Max(Min(mBatchSize, numUrls), MINIMUM_CACHESIZE);
+    uint16_t cacheSize = Max(Min(Max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
 
     if(cacheSize < numUrls)
     {
@@ -1061,9 +1062,9 @@ void AnimatedImageVisual::OnSetTransform()
     Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
     uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
     uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
-    sizeWidth                        = std::min(sizeWidth, maximumNumber);
+    sizeWidth                        = Min(sizeWidth, maximumNumber);
     uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
-    sizeHeight                       = std::min(sizeHeight, maximumNumber);
+    sizeHeight                       = Min(sizeHeight, maximumNumber);
     Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
 
     // Reload if visual size is updated
@@ -1261,13 +1262,13 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
       Texture maskTexture = textureSet.GetTexture(1);
       if(maskTexture)
       {
-        mImageSize.SetWidth(std::min(static_cast<uint32_t>(mImageSize.GetWidth() * mMaskingData->mContentScaleFactor), maskTexture.GetWidth()));
-        mImageSize.SetHeight(std::min(static_cast<uint32_t>(mImageSize.GetHeight() * mMaskingData->mContentScaleFactor), maskTexture.GetHeight()));
+        mImageSize.SetWidth(Min(static_cast<uint32_t>(mImageSize.GetWidth() * mMaskingData->mContentScaleFactor), maskTexture.GetWidth()));
+        mImageSize.SetHeight(Min(static_cast<uint32_t>(mImageSize.GetHeight() * mMaskingData->mContentScaleFactor), maskTexture.GetHeight()));
 
-        float   textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-        float   textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
-        Vector2 textureRatio(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
-                             std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+        float   textureWidth  = Max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        float   textureHeight = Max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        Vector2 textureRatio(Min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                             Min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
         mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, textureRatio);
       }
     }

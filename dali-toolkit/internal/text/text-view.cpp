@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/text-view.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>
 #include <memory.h>
 
@@ -42,7 +43,7 @@ void GlyphMemmove(T* buffer, Length bufferSize, Length dstIndex, Length srcIndex
 
   const Length maxByDst  = bufferSize - dstIndex;
   const Length maxBySrc  = bufferSize - srcIndex;
-  Length       safeCount = std::min(count, std::min(maxByDst, maxBySrc));
+  Length       safeCount = Min(count, Min(maxByDst, maxBySrc));
 
   if(safeCount > 0u)
   {
@@ -154,7 +155,7 @@ void InsertEllipsisGlyph(
 
       const float characterSpacing = GetGlyphCharacterSpacing(indexOfEllipsis, characterSpacingGlyphRuns, modelCharacterSpacing);
       calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
-      removedGlyphsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
+      removedGlyphsWidth += Min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
       // Calculate the width of the ellipsis glyph and check if it fits.
       const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
@@ -194,7 +195,7 @@ void InsertEllipsisGlyph(
                   firstPenX = -ellipsisGlyph.xBearing;
                 }
                 //Reset the width of removed glyphs
-                removedGlyphsWidth = std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width)) - ellipsisGlyph.xBearing;
+                removedGlyphsWidth = Min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width)) - ellipsisGlyph.xBearing;
 
                 --indexOfEllipsis;
                 continue;
@@ -589,7 +590,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
             if(lineIndex < numberOfLines)
             {
               line          = lineBuffer + lineIndex;
-              minLineOffset = std::min(minLineOffset, line->alignmentOffset);
+              minLineOffset = Min(minLineOffset, line->alignmentOffset);
 
               lastGlyphIndexOfLine = (line->isSplitToTwoHalves ? line->glyphRunSecondHalf.glyphIndex + line->glyphRunSecondHalf.numberOfGlyphs : line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs) - 1u;
 

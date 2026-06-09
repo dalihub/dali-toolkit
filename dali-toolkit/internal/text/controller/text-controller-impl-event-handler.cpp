@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
@@ -298,7 +299,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     {
       if(!isShiftModifier && eventData.mDecorator->IsHighlightVisible())
       {
-        primaryCursorPosition = std::min(eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+        primaryCursorPosition = Min(eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
       }
       else
       {
@@ -312,7 +313,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     {
       if(!isShiftModifier && eventData.mDecorator->IsHighlightVisible())
       {
-        primaryCursorPosition = std::max(eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+        primaryCursorPosition = Max(eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
       }
       else
       {
@@ -769,8 +770,8 @@ void ControllerImplEventHandler::OnSelectRangeEvent(Controller::Impl& impl, cons
 
     // Calculate the selection index.
     const uint32_t length = static_cast<uint32_t>(model->mLogicalModel->mText.Count());
-    const uint32_t start  = std::min(event.p2.mUint, length);
-    const uint32_t end    = std::min(event.p3.mUint, length);
+    const uint32_t start  = Min(event.p2.mUint, length);
+    const uint32_t end    = Min(event.p3.mUint, length);
 
     if(start != end)
     {

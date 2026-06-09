@@ -21,10 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
-#include <string.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
+#include <string.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
@@ -208,7 +209,7 @@ bool LoadEnvironmentMapData(const std::string& environmentMapUrl, Scene3D::Loade
 
       if(pixelDataWidth > 0u && pixelDataHeight > 0u)
       {
-        uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(std::min(pixelDataWidth, pixelDataHeight))));
+        uint32_t mipmap = static_cast<uint32_t>(1 + std::floor(std::log2(Min(pixelDataWidth, pixelDataHeight))));
         environmentMapData.SetMipmapLevels(mipmap);
       }
     }

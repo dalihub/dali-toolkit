@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <cmath>
 #include <limits>
 
@@ -285,10 +286,10 @@ struct Engine::Impl
     }
 
     // Sets the maximum ascender.
-    lineLayout.ascender = std::max(lineLayout.ascender, fontMetrics.ascender);
+    lineLayout.ascender = Max(lineLayout.ascender, fontMetrics.ascender);
 
     // Sets the minimum descender.
-    lineLayout.descender = std::min(lineLayout.descender, fontMetrics.descender);
+    lineLayout.descender = Min(lineLayout.descender, fontMetrics.descender);
 
     lineLayout.lineSpacing = GetLineSpacing(lineLayout.ascender + -lineLayout.descender, lineLayout.relativeLineSize);
   }
@@ -314,10 +315,10 @@ struct Engine::Impl
     lineLayout.whiteSpaceLengthEndOfLine = tmpLineLayout.whiteSpaceLengthEndOfLine;
 
     // Sets the maximum ascender.
-    lineLayout.ascender = std::max(lineLayout.ascender, tmpLineLayout.ascender);
+    lineLayout.ascender = Max(lineLayout.ascender, tmpLineLayout.ascender);
 
     // Sets the minimum descender.
-    lineLayout.descender = std::min(lineLayout.descender, tmpLineLayout.descender);
+    lineLayout.descender = Min(lineLayout.descender, tmpLineLayout.descender);
 
     // To handle cases START in ellipsis position when want to shift first glyph to let width fit.
     if(isShifted)
@@ -503,11 +504,11 @@ struct Engine::Impl
 
           if(parameters.textModel->mRemoveBackInset)
           {
-            length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+            length = Max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
           }
           else
           {
-            length = std::max(length, penX + glyphMetrics.advance);
+            length = Max(length, penX + glyphMetrics.advance);
           }
 
           penX += (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
@@ -576,11 +577,11 @@ struct Engine::Impl
 
         if(parameters.textModel->mRemoveBackInset)
         {
-          length = std::max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
+          length = Max(length, penX + glyphMetrics.xBearing + glyphMetrics.width);
         }
         else
         {
-          length = std::max(length, penX + glyphMetrics.advance);
+          length = Max(length, penX + glyphMetrics.advance);
         }
         penX += (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
       }
@@ -686,7 +687,7 @@ struct Engine::Impl
           }
           else
           {
-            lineLayout.length = std::max(length, lineLayout.length);
+            lineLayout.length = Max(length, lineLayout.length);
           }
         }
       }
@@ -924,11 +925,11 @@ struct Engine::Impl
 
         if(parameters.textModel->mRemoveBackInset)
         {
-          tmpLineLayout.length = std::max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width);
+          tmpLineLayout.length = Max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width);
         }
         else
         {
-          tmpLineLayout.length = std::max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.advance);
+          tmpLineLayout.length = Max(tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.advance);
         }
 
         // Clear the white space length at the end of the line.
@@ -1007,7 +1008,7 @@ struct Engine::Impl
           else
           {
             tmpLineLayout.penX -= (glyphMetrics.advance + parameters.interGlyphExtraAdvance);
-            tmpLineLayout.length -= (std::min(glyphMetrics.advance + parameters.interGlyphExtraAdvance, glyphMetrics.xBearing + glyphMetrics.width));
+            tmpLineLayout.length -= (Min(glyphMetrics.advance + parameters.interGlyphExtraAdvance, glyphMetrics.xBearing + glyphMetrics.width));
           }
 
           if(isSecondHalf)
@@ -1369,7 +1370,7 @@ struct Engine::Impl
                              (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded :
                              (((mLayout == MULTI_LINE_BOX) &&
                              !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) &&
-                             (penY - layout.descender + std::max(0.f, GetLineSpacing(layout.ascender - layout.descender, mRelativeLineSize)) > layoutParameters.boundingBox.height)) ||
+                             (penY - layout.descender + Max(0.f, GetLineSpacing(layout.ascender - layout.descender, mRelativeLineSize)) > layoutParameters.boundingBox.height)) ||
                              ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
 
     const bool isMultiline = !enforceEllipsisInSingleLine && (mLayout == MULTI_LINE_BOX);
@@ -1815,7 +1816,7 @@ struct Engine::Impl
     Vector<LineRun> newLines;
 
     // Estimate the number of lines.
-    Length linesCapacity = std::max(1u, layoutParameters.estimatedNumberOfLines);
+    Length linesCapacity = Max(1u, layoutParameters.estimatedNumberOfLines);
     Length numberOfLines = 0u;
 
     if(updateCurrentBuffer)
@@ -2231,7 +2232,7 @@ struct Engine::Impl
                                    matchLayoutDirection);
 
       // Updates the alignment offset.
-      alignmentOffset = std::min(alignmentOffset, line.alignmentOffset);
+      alignmentOffset = Min(alignmentOffset, line.alignmentOffset);
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/text-selection-handle-controller.h>
 
+// EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <limits>
 
 // INTERNAL INCLUDES
@@ -206,8 +208,8 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
       quad.w = selectionBoxInfo->lineOffset + selectionBoxInfo->lineHeight;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min(selectionBoxInfo->minX, quad.x);
-      selectionBoxInfo->maxX = std::max(selectionBoxInfo->maxX, quad.z);
+      selectionBoxInfo->minX = Min(selectionBoxInfo->minX, quad.x);
+      selectionBoxInfo->maxX = Max(selectionBoxInfo->maxX, quad.z);
 
       decorator->AddHighlight(actualNumberOfQuads, quad);
       ++actualNumberOfQuads;
@@ -237,8 +239,8 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
       quad.w = quad.y + selectionBoxInfo->lineHeight;
 
       // Store the min and max 'x' for each line.
-      selectionBoxInfo->minX = std::min(selectionBoxInfo->minX, quad.x);
-      selectionBoxInfo->maxX = std::max(selectionBoxInfo->maxX, quad.z);
+      selectionBoxInfo->minX = Min(selectionBoxInfo->minX, quad.x);
+      selectionBoxInfo->maxX = Max(selectionBoxInfo->maxX, quad.z);
 
       decorator->AddHighlight(actualNumberOfQuads,
                               quad);
@@ -254,8 +256,8 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
     quad.w = quad.y + selectionBoxInfo->lineHeight;
 
     // Store the min and max 'x' for each line.
-    selectionBoxInfo->minX = std::min(selectionBoxInfo->minX, quad.x);
-    selectionBoxInfo->maxX = std::max(selectionBoxInfo->maxX, quad.z);
+    selectionBoxInfo->minX = Min(selectionBoxInfo->minX, quad.x);
+    selectionBoxInfo->maxX = Max(selectionBoxInfo->maxX, quad.z);
 
     decorator->AddHighlight(actualNumberOfQuads,
                             quad);
@@ -311,8 +313,8 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
 
     // Update the size of the highlighted text.
     highLightSize.height += info.lineHeight;
-    minHighlightX = std::min(minHighlightX, info.minX);
-    maxHighlightX = std::max(maxHighlightX, info.maxX);
+    minHighlightX = Min(minHighlightX, info.minX);
+    maxHighlightX = Max(maxHighlightX, info.maxX);
   }
 
   // Add extra geometry to 'boxify' the selection.
@@ -534,7 +536,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl, float visualX
     eventData->mScrollAfterUpdatePosition = (eventData->mLeftSelectionPosition != eventData->mRightSelectionPosition);
 
     // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-    eventData->mPrimaryCursorPosition = std::max(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
+    eventData->mPrimaryCursorPosition = Max(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
 
     if(impl.mSelectableControlInterface != nullptr)
     {
@@ -584,8 +586,8 @@ void SelectionHandleController::Update(Controller::Impl& impl, HandleType handle
                                      cursorInfo.lineHeight);
 
   // If selection handle at start of the text and other at end of the text then all text is selected.
-  const CharacterIndex startOfSelection = std::min(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
-  const CharacterIndex endOfSelection   = std::max(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
+  const CharacterIndex startOfSelection = Min(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
+  const CharacterIndex endOfSelection   = Max(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
   eventData->mAllTextSelected           = (startOfSelection == 0) && (endOfSelection == model->mLogicalModel->mText.Count());
 }
 

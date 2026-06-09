@@ -41,6 +41,11 @@ IF (HAVE_NO_IGNORED_ATTRIBUTES)
   ADD_COMPILE_OPTIONS( -Wno-ignored-attributes )
 ENDIF()
 
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-command-line-argument HAVE_NO_UNUSED_COMMAND_LINE_ARGUMENT)
+IF (HAVE_NO_UNUSED_COMMAND_LINE_ARGUMENT)
+  ADD_COMPILE_OPTIONS( -Wno-unused-command-line-argument )
+ENDIF()
+
 ADD_SUBDIRECTORY(src)
 
 #Internationalization

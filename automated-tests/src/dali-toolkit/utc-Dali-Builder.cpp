@@ -1958,7 +1958,8 @@ int UtcDaliBuilderCustomControl(void)
   DALI_TEST_CHECK(dummyControl);
   if(dummyControl)
   {
-    DALI_TEST_CHECK(typeid(dummyControl.GetImplementation()) == typeid(DummyControlImpl));
+    auto& impl = dummyControl.GetImplementation();
+    DALI_TEST_CHECK(typeid(impl) == typeid(DummyControlImpl));
   }
 
   END_TEST;

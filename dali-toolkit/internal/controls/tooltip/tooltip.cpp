@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cmath>
 
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>
@@ -563,7 +563,11 @@ bool Tooltip::OnTimeout()
 
     mPopup.SetDisplayState(Toolkit::Popup::SHOWN);
 
-    Stage::GetCurrent().Add(mPopup);
+    Window window = DevelWindow::Get(control);
+    if(window)
+    {
+      window.Add(mPopup);
+    }
   }
 
   return false;
@@ -591,7 +595,14 @@ void Tooltip::OnRelayout(Actor actor)
       }
     }
 
-    Vector2 stageSize = Stage::GetCurrent().GetSize();
+    // actor is the popup background which is on scene, so window should always be valid here.
+    Window window = DevelWindow::Get(actor);
+    if(!window)
+    {
+      return;
+    }
+    auto    winSize = window.GetSize();
+    Vector2 windowSize(static_cast<float>(winSize.GetWidth()), static_cast<float>(winSize.GetHeight()));
     Vector3 position;
 
     switch(mPositionType)
@@ -611,8 +622,8 @@ void Tooltip::OnRelayout(Actor actor)
           Vector3 worldPos = control.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
           float   height   = control.GetRelayoutSize(Dimension::HEIGHT);
 
-          position.x = stageSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
-          position.y = stageSize.height * 0.5f + worldPos.y - height * 0.5f - popupHeight * 1.0f - tailHeight;
+          position.x = windowSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
+          position.y = windowSize.height * 0.5f + worldPos.y - height * 0.5f - popupHeight * 1.0f - tailHeight;
         }
         break;
       }
@@ -625,8 +636,8 @@ void Tooltip::OnRelayout(Actor actor)
           Vector3 worldPos = control.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
           float   height   = control.GetRelayoutSize(Dimension::HEIGHT);
 
-          position.x = stageSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
-          position.y = stageSize.height * 0.5f + worldPos.y + height * 0.5f + tailHeight;
+          position.x = windowSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
+          position.y = windowSize.height * 0.5f + worldPos.y + height * 0.5f + tailHeight;
         }
         break;
       }
@@ -638,9 +649,9 @@ void Tooltip::OnRelayout(Actor actor)
     {
       position.x = 0.0f;
     }
-    else if((position.x + popupWidth) > stageSize.width)
+    else if((position.x + popupWidth) > windowSize.width)
     {
-      position.x -= position.x + popupWidth - stageSize.width;
+      position.x -= position.x + popupWidth - windowSize.width;
     }
 
     bool yPosChanged = false;
@@ -649,10 +660,10 @@ void Tooltip::OnRelayout(Actor actor)
       yPosChanged = true;
       position.y  = 0.0f;
     }
-    else if((position.y + popupHeight) > stageSize.height)
+    else if((position.y + popupHeight) > windowSize.height)
     {
       yPosChanged = true;
-      position.y -= position.y + popupHeight - stageSize.height;
+      position.y -= position.y + popupHeight - windowSize.height;
     }
 
     if(yPosChanged && tail)

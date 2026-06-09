@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 
 // FILE HEADER
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
@@ -89,11 +92,11 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
       const GlyphInfo& glyphInfo = *(glyphsBuffer + glyphIndex + i);
 
       // update the initial xBearing if smaller.
-      glyphMetrics.xBearing = std::min(glyphMetrics.xBearing, glyphMetrics.advance + glyphInfo.xBearing);
+      glyphMetrics.xBearing = Min(glyphMetrics.xBearing, glyphMetrics.advance + glyphInfo.xBearing);
 
       // update the max width edge if bigger.
       const float currentMaxGlyphWidthEdge = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width;
-      maxWidthEdge                         = std::max(maxWidthEdge, currentMaxGlyphWidthEdge);
+      maxWidthEdge                         = Max(maxWidthEdge, currentMaxGlyphWidthEdge);
 
       glyphMetrics.advance += (glyphInfo.advance);
     }

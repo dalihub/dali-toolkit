@@ -30,7 +30,6 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
@@ -38,6 +37,7 @@
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <algorithm>
 #include <string_view>
@@ -251,16 +251,16 @@ void SetShadowLightConstraint(Dali::CameraActor selectedCamera, Dali::CameraActo
     for(auto&& point : points)
     {
       Vector4 pointV = shadowCameraViewMatrix * point;
-      areaMin.x      = std::min(areaMin.x, pointV.x);
-      areaMin.y      = std::min(areaMin.y, pointV.y);
-      areaMin.z      = std::min(areaMin.z, pointV.z);
-      areaMax.x      = std::max(areaMax.x, pointV.x);
-      areaMax.y      = std::max(areaMax.y, pointV.y);
-      areaMax.z      = std::max(areaMax.z, pointV.z);
+      areaMin.x      = Min(areaMin.x, pointV.x);
+      areaMin.y      = Min(areaMin.y, pointV.y);
+      areaMin.z      = Min(areaMin.z, pointV.z);
+      areaMax.x      = Max(areaMax.x, pointV.x);
+      areaMax.y      = Max(areaMax.y, pointV.y);
+      areaMax.z      = Max(areaMax.z, pointV.z);
     }
 
     Vector2 center        = Vector2(areaMax + areaMin) * 0.5;
-    float   delta         = std::max(std::abs(areaMax.x - areaMin.x), std::abs(areaMax.y - areaMin.y));
+    float   delta         = Max(std::abs(areaMax.x - areaMin.x), std::abs(areaMax.y - areaMin.y));
     float   delta_2       = delta * 0.5f;
     Vector2 squareAreaMin = center - Vector2::ONE * delta_2;
     Vector2 squareAreaMax = center + Vector2::ONE * delta_2;
@@ -736,7 +736,7 @@ void SceneView::SetShadow(Scene3D::Light light)
   SetShadowLightConstraint(selectedCamera, lightCamera);
 
   // make framebuffer for depth map and set it to render task.
-  uint32_t shadowMapBufferSize = std::min(std::max(GetResolutionWidth(), GetResolutionHeight()), MAXIMUM_SIZE_SHADOW_MAP);
+  uint32_t shadowMapBufferSize = Min(Max(GetResolutionWidth(), GetResolutionHeight()), MAXIMUM_SIZE_SHADOW_MAP);
   UpdateShadowMapBuffer(shadowMapBufferSize);
 
   // use lightCamera as a camera of shadow render task.
@@ -939,8 +939,8 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     capturePossible = false;
   }
 
-  uint32_t width  = std::max(1u, unsigned(size.width));
-  uint32_t height = std::max(1u, unsigned(size.height));
+  uint32_t width  = Max(1u, unsigned(size.width));
+  uint32_t height = Max(1u, unsigned(size.height));
   if(width > Dali::GetMaxTextureSize() || height > Dali::GetMaxTextureSize())
   {
     DALI_LOG_ERROR("The input size is too large.\n");
@@ -1415,7 +1415,7 @@ void SceneView::UpdateRenderTask()
     uint32_t width  = GetResolutionWidth();
     uint32_t height = GetResolutionHeight();
 
-    uint32_t shadowMapBufferSize = std::min(std::max(width, height), MAXIMUM_SIZE_SHADOW_MAP);
+    uint32_t shadowMapBufferSize = Min(Max(width, height), MAXIMUM_SIZE_SHADOW_MAP);
     UpdateShadowMapBuffer(shadowMapBufferSize);
 
     if(mUseFrameBuffer)
@@ -1890,8 +1890,8 @@ void SceneView::RequestCameraTransition()
 
     float destinationNearPlaneDistance = mTransitionDestinationCamera.GetNearClippingPlane();
     float destinationFarPlaneDistance  = mTransitionDestinationCamera.GetFarClippingPlane();
-    mTransitionCamera.SetNearClippingPlane(std::min(mTransitionSourceCamera.GetNearClippingPlane(), destinationNearPlaneDistance));
-    mTransitionCamera.SetFarClippingPlane(std::max(mTransitionSourceCamera.GetFarClippingPlane(), destinationFarPlaneDistance));
+    mTransitionCamera.SetNearClippingPlane(Min(mTransitionSourceCamera.GetNearClippingPlane(), destinationNearPlaneDistance));
+    mTransitionCamera.SetFarClippingPlane(Max(mTransitionSourceCamera.GetFarClippingPlane(), destinationFarPlaneDistance));
 
     mTransitionCamera.SetProperty(Dali::DevelCameraActor::Property::PROJECTION_DIRECTION, destinationProjectionDirection);
     mTransitionCamera.SetProjectionMode(mTransitionDestinationCamera.GetProjectionMode());

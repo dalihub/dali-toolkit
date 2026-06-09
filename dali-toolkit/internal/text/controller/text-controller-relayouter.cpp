@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <algorithm>
 #include <cmath>
@@ -444,7 +445,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
       while(minIndex < maxIndex)
       {
         uint32_t    testIndex     = minIndex + ((maxIndex - minIndex) >> 1u);
-        const float testPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
+        const float testPointSize = Min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
 
         if(CheckForTextFit(controller, testPointSize, layoutSize))
         {
@@ -459,7 +460,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
           maxIndex              = testIndex;
         }
       }
-      bestPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
+      bestPointSize = Min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
 
       // Best point size was not updated. re-run so the TextFit should be fitted really.
       if(!bestSizeUpdatedLatest)
@@ -512,17 +513,17 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
 
       float aBasedX = (resultBasedX[1] - resultBasedX[0]) / (tmpPointSize[1] - tmpPointSize[0]);
       float bBasedX = resultBasedX[1] - aBasedX * tmpPointSize[1];
-      aBasedX       = std::max(aBasedX, Dali::Math::MACHINE_EPSILON_1000);
+      aBasedX       = Max(aBasedX, Dali::Math::MACHINE_EPSILON_1000);
 
       float aBasedY = (resultBasedY[1] - resultBasedY[0]) / (tmpPointSize[1] - tmpPointSize[0]);
       float bBasedY = resultBasedY[1] - aBasedY * tmpPointSize[1];
-      aBasedY       = std::max(aBasedY, Dali::Math::MACHINE_EPSILON_1000);
+      aBasedY       = Max(aBasedY, Dali::Math::MACHINE_EPSILON_1000);
 
       float bestPointSizeBasedX = (layoutSize.x - bBasedX) / aBasedX;
       float bestPointSizeBasedY = (layoutSize.y - bBasedY) / aBasedY;
 
-      bestPointSize = std::min(bestPointSizeBasedX, bestPointSizeBasedY);
-      bestPointSize = std::min(std::max(bestPointSize, minPointSize), maxPointSize);
+      bestPointSize = Min(bestPointSizeBasedX, bestPointSizeBasedY);
+      bestPointSize = Min(Max(bestPointSize, minPointSize), maxPointSize);
       bestPointSize = std::floor((bestPointSize - minPointSize) / pointInterval) * pointInterval + minPointSize;
 
       if(CheckForTextFit(controller, bestPointSize, layoutSize))

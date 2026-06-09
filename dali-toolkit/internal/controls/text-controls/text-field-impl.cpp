@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
@@ -505,11 +505,6 @@ void TextField::OnInitialize()
   mController->SetNoTextDoubleTapAction(Controller::NoTextTap::HIGHLIGHT);
   mController->SetNoTextLongPressAction(Controller::NoTextTap::HIGHLIGHT);
 
-  // Sets layoutDirection value
-  Dali::Stage                 stage           = Dali::Stage::GetCurrent();
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  mController->SetLayoutDirection(layoutDirection);
-
   self.LayoutDirectionChangedSignal().Connect(this, &TextField::OnLayoutDirectionChanged);
 
   if(Dali::Adaptor::IsAvailable())
@@ -523,16 +518,6 @@ void TextField::OnInitialize()
   GetTapGestureDetector().ReceiveAllTapEvents(true);
 
   self.TouchedSignal().Connect(this, &TextField::OnTouched);
-
-  // Set BoundingBox to stage size if not already set.
-  BoundsInteger boundingBox;
-  mDecorator->GetBoundingBox(boundingBox);
-
-  if(boundingBox.IsEmpty())
-  {
-    Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-    mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(std::roundf(stageSize.width)), static_cast<int32_t>(std::roundf(stageSize.height))));
-  }
 
   // Flip vertically the 'left' selection handle
   mDecorator->FlipHandleVertically(LEFT_SELECTION_HANDLE, true);
@@ -1187,6 +1172,23 @@ void TextField::OnSceneConnection(int depth)
 
   // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
   ControlImpl::OnSceneConnection(depth);
+
+  Dali::Window window = DevelWindow::Get(Self());
+  if(window)
+  {
+    // Sets layoutDirection value
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+    mController->SetLayoutDirection(layoutDirection);
+
+    // Set BoundingBox to window size if not already set.
+    BoundsInteger boundingBox;
+    mDecorator->GetBoundingBox(boundingBox);
+    if(boundingBox.IsEmpty())
+    {
+      Dali::Window::WindowSize windowSize = window.GetSize();
+      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(windowSize.GetWidth()), static_cast<int32_t>(windowSize.GetHeight())));
+    }
+  }
 }
 
 bool TextField::OnTouched(Actor actor, TouchEvent touch)

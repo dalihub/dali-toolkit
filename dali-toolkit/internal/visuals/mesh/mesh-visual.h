@@ -123,7 +123,7 @@ private:
   /**
    * @brief Update shader related info, uniforms, etc. for the new shader.
    */
-  void UpdateShaderUniforms();
+  void UpdateShaderUniforms(Vector2 windowSize);
 
   /**
    * @brief Use the object URL stored in the mesh visual to load and create the geometry of the object.

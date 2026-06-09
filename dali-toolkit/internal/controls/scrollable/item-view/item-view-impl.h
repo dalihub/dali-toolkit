@@ -417,6 +417,7 @@ private: // From Control
    * @copydoc Toolkit::Control::OnInitialize()
    */
   void OnInitialize() override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
@@ -635,7 +636,8 @@ private:
   float mRefreshIntervalLayoutPositions; ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
   float mMinimumSwipeSpeed;
   float mMinimumSwipeDistance;
-  float mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each wheel event received.
+  float mWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates for each wheel event received.
+  bool  mWheelScrollDistanceStepSet : 1; ///< Whether mWheelScrollDistanceStep was explicitly set by the user.
   float mScrollDistance;
   float mScrollSpeed;
   float mScrollOvershoot;

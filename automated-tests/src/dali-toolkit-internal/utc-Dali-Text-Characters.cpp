@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@ using namespace Text;
 
 namespace
 {
-const std::string  DEFAULT_FONT_DIR("/resources/fonts");
-const unsigned int DEFAULT_FONT_SIZE = 1152u;
+const std::string DEFAULT_FONT_DIR("/resources/fonts");
 
 struct RetrieveClusteredCharactersOfCharacterIndexData
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h>
 #include <memory.h>
 
 // INTERNAL INCLUDES
@@ -45,7 +46,7 @@ void GlyphMemmove(T* buffer, Length bufferSize, Length dstIndex, Length srcIndex
 
   const Length maxByDst  = bufferSize - dstIndex;
   const Length maxBySrc  = bufferSize - srcIndex;
-  Length       safeCount = std::min(count, std::min(maxByDst, maxBySrc));
+  Length       safeCount = Min(count, Min(maxByDst, maxBySrc));
 
   if(safeCount > 0u)
   {
@@ -561,7 +562,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
 
               // For AutoScroll, there are cases where the layout is larger than the control.
               // If the layout is larger than the max texture, it should be ellipsised.
-              const float controlWidth = std::max(mModel->GetControlSize().width, mModel->GetLayoutSize().width);
+              const float controlWidth = Max(mModel->GetControlSize().width, mModel->GetLayoutSize().width);
 
               bool isRTLLine = ellipsisLine->direction;
               // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
@@ -622,7 +623,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                           firstPenX = -ellipsisGlyph.xBearing;
                         }
                         //Reset the width of removed glyphs
-                        removedGlypsWidth = std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width)) - ellipsisGlyph.xBearing;
+                        removedGlypsWidth = Min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width)) - ellipsisGlyph.xBearing;
 
                         --indexOfEllipsis;
                         continue;

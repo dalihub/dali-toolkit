@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PRIMITIVE_VISUAL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,7 @@ private:
   /**
    * @brief Update shader related info, uniforms, etc. for the new shader.
    */
-  void UpdateShaderUniforms();
+  void UpdateShaderUniforms(Vector2 windowSize);
 
   /**
    * @brief Create the geometry of the given primitive type.

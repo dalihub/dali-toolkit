@@ -2,12 +2,13 @@
 #define __DALI_TOOLKIT_ACCESSIBILITY_TEST_UTILS__
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/scene.h>
 
 namespace Dali
 {
 namespace Accessibility
 {
-void                                                                           TestEnableSC(bool b);
+void                                                                           TestEnableSC(bool b, Dali::Integration::Scene scene);
 std::vector<Address>                                                           TestGetChildren(const Address& adr);
 std::string                                                                    TestGetName(const Address& adr);
 std::string                                                                    TestGetDescription(const Address& adr);

@@ -328,9 +328,8 @@ private:
 
 struct AsyncTaskManager::TasksCompletedImpl
 {
-  TasksCompletedImpl(AsyncTaskManager& manager, EventThreadCallback* trigger)
-  : mManager(manager),
-    mTrigger(trigger),
+  TasksCompletedImpl(EventThreadCallback* trigger)
+  : mTrigger(trigger),
     mEmitCompletedTaskTriggered(false)
   {
   }
@@ -613,7 +612,6 @@ private:
   };
 
 private:
-  AsyncTaskManager&    mManager; ///< Owner of this CacheImpl.
   EventThreadCallback* mTrigger; ///< EventThread callback trigger. (Not owned.)
 
   Dali::AsyncTaskManager::TasksCompletedId mTasksCompletedCount{0u};
@@ -645,7 +643,7 @@ AsyncTaskManager::AsyncTaskManager()
 : mTasks(GetNumberOfThreads(NUMBER_OF_ASYNC_THREADS_ENV, DEFAULT_NUMBER_OF_ASYNC_THREADS), [&]()
 { return TaskHelper(*this); }),
   mTrigger(new EventThreadCallback(MakeCallback(this, &AsyncTaskManager::TaskCompleted))),
-  mTasksCompletedImpl(new TasksCompletedImpl(*this, mTrigger.get()))
+  mTasksCompletedImpl(new TasksCompletedImpl(mTrigger.get()))
 {
 }
 

@@ -17,11 +17,13 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <initializer_list>
 #include <iostream>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 #include <dali-toolkit/internal/text/multi-language-support-impl.h>
@@ -74,6 +76,8 @@ namespace
 const std::string  DEFAULT_FONT_DIR("/resources/fonts");
 const unsigned int EMOJI_FONT_SIZE       = 3840u; // 60 * 64
 const unsigned int NON_DEFAULT_FONT_SIZE = 40u;
+const Character    CHAR_ZWJ              = 0x200Du;
+const Character    CHAR_ZWNJ             = 0x200Cu;
 
 struct MergeFontDescriptionsData
 {
@@ -111,6 +115,144 @@ struct ValidateFontsData
 };
 
 //////////////////////////////////////////////////////////
+Vector<Character> MakeEmojiTestText(std::initializer_list<Character> characters)
+{
+  Vector<Character> text;
+  text.Reserve(characters.size());
+  for(Character character : characters)
+  {
+    text.PushBack(character);
+  }
+
+  return text;
+}
+
+void CheckEmojiSequence(std::initializer_list<Character> characters,
+                        Length                           startIndex,
+                        TextAbstraction::Script          currentScript,
+                        bool                             expectedResult,
+                        Length                           expectedLength,
+                        TextAbstraction::Script          expectedScript)
+{
+  Vector<Character> text = MakeEmojiTestText(characters);
+
+  Length                  sequenceLength = 0u;
+  TextAbstraction::Script sequenceScript = currentScript;
+  const Length            lastIndex      = text.Count() - 1u;
+  const bool              result         = GetEmojiSequence(text.Begin(),
+                                                            startIndex,
+                                                            lastIndex,
+                                                            currentScript,
+                                                            sequenceLength,
+                                                            sequenceScript);
+
+  DALI_TEST_EQUALS(result, expectedResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(sequenceLength, expectedLength, TEST_LOCATION);
+  DALI_TEST_EQUALS(sequenceScript, expectedScript, TEST_LOCATION);
+}
+
+void CheckNoEmojiSequence(std::initializer_list<Character> characters,
+                          Length                           startIndex,
+                          Length                           lastIndex,
+                          TextAbstraction::Script          currentScript)
+{
+  Vector<Character> text = MakeEmojiTestText(characters);
+
+  Length                  sequenceLength = 1u;
+  TextAbstraction::Script sequenceScript = currentScript;
+  const bool              result         = GetEmojiSequence(text.Begin(),
+                                                            startIndex,
+                                                            lastIndex,
+                                                            currentScript,
+                                                            sequenceLength,
+                                                            sequenceScript);
+
+  DALI_TEST_CHECK(!result);
+  DALI_TEST_EQUALS(sequenceLength, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sequenceScript, currentScript, TEST_LOCATION);
+}
+
+void CheckNewSequence(std::initializer_list<Character> characters,
+                      Length                           currentIndex,
+                      TextAbstraction::Script          currentRunScript,
+                      TextAbstraction::Script          initialScript,
+                      bool                             expectedResult,
+                      TextAbstraction::Script          expectedScript)
+{
+  Vector<Character> text = MakeEmojiTestText(characters);
+
+  TextAbstraction::Script script = initialScript;
+  const bool              result = IsNewSequence(text.Begin(),
+                                                 currentRunScript,
+                                                 currentIndex,
+                                                 text.Count() - 1u,
+                                                 script);
+
+  DALI_TEST_EQUALS(result, expectedResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(script, expectedScript, TEST_LOCATION);
+}
+
+void CheckFollowSequence(TextAbstraction::Script currentRunScript,
+                         Character               character,
+                         TextAbstraction::Script initialScript,
+                         bool                    expectedResult,
+                         TextAbstraction::Script expectedScript)
+{
+  TextAbstraction::Script script = initialScript;
+  const bool              result = IsScriptChangedToFollowSequence(currentRunScript, character, script);
+
+  DALI_TEST_EQUALS(result, expectedResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(script, expectedScript, TEST_LOCATION);
+}
+
+bool GetFontAtCharacter(const Vector<FontRun>& fonts, CharacterIndex characterIndex, FontId& fontId)
+{
+  for(Vector<FontRun>::ConstIterator it = fonts.Begin(), endIt = fonts.End(); it != endIt; ++it)
+  {
+    const CharacterIndex begin = it->characterRun.characterIndex;
+    const CharacterIndex end   = begin + it->characterRun.numberOfCharacters;
+    if(characterIndex >= begin && characterIndex < end)
+    {
+      fontId = it->fontId;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void ValidateFontsForCharacters(MultilanguageSupport&                         multilanguageSupport,
+                                TextAbstraction::FontClient&                  fontClient,
+                                std::initializer_list<Character>              characters,
+                                const TextAbstraction::FontDescription&       defaultFontDescription,
+                                const TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                                Vector<ScriptRun>&                            scripts,
+                                Vector<FontRun>&                              fonts,
+                                const Vector<FontDescriptionRun>&             fontDescriptions = Vector<FontDescriptionRun>())
+{
+  Vector<Character> text = MakeEmojiTestText(characters);
+
+  scripts.Clear();
+  fonts.Clear();
+
+  multilanguageSupport.SetScripts(text, 0u, text.Count(), scripts);
+  multilanguageSupport.ValidateFonts(fontClient,
+                                     text,
+                                     scripts,
+                                     fontDescriptions,
+                                     defaultFontDescription,
+                                     defaultFontPointSize,
+                                     1.f,
+                                     0u,
+                                     text.Count(),
+                                     fonts);
+
+  DALI_TEST_CHECK(!scripts.Empty());
+  DALI_TEST_CHECK(!fonts.Empty());
+  const FontRun& lastRun = fonts[fonts.Count() - 1u];
+  DALI_TEST_EQUALS(lastRun.characterRun.characterIndex + lastRun.characterRun.numberOfCharacters, text.Count(), TEST_LOCATION);
+}
+
 bool MergeFontDescriptionsTest(const MergeFontDescriptionsData& data)
 {
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -609,6 +751,483 @@ int UtcDaliTextMergeFontDescriptions(void)
       tet_result(TET_FAIL);
     }
   }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextEmojiHelperSequences(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEmojiHelperSequences");
+
+  CheckEmojiSequence({0x0033u, TextAbstraction::CHAR_VARIATION_SELECTOR_16, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                     0u,
+                     TextAbstraction::ASCII_DIGITS,
+                     true,
+                     3u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x0033u, TextAbstraction::CHAR_VARIATION_SELECTOR_15, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                     0u,
+                     TextAbstraction::ASCII_DIGITS,
+                     true,
+                     3u,
+                     TextAbstraction::EMOJI_TEXT);
+  CheckEmojiSequence({0x0023u, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                     0u,
+                     TextAbstraction::COMMON,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI);
+  CheckEmojiSequence({0x1F1F0u, 0x1F1F7u},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x1F1F0u},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     1u,
+                     TextAbstraction::EMOJI);
+  CheckEmojiSequence({0x1F469u, 0x1F3FBu, CHAR_ZWJ, 0x1F52Cu},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     4u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x1F600u, CHAR_ZWJ},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x1F3F4u, 0xE0067u, 0xE0062u, 0xE007Fu},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     4u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x1F3F4u, 0xE0067u, 0x0041u},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     1u,
+                     TextAbstraction::EMOJI);
+  CheckEmojiSequence({0x2194u, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                     0u,
+                     TextAbstraction::COMMON,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x2194u, TextAbstraction::CHAR_VARIATION_SELECTOR_15},
+                     0u,
+                     TextAbstraction::COMMON,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI_TEXT);
+  CheckEmojiSequence({0x00A9u},
+                     0u,
+                     TextAbstraction::COMMON,
+                     true,
+                     1u,
+                     TextAbstraction::EMOJI);
+  CheckEmojiSequence({0x1FAE0u},
+                     0u,
+                     TextAbstraction::UNKNOWN,
+                     true,
+                     1u,
+                     TextAbstraction::EMOJI);
+  CheckEmojiSequence({0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                     0u,
+                     TextAbstraction::ASCII_DIGITS,
+                     true,
+                     2u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckEmojiSequence({0x1F9D1u, CHAR_ZWJ, 0x1F9B0u},
+                     0u,
+                     TextAbstraction::EMOJI,
+                     true,
+                     3u,
+                     TextAbstraction::EMOJI_COLOR);
+  CheckNoEmojiSequence({TextAbstraction::CHAR_VARIATION_SELECTOR_16}, 0u, 0u, TextAbstraction::EMOJI_COLOR);
+  CheckNoEmojiSequence({TextAbstraction::CHAR_VARIATION_SELECTOR_16, TextAbstraction::CHAR_VARIATION_SELECTOR_16}, 0u, 1u, TextAbstraction::EMOJI_COLOR);
+  CheckNoEmojiSequence({0x0031u}, 0u, 0u, TextAbstraction::ASCII_DIGITS);
+  CheckNoEmojiSequence({0x1F170u}, 0u, 0u, TextAbstraction::EMOJI);
+  CheckNoEmojiSequence({0x0041u}, 0u, 0u, TextAbstraction::LATIN);
+  CheckNoEmojiSequence({0x1F600u}, 1u, 0u, TextAbstraction::EMOJI);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextEmojiHelperScriptTransitions(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEmojiHelperScriptTransitions");
+
+  DALI_TEST_CHECK(IsStartForKeycapSequence(0x0030u));
+  DALI_TEST_CHECK(IsStartForKeycapSequence(0x0023u));
+  DALI_TEST_CHECK(IsStartForKeycapSequence(0x002Au));
+  DALI_TEST_CHECK(!IsStartForKeycapSequence(0x0041u));
+
+  CheckNewSequence({0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_16, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                   0u,
+                   TextAbstraction::LATIN,
+                   TextAbstraction::ASCII_DIGITS,
+                   true,
+                   TextAbstraction::EMOJI_COLOR);
+  CheckNewSequence({0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                   0u,
+                   TextAbstraction::LATIN,
+                   TextAbstraction::COMMON,
+                   true,
+                   TextAbstraction::EMOJI_COLOR);
+  CheckNewSequence({0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                   0u,
+                   TextAbstraction::EMOJI_COLOR,
+                   TextAbstraction::COMMON,
+                   false,
+                   TextAbstraction::EMOJI_COLOR);
+  CheckNewSequence({0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_15},
+                   0u,
+                   TextAbstraction::EMOJI_COLOR,
+                   TextAbstraction::COMMON,
+                   true,
+                   TextAbstraction::EMOJI_TEXT);
+  CheckNewSequence({0x263Au, 0x0041u},
+                   0u,
+                   TextAbstraction::LATIN,
+                   TextAbstraction::COMMON,
+                   true,
+                   TextAbstraction::COMMON);
+  CheckNewSequence({0x0031u, 0x0041u},
+                   0u,
+                   TextAbstraction::LATIN,
+                   TextAbstraction::ASCII_DIGITS,
+                   false,
+                   TextAbstraction::ASCII_DIGITS);
+  CheckNewSequence({0x263Au, 0x0041u},
+                   1u,
+                   TextAbstraction::EMOJI,
+                   TextAbstraction::LATIN,
+                   true,
+                   TextAbstraction::LATIN);
+
+  CheckFollowSequence(TextAbstraction::EMOJI,
+                      TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP,
+                      TextAbstraction::LATIN,
+                      true,
+                      TextAbstraction::EMOJI);
+  CheckFollowSequence(TextAbstraction::EMOJI_COLOR,
+                      TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP,
+                      TextAbstraction::LATIN,
+                      true,
+                      TextAbstraction::EMOJI_COLOR);
+  CheckFollowSequence(TextAbstraction::EMOJI,
+                      TextAbstraction::CHAR_VARIATION_SELECTOR_15,
+                      TextAbstraction::COMMON,
+                      true,
+                      TextAbstraction::EMOJI_TEXT);
+  CheckFollowSequence(TextAbstraction::EMOJI,
+                      TextAbstraction::CHAR_VARIATION_SELECTOR_16,
+                      TextAbstraction::COMMON,
+                      true,
+                      TextAbstraction::EMOJI_COLOR);
+  CheckFollowSequence(TextAbstraction::EMOJI,
+                      0x1F600u,
+                      TextAbstraction::EMOJI_COLOR,
+                      false,
+                      TextAbstraction::EMOJI_COLOR);
+  CheckFollowSequence(TextAbstraction::EMOJI_COLOR,
+                      CHAR_ZWNJ,
+                      TextAbstraction::UNKNOWN,
+                      true,
+                      TextAbstraction::EMOJI_COLOR);
+  CheckFollowSequence(TextAbstraction::EMOJI_COLOR,
+                      0x1F600u,
+                      TextAbstraction::EMOJI_TEXT,
+                      false,
+                      TextAbstraction::EMOJI_TEXT);
+  CheckFollowSequence(TextAbstraction::EMOJI_COLOR,
+                      0x1F170u,
+                      TextAbstraction::EMOJI,
+                      false,
+                      TextAbstraction::EMOJI);
+
+  DALI_TEST_EQUALS(GetVariationSelectorByScript(TextAbstraction::EMOJI_COLOR), TextAbstraction::CHAR_VARIATION_SELECTOR_16, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVariationSelectorByScript(TextAbstraction::EMOJI_TEXT), TextAbstraction::CHAR_VARIATION_SELECTOR_15, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVariationSelectorByScript(TextAbstraction::EMOJI), 0u, TEST_LOCATION);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextMultiLanguageEmojiFontPriority(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextMultiLanguageEmojiFontPriority");
+
+  MultilanguageSupport        multilanguageSupport = MultilanguageSupport::Get();
+  TextAbstraction::FontClient fontClient           = TextAbstraction::FontClient::Get();
+
+  char*             pathNamePtr = get_current_dir_name();
+  const std::string pathName(pathNamePtr);
+  free(pathNamePtr);
+
+  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf", EMOJI_FONT_SIZE);
+  const FontId dejavuFontId = fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSans.ttf");
+  TextAbstraction::FontDescription dejavuFontDescription;
+  fontClient.GetDescription(dejavuFontId, dejavuFontDescription);
+  const TextAbstraction::PointSize26Dot6 dejavuFontPointSize = fontClient.GetPointSize(dejavuFontId);
+
+  const FontId colorFontId = fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf",
+                                                  EMOJI_FONT_SIZE);
+  TextAbstraction::FontDescription colorFontDescription;
+  fontClient.GetDescription(colorFontId, colorFontDescription);
+  const TextAbstraction::PointSize26Dot6 colorFontPointSize = fontClient.GetPointSize(colorFontId);
+
+  const FontId defaultFontId = fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf",
+                                                    TextAbstraction::FontClient::DEFAULT_POINT_SIZE);
+  TextAbstraction::FontDescription defaultFontDescription;
+  fontClient.GetDescription(defaultFontId, defaultFontDescription);
+  const TextAbstraction::PointSize26Dot6 defaultFontPointSize = fontClient.GetPointSize(defaultFontId);
+
+  Vector<ScriptRun> scripts;
+  Vector<FontRun>   fonts;
+
+  multilanguageSupport.ClearCache();
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_16, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+
+  DALI_TEST_EQUALS(scripts.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(scripts[0u].script, TextAbstraction::EMOJI_COLOR, TEST_LOCATION);
+
+  FontId keycapFontId = 0u;
+  DALI_TEST_CHECK(GetFontAtCharacter(fonts, 0u, keycapFontId));
+  DALI_TEST_CHECK(0u != keycapFontId);
+  if(0u != keycapFontId)
+  {
+    DALI_TEST_CHECK(fontClient.IsColorFont(keycapFontId));
+    FontId followingFontId = 0u;
+    DALI_TEST_CHECK(GetFontAtCharacter(fonts, 1u, followingFontId));
+    DALI_TEST_EQUALS(followingFontId, keycapFontId, TEST_LOCATION);
+    DALI_TEST_CHECK(GetFontAtCharacter(fonts, 2u, followingFontId));
+    DALI_TEST_EQUALS(followingFontId, keycapFontId, TEST_LOCATION);
+  }
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_16, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP, 0x0041u},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_15, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                             colorFontDescription,
+                             colorFontPointSize,
+                             scripts,
+                             fonts);
+  DALI_TEST_EQUALS(scripts.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(scripts[0u].script, TextAbstraction::EMOJI_TEXT, TEST_LOCATION);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_15, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                             dejavuFontDescription,
+                             dejavuFontPointSize,
+                             scripts,
+                             fonts);
+
+  const FontId textKeycapFontId =
+    fontClient.FindFallbackFont(TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP,
+                                defaultFontDescription,
+                                defaultFontPointSize,
+                                false);
+  if(0u != textKeycapFontId)
+  {
+    TextAbstraction::FontDescription textKeycapFontDescription;
+    fontClient.GetDescription(textKeycapFontId, textKeycapFontDescription);
+    ValidateFontsForCharacters(multilanguageSupport,
+                               fontClient,
+                               {0x0031u, TextAbstraction::CHAR_VARIATION_SELECTOR_15, TextAbstraction::CHAR_COMBINING_ENCLOSING_KEYCAP},
+                               textKeycapFontDescription,
+                               fontClient.GetPointSize(textKeycapFontId),
+                               scripts,
+                               fonts);
+  }
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_15, 0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+  DALI_TEST_CHECK(scripts.Count() >= 2u);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x263Au, TextAbstraction::CHAR_VARIATION_SELECTOR_15},
+                             colorFontDescription,
+                             colorFontPointSize,
+                             scripts,
+                             fonts);
+  DALI_TEST_EQUALS(scripts.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(scripts[0u].script, TextAbstraction::EMOJI_TEXT, TEST_LOCATION);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0041u, TextAbstraction::CHAR_VARIATION_SELECTOR_15},
+                             colorFontDescription,
+                             colorFontPointSize,
+                             scripts,
+                             fonts);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0041u, TextAbstraction::CHAR_VARIATION_SELECTOR_16},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x263Au},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x1F469u, 0x1F3FBu, CHAR_ZWJ, 0x1F52Cu, 0x1F3F4u, 0xE0067u, 0xE0062u, 0xE007Fu},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts);
+  DALI_TEST_CHECK(!scripts.Empty());
+
+  Vector<Character> scriptText = MakeEmojiTestText({0x1F600u, 0x0020u, 0x0041u});
+  scripts.Clear();
+  multilanguageSupport.SetScripts(scriptText, 0u, scriptText.Count(), scripts);
+  DALI_TEST_CHECK(!scripts.Empty());
+
+  scriptText = MakeEmojiTestText({0x0031u, 0x0032u, 0x003Au, 0x0041u});
+  scripts.Clear();
+  multilanguageSupport.SetScripts(scriptText, 0u, scriptText.Count(), scripts);
+  DALI_TEST_CHECK(!scripts.Empty());
+
+  Vector<FontDescriptionRun> boldDescription;
+  FontDescriptionRun         boldRun =
+    {
+      {0u,
+       1u},
+      const_cast<char*>("DejaVu Sans"),
+      11u,
+      TextAbstraction::FontWeight::BOLD,
+      TextAbstraction::FontWidth::NORMAL,
+      TextAbstraction::FontSlant::NORMAL,
+      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      true,
+      true,
+      false,
+      false,
+      true};
+  boldDescription.PushBack(boldRun);
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0041u},
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts,
+                             boldDescription);
+
+  Vector<TextAbstraction::LineBreakInfo> lineBreakInfo;
+  lineBreakInfo.Resize(1u, TextAbstraction::LINE_ALLOW_BREAK);
+  GetImplementation(multilanguageSupport).UpdateICULineBreak("a", 1u, lineBreakInfo.Begin());
+
+  TextAbstraction::FontDescription invalidFontDescription;
+  invalidFontDescription.path   = "/invalid/font/path/NoSuchFont.ttf";
+  invalidFontDescription.family = "NoSuchFont";
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x0041u},
+                             invalidFontDescription,
+                             TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+                             scripts,
+                             fonts);
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             {0x10FFFFu},
+                             invalidFontDescription,
+                             TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+                             scripts,
+                             fonts);
+
+  Vector<FontDescriptionRun> manyFontDescriptions;
+  std::initializer_list<Character> cacheCharacters =
+  {
+    0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u,
+    0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u,
+    0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u,
+    0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u, 0x0041u,
+    0x0041u, 0x0041u, 0x0041u
+  };
+  for(uint32_t index = 0u; index < cacheCharacters.size(); ++index)
+  {
+    FontDescriptionRun run =
+    {
+      {index, 1u},
+      const_cast<char*>("DejaVu Sans"),
+      11u,
+      TextAbstraction::FontWeight::NORMAL,
+      TextAbstraction::FontWidth::NORMAL,
+      TextAbstraction::FontSlant::NORMAL,
+      static_cast<TextAbstraction::PointSize26Dot6>(TextAbstraction::FontClient::DEFAULT_POINT_SIZE + index),
+      true,
+      false,
+      false,
+      false,
+      true};
+    manyFontDescriptions.PushBack(run);
+  }
+
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             cacheCharacters,
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts,
+                             manyFontDescriptions);
+  ValidateFontsForCharacters(multilanguageSupport,
+                             fontClient,
+                             cacheCharacters,
+                             defaultFontDescription,
+                             defaultFontPointSize,
+                             scripts,
+                             fonts,
+                             manyFontDescriptions);
 
   tet_result(TET_PASS);
   END_TEST;

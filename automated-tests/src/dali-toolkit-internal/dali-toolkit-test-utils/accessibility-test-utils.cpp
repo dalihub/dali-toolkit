@@ -2,7 +2,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
-#include <dali/devel-api/common/stage.h>
+#include <dali/integration-api/scene.h>
 #include "dbus-wrapper.h"
 
 namespace Dali
@@ -22,17 +22,16 @@ struct StateChangedResult
 };
 static StateChangedResult gStateChangedResult{};
 
-void TestEnableSC(bool b)
+void TestEnableSC(bool b, Dali::Integration::Scene scene)
 {
   static bool firstTime = true;
   if(b && firstTime)
   {
-    gPropertyChangeCalled  = false;
-    gStateChangedResult    = {};
-    firstTime              = false;
-    auto        bridge     = Accessibility::Bridge::GetCurrentBridge();
-    Dali::Stage stage      = Dali::Stage::GetCurrent();
-    auto        accessible = Accessibility::Accessible::Get(stage.GetRootLayer());
+    gPropertyChangeCalled = false;
+    gStateChangedResult   = {};
+    firstTime             = false;
+    auto bridge           = Accessibility::Bridge::GetCurrentBridge();
+    auto accessible       = Accessibility::Accessible::Get(scene.GetRootLayer());
     bridge->ApplicationResumed();
     bridge->AddTopLevelWindow(accessible);
     bridge->SetApplicationName("TestApp");

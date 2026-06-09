@@ -340,6 +340,11 @@ private: // From Control
   void OnInitialize() override;
 
   /**
+   * @copydoc Control::OnSceneConnection()
+   */
+  void OnSceneConnection(int depth) override;
+
+  /**
    * @copydoc Toolkit::Internal::Control::CreateAccessibleObject()
    */
   DevelControl::ControlAccessible* CreateAccessibleObject() override;

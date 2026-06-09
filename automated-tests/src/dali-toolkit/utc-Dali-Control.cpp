@@ -155,6 +155,36 @@ int UtcDaliControlRegister(void)
   END_TEST;
 }
 
+int UtcDaliControlInvokeMethod(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  DALI_TEST_CHECK(control);
+
+  InvokeArguments styleArguments;
+  styleArguments.PushBack(Any(String("invoke-style")));
+
+  InvokeResult result;
+  DALI_TEST_CHECK(control.InvokeMethod("SetStyleName", styleArguments, result));
+  DALI_TEST_CHECK(control.InvokeMethod("GetStyleName", InvokeArguments(), result));
+
+  const String* styleName = AnyCast<String>(&result);
+  DALI_TEST_CHECK(styleName);
+  DALI_TEST_EQUALS(*styleName, String("invoke-style"), TEST_LOCATION);
+
+  InvokeArguments colorArguments;
+  colorArguments.PushBack(Any(Vector4(0.25f, 0.5f, 0.75f, 1.0f)));
+  DALI_TEST_CHECK(control.InvokeMethod("SetBackgroundColor", colorArguments, result));
+  DALI_TEST_EQUALS(GetControlBackgroundColor(control), Vector4(0.25f, 0.5f, 0.75f, 1.0f), TEST_LOCATION);
+
+  InvokeArguments wrongTypeArguments;
+  wrongTypeArguments.PushBack(Any(1));
+  DALI_TEST_CHECK(!control.InvokeMethod("SetStyleName", wrongTypeArguments, result));
+
+  END_TEST;
+}
+
 int UtcDaliControlCopyAndAssignment(void)
 {
   ToolkitTestApplication application;

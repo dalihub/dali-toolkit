@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <algorithm>
 
 // INTERNAL INCLUDES
@@ -290,7 +291,7 @@ void SpiralLayout::SetItemSpacing(Radian itemSpacing)
 {
   mImpl->mItemSpacingRadians = itemSpacing;
 
-  float itemsPerSpiral = std::max(1.0f, (2.0f * (float)Math::PI) / mImpl->mItemSpacingRadians);
+  float itemsPerSpiral = Max(1.0f, (2.0f * (float)Math::PI) / mImpl->mItemSpacingRadians);
   mImpl->mItemDescent  = mImpl->mRevolutionDistance / itemsPerSpiral;
 }
 
@@ -303,7 +304,7 @@ void SpiralLayout::SetRevolutionDistance(float distance)
 {
   mImpl->mRevolutionDistance = distance;
 
-  float itemsPerSpiral = std::max(1.0f, (2.0f * (float)Math::PI) / mImpl->mItemSpacingRadians);
+  float itemsPerSpiral = Max(1.0f, (2.0f * (float)Math::PI) / mImpl->mItemSpacingRadians);
   mImpl->mItemDescent  = mImpl->mRevolutionDistance / itemsPerSpiral;
 }
 
@@ -372,10 +373,10 @@ ItemRange SpiralLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layo
   float layoutHeight             = IsHorizontal(GetOrientation()) ? layoutSize.width : layoutSize.height;
   float itemsPerSpiral           = layoutHeight / mImpl->mItemDescent;
   float itemsCachedBeforeTopItem = layoutHeight * (mImpl->mTopItemAlignment + 0.5f) / mImpl->mItemDescent;
-  float itemsViewable            = std::min(itemsPerSpiral, itemsPerSpiral - itemsCachedBeforeTopItem - firstItemPosition + 1.0f);
+  float itemsViewable            = Min(itemsPerSpiral, itemsPerSpiral - itemsCachedBeforeTopItem - firstItemPosition + 1.0f);
 
-  unsigned int firstItem = static_cast<unsigned int>(std::max(0.0f, -firstItemPosition - itemsCachedBeforeTopItem - 1.0f));
-  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, firstItem + itemsViewable));
+  unsigned int firstItem = static_cast<unsigned int>(Max(0.0f, -firstItemPosition - itemsCachedBeforeTopItem - 1.0f));
+  unsigned int lastItem  = static_cast<unsigned int>(Max(0.0f, firstItem + itemsViewable));
 
   return ItemRange(firstItem, lastItem + 1);
 }

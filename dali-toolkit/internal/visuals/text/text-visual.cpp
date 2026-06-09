@@ -29,6 +29,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -36,6 +37,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/text/color-glyph-helper.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
@@ -648,7 +650,7 @@ void TextVisual::UpdateRenderer()
         const Text::GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
 
         // Whether the current glyph is a color one.
-        if(fontClient.IsColorGlyph(glyphInfo->fontId, glyphInfo->index))
+        if(Text::Internal::IsRenderableColorGlyph(fontClient, glyphInfo->fontId, glyphInfo->index))
         {
           containsColorGlyph = true;
           break;
@@ -1047,8 +1049,8 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 
         if(renderInfo.embossEnabled)
         {
-          float          sizeX             = std::max(layoutSize.x, Math::MACHINE_EPSILON_100);
-          float          sizeY             = std::max(std::min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
+          float          sizeX             = Max(layoutSize.x, Math::MACHINE_EPSILON_100);
+          float          sizeY             = Max(Min((float)maxTextureSize, layoutSize.y), Math::MACHINE_EPSILON_100);
           const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
           const Vector2& embossDirection   = parameters.embossDirection;
           const float    embossStrength    = parameters.embossStrength;
@@ -1406,8 +1408,8 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
 
       if(embossEnabled)
       {
-        float          sizeX             = std::max(size.x, Math::MACHINE_EPSILON_100);
-        float          sizeY             = std::max(std::min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
+        float          sizeX             = Max(size.x, Math::MACHINE_EPSILON_100);
+        float          sizeY             = Max(Min((float)maxTextureSize, size.y), Math::MACHINE_EPSILON_100);
         const Vector2& embossSize        = Vector2(1.0f / sizeX, 1.0f / sizeY);
         const Vector2& embossDirection   = mController->GetEmbossDirection();
         const float    embossStrength    = mController->GetEmbossStrength();

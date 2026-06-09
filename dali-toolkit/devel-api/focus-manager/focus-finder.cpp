@@ -28,6 +28,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -73,7 +74,7 @@ static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction
  */
 static int MajorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
-  return std::max(0, MajorAxisDistanceRaw(direction, source, dest));
+  return Max(0, MajorAxisDistanceRaw(direction, source, dest));
 }
 
 static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
@@ -110,7 +111,7 @@ static int MajorAxisDistanceToFarEdgeRaw(Dali::Toolkit::Control::KeyboardFocus::
  */
 static int MajorAxisDistanceToFarEdge(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Bounds source, Dali::Bounds dest)
 {
-  return std::max(1, MajorAxisDistanceToFarEdgeRaw(direction, source, dest));
+  return Max(1, MajorAxisDistanceToFarEdgeRaw(direction, source, dest));
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <memory.h>
 
@@ -316,7 +317,7 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
 
     // Restrict new text to fit within Maximum characters setting.
     Length temp_length      = (impl.mMaximumNumberOfCharacters > numberOfCharactersInModel ? impl.mMaximumNumberOfCharacters - numberOfCharactersInModel : 0);
-    Length maxSizeOfNewText = std::min(temp_length, characterCount);
+    Length maxSizeOfNewText = Min(temp_length, characterCount);
     maxLengthReached        = (characterCount > maxSizeOfNewText);
 
     // The cursor position.
@@ -436,7 +437,7 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     }
     else
     {
-      textUpdateInfo.mCharacterIndex = std::min(cursorIndex, textUpdateInfo.mCharacterIndex);
+      textUpdateInfo.mCharacterIndex = Min(cursorIndex, textUpdateInfo.mCharacterIndex);
       textUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
     }
 
@@ -602,7 +603,7 @@ bool Controller::TextUpdater::RemoveText(
       }
       else
       {
-        textUpdateInfo.mCharacterIndex = std::min(cursorIndex, textUpdateInfo.mCharacterIndex);
+        textUpdateInfo.mCharacterIndex = Min(cursorIndex, textUpdateInfo.mCharacterIndex);
         textUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
       }
 

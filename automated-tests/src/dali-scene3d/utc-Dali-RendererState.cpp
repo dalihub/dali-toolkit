@@ -94,11 +94,11 @@ int UtcDaliRendererStateApply(void)
     HELP_TEST_RENDERER_STATE(Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS, p.first, p.second, renderer);
   }
 
-#define BLEND_FACTOR_PAIR(x)           \
-  {                                    \
-    sl::BlendFactor::x, BlendFactor::x \
+#define BLEND_FACTOR_PAIR(x)                 \
+  {                                          \
+    sl::BlendFactor::x, Dali::BlendFactor::x \
   }
-  const std::pair<rs::Type, BlendFactor::Type> BLEND_FACTORS[]{
+  const std::pair<rs::Type, Dali::BlendFactor::Type> BLEND_FACTORS[]{
     BLEND_FACTOR_PAIR(ZERO),
     BLEND_FACTOR_PAIR(ONE),
     BLEND_FACTOR_PAIR(SRC_COLOR),
@@ -127,12 +127,12 @@ int UtcDaliRendererStateApply(void)
     const auto shift     = rs::BLEND_FACTOR_BASE_SHIFT + itemShift;
     for(auto& value : BLEND_FACTORS)
     {
-      HELP_TEST_RENDERER_STATE(property, BlendFactor::ZERO, value.first << shift, value.second, renderer);
+      HELP_TEST_RENDERER_STATE(property, Dali::BlendFactor::ZERO, value.first << shift, value.second, renderer);
     }
   }
 
-#define RENDER_MODE_PAIR(x) {BufferMode::x << rs::BUFFER_MODE_SHIFT, RenderMode::x}
-  std::pair<rs::Type, RenderMode::Type> renderModePairs[]{
+#define RENDER_MODE_PAIR(x) {BufferMode::x << rs::BUFFER_MODE_SHIFT, Dali::RenderMode::x}
+  std::pair<rs::Type, Dali::RenderMode::Type> renderModePairs[]{
     // same as our reset value: RENDER_MODE_PAIR(NONE),
     RENDER_MODE_PAIR(AUTO),
     RENDER_MODE_PAIR(COLOR),
@@ -142,7 +142,7 @@ int UtcDaliRendererStateApply(void)
 #undef RENDER_MODE_PAIR
   for(auto& p : renderModePairs)
   {
-    HELP_TEST_RENDERER_STATE(Renderer::Property::RENDER_MODE, RenderMode::NONE, p.first, p.second, renderer);
+    HELP_TEST_RENDERER_STATE(Renderer::Property::RENDER_MODE, Dali::RenderMode::NONE, p.first, p.second, renderer);
   }
 
   END_TEST;

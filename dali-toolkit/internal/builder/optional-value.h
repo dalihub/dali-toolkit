@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ struct OptionalTypes
   {
     return v;
   }
-  static ValueType Set(const ReturnType v)
+  static ValueType Set(ReturnType v)
   {
     return v;
   }
-  static bool Ok(const ValueType& v)
+  static bool Ok(ReturnType v)
   {
     return true;
   }
@@ -46,11 +46,11 @@ struct OptionalTypes<T*>
   {
     return v;
   }
-  static ValueType Set(const ReturnType v)
+  static ValueType Set(ReturnType v)
   {
     return v;
   }
-  static bool Ok(const ReturnType v)
+  static bool Ok(ReturnType v)
   {
     return NULL != v;
   }
@@ -65,11 +65,11 @@ struct OptionalTypes<T&>
   {
     return *v;
   }
-  static ValueType Set(const ReturnType v)
+  static ValueType Set(ReturnType v)
   {
     return &v;
   }
-  static bool Ok(const ReturnType v)
+  static bool Ok(ReturnType v)
   {
     return true;
   }

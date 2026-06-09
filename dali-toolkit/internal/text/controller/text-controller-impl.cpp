@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <cmath>
 
@@ -548,7 +549,7 @@ CharacterIndex Controller::Impl::GetLogicalCursorPosition() const
     if((EventData::SELECTING == mEventData->mState) ||
        (EventData::SELECTION_HANDLE_PANNING == mEventData->mState))
     {
-      cursorPosition = std::min(mEventData->mRightSelectionPosition, mEventData->mLeftSelectionPosition);
+      cursorPosition = Min(mEventData->mRightSelectionPosition, mEventData->mLeftSelectionPosition);
     }
     else
     {
@@ -906,11 +907,11 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint3
 
     if(pStart)
     {
-      mEventData->mLeftSelectionPosition = std::min(*pStart, length);
+      mEventData->mLeftSelectionPosition = Min(*pStart, length);
     }
     if(pEnd)
     {
-      mEventData->mRightSelectionPosition = std::min(*pEnd, length);
+      mEventData->mRightSelectionPosition = Min(*pEnd, length);
     }
 
     if(mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
@@ -959,7 +960,7 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
 
   uint32_t length                    = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
   uint32_t oldCursorPos              = mEventData->mPrimaryCursorPosition;
-  mEventData->mPrimaryCursorPosition = std::min(index, length);
+  mEventData->mPrimaryCursorPosition = Min(index, length);
   // If there is no focus, only the value is updated.
   if(focused)
   {
@@ -1702,7 +1703,7 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
 
       if(isHorizontalScrollEnabled)
       {
-        const float scrollPositionX = std::max(mModel->mScrollPosition.x, -(layoutSize.width - targetSize.width));
+        const float scrollPositionX = Max(mModel->mScrollPosition.x, -(layoutSize.width - targetSize.width));
         const float positionX       = scrollPositionX + displacement.x;
         if(layoutSize.width > targetSize.width && -positionX > 0.f && -positionX < layoutSize.width - targetSize.width)
         {
@@ -1712,7 +1713,7 @@ bool Controller::Impl::IsScrollable(const Vector2& displacement)
 
       if(isVerticalScrollEnabled)
       {
-        const float scrollPositionY = std::max(mModel->mScrollPosition.y, -(layoutSize.height - targetSize.height));
+        const float scrollPositionY = Max(mModel->mScrollPosition.y, -(layoutSize.height - targetSize.height));
         const float positionY       = scrollPositionY + displacement.y;
         if(layoutSize.height > targetSize.height && -positionY > 0.f && -positionY < layoutSize.height - targetSize.height)
         {

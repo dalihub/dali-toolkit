@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali-scene3d/internal/loader/json-reader.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
+#include <dali/public-api/common/dali-utility.h>
 #include <cstring>
 
 namespace json
@@ -27,7 +27,7 @@ namespace json
 int StrCmp(const json_string_s& js, const char* s)
 {
   auto sSize   = strlen(s);
-  auto shorter = std::min(js.string_size, sSize);
+  auto shorter = Dali::Min(js.string_size, sSize);
   auto base    = strncmp(js.string, s, shorter);
   return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ? -s[shorter] : js.string[shorter]);
 }
@@ -35,7 +35,7 @@ int StrCmp(const json_string_s& js, const char* s)
 int StrCmp(const json_string_s& js, const std::string& s)
 {
   auto sSize   = s.size();
-  auto shorter = std::min(js.string_size, sSize);
+  auto shorter = Dali::Min(js.string_size, sSize);
   auto base    = strncmp(js.string, s.c_str(), shorter);
   return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ? -s[shorter] : js.string[shorter]);
 }

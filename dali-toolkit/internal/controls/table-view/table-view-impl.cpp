@@ -25,6 +25,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <locale>
@@ -1710,7 +1711,7 @@ void TableView::CalculateFitSizes(RowColumnArray& data, Dimension::Type dimensio
         {
           if(FitToChild(actor, dimension) && (dimension == Dimension::WIDTH) ? (cellData.position.columnSpan == 1) : (cellData.position.rowSpan == 1))
           {
-            maxActorHeight = std::max(maxActorHeight, actor.GetRelayoutSize(dimension) + cellPadding.x + cellPadding.y);
+            maxActorHeight = Max(maxActorHeight, actor.GetRelayoutSize(dimension) + cellPadding.x + cellPadding.y);
           }
         }
       }

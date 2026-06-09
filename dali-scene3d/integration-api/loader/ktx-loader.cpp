@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/texture.h>
 #include <fstream>
 #include <locale>
@@ -225,10 +226,10 @@ bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapDat
     return false;
   }
 
-  header.numberOfMipmapLevels  = std::max(header.numberOfMipmapLevels, 1u);
-  header.numberOfArrayElements = std::max(header.numberOfArrayElements, 1u);
-  header.pixelDepth            = std::max(header.pixelDepth, 1u);
-  header.pixelHeight           = std::max(header.pixelHeight, 1u);
+  header.numberOfMipmapLevels  = Max(header.numberOfMipmapLevels, 1u);
+  header.numberOfArrayElements = Max(header.numberOfArrayElements, 1u);
+  header.pixelDepth            = Max(header.pixelDepth, 1u);
+  header.pixelHeight           = Max(header.pixelHeight, 1u);
   environmentMapData.SetMipmapLevels(header.numberOfMipmapLevels);
 
   environmentMapData.mPixelData.Resize(header.numberOfFaces);

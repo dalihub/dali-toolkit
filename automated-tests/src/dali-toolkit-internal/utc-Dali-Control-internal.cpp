@@ -37,7 +37,6 @@ int UtcDaliControlActionOnVisual(void)
   ToolkitTestApplication application;
 
   tet_infoline("Register an ImageVisual and perform image reload Action on it. Tests Actions are completed.");
-  Vector2 controlSize(20.f, 30.f);
 
   // Created DummyVisual
   Property::Map                     settings;

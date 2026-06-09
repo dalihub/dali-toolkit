@@ -22,12 +22,14 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <algorithm>
 #include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/color-glyph-helper.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/markup-processor/markup-processor.h>
@@ -902,7 +904,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
     const Text::GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
 
     // Whether the current glyph is a color one.
-    if(mModule.GetFontClient().IsColorGlyph(glyphInfo->fontId, glyphInfo->index))
+    if(Internal::IsRenderableColorGlyph(mModule.GetFontClient(), glyphInfo->fontId, glyphInfo->index))
     {
       containsColorGlyph = true;
       break;
@@ -951,7 +953,7 @@ AsyncTextRenderInfo AsyncTextLoader::Render(AsyncTextParameters& parameters)
 
   float outlineWidth = mTextModel->GetOutlineWidth();
   layoutSize.y += outlineWidth * 2.0f;
-  layoutSize.y = std::min(layoutSize.y, parameters.textHeight);
+  layoutSize.y = Min(layoutSize.y, parameters.textHeight);
 
   if(cutoutEnabled)
   {
@@ -1271,8 +1273,8 @@ Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& ca
   }
 
   // Adjust the size to ensure same ellipsis behavior as the original text.
-  parameters.textWidth  = widthEllipsized ? std::min(parameters.textWidth, naturalSize.width - 1) : std::max(parameters.textWidth, naturalSize.width);
-  parameters.textHeight = heightEllipsized ? std::min(parameters.textHeight, naturalSize.height - 1) : std::max(parameters.textHeight, naturalSize.height);
+  parameters.textWidth  = widthEllipsized ? Min(parameters.textWidth, naturalSize.width - 1) : Max(parameters.textWidth, naturalSize.width);
+  parameters.textHeight = heightEllipsized ? Min(parameters.textHeight, naturalSize.height - 1) : Max(parameters.textHeight, naturalSize.height);
 
   // Update the control size because textWidth and textHeight have been adjusted. (Skip Initialize and Update)
   mTextModel->mVisualModel->mControlSize = Size(parameters.textWidth, parameters.textHeight);
@@ -1368,8 +1370,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
 #endif
 
     // Calculate the actual gap before scrolling wraps.
-    int textPadding     = std::max(controlSize.x - textNaturalSize.x, 0.0f);
-    wrapGap             = std::max(parameters.autoScrollGap, textPadding);
+    int textPadding     = Max(controlSize.x - textNaturalSize.x, 0.0f);
+    wrapGap             = Max(parameters.autoScrollGap, textPadding);
     Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture.
 
     // Calculate a size of texture for text scrolling
@@ -1396,7 +1398,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
         parameters.textWidth  = actualWidth;
         parameters.textHeight = actualHeight;
       }
-      wrapGap = std::max(maxTextureSize - textNaturalSize.width, static_cast<float>(parameters.autoScrollGap));
+      wrapGap = Max(maxTextureSize - textNaturalSize.width, static_cast<float>(parameters.autoScrollGap));
     }
   }
   else // AutoScroll::VERTICAL
@@ -1434,8 +1436,8 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
     textHeight = useCachedHeight ? textHeight : ComputeHeightForWidth(parameters, parameters.textWidth, layoutOnly);
 
     // Calculate the actual gap before scrolling wraps.
-    int textPadding = std::max(controlSize.y - textHeight, 0.0f);
-    wrapGap         = std::max(parameters.autoScrollGap, textPadding);
+    int textPadding = Max(controlSize.y - textHeight, 0.0f);
+    wrapGap         = Max(parameters.autoScrollGap, textPadding);
     Vector2 textureSize(controlSize.width, textHeight + wrapGap); // Add the gap as a part of the texture
 
     // Calculate a size of texture for text scrolling
@@ -1463,7 +1465,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderAutoScroll(AsyncTextParameters& param
         parameters.textHeight          = actualHeight;
         parameters.isAutoScrollEnabled = true;
       }
-      wrapGap = std::max(maxTextureSize - textHeight, 0.0f);
+      wrapGap = Max(maxTextureSize - textHeight, 0.0f);
     }
   }
 
@@ -1697,7 +1699,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
     while(minIndex < maxIndex)
     {
       uint32_t    testIndex     = minIndex + ((maxIndex - minIndex) >> 1u);
-      const float testPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
+      const float testPointSize = Min(maxPointSize, minPointSize + static_cast<float>(testIndex) * pointInterval);
 
       if(CheckForTextFit(parameters, testPointSize, allowedSize))
       {
@@ -1712,7 +1714,7 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
         maxIndex              = testIndex;
       }
     }
-    bestPointSize = std::min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
+    bestPointSize = Min(maxPointSize, minPointSize + static_cast<float>(bestSizeIndex) * pointInterval);
 
     // Best point size was not updated. re-run so the TextFit should be fitted really.
     if(!bestSizeUpdatedLatest)
