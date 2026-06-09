@@ -89,6 +89,11 @@ private:
 } // namespace Adaptor
 } // namespace Internal
 
+UiContext::UiContext(Internal::Adaptor::UiContext* uiContext)
+: BaseHandle(uiContext)
+{
+}
+
 // Override public UiContext methods so that calls from dali2-physics-3d.so
 // (or any other DSO) are dispatched to our stub via the main executable's PLT.
 // Without these overrides, DSOs would resolve the symbols to dali2-adaptor.so

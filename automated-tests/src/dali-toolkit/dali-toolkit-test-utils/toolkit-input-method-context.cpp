@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "toolkit-input-method-context.h"
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
+#include <dali/integration-api/adaptor-framework/input-method-options.h>
 #include <dali/public-api/object/base-object.h>
 
 namespace Dali
@@ -33,15 +33,18 @@ class RenderSurface;
 class InputMethodContext : public Dali::BaseObject
 {
 public:
-  typedef Dali::InputMethodContext::ActivatedSignalType     ActivatedSignalType;
-  typedef Dali::InputMethodContext::KeyboardEventSignalType KeyboardEventSignalType;
-  typedef Dali::InputMethodContext::StatusSignalType        StatusSignalType;
-  typedef Dali::InputMethodContext::VoidSignalType          VoidSignalType;
+  using ActivatedSignalType              = Dali::InputMethodContext::ActivatedSignalType;
+  using KeyboardEventSignalType          = Dali::Integration::InputMethodContext::KeyboardEventSignalType;
+  using StatusChangedSignalType          = Dali::InputMethodContext::StatusChangedSignalType;
+  using KeyboardResizedSignalType        = Dali::InputMethodContext::KeyboardResizedSignalType;
+  using LanguageChangedSignalType        = Dali::InputMethodContext::LanguageChangedSignalType;
+  using KeyboardTypeChangedSignalType    = Dali::InputMethodContext::KeyboardTypeChangedSignalType;
+  using PrivateCommandReceivedSignalType = Dali::InputMethodContext::PrivateCommandReceivedSignalType;
 
 public:
-  static Dali::InputMethodContext New();
+  static Dali::InputMethodContext Create();
 
-  InputMethodContext(/* Ecore_X_Window ecoreXwin */);
+  InputMethodContext();
   void Finalize();
   void ConnectCallbacks();
   void DisconnectCallbacks();
@@ -49,17 +52,30 @@ public:
   void Deactivate();
   void Reset();
 
-  bool               RestoreAfterFocusLost() const;
-  void               SetRestoreAfterFocusLost(bool toggle);
-  void               NotifyCursorPosition();
-  void               SetCursorPosition(unsigned int cursorPosition);
-  unsigned int       GetCursorPosition() const;
-  void               SetSurroundingText(const std::string& text);
-  const std::string& GetSurroundingText() const;
-  void               ApplyOptions(const InputMethodOptions& options);
-  bool               FilterEventKey(const Dali::KeyEvent& keyEvent);
-  void               SetPreeditStyle(Dali::InputMethodContext::PreeditStyle type);
-  void               GetPreeditStyle(Dali::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
+  bool IsRestoreAfterFocusLostEnabled() const;
+  bool SetRestoreAfterFocusLostEnabled(bool enabled);
+  bool SetReturnKeyEnabled(bool enabled);
+  bool IsReturnKeyEnabled() const;
+
+  void         NotifyCursorPosition();
+  void         SetCursorPosition(uint32_t cursorPosition);
+  uint32_t     GetCursorPosition() const;
+  void         SetSurroundingText(const Dali::String& text);
+  Dali::String GetSurroundingText() const;
+  void         NotifyTextInputMultiLine(bool multiLine);
+  void         ApplyOptions(const Dali::Integration::InputMethodOptions& options);
+  bool         FilterEventKey(const Dali::KeyEvent& keyEvent);
+  void         GetPreeditStyle(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
+  void         SetPreeditStyle(Dali::Integration::InputMethodContext::PreeditStyle type);
+
+  bool                                      SetInputPanelLayout(Dali::InputMethod::PanelLayout layout);
+  Dali::InputMethod::PanelLayout      GetInputPanelLayout() const;
+  bool                                      SetInputPanelReturnKeyType(Dali::InputMethod::ReturnKeyType action);
+  Dali::InputMethod::ReturnKeyType     GetInputPanelReturnKeyType() const;
+  bool                                      SetInputPanelAutoCapitalType(Dali::InputMethod::AutoCapitalType autoCapital);
+  Dali::InputMethod::AutoCapitalType      GetInputPanelAutoCapitalType() const;
+  bool                                      SetInputPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation variation);
+  Dali::InputMethod::PanelLayoutVariation GetInputPanelLayoutVariation() const;
 
 public: // Signals
   ActivatedSignalType& ActivatedSignal()
@@ -74,45 +90,59 @@ public: // Signals
   {
     return mKeyboardEventSignal;
   }
-  StatusSignalType& StatusChangedSignal()
+  StatusChangedSignalType& StatusChangedSignal()
   {
     return mKeyboardStatusSignal;
   }
-  VoidSignalType& ResizedSignal()
+  KeyboardResizedSignalType& ResizedSignal()
   {
     return mKeyboardResizeSignal;
   }
-  VoidSignalType& LanguageChangedSignal()
+  LanguageChangedSignalType& LanguageChangedSignal()
   {
     return mKeyboardLanguageChangedSignal;
   }
+  KeyboardTypeChangedSignalType& KeyboardTypeChangedSignal()
+  {
+    return mKeyboardTypeChangedSignal;
+  }
+  PrivateCommandReceivedSignalType& PrivateCommandReceivedSignal()
+  {
+    return mPrivateCommandReceivedSignal;
+  }
 
 protected:
-  virtual ~InputMethodContext();
+  ~InputMethodContext() override;
 
 private:
-  void CreateContext(/*Ecore_X_Window ecoreXwin*/);
+  void CreateContext();
   void DeleteContext();
 
 private:
-  // Undefined
   InputMethodContext(const InputMethodContext&);
   InputMethodContext& operator=(InputMethodContext&);
 
 private:
-  int                                                     mIMFCursorPosition;
-  std::string                                             mSurroundingText;
-  bool                                                    mRestoreAfterFocusLost : 1; ///< Whether the keyboard needs to be restored (activated ) after focus regained.
-  bool                                                    mIdleCallbackConnected : 1; ///< Whether the idle callback is already connected.
-  InputMethodOptions                                      mOptions;
-  Dali::InputMethodContext::PreEditAttributeDataContainer mPreeditAttrs; ///< Stores preedit attribute data
+  uint32_t                                                            mIMFCursorPosition;
+  Dali::String                                                        mSurroundingText;
+  bool                                                                mRestoreAfterFocusLost : 1;
+  bool                                                                mReturnKeyEnabled : 1;
+  bool                                                                mIdleCallbackConnected : 1;
+  Dali::Integration::InputMethodContext::PreEditAttributeDataContainer mPreeditAttrs;
 
-  ActivatedSignalType     mActivatedSignal;
-  KeyboardEventSignalType mEventSignal;
-  KeyboardEventSignalType mKeyboardEventSignal;
-  StatusSignalType        mKeyboardStatusSignal;
-  VoidSignalType          mKeyboardResizeSignal;
-  VoidSignalType          mKeyboardLanguageChangedSignal;
+  Dali::InputMethod::PanelLayout          mPanelLayout;
+  Dali::InputMethod::ReturnKeyType         mButtonAction;
+  Dali::InputMethod::AutoCapitalType          mAutoCapital;
+  Dali::InputMethod::PanelLayoutVariation mPanelLayoutVariation;
+
+  ActivatedSignalType              mActivatedSignal;
+  KeyboardEventSignalType          mEventSignal;
+  KeyboardEventSignalType          mKeyboardEventSignal;
+  StatusChangedSignalType          mKeyboardStatusSignal;
+  KeyboardResizedSignalType        mKeyboardResizeSignal;
+  LanguageChangedSignalType        mKeyboardLanguageChangedSignal;
+  KeyboardTypeChangedSignalType    mKeyboardTypeChangedSignal;
+  PrivateCommandReceivedSignalType mPrivateCommandReceivedSignal;
 
   static Dali::InputMethodContext mToolkitInputMethodContext;
 
@@ -132,7 +162,7 @@ public:
 
 Dali::InputMethodContext Dali::Internal::Adaptor::InputMethodContext::mToolkitInputMethodContext;
 
-Dali::InputMethodContext InputMethodContext::New()
+Dali::InputMethodContext InputMethodContext::Create()
 {
   if(!mToolkitInputMethodContext)
   {
@@ -141,13 +171,19 @@ Dali::InputMethodContext InputMethodContext::New()
   return mToolkitInputMethodContext;
 }
 
-InputMethodContext::InputMethodContext(/*Ecore_X_Window ecoreXwin*/)
-: mIMFCursorPosition(0),
+InputMethodContext::InputMethodContext()
+: mIMFCursorPosition(0u),
   mSurroundingText(),
   mRestoreAfterFocusLost(false),
-  mIdleCallbackConnected(false)
+  mReturnKeyEnabled(true),
+  mIdleCallbackConnected(false),
+  mPreeditAttrs(),
+  mPanelLayout(Dali::InputMethod::PanelLayout::NORMAL),
+  mButtonAction(Dali::InputMethod::ReturnKeyType::DEFAULT),
+  mAutoCapital(Dali::InputMethod::AutoCapitalType::SENTENCE),
+  mPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation::NORMAL_NORMAL)
 {
-  CreateContext(/*ecoreXwin*/);
+  CreateContext();
   ConnectCallbacks();
 }
 
@@ -161,7 +197,7 @@ void InputMethodContext::Finalize()
 {
 }
 
-void InputMethodContext::CreateContext(/*Ecore_X_Window ecoreXwin*/)
+void InputMethodContext::CreateContext()
 {
 }
 
@@ -169,7 +205,6 @@ void InputMethodContext::DeleteContext()
 {
 }
 
-// Callbacks for predicitive text support.
 void InputMethodContext::ConnectCallbacks()
 {
 }
@@ -190,42 +225,59 @@ void InputMethodContext::Reset()
 {
 }
 
-bool InputMethodContext::RestoreAfterFocusLost() const
+bool InputMethodContext::IsRestoreAfterFocusLostEnabled() const
 {
   return mRestoreAfterFocusLost;
 }
 
-void InputMethodContext::SetRestoreAfterFocusLost(bool toggle)
+bool InputMethodContext::SetRestoreAfterFocusLostEnabled(bool enabled)
 {
-  mRestoreAfterFocusLost = toggle;
+  mRestoreAfterFocusLost = enabled;
+  return true;
+}
+
+bool InputMethodContext::SetReturnKeyEnabled(bool enabled)
+{
+  mReturnKeyEnabled = enabled;
+  return true;
+}
+
+bool InputMethodContext::IsReturnKeyEnabled() const
+{
+  return mReturnKeyEnabled;
 }
 
 void InputMethodContext::NotifyCursorPosition()
 {
 }
 
-void InputMethodContext::SetCursorPosition(unsigned int cursorPosition)
+void InputMethodContext::SetCursorPosition(uint32_t cursorPosition)
 {
-  mIMFCursorPosition = static_cast<int>(cursorPosition);
+  mIMFCursorPosition = cursorPosition;
 }
 
-unsigned int InputMethodContext::GetCursorPosition() const
+uint32_t InputMethodContext::GetCursorPosition() const
 {
-  return static_cast<unsigned int>(mIMFCursorPosition);
+  return mIMFCursorPosition;
 }
 
-void InputMethodContext::SetSurroundingText(const std::string& text)
+void InputMethodContext::SetSurroundingText(const Dali::String& text)
 {
   mSurroundingText = text;
 }
 
-const std::string& InputMethodContext::GetSurroundingText() const
+Dali::String InputMethodContext::GetSurroundingText() const
 {
   return mSurroundingText;
 }
 
-void InputMethodContext::ApplyOptions(const InputMethodOptions& options)
+void InputMethodContext::NotifyTextInputMultiLine(bool multiLine)
 {
+}
+
+void InputMethodContext::ApplyOptions(const Dali::Integration::InputMethodOptions& options)
+{
+  (void)options;
 }
 
 bool InputMethodContext::FilterEventKey(const Dali::KeyEvent& keyEvent)
@@ -233,24 +285,63 @@ bool InputMethodContext::FilterEventKey(const Dali::KeyEvent& keyEvent)
   return false;
 }
 
-void InputMethodContext::SetPreeditStyle(Dali::InputMethodContext::PreeditStyle type)
+void InputMethodContext::GetPreeditStyle(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer& attrs) const
 {
-  Dali::InputMethodContext::PreeditAttributeData data;
+  attrs = mPreeditAttrs;
+}
+
+void InputMethodContext::SetPreeditStyle(Dali::Integration::InputMethodContext::PreeditStyle type)
+{
+  Dali::Integration::InputMethodContext::PreeditAttributeData data;
   data.preeditType = type;
   mPreeditAttrs.PushBack(data);
 }
 
-void InputMethodContext::GetPreeditStyle(Dali::InputMethodContext::PreEditAttributeDataContainer& attrs) const
+bool InputMethodContext::SetInputPanelLayout(Dali::InputMethod::PanelLayout layout)
 {
-  attrs = mPreeditAttrs;
+  mPanelLayout = layout;
+  return true;
 }
-} //namespace Adaptor
 
-} //namespace Internal
+Dali::InputMethod::PanelLayout InputMethodContext::GetInputPanelLayout() const
+{
+  return mPanelLayout;
+}
 
-/********************************************************************************/
-/*********************************  PUBLIC CLASS  *******************************/
-/********************************************************************************/
+bool InputMethodContext::SetInputPanelReturnKeyType(Dali::InputMethod::ReturnKeyType action)
+{
+  mButtonAction = action;
+  return true;
+}
+
+Dali::InputMethod::ReturnKeyType InputMethodContext::GetInputPanelReturnKeyType() const
+{
+  return mButtonAction;
+}
+
+bool InputMethodContext::SetInputPanelAutoCapitalType(Dali::InputMethod::AutoCapitalType autoCapital)
+{
+  mAutoCapital = autoCapital;
+  return true;
+}
+
+Dali::InputMethod::AutoCapitalType InputMethodContext::GetInputPanelAutoCapitalType() const
+{
+  return mAutoCapital;
+}
+
+bool InputMethodContext::SetInputPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation variation)
+{
+  mPanelLayoutVariation = variation;
+  return true;
+}
+
+Dali::InputMethod::PanelLayoutVariation InputMethodContext::GetInputPanelLayoutVariation() const
+{
+  return mPanelLayoutVariation;
+}
+} // namespace Adaptor
+} // namespace Internal
 
 InputMethodContext::InputMethodContext()
 {
@@ -260,124 +351,179 @@ InputMethodContext::~InputMethodContext()
 {
 }
 
-InputMethodContext InputMethodContext::New()
+InputMethodContext InputMethodContext::DownCast(BaseHandle handle)
 {
-  return InputMethodContext::New(Actor());
+  return InputMethodContext(dynamic_cast<Internal::Adaptor::InputMethodContext*>(handle.GetObjectPtr()));
 }
 
-InputMethodContext InputMethodContext::New(Actor actor)
+bool InputMethodContext::IsRestoreAfterFocusLostEnabled() const
 {
-  return Internal::Adaptor::InputMethodContext::New();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).IsRestoreAfterFocusLostEnabled();
 }
 
-void InputMethodContext::Finalize()
+bool InputMethodContext::SetRestoreAfterFocusLostEnabled(bool enabled)
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).Finalize();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetRestoreAfterFocusLostEnabled(enabled);
 }
 
-void InputMethodContext::Activate()
+Dali::BoundsInteger InputMethodContext::GetInputPanelArea()
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).Activate();
+  return Dali::BoundsInteger();
 }
 
-void InputMethodContext::Deactivate()
+bool InputMethodContext::SetInputPanelUserData(const Dali::String& data)
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).Deactivate();
+  return true;
 }
 
-bool InputMethodContext::RestoreAfterFocusLost() const
+Dali::String InputMethodContext::GetInputPanelUserData() const
 {
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).RestoreAfterFocusLost();
+  return Dali::String();
 }
 
-void InputMethodContext::SetRestoreAfterFocusLost(bool toggle)
+InputMethodContext::State InputMethodContext::GetInputPanelState() const
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetRestoreAfterFocusLost(toggle);
+  return DEFAULT;
 }
 
-void InputMethodContext::Reset()
+bool InputMethodContext::SetReturnKeyEnabled(bool enabled)
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).Reset();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetReturnKeyEnabled(enabled);
 }
 
-void InputMethodContext::NotifyCursorPosition()
+bool InputMethodContext::IsReturnKeyEnabled() const
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).NotifyCursorPosition();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).IsReturnKeyEnabled();
 }
 
-void InputMethodContext::SetCursorPosition(unsigned int SetCursorPosition)
+bool InputMethodContext::SetInputPanelAutoShowEnabled(bool enabled)
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetCursorPosition(SetCursorPosition);
+  return true;
 }
 
-unsigned int InputMethodContext::GetCursorPosition() const
+bool InputMethodContext::ShowInputPanel()
 {
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetCursorPosition();
+  return true;
 }
 
-void InputMethodContext::SetSurroundingText(const std::string& text)
+bool InputMethodContext::HideInputPanel()
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetSurroundingText(text);
+  return true;
 }
 
-const std::string& InputMethodContext::GetSurroundingText() const
+InputMethodContext::KeyboardType InputMethodContext::GetKeyboardType() const
 {
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetSurroundingText();
+  return SOFTWARE_KEYBOARD;
 }
 
-void InputMethodContext::NotifyTextInputMultiLine(bool multiLine)
+bool InputMethodContext::SetInputPanelLanguageLocale(const Dali::String& locale)
 {
+  return false;
 }
 
-void InputMethodContext::ApplyOptions(const InputMethodOptions& options)
+Dali::String InputMethodContext::GetInputPanelLanguageLocale() const
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).ApplyOptions(options);
+  return Dali::String();
 }
 
-bool InputMethodContext::FilterEventKey(const Dali::KeyEvent& keyEvent)
+bool InputMethodContext::SetTextPredictionEnabled(bool enabled)
 {
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).FilterEventKey(keyEvent);
+  return true;
 }
 
-void InputMethodContext::SetPreeditStyle(Dali::InputMethodContext::PreeditStyle type)
+bool InputMethodContext::IsTextPredictionEnabled() const
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetPreeditStyle(type);
+  return false;
 }
 
-void InputMethodContext::GetPreeditStyle(Dali::InputMethodContext::PreEditAttributeDataContainer& attrs) const
+bool InputMethodContext::SetFullScreenModeEnabled(bool enabled)
 {
-  Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetPreeditStyle(attrs);
+  return true;
 }
 
-// Signals
+bool InputMethodContext::IsFullScreenModeEnabled() const
+{
+  return false;
+}
+
+bool InputMethodContext::SetInputPanelPosition(uint32_t x, uint32_t y)
+{
+  return true;
+}
+
+bool InputMethodContext::SetInputPanelPositionAlign(int32_t x, int32_t y, InputPanelAlign align)
+{
+  return false;
+}
+
+bool InputMethodContext::SetInputPanelLayout(Dali::InputMethod::PanelLayout layout)
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelLayout(layout);
+}
+
+Dali::InputMethod::PanelLayout InputMethodContext::GetInputPanelLayout() const
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelLayout();
+}
+
+bool InputMethodContext::SetInputPanelReturnKeyType(Dali::InputMethod::ReturnKeyType action)
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelReturnKeyType(action);
+}
+
+Dali::InputMethod::ReturnKeyType InputMethodContext::GetInputPanelReturnKeyType() const
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelReturnKeyType();
+}
+
+bool InputMethodContext::SetInputPanelAutoCapitalType(Dali::InputMethod::AutoCapitalType autoCapital)
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelAutoCapitalType(autoCapital);
+}
+
+Dali::InputMethod::AutoCapitalType InputMethodContext::GetInputPanelAutoCapitalType() const
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelAutoCapitalType();
+}
+
+bool InputMethodContext::SetInputPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation variation)
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelLayoutVariation(variation);
+}
+
+Dali::InputMethod::PanelLayoutVariation InputMethodContext::GetInputPanelLayoutVariation() const
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelLayoutVariation();
+}
+
 InputMethodContext::ActivatedSignalType& InputMethodContext::ActivatedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).ActivatedSignal();
 }
 
-InputMethodContext::KeyboardEventSignalType& InputMethodContext::EventReceivedSignal()
-{
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).EventReceivedSignal();
-}
-
-InputMethodContext::KeyboardEventSignalType& InputMethodContext::KeyboardEventReceivedSignal()
-{
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).KeyboardEventReceivedSignal();
-}
-
-InputMethodContext::StatusSignalType& InputMethodContext::StatusChangedSignal()
+InputMethodContext::StatusChangedSignalType& InputMethodContext::StatusChangedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).StatusChangedSignal();
 }
 
-InputMethodContext::VoidSignalType& InputMethodContext::ResizedSignal()
+InputMethodContext::KeyboardResizedSignalType& InputMethodContext::ResizedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).ResizedSignal();
 }
 
-InputMethodContext::VoidSignalType& InputMethodContext::LanguageChangedSignal()
+InputMethodContext::LanguageChangedSignalType& InputMethodContext::LanguageChangedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).LanguageChangedSignal();
+}
+
+InputMethodContext::KeyboardTypeChangedSignalType& InputMethodContext::KeyboardTypeChangedSignal()
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).KeyboardTypeChangedSignal();
+}
+
+InputMethodContext::PrivateCommandReceivedSignalType& InputMethodContext::PrivateCommandReceivedSignal()
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).PrivateCommandReceivedSignal();
 }
 
 InputMethodContext::InputMethodContext(Internal::Adaptor::InputMethodContext* impl)
@@ -385,4 +531,117 @@ InputMethodContext::InputMethodContext(Internal::Adaptor::InputMethodContext* im
 {
 }
 
+namespace Integration
+{
+namespace InputMethodContext
+{
+Dali::InputMethodContext New()
+{
+  return Dali::Internal::Adaptor::InputMethodContext::Create();
+}
+
+Dali::InputMethodContext New(Dali::Actor actor)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::Create();
+}
+
+void Finalize(Dali::InputMethodContext context)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).Finalize();
+}
+
+void Activate(Dali::InputMethodContext context)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).Activate();
+}
+
+void Deactivate(Dali::InputMethodContext context)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).Deactivate();
+}
+
+void Reset(Dali::InputMethodContext context)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).Reset();
+}
+
+void NotifyCursorPosition(Dali::InputMethodContext context)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).NotifyCursorPosition();
+}
+
+void SetCursorPosition(Dali::InputMethodContext context, uint32_t cursorPosition)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).SetCursorPosition(cursorPosition);
+}
+
+uint32_t GetCursorPosition(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).GetCursorPosition();
+}
+
+void SetSurroundingText(Dali::InputMethodContext context, const Dali::String& text)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).SetSurroundingText(text);
+}
+
+Dali::String GetSurroundingText(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).GetSurroundingText();
+}
+
+void NotifyTextInputMultiLine(Dali::InputMethodContext context, bool multiLine)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).NotifyTextInputMultiLine(multiLine);
+}
+
+TextDirection GetTextDirection(Dali::InputMethodContext context)
+{
+  return LEFT_TO_RIGHT;
+}
+
+void ApplyOptions(Dali::InputMethodContext context, const Dali::Integration::InputMethodOptions& options)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).ApplyOptions(options);
+}
+
+bool SetInputPanelLanguage(Dali::InputMethodContext context, InputPanelLanguage language)
+{
+  return true;
+}
+
+InputPanelLanguage GetInputPanelLanguage(Dali::InputMethodContext context)
+{
+  return InputPanelLanguage::AUTOMATIC;
+}
+
+bool FilterEventKey(Dali::InputMethodContext context, const Dali::KeyEvent& keyEvent)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).FilterEventKey(keyEvent);
+}
+
+void GetPreeditStyle(Dali::InputMethodContext context, PreEditAttributeDataContainer& attrs)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).GetPreeditStyle(attrs);
+}
+
+KeyboardEventSignalType& EventReceivedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).EventReceivedSignal();
+}
+
+KeyboardEventSignalType& KeyboardEventReceivedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).KeyboardEventReceivedSignal();
+}
+
+namespace Test
+{
+void SetPreeditStyle(Dali::InputMethodContext context, PreeditStyle type)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).SetPreeditStyle(type);
+}
+} // namespace Test
+} // namespace InputMethodContext
+} // namespace Integration
 } // namespace Dali

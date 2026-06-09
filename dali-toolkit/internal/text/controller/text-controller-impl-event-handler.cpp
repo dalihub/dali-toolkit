@@ -455,8 +455,8 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       // Notify the cursor position to the InputMethodContext.
       if(eventData.mInputMethodContext)
       {
-        eventData.mInputMethodContext.SetCursorPosition(primaryCursorPosition);
-        eventData.mInputMethodContext.NotifyCursorPosition();
+        Dali::Integration::InputMethodContext::SetCursorPosition(eventData.mInputMethodContext, primaryCursorPosition);
+        Dali::Integration::InputMethodContext::NotifyCursorPosition(eventData.mInputMethodContext);
       }
 
       impl.ChangeState(EventData::SELECTING);
@@ -548,8 +548,8 @@ void ControllerImplEventHandler::OnTapEvent(Controller::Impl& impl, const Event&
       // Notify the cursor position to the InputMethodContext.
       if(eventData.mInputMethodContext)
       {
-        eventData.mInputMethodContext.SetCursorPosition(eventData.mPrimaryCursorPosition);
-        eventData.mInputMethodContext.NotifyCursorPosition();
+        Dali::Integration::InputMethodContext::SetCursorPosition(eventData.mInputMethodContext, eventData.mPrimaryCursorPosition);
+        Dali::Integration::InputMethodContext::NotifyCursorPosition(eventData.mInputMethodContext);
       }
     }
     else if(2u == tapCount)

@@ -445,14 +445,14 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
      impl.mEventData->mPreEditFlag &&
      (0u != impl.mModel->mVisualModel->mCharactersToGlyph.Count()))
   {
-    Dali::InputMethodContext::PreEditAttributeDataContainer attrs;
-    impl.mEventData->mInputMethodContext.GetPreeditStyle(attrs);
-    Dali::InputMethodContext::PreeditStyle type = Dali::InputMethodContext::PreeditStyle::NONE;
+    Dali::Integration::InputMethodContext::PreEditAttributeDataContainer attrs;
+    Dali::Integration::InputMethodContext::GetPreeditStyle(impl.mEventData->mInputMethodContext, attrs);
+    Dali::Integration::InputMethodContext::PreeditStyle type = Dali::Integration::InputMethodContext::PreeditStyle::NONE;
 
     // Check the type of preedit and run it.
-    for(Dali::InputMethodContext::PreEditAttributeDataContainer::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++)
+    for(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++)
     {
-      Dali::InputMethodContext::PreeditAttributeData attrData = *it;
+      Dali::Integration::InputMethodContext::PreeditAttributeData attrData = *it;
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::UpdateModel PreeditStyle type : %d  start %d end %d \n", attrData.preeditType, attrData.startIndex, attrData.endIndex);
       type = attrData.preeditType;
 
@@ -462,7 +462,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
       switch(type)
       {
-        case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
+        case Dali::Integration::InputMethodContext::PreeditStyle::UNDERLINE:
         {
           // Add the underline for the pre-edit text.
           UnderlinedGlyphRun underlineRun;
@@ -478,7 +478,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::REVERSE:
+        case Dali::Integration::InputMethodContext::PreeditStyle::REVERSE:
         {
           Vector4  textColor = impl.mModel->mVisualModel->GetTextColor();
           ColorRun backgroundColorRun;
@@ -520,7 +520,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
+        case Dali::Integration::InputMethodContext::PreeditStyle::HIGHLIGHT:
         {
           ColorRun backgroundColorRun;
           backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
@@ -536,7 +536,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1:
+        case Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1:
         {
           // CUSTOM_PLATFORM_STYLE_1 should be drawn with background and underline together.
           ColorRun backgroundColorRun;
@@ -558,7 +558,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2:
+        case Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2:
         {
           // CUSTOM_PLATFORM_STYLE_2 should be drawn with background and underline together.
           ColorRun backgroundColorRun;
@@ -580,7 +580,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3:
+        case Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3:
         {
           // CUSTOM_PLATFORM_STYLE_3 should be drawn with background and underline together.
           ColorRun backgroundColorRun;
@@ -602,7 +602,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4:
+        case Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4:
         {
           // CUSTOM_PLATFORM_STYLE_4 should be drawn with background and underline together.
           ColorRun backgroundColorRun;
@@ -624,7 +624,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           }
           break;
         }
-        case Dali::InputMethodContext::PreeditStyle::NONE:
+        case Dali::Integration::InputMethodContext::PreeditStyle::NONE:
         default:
         {
           break;

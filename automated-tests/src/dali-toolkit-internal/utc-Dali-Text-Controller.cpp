@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali/devel-api/events/key-event-devel.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <toolkit-text-utils.h>
 
 using namespace Dali;
@@ -44,6 +45,8 @@ const char* const OPTION_CLIPBOARD("optionClipboard");    // "Clipboard" popup o
 
 const Size CONTROL_SIZE(300.f, 60.f);
 
+using InputMethodEventData = Dali::Integration::InputMethodContext::EventData;
+
 // Generate a KeyEvent to send to Core.
 Dali::KeyEvent GenerateKey(const Dali::String&          keyName,
                            const Dali::String&          keyString,
@@ -53,6 +56,11 @@ Dali::KeyEvent GenerateKey(const Dali::String&          keyName,
                            const Dali::KeyEvent::State& keyState)
 {
   return DevelKeyEvent::New(keyName, "", keyString, keyCode, keyModifier, timeStamp, keyState, "", "", Device::Class::NONE, Device::Subclass::NONE);
+}
+
+InputMethodEventData CreateInputMethodEvent(Dali::Integration::InputMethodContext::EventType eventName, const char* predictiveString, int cursorOffset, int numberOfChars)
+{
+  return InputMethodEventData(eventName, Dali::String(predictiveString), cursorOffset, numberOfChars);
 }
 
 } // namespace
@@ -151,7 +159,7 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -177,8 +185,8 @@ int UtcDaliTextControllerImfEvent(void)
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
 
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
+  std::string          text;
+  InputMethodEventData imfEvent;
 
   DALI_TEST_CHECK(controller);
 
@@ -187,7 +195,7 @@ int UtcDaliTextControllerImfEvent(void)
   Text::DecoratorPtr decorator = Text::Decorator::New(*controller,
                                                       *controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -195,23 +203,23 @@ int UtcDaliTextControllerImfEvent(void)
   controller->SetPlaceholderText(Controller::PLACEHOLDER_TYPE_INACTIVE, "Hello Dali");
 
   // For coverage.
-  imfEvent = InputMethodContext::EventData(InputMethodContext::GET_SURROUNDING, "", 0, 0);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::GET_SURROUNDING, "", 0, 0);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Send VOID event.
-  imfEvent = InputMethodContext::EventData(InputMethodContext::VOID, "", 0, 0);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::VOID, "", 0, 0);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   controller->GetText(text);
   DALI_TEST_CHECK(text.empty());
   DALI_TEST_EQUALS(0u, controller->GetNumberOfCharacters(), TEST_LOCATION); // We should ignore Placeholder text here
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello ", 0, 6);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::COMMIT, "Hello ", 0, 6);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
   controller->GetNaturalSize();
 
   // Check 'Delete All' key which means the input panel send a big range
-  imfEvent = InputMethodContext::EventData(InputMethodContext::DELETE_SURROUNDING, "", -100, 100);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::DELETE_SURROUNDING, "", -100, 100);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
   controller->GetNaturalSize();
 
@@ -220,7 +228,7 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(0u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send COMMIT event.
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello ", 0, 6);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::COMMIT, "Hello ", 0, 6);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -231,7 +239,7 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(6u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send PRE_EDIT event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -242,7 +250,7 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send DELETE_SURROUNDING event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::DELETE_SURROUNDING, "", -1, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::DELETE_SURROUNDING, "", -1, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -253,10 +261,10 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(6u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // for coverage
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::UNDERLINE);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::UNDERLINE);
 
   // Send PRE_EDIT event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "wo", 6, 2);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "wo", 6, 2);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -267,7 +275,7 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(8u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send GET_SURROUNDING event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::GET_SURROUNDING, "", 0, 0);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::GET_SURROUNDING, "", 0, 0);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   controller->GetText(text);
@@ -275,7 +283,7 @@ int UtcDaliTextControllerImfEvent(void)
   DALI_TEST_EQUALS(8u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send PRIVATE_COMMAND event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRIVATE_COMMAND, "", 0, 0);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRIVATE_COMMAND, "", 0, 0);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   controller->GetText(text);
@@ -294,18 +302,18 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
 
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
+  std::string          text;
+  InputMethodEventData imfEvent;
 
   DALI_TEST_CHECK(controller);
 
   // Configures the text controller similarly to the text-field.
   ConfigureTextField(controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
 
   // Send COMMIT event.
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello ", 0, 6);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::COMMIT, "Hello ", 0, 6);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -316,75 +324,75 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   DALI_TEST_EQUALS(6u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
   // Send PRE_EDIT event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::NONE);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::NONE);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as REVERSE
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::REVERSE);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::REVERSE);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as HIGHLIGHT
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::HIGHLIGHT);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::HIGHLIGHT);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as CUSTOM_PLATFORM_STYLE_1
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as CUSTOM_PLATFORM_STYLE_2
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as CUSTOM_PLATFORM_STYLE_3
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3);
   controller->GetNaturalSize();
 
   controller->GetText(text);
   DALI_TEST_EQUALS("Hello w", text, TEST_LOCATION);
   DALI_TEST_EQUALS(7u, controller->GetNumberOfCharacters(), TEST_LOCATION);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "w", 6, 1);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "w", 6, 1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Set the preedit style as CUSTOM_PLATFORM_STYLE_4
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4);
   controller->GetNaturalSize();
 
   controller->GetText(text);
@@ -403,18 +411,18 @@ int UtcDaliTextControllerImfPreeditStyleReverse(void)
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
 
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
+  std::string          text;
+  InputMethodEventData imfEvent;
 
   DALI_TEST_CHECK(controller);
 
   // Configures the text controller similarly to the text-field.
   ConfigureTextField(controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
 
   // Send PRE_EDIT event
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "Reverse", 0, 7);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "Reverse", 0, 7);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // For coverage, mEditableControlInterface is required.
@@ -429,7 +437,7 @@ int UtcDaliTextControllerImfPreeditStyleReverse(void)
   controllerImpl.mEditableControlInterface = fieldControllerImpl.mEditableControlInterface;
 
   // Set the preedit style as REVERSE
-  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::REVERSE);
+  Dali::Integration::InputMethodContext::Test::SetPreeditStyle(inputMethodContext, Dali::Integration::InputMethodContext::PreeditStyle::REVERSE);
   controller->GetNaturalSize();
 
   controller->GetText(text);
@@ -458,7 +466,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   Text::DecoratorPtr decorator = Text::Decorator::New(*controller,
                                                       *controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -648,7 +656,7 @@ int UtcDaliTextControllerSetGetCheckProperty(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New(*controller, *controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -693,7 +701,7 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New(*controller, *controller);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -902,7 +910,7 @@ int UtcDaliTextControllerCheckInputColorChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -953,7 +961,7 @@ int UtcDaliTextControllerCheckInputFontFamilyChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -1001,7 +1009,7 @@ int UtcDaliTextControllerCheckInputFontWeightChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -1049,7 +1057,7 @@ int UtcDaliTextControllerCheckInputFontWidthChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -1097,7 +1105,7 @@ int UtcDaliTextControllerCheckInputFontSlantChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -1145,7 +1153,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator          = Text::Decorator::New(*controller,
                                                                *controller);
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -1245,8 +1253,8 @@ int UtcDaliTextControllerRemoveTextChangeEventData(void)
   DALI_TEST_EQUALS(EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION);
 
   // Send DELETE_SURROUNDING event
-  InputMethodContext::EventData imfEvent           = InputMethodContext::EventData(InputMethodContext::DELETE_SURROUNDING, "", -1, 1);
-  InputMethodContext            inputMethodContext = InputMethodContext::New();
+  InputMethodEventData imfEvent           = CreateInputMethodEvent(Dali::Integration::InputMethodContext::DELETE_SURROUNDING, "", -1, 1);
+  InputMethodContext   inputMethodContext = Dali::Integration::InputMethodContext::New();
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Force to update the model.
@@ -1321,9 +1329,9 @@ int UtcDaliTextControllerDeleteSurroundings(void)
 
   DALI_TEST_EQUALS(EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Add some pre-edit text, such as Korean
-  InputMethodContext::EventData imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "ㅂㅂㅂ", 0, 3);
+  InputMethodEventData imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "ㅂㅂㅂ", 0, 3);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   // Perform a relayout
@@ -1338,7 +1346,7 @@ int UtcDaliTextControllerDeleteSurroundings(void)
   controller->KeyEvent(GenerateKey("", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::DOWN));
 
   // Send DELETE_SURROUNDING event (Delete All text)
-  imfEvent = InputMethodContext::EventData(InputMethodContext::DELETE_SURROUNDING, "", -2, 2);
+  imfEvent = CreateInputMethodEvent(Dali::Integration::InputMethodContext::DELETE_SURROUNDING, "", -2, 2);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
 
   application.SendNotification();
@@ -1380,11 +1388,11 @@ int UtcDaliTextControllerMultipleInsert(void)
 
   DALI_TEST_EQUALS(EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
 
   // When maid thread is busy, multiple event might be executed.
-  InputMethodContext::EventData imfEvent1 = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "A", 0, 1);
-  InputMethodContext::EventData imfEvent2 = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "AAAAA", 0, 5);
+  InputMethodEventData imfEvent1 = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "A", 0, 1);
+  InputMethodEventData imfEvent2 = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "AAAAA", 0, 5);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent1);
   controller->OnInputMethodContextEvent(inputMethodContext, imfEvent2);
 

@@ -18,7 +18,7 @@
  *
  */
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/public-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
@@ -209,17 +209,17 @@ enum Type
    * @brief The settings to relating to the System's Input Method, Key and Value.
    * @details Name "inputMethodSettings", type Property::MAP.
    *
-   * @note VARIATION key can be changed depending on PANEL_LAYOUT.
-   * For example, when PANEL_LAYOUT key is InputMethod::PanelLayout::NORMAL,
-   * then VARIATION would be among NORMAL, WITH_FILENAME, and WITH_PERSON_NAME in Dali::InputMethod::NormalLayout.
-   * For more information, see Dali::InputMethod::Category.
+   * @note VARIATION key is a raw layout variation value interpreted according to PANEL_LAYOUT.
+   * For example, when PANEL_LAYOUT is InputMethod::PanelLayout::NORMAL,
+   * VARIATION can be 0, 1, or 2, corresponding to normal, filename, and person-name variations.
+   * Dali::InputMethod::PanelLayoutVariation values are not used as raw VARIATION map values.
    *
    * Example Usage:
    * @code
    *   Property::Map propertyMap;
-   *   InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
-   *   InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
-   *   InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
+   *   InputMethod::PanelLayout panelLayout = InputMethod::PanelLayout::NUMBER;
+   *   InputMethod::AutoCapitalType autoCapital = InputMethod::AutoCapitalType::WORD;
+   *   InputMethod::ReturnKeyType buttonAction = InputMethod::ReturnKeyType::GO;
    *   int inputVariation = 1;
    *   propertyMap["PANEL_LAYOUT"] = panelLayout;
    *   propertyMap["AUTO_CAPITALIZE"] = autoCapital;

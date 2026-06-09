@@ -486,7 +486,7 @@ void TextField::OnInitialize()
   mDecorator = Text::Decorator::New(*mController,
                                     *mController);
 
-  mInputMethodContext = InputMethodContext::New(self);
+  mInputMethodContext = Dali::Integration::InputMethodContext::New(self);
 
   mController->GetLayoutEngine().SetLayout(Layout::Engine::SINGLE_LINE_BOX);
 
@@ -766,18 +766,18 @@ void TextField::OnKeyInputFocusGained()
   if(mInputMethodContext && IsEditable())
   {
     // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
-    mInputMethodContext.ApplyOptions(mInputMethodOptions);
-    mInputMethodContext.NotifyTextInputMultiLine(false);
+    Dali::Integration::InputMethodContext::ApplyOptions(mInputMethodContext, mInputMethodOptions);
+    Dali::Integration::InputMethodContext::NotifyTextInputMultiLine(mInputMethodContext, false);
 
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextField::KeyboardStatusChanged);
 
-    mInputMethodContext.KeyboardEventReceivedSignal().Connect(this, &TextField::OnInputMethodContextEvent);
+    Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(mInputMethodContext).Connect(this, &TextField::OnInputMethodContextEvent);
 
     // Notify that the text editing start.
-    mInputMethodContext.Activate();
+    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
 
     // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
-    mInputMethodContext.SetRestoreAfterFocusLost(true);
+    mInputMethodContext.SetRestoreAfterFocusLostEnabled(true);
   }
 
   if(IsEditable() && mController->IsUserInteractionEnabled())
@@ -795,12 +795,12 @@ void TextField::OnKeyInputFocusLost()
   {
     mInputMethodContext.StatusChangedSignal().Disconnect(this, &TextField::KeyboardStatusChanged);
     // The text editing is finished. Therefore the inputMethodContext don't have restore activation.
-    mInputMethodContext.SetRestoreAfterFocusLost(false);
+    mInputMethodContext.SetRestoreAfterFocusLostEnabled(false);
 
     // Notify that the text editing finish.
-    mInputMethodContext.Deactivate();
+    Dali::Integration::InputMethodContext::Deactivate(mInputMethodContext);
 
-    mInputMethodContext.KeyboardEventReceivedSignal().Disconnect(this, &TextField::OnInputMethodContextEvent);
+    Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(mInputMethodContext).Disconnect(this, &TextField::OnInputMethodContextEvent);
   }
 
   mController->KeyboardFocusLostEvent();
@@ -850,7 +850,7 @@ void TextField::OnLongPress(const LongPressGesture& gesture)
 {
   if(mInputMethodContext && IsEditable())
   {
-    mInputMethodContext.Activate();
+    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
   }
   Extents padding;
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
@@ -904,7 +904,7 @@ void TextField::SetEditable(bool editable)
   mController->SetEditable(editable);
   if(mInputMethodContext && !editable)
   {
-    mInputMethodContext.Deactivate();
+    Dali::Integration::InputMethodContext::Deactivate(mInputMethodContext);
   }
 }
 
@@ -1094,7 +1094,9 @@ void TextField::OnSceneConnect(Dali::Actor actor)
   }
 }
 
-InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(Dali::InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+Dali::Integration::InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(
+  Dali::InputMethodContext inputMethodContext,
+  const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
   return mController->OnInputMethodContextEvent(inputMethodContext, inputMethodContextEvent);
@@ -1137,9 +1139,9 @@ void TextField::EnableClipping()
   }
 }
 
-void TextField::KeyboardStatusChanged(bool keyboardShown)
+void TextField::KeyboardStatusChanged(InputMethodContext context, InputMethodContext::State state)
 {
-  DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardShown %d\n", mController.Get(), keyboardShown);
+  DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardState %d\n", mController.Get(), state);
 
   bool isFocused = false;
 
@@ -1149,15 +1151,14 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
     isFocused = keyboardFocusManager.GetCurrentFocusActor() == Self();
   }
 
-  // Just hide the grab handle when keyboard is hidden.
-  if(!keyboardShown)
+  if(state == InputMethodContext::State::HIDE)
   {
     if(!isFocused)
     {
       mController->KeyboardFocusLostEvent();
     }
   }
-  else
+  else if(state == InputMethodContext::State::SHOW)
   {
     mController->KeyboardFocusGainEvent(); // Initially called by OnKeyInputFocusGained
   }

@@ -1962,7 +1962,9 @@ void Controller::PasteText()
   }
 }
 
-InputMethodContext::CallbackData Controller::OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+Dali::Integration::InputMethodContext::CallbackData Controller::OnInputMethodContextEvent(
+  InputMethodContext& inputMethodContext,
+  const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   return EventHandler::OnInputMethodContextEvent(*this, inputMethodContext, inputMethodContextEvent);
 }

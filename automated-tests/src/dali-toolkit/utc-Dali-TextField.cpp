@@ -31,6 +31,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
@@ -893,9 +894,9 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the input method setting
   Property::Map                   propertyMap;
-  InputMethod::PanelLayout::Type  panelLayout    = InputMethod::PanelLayout::NUMBER;
-  InputMethod::AutoCapital::Type  autoCapital    = InputMethod::AutoCapital::WORD;
-  InputMethod::ButtonAction::Type buttonAction   = InputMethod::ButtonAction::GO;
+  InputMethod::PanelLayout  panelLayout    = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapitalType  autoCapital    = InputMethod::AutoCapitalType::WORD;
+  InputMethod::ReturnKeyType buttonAction   = InputMethod::ReturnKeyType::GO;
   int                             inputVariation = 1;
   propertyMap["PANEL_LAYOUT"]                    = panelLayout;
   propertyMap["AUTO_CAPITALIZE"]                 = autoCapital;
@@ -1714,49 +1715,49 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   field.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
 
   // get InputMethodContext
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
-  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+  std::string                                      text;
+  Dali::Integration::InputMethodContext::EventData imfEvent;
+  InputMethodContext                               inputMethodContext = DevelTextField::GetInputMethodContext(field);
 
   field.SetKeyInputFocus();
   field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
 
   // input text
   gTextChangedCallBackCalled = false;
-  imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "ㅎ", 0, 1);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                   = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::PRE_EDIT, Dali::String("ㅎ"), 0, 1);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
   DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("ㅎ"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
-  imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "호", 0, 1);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                   = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::PRE_EDIT, Dali::String("호"), 0, 1);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
   DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("호"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
-  imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "혿", 0, 1);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                   = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::PRE_EDIT, Dali::String("혿"), 0, 1);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gTextChangedCallBackCalled);
   DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("혿"), TEST_LOCATION);
 
   gTextChangedCallBackCalled = false;
-  imfEvent                   = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "", 0, 1);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                   = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::PRE_EDIT, Dali::String(""), 0, 1);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::COMMIT, "호", 0, 1);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::COMMIT, Dali::String("호"), 0, 1);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
-  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "두", 1, 2);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::PRE_EDIT, Dali::String("두"), 1, 2);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   application.SendNotification();
@@ -1785,17 +1786,17 @@ int utcDaliTextFieldSelectionWithInputMethodContext(void)
   field.ConnectSignal(testTracker, "selectionChanged", CallbackFunctor(&selectionChangedSignal));
 
   // get InputMethodContext
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
-  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+  std::string                                      text;
+  Dali::Integration::InputMethodContext::EventData imfEvent;
+  InputMethodContext                               inputMethodContext = DevelTextField::GetInputMethodContext(field);
 
   field.SetKeyInputFocus();
   field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
 
   // input text
   gSelectionChangedCallbackCalled = false;
-  imfEvent                        = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 1, 4);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                        = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::SELECTION_SET, 1, 4);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
@@ -1824,17 +1825,17 @@ int utcDaliTextFieldPositionWithInputMethodContext(void)
   field.ConnectSignal(testTracker, "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
 
   // get InputMethodContext
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
-  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+  std::string                                      text;
+  Dali::Integration::InputMethodContext::EventData imfEvent;
+  InputMethodContext                               inputMethodContext = DevelTextField::GetInputMethodContext(field);
 
   field.SetKeyInputFocus();
   field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
 
   // input text
   gCursorPositionChangedCallbackCalled = false;
-  imfEvent                             = InputMethodContext::EventData(InputMethodContext::SELECTION_SET, 2, 2);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                             = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::SELECTION_SET, 2, 2);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
@@ -1867,17 +1868,17 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
 
   // get InputMethodContext
-  std::string                   text;
-  InputMethodContext::EventData imfEvent;
-  InputMethodContext            inputMethodContext = DevelTextField::GetInputMethodContext(field);
+  std::string                                      text;
+  Dali::Integration::InputMethodContext::EventData imfEvent;
+  InputMethodContext                               inputMethodContext = DevelTextField::GetInputMethodContext(field);
 
   field.SetKeyInputFocus();
   field.SetProperty(DevelTextField::Property::ENABLE_EDITING, true);
 
   // input text
   gInputFilteredAcceptedCallbackCalled = false;
-  imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "Hello1234", 0, 9);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                             = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::COMMIT, Dali::String("Hello1234"), 0, 9);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
@@ -1885,8 +1886,8 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
 
   inputFilteredSignal                  = false;
   gInputFilteredRejectedCallbackCalled = false;
-  imfEvent                             = InputMethodContext::EventData(InputMethodContext::COMMIT, "1234567", 0, 7);
-  inputMethodContext.KeyboardEventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  imfEvent                             = Dali::Integration::InputMethodContext::EventData(Dali::Integration::InputMethodContext::COMMIT, Dali::String("1234567"), 0, 7);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(gInputFilteredRejectedCallbackCalled);
@@ -1915,12 +1916,12 @@ int utcDaliTextFieldFocusWithInputMethodContext(void)
   field.SetKeyInputFocus();
 
   // keyboard shown
-  inputMethodContext.StatusChangedSignal().Emit(true);
+  inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::SHOW);
   application.SendNotification();
   application.Render();
 
   // keyboard hidden
-  inputMethodContext.StatusChangedSignal().Emit(false);
+  inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::HIDE);
   application.SendNotification();
   application.Render();
 
@@ -1928,12 +1929,12 @@ int utcDaliTextFieldFocusWithInputMethodContext(void)
   field.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   KeyboardFocusManager::Get().SetCurrentFocusActor(field);
 
-  inputMethodContext.StatusChangedSignal().Emit(true);
+  inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::SHOW);
   application.SendNotification();
   application.Render();
 
   // keyboard hidden, focus should remain
-  inputMethodContext.StatusChangedSignal().Emit(false);
+  inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::HIDE);
   application.SendNotification();
   application.Render();
 

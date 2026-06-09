@@ -19,7 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
+#include <dali/integration-api/adaptor-framework/input-method-options.h>
 #include <dali/devel-api/atspi-interfaces/editable-text.h>
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
@@ -459,9 +460,11 @@ public:
 
 private: // Implementation
   /**
-   * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
+   * @copydoc Dali::Toolkit::Text::Controller::OnInputMethodContextEvent()
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+  Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
+    InputMethodContext inputMethodContext,
+    const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Get a Property Map for the image used for the required Handle Image
@@ -477,11 +480,12 @@ private: // Implementation
   void EnableClipping();
 
   /**
-   * @brief Callback when keyboard is shown/hidden.
+   * @brief Callback when keyboard status changes.
    *
-   * @param[in] keyboardShown True if keyboard is shown.
+   * @param[in] inputMethodContext The input method context.
+   * @param[in] state The input panel state.
    */
-  void KeyboardStatusChanged(bool keyboardShown);
+  void KeyboardStatusChanged(InputMethodContext context, InputMethodContext::State state);
 
   /**
    * @brief Callback when TextField is touched
@@ -598,7 +602,7 @@ private: // Data
   Toolkit::Control                 mStencil;                  ///< For EXCEED_POLICY_CLIP
   std::vector<Actor>               mClippingDecorationActors; ///< Decoration actors which need clipping.
   std::vector<Toolkit::TextAnchor> mAnchorActors;
-  Dali::InputMethodOptions         mInputMethodOptions;
+  Dali::Integration::InputMethodOptions mInputMethodOptions;
 
   Actor mRenderableActor;
   Actor mActiveLayer;
