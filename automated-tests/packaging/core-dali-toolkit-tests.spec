@@ -5,7 +5,7 @@ Summary:    Core API unit TC (%{name})
 Version:    0.1
 Release:    0
 Group:      Development/Tools
-License:    Apache-2.0 and OFL-1.1
+License:    Apache-2.0 and OFL-1.1 and Bitstream-Vera and BSD-3-Clause
 Source0:    %{name}-%{version}.tar.gz
 Requires:       dali
 Requires:       dali-adaptor
@@ -51,3 +51,4 @@ cp %{_builddir}/%{name}-%{version}/automated-tests/scripts/all_smack.rule %{buil
 /tmp/add_all_smack_rule.sh
 /tmp/all_smack.rule
 %license LICENSE
+%license LICENSE.BSD-3-Clause

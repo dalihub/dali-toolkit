@@ -3,7 +3,7 @@ Summary:    Dali 3D engine Toolkit
 Version:    2.4.46
 Release:    1
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-3-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
@@ -127,7 +127,7 @@ Application development package for Dali 3D engine toolkit - headers and package
 %package -n %{dali2_scene3d}
 Summary:    DLI scene loading library
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-3-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 Requires:   dali2-toolkit
 
 %description -n %{dali2_scene3d}
@@ -148,7 +148,7 @@ Development components for dali-scene3d.
 %package -n %{dali2_physics2d}
 Summary:    Physics library 2D
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-3-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 
 %description -n %{dali2_physics2d}
 Provides functionality for 2D physics simulation. See README.md for more details.
@@ -168,7 +168,7 @@ Development components for dali2-physics-2d.
 %package -n %{dali2_physics3d}
 Summary:    Physics library 3D
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-3-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 
 %description -n %{dali2_physics3d}
 Provides functionality for 3D physics simulation. See README.md for more details.
@@ -189,7 +189,7 @@ Development components for dali2-physics-3d.
 %package -n %{dali2_usdloader}
 Summary:    USD model loading library
 Group:      System/Libraries
-License:    Apache-2.0 and BSD-3-Clause and MIT
+License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 Requires:   %{dali2_scene3d}
 Requires:   openusd
 
@@ -541,6 +541,7 @@ exit 0
 %{_libdir}/libdali2-toolkit.so*
 %{_libdir}/libdali2-toolkit-gles.so*
 %license LICENSE
+%license LICENSE.MIT
 
 %files devel
 %defattr(-,root,root,-)
@@ -607,6 +608,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/lib%{dali2_scene3d}.so
 %license LICENSE
+%license LICENSE.Unlicense
 
 %files -n %{dali2_scene3d}-devel
 %defattr(-,root,root,-)
@@ -625,6 +627,7 @@ exit 0
 %{_libdir}/libdali2-physics-2d.so*
 %{_libdir}/libdali2-physics-2d-gles.so*
 %license LICENSE
+%license LICENSE.MIT
 
 %files -n %{dali2_physics2d}-devel
 %defattr(-,root,root,-)
@@ -646,6 +649,7 @@ exit 0
 %{_libdir}/libdali2-physics-3d.so*
 %{_libdir}/libdali2-physics-3d-gles.so*
 %license LICENSE
+%license LICENSE.Zlib
 
 %files -n %{dali2_physics3d}-devel
 %defattr(-,root,root,-)
