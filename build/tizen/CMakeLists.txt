@@ -397,9 +397,26 @@ IF(ENABLE_INVOKE_METHOD_WRAPPERS)
 
   SET(INVOKE_METHOD_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/invoke-method)
   SET(INVOKE_METHOD_PUBLIC_API_CPP ${INVOKE_METHOD_GENERATED_DIR}/public-api-invoke-methods.cpp)
+  SET(INVOKE_METHOD_CORE_PUBLIC_API_SOURCE_DIR ${ROOT_SRC_DIR}/../dali-core/dali/public-api)
+  SET(INVOKE_METHOD_ADAPTOR_PUBLIC_API_SOURCE_DIR ${ROOT_SRC_DIR}/../dali-adaptor/dali/public-api)
+  SET(INVOKE_METHOD_DALI_PUBLIC_API_INSTALL_DIR ${INCLUDE_DIR}/dali/public-api)
+  IF(EXISTS ${INVOKE_METHOD_CORE_PUBLIC_API_SOURCE_DIR})
+    SET(INVOKE_METHOD_CORE_PUBLIC_API_DIR ${INVOKE_METHOD_CORE_PUBLIC_API_SOURCE_DIR})
+  ELSEIF(EXISTS ${INVOKE_METHOD_DALI_PUBLIC_API_INSTALL_DIR})
+    SET(INVOKE_METHOD_CORE_PUBLIC_API_DIR ${INVOKE_METHOD_DALI_PUBLIC_API_INSTALL_DIR})
+  ELSE()
+    MESSAGE(FATAL_ERROR "dali-core public API headers not found. Build and install dali-core first.")
+  ENDIF()
+  IF(EXISTS ${INVOKE_METHOD_ADAPTOR_PUBLIC_API_SOURCE_DIR})
+    SET(INVOKE_METHOD_ADAPTOR_PUBLIC_API_DIR ${INVOKE_METHOD_ADAPTOR_PUBLIC_API_SOURCE_DIR})
+  ELSEIF(EXISTS ${INVOKE_METHOD_DALI_PUBLIC_API_INSTALL_DIR})
+    SET(INVOKE_METHOD_ADAPTOR_PUBLIC_API_DIR ${INVOKE_METHOD_DALI_PUBLIC_API_INSTALL_DIR})
+  ELSE()
+    MESSAGE(FATAL_ERROR "dali-adaptor public API headers not found. Build and install dali-adaptor first.")
+  ENDIF()
   FILE(GLOB_RECURSE INVOKE_METHOD_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/dali-toolkit/public-api/*.h)
-  FILE(GLOB_RECURSE INVOKE_METHOD_CORE_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/../dali-core/dali/public-api/*.h)
-  FILE(GLOB_RECURSE INVOKE_METHOD_ADAPTOR_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/../dali-adaptor/dali/public-api/*.h)
+  FILE(GLOB_RECURSE INVOKE_METHOD_CORE_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${INVOKE_METHOD_CORE_PUBLIC_API_DIR}/*.h)
+  FILE(GLOB_RECURSE INVOKE_METHOD_ADAPTOR_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${INVOKE_METHOD_ADAPTOR_PUBLIC_API_DIR}/*.h)
   FILE(GLOB_RECURSE INVOKE_METHOD_REGISTRATION_SCAN_FILES CONFIGURE_DEPENDS
        ${ROOT_SRC_DIR}/dali-toolkit/*.cpp
        ${ROOT_SRC_DIR}/dali-toolkit/*.h
@@ -409,9 +426,9 @@ IF(ENABLE_INVOKE_METHOD_WRAPPERS)
                      COMMAND ${INVOKE_METHOD_GENERATOR}
                              --scan-root ${ROOT_SRC_DIR}/dali-toolkit/public-api
                              --include-prefix dali-toolkit/public-api
-                             --dependency-scan-root ${ROOT_SRC_DIR}/../dali-core/dali/public-api
+                             --dependency-scan-root ${INVOKE_METHOD_CORE_PUBLIC_API_DIR}
                              --dependency-include-prefix dali/public-api
-                             --dependency-scan-root ${ROOT_SRC_DIR}/../dali-adaptor/dali/public-api
+                             --dependency-scan-root ${INVOKE_METHOD_ADAPTOR_PUBLIC_API_DIR}
                              --dependency-include-prefix dali/public-api
                              --dependency-export-api DALI_CORE_API
                              --dependency-export-api DALI_ADAPTOR_API
