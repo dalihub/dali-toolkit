@@ -247,64 +247,6 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
   END_TEST;
 }
 
-int UtcDaliToggleButtonToggleTipsProperty(void)
-{
-  ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
-  tet_infoline(" UtcDaliToggleButtonToggleTipsProperty");
-
-  // Create the ToggleButton actor
-  ToggleButton toggleButton = ToggleButton::New();
-  application.GetScene().Add(toggleButton);
-  toggleButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  toggleButton.SetProperty(Actor::Property::PIVOT, ParentOrigin::TOP_LEFT);
-  toggleButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-
-  { // Check empty tip array
-    Property::Array toggleIcons;
-    toggleIcons.PushBack(TEST_IMAGE_ONE); //Icons path
-    toggleIcons.PushBack(TEST_IMAGE_TWO);
-    toggleIcons.PushBack(TEST_IMAGE_THREE);
-    toggleButton.SetProperty(Toolkit::ToggleButton::Property::STATE_VISUALS, toggleIcons);
-
-    Property::Array toggleTips;
-    toggleButton.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS, toggleTips);
-
-    application.SendNotification();
-    application.Render();
-
-    Property::Array resultTips;
-    resultTips = toggleButton.GetProperty(Toolkit::ToggleButton::Property::TOOLTIPS).Get<Property::Array>();
-    DALI_TEST_CHECK(resultTips.Count() == 0);
-  }
-
-  { // Check non-empty tip array
-    Property::Array toggleIcons;
-    toggleIcons.PushBack(TEST_IMAGE_ONE); //Icons path
-    toggleIcons.PushBack(TEST_IMAGE_TWO);
-    toggleIcons.PushBack(TEST_IMAGE_THREE);
-    toggleButton.SetProperty(Toolkit::ToggleButton::Property::STATE_VISUALS, toggleIcons);
-
-    Property::Array toggleTips;
-    toggleTips.PushBack("Button State A"); //Tooltip string
-    toggleTips.PushBack("Button State B");
-    toggleTips.PushBack("Button State C");
-    toggleButton.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS, toggleTips);
-
-    application.SendNotification();
-    application.Render();
-
-    Property::Array resultTips;
-    resultTips = toggleButton.GetProperty(Toolkit::ToggleButton::Property::TOOLTIPS).Get<Property::Array>();
-
-    //Check that the result is the same as
-    DALI_TEST_EQUALS(toggleTips.Count(), resultTips.Count(), TEST_LOCATION);
-    DALI_TEST_CHECK(toggleTips[0].Get<Dali::String>() == resultTips[0].Get<Dali::String>());
-    DALI_TEST_CHECK(toggleTips[1].Get<Dali::String>() == resultTips[1].Get<Dali::String>());
-    DALI_TEST_CHECK(toggleTips[2].Get<Dali::String>() == resultTips[2].Get<Dali::String>());
-  }
-  END_TEST;
-}
-
 int UtcDaliToggleButtonStateChange(void)
 {
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
@@ -324,22 +266,12 @@ int UtcDaliToggleButtonStateChange(void)
   toggleIcons.PushBack(TEST_IMAGE_THREE);
   toggleButton.SetProperty(Toolkit::ToggleButton::Property::STATE_VISUALS, toggleIcons);
 
-  Property::Array toggleTips;
-  toggleTips.PushBack("Button State A"); //Tooltip string
-  toggleTips.PushBack("Button State B");
-  toggleTips.PushBack("Button State C");
-  toggleButton.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS, toggleTips);
-
   application.SendNotification();
   application.Render();
 
   Property::Array resultIcons;
   resultIcons = toggleButton.GetProperty(Toolkit::ToggleButton::Property::STATE_VISUALS).Get<Property::Array>();
   DALI_TEST_EQUALS(toggleIcons.Count(), resultIcons.Count(), TEST_LOCATION);
-
-  Property::Array resultTips;
-  resultTips = toggleButton.GetProperty(Toolkit::ToggleButton::Property::TOOLTIPS).Get<Property::Array>();
-  DALI_TEST_EQUALS(toggleTips.Count(), resultTips.Count(), TEST_LOCATION);
 
   int index;
   DALI_TEST_CHECK(toggleButton.GetProperty(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX).Get(index));

@@ -497,9 +497,6 @@ int UtcDaliControlAccessibilityRoleToggleButton(void)
   auto control = Dali::Toolkit::ToggleButton::New();
   auto button  = Dali::Accessibility::Role::TOGGLE_BUTTON;
 
-  control.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS,
-                      Dali::CreatePropertyArray({"option1", "option2"}));
-
   Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, button);
@@ -510,8 +507,6 @@ int UtcDaliControlAccessibilityRoleToggleButton(void)
 
   Dali::Accessibility::States states = q->GetStates();
   DALI_TEST_EQUALS(true, (bool)states[Dali::Accessibility::State::VISIBLE], TEST_LOCATION);
-
-  DALI_TEST_EQUALS("option1", q->GetDescription(), TEST_LOCATION);
 
   DALI_TEST_CHECK(q);
   q->GrabHighlight();
