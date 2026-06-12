@@ -552,6 +552,11 @@ void DepthLayout::SetDepthLayoutProperties(const Property::Map& properties)
   }
 }
 
+void DepthLayout::OnLayoutPropertiesSet(const Property::Map& properties)
+{
+  SetDepthLayoutProperties(properties);
+}
+
 Vector3 DepthLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3 itemPosition = Vector3::ZERO;

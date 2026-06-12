@@ -542,6 +542,11 @@ void SpiralLayout::SetSpiralLayoutProperties(const Property::Map& properties)
   }
 }
 
+void SpiralLayout::OnLayoutPropertiesSet(const Property::Map& properties)
+{
+  SetSpiralLayoutProperties(properties);
+}
+
 Vector3 SpiralLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3                        itemPosition = Vector3::ZERO;

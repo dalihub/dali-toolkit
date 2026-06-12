@@ -674,6 +674,11 @@ void GridLayout::SetGridLayoutProperties(const Property::Map& properties)
   }
 }
 
+void GridLayout::OnLayoutPropertiesSet(const Property::Map& properties)
+{
+  SetGridLayoutProperties(properties);
+}
+
 Vector3 GridLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3                        itemPosition = Vector3::ZERO;
