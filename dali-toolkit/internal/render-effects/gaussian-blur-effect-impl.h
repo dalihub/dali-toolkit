@@ -100,6 +100,16 @@ public:
   float GetBlurDownscaleFactor() const;
 
   /**
+   * @copydoc Toolkit::GaussianBlurEffect::SetDitherNoiseStrength
+   */
+  void SetDitherNoiseStrength(float strength);
+
+  /**
+   * @copydoc Toolkit::GaussianBlurEffect::GetDitherNoiseStrength
+   */
+  float GetDitherNoiseStrength() const;
+
+  /**
    * @copydoc Toolkit::GaussianBlurEffect::AddBlurStrengthAnimation
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);

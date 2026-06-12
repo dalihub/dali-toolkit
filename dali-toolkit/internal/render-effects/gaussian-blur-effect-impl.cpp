@@ -231,6 +231,16 @@ float GaussianBlurEffectImpl::GetBlurDownscaleFactor() const
   return mDownscaleFactor;
 }
 
+void GaussianBlurEffectImpl::SetDitherNoiseStrength(float strength)
+{
+  RenderEffectImpl::SetDitherNoiseStrength(strength);
+}
+
+float GaussianBlurEffectImpl::GetDitherNoiseStrength() const
+{
+  return RenderEffectImpl::GetDitherNoiseStrength();
+}
+
 void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   if(DALI_UNLIKELY(mSkipBlur))
