@@ -248,6 +248,18 @@ public:
   {
     return false;
   }
+  bool IsColorFont(FontId fontId)
+  {
+    return false;
+  }
+  bool IsRenderableColrV1Font(FontId fontId)
+  {
+    return false;
+  }
+  bool IsRenderableColrV1Glyph(FontId fontId, GlyphIndex glyphIndex)
+  {
+    return false;
+  }
 
 private:
   GlyphInfo mGlyphInfo;
@@ -306,6 +318,10 @@ public:
 
   Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
   {
+    if(mText)
+    {
+      delete[] mText;
+    }
     mText     = new unsigned char[numChars];
     mNumChars = numChars;
 
@@ -362,8 +378,6 @@ inline static TextAbstraction::Internal::Shaping& GetImplementation(TextAbstract
 
 namespace TextAbstraction
 {
-const PointSize26Dot6 FontClient::DEFAULT_POINT_SIZE = 768u; // 12*64
-
 BidirectionalSupport::BidirectionalSupport()
 {
 }
@@ -624,6 +638,21 @@ const GlyphInfo& FontClient::GetEllipsisGlyph(PointSize26Dot6 pointSize)
 bool FontClient::IsColorGlyph(FontId fontId, GlyphIndex glyphIndex)
 {
   return GetImplementation(*this).IsColorGlyph(fontId, glyphIndex);
+}
+
+bool FontClient::IsColorFont(FontId fontId)
+{
+  return GetImplementation(*this).IsColorFont(fontId);
+}
+
+bool FontClient::IsRenderableColrV1Font(FontId fontId)
+{
+  return GetImplementation(*this).IsRenderableColrV1Font(fontId);
+}
+
+bool FontClient::IsRenderableColrV1Glyph(FontId fontId, GlyphIndex glyphIndex)
+{
+  return GetImplementation(*this).IsRenderableColrV1Glyph(fontId, glyphIndex);
 }
 
 FontClient::FontClient(Internal::FontClient* internal)

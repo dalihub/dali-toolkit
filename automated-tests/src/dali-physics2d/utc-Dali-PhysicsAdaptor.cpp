@@ -44,6 +44,10 @@ void utc_dali_physics2d_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+namespace
+{
+const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+
 cpBody* CreateBody(cpSpace* space)
 {
   const float BALL_MASS       = 10.0f;
@@ -102,6 +106,15 @@ cpBody* CreateSegBody(cpSpace* space)
 
   return body;
 }
+
+void removeShape(cpBody* body, cpShape* shape, void* data)
+{
+  cpSpace* space = static_cast<cpSpace*>(data);
+  cpSpaceRemoveShape(space, shape);
+  cpShapeSetBody(shape, nullptr);
+  cpShapeFree(shape);
+}
+} // namespace
 
 int UtcDaliPhysics2DCreateAdaptorP1(void)
 {
@@ -339,32 +352,36 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayer(void)
 
   adaptor.SetDebugState(PhysicsAdaptor::DebugState::ON);
 
-  cpBody* body{nullptr};
-  cpBody* body2{nullptr};
-  cpBody* body3{nullptr};
+  cpBody*       body{nullptr};
+  cpBody*       body2{nullptr};
+  cpBody*       body3{nullptr};
+  cpConstraint* constraint{nullptr};
   {
     auto accessor = adaptor.GetPhysicsAccessor();
     auto space    = accessor->GetNative().Get<cpSpace*>();
 
     body                     = CreateBody(space);
-    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
     cpBodySetPosition(body, cpv(0, 0));
 
     // Constraint should create a dot in debug
     cpBody* staticBody = cpSpaceGetStaticBody(space);
-    cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, body, cpv(10, 10)));
+    constraint         = cpPivotJointNew(staticBody, body, cpv(10, 10));
+    cpSpaceAddConstraint(space, constraint);
 
     body2                     = CreateHexBody(space);
-    Dali::Actor ballActor2    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor2    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor2 = adaptor.AddActorBody(ballActor2, body2);
     cpBodySleep(body2);
 
     body3                     = CreateSegBody(space);
-    Dali::Actor ballActor3    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor3    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor3 = adaptor.AddActorBody(ballActor3, body3);
   }
   Test::WaitForEventThreadTrigger(1);
+
+  tet_printf("%p %p %p\n", body, body2, body3);
 
   // Render - if it doesn't crash, great!
   application.SendNotification();
@@ -375,6 +392,28 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayer(void)
 
   application.SendNotification();
   application.Render();
+  {
+    auto accessor = adaptor.GetPhysicsAccessor();
+    auto space    = accessor->GetNative().Get<cpSpace*>();
+
+    cpBodyEachShape(body, removeShape, space);
+    cpBodyEachShape(body2, removeShape, space);
+    cpBodyEachShape(body3, removeShape, space);
+
+    if(constraint)
+    {
+      cpSpaceRemoveConstraint(space, constraint);
+      cpConstraintFree(constraint);
+      constraint = nullptr;
+    }
+
+    cpSpaceRemoveBody(space, body);
+    cpBodyFree(body);
+    cpSpaceRemoveBody(space, body2);
+    cpBodyFree(body2);
+    cpSpaceRemoveBody(space, body3);
+    cpBodyFree(body3);
+  }
 
   END_TEST;
 }
@@ -671,7 +710,7 @@ int UtcDaliPhysics2DAdaptorAddActorBody(void)
   auto space    = accessor->GetNative().Get<cpSpace*>();
 
   cpBody*     body         = CreateBody(space);
-  Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
   DALI_TEST_CHECK(physicsActor);
@@ -681,14 +720,6 @@ int UtcDaliPhysics2DAdaptorAddActorBody(void)
   DALI_TEST_EQUALS(physicsActor.GetBody().Get<cpBody*>(), body, TEST_LOCATION);
 
   END_TEST;
-}
-
-void removeShape(cpBody* body, cpShape* shape, void* data)
-{
-  cpSpace* space = static_cast<cpSpace*>(data);
-  cpSpaceRemoveShape(space, shape);
-  cpShapeSetBody(shape, nullptr);
-  cpShapeFree(shape);
 }
 
 int UtcDaliPhysics2DAdaptorRemoveActorBodyP01(void)
@@ -711,7 +742,7 @@ int UtcDaliPhysics2DAdaptorRemoveActorBodyP01(void)
 
     body = CreateBody(space);
   }
-  Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
   application.SendNotification();
@@ -730,6 +761,7 @@ int UtcDaliPhysics2DAdaptorRemoveActorBodyP01(void)
     {
       cpBodyEachShape(body, removeShape, space);
       cpSpaceRemoveBody(space, body);
+      cpBodyFree(body);
       tet_result(TET_PASS);
     }
     catch(std::exception& e)
@@ -756,10 +788,10 @@ int UtcDaliPhysics2DAdaptorRemoveActorBodyN01(void)
   Dali::Actor  actor        = Dali::Actor::New();
   cpBody*      body         = cpBodyNew(1.0f, 1.0f);
   PhysicsActor physicsActor = PhysicsActor::New(actor, body, adaptor);
-  ;
   try
   {
     adaptor.RemoveActorBody(physicsActor);
+    cpBodyFree(body);
     tet_result(TET_PASS);
   }
   catch(std::exception& e)
@@ -815,7 +847,7 @@ int UtcDaliPhysics2DAdaptorGetPhysicsActor(void)
   auto space    = accessor->GetNative().Get<cpSpace*>();
 
   cpBody*     body         = CreateBody(space);
-  Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
   DALI_TEST_CHECK(physicsActor);
@@ -884,7 +916,7 @@ int UtcDaliPhysics2DAdaptorQueue(void)
     auto accessor            = adaptor.GetPhysicsAccessor();
     auto space               = accessor->GetNative().Get<cpSpace*>();
     body                     = CreateBody(space);
-    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
   }
 
@@ -928,7 +960,7 @@ int UtcDaliPhysics2DAdaptorCreateSyncPoint(void)
     auto accessor            = adaptor.GetPhysicsAccessor();
     auto space               = accessor->GetNative().Get<cpSpace*>();
     body                     = CreateBody(space);
-    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
     tet_infoline("Test that Queue works with accessor");
@@ -983,7 +1015,7 @@ int UtcDaliPhysics2DAdaptorHitTestP(void)
   {
     auto        accessor  = adaptor.GetPhysicsAccessor(); // Prevent integration
     auto        space     = accessor->GetNative().Get<cpSpace*>();
-    Dali::Actor ballActor = Toolkit::ImageView::New(TEST_RESOURCE_DIR "/gallery-small-1.jpg");
+    Dali::Actor ballActor = Toolkit::ImageView::New(BALL_IMAGE);
     cpBody*     body      = CreateBody(space);
     cpBodySetPosition(body, cpv(center.x, center.y));
 
