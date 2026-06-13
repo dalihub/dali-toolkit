@@ -33,6 +33,26 @@ class Adaptor;
 
 namespace TextAbstraction
 {
+namespace
+{
+constexpr unsigned int WHITE_SPACE_THRESHOLD = 0x21;   ///< All characters below 0x21 are considered white spaces.
+constexpr unsigned int CHAR_SPACE            = 0x20;   ///< Space.
+constexpr unsigned int CHAR_LF               = 0x000A; ///< NL Line feed, new line.
+constexpr unsigned int CHAR_VT               = 0x000B; ///< Vertical tab.
+constexpr unsigned int CHAR_FF               = 0x000C; ///< NP Form feed, new page.
+constexpr unsigned int CHAR_CR               = 0x000D; ///< Carriage return, new line.
+constexpr unsigned int CHAR_NEL              = 0x0085; ///< Next line.
+constexpr unsigned int CHAR_LS               = 0x2028; ///< Line separator.
+constexpr unsigned int CHAR_PS               = 0x2029; ///< Paragraph separator
+
+constexpr unsigned int CHAR_ZWNJ = 0x200C; ///< Zero width non joiner.
+constexpr unsigned int CHAR_ZWJ  = 0x200D; ///< Zero width joiner.
+constexpr unsigned int CHAR_LTRM = 0x200E; ///< Left to Right Mark.
+constexpr unsigned int CHAR_RTLM = 0x200F; ///< Right to Left Mark.
+constexpr unsigned int CHAR_TS   = 0x2009; ///< Thin Space.
+constexpr unsigned int CHAR_BOM  = 0xFEFF; ///< Byte Order Mark.
+} // namespace
+
 namespace Internal
 {
 class BidirectionalSupport : public BaseObject
@@ -152,7 +172,7 @@ public:
   }
   int GetDefaultFontSize()
   {
-    return 10.0f;
+    return 10;
   }
   void ResetSystemDefaults()
   {
@@ -231,10 +251,46 @@ public:
   }
   void CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::GlyphBufferData& data, int outlineWidth)
   {
+    // Dummy data for testing
+    data.width           = 2;
+    data.height          = 4;
+    data.format          = Pixel::L8;
+    data.compressionType = TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION;
+
+    uint8_t* newBuffer = (uint8_t*)malloc(data.width * data.height * Pixel::GetBytesPerPixel(data.format));
+    std::fill(newBuffer, newBuffer + (data.width * data.height), 255); // Fill with white pixels
+
+    data.buffer        = newBuffer;
+    data.isBufferOwned = true;
   }
   PixelData CreateBitmap(FontId fontId, GlyphIndex glyphIndex, int outlineWidth)
   {
-    return PixelData();
+    TextAbstraction::GlyphBufferData data;
+
+    CreateBitmap(fontId, glyphIndex, false, false, data, outlineWidth);
+
+    // If data is compressed or not owned buffer, copy this.
+    if(!data.isBufferOwned || data.compressionType != TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION)
+    {
+      uint8_t* newBuffer = (uint8_t*)malloc(data.width * data.height * Pixel::GetBytesPerPixel(data.format));
+
+      TextAbstraction::GlyphBufferData::Decompress(data, newBuffer);
+      if(data.isBufferOwned)
+      {
+        free(data.buffer);
+      }
+
+      data.buffer          = newBuffer;
+      data.isBufferOwned   = true;
+      data.compressionType = TextAbstraction::GlyphBufferData::CompressionType::NO_COMPRESSION;
+    }
+
+    return PixelData::New(data.buffer,
+                          data.width * data.height * Pixel::GetBytesPerPixel(data.format),
+                          data.width,
+                          data.height,
+                          data.format,
+                          PixelData::FREE);
   }
   void CreateVectorBlob(FontId fontId, GlyphIndex glyphIndex, VectorBlob*& blob, unsigned int& blobLength, unsigned int& nominalWidth, unsigned int& nominalHeight)
   {
@@ -269,8 +325,9 @@ class Shaping : public BaseObject
 {
 public:
   Shaping()
-  : mText(NULL),
-    mNumChars(0)
+  : mText(nullptr),
+    mNumChars(0u),
+    mFontId(0u)
   {
   }
 
@@ -306,9 +363,21 @@ public:
   void GetGlyphs(GlyphInfo* glyphStore, unsigned int* mappingTable)
   {
     // Return store & mapping table (0, 1, 2, 3... N-1))
-    if(glyphStore)
+    if(glyphStore && mappingTable)
     {
-      memcpy(glyphStore, mText, mNumChars);
+      for(unsigned int i = 0; i < mNumChars; ++i)
+      {
+        GlyphInfo& glyph = *(glyphStore + i);
+
+        // Dummy info for testing
+        glyph.fontId   = mFontId;
+        glyph.index    = mText[i];
+        glyph.advance  = 1.0f;
+        glyph.xBearing = 0.0f;
+        glyph.yBearing = 0.0f;
+
+        mappingTable[i] = i;
+      }
     }
     for(unsigned int i = 0; i < mNumChars; ++i)
     {
@@ -318,21 +387,24 @@ public:
 
   Length Shape(TextAbstraction::FontClient& fontClient, unsigned int const* text, unsigned int numChars, unsigned int fontId, Script script)
   {
+    mFontId = fontId;
+
     if(mText)
     {
       delete[] mText;
     }
-    mText     = new unsigned char[numChars];
+    mText     = new unsigned int[numChars];
     mNumChars = numChars;
 
-    memcpy(mText, text, numChars);
+    memcpy(mText, text, numChars * sizeof(unsigned int));
 
     return numChars;
   }
 
 private:
-  unsigned char* mText;
-  unsigned int   mNumChars;
+  unsigned int* mText; ///< UTF-32
+  unsigned int  mNumChars;
+  FontId        mFontId;
 };
 
 } // namespace Internal
@@ -673,29 +745,103 @@ GlyphInfo::GlyphInfo()
 {
 }
 
-Script GetCharacterScript(unsigned int x)
+// Script.h
+
+bool IsRightToLeftScript(Script script)
+{
+  return ((ARABIC == script) ||
+          (HEBREW == script));
+}
+
+Script GetCharacterScript(Character character)
 {
   return LATIN;
 }
-bool HasLigatureMustBreak(Script x)
+
+bool IsWhiteSpace(Character character)
 {
-  return false;
+  return character < WHITE_SPACE_THRESHOLD;
 }
-bool IsCommonScript(unsigned int character)
+
+bool IsSpace(Character character)
 {
-  return false;
+  return CHAR_SPACE == character;
 }
-bool IsNewParagraph(unsigned int character)
+
+bool IsNewParagraph(Character character)
 {
-  return false;
+  return ((CHAR_LF == character) ||
+          (CHAR_VT == character) ||
+          (CHAR_FF == character) ||
+          (CHAR_CR == character) ||
+          (CHAR_NEL == character) ||
+          (CHAR_LS == character) ||
+          (CHAR_PS == character));
 }
-bool IsRightToLeftScript(Script)
+
+bool IsZeroWidthNonJoiner(Character character)
 {
-  return false;
+  return CHAR_ZWNJ == character;
 }
-bool IsWhiteSpace(unsigned int character)
+
+bool IsZeroWidthJoiner(Character character)
 {
-  return character < 0x21;
+  return CHAR_ZWJ == character;
+}
+
+bool IsZeroWidthSpace(Character character)
+{
+  return CHAR_ZWS == character;
+}
+
+bool IsLeftToRightMark(Character character)
+{
+  return CHAR_LTRM == character;
+}
+
+bool IsRightToLeftMark(Character character)
+{
+  return CHAR_RTLM == character;
+}
+
+bool IsThinSpace(Character character)
+{
+  return CHAR_TS == character;
+}
+
+bool IsByteOrderMark(Character character)
+{
+  return CHAR_BOM == character;
+}
+
+bool IsCommonScript(Character character)
+{
+  return (IsWhiteSpace(character) ||
+          IsZeroWidthNonJoiner(character) ||
+          IsZeroWidthJoiner(character) ||
+          IsZeroWidthSpace(character) ||
+          IsLeftToRightMark(character) ||
+          IsRightToLeftMark(character) ||
+          IsThinSpace(character) ||
+          IsNewParagraph(character) ||
+          IsByteOrderMark(character) ||
+          IsCombiningDiacriticalMarks(character));
+}
+
+bool HasLigatureMustBreak(Script script)
+{
+  return ((LATIN == script) ||
+          (ARABIC == script));
+}
+
+Length GetNumberOfScripts()
+{
+  return SYMBOLS_NSLCL + 1;
+}
+
+bool IsCombiningDiacriticalMarks(Character character)
+{
+  return character >= 0x0300 && character <= 0x036f;
 }
 
 Segmentation Segmentation::Get()
@@ -708,16 +854,28 @@ Segmentation::Segmentation()
 Segmentation::~Segmentation()
 {
 }
-void Segmentation::GetLineBreakPositions(unsigned int const*, unsigned int, char*)
+void Segmentation::GetLineBreakPositions(unsigned int const* text, unsigned int length, char* breakInfo)
+{
+  // For test codes, Mark end of text is break position
+  if(breakInfo && text && length > 0u)
+  {
+    for(unsigned int i = 0; i < length - 1; ++i)
+    {
+      if(IsWhiteSpace(text[i]))
+      {
+        breakInfo[i] = TextAbstraction::LINE_ALLOW_BREAK;
+      }
+    }
+    breakInfo[length - 1] = TextAbstraction::LINE_MUST_BREAK;
+  }
+}
+void Segmentation::GetWordBreakPositions(unsigned int const* text, unsigned int length, char* breakInfo)
 {
 }
-void Segmentation::GetWordBreakPositions(unsigned int const*, unsigned int, char*)
+void Segmentation::GetLineBreakPositionsUtf8(unsigned char const* text, unsigned int length, char* breakInfo)
 {
 }
-void Segmentation::GetLineBreakPositionsUtf8(unsigned char const*, unsigned int, char*)
-{
-}
-void Segmentation::GetWordBreakPositionsUtf8(unsigned char const*, unsigned int, char*)
+void Segmentation::GetWordBreakPositionsUtf8(unsigned char const* text, unsigned int length, char* breakInfo)
 {
 }
 
