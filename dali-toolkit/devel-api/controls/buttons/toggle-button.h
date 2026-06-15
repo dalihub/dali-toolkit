@@ -76,7 +76,7 @@ class ToggleButton;
  *                       .Add( propertyMap2 )
  *                       .Add( propertyMap3 ));
  *
- *   Stage::GetCurrent().Add( button );
+ *   application.Add( button );
  *
  *   // Connect to button signals emitted by the button
  *   button.ClickedSignal().Connect( this, &ToggleButtonExample::OnButtonClicked );
