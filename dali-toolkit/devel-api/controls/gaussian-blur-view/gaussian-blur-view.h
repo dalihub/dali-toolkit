@@ -66,7 +66,7 @@ class BloomView;
  * normal ways. It can be considered a 'portal' in the sense that all child actors are clipped to the GaussianBlurView actor bounds.
  *
  * ************\n
- * NB: It is essential to remove the GaussianBlurView from the stage and also to call Deactivate() on it when you are not using it. This will ensure that resources are freed and
+ * NB: It is essential to remove the GaussianBlurView from the window and also to call Deactivate() on it when you are not using it. This will ensure that resources are freed and
  * rendering stops.\n
  * ************\n
  *
@@ -83,7 +83,7 @@ class BloomView;
  *  ...
  *
  *  // Start rendering the GaussianBlurView
- *  Stage::GetCurrent().Add(gaussianBlurView);
+ *  window.Add(gaussianBlurView);
  *  gaussianBlurView.Activate();
  *  ...
  *
@@ -94,7 +94,7 @@ class BloomView;
  *
  *  ...
  *  // Stop rendering the GaussianBlurView
- *  Stage::GetCurrent().Remove(gaussianBlurView);
+ *  window.Remove(gaussianBlurView);
  *  gaussianBlurView.Deactivate();
  * @endcode
  * @SINCE_1_0.0
@@ -183,7 +183,7 @@ public:
   static GaussianBlurView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage = false);
 
   /**
-   * @brief Start rendering the GaussianBlurView. Must be called after you Add() it to the stage.
+   * @brief Start rendering the GaussianBlurView. Must be called after you Add() it to the window.
    * @SINCE_1_0.0
    */
   void Activate();
@@ -191,14 +191,14 @@ public:
   /**
    * @brief Render the GaussianBlurView once.
    *
-   * Must be called after you Add() it to the stage.
+   * Must be called after you Add() it to the window.
    * Listen to the Finished signal to determine when the rendering has completed.
    * @SINCE_1_0.0
    */
   void ActivateOnce();
 
   /**
-   * @brief Stop rendering the GaussianBlurView. Must be called after you Remove() it from the stage.
+   * @brief Stop rendering the GaussianBlurView. Must be called after you Remove() it from the window.
    * @SINCE_1_0.0
    */
   void Deactivate();
@@ -223,7 +223,7 @@ public:
    * This is the overall strength of the blur.
    * User can use this to animate the blur. A value of 0.0 is zero blur and 1.0 is full blur. Default is 1.0.
    * Note that if you set the blur to 0.0, the result will be no blur BUT the internal rendering will still be happening. If you wish to turn the blur off, you should remove
-   * the GaussianBlurView object from the stage also.
+   * the GaussianBlurView object from the window also.
    * @SINCE_1_0.0
    * @return Index of the property that can be used to fade the blur in / out
    */
@@ -259,7 +259,7 @@ public:
    * This method creates frame buffers, textures, and cameras required for the blur process.
    * The resources are allocated based on the current size of the GaussianBlurView.
    * @SINCE_2_5.12
-   * @pre The GaussianBlurView should be added to the stage before calling this method.
+   * @pre The GaussianBlurView should be added to the window before calling this method.
    */
   void AllocateResources();
 
@@ -268,10 +268,10 @@ public:
    *
    * This method sets up the render tasks that perform the horizontal and vertical blur passes,
    * as well as the compositing task if not in user image mode.
-   * The render tasks are added to the Stage's render task list.
+   * The render tasks are added to the Window's render task list.
    * @SINCE_2_5.12
    * @pre AllocateResources() should be called before this method to ensure frame buffers are ready.
-   * @pre The GaussianBlurView should be added to the stage before calling this method.
+   * @pre The GaussianBlurView should be added to the window before calling this method.
    * @note The render tasks will start processing immediately after creation.
    */
   void CreateRenderTasks();

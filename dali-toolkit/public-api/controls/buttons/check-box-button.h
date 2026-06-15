@@ -61,7 +61,7 @@ class CheckBoxButton;
  *   button.SetProperty( Button::Property::LABEL, "Check" );
  *   button.SetProperty( Actor::Property::SIZE, Vector2( 200, 40 );
  *   button.SetBackgroundColor( Color::WHITE );
- *   Stage::GetCurrent().Add( button );
+ *   application.Add( button );
  *
  *   // Connect to a button signal emitted by the button
  *   button.StateChangedSignal().Connect( this, &HelloWorldExample::OnButtonStateChanged );

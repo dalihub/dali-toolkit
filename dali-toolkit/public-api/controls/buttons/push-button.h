@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PUSH_BUTTON_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class PushButton;
  *   PushButton button = PushButton::New();
  *   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
  *   button.SetProperty( Button::Property::LABEL, "Press" );
- *   Stage::GetCurrent().Add( button );
+ *   application.Add( button );
  *
  *   // Connect to button signals emitted by the button
  *   button.ClickedSignal().Connect( this, &HelloWorldExample::OnButtonClicked );

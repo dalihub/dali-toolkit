@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_UIBUILDER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class Builder;
  * Examples
  * - Load all actors in the "stage" section to the root layer
  * @code
- * builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+ * builder.AddActors( window.GetRootLayer() );
  * @endcode
  *
  * - Create an actor tree from the "templates" section
@@ -378,7 +378,7 @@ public:
    * Add the actor tree in the "stage" section to the actor toActor.
    * ie if the representation has a 'stage' section that contains a tree of
    * actors then
-   *    builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+   *    builder.AddActors( window.GetRootLayer() );
    * will create and add the actors to the stage root layer.
    * @param toActor The actor to add the created actors to
    */
@@ -388,7 +388,7 @@ public:
    * Adds actors in the sectionName to the actor toActor.
    * ie if the representation has a sectionName section that contains a tree of
    * actors then
-   *    builder.AddActors( sectionName, Stage::GetCurrent().GetRootLayer() );
+   *    builder.AddActors( sectionName, window.GetRootLayer() );
    * will create and add the actors to the stage root layer.
    * @param sectionName The section name to search for the actor tree
    * @param toActor The actor to add the created actors to
