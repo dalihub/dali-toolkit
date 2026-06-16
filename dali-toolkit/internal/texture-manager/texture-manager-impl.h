@@ -117,6 +117,7 @@ public:
    *                                   This is called when an image load completes (or fails).
    * @param[in,out] preMultiplyOnLoad  True if the image color should be multiplied by it's alpha. Set to false if the
    *                                   image has no alpha channel
+   * @param[in] reloadPolicy           Whether to reuse a cached texture or force a reload.
    *
    * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
@@ -130,7 +131,8 @@ public:
                                       const Dali::SamplingMode::Type  samplingMode,
                                       const bool                      synchronousLoading,
                                       TextureUploadObserver*          textureObserver,
-                                      TextureManager::MultiplyOnLoad& preMultiplyOnLoad);
+                                      TextureManager::MultiplyOnLoad& preMultiplyOnLoad,
+                                      const ReloadPolicy              reloadPolicy = ReloadPolicy::CACHED);
 
   /**
    * @brief Requests an image load of the given URL to get PixelBuffer.

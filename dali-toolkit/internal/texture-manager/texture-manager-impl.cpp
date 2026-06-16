@@ -138,7 +138,8 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   const Dali::SamplingMode::Type  samplingMode,
   const bool                      synchronousLoading,
   TextureUploadObserver*          textureObserver,
-  TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
+  TextureManager::MultiplyOnLoad& preMultiplyOnLoad,
+  const TextureManager::ReloadPolicy reloadPolicy)
 {
   TextureSet textureSet;
 
@@ -272,7 +273,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   }
   else
   {
-    textureId = RequestLoadInternal(url, alphaMaskId, textureId, contentScaleFactor, desiredSize, fittingMode, samplingMode, cropToMask, TextureManager::StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad, animatedImageLoading, frameIndex, false);
+    textureId = RequestLoadInternal(url, alphaMaskId, textureId, contentScaleFactor, desiredSize, fittingMode, samplingMode, cropToMask, TextureManager::StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, reloadPolicy, preMultiplyOnLoad, animatedImageLoading, frameIndex, false);
 
     TextureManager::LoadState loadState = mTextureCacheManager.GetTextureState(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)

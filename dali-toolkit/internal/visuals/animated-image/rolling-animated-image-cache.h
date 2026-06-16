@@ -54,6 +54,7 @@ public:
    * @param[in] wrapModeV            Vertical Wrap mode
    * @param[in] isSynchronousLoading The flag to define whether to load first frame synchronously
    * @param[in] preMultiplyOnLoad    The flag if image's color should be multiplied by it's alpha
+   * @param[in] reloadPolicy         Whether the first frame load should reuse cache or force reload.
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
@@ -70,7 +71,8 @@ public:
                             const Dali::WrapMode::Type&         wrapModeU,
                             const Dali::WrapMode::Type&         wrapModeV,
                             bool                                isSynchronousLoading,
-                            bool                                preMultiplyOnLoad);
+                            bool                                preMultiplyOnLoad,
+                            TextureManager::ReloadPolicy        reloadPolicy = TextureManager::ReloadPolicy::CACHED);
 
   /**
    * @brief Destructor
@@ -208,6 +210,7 @@ private:
   Dali::WrapMode::Type       mWrapModeU : 3;
   Dali::WrapMode::Type       mWrapModeV : 3;
   bool                       mIsSynchronousLoading;
+  TextureManager::ReloadPolicy mReloadPolicy;
 };
 
 } // namespace Internal

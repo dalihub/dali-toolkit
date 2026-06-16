@@ -276,7 +276,7 @@ void AnimatedImageVisual::InitializeAnimatedImage(const VisualUrl& imageUrl)
   }
 }
 
-void AnimatedImageVisual::CreateImageCache()
+void AnimatedImageVisual::CreateImageCache(TextureManager::ReloadPolicy reloadPolicy)
 {
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::CreateImageCache()  batchSize:%d  cacheSize:%d\n", mBatchSize, mCacheSize);
 
@@ -284,7 +284,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), IsPreMultipliedAlphaEnabled());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), IsPreMultipliedAlphaEnabled(), reloadPolicy);
   }
   else if(mImageUrls)
   {
@@ -595,7 +595,7 @@ void AnimatedImageVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   // Make not set any action when the resource status is already failed.
-  if(mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED)
+  if(mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED && actionId != DevelImageVisual::Action::RELOAD)
   {
     return;
   }
@@ -603,6 +603,46 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
   // Check if action is valid for this visual type and perform action if possible
   switch(actionId)
   {
+    case DevelImageVisual::Action::RELOAD:
+    {
+      DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RELOAD\n");
+
+      if(mFrameDelayTimer)
+      {
+        mFrameDelayTimer.Stop();
+        mFrameDelayTimer.Reset();
+      }
+
+      if(mImageCache)
+      {
+        mImageCache->ClearCache();
+        delete mImageCache;
+        mImageCache = nullptr;
+      }
+
+      if(mImageUrl.IsValid())
+      {
+        mAnimatedImageLoading = AnimatedImageLoading::New(mImageUrl.GetUrl(), mImageUrl.IsLocalResource());
+      }
+
+      CreateImageCache(TextureManager::ReloadPolicy::FORCED);
+
+      ResourceReady(Toolkit::Visual::ResourceStatus::PREPARING);
+      mStartFirstFrame   = true;
+      mCurrentFrameIndex = FIRST_FRAME_INDEX;
+      mCurrentLoopIndex  = FIRST_LOOP;
+      mIsJumpTo          = false;
+
+      if(mImpl->mRenderer)
+      {
+        mImpl->mRenderer.RemoveTextures();
+        TextureSet emptyTextureSet;
+        UpdateNativeTextureInfomation(emptyTextureSet);
+      }
+
+      PrepareTextureSet();
+      break;
+    }
     case DevelAnimatedImageVisual::Action::PAUSE:
     {
       DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "PAUSE\n");
