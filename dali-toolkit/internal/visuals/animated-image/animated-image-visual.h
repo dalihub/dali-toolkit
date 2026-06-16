@@ -214,8 +214,10 @@ private:
 
   /**
    * @brief Create image cache for animated image or image array.
+   * @param[in] reloadPolicy Whether to reuse a cached texture or force a reload.
+   *                         Default is TextureManager::ReloadPolicy::CACHED.
    */
-  void CreateImageCache();
+  void CreateImageCache(TextureManager::ReloadPolicy reloadPolicy = TextureManager::ReloadPolicy::CACHED);
 
   /**
    * @brief Adds the texture set to the renderer, and the renderer to the
