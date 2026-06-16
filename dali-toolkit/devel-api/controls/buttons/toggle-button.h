@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOGGLE_BUTTON_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,12 +76,7 @@ class ToggleButton;
  *                       .Add( propertyMap2 )
  *                       .Add( propertyMap3 ));
  *
- * button.SetProperty( Toolkit::ToggleButton::Property::TOOLTIPS, Property::Array()
- *                       .Add( "STATE A" )
- *                       .Add( "STATE B" )
- *                       .Add( "STATE C" ));
- *
- *   Stage::GetCurrent().Add( button );
+ *   application.Add( button );
  *
  *   // Connect to button signals emitted by the button
  *   button.ClickedSignal().Connect( this, &ToggleButtonExample::OnButtonClicked );
@@ -124,15 +119,6 @@ public:
        * @note Mandatory
        */
       STATE_VISUALS = PROPERTY_START_INDEX,
-
-      /**
-       * @brief The tooltips of toggle button.
-       * @details Name "tooltips",  type Property::Array.
-       * It's an array of toggle state tooltip strings.
-       * Each tooltip string should match a toggle state strictly.
-       * @note Mandatory
-       */
-      TOOLTIPS,
 
       /**
        * @brief The current state index of toggle button.

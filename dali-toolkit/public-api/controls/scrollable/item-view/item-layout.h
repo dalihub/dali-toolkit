@@ -398,6 +398,17 @@ protected:
    */
   ItemLayout();
 
+  /**
+   * @brief For derived class to set the layout properties.
+   *
+   * Called by SetLayoutProperties.
+   * @SINCE_2_5.27
+   * @param[in] properties The properties the layout.
+   */
+  virtual void OnLayoutPropertiesSet(const Property::Map& properties)
+  {
+  }
+
 private:
   /**
    * @brief Don't allow copy constructor

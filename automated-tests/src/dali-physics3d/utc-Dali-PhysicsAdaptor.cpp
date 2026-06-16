@@ -44,6 +44,10 @@ void utc_dali_physics3d_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+namespace
+{
+const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+
 btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld)
 {
   btSphereShape* ball = new btSphereShape(30);
@@ -61,6 +65,15 @@ btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld)
   bulletWorld->addRigidBody(body);
   return body;
 }
+
+void DeleteBody(btDiscreteDynamicsWorld* bulletWorld, btRigidBody* body)
+{
+  bulletWorld->removeRigidBody(body);
+  delete body->getMotionState();
+  delete body->getCollisionShape();
+  delete body;
+}
+} // namespace
 
 int UtcDaliPhysics3DCreateAdaptorP1(void)
 {
@@ -303,7 +316,7 @@ int UtcDaliPhysics3DAdaptorCreateDebugLayer(void)
     auto accessor            = adaptor.GetPhysicsAccessor();
     auto bulletWorld         = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
     body                     = CreateBody(bulletWorld);
-    Dali::Actor ballActor    = Toolkit::ImageView::New(TEST_RESOURCE_DIR "/gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
     physicsActor.AsyncSetPhysicsPosition(Vector3(0.f, 0.f, 0.f));
   }
@@ -313,6 +326,12 @@ int UtcDaliPhysics3DAdaptorCreateDebugLayer(void)
 
   application.SendNotification();
   application.Render();
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
 
   END_TEST;
 }
@@ -644,7 +663,7 @@ int UtcDaliPhysics3DAdaptorAddActorBody(void)
   auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
 
   btRigidBody* body         = CreateBody(bulletWorld);
-  Dali::Actor  ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor  ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto         physicsActor = adaptor.AddActorBody(ballActor, body);
 
   DALI_TEST_CHECK(physicsActor);
@@ -652,6 +671,8 @@ int UtcDaliPhysics3DAdaptorAddActorBody(void)
 
   DALI_TEST_EQUALS(physicsActor.GetId(), id, TEST_LOCATION);
   DALI_TEST_EQUALS(physicsActor.GetBody().Get<btRigidBody*>(), body, TEST_LOCATION);
+
+  DeleteBody(bulletWorld, body);
 
   END_TEST;
 }
@@ -676,7 +697,7 @@ int UtcDaliPhysics3DAdaptorRemoveActorBodyP01(void)
 
     body = CreateBody(bulletWorld);
   }
-  Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
   application.SendNotification();
@@ -691,10 +712,9 @@ int UtcDaliPhysics3DAdaptorRemoveActorBodyP01(void)
     auto accessor    = adaptor.GetPhysicsAccessor();
     auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
 
-    bulletWorld->removeRigidBody(body);
     try
     {
-      delete body;
+      DeleteBody(bulletWorld, body);
       tet_result(TET_PASS);
     }
     catch(std::exception& e)
@@ -740,6 +760,12 @@ int UtcDaliPhysics3DAdaptorRemoveActorBodyN01(void)
   catch(std::exception& e)
   {
     tet_result(TET_FAIL);
+  }
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
   }
 
   END_TEST;
@@ -789,7 +815,7 @@ int UtcDaliPhysics3DAdaptorGetPhysicsActor(void)
   auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
 
   btRigidBody* body         = CreateBody(bulletWorld);
-  Dali::Actor  ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+  Dali::Actor  ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
   auto         physicsActor = adaptor.AddActorBody(ballActor, body);
 
   DALI_TEST_CHECK(physicsActor);
@@ -797,6 +823,12 @@ int UtcDaliPhysics3DAdaptorGetPhysicsActor(void)
   PhysicsActor testActor = adaptor.GetPhysicsActor(body);
   DALI_TEST_CHECK(testActor);
   DALI_TEST_CHECK(physicsActor == testActor);
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
 
   END_TEST;
 }
@@ -856,7 +888,7 @@ int UtcDaliPhysics3DAdaptorQueue(void)
     auto accessor            = adaptor.GetPhysicsAccessor();
     auto bulletWorld         = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
     body                     = CreateBody(bulletWorld);
-    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
   }
 
@@ -880,6 +912,12 @@ int UtcDaliPhysics3DAdaptorQueue(void)
     DALI_TEST_EQUALS(origin.z(), 20.0f, 0.001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -901,7 +939,7 @@ int UtcDaliPhysics3DAdaptorCreateSyncPoint(void)
     auto accessor            = adaptor.GetPhysicsAccessor();
     auto bulletWorld         = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
     body                     = CreateBody(bulletWorld);
-    Dali::Actor ballActor    = Toolkit::ImageView::New("gallery-small-1.jpg");
+    Dali::Actor ballActor    = Toolkit::ImageView::New(BALL_IMAGE);
     auto        physicsActor = adaptor.AddActorBody(ballActor, body);
 
     tet_infoline("Test that Queue works with accessor");
@@ -938,6 +976,12 @@ int UtcDaliPhysics3DAdaptorCreateSyncPoint(void)
     DALI_TEST_EQUALS(origin.z(), 20.0f, 0.001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -955,11 +999,13 @@ int UtcDaliPhysics3DAdaptorHitTestP(void)
   auto           scene     = application.GetScene();
   scene.Add(rootActor);
 
+  btRigidBody* body{nullptr};
   {
-    auto         accessor    = adaptor.GetPhysicsAccessor(); // Prevent integration
-    auto         bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
-    Dali::Actor  ballActor   = Toolkit::ImageView::New(TEST_RESOURCE_DIR "/gallery-small-1.jpg");
-    btRigidBody* body        = CreateBody(bulletWorld);
+    auto        accessor    = adaptor.GetPhysicsAccessor(); // Prevent integration
+    auto        bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    Dali::Actor ballActor   = Toolkit::ImageView::New(BALL_IMAGE);
+
+    body = CreateBody(bulletWorld);
     body->getWorldTransform().setOrigin(btVector3(0.f, 0.f, 0.f));
 
     ballActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
@@ -983,9 +1029,15 @@ int UtcDaliPhysics3DAdaptorHitTestP(void)
     Vector3   localPivot;
     float     distanceFromCamera;
     Dali::Any nullFilter;
-    auto      body = accessor->HitTest(from, to, nullFilter, localPivot, distanceFromCamera);
+    auto      hitBody = accessor->HitTest(from, to, nullFilter, localPivot, distanceFromCamera);
 
-    DALI_TEST_CHECK(!body.Empty());
+    DALI_TEST_CHECK(!hitBody.Empty());
+  }
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
   }
 
   END_TEST;

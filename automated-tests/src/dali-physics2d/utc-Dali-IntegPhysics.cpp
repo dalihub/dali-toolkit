@@ -37,9 +37,11 @@
 using namespace Dali;
 using namespace Dali::Toolkit::Physics;
 
-static const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+namespace
+{
+const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
-static cpBody* CreateBody(cpSpace* space)
+cpBody* CreateBody(cpSpace* space)
 {
   const float BALL_MASS       = 10.0f;
   const float BALL_RADIUS     = 26.0f;
@@ -56,7 +58,7 @@ static cpBody* CreateBody(cpSpace* space)
 }
 
 // Defines a PolyShape
-static cpBody* CreateHexBody(cpSpace* space)
+cpBody* CreateHexBody(cpSpace* space)
 {
   const float MASS       = 10.0f;
   const float RADIUS     = 26.0f;
@@ -78,6 +80,7 @@ static cpBody* CreateHexBody(cpSpace* space)
 
   return body;
 }
+} // namespace
 
 int UtcDaliPhysics2DIntegrationGetPhysicsWorld(void)
 {

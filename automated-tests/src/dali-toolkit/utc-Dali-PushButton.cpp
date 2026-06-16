@@ -1110,7 +1110,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   propertyMap2.Insert(ColorVisual::Property::MIX_COLOR, Color::RED);
   pushButton.SetProperty(Toolkit::Button::Property::UNSELECTED_VISUAL, propertyMap2);
 
-  tet_printf("Added UNSELECTED_VISUAL and add button back to Stage\n");
+  tet_printf("Added UNSELECTED_VISUAL and add button back to Scene\n");
 
   application.GetScene().Add(pushButton);
 

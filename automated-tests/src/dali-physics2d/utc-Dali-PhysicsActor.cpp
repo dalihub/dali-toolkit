@@ -29,9 +29,26 @@
 using namespace Dali;
 using namespace Dali::Toolkit::Physics;
 
-extern cpBody* CreateBody(cpSpace* space);
-
+namespace
+{
 const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+
+cpBody* CreateBody(cpSpace* space)
+{
+  const float BALL_MASS       = 10.0f;
+  const float BALL_RADIUS     = 26.0f;
+  const float BALL_ELASTICITY = 0.5f;
+  const float BALL_FRICTION   = 0.5f;
+
+  cpBody* body = cpSpaceAddBody(space, cpBodyNew(BALL_MASS, cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero)));
+
+  cpShape* shape = cpSpaceAddShape(space, cpCircleShapeNew(body, BALL_RADIUS, cpvzero));
+  cpShapeSetElasticity(shape, BALL_ELASTICITY);
+  cpShapeSetFriction(shape, BALL_FRICTION);
+
+  return body;
+}
+} // namespace
 
 int UtcDaliPhysics2DActorNew(void)
 {

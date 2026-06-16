@@ -18,7 +18,7 @@
  *
  */
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/public-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES

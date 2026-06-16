@@ -107,16 +107,16 @@ struct DBusWrapper
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
 
-  virtual void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) = 0;
-  virtual MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) = 0;
-  virtual MessageIterPtr eldbus_message_iter_get_and_next_by_type_impl(const MessageIterPtr& it, int type)                                        = 0;
-  virtual MessageIterPtr eldbus_message_iter_get_impl(const MessagePtr& it, bool write)                                                           = 0;
-  virtual MessagePtr     eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName)                                    = 0;
-  virtual MessagePtr     eldbus_proxy_send_and_block_impl(const ProxyPtr& proxy, const MessagePtr& msg)                                           = 0;
-  virtual bool           eldbus_message_error_get_impl(const MessagePtr& msg, std::string& name, std::string& text)                               = 0;
-  virtual std::string    eldbus_message_signature_get_impl(const MessagePtr& msg)                                                                 = 0;
-  virtual void           eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg)                                        = 0;
-  virtual void           eldbus_message_iter_container_close_impl(const MessageIterPtr& it)                                                       = 0;
+                        virtual void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) = 0;
+  virtual MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig)                            = 0;
+  virtual MessageIterPtr eldbus_message_iter_get_and_next_by_type_impl(const MessageIterPtr& it, int type)                                             = 0;
+  virtual MessageIterPtr eldbus_message_iter_get_impl(const MessagePtr& it, bool write)                                                                = 0;
+  virtual MessagePtr     eldbus_proxy_method_call_new_impl(const ProxyPtr& proxy, const std::string& funcName)                                         = 0;
+  virtual MessagePtr     eldbus_proxy_send_and_block_impl(const ProxyPtr& proxy, const MessagePtr& msg)                                                = 0;
+  virtual bool           eldbus_message_error_get_impl(const MessagePtr& msg, std::string& name, std::string& text)                                    = 0;
+  virtual std::string    eldbus_message_signature_get_impl(const MessagePtr& msg)                                                                      = 0;
+  virtual void           eldbus_message_iter_pack_end_impl(const MessageIterPtr& it, const MessagePtr& msg)                                            = 0;
+  virtual void           eldbus_message_iter_container_close_impl(const MessageIterPtr& it)                                                            = 0;
 
   using SendCallback                                                                                                                                             = std::function<void(const MessagePtr& msg)>;
   virtual PendingPtr    eldbus_proxy_send_impl(const ProxyPtr& proxy, const MessagePtr& msg, const SendCallback& callback)                                       = 0;
@@ -166,8 +166,8 @@ struct DBusWrapper
 
   struct CallId
   {
-    static std::atomic<unsigned int> LastId;
-    unsigned int                     id = ++LastId;
+    static std::atomic<unsigned int> LastId2; ///< DEV NOTE: Avoid odr-violation with LastId in dbus-tizen.cpp
+    unsigned int                     id = ++LastId2;
   };
   struct MethodInfo
   {
@@ -201,7 +201,7 @@ struct DBusWrapper
   };
   virtual void        add_interface_impl(bool fallback, const std::string& pathName, const ConnectionPtr& connection, std::vector<std::function<void()>>& destructors, const std::string& interfaceName, std::vector<MethodInfo>& dscrMethods, std::vector<PropertyInfo>& dscrProperties, std::vector<SignalInfo>& dscrSignals) = 0;
   virtual void        add_property_changed_event_listener_impl(const ProxyPtr& proxy, const std::string& interface, const std::string& name, std::function<void(const _Eina_Value*)> cb)                                                                                                                                        = 0;
-  virtual bool        get_from_value_impl(const void* v, void* dst) = 0;
+  virtual bool        get_from_value_impl(const void* v, void* dst)                                                                                                                                                                                                                                                             = 0;
   static DBusWrapper* Installed();
   static void         Install(std::unique_ptr<DBusWrapper>);
 
@@ -550,7 +550,7 @@ struct TestDBusWrapper : public DBusWrapper
 #undef eldbus_message_iter_arguments_append_impl_basic
 #undef eldbus_message_iter_arguments_append_impl_basic_impl
 
-  void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) override;
+                        void eldbus_message_iter_arguments_append_impl(const MessageIterPtr& it, const std::string& v1, const std::string& v2) override;
   MessageIterPtr eldbus_message_iter_container_new_impl(const MessageIterPtr& it, int type, const std::string& sig) override;
   MessageIterPtr eldbus_message_iter_get_and_next_by_type_impl(const MessageIterPtr& it, int type) override;
   MessageIterPtr eldbus_message_iter_get_impl(const MessagePtr& it, bool write) override;

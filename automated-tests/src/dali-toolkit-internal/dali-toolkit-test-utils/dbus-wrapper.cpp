@@ -47,7 +47,7 @@
   {               \
   } while(0)
 
-std::atomic<unsigned int>                       DBus::detail::CallId::LastId{0};
+std::atomic<unsigned int>                       DBus::detail::CallId::LastId2{0};
 static std::function<void(const char*, size_t)> debugPrinter;
 static std::mutex                               debugLock;
 

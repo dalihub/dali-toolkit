@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BOUNCING_EFFECT_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ namespace Internal
  *  bounceActor.SetProperty( Actor::Property::SIZE, Vector2(720.f, 42.f );
  *  bounceActor.SetProperty( Actor::Property::COLOR, Vector4( 0.0,0.64f,0.85f,0.25f ) );
  *
- *  // add to stage
+ *  // add to window
  *  bounceActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
- *  Stage::GetCurrent().Add(bounceActor);
+ *  window.Add(bounceActor);
 
  *  // start the bouncing animation
  *  Animation anim = Animation::New(2.0f);

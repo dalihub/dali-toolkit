@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <cstring> ///< for memcpy
 #include <limits>
 
@@ -413,7 +414,7 @@ void ConfigureTextLabel(ControllerPtr controller)
   // Set cursor's width to zero.
   controller->GetLayoutEngine().SetCursorWidth(0);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Disables the text input.
   controller->EnableTextInput(NULL, inputMethodContext);
 
@@ -442,7 +443,7 @@ void ConfigureTextField(ControllerPtr controller)
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout(Layout::Engine::SINGLE_LINE_BOX);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 
@@ -474,7 +475,7 @@ void ConfigureTextEditor(ControllerPtr controller)
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout(Layout::Engine::MULTI_LINE_BOX);
 
-  InputMethodContext inputMethodContext = InputMethodContext::New();
+  InputMethodContext inputMethodContext = Dali::Integration::InputMethodContext::New();
   // Enables the text input.
   controller->EnableTextInput(decorator, inputMethodContext);
 

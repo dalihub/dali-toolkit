@@ -29,9 +29,36 @@
 using namespace Dali;
 using namespace Dali::Toolkit::Physics;
 
-extern btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld);
-
+namespace
+{
 const char* BALL_IMAGE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+
+btRigidBody* CreateBody(btDiscreteDynamicsWorld* bulletWorld)
+{
+  btSphereShape* ball = new btSphereShape(30);
+  btVector3      localInertia(0.f, 0.f, 0.f);
+  ball->calculateLocalInertia(10, localInertia);
+  btTransform transform;
+  transform.setIdentity();
+  auto* motionState = new btDefaultMotionState(transform);
+
+  btRigidBody::btRigidBodyConstructionInfo ci(10, motionState, ball, localInertia);
+
+  btRigidBody* body = new btRigidBody(ci);
+  body->setFriction(0.5f);
+  body->setRestitution(0.5f);
+  bulletWorld->addRigidBody(body);
+  return body;
+}
+
+void DeleteBody(btDiscreteDynamicsWorld* bulletWorld, btRigidBody* body)
+{
+  bulletWorld->removeRigidBody(body);
+  delete body->getMotionState();
+  delete body->getCollisionShape();
+  delete body;
+}
+} // namespace
 
 int UtcDaliPhysics3DActorNew(void)
 {
@@ -51,6 +78,8 @@ int UtcDaliPhysics3DActorNew(void)
   PhysicsActor physicsActor = PhysicsActor::New(ballActor, body, adaptor);
 
   DALI_TEST_CHECK(physicsActor);
+
+  DeleteBody(bulletWorld, body);
   END_TEST;
 }
 
@@ -73,6 +102,8 @@ int UtcDaliPhysics3DActorDownCastP(void)
   PhysicsActor actor2 = PhysicsActor::DownCast(handle);
   DALI_TEST_CHECK(actor2);
   DALI_TEST_EQUALS(physicsActor.GetId(), actor2.GetId(), TEST_LOCATION);
+
+  DeleteBody(bulletWorld, body);
 
   END_TEST;
 }
@@ -110,6 +141,8 @@ int UtcDaliPhysics3DActorMoveConstructor(void)
   DALI_TEST_CHECK(moved != physicsActor);
   DALI_TEST_EQUALS(moved.GetId(), id, TEST_LOCATION);
 
+  DeleteBody(bulletWorld, body);
+
   END_TEST;
 }
 
@@ -137,6 +170,8 @@ int UtcDaliPhysics3DActorCopyConstructor(void)
   DALI_TEST_CHECK(physicsActor);
   DALI_TEST_CHECK(selectedActor == physicsActor); // should point at same object
   DALI_TEST_EQUALS(selectedActor.GetId(), id, TEST_LOCATION);
+
+  DeleteBody(bulletWorld, body);
 
   END_TEST;
 }
@@ -166,6 +201,8 @@ int UtcDaliPhysics3DActorCopyAssign(void)
   DALI_TEST_CHECK(selectedActor == physicsActor); // should point at same object
   DALI_TEST_EQUALS(selectedActor.GetId(), id, TEST_LOCATION);
 
+  DeleteBody(bulletWorld, body);
+
   END_TEST;
 }
 
@@ -194,6 +231,8 @@ int UtcDaliPhysics3DActorMoveAssignment(void)
   DALI_TEST_CHECK(!physicsActor);
   DALI_TEST_EQUALS(moved.GetId(), id, TEST_LOCATION);
 
+  DeleteBody(bulletWorld, body);
+
   END_TEST;
 }
 
@@ -215,6 +254,8 @@ int UtcDaliPhysics3DActorGetIdP(void)
   int          id           = physicsActor.GetId();
   int          actorId      = ballActor[Actor::Property::ID];
   DALI_TEST_EQUALS(id, actorId, TEST_LOCATION);
+
+  DeleteBody(bulletWorld, body);
 
   END_TEST;
 }
@@ -266,6 +307,12 @@ int UtcDaliPhysics3DActorGetBodyP(void)
 
   Dali::Any any = physicsActor.GetBody();
   DALI_TEST_EQUALS(any.Get<btRigidBody*>(), body, TEST_LOCATION);
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
 
   END_TEST;
 }
@@ -329,6 +376,12 @@ int UtcDaliPhysics3DActorSetPosition(void)
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(10, 20, -30), 0.0001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -373,6 +426,12 @@ int UtcDaliPhysics3DActorSetRotation1(void)
     Quaternion q = actor.GetCurrentProperty<Quaternion>(Actor::Property::ORIENTATION);
     Quaternion expected(Degree(30), Vector3::YAXIS);
     DALI_TEST_EQUALS(q, expected, 0.0001f, TEST_LOCATION);
+  }
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
   }
 
   END_TEST;
@@ -421,6 +480,12 @@ int UtcDaliPhysics3DActorSetRotation2(void)
     DALI_TEST_EQUALS(q, expected, 0.0001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -462,6 +527,12 @@ int UtcDaliPhysics3DActorGetActorPosition(void)
     DALI_TEST_EQUALS(physicsActor.GetActorPosition(), Vector3(10, 20, -30), 0.0001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -501,6 +572,12 @@ int UtcDaliPhysics3DActorGetActorRotation(void)
   {
     auto accessor = adaptor.GetPhysicsAccessor();
     DALI_TEST_EQUALS(physicsActor.GetActorRotation(), Quaternion(Degree(30), Vector3::ZAXIS), 0.0001f, TEST_LOCATION);
+  }
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
   }
 
   END_TEST;
@@ -546,6 +623,12 @@ int UtcDaliPhysics3DActorGetPhysicsPosition(void)
     DALI_TEST_EQUALS(physicsActor.GetPhysicsPosition(), Vector3(pos), 0.0001f, TEST_LOCATION);
   }
 
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
+  }
+
   END_TEST;
 }
 
@@ -585,6 +668,12 @@ int UtcDaliPhysics3DActorGetPhysicsRotation(void)
   {
     auto accessor = adaptor.GetPhysicsAccessor();
     DALI_TEST_EQUALS(physicsActor.GetPhysicsRotation(), Quaternion(Degree(-30), Vector3::ZAXIS), 0.0001f, TEST_LOCATION);
+  }
+
+  {
+    auto accessor    = adaptor.GetPhysicsAccessor();
+    auto bulletWorld = accessor->GetNative().Get<btDiscreteDynamicsWorld*>();
+    DeleteBody(bulletWorld, body);
   }
 
   END_TEST;
