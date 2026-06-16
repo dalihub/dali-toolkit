@@ -291,6 +291,73 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualReloadAction01(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction&     gl = application.GetGlAbstraction();
+
+  tet_infoline("UtcDaliAnimatedImageVisualReloadAction01 - Test RELOAD action clears cache and reloads");
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 4);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(propertyMap);
+
+  DummyControl        dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for initial load
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(20);
+
+  // Check initial texture generation
+  GLint initialLastTextureId = gl.GetLastGenTextureId();
+  DALI_TEST_CHECK(initialLastTextureId >= 0);
+
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  // Execute RELOAD action
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, 
+                         Dali::Toolkit::DevelImageVisual::Action::RELOAD, Property::Map());
+
+  // Wait for reload
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(20);
+
+  // Verify textures were regenerated
+  DALI_TEST_CHECK(static_cast<GLint>(gl.GetLastGenTextureId()) > initialLastTextureId);
+
+  dummyControl.Unparent();
+
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+  application.RunIdles();
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
 {
   ToolkitTestApplication application;
