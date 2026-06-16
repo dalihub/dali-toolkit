@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
@@ -1721,7 +1722,7 @@ bool Control::FilterKeyEvent(const KeyEvent& event)
 
   if(mInputMethodContext)
   {
-    consumed = mInputMethodContext.FilterEventKey(event);
+    consumed = Dali::Integration::InputMethodContext::FilterEventKey(mInputMethodContext, event);
   }
   return consumed;
 }

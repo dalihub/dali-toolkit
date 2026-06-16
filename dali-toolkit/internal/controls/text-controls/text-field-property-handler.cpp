@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/string-utils.h>
 
 #if defined(DEBUG_ENABLED)
@@ -396,7 +397,7 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
       if(control == textField)
       {
-        impl.mInputMethodContext.ApplyOptions(impl.mInputMethodOptions);
+        Dali::Integration::InputMethodContext::ApplyOptions(impl.mInputMethodContext, impl.mInputMethodOptions);
       }
       break;
     }

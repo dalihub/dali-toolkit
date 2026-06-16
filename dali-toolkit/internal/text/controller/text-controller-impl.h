@@ -568,7 +568,7 @@ public:
       // Reset incase we are in a pre-edit state.
       if(mEventData->mInputMethodContext)
       {
-        mEventData->mInputMethodContext.Reset(); // Will trigger a message ( commit, get surrounding )
+        Dali::Integration::InputMethodContext::Reset(mEventData->mInputMethodContext); // Will trigger a message ( commit, get surrounding )
       }
 
       ClearPreEditFlag();

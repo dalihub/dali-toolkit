@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spanned.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/events/gesture.h>
 
@@ -2383,7 +2383,9 @@ public: // Text-input Event Queuing.
    * @param[in] inputMethodContextEvent The event received.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+  Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
+    InputMethodContext& inputMethodContext,
+    const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting

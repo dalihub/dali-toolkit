@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector2.h>
@@ -121,9 +121,10 @@ struct Controller::EventHandler
 
   /// @copydoc Text::Controller::OnInputMethodContextEvent
   /// @param[in] controller A reference to the controller class
-  static InputMethodContext::CallbackData OnInputMethodContextEvent(Controller&                          controller,
-                                                                    InputMethodContext&                  inputMethodContext,
-                                                                    const InputMethodContext::EventData& inputMethodContextEvent);
+  static Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
+    Controller& controller,
+    InputMethodContext& inputMethodContext,
+    const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief This function executes the actual text update when a clipboard paste event occurs.
