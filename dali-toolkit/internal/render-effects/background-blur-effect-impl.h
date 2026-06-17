@@ -174,9 +174,10 @@ private:
   // Inner functions
   /**
    * @brief Sets frame buffers to draw blurred output.
-   * @param[in] downsampledSize Downsampled size for performance.
+   * @param[in] inputSize Downsampled size for the source background.
+   * @param[in] downsampledSize Downsampled size for blur passes.
    */
-  void CreateFrameBuffers(const ImageDimensions downsampledSize);
+  void CreateFrameBuffers(const ImageDimensions inputSize, const ImageDimensions downsampledSize);
 
   /**
    * @brief Removes and destroys local frame buffers.
@@ -188,8 +189,9 @@ private:
    * Requires initialized buffers, source actors, and source cameras.
    * @param[in] sceneHolder SceneHolder of source control
    * @param[in] sourceControl Input source control
+   * @param[in] sourceDownscaleFactor Downscale factor for the source background render task
    */
-  void CreateRenderTasks(Dali::Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl);
+  void CreateRenderTasks(Dali::Integration::SceneHolder sceneHolder, const Toolkit::Control sourceControl, float sourceDownscaleFactor);
 
   /**
    * @brief Removes and destroys local render tasks.
@@ -231,8 +233,11 @@ private:
 
   // Resource
   FrameBuffer mInputBackgroundFrameBuffer; // Input. Background. What to blur.
+  FrameBuffer mDownsampledBackgroundFrameBuffer;
 
   Actor       mInternalRoot;
+  Actor       mDownsampleActor;
+  RenderTask  mDownsampleTask;
   Actor       mHorizontalBlurActor;
   RenderTask  mHorizontalBlurTask;
   FrameBuffer mTemporaryFrameBuffer;

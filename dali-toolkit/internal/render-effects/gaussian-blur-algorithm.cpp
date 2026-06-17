@@ -30,7 +30,7 @@ using Dali::Integration::ToDaliStringView;
 
 namespace
 {
-static constexpr float MINIMUM_DOWNSCALE_FACTOR = Dali::Math::MACHINE_EPSILON_1000;
+static constexpr float MINIMUM_DOWNSCALE_FACTOR = 0.25f;
 static constexpr float MAXIMUM_DOWNSCALE_FACTOR = 1.0f;
 
 static constexpr uint32_t MAXIMUM_BLUR_RADIUS       = 200u; ///< TODO : This is just experience defined value. We need to change it after more tests.

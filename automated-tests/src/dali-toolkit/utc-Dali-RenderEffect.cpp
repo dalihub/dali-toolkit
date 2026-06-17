@@ -28,6 +28,20 @@ using namespace Dali;
 using Dali::Integration::ToDaliString;
 using namespace Dali::Toolkit;
 
+namespace
+{
+void CheckTaskFrameBufferSize(RenderTask task, uint32_t expectedWidth, uint32_t expectedHeight)
+{
+  FrameBuffer frameBuffer = task.GetFrameBuffer();
+  DALI_TEST_CHECK(frameBuffer);
+
+  Texture texture = frameBuffer.GetColorTexture();
+  DALI_TEST_CHECK(texture);
+  DALI_TEST_EQUALS(texture.GetWidth(), expectedWidth, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetHeight(), expectedHeight, TEST_LOCATION);
+}
+} // namespace
+
 int UtcDaliRenderEffectNewP(void)
 {
   ToolkitTestApplication application;
@@ -347,7 +361,7 @@ int UtcDaliRenderEffectResize01(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
@@ -372,7 +386,7 @@ int UtcDaliRenderEffectResize01(void)
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
     tet_infoline("Background blur effect refreshed.\n");
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
     application.SendNotification();
@@ -415,7 +429,7 @@ int UtcDaliRenderEffectResize01(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
@@ -438,7 +452,7 @@ int UtcDaliRenderEffectResize01(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
@@ -589,7 +603,7 @@ int UtcDaliRenderEffectResize02(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
@@ -614,7 +628,7 @@ int UtcDaliRenderEffectResize02(void)
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_HEIGHT), 10.0f, TEST_LOCATION);
     tet_infoline("Background blur effect refreshed.\n");
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count + 1, control.GetRendererCount(), TEST_LOCATION);
 
     application.SendNotification();
@@ -657,7 +671,7 @@ int UtcDaliRenderEffectResize02(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 30.0f, TEST_LOCATION);
@@ -680,7 +694,7 @@ int UtcDaliRenderEffectResize02(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
     DALI_TEST_EQUALS(count, control.GetRendererCount(), TEST_LOCATION); // Uses cache renderer
 
     DALI_TEST_EQUALS(control.GetProperty<float>(Actor::Property::SIZE_WIDTH), 10.0f, TEST_LOCATION);
@@ -1520,7 +1534,7 @@ int UtcDaliBlurEffectDownscaleFactor(void)
     effect.Deactivate();
     effect.SetBlurDownscaleFactor(0.16f); // update while deactivated
     effect.Activate();
-    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.16f, TEST_LOCATION);
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION);
     DALI_TEST_EQUALS(effect.IsActivated(), true, TEST_LOCATION);
 
     effect.SetBlurDownscaleFactor(0.5f); // update while activated
@@ -1532,6 +1546,8 @@ int UtcDaliBlurEffectDownscaleFactor(void)
     effect.Deactivate();
     effect.Refresh();
     DALI_TEST_EQUALS(effect.IsActivated(), true, TEST_LOCATION);
+
+    effect.Deactivate();
   }
   {
     tet_printf("test GaussianBlurEffect\n");
@@ -1546,12 +1562,98 @@ int UtcDaliBlurEffectDownscaleFactor(void)
     effect.Deactivate();
     effect.SetBlurDownscaleFactor(0.16f); // update while deactivated
     effect.Activate();
-    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.16f, TEST_LOCATION);
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION);
 
     effect.SetBlurDownscaleFactor(0.5f); // update while activated
     DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
 
     effect.SetBlurRadius(30);
+    effect.Deactivate();
+  }
+
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+
+  {
+    tet_printf("test BackgroundBlurEffect intermediate downsample task\n");
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New(40u);
+    effect.SetBlurDownscaleFactor(0.25f);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(1u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(2u), 25u, 25u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(3u), 25u, 25u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(4u), 25u, 25u);
+
+    effect.Deactivate();
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(1u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  }
+
+  {
+    tet_printf("test BackgroundBlurEffect without intermediate downsample task\n");
+    BackgroundBlurEffect effect = BackgroundBlurEffect::New(40u);
+    effect.SetBlurDownscaleFactor(0.5f);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
+    DALI_TEST_EQUALS(4u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(1u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(2u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(3u), 50u, 50u);
+
+    effect.Deactivate();
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(1u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  }
+
+  {
+    tet_printf("test GaussianBlurEffect intermediate downsample task\n");
+    GaussianBlurEffect effect = GaussianBlurEffect::New(40u);
+    effect.SetBlurDownscaleFactor(0.25f);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.25f, TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(1u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(2u), 25u, 25u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(3u), 25u, 25u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(4u), 25u, 25u);
+
+    effect.Deactivate();
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(1u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+  }
+
+  {
+    tet_printf("test GaussianBlurEffect without intermediate downsample task\n");
+    GaussianBlurEffect effect = GaussianBlurEffect::New(40u);
+    effect.SetBlurDownscaleFactor(0.5f);
+    control.SetRenderEffect(effect);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(effect.GetBlurDownscaleFactor(), 0.5f, TEST_LOCATION);
+    DALI_TEST_EQUALS(4u, scene.GetRenderTaskList().GetTaskCount(), TEST_LOCATION);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(1u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(2u), 50u, 50u);
+    CheckTaskFrameBufferSize(scene.GetRenderTaskList().GetTask(3u), 50u, 50u);
+
+    effect.Deactivate();
   }
 
   END_TEST;
