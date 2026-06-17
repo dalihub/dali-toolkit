@@ -18,16 +18,48 @@
  *
  */
 
+// Prevent real clipboard headers from being included
 #define DALI_CLIPBOARD_H
+#define DALI_CLIPBOARD_DATA_H
+#define DALI_INTEGRATION_CLIPBOARD_INTEG_H
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/math/rect.h>
+#include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <string>
+#include <cstdint>
 
 namespace Dali DALI_IMPORT_API
 {
+
+/**
+ * @brief ClipboardData stores clipboard MIME type and content.
+ *
+ * Fake implementation for test purposes.
+ */
+class ClipboardData
+{
+public:
+  ClipboardData();
+  ClipboardData(const Dali::String& mimeType, const Dali::String& content);
+  ClipboardData(const ClipboardData& rhs);
+  ClipboardData(ClipboardData&& rhs) noexcept;
+  ClipboardData& operator=(const ClipboardData& rhs);
+  ClipboardData& operator=(ClipboardData&& rhs) noexcept;
+  ~ClipboardData();
+
+  void SetMimeType(const Dali::String& mimeType);
+  Dali::String GetMimeType() const;
+
+  void SetContent(const Dali::String& content);
+  Dali::String GetContent() const;
+
+private:
+  struct Impl;
+  UniquePtr<Impl> mImpl;
+};
 
 namespace Internal DALI_INTERNAL
 {
@@ -45,43 +77,7 @@ class Clipboard;
 class Clipboard : public BaseHandle
 {
 public:
-  /**
-   * @brief Structure that contains information about the clipboard data information.
-   */
-  struct ClipData
-  {
-    ClipData(const char* mimeType = nullptr, const char* data = nullptr)
-    {
-      this->mimeType = mimeType;
-      this->data     = data;
-    }
-    void SetMimeType(const char* mimeType)
-    {
-      this->mimeType = mimeType;
-    }
-    const char* GetMimeType() const
-    {
-      return mimeType;
-    }
-    void SetData(const char* data)
-    {
-      this->data = data;
-    }
-    const char* GetData() const
-    {
-      return data;
-    }
-
-  private:
-    const char* mimeType{nullptr}; ///< The mime type of clip data.
-    const char* data{nullptr};     ///< The clip data.
-  };
-
-  /// @brief Data send completed signal.
-  typedef Signal<void(const char*, const char*)> DataSentSignalType;
-
-  /// @brief Data receive completed signal.
-  typedef Signal<void(uint32_t, const char*, const char*)> DataReceivedSignalType;
+  using DataOfferedSignalType = Signal<void(const Dali::String&)>;
 
   /**
    * Create an uninitialized Clipboard;
@@ -107,72 +103,65 @@ public:
   static Clipboard Get();
 
   /**
-   * @brief Checks whether the clipboard is available.
-   * @return true, if it is available, false otherwise.
+   * @brief Send the given data to the clipboard.
+   * @param[in] data data to send to the clipboard
+   * @return bool true if the internal clipboard sending was successful.
    */
-  static bool IsAvailable();
-
-  /**
-   * @brief This signal is emitted when the data send complete.
-   * @note
-   * SetData() opertion does not follow a synchronous call.
-   * It follows the sequence below.
-   * SetData() -> EcoreEventDataSend() -> SendData() -> DataSentSignal() Emit
-   */
-  DataSentSignalType& DataSentSignal();
-
-  /**
-   * @brief This signal is emitted when the data receive complete.
-   * @note
-   * GetData() opertion does not follow a synchronous call.
-   * It follows the sequence below.
-   * GetData() -> EcoreEventOfferDataReady() -> ReceiveData() -> DataReceivedSignal() Emit
-   */
-  DataReceivedSignalType& DataReceivedSignal();
+  bool SetData(const ClipboardData& data);
 
   /**
    * @brief Check if there is data in the clipboard with a given mime type.
    * @param[in] mimeType mime type to search for.
    * @return bool true if there is data, otherwise false.
    */
-  bool HasType(const std::string& mimeType);
-
-  /**
-   * @brief Send the given data to the clipboard.
-   * @param[in] clipData data to send to the clipboard
-   * @return bool true if the internal clipboard sending was successful.
-   */
-  bool SetData(const ClipData& clipData);
+  bool HasType(const Dali::String& mimeType);
 
   /**
    * @brief Request data from the clipboard.
    * @param[in] mimeType mime type of data to request.
-   * @return uint32_t Returns the data request id.
+   * @param[in] callback Callback to receive the data. Ownership is transferred.
    */
-  uint32_t GetData(const std::string& mimeType);
+  void GetData(const Dali::String& mimeType, CallbackBase* callback);
 
   /**
-   * @brief Returns the number of item currently in the clipboard.
-   * @return size_t number of clipboard items.
+   * @brief Signal emitted when clipboard data is offered.
    */
-  size_t NumberOfItems();
-
-  /**
-   * Show the clipboard window
-   */
-  void ShowClipboard();
-
-  /**
-   * Hide the clipboard window
-   */
-  void HideClipboard();
-
-  /**
-   * @brief Retrieves the clipboard's visibility
-   * @return bool true if the clipboard is visible.
-   */
-  bool IsVisible() const;
+  DataOfferedSignalType& DataOfferedSignal();
 };
-} //namespace Dali DALI_IMPORT_API
+
+} // namespace Dali DALI_IMPORT_API
+
+namespace Dali
+{
+namespace Integration
+{
+namespace Clipboard
+{
+
+using DataSentSignalType     = Signal<void(const char*, const char*)>;
+using DataReceivedSignalType = Signal<void(uint32_t, const char*, const char*)>;
+using DataSelectedSignalType = Signal<void(const char*)>;
+
+bool IsAvailable();
+
+DataSentSignalType& DataSentSignal(Dali::Clipboard& clipboard);
+
+DataReceivedSignalType& DataReceivedSignal(Dali::Clipboard& clipboard);
+
+DataSelectedSignalType& DataSelectedSignal(Dali::Clipboard& clipboard);
+
+uint32_t GetData(Dali::Clipboard& clipboard, const Dali::String& mimeType);
+
+uint32_t GetItemCount(Dali::Clipboard& clipboard);
+
+void ShowClipboard(Dali::Clipboard& clipboard);
+
+void HideClipboard(Dali::Clipboard& clipboard, bool skipFirstHide = false);
+
+bool IsVisible(const Dali::Clipboard& clipboard);
+
+} // namespace Clipboard
+} // namespace Integration
+} // namespace Dali
 
 #endif // TOOLKIT_CLIPBOARD_H

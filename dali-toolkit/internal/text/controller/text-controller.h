@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spanned.h>
-#include <dali/devel-api/adaptor-framework/clipboard.h>
+#include <dali/public-api/adaptor-framework/clipboard.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/events/gesture.h>
