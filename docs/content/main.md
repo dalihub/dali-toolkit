@@ -54,7 +54,6 @@
  + Buttons
  + [FlexContainer](@ref flex-container)
  + [ItemView](@ref item-view)
- + [Popup](@ref popup)
  + [Scroll View](@ref scroll-view)
  + TableView
  + [Text Editor](@ref text-editor)
