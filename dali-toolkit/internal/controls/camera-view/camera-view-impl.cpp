@@ -29,8 +29,12 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
 
@@ -97,16 +101,35 @@ void CameraView::OnSceneDisconnection()
 {
   Control::OnSceneDisconnection();
   Actor self = Self();
+
+  // Remove PropertyNotifications to prevent accumulation on repeated scene connections.
+  self.RemovePropertyNotification(mPositionUpdateNotification);
+  self.RemovePropertyNotification(mSizeUpdateNotification);
+  self.RemovePropertyNotification(mScaleUpdateNotification);
+
   if(mTextureRenderer)
   {
     self.RemoveRenderer(mTextureRenderer);
     mTextureRenderer.Reset();
   }
 
-  if(mOverlayRenderer)
+  if(mOverlayVisual)
   {
-    self.RemoveRenderer(mOverlayRenderer);
-    mOverlayRenderer.Reset();
+    if(mOverlayVisualIndex != Property::INVALID_INDEX)
+    {
+      Toolkit::CameraView  cameraViewHandle = Toolkit::CameraView::DownCast(self);
+      Toolkit::Control     control          = Toolkit::Control::DownCast(cameraViewHandle);
+      Internal::Control&   controlImpl      = GetImplementation(control);
+
+      Dali::Toolkit::DevelControl::UnregisterVisual(controlImpl, mOverlayVisualIndex);
+      // mOverlayVisualIndex is kept for reuse on next OnSceneConnection
+    }
+
+    if(Dali::Adaptor::IsAvailable())
+    {
+      Dali::Toolkit::VisualFactory::Get().DiscardVisual(mOverlayVisual);
+    }
+    mOverlayVisual.Reset();
   }
 }
 
@@ -122,12 +145,59 @@ void CameraView::SetWindowSurfaceTarget()
   mScaleUpdateNotification.NotifySignal().Connect(this, &CameraView::UpdateDisplayArea);
 
   // For underlay rendering mode, camera display area have to be transparent.
-  mOverlayRenderer = CreateRenderer(SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG, static_cast<Shader::Hint::Value>(Shader::Hint::FILE_CACHE_SUPPORT | Shader::Hint::INTERNAL), "CAMERA_VIEW_OVERLAY", Uint16Pair(1, 1));
-  mOverlayRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
+  // Use ColorVisual with special blend settings so that CornerRadius can cut alpha on the boundary.
+  if(!mOverlayVisual)
+  {
+    Toolkit::CameraView cameraViewHandle = Toolkit::CameraView::DownCast(self);
+    Toolkit::Control    control          = Toolkit::Control::DownCast(cameraViewHandle);
+    Internal::Control&  controlImpl      = GetImplementation(control);
 
-  Self().AddRenderer(mOverlayRenderer);
+    Property::Map properties;
+    properties[Dali::Toolkit::Visual::Property::TYPE]      = Dali::Toolkit::Visual::Type::COLOR;
+    properties[Dali::Toolkit::Visual::Property::MIX_COLOR] = Color::BLACK;
 
-  // Note CameraPlayer::SetWindowRenderingTarget
+    mOverlayVisual = Dali::Toolkit::VisualFactory::Get().CreateVisual(properties);
+    if(mOverlayVisual)
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(mOverlayVisual);
+      Renderer                renderer   = visualImpl.GetRenderer();
+      if(!renderer)
+      {
+        DALI_LOG_ERROR("CameraView: Failed to get renderer from overlay visual\n");
+        mOverlayVisual.Reset();
+        return;
+      }
+
+      // Blend settings identical to VideoView WindowSurfaceStrategy.
+      // Final RGB  = DestRGB * (1 - SrcAlpha)
+      // Final Alpha = DestAlpha - SrcAlpha  (REVERSE_SUBTRACT)
+      // CornerRadius fragment shader writes (1 - opacity) into SrcAlpha,
+      // so pixels outside the rounded corner become a hole in the UI layer.
+      renderer.SetProperty(Renderer::Property::BLEND_MODE,             BlendMode::ON);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB,   BlendFactor::ZERO);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB,  BlendFactor::ONE_MINUS_SRC_ALPHA);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_ALPHA,  BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_RGB,     BlendEquation::ADD);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA,   BlendEquation::REVERSE_SUBTRACT);
+
+      // Register an internal property index for the visual.
+      // CameraView has no dedicated Property::OVERLAY enum (DisplayType is fixed at construction),
+      // so use RegisterProperty to obtain an index — same pattern as VideoView's mOverlayTextureVisualIndex.
+      if(mOverlayVisualIndex == Property::INVALID_INDEX)
+      {
+        mOverlayVisualIndex = cameraViewHandle.RegisterProperty(
+          "cameraViewOverlay", "cameraViewOverlay", Property::AccessMode::READ_WRITE);
+      }
+
+      Dali::Toolkit::DevelControl::RegisterVisual(controlImpl, mOverlayVisualIndex, mOverlayVisual);
+
+      // Auto-sync Control's cornerRadius / cornerSquareness properties → shader uniforms.
+      Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, mOverlayVisual, true);
+    }
+  }
+
+  // Note: CameraPlayer::SetWindowRenderingTarget resets player options (url, mute, etc.)
   mCameraPlayer.SetWindowRenderingTarget(DevelWindow::Get(self));
 }
 
