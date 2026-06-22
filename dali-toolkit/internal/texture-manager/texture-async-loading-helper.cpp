@@ -103,7 +103,7 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
 
   // For remote URLs, route through RemoteFileDownloadManager when async download is supported.
   // This avoids blocking a Worker Thread on network I/O.
-  if(!url.IsLocalResource() && Dali::RemoteFileDownloadManager::IsAvailable())
+  if(!url.IsLocalResource() && Dali::RemoteFileDownloadManager::IsAsyncDownloadSupported())
   {
     DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper::Load textureId[%d] via RemoteFileDownloadManager url[%s]\n", textureId, url.GetEllipsedUrl().c_str());
 
