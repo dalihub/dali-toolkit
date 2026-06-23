@@ -60,11 +60,11 @@ public:
   ResizeSignalType                           mResizeSignal;
   int                                        mRotationAngle;
   bool                                       mVisible;
-  DevelWindow::VisibilityChangedSignalType   mVisibilityChangedSignal;
+  Dali::Window::VisibilityChangedSignalType  mVisibilityChangedSignal;
   Dali::Window::KeyEventSignalType           mKeyEventSignal;
   Dali::Window::TouchEventSignalType         mTouchEventSignal;
+  Dali::Window::WheelEventSignalType         mWheelEventSignal;
   DevelWindow::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
-  DevelWindow::WheelEventSignalType          mWheelEventSignal;
   DevelWindow::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
   Dali::SlotDelegate<Window>                 mSlotDelegate;
 };

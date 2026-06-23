@@ -263,7 +263,7 @@ void DrawableView::OnSceneConnection(int depth)
   if(window)
   {
     mPlacementWindow = window;
-    DevelWindow::VisibilityChangedSignal(window).Connect(this, &DrawableView::OnWindowVisibilityChanged);
+    window.VisibilityChangedSignal().Connect(this, &DrawableView::OnWindowVisibilityChanged);
   }
 }
 
@@ -276,7 +276,7 @@ void DrawableView::OnSceneDisconnection()
   Window window = mPlacementWindow.GetHandle();
   if(window)
   {
-    DevelWindow::VisibilityChangedSignal(window).Disconnect(this, &DrawableView::OnWindowVisibilityChanged);
+    window.VisibilityChangedSignal().Disconnect(this, &DrawableView::OnWindowVisibilityChanged);
     mPlacementWindow.Reset();
   }
 }

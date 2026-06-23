@@ -55,9 +55,11 @@ public:
   using WindowSize     = Int32Pair;
   using WindowPosition = Int32Pair;
 
-  using KeyEventSignalType   = Signal<void(Window, KeyEvent)>;
-  using TouchEventSignalType = Signal<void(Window, TouchEvent)>;
-  using ResizeSignalType     = Signal<void(Window, WindowSize)>;
+  using KeyEventSignalType          = Signal<void(Window, KeyEvent)>;
+  using TouchEventSignalType        = Signal<void(Window, TouchEvent)>;
+  using ResizeSignalType            = Signal<void(Window, WindowSize)>;
+  using WheelEventSignalType        = Signal<void(Window, WheelEvent)>;
+  using VisibilityChangedSignalType = Signal<void(Window, bool)>;
 
   static Window New(PositionSize windowPosition, const Dali::String& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const Dali::String& name, const Dali::String& className, bool isTransparent = false);
@@ -86,8 +88,11 @@ public:
   KeyEventSignalType&                        KeyEventSignal();
   TouchEventSignalType&                      TouchedSignal();
   ResizeSignalType&                          ResizeSignal();
-  Dali::RenderTaskList                       GetRenderTaskList();
-  void                                       KeepRendering(float durationSeconds);
+  WheelEventSignalType&                      WheelEventSignal();
+  VisibilityChangedSignalType&               VisibilityChangedSignal();
+
+  Dali::RenderTaskList GetRenderTaskList();
+  void                 KeepRendering(float durationSeconds);
 
 public:
   explicit Window(Internal::Adaptor::Window* window);
@@ -100,9 +105,7 @@ namespace DevelWindow
 {
 typedef Signal<void()>                   EventProcessingFinishedSignalType;
 typedef Signal<bool(Window, KeyEvent)>   KeyEventGeneratedSignalType;
-typedef Signal<void(Window, WheelEvent)> WheelEventSignalType;
 typedef Signal<bool(Window, WheelEvent)> WheelEventGeneratedSignalType;
-typedef Signal<void(Window, bool)>       VisibilityChangedSignalType;
 
 Dali::Window Get(Actor actor);
 void         SetPositionSize(Window window, PositionSize positionSize);
@@ -110,9 +113,7 @@ int          GetPhysicalOrientation(Window window);
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window);
 KeyEventGeneratedSignalType&       KeyEventGeneratedSignal(Dali::Window window);
-WheelEventSignalType&              WheelEventSignal(Window window);
 WheelEventGeneratedSignalType&     WheelEventGeneratedSignal(Dali::Window window);
-VisibilityChangedSignalType&       VisibilityChangedSignal(Window window);
 } // namespace DevelWindow
 
 } // namespace Dali

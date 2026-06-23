@@ -52,8 +52,8 @@ Window::Window(const PositionSize& positionSize)
   mVisibilityChangedSignal(),
   mKeyEventSignal(),
   mTouchEventSignal(),
-  mKeyEventGeneratedSignal(),
   mWheelEventSignal(),
+  mKeyEventGeneratedSignal(),
   mWheelEventGeneratedSignal(),
   mSlotDelegate(this)
 {
@@ -277,6 +277,15 @@ Window::TouchEventSignalType& Window::TouchedSignal()
   return GetImplementation(*this).TouchedSignal();
 }
 
+Window::WheelEventSignalType& Window::WheelEventSignal()
+{
+  return GetImplementation(*this).mWheelEventSignal;
+}
+Window::VisibilityChangedSignalType& Window::VisibilityChangedSignal()
+{
+  return GetImplementation(*this).mVisibilityChangedSignal;
+}
+
 Dali::RenderTaskList Window::GetRenderTaskList()
 {
   return GetImplementation(*this).GetRenderTaskList();
@@ -321,19 +330,9 @@ KeyEventGeneratedSignalType& KeyEventGeneratedSignal(Window window)
   return GetImplementation(window).mKeyEventGeneratedSignal;
 }
 
-WheelEventSignalType& WheelEventSignal(Window window)
-{
-  return GetImplementation(window).mWheelEventSignal;
-}
-
 WheelEventGeneratedSignalType& WheelEventGeneratedSignal(Window window)
 {
   return GetImplementation(window).mWheelEventGeneratedSignal;
-}
-
-VisibilityChangedSignalType& VisibilityChangedSignal(Window window)
-{
-  return GetImplementation(window).mVisibilityChangedSignal;
 }
 
 } // namespace DevelWindow
