@@ -1122,7 +1122,14 @@ void ProcessMarkupStringBuffer(
     }
 
     ++characterIndex;
-    markupStringBuffer += count;
+    if(count > 0u)
+    {
+      markupStringBuffer += count;
+    }
+    else if(len == 0u)
+    {
+      ++markupStringBuffer;
+    }
   }
 }
 

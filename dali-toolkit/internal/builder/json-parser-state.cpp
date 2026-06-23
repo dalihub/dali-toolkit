@@ -506,6 +506,10 @@ bool JsonParserState::ParseNumber()
       mCurrent.SetType(TreeNode::FLOAT);
     }
     Advance(1);
+    if(AtEnd())
+    {
+      break;
+    }
     c = Char();
   }
 
