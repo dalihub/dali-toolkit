@@ -646,13 +646,6 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
       mCurrentLoopIndex  = FIRST_LOOP;
       mIsJumpTo          = false;
 
-      if(mImpl->mRenderer)
-      {
-        mImpl->mRenderer.RemoveTextures();
-        TextureSet emptyTextureSet;
-        UpdateNativeTextureInfomation(emptyTextureSet);
-      }
-
       PrepareTextureSet();
       break;
     }
