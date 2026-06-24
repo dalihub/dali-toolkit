@@ -25,7 +25,6 @@
 #include <dali/integration-api/string-utils.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -2486,16 +2485,6 @@ int utcDaliTextEditorEvent03(void)
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Send some taps and check text controller with clipboard window
-  Dali::Clipboard clipboard = Clipboard::Get();
-  clipboard.ShowClipboard();
-  TestGenerateTap(application, 3.0f, 25.0f, 100);
-  clipboard.HideClipboard();
 
   // Render and notify
   application.SendNotification();

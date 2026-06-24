@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/clipboard-integ.h>
 #include <dali/integration-api/debug.h>
 #include <memory.h>
 #include <cmath>
@@ -1916,7 +1917,7 @@ void Controller::PasteClipboardItemEvent(uint32_t id, const char* mimeType, cons
 {
   // Upon receiving the data, it is important to disconnect the signal
   // to avoid potential unintended pasting caused by subsequent requests.
-  mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
+  Dali::Integration::Clipboard::DataReceivedSignal(mImpl->mClipboard).Disconnect(this, &Controller::PasteClipboardItemEvent);
 
   // If the id is 0u, it is an invalid response.
   if(id == 0u)
@@ -1947,17 +1948,17 @@ void Controller::PasteText()
   if(mImpl->EnsureClipboardCreated())
   {
     // Connect the signal before calling GetData() of the clipboard.
-    mImpl->mClipboard.DataReceivedSignal().Connect(this, &Controller::PasteClipboardItemEvent);
+    Dali::Integration::Clipboard::DataReceivedSignal(mImpl->mClipboard).Connect(this, &Controller::PasteClipboardItemEvent);
 
     // If there is no plain text type data on the clipboard, request html type data.
-    std::string mimeType = mImpl->mClipboard.HasType(MIME_TYPE_TEXT_PLAIN) ? MIME_TYPE_TEXT_PLAIN : MIME_TYPE_HTML;
+    Dali::String mimeType = mImpl->mClipboard.HasType(MIME_TYPE_TEXT_PLAIN) ? MIME_TYPE_TEXT_PLAIN : MIME_TYPE_HTML;
 
     // Request clipboard service to retrieve an item.
-    uint id = mImpl->mClipboard.GetData(mimeType);
+    uint32_t id = Dali::Integration::Clipboard::GetData(mImpl->mClipboard, mimeType);
     if(id == 0u)
     {
       // If the return id is 0u, the signal is not emitted, we must disconnect signal here.
-      mImpl->mClipboard.DataReceivedSignal().Disconnect(this, &Controller::PasteClipboardItemEvent);
+      Dali::Integration::Clipboard::DataReceivedSignal(mImpl->mClipboard).Disconnect(this, &Controller::PasteClipboardItemEvent);
     }
   }
 }

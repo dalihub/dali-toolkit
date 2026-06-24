@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <limits>
 
+#include "toolkit-clipboard.h"
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
@@ -30,6 +32,7 @@
 #include <dali/devel-api/events/key-event-devel.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <toolkit-text-utils.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -453,8 +456,8 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   ToolkitTestApplication application;
 
   // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
+  ControllerPtr     controller     = Controller::New();
+  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
   DALI_TEST_CHECK(controller);
 
   std::string   text;
@@ -516,6 +519,29 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   controller->GetText(text);
   DALI_TEST_CHECK(text.empty());
 
+  // Test for invalid mime type paste.
+  Dali::Clipboard           clipboard = Dali::Clipboard::Get();
+  Dali::ClipboardData data("unknown/mime-type", "invalid mimi type");
+  clipboard.SetData(data);
+
+  // Paste the text.
+  button = PushButton::DownCast(textPopup.FindChildByName(OPTION_PASTE));
+  DALI_TEST_CHECK(button);
+
+  button.DoAction("buttonClick", attributes);
+
+  // Call relayout to process the input events.
+  controller->Relayout(CONTROL_SIZE);
+  controller->GetText(text);
+
+  DALI_TEST_EQUALS("", text.c_str(), TEST_LOCATION);
+
+  // Show the clipboard.
+  button = PushButton::DownCast(textPopup.FindChildByName(OPTION_CLIPBOARD));
+  DALI_TEST_CHECK(button);
+
+  button.DoAction("buttonClick", attributes);
+
   // Set text again.
   controller->SetText("Hello world");
 
@@ -536,6 +562,10 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
 
   // Call relayout to process the input events.
   controller->Relayout(CONTROL_SIZE);
+
+  controllerImpl.ShowClipboard();
+  controllerImpl.SetClipboardHideEnable(true);
+  controllerImpl.HideClipboard();
 
   // Cut the text.
   button = PushButton::DownCast(textPopup.FindChildByName(OPTION_CUT));
