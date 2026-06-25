@@ -77,11 +77,11 @@ Layer BulletPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   auto renderTaskList = window.GetRenderTaskList();
   auto renderTask     = renderTaskList.GetTask(0);
-  auto windowSize     = window.GetSize();
+  auto posSize        = window.GetPositionSize();
 
   debugLayer                                 = Layer::New();
   debugLayer[Actor::Property::NAME]          = "PhysicsDebugLayer";
-  debugLayer[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
+  debugLayer[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;
   debugLayer[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   Constraint positionConstraint = Constraint::New<Vector3>(debugLayer, Actor::Property::POSITION, EqualToConstraint());
@@ -91,9 +91,9 @@ Layer BulletPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   sizeConstraint.AddSource(Source(mRootActor, Actor::Property::SIZE));
   sizeConstraint.Apply();
 
-  mDebugRenderer                              = PhysicsDebugRenderer::New(windowSize.GetWidth(), windowSize.GetHeight(), renderTask.GetCameraActor(), this);
+  mDebugRenderer                              = PhysicsDebugRenderer::New(posSize.width, posSize.height, renderTask.GetCameraActor(), this);
   mDebugActor                                 = DrawableActor::New(*(mDebugRenderer->GetCallback().Get()));
-  mDebugActor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
+  mDebugActor[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;
   mDebugActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 
   Constraint sizeConstraint2 = Constraint::New<Vector3>(mDebugActor, Actor::Property::SIZE, EqualToConstraint());
@@ -138,7 +138,7 @@ PhysicsActorPtr BulletPhysicsAdaptor::AddActorBody(Dali::Actor actor, Dali::Any 
   btBody->setUserIndex(id);
   mPhysicsActors.insert(std::make_pair(id, PhysicsActor::New(actor, body, *this)));
   actor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
-  actor[Actor::Property::PIVOT]  = Dali::Pivot::CENTER;
+  actor[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;
   mRootActor.Add(actor);
   return mPhysicsActors.at(id);
 }

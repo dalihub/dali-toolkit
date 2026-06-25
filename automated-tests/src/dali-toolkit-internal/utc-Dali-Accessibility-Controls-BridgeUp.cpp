@@ -1264,7 +1264,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
   DALI_TEST_CHECK(window);
 
   //window.SetPosition({0,0});
-  DevelWindow::SetPositionSize(window, PositionSize(0, 0, 480, 240));
+  window.SetPositionSize(PositionSize(0, 0, 480, 240));
 
   control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
   control.SetProperty(Actor::Property::SIZE, Vector2(10, 10));
@@ -1341,7 +1341,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
   application.GetScene().GetRootLayer().Add(control);
   auto window = Dali::DevelWindow::Get(control);
   //window.SetPosition({33,33});
-  DevelWindow::SetPositionSize(window, PositionSize(33, 33, 480, 240));
+  window.SetPositionSize(PositionSize(33, 33, 480, 240));
 
   control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
   control.SetProperty(Actor::Property::SIZE, Vector2(10, 10));

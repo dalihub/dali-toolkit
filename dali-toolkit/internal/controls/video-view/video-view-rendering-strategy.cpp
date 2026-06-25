@@ -114,7 +114,7 @@ bool WindowSurfaceStrategy::Initialize()
   }
 
   Dali::Window window = DevelWindow::Get(self);
-  window.ResizeSignal().Connect(videoView, &VideoView::OnWindowResized);
+  window.ResizedSignal().Connect(videoView, &VideoView::OnWindowResized);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));

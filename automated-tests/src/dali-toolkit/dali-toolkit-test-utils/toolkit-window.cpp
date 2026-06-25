@@ -45,8 +45,8 @@ namespace Adaptor
 {
 Window::Window(const PositionSize& positionSize)
 : SceneHolder(positionSize),
-  mFocusChangeSignal(),
-  mResizeSignal(),
+  mFocusChangedSignal(),
+  mResizedSignal(),
   mRotationAngle(90), // dummy angle for test coverage
   mVisible(true),
   mVisibilityChangedSignal(),
@@ -58,7 +58,7 @@ Window::Window(const PositionSize& positionSize)
   mSlotDelegate(this)
 {
   SceneHolder::KeyEventSignal().Connect(mSlotDelegate, &Window::OnKeyEvent);
-  SceneHolder::TouchedSignal().Connect(mSlotDelegate, &Window::OnTouchEvent);
+  SceneHolder::TouchEventSignal().Connect(mSlotDelegate, &Window::OnTouchEvent);
 }
 
 Window* Window::New(const PositionSize& positionSize, const Dali::String& name, const Dali::String& className, bool isTransparent)
@@ -66,23 +66,9 @@ Window* Window::New(const PositionSize& positionSize, const Dali::String& name, 
   return new Window(positionSize);
 }
 
-Dali::Window::WindowPosition Window::GetPosition() const
-{
-  PositionSize positionSize = mRenderSurface->GetPositionSize();
-
-  return Dali::Window::WindowPosition(positionSize.x, positionSize.y);
-}
-
 PositionSize Window::GetPositionSize() const
 {
   return mRenderSurface->GetPositionSize();
-}
-
-Dali::Window::WindowSize Window::GetSize() const
-{
-  PositionSize positionSize = mRenderSurface->GetPositionSize();
-
-  return Dali::Window::WindowSize(positionSize.width, positionSize.height);
 }
 
 Dali::Window::KeyEventSignalType& Window::KeyEventSignal()
@@ -90,7 +76,7 @@ Dali::Window::KeyEventSignalType& Window::KeyEventSignal()
   return mKeyEventSignal;
 }
 
-Dali::Window::TouchEventSignalType& Window::TouchedSignal()
+Dali::Window::TouchEventSignalType& Window::TouchEventSignal()
 {
   return mTouchEventSignal;
 }
@@ -113,7 +99,7 @@ void Window::SetPositionSize(PositionSize positionSize)
 
   Int32Pair    newSize(positionSize.width, positionSize.height);
   Dali::Window handle(this);
-  mResizeSignal.Emit(handle, newSize);
+  mResizedSignal.Emit(handle, newSize);
 }
 
 std::string Window::GetNativeResourceId() const
@@ -228,13 +214,13 @@ Vector4 Window::GetBackgroundColor() const
 
 void Window::Raise()
 {
-  GetImplementation(*this).mFocusChangeSignal.Emit(*this, true);
+  GetImplementation(*this).mFocusChangedSignal.Emit(*this, true);
   GetImplementation(*this).FocusChanged(true);
 }
 
 void Window::Lower()
 {
-  GetImplementation(*this).mFocusChangeSignal.Emit(*this, false);
+  GetImplementation(*this).mFocusChangedSignal.Emit(*this, false);
   GetImplementation(*this).FocusChanged(false);
 }
 
@@ -257,14 +243,14 @@ bool Window::IsVisible() const
   return GetImplementation(*this).mVisible;
 }
 
-FocusChangeSignalType& Window::FocusChangeSignal()
+FocusChangedSignalType& Window::FocusChangedSignal()
 {
-  return GetImplementation(*this).mFocusChangeSignal;
+  return GetImplementation(*this).mFocusChangedSignal;
 }
 
-ResizeSignalType& Window::ResizeSignal()
+ResizedSignalType& Window::ResizedSignal()
 {
-  return GetImplementation(*this).mResizeSignal;
+  return GetImplementation(*this).mResizedSignal;
 }
 
 Window::KeyEventSignalType& Window::KeyEventSignal()
@@ -272,9 +258,9 @@ Window::KeyEventSignalType& Window::KeyEventSignal()
   return GetImplementation(*this).KeyEventSignal();
 }
 
-Window::TouchEventSignalType& Window::TouchedSignal()
+Window::TouchEventSignalType& Window::TouchEventSignal()
 {
-  return GetImplementation(*this).TouchedSignal();
+  return GetImplementation(*this).TouchEventSignal();
 }
 
 Window::WheelEventSignalType& Window::WheelEventSignal()
@@ -308,11 +294,6 @@ Window Get(Actor actor)
   }
 
   return Dali::Window(windowImpl);
-}
-
-void SetPositionSize(Window window, PositionSize positionSize)
-{
-  GetImplementation(window).SetPositionSize(positionSize);
 }
 
 int GetPhysicalOrientation(Window window)

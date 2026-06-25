@@ -256,7 +256,7 @@ struct Decorator::Impl : public ConnectionTracker
       Dali::Window window = DevelWindow::Get(mActiveLayer);
       if(window)
       {
-        LocalToWorldCoordinatesBoundingBox(mLocalBoundingBox, window.GetSize(), mBoundingBox);
+        LocalToWorldCoordinatesBoundingBox(mLocalBoundingBox, Vector2(window.GetPositionSize().width, window.GetPositionSize().height), mBoundingBox);
         mBoundingBoxDirty = false;
       }
     }
@@ -2007,7 +2007,7 @@ void Decorator::SetBoundingBox(const BoundsInteger& boundingBox)
   Dali::Window window = DevelWindow::Get(mImpl->mActiveLayer);
   if(window)
   {
-    LocalToWorldCoordinatesBoundingBox(boundingBox, window.GetSize(), mImpl->mBoundingBox);
+    LocalToWorldCoordinatesBoundingBox(boundingBox, Vector2(window.GetPositionSize().width, window.GetPositionSize().height), mImpl->mBoundingBox);
     mImpl->mBoundingBoxDirty = false;
   }
   else

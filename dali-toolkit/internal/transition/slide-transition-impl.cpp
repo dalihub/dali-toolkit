@@ -101,7 +101,8 @@ void SlideTransition::OnPlay()
   Vector3 size = targetControl[Dali::Actor::Property::SIZE];
   size *= currentScale;
 
-  Vector2 windowSize = DevelWindow::Get(targetControl).GetSize();
+  PositionSize positionSize = DevelWindow::Get(targetControl).GetPositionSize();
+  Vector2      windowSize(positionSize.width, positionSize.height);
   // This checkPosition go outside of window(by following the direction), this targetControl will be out of window.
   Vector2 checkPosition = windowSize / 2.0f +
                           Vector2(currentPosition.x + ((mDirection.x < 0.0f) ? size.x / 2.0f : -size.x / 2.0f),

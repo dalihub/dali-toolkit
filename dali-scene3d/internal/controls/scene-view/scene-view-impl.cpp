@@ -1205,7 +1205,7 @@ void SceneView::OnSceneConnection(int depth)
   if(window)
   {
     // Only for on-screen window
-    window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+    window.ResizedSignal().Connect(this, &SceneView::OnWindowResized);
 
     mWindow            = window;
     mWindowOrientation = DevelWindow::GetPhysicalOrientation(window);
@@ -1244,7 +1244,7 @@ void SceneView::OnSceneDisconnection()
   Window window = mWindow.GetHandle();
   if(window)
   {
-    window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+    window.ResizedSignal().Disconnect(this, &SceneView::OnWindowResized);
   }
   mWindow.Reset();
 

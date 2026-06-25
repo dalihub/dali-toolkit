@@ -46,8 +46,8 @@ class Window;
 } // namespace Internal
 
 class Window;
-typedef Signal<void(Window, bool)>      FocusChangeSignalType;
-typedef Signal<void(Window, Int32Pair)> ResizeSignalType;
+typedef Signal<void(Window, bool)>      FocusChangedSignalType;
+typedef Signal<void(Window, Int32Pair)> ResizedSignalType;
 
 class Window : public BaseHandle
 {
@@ -57,8 +57,8 @@ public:
 
   using KeyEventSignalType          = Signal<void(Window, KeyEvent)>;
   using TouchEventSignalType        = Signal<void(Window, TouchEvent)>;
-  using ResizeSignalType            = Signal<void(Window, WindowSize)>;
   using WheelEventSignalType        = Signal<void(Window, WheelEvent)>;
+  using ResizedSignalType           = Signal<void(Window, WindowSize)>;
   using VisibilityChangedSignalType = Signal<void(Window, bool)>;
 
   static Window New(PositionSize windowPosition, const Dali::String& name, bool isTransparent = false);
@@ -72,6 +72,9 @@ public:
   Window&       operator=(Window&& rhs);
   static Window DownCast(BaseHandle handle);
 
+  void         SetPositionSize(PositionSize positionSize);
+  PositionSize GetPositionSize() const;
+
   Dali::Integration::Scene                   GetScene();
   Dali::Integration::RenderSurfaceInterface& GetRenderSurface();
   void                                       Add(Dali::Actor actor);
@@ -84,10 +87,10 @@ public:
   void                                       Show();
   void                                       Hide();
   bool                                       IsVisible() const;
-  FocusChangeSignalType&                     FocusChangeSignal();
+  FocusChangedSignalType&                    FocusChangedSignal();
+  ResizedSignalType&                         ResizedSignal();
   KeyEventSignalType&                        KeyEventSignal();
-  TouchEventSignalType&                      TouchedSignal();
-  ResizeSignalType&                          ResizeSignal();
+  TouchEventSignalType&                      TouchEventSignal();
   WheelEventSignalType&                      WheelEventSignal();
   VisibilityChangedSignalType&               VisibilityChangedSignal();
 
@@ -108,7 +111,6 @@ typedef Signal<bool(Window, KeyEvent)>   KeyEventGeneratedSignalType;
 typedef Signal<bool(Window, WheelEvent)> WheelEventGeneratedSignalType;
 
 Dali::Window Get(Actor actor);
-void         SetPositionSize(Window window, PositionSize positionSize);
 int          GetPhysicalOrientation(Window window);
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window);

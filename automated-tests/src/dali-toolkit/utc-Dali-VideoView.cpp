@@ -902,7 +902,7 @@ int UtcDaliVideoViewSynchronizationForWindowRotation(void)
 
   view.Play();
 
-  DevelWindow::SetPositionSize(window, PositionSize(0, 0, 480, 240));
+  window.SetPositionSize(PositionSize(0, 0, 480, 240));
 
   application.SendNotification();
   application.Render();

@@ -167,9 +167,9 @@ Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEve
   return mSceneHolderKeyEventGeneratedSignal;
 }
 
-Dali::Integration::SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
+Dali::Integration::SceneHolder::TouchEventSignalType& SceneHolder::TouchEventSignal()
 {
-  return mSceneHolderTouchedSignal;
+  return mSceneHolderTouchEventSignal;
 }
 
 Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
@@ -197,7 +197,7 @@ bool SceneHolder::OnSceneKeyEventGenerated(Dali::KeyEvent event)
 void SceneHolder::OnSceneTouchEvent(Dali::TouchEvent event)
 {
   Dali::Integration::SceneHolder handle(this);
-  mSceneHolderTouchedSignal.Emit(handle, event);
+  mSceneHolderTouchEventSignal.Emit(handle, event);
 }
 
 void SceneHolder::OnSceneWheelEvent(Dali::WheelEvent event)
@@ -350,9 +350,9 @@ SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
   return GetImplementation(*this).KeyEventGeneratedSignal();
 }
 
-SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
+SceneHolder::TouchEventSignalType& SceneHolder::TouchEventSignal()
 {
-  return GetImplementation(*this).TouchedSignal();
+  return GetImplementation(*this).TouchEventSignal();
 }
 
 SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()

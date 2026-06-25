@@ -1095,7 +1095,7 @@ void TextField::OnSceneConnect(Dali::Actor actor)
 }
 
 Dali::Integration::InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(
-  Dali::InputMethodContext inputMethodContext,
+  Dali::InputMethodContext                                inputMethodContext,
   const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
@@ -1186,8 +1186,8 @@ void TextField::OnSceneConnection(int depth)
     mDecorator->GetBoundingBox(boundingBox);
     if(boundingBox.IsEmpty())
     {
-      Dali::Window::WindowSize windowSize = window.GetSize();
-      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(windowSize.GetWidth()), static_cast<int32_t>(windowSize.GetHeight())));
+      Dali::PositionSize posSize = window.GetPositionSize();
+      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(posSize.width), static_cast<int32_t>(posSize.height)));
     }
   }
 }

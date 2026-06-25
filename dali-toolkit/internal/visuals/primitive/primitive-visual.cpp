@@ -322,8 +322,8 @@ void PrimitiveVisual::DoSetOnScene(Actor& actor)
   Window window = DevelWindow::Get(actor);
   if(window)
   {
-    auto    winSize = window.GetSize();
-    Vector2 windowSize(static_cast<float>(winSize.GetWidth()), static_cast<float>(winSize.GetHeight()));
+    auto    posSize = window.GetPositionSize();
+    Vector2 windowSize(static_cast<float>(posSize.width), static_cast<float>(posSize.height));
     UpdateShaderUniforms(windowSize);
   }
 

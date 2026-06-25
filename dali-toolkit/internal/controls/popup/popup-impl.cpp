@@ -1593,7 +1593,8 @@ void Popup::OnSceneConnection(int depth)
   Dali::Window window = DevelWindow::Get(Self());
   if(window)
   {
-    Vector2 windowSize(window.GetSize().GetWidth(), window.GetSize().GetHeight());
+    auto    positionSize = window.GetPositionSize();
+    Vector2 windowSize(positionSize.width, positionSize.height);
 
     // Backing must cover the full window.
     mBacking.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1641,12 +1642,12 @@ void Popup::LayoutContext(const Vector2& size)
 
   // Setup with some pre-calculations for speed.
   // LayoutContext is called from OnRelayout, so the window is guaranteed to be available.
-  Dali::Window::WindowSize windowSize = DevelWindow::Get(Self()).GetSize();
-  Vector3                  halfWindowSize(windowSize.GetWidth() / 2.0f, windowSize.GetHeight() / 2.0f, 0.0f);
-  Vector3                  parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
-  Vector2                  halfSize(size / 2.0f);
-  Vector2                  halfParentSize(parent.GetRelayoutSize(Dimension::WIDTH) / 2.0f, parent.GetRelayoutSize(Dimension::HEIGHT) / 2.0f);
-  Vector3                  newPosition(Vector3::ZERO);
+  auto    windowSize = DevelWindow::Get(Self()).GetPositionSize();
+  Vector3 halfWindowSize(windowSize.width / 2.0f, windowSize.height / 2.0f, 0.0f);
+  Vector3 parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
+  Vector2 halfSize(size / 2.0f);
+  Vector2 halfParentSize(parent.GetRelayoutSize(Dimension::WIDTH) / 2.0f, parent.GetRelayoutSize(Dimension::HEIGHT) / 2.0f);
+  Vector3 newPosition(Vector3::ZERO);
 
   // Perform different positioning based on the specified contextual layout mode.
   switch(mContextualMode)

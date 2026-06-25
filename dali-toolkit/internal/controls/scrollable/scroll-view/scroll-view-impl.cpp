@@ -456,11 +456,11 @@ void SnapWithVelocity(
     // v = 0 (Final Velocity)
     // t = Time (Velocity / Deceleration)
     // SnapWithVelocity is called during gesture handling, so the window is guaranteed to be available.
-    Dali::Window::WindowSize ws          = DevelWindow::Get(scrollView.Self()).GetSize();
-    float                    stageLength = Vector3(ws.GetWidth(), ws.GetHeight(), 0.0f).Length();
-    float                    a           = (stageLength * scrollView.GetFrictionCoefficient());
-    Vector3                  u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
-    float                    speed       = u.Length();
+    Dali::PositionSize ws          = DevelWindow::Get(scrollView.Self()).GetPositionSize();
+    float              stageLength = Vector3(ws.width, ws.height, 0.0f).Length();
+    float              a           = (stageLength * scrollView.GetFrictionCoefficient());
+    Vector3            u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
+    float              speed       = u.Length();
     u /= speed;
 
     // TODO: Change this to a decay function. (faster you flick, the slower it should be)

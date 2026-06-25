@@ -175,14 +175,14 @@ void KeyboardFocusManager::OnAdaptorInit()
     for(auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter)
     {
       (*iter).KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-      (*iter).TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
+      (*iter).TouchEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
       (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
       (*iter).WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
       (*iter).FocusChangedGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneHolderFocusChanged);
       Window window = Window::DownCast(*iter);
       if(window)
       {
-        window.FocusChangeSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
+        window.FocusChangedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
       }
     }
 
@@ -194,14 +194,14 @@ void KeyboardFocusManager::OnAdaptorInit()
 void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder sceneHolder)
 {
   sceneHolder.KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-  sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
+  sceneHolder.TouchEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
   sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnCustomWheelEvent);
   sceneHolder.WheelEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
   sceneHolder.FocusChangedGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneHolderFocusChanged);
   Window window = Window::DownCast(sceneHolder);
   if(window)
   {
-    window.FocusChangeSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
+    window.FocusChangedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
   }
 }
 

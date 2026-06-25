@@ -601,8 +601,8 @@ void Tooltip::OnRelayout(Actor actor)
     {
       return;
     }
-    auto    winSize = window.GetSize();
-    Vector2 windowSize(static_cast<float>(winSize.GetWidth()), static_cast<float>(winSize.GetHeight()));
+    auto    winSize = window.GetPositionSize();
+    Vector2 windowSize(static_cast<float>(winSize.width), static_cast<float>(winSize.height));
     Vector3 position;
 
     switch(mPositionType)
