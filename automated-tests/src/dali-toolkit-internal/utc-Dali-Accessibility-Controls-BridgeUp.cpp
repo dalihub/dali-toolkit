@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/devel-api/property-bridge/property-bridge.h>
@@ -708,6 +709,15 @@ int UtcDaliControlAccessibilityModal(void)
   ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC(true, application.GetScene());
+
+  // Modal state is set by Dialog role
+  {
+    auto control    = Dali::Toolkit::Popup::New();
+    auto accessible = Dali::Accessibility::Accessible::Get(control);
+
+    auto states_by_bridge = Dali::Accessibility::States{TestGetStates(accessible->GetAddress())};
+    DALI_TEST_CHECK(states_by_bridge[Dali::Accessibility::State::MODAL]);
+  }
 
   // Modal state is set by isModal property
   {
