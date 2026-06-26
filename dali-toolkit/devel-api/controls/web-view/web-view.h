@@ -911,6 +911,41 @@ public:
    */
   void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
 
+  /**
+   * @brief Register PlaybackVideoReady callback.
+   *
+   * @param[in] callback The callback to be called when playback video is ready.
+   */
+  void RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback);
+
+  /**
+   * @brief Register PlaybackVideoStarted callback.
+   *
+   * @param[in] callback The callback to be called when playback video is started.
+   */
+  void RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback);
+
+  /**
+   * @brief Register PlaybackVideoFinished callback.
+   *
+   * @param[in] callback The callback to be called when playback video is finished.
+   */
+  void RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback);
+
+  /**
+   * @brief Register PlaybackVideoStopped callback.
+   *
+   * @param[in] callback The callback to be called when playback video is stopped.
+   */
+  void RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback);
+
+  /**
+   * @brief Register PlaybackVideoPaused callback.
+   *
+   * @param[in] callback The callback to be called when playback video is paused.
+   */
+  void RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback);
+
 public: // Not intended for application developers
   /// @cond internal
   /**

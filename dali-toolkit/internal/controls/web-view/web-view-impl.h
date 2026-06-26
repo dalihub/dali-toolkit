@@ -513,6 +513,31 @@ public:
   void RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDeviceListGetCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterPlaybackVideoReadyCallback()
+   */
+  void RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterPlaybackVideoStartedCallback()
+   */
+  void RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterPlaybackVideoFinishedCallback()
+   */
+  void RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterPlaybackVideoStoppedCallback()
+   */
+  void RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterPlaybackVideoPausedCallback()
+   */
+  void RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::FeedMouseWheel()
    */
   void FeedMouseWheel(bool yDirection, int step, int x, int y);

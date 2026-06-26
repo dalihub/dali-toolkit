@@ -1574,6 +1574,26 @@ public:
   {
   }
 
+  void RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback) override
+  {
+  }
+
+  void RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback) override
+  {
+  }
+
+  void RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback) override
+  {
+  }
+
+  void RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback) override
+  {
+  }
+
+  void RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback) override
+  {
+  }
+
   void FeedMouseWheel(bool yDirection, int step, int x, int y) override
   {
   }
@@ -2168,6 +2188,31 @@ public:
   {
   }
 
+  void RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback)
+  {
+    mPlaybackVideoReadyCallback = callback;
+  }
+
+  void RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback)
+  {
+    mPlaybackVideoStartedCallback = callback;
+  }
+
+  void RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback)
+  {
+    mPlaybackVideoFinishedCallback = callback;
+  }
+
+  void RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback)
+  {
+    mPlaybackVideoStoppedCallback = callback;
+  }
+
+  void RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback)
+  {
+    mPlaybackVideoPausedCallback = callback;
+  }
+
   void FeedMouseWheel(bool yDirection, int step, int x, int y)
   {
   }
@@ -2232,6 +2277,11 @@ public:
   Dali::WebEnginePlugin::WebEngineFileChooserRequestedCallback       mFileChooserRequestedCallback;
   Dali::WebEnginePlugin::WebEngineWebProcessCrashedCallback          mWebProcessCrashedCallback;
   Dali::WebEnginePlugin::WebEngineUserMediaPermissionRequestCallback mUserMediaPermissionRequestCallback;
+  Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback         mPlaybackVideoReadyCallback;
+  Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback       mPlaybackVideoStartedCallback;
+  Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback      mPlaybackVideoFinishedCallback;
+  Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback       mPlaybackVideoStoppedCallback;
+  Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback        mPlaybackVideoPausedCallback;
 };
 
 namespace
@@ -2383,6 +2433,26 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEngineUserMediaPermissionRequest> request(new MockUserMediaPermissionRequest());
       gInstance->mUserMediaPermissionRequestCallback(request.get(), "message");
+    }
+    if(gInstance->mPlaybackVideoReadyCallback)
+    {
+      gInstance->mPlaybackVideoReadyCallback();
+    }
+    if(gInstance->mPlaybackVideoStartedCallback)
+    {
+      gInstance->mPlaybackVideoStartedCallback();
+    }
+    if(gInstance->mPlaybackVideoFinishedCallback)
+    {
+      gInstance->mPlaybackVideoFinishedCallback();
+    }
+    if(gInstance->mPlaybackVideoStoppedCallback)
+    {
+      gInstance->mPlaybackVideoStoppedCallback();
+    }
+    if(gInstance->mPlaybackVideoPausedCallback)
+    {
+      gInstance->mPlaybackVideoPausedCallback();
     }
   }
   return false;
@@ -3234,6 +3304,31 @@ void WebEngine::FeedMouseWheel(bool yDirection, int step, int x, int y)
 void WebEngine::SetVideoHole(bool enabled, bool isWaylandWindow)
 {
   Internal::Adaptor::GetImplementation(*this).SetVideoHole(enabled, isWaylandWindow);
+}
+
+void WebEngine::RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoReadyCallback(callback);
+}
+
+void WebEngine::RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoStartedCallback(callback);
+}
+
+void WebEngine::RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoFinishedCallback(callback);
+}
+
+void WebEngine::RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoStoppedCallback(callback);
+}
+
+void WebEngine::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoPausedCallback(callback);
 }
 
 } // namespace Dali

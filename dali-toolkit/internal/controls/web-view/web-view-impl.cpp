@@ -1055,6 +1055,46 @@ void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDevi
   }
 }
 
+void WebView::RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterPlaybackVideoReadyCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterPlaybackVideoStartedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterPlaybackVideoFinishedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterPlaybackVideoStoppedCallback(std::move(callback));
+  }
+}
+
+void WebView::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterPlaybackVideoPausedCallback(std::move(callback));
+  }
+}
+
 void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
 {
   if(mWebEngine)
