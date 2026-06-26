@@ -121,6 +121,11 @@ static int                                                                gFileC
 static std::unique_ptr<Dali::WebEngineFileChooserRequest>                 gFileChooserRequestInstance             = nullptr;
 static int                                                                gWebProcessCrashedCalled                = 0;
 static int                                                                gUserMediaPermissionRequestCalled       = 0;
+static int                                                                gPlaybackVideoReadyCalled               = 0;
+static int                                                                gPlaybackVideoStartedCalled             = 0;
+static int                                                                gPlaybackVideoFinishedCalled            = 0;
+static int                                                                gPlaybackVideoStoppedCalled             = 0;
+static int                                                                gPlaybackVideoPausedCalled              = 0;
 
 struct CallbackFunctor
 {
@@ -402,6 +407,31 @@ static void OnDeviceConnectionChanged(int32_t)
 // using WebEngineDeviceListGetCallback = std::function<void(Dali::WebEngineDeviceListGet*, int32_t)>;
 static void OnDeviceListGetCallback(Dali::WebEngineDeviceListGet*, int32_t)
 {
+}
+
+static void OnPlaybackVideoReady()
+{
+  gPlaybackVideoReadyCalled++;
+}
+
+static void OnPlaybackVideoStarted()
+{
+  gPlaybackVideoStartedCalled++;
+}
+
+static void OnPlaybackVideoFinished()
+{
+  gPlaybackVideoFinishedCalled++;
+}
+
+static void OnPlaybackVideoStopped()
+{
+  gPlaybackVideoStoppedCalled++;
+}
+
+static void OnPlaybackVideoPaused()
+{
+  gPlaybackVideoPausedCalled++;
 }
 
 } // namespace
@@ -2854,5 +2884,85 @@ int UtcDaliWebViewWebAuthenticationCancel(void)
     tet_result(TET_FAIL);
   }
 
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterPlaybackVideoReadyCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterPlaybackVideoReadyCallback(&OnPlaybackVideoReady);
+  DALI_TEST_EQUALS(gPlaybackVideoReadyCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlaybackVideoReadyCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterPlaybackVideoStartedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterPlaybackVideoStartedCallback(&OnPlaybackVideoStarted);
+  DALI_TEST_EQUALS(gPlaybackVideoStartedCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlaybackVideoStartedCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterPlaybackVideoFinishedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterPlaybackVideoFinishedCallback(&OnPlaybackVideoFinished);
+  DALI_TEST_EQUALS(gPlaybackVideoFinishedCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlaybackVideoFinishedCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterPlaybackVideoStoppedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterPlaybackVideoStoppedCallback(&OnPlaybackVideoStopped);
+  DALI_TEST_EQUALS(gPlaybackVideoStoppedCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlaybackVideoStoppedCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewRegisterPlaybackVideoPausedCallback(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.RegisterPlaybackVideoPausedCallback(&OnPlaybackVideoPaused);
+  DALI_TEST_EQUALS(gPlaybackVideoPausedCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlaybackVideoPausedCalled, 1, TEST_LOCATION);
   END_TEST;
 }
