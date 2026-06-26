@@ -471,6 +471,7 @@ const PropertyRegistration Control::PROPERTY_4(typeRegistration,  "keyInputFocus
 const PropertyRegistration Control::PROPERTY_5(typeRegistration,  "background",                       Toolkit::Control::Property::BACKGROUND,                                Property::MAP,     &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_6(typeRegistration,  "margin",                           Toolkit::Control::Property::MARGIN,                                    Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_7(typeRegistration,  "padding",                          Toolkit::Control::Property::PADDING,                                   Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_8(typeRegistration,  "tooltip",                          Toolkit::DevelControl::Property::TOOLTIP,                              Property::MAP,     &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_9(typeRegistration,  "state",                            Toolkit::DevelControl::Property::STATE,                                Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_10(typeRegistration, "subState",                         Toolkit::DevelControl::Property::SUB_STATE,                            Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_11(typeRegistration, "leftFocusableActorId",             Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID,              Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
@@ -526,6 +527,7 @@ Control::Control(ControlImpl& controlImpl)
   mFocusableIdList(nullptr),
   mGestureDetectorContext(nullptr),
   mOffScreenRenderingContext(nullptr),
+  mTooltip(NULL),
   mInputMethodContext(),
   mIdleCallback(nullptr),
   mFlags(ControlBehaviour(ControlImpl::CONTROL_BEHAVIOUR_DEFAULT)),
@@ -1016,6 +1018,17 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
         break;
       }
 
+      case Toolkit::DevelControl::Property::TOOLTIP:
+      {
+        Internal::TooltipPtr& tooltipPtr = controlImpl.mInternal->mTooltip;
+        if(!tooltipPtr)
+        {
+          tooltipPtr = Internal::Tooltip::New(control);
+        }
+        tooltipPtr->SetProperties(value);
+        break;
+      }
+
       case Toolkit::DevelControl::Property::SHADOW:
       {
         const Property::Map* map = value.GetMap();
@@ -1425,6 +1438,17 @@ Property::Value Control::GetProperty(BaseObject* object, Property::Index index)
       case Toolkit::Control::Property::PADDING:
       {
         value = controlImpl.mInternal->GetPadding();
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::TOOLTIP:
+      {
+        Property::Map map;
+        if(controlImpl.mInternal->mTooltip)
+        {
+          controlImpl.mInternal->mTooltip->CreatePropertyMap(map);
+        }
+        value = map;
         break;
       }
 
