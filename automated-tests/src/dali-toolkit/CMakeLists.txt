@@ -14,6 +14,7 @@ SET(TC_SOURCES
   utc-Dali-Builder.cpp
   utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
+  utc-Dali-ConfirmationPopup.cpp
   utc-Dali-FadeTransition.cpp
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
@@ -63,6 +64,7 @@ SET(TC_SOURCES
   utc-Dali-ItemLayout.cpp
   utc-Dali-ItemView.cpp
   utc-Dali-KeyboardFocusManager.cpp
+  utc-Dali-Popup.cpp
   utc-Dali-PushButton.cpp
   utc-Dali-RadioButton.cpp
   utc-Dali-ToggleButton.cpp

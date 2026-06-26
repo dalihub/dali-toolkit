@@ -360,6 +360,7 @@ int UtcDaliAccessibilityToggleButtonStates(void)
   END_TEST;
 }
 
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 int UtcDaliAccessibilityTextSelectionPopupConstructor(void)
@@ -372,6 +373,33 @@ int UtcDaliAccessibilityTextSelectionPopupConstructor(void)
   auto accessible = Dali::Accessibility::Accessible::Get(textselectionpopup);
   DALI_TEST_CHECK(accessible);
   DALI_TEST_EQUALS(accessible->GetRole(), Accessibility::Role::DIALOG, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityPopupGetNameRaw(void)
+{
+  ToolkitTestApplication application;
+
+  auto popup = Popup::New();
+  DALI_TEST_CHECK(popup);
+
+  auto accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(popup));
+  DALI_TEST_CHECK(accessible);
+
+  // Test default GetNameRaw behavior - Popup does NOT allow empty names
+  auto nameRaw = accessible->GetNameRaw();
+  DALI_TEST_EQUALS(nameRaw.first, "", TEST_LOCATION);
+  DALI_TEST_EQUALS(nameRaw.second, false, TEST_LOCATION);
+
+  // Test GetName behavior with default GetNameRaw
+  // Since GetNameRaw returns ("", false), GetName should fall back to Actor::Property::NAME
+  popup.SetProperty(Actor::Property::NAME, "test-actor-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "test-actor-name", TEST_LOCATION);
+
+  // Test with AccessibilityName property set - this should override GetNameRaw
+  popup.SetProperty(DevelControl::Property::ACCESSIBILITY_NAME, "custom-accessibility-name");
+  DALI_TEST_EQUALS(accessible->GetName(), "custom-accessibility-name", TEST_LOCATION);
 
   END_TEST;
 }
