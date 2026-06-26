@@ -76,6 +76,11 @@ class ToggleButton;
  *                       .Add( propertyMap2 )
  *                       .Add( propertyMap3 ));
  *
+ * button.SetProperty( Toolkit::ToggleButton::Property::TOOLTIPS, Property::Array()
+ *                       .Add( "STATE A" )
+ *                       .Add( "STATE B" )
+ *                       .Add( "STATE C" ));
+ *
  *   application.Add( button );
  *
  *   // Connect to button signals emitted by the button
@@ -119,6 +124,15 @@ public:
        * @note Mandatory
        */
       STATE_VISUALS = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The tooltips of toggle button.
+       * @details Name "tooltips",  type Property::Array.
+       * It's an array of toggle state tooltip strings.
+       * Each tooltip string should match a toggle state strictly.
+       * @note Mandatory
+       */
+      TOOLTIPS,
 
       /**
        * @brief The current state index of toggle button.
