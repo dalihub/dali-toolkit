@@ -19,72 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/accessibility-highlight-overlay.h>
+#include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali::Toolkit::DevelControl
 {
-/**
- * @brief Represents current state of a control.
- */
-enum class AccessibilityState : uint32_t
-{
-  ENABLED = 0,
-  SELECTED,
-  CHECKED,
-  BUSY,
-  EXPANDED,
-  MAX_COUNT
-};
-using AccessibilityStates = Accessibility::EnumBitSet<AccessibilityState, AccessibilityState::MAX_COUNT>;
-
-constexpr const uint32_t ROLE_START_INDEX = 200;
-/**
- * @brief AccessibilityRole represents the purpose of a control.
- */
-enum class AccessibilityRole : uint32_t
-{
-  ADJUSTABLE = ROLE_START_INDEX,
-  ALERT,
-  BUTTON,
-  CHECK_BOX,
-  COMBO_BOX,
-  CONTAINER,
-  DIALOG,
-  ENTRY,
-  HEADER,
-  IMAGE,
-  LINK,
-  LIST,
-  LIST_ITEM,
-  MENU,
-  MENU_BAR,
-  MENU_ITEM,
-  NONE,
-  NOTIFICATION,
-  PASSWORD_TEXT,
-  POPUP_MENU,
-  PROGRESS_BAR,
-  RADIO_BUTTON,
-  SCROLL_BAR,
-  SPIN_BUTTON,
-  TAB,
-  TAB_LIST,
-  TEXT,
-  TOGGLE_BUTTON,
-  TOOL_BAR,
-  SCENE_3D,
-  MODEL,
-  MAX_COUNT
-};
-
 /**
  * @brief Represents the Accessible object for Dali::Toolkit::Control and derived classes
  *
@@ -168,7 +114,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetRole()
    */
-  Dali::Accessibility::Role GetRole() const override;
+  Dali::Integration::Accessibility::Role GetRole() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetLocalizedRoleName()
@@ -178,12 +124,12 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
-  Dali::Accessibility::States GetStates() override;
+  Dali::Integration::Accessibility::States GetStates() override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetAttributes()
    */
-  Dali::Accessibility::Attributes GetAttributes() const override;
+  Dali::Devel::Accessibility::Attributes GetAttributes() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::InitDefaultFeatures()
@@ -248,12 +194,12 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::DoGesture()
    */
-  bool DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo) override;
+  bool DoGesture(const Dali::Devel::Accessibility::GestureInfo& gestureInfo) override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetRelationSet()
    */
-  std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
+  std::vector<Dali::Devel::Accessibility::Relation> GetRelationSet() override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStringProperty()
@@ -285,7 +231,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
-  virtual Dali::Accessibility::States CalculateStates();
+  virtual Dali::Integration::Accessibility::States CalculateStates();
 
   /**
    * @brief Makes sure that a given child (descendant) of this container (e.g. ItemView) is visible
@@ -318,7 +264,7 @@ public:
   /**
    * @brief Handles AcessibilityState property change; Only called when the control is highlighted.
    */
-  void OnStatePropertySet(AccessibilityStates newStates);
+  void OnStatePropertySet(uint32_t newStates);
 
   /**
    * @brief Returns true if given actor is considered as modal by propeties set.
@@ -334,13 +280,13 @@ private:
   /**
    * @brief Appliys relavant accessibility properties to AT-SPI states.
    */
-  void ApplyAccessibilityProps(Dali::Accessibility::States& states);
+  void ApplyAccessibilityProps(Dali::Integration::Accessibility::States& states);
 
 private:
   /**
    * @brief Grabs snapshot of previous state when the control is highlighted.
    */
-  AccessibilityStates           mStatesSnapshot;
+  uint32_t           mStatesSnapshot;
   AccessibilityHighlightOverlay mHighlightOverlay;
 };
 

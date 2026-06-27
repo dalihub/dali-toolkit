@@ -63,6 +63,7 @@ SET( public_api_header_files
 )
 
 SET( public_api_controls_header_files
+  ${public_api_src_dir}/controls/control-accessibility-types.h
   ${public_api_src_dir}/controls/control-impl.h
   ${public_api_src_dir}/controls/control.h
 )

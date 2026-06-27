@@ -146,6 +146,34 @@ Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Dali::Property:
   return internalControl.GetVisualResourceStatus(index);
 }
 
+void Control::AddAccessibilityState(Accessibility::State state)
+{
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  internalControl.AddAccessibilityState(state);
+}
+
+void Control::RemoveAccessibilityState(Accessibility::State state)
+{
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  internalControl.RemoveAccessibilityState(state);
+}
+
+void Control::ClearAccessibilityStates()
+{
+  ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  internalControl.ClearAccessibilityStates();
+}
+
+bool Control::HasAccessibilityState(Accessibility::State state) const
+{
+  const ControlImpl&       controlImpl     = Toolkit::GetImplementation(*this);
+  const Internal::Control& internalControl = Internal::Control::Get(controlImpl);
+  return internalControl.HasAccessibilityState(state);
+}
+
 Control::KeyEventSignalType& Control::KeyEventSignal()
 {
   return Toolkit::GetImplementation(*this).KeyEventSignal();

@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -553,7 +554,7 @@ protected:
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
      */
-    Dali::Accessibility::States CalculateStates() override;
+    Dali::Integration::Accessibility::States CalculateStates() override;
 
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()

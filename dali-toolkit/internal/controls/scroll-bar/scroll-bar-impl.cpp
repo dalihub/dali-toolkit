@@ -218,7 +218,7 @@ void ScrollBar::OnInitialize()
   CreateDefaultIndicatorActor();
   self.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_BAR);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::SCROLL_BAR);
 }
 
 DevelControl::ControlAccessible* ScrollBar::CreateAccessibleObject()
@@ -370,7 +370,7 @@ void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification source)
     auto accessible = GetAccessibleObject();
     if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+      accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::VALUE);
     }
   }
 }

@@ -98,7 +98,7 @@ bool Scrollable::ScrollableAccessible::IsScrollable() const
 
 void Scrollable::OnInitialize()
 {
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::SCROLL_PANE);
 }
 
 DevelControl::ControlAccessible* Scrollable::CreateAccessibleObject()

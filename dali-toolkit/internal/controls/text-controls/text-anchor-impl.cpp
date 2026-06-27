@@ -152,7 +152,7 @@ void TextAnchor::OnInitialize()
   Actor self = Self();
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::LINK);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::LINK);
 }
 
 DevelControl::ControlAccessible* TextAnchor::CreateAccessibleObject()

@@ -20,12 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
@@ -41,6 +42,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
@@ -84,6 +86,11 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CONTROL_DATA");
 #endif
+
+uint32_t ControlAccessibilityStateToMask(Toolkit::Accessibility::State state)
+{
+  return 1u << static_cast<uint32_t>(state);
+}
 
 /**
  * Performs actions as requested using the action name.
@@ -214,7 +221,7 @@ static void InnerShadowCornerRadiusConstraint(Vector4& current, const PropertyIn
 
 bool PerformAccessibilityAction(Toolkit::Control control, const std::string& actionName, const Property::Map& attributes)
 {
-  using Dali::Accessibility::ActionType;
+  using Dali::Devel::Accessibility::ActionType;
   DALI_ASSERT_DEBUG(control);
   DALI_ASSERT_DEBUG(!DevelControl::AccessibilityActionSignal(control).Empty());
 
@@ -492,7 +499,6 @@ const PropertyRegistration Control::PROPERTY_25(typeRegistration, "counterClockw
 const PropertyRegistration Control::PROPERTY_26(typeRegistration, "automationId",                     Toolkit::DevelControl::Property::AUTOMATION_ID,                        Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_27(typeRegistration, "accessibilityValue",               Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE,                  Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_28(typeRegistration, "accessibilityScrollable",          Toolkit::DevelControl::Property::ACCESSIBILITY_SCROLLABLE,             Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
-const PropertyRegistration Control::PROPERTY_29(typeRegistration, "accessibilityStates",              Toolkit::DevelControl::Property::ACCESSIBILITY_STATES,                 Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_30(typeRegistration, "accessibilityIsModal",             Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL,               Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_31(typeRegistration, "offScreenRendering",               Toolkit::DevelControl::Property::OFFSCREEN_RENDERING,                  Property::INTEGER, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_32(typeRegistration, "innerShadow",                      Toolkit::DevelControl::Property::INNER_SHADOW,                         Property::MAP,     &Control::SetProperty, &Control::GetProperty);
@@ -531,7 +537,7 @@ Control::Control(ControlImpl& controlImpl)
   mInputMethodContext(),
   mIdleCallback(nullptr),
   mFlags(ControlBehaviour(ControlImpl::CONTROL_BEHAVIOUR_DEFAULT)),
-  mAccessibilityRole{static_cast<int32_t>(DevelControl::AccessibilityRole::NONE)},
+  mAccessibilityRole{static_cast<int32_t>(Accessibility::Role::NONE)},
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
@@ -1195,19 +1201,6 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
         break;
       }
 
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
-      {
-        int32_t states;
-        if(value.Get(states))
-        {
-          if(DALI_LIKELY(controlImpl.mInternal->GetAccessibilityData()) || states != static_cast<int32_t>(AccessibilityData::GetDefaultControlAccessibilityStates().GetRawData32()))
-          {
-            controlImpl.mInternal->GetOrCreateAccessibilityData().mAccessibilityProps.states = Toolkit::DevelControl::AccessibilityStates{static_cast<uint32_t>(states)};
-          }
-        }
-        break;
-      }
-
       case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
       {
         bool isModal;
@@ -1549,13 +1542,6 @@ Property::Value Control::GetProperty(BaseObject* object, Property::Index index)
         break;
       }
 
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_STATES:
-      {
-        const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
-        value                         = static_cast<int32_t>((DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.states : AccessibilityData::GetDefaultControlAccessibilityStates()).GetRawData32());
-        break;
-      }
-
       case Toolkit::DevelControl::Property::ACCESSIBILITY_IS_MODAL:
       {
         const auto* accessibilityData = controlImpl.mInternal->GetAccessibilityData();
@@ -1767,6 +1753,47 @@ Control::AccessibilityData* Control::GetAccessibilityData() const
   return mAccessibilityData.get();
 }
 
+void Control::SetAccessibilityStates(uint32_t states)
+{
+  const auto defaultStates = AccessibilityData::GetDefaultControlAccessibilityStates();
+  if(DALI_LIKELY(GetAccessibilityData()) || states != defaultStates)
+  {
+    GetOrCreateAccessibilityData().mAccessibilityProps.states = states;
+  }
+
+  auto accessible = GetAccessibleObject();
+  if(DALI_LIKELY(accessible))
+  {
+    accessible->OnStatePropertySet(states);
+  }
+}
+
+uint32_t Control::GetAccessibilityStates() const
+{
+  const auto* accessibilityData = GetAccessibilityData();
+  return DALI_LIKELY(accessibilityData) ? accessibilityData->mAccessibilityProps.states : AccessibilityData::GetDefaultControlAccessibilityStates();
+}
+
+void Control::AddAccessibilityState(Toolkit::Accessibility::State state)
+{
+  SetAccessibilityStates(GetAccessibilityStates() | ControlAccessibilityStateToMask(state));
+}
+
+void Control::RemoveAccessibilityState(Toolkit::Accessibility::State state)
+{
+  SetAccessibilityStates(GetAccessibilityStates() & ~ControlAccessibilityStateToMask(state));
+}
+
+void Control::ClearAccessibilityStates()
+{
+  SetAccessibilityStates(0u);
+}
+
+bool Control::HasAccessibilityState(Toolkit::Accessibility::State state) const
+{
+  return (GetAccessibilityStates() & ControlAccessibilityStateToMask(state)) != 0u;
+}
+
 void Control::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
   GetOrCreateAccessibilityData().AppendAccessibilityAttribute(key, value);
@@ -1790,12 +1817,12 @@ void Control::ClearAccessibilityAttributes()
   }
 }
 
-void Control::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
+void Control::SetAccessibilityReadingInfoType(const Dali::Integration::Accessibility::ReadingInfoTypes types)
 {
   GetOrCreateAccessibilityData().SetAccessibilityReadingInfoType(types);
 }
 
-Dali::Accessibility::ReadingInfoTypes Control::GetAccessibilityReadingInfoType() const
+Dali::Integration::Accessibility::ReadingInfoTypes Control::GetAccessibilityReadingInfoType() const
 {
   const auto* accessibilityData = GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData))
@@ -1811,7 +1838,7 @@ Dali::Accessibility::ReadingInfoTypes Control::GetAccessibilityReadingInfoType()
 
 bool Control::IsAccessibleCreated() const
 {
-  auto bridge = Accessibility::Bridge::GetCurrentBridge();
+  auto bridge = Integration::Accessibility::Bridge::GetCurrentBridge();
   return DALI_LIKELY(bridge) ? !!bridge->GetAccessible(mControlImpl.Self()) : false;
 }
 

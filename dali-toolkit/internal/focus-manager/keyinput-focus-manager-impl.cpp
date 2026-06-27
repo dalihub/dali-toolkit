@@ -24,6 +24,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/events/key-event.h>
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES

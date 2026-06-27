@@ -1323,7 +1323,7 @@ void SceneView::OnInitialize()
   self.Add(mRootLayer);
 
   Dali::Toolkit::DevelControl::AppendAccessibilityAttribute(Dali::Toolkit::Control::DownCast(self), "forceChildSearch", "1");
-  self.SetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Toolkit::DevelControl::AccessibilityRole::SCENE_3D);
+  self.SetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Toolkit::Accessibility::Role::SCENE_3D);
 
   mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

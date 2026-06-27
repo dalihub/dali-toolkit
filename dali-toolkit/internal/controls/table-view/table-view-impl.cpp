@@ -1127,7 +1127,7 @@ void TableView::OnInitialize()
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   SetAsKeyboardFocusGroup(true);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::TABLE);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::TABLE);
 }
 
 void TableView::ResizeContainers(unsigned int rows, unsigned int columns)

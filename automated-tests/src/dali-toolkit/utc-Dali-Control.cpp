@@ -2850,3 +2850,44 @@ int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
   // issues like memory leaks or invalid accesses during destruction.
   END_TEST;
 }
+
+int UtcDaliControlAccessibilityStateApi(void)
+{
+  ToolkitTestApplication application;
+  Control                control = Control::New();
+
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::ENABLED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  control.ClearAccessibilityStates();
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::ENABLED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
+  END_TEST;
+}
