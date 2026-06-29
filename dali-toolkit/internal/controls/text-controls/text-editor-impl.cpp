@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -28,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
 #include <cstring>
@@ -1344,7 +1344,7 @@ void TextEditor::OnSceneConnection(int depth)
   // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
   ControlImpl::OnSceneConnection(depth);
 
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(window)
   {
     // Sets layoutDirection value

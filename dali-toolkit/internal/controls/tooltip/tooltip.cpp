@@ -21,10 +21,10 @@
 // EXTERNAL INCLUDES
 #include <cmath>
 
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/events/hover-event.h>
 
 // INTERNAL INCLUDES
@@ -563,7 +563,7 @@ bool Tooltip::OnTimeout()
 
     mPopup.SetDisplayState(Toolkit::Popup::SHOWN);
 
-    Window window = DevelWindow::Get(control);
+    Window window = Window::Get(control);
     if(window)
     {
       window.Add(mPopup);
@@ -596,7 +596,7 @@ void Tooltip::OnRelayout(Actor actor)
     }
 
     // actor is the popup background which is on scene, so window should always be valid here.
-    Window window = DevelWindow::Get(actor);
+    Window window = Window::Get(actor);
     if(!window)
     {
       return;

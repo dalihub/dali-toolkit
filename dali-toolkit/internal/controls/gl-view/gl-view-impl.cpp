@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -214,7 +214,7 @@ void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible
   Actor self = Self();
   if(mRenderThread)
   {
-    auto window = DevelWindow::Get(self);
+    auto window = Window::Get(self);
     if(visible && window && window.IsVisible())
     {
       mRenderThread->Resume();

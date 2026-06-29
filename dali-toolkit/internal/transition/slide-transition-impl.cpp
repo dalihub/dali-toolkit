@@ -19,15 +19,17 @@
 #include <dali-toolkit/internal/transition/slide-transition-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <limits>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
@@ -101,7 +103,7 @@ void SlideTransition::OnPlay()
   Vector3 size = targetControl[Dali::Actor::Property::SIZE];
   size *= currentScale;
 
-  PositionSize positionSize = DevelWindow::Get(targetControl).GetPositionSize();
+  PositionSize positionSize = Window::Get(targetControl).GetPositionSize();
   Vector2      windowSize(positionSize.width, positionSize.height);
   // This checkPosition go outside of window(by following the direction), this targetControl will be out of window.
   Vector2 checkPosition = windowSize / 2.0f +

@@ -20,11 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -447,7 +447,7 @@ void GaussianBlurView::AllocateResources()
 
 void GaussianBlurView::CreateRenderTasks()
 {
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(!window)
   {
     return;
@@ -530,7 +530,7 @@ void GaussianBlurView::CreateRenderTasks()
 
 void GaussianBlurView::RemoveRenderTasks()
 {
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(!window)
   {
     return;
@@ -551,7 +551,7 @@ void GaussianBlurView::Activate()
     Self().Add(mInternalRoot);
     AllocateResources();
     mActivated = true;
-    if(DevelWindow::Get(Self()))
+    if(Window::Get(Self()))
     {
       CreateRenderTasks();
     }
@@ -576,7 +576,7 @@ void GaussianBlurView::Deactivate()
     mBlurResultFrameBuffer.Reset();
     mRenderTarget1.Reset();
     mRenderTarget2.Reset();
-    if(DevelWindow::Get(Self()))
+    if(Window::Get(Self()))
     {
       RemoveRenderTasks();
     }

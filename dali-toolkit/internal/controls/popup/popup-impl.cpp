@@ -21,13 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
@@ -1590,7 +1590,7 @@ void Popup::OnSceneConnection(int depth)
   mLayoutDirty = true;
 
   // Set backing and popup layout sizes based on the window size, now that the window is available.
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(window)
   {
     auto    positionSize = window.GetPositionSize();
@@ -1642,7 +1642,7 @@ void Popup::LayoutContext(const Vector2& size)
 
   // Setup with some pre-calculations for speed.
   // LayoutContext is called from OnRelayout, so the window is guaranteed to be available.
-  auto    windowSize = DevelWindow::Get(Self()).GetPositionSize();
+  auto    windowSize = Window::Get(Self()).GetPositionSize();
   Vector3 halfWindowSize(windowSize.width / 2.0f, windowSize.height / 2.0f, 0.0f);
   Vector3 parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
   Vector2 halfSize(size / 2.0f);

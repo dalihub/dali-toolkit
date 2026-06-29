@@ -23,9 +23,9 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <stdlib.h>
 #include <iostream>
 

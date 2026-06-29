@@ -30,11 +30,11 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/object/property-array-devel.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 #include <dlfcn.h>
 #include <algorithm>
@@ -1260,7 +1260,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
   auto control = Control::New();
   application.GetScene().GetRootLayer().Add(control);
 
-  auto window = Dali::DevelWindow::Get(control);
+  auto window = Dali::Window::Get(control);
   DALI_TEST_CHECK(window);
 
   //window.SetPosition({0,0});
@@ -1339,7 +1339,7 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
 
   auto control = Control::New();
   application.GetScene().GetRootLayer().Add(control);
-  auto window = Dali::DevelWindow::Get(control);
+  auto window = Dali::Window::Get(control);
   //window.SetPosition({33,33});
   window.SetPositionSize(PositionSize(33, 33, 480, 240));
 

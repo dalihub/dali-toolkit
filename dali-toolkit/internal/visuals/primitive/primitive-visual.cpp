@@ -19,22 +19,22 @@
 #include "primitive-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
-
-using Dali::Integration::ToDaliStringView;
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+
+using Dali::Integration::ToDaliStringView;
 
 namespace Dali
 {
@@ -319,7 +319,7 @@ void PrimitiveVisual::DoSetOnScene(Actor& actor)
 {
   actor.AddRenderer(mImpl->mRenderer);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = Window::Get(actor);
   if(window)
   {
     auto    posSize = window.GetPositionSize();

@@ -29,7 +29,6 @@
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 
 #include <chipmunk/chipmunk.h>

@@ -38,9 +38,9 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 using namespace Dali;
 using Dali::Integration::ToPropertyValue;
@@ -2415,7 +2415,7 @@ int UtcDaliAnimatedVectorImageVisualInheritedVisibilityChanged(void)
   DALI_TEST_CHECK(renderer);
   DALI_TEST_CHECK(renderer.GetProperty<int>(DevelRenderer::Property::RENDERING_BEHAVIOR) == DevelRenderer::Rendering::CONTINUOUSLY);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = Window::Get(actor);
   window.Hide();
 
   application.SendNotification();

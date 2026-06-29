@@ -71,6 +71,7 @@ public:
   Window(Window&& rhs);
   Window&       operator=(Window&& rhs);
   static Window DownCast(BaseHandle handle);
+  static Window Get(Actor actor);
 
   void         SetPositionSize(PositionSize positionSize);
   PositionSize GetPositionSize() const;
@@ -110,8 +111,7 @@ typedef Signal<void()>                   EventProcessingFinishedSignalType;
 typedef Signal<bool(Window, KeyEvent)>   KeyEventGeneratedSignalType;
 typedef Signal<bool(Window, WheelEvent)> WheelEventGeneratedSignalType;
 
-Dali::Window Get(Actor actor);
-int          GetPhysicalOrientation(Window window);
+int GetPhysicalOrientation(Window window);
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal(Window window);
 KeyEventGeneratedSignalType&       KeyEventGeneratedSignal(Dali::Window window);

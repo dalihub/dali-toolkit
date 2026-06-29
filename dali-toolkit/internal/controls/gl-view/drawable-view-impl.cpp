@@ -20,13 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/ui-context.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
@@ -157,7 +157,7 @@ void DrawableView::RenderOnce()
   if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     Dali::Adaptor::Get().RenderOnce();
-    Dali::Window window = DevelWindow::Get(Self());
+    Dali::Window window = Window::Get(Self());
     if(DALI_LIKELY(window))
     {
       // TODO : Change it as SceneHolder in future, for OffscreenApplication or GlWindow case.
@@ -192,7 +192,7 @@ void DrawableView::Terminate()
 
       // Register global frame callbacks.
       Dali::UiContext::Get().AddFrameCallback(*mFrameCallback, Dali::Actor());
-      Dali::Window window = DevelWindow::Get(Self());
+      Dali::Window window = Window::Get(Self());
       if(DALI_LIKELY(window))
       {
         // TODO : Change it as SceneHolder in future, for OffscreenApplication or GlWindow case.
@@ -256,7 +256,7 @@ void DrawableView::OnSceneConnection(int depth)
   ControlImpl::OnSceneConnection(depth);
 
   Actor  self   = Self();
-  Window window = DevelWindow::Get(self);
+  Window window = Window::Get(self);
 
   // Despite OnWindowVisibilityChanged() is ignored it still should follow
   // the designed behaviour of GlView so signal is connected regardless

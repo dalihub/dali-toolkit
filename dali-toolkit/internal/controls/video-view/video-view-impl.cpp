@@ -901,7 +901,7 @@ void VideoView::SetFrameRenderCallback()
 {
   mFrameID++;
   // TODO: This method is not called now. Comment out because of line coverage.
-  //  DevelWindow::Get(Self()).AddFrameRenderedCallback(MakeCallback(this, &VideoView::FrameRenderCallback), mFrameID);
+  //  Window::Get(Self()).AddFrameRenderedCallback(MakeCallback(this, &VideoView::FrameRenderCallback), mFrameID);
 }
 
 bool VideoView::IsVideoView(Actor actor) const

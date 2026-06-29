@@ -20,16 +20,15 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
@@ -37,6 +36,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 using Dali::Integration::ToDaliStringView;
 
@@ -175,13 +175,13 @@ void CameraView::SetWindowSurfaceTarget()
       // Final Alpha = DestAlpha - SrcAlpha  (REVERSE_SUBTRACT)
       // CornerRadius fragment shader writes (1 - opacity) into SrcAlpha,
       // so pixels outside the rounded corner become a hole in the UI layer.
-      renderer.SetProperty(Renderer::Property::BLEND_MODE,             BlendMode::ON);
-      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB,   BlendFactor::ZERO);
-      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB,  BlendFactor::ONE_MINUS_SRC_ALPHA);
-      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_ALPHA,  BlendFactor::ONE);
+      renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ZERO);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ONE_MINUS_SRC_ALPHA);
+      renderer.SetProperty(Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE);
       renderer.SetProperty(Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ONE);
-      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_RGB,     BlendEquation::ADD);
-      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA,   BlendEquation::REVERSE_SUBTRACT);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_RGB, BlendEquation::ADD);
+      renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::REVERSE_SUBTRACT);
 
       // Skip CornerRadius calculation during offscreen rendering pass.
       visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
@@ -203,7 +203,7 @@ void CameraView::SetWindowSurfaceTarget()
   }
 
   // Note: CameraPlayer::SetWindowRenderingTarget resets player options (url, mute, etc.)
-  mCameraPlayer.SetWindowRenderingTarget(DevelWindow::Get(self));
+  mCameraPlayer.SetWindowRenderingTarget(Window::Get(self));
 }
 
 void CameraView::SetNativeImageTarget()

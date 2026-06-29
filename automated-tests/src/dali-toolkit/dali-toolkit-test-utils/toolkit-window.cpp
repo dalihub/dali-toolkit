@@ -172,6 +172,18 @@ Window Window::DownCast(BaseHandle handle)
   return Dali::Window(windowImpl);
 }
 
+Window Window::Get(Actor actor)
+{
+  Internal::Adaptor::Window* windowImpl = nullptr;
+
+  if(Dali::Adaptor::IsAvailable())
+  {
+    windowImpl = static_cast<Internal::Adaptor::Window*>(AdaptorImpl::GetImpl(AdaptorImpl::Get()).GetWindow(actor));
+  }
+
+  return Dali::Window(windowImpl);
+}
+
 Window::Window(Internal::Adaptor::Window* window)
 : BaseHandle(window)
 {
@@ -284,18 +296,6 @@ void Window::KeepRendering(float durationSeconds)
 
 namespace DevelWindow
 {
-Window Get(Actor actor)
-{
-  Internal::Adaptor::Window* windowImpl = nullptr;
-
-  if(Dali::Adaptor::IsAvailable())
-  {
-    windowImpl = static_cast<Internal::Adaptor::Window*>(AdaptorImpl::GetImpl(AdaptorImpl::Get()).GetWindow(actor));
-  }
-
-  return Dali::Window(windowImpl);
-}
-
 int GetPhysicalOrientation(Window window)
 {
   return GetImplementation(window).mRotationAngle;

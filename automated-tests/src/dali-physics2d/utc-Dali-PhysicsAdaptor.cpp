@@ -26,7 +26,6 @@
 #include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 
 #include <chipmunk/chipmunk.h>
@@ -345,7 +344,7 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayer(void)
   PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
   Actor          rootActor = adaptor.GetRootActor();
   scene.Add(rootActor);
-  Window window = DevelWindow::Get(rootActor);
+  Window window = Window::Get(rootActor);
 
   Layer layer = adaptor.CreateDebugLayer(window);
   DALI_TEST_CHECK(layer);
@@ -431,7 +430,7 @@ int UtcDaliPhysics2DAdaptorCreateDebugLayerN(void)
   PhysicsAdaptor adaptor   = PhysicsAdaptor::New(transform, size);
   Actor          rootActor = adaptor.GetRootActor();
   scene.Add(rootActor);
-  Window window = DevelWindow::Get(rootActor);
+  Window window = Window::Get(rootActor);
 
   try
   {

@@ -17,13 +17,14 @@
 
 // CLASS HEADER
 #include "video-view-rendering-strategy.h"
+
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -113,7 +114,7 @@ bool WindowSurfaceStrategy::Initialize()
     return true;
   }
 
-  Dali::Window window = DevelWindow::Get(self);
+  Dali::Window window = Window::Get(self);
   window.ResizedSignal().Connect(videoView, &VideoView::OnWindowResized);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));

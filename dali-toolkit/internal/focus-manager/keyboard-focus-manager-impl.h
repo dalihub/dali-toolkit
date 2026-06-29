@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <string>
@@ -28,7 +29,6 @@
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 namespace Dali
 {

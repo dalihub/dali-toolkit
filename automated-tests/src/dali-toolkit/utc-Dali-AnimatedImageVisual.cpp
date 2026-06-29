@@ -33,8 +33,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"
@@ -332,7 +332,7 @@ int UtcDaliAnimatedImageVisualReloadAction01(void)
   textureTrace.Enable(true);
 
   // Execute RELOAD action
-  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL, 
+  DevelControl::DoAction(dummyControl, DummyControl::Property::TEST_VISUAL,
                          Dali::Toolkit::DevelImageVisual::Action::RELOAD, Property::Map());
 
   // Wait for reload
@@ -3412,7 +3412,7 @@ int UtcDaliAnimatedImageVisualInheritedVisibilityChanged(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_NOT_EQUALS(value->Get<int>(), 0, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
-  Window window = DevelWindow::Get(actor);
+  Window window = Window::Get(actor);
   window.Hide();
 
   Test::EmitGlobalTimerSignal();
