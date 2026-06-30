@@ -224,7 +224,7 @@ void DrawableView::OnInitialize()
   self.AddRenderer(mRenderer);
 
   // Adding VisibilityChange Signal.
-  Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &DrawableView::OnControlVisibilityChanged);
+  self.VisibilityChangedSignal().Connect(this, &DrawableView::OnControlVisibilityChanged);
 }
 
 void DrawableView::OnSizeSet(const Vector3& targetSize)
@@ -241,7 +241,7 @@ void DrawableView::OnSizeSet(const Vector3& targetSize)
   }
 }
 
-void DrawableView::OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::DevelActor::VisibilityChange::Type type)
+void DrawableView::OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::VisibilityChangeType type)
 {
   // Ignored due to lack dedicated rendering thread
 }

@@ -517,7 +517,7 @@ void TextField::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired(2);
   GetTapGestureDetector().ReceiveAllTapEvents(true);
 
-  self.TouchedSignal().Connect(this, &TextField::OnTouched);
+  self.TouchEventSignal().Connect(this, &TextField::OnTouched);
 
   // Flip vertically the 'left' selection handle
   mDecorator->FlipHandleVertically(LEFT_SELECTION_HANDLE, true);
@@ -525,7 +525,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
-  self.OnSceneSignal().Connect(this, &TextField::OnSceneConnect);
+  self.SceneConnectedSignal().Connect(this, &TextField::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 

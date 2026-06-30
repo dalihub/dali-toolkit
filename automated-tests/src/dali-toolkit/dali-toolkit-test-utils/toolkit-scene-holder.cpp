@@ -97,7 +97,7 @@ SceneHolder::SceneHolder(const Dali::BoundsInteger& positionSize)
 
   mScene.KeyEventSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneKeyEvent);
   mScene.KeyEventGeneratedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneKeyEventGenerated);
-  mScene.TouchedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneTouchEvent);
+  mScene.TouchEventSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneTouchEvent);
   mScene.WheelEventSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneWheelEvent);
   mScene.WheelEventGeneratedSignal().Connect(mSceneSignalBridgeSlot, &SceneHolder::OnSceneWheelEventGenerated);
 }

@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -826,7 +827,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor.Add(grabHandle.grabArea);
         grabHandle.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
-        grabHandle.grabArea.TouchedSignal().Connect(this, &Decorator::Impl::OnGrabHandleTouched);
+        grabHandle.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnGrabHandleTouched);
 
         // The grab handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -895,7 +896,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         primary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
-        primary.grabArea.TouchedSignal().Connect(this, &Decorator::Impl::OnHandleOneTouched);
+        primary.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnHandleOneTouched);
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -940,7 +941,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         secondary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
-        secondary.grabArea.TouchedSignal().Connect(this, &Decorator::Impl::OnHandleTwoTouched);
+        secondary.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnHandleTwoTouched);
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -973,7 +974,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
       mCopyPastePopup.actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
       mCopyPastePopup.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
-      mCopyPastePopup.actor.OnRelayoutSignal().Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
+      DevelActor::OnRelayoutSignal(mCopyPastePopup.actor).Connect(this, &Decorator::Impl::SetPopupPosition); // Position popup after size negotiation
     }
   }
 

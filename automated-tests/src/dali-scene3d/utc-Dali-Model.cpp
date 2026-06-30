@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -797,7 +798,7 @@ int UtcDaliModelChildrenSensitive01(void)
 
   // connect hit-test signal
   gTouchCallBackCalled = false;
-  meshActor.TouchedSignal().Connect(TestTouchCallback);
+  meshActor.TouchEventSignal().Connect(TestTouchCallback);
 
   Vector2 sceneSize = application.GetScene().GetSize();
 
@@ -894,7 +895,7 @@ int UtcDaliModelChildrenSensitive02(void)
 
   // connect hit-test signal
   gTouchCallBackCalled = false;
-  meshActor.TouchedSignal().Connect(TestTouchCallback);
+  meshActor.TouchEventSignal().Connect(TestTouchCallback);
 
   Vector2 sceneSize = application.GetScene().GetSize();
 
@@ -1414,7 +1415,7 @@ int UtcDaliModelResourceReady(void)
   gResourceReadyCalled      = false;
   Scene3D::Model model      = Scene3D::Model::New(TEST_GLTF_ANIMATION_TEST_FILE_NAME);
   model.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  model.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  DevelActor::OnRelayoutSignal(model).Connect(OnRelayoutCallback);
   model.ResourceReadySignal().Connect(OnResourceReady);
   DALI_TEST_EQUALS(model.IsResourceReady(), false, TEST_LOCATION);
 
@@ -1454,7 +1455,7 @@ int UtcDaliModelResourceReady02(void)
     gResourceReadyCalled      = false;
     Scene3D::Model model      = Scene3D::Model::New(TEST_GLTF_MORPH_FILE_NAME);
     model.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-    model.OnRelayoutSignal().Connect(OnRelayoutCallback);
+    DevelActor::OnRelayoutSignal(model).Connect(OnRelayoutCallback);
     model.ResourceReadySignal().Connect(OnResourceReady);
     DALI_TEST_EQUALS(model.IsResourceReady(), false, TEST_LOCATION);
 

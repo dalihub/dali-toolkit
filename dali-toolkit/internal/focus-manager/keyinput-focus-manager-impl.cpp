@@ -84,7 +84,7 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
     return;
   }
 
-  control.OffSceneSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
+  control.SceneDisconnectedSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
   Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
 
@@ -127,7 +127,7 @@ void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
   if(control && control == mCurrentFocusControl)
   {
     DALI_LOG_RELEASE_INFO("RemoveFocus id:(%d)\n", control.GetProperty<int32_t>(Dali::Actor::Property::ID));
-    control.OffSceneSignal().Disconnect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
+    control.SceneDisconnectedSignal().Disconnect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
     mCurrentFocusControl.Reset();
     mCurrentWindowId = 0;

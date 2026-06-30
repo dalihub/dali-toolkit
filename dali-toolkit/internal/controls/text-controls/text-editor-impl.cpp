@@ -594,7 +594,7 @@ void TextEditor::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired(2);
   GetTapGestureDetector().ReceiveAllTapEvents(true);
 
-  self.TouchedSignal().Connect(this, &TextEditor::OnTouched);
+  self.TouchEventSignal().Connect(this, &TextEditor::OnTouched);
 
   // Whether to flip the selection handles as soon as they cross.
   mDecorator->FlipSelectionHandlesOnCrossEnabled(true);
@@ -605,7 +605,7 @@ void TextEditor::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
-  self.OnSceneSignal().Connect(this, &TextEditor::OnSceneConnect);
+  self.SceneConnectedSignal().Connect(this, &TextEditor::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 

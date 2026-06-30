@@ -214,7 +214,7 @@ private:
   /**
    * @brief Callback when the visibility of the actor is changed.
    */
-  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
+  void OnControlEffectiveVisibilityChanged(Actor actor, bool visible);
 
   /**
    * @brief Callback when the event is processed.

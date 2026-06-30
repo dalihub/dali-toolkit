@@ -672,7 +672,7 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
   ControlImpl::OnSizeSet(targetSize);
 }
 
-void VideoView::OnChildOrderChanged(Actor actor)
+void VideoView::OnChildOrderChanged(Actor parent, Actor child)
 {
   Actor self                = Self();
   int   currentSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);

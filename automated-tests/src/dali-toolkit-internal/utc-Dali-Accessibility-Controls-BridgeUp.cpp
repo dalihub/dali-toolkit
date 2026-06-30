@@ -2478,7 +2478,7 @@ private:
     auto actor = Control::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
     actor.SetProperty(Actor::Property::SENSITIVE, true);
     actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
-    actor.TouchedSignal().Connect(TestTouchCallback);
+    actor.TouchEventSignal().Connect(TestTouchCallback);
     return actor;
   }
 

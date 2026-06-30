@@ -788,7 +788,7 @@ private:
    * @param[in] actor The actor, whose inherit visibility has changed
    * @param[in] isVisible Whether the actor is now visible or not
    */
-  void OnInheritedVisibilityChanged(Actor actor, bool isVisible);
+  void OnEffectiveVisibilityChanged(Actor actor, bool isVisible);
 
   /**
    * @brief callback for screen shot captured.

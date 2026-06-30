@@ -26,6 +26,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -1194,7 +1195,7 @@ int UtcDaliControlImplResourceReady(void)
   Control control           = Control::New();
   control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   control.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  control.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  DevelActor::OnRelayoutSignal(control).Connect(OnRelayoutCallback);
   control.ResourceReadySignal().Connect(OnResourceReady);
   application.GetScene().Add(control);
 

@@ -367,7 +367,7 @@ SceneView::~SceneView()
       Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
       mSkyboxLoadTask.Reset();
     }
-    mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+    mSelectedCamera.SceneDisconnectedSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
 
     if(mInCameraTransition)
     {
@@ -1383,11 +1383,11 @@ void SceneView::UpdateCamera(CameraActor camera)
     {
       if(mSelectedCamera)
       {
-        mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+        mSelectedCamera.SceneDisconnectedSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
       }
 
       mSelectedCamera = camera;
-      camera.OffSceneSignal().Connect(this, &SceneView::OnCameraDisconnected);
+      camera.SceneDisconnectedSignal().Connect(this, &SceneView::OnCameraDisconnected);
     }
 
     bool isCameraIncluded = CheckInside(mRootLayer, camera);

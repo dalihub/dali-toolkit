@@ -356,7 +356,7 @@ void ItemView::OnInitialize()
 
   Actor self = Self();
 
-  self.TouchedSignal().Connect(this, &ItemView::OnTouch);
+  self.TouchEventSignal().Connect(this, &ItemView::OnTouch);
   EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
   mWheelEventFinishedTimer = Timer::New(WHEEL_EVENT_FINISHED_TIME_OUT);

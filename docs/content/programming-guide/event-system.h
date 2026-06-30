@@ -42,7 +42,7 @@ bool OnTouch( Dali::Actor actor, const Dali::TouchEvent& touch )
 
 // Elsewhere
 Dali::Actor actor = Actor::New();
-actor.TouchedSignal().Connect( &OnTouch );
+actor.TouchEventSignal().Connect( &OnTouch );
 @endcode
 
 The primary touch point is the first point that the user touches.

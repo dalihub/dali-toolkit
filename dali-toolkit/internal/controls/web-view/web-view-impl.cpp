@@ -305,10 +305,10 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
-  self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
+  self.TouchEventSignal().Connect(this, &WebView::OnTouchEvent);
+  self.HoverEventSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
-  self.InheritedVisibilityChangedSignal().Connect(this, &WebView::OnInheritedVisibilityChanged);
+  self.EffectiveVisibilityChangedSignal().Connect(this, &WebView::OnEffectiveVisibilityChanged);
   self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
@@ -1134,7 +1134,7 @@ void WebView::OnDisplayAreaUpdated(Dali::PropertyNotification /*source*/)
   SetDisplayArea(displayArea);
 }
 
-void WebView::OnInheritedVisibilityChanged(Actor actor, bool isVisible)
+void WebView::OnEffectiveVisibilityChanged(Actor actor, bool isVisible)
 {
   SetVisibility(isVisible);
 }
