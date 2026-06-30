@@ -35,11 +35,17 @@ class InputMethodContext : public Dali::BaseObject
 public:
   using ActivatedSignalType              = Dali::InputMethodContext::ActivatedSignalType;
   using KeyboardEventSignalType          = Dali::Integration::InputMethodContext::KeyboardEventSignalType;
+  using ContentReceivedSignalType        = Dali::Integration::InputMethodContext::ContentReceivedSignalType;
   using StatusChangedSignalType          = Dali::InputMethodContext::StatusChangedSignalType;
   using KeyboardResizedSignalType        = Dali::InputMethodContext::KeyboardResizedSignalType;
   using LanguageChangedSignalType        = Dali::InputMethodContext::LanguageChangedSignalType;
   using KeyboardTypeChangedSignalType    = Dali::InputMethodContext::KeyboardTypeChangedSignalType;
   using PrivateCommandReceivedSignalType = Dali::InputMethodContext::PrivateCommandReceivedSignalType;
+  using LegacyStatusChangedSignalType       = Dali::Integration::InputMethodContext::LegacyStatusChangedSignalType;
+  using LegacyKeyboardTypeChangedSignalType = Dali::Integration::InputMethodContext::LegacyKeyboardTypeChangedSignalType;
+  using LegacyKeyboardResizedSignalType     = Dali::Integration::InputMethodContext::LegacyKeyboardResizedSignalType;
+  using LegacyLanguageChangedSignalType     = Dali::Integration::InputMethodContext::LegacyLanguageChangedSignalType;
+  using LegacyContentReceivedSignalType     = Dali::Integration::InputMethodContext::LegacyContentReceivedSignalType;
 
 public:
   static Dali::InputMethodContext Create();
@@ -56,6 +62,22 @@ public:
   bool SetRestoreAfterFocusLostEnabled(bool enabled);
   bool SetReturnKeyEnabled(bool enabled);
   bool IsReturnKeyEnabled() const;
+  Dali::BoundsInteger GetInputPanelArea() const;
+  bool                SetInputPanelUserData(const Dali::String& data);
+  Dali::String        GetInputPanelUserData() const;
+  Dali::InputMethodContext::State GetInputPanelState() const;
+  bool                            SetInputPanelAutoShowEnabled(bool enabled);
+  bool                            ShowInputPanel();
+  bool                            HideInputPanel();
+  Dali::InputMethodContext::KeyboardType GetKeyboardType() const;
+  bool                                   SetInputPanelLanguageLocale(const Dali::String& locale);
+  Dali::String                           GetInputPanelLanguageLocale() const;
+  bool                                   SetTextPredictionEnabled(bool enabled);
+  bool                                   IsTextPredictionEnabled() const;
+  bool                                   SetFullScreenModeEnabled(bool enabled);
+  bool                                   IsFullScreenModeEnabled() const;
+  bool                                   SetInputPanelPosition(uint32_t x, uint32_t y);
+  bool                                   SetInputPanelPositionAlign(int32_t x, int32_t y, Dali::InputMethodContext::InputPanelAlign align);
 
   void         NotifyCursorPosition();
   void         SetCursorPosition(uint32_t cursorPosition);
@@ -63,7 +85,11 @@ public:
   void         SetSurroundingText(const Dali::String& text);
   Dali::String GetSurroundingText() const;
   void         NotifyTextInputMultiLine(bool multiLine);
+  Dali::Integration::InputMethodContext::TextDirection GetTextDirection() const;
+  void         SetContentMimeTypes(const Dali::String& mimeTypes);
   void         ApplyOptions(const Dali::Integration::InputMethodOptions& options);
+  bool         SetInputPanelLanguage(Dali::Integration::InputMethodContext::InputPanelLanguage language);
+  Dali::Integration::InputMethodContext::InputPanelLanguage GetInputPanelLanguage() const;
   bool         FilterEventKey(const Dali::KeyEvent& keyEvent);
   void         GetPreeditStyle(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
   void         SetPreeditStyle(Dali::Integration::InputMethodContext::PreeditStyle type);
@@ -90,6 +116,10 @@ public: // Signals
   {
     return mKeyboardEventSignal;
   }
+  ContentReceivedSignalType& ContentReceivedSignal()
+  {
+    return mContentReceivedSignal;
+  }
   StatusChangedSignalType& StatusChangedSignal()
   {
     return mKeyboardStatusSignal;
@@ -110,6 +140,26 @@ public: // Signals
   {
     return mPrivateCommandReceivedSignal;
   }
+  LegacyStatusChangedSignalType& LegacyStatusChangedSignal()
+  {
+    return mLegacyKeyboardStatusSignal;
+  }
+  LegacyKeyboardTypeChangedSignalType& LegacyKeyboardTypeChangedSignal()
+  {
+    return mLegacyKeyboardTypeChangedSignal;
+  }
+  LegacyKeyboardResizedSignalType& LegacyResizedSignal()
+  {
+    return mLegacyKeyboardResizeSignal;
+  }
+  LegacyLanguageChangedSignalType& LegacyLanguageChangedSignal()
+  {
+    return mLegacyKeyboardLanguageChangedSignal;
+  }
+  LegacyContentReceivedSignalType& LegacyContentReceivedSignal()
+  {
+    return mLegacyContentReceivedSignal;
+  }
 
 protected:
   ~InputMethodContext() override;
@@ -125,8 +175,18 @@ private:
 private:
   uint32_t                                                            mIMFCursorPosition;
   Dali::String                                                        mSurroundingText;
+  Dali::String                                                        mInputPanelUserData;
+  Dali::String                                                        mLanguageLocale;
+  Dali::String                                                        mContentMimeTypes;
+  Dali::BoundsInteger                                                 mInputPanelArea;
+  Dali::InputMethodContext::State                                     mInputPanelState;
+  Dali::InputMethodContext::KeyboardType                              mKeyboardType;
+  Dali::Integration::InputMethodContext::InputPanelLanguage           mInputPanelLanguage;
   bool                                                                mRestoreAfterFocusLost : 1;
   bool                                                                mReturnKeyEnabled : 1;
+  bool                                                                mAutoShowEnabled : 1;
+  bool                                                                mTextPredictionEnabled : 1;
+  bool                                                                mFullScreenModeEnabled : 1;
   bool                                                                mIdleCallbackConnected : 1;
   Dali::Integration::InputMethodContext::PreEditAttributeDataContainer mPreeditAttrs;
 
@@ -138,11 +198,17 @@ private:
   ActivatedSignalType              mActivatedSignal;
   KeyboardEventSignalType          mEventSignal;
   KeyboardEventSignalType          mKeyboardEventSignal;
+  ContentReceivedSignalType        mContentReceivedSignal;
   StatusChangedSignalType          mKeyboardStatusSignal;
   KeyboardResizedSignalType        mKeyboardResizeSignal;
   LanguageChangedSignalType        mKeyboardLanguageChangedSignal;
   KeyboardTypeChangedSignalType    mKeyboardTypeChangedSignal;
   PrivateCommandReceivedSignalType mPrivateCommandReceivedSignal;
+  LegacyStatusChangedSignalType       mLegacyKeyboardStatusSignal;
+  LegacyKeyboardTypeChangedSignalType mLegacyKeyboardTypeChangedSignal;
+  LegacyKeyboardResizedSignalType     mLegacyKeyboardResizeSignal;
+  LegacyLanguageChangedSignalType     mLegacyKeyboardLanguageChangedSignal;
+  LegacyContentReceivedSignalType     mLegacyContentReceivedSignal;
 
   static Dali::InputMethodContext mToolkitInputMethodContext;
 
@@ -174,8 +240,18 @@ Dali::InputMethodContext InputMethodContext::Create()
 InputMethodContext::InputMethodContext()
 : mIMFCursorPosition(0u),
   mSurroundingText(),
+  mInputPanelUserData(),
+  mLanguageLocale(),
+  mContentMimeTypes(),
+  mInputPanelArea(),
+  mInputPanelState(Dali::InputMethodContext::State::HIDE),
+  mKeyboardType(Dali::InputMethodContext::KeyboardType::SOFTWARE_KEYBOARD),
+  mInputPanelLanguage(Dali::Integration::InputMethodContext::InputPanelLanguage::AUTOMATIC),
   mRestoreAfterFocusLost(false),
   mReturnKeyEnabled(true),
+  mAutoShowEnabled(false),
+  mTextPredictionEnabled(false),
+  mFullScreenModeEnabled(false),
   mIdleCallbackConnected(false),
   mPreeditAttrs(),
   mPanelLayout(Dali::InputMethod::PanelLayout::NORMAL),
@@ -247,6 +323,98 @@ bool InputMethodContext::IsReturnKeyEnabled() const
   return mReturnKeyEnabled;
 }
 
+Dali::BoundsInteger InputMethodContext::GetInputPanelArea() const
+{
+  return mInputPanelArea;
+}
+
+bool InputMethodContext::SetInputPanelUserData(const Dali::String& data)
+{
+  mInputPanelUserData = data;
+  return true;
+}
+
+Dali::String InputMethodContext::GetInputPanelUserData() const
+{
+  return mInputPanelUserData;
+}
+
+Dali::InputMethodContext::State InputMethodContext::GetInputPanelState() const
+{
+  return mInputPanelState;
+}
+
+bool InputMethodContext::SetInputPanelAutoShowEnabled(bool enabled)
+{
+  mAutoShowEnabled = enabled;
+  return true;
+}
+
+bool InputMethodContext::ShowInputPanel()
+{
+  mInputPanelState = Dali::InputMethodContext::State::SHOW;
+  return true;
+}
+
+bool InputMethodContext::HideInputPanel()
+{
+  mInputPanelState = Dali::InputMethodContext::State::HIDE;
+  return true;
+}
+
+Dali::InputMethodContext::KeyboardType InputMethodContext::GetKeyboardType() const
+{
+  return mKeyboardType;
+}
+
+bool InputMethodContext::SetInputPanelLanguageLocale(const Dali::String& locale)
+{
+  mLanguageLocale = locale;
+  return true;
+}
+
+Dali::String InputMethodContext::GetInputPanelLanguageLocale() const
+{
+  return mLanguageLocale;
+}
+
+bool InputMethodContext::SetTextPredictionEnabled(bool enabled)
+{
+  mTextPredictionEnabled = enabled;
+  return true;
+}
+
+bool InputMethodContext::IsTextPredictionEnabled() const
+{
+  return mTextPredictionEnabled;
+}
+
+bool InputMethodContext::SetFullScreenModeEnabled(bool enabled)
+{
+  mFullScreenModeEnabled = enabled;
+  return true;
+}
+
+bool InputMethodContext::IsFullScreenModeEnabled() const
+{
+  return mFullScreenModeEnabled;
+}
+
+bool InputMethodContext::SetInputPanelPosition(uint32_t x, uint32_t y)
+{
+  mInputPanelArea.x = static_cast<int32_t>(x);
+  mInputPanelArea.y = static_cast<int32_t>(y);
+  return true;
+}
+
+bool InputMethodContext::SetInputPanelPositionAlign(int32_t x, int32_t y, Dali::InputMethodContext::InputPanelAlign align)
+{
+  (void)align;
+  mInputPanelArea.x = x;
+  mInputPanelArea.y = y;
+  return true;
+}
+
 void InputMethodContext::NotifyCursorPosition()
 {
 }
@@ -273,6 +441,17 @@ Dali::String InputMethodContext::GetSurroundingText() const
 
 void InputMethodContext::NotifyTextInputMultiLine(bool multiLine)
 {
+  (void)multiLine;
+}
+
+Dali::Integration::InputMethodContext::TextDirection InputMethodContext::GetTextDirection() const
+{
+  return Dali::Integration::InputMethodContext::LEFT_TO_RIGHT;
+}
+
+void InputMethodContext::SetContentMimeTypes(const Dali::String& mimeTypes)
+{
+  mContentMimeTypes = mimeTypes;
 }
 
 void InputMethodContext::ApplyOptions(const Dali::Integration::InputMethodOptions& options)
@@ -280,8 +459,20 @@ void InputMethodContext::ApplyOptions(const Dali::Integration::InputMethodOption
   (void)options;
 }
 
+bool InputMethodContext::SetInputPanelLanguage(Dali::Integration::InputMethodContext::InputPanelLanguage language)
+{
+  mInputPanelLanguage = language;
+  return true;
+}
+
+Dali::Integration::InputMethodContext::InputPanelLanguage InputMethodContext::GetInputPanelLanguage() const
+{
+  return mInputPanelLanguage;
+}
+
 bool InputMethodContext::FilterEventKey(const Dali::KeyEvent& keyEvent)
 {
+  (void)keyEvent;
   return false;
 }
 
@@ -351,6 +542,20 @@ InputMethodContext::~InputMethodContext()
 {
 }
 
+InputMethodContext::InputMethodContext(const InputMethodContext& inputMethodContext)
+: BaseHandle(inputMethodContext)
+{
+}
+
+InputMethodContext& InputMethodContext::operator=(const InputMethodContext& inputMethodContext)
+{
+  if(*this != inputMethodContext)
+  {
+    BaseHandle::operator=(inputMethodContext);
+  }
+  return *this;
+}
+
 InputMethodContext InputMethodContext::DownCast(BaseHandle handle)
 {
   return InputMethodContext(dynamic_cast<Internal::Adaptor::InputMethodContext*>(handle.GetObjectPtr()));
@@ -368,22 +573,22 @@ bool InputMethodContext::SetRestoreAfterFocusLostEnabled(bool enabled)
 
 Dali::BoundsInteger InputMethodContext::GetInputPanelArea()
 {
-  return Dali::BoundsInteger();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelArea();
 }
 
 bool InputMethodContext::SetInputPanelUserData(const Dali::String& data)
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelUserData(data);
 }
 
 Dali::String InputMethodContext::GetInputPanelUserData() const
 {
-  return Dali::String();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelUserData();
 }
 
 InputMethodContext::State InputMethodContext::GetInputPanelState() const
 {
-  return DEFAULT;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelState();
 }
 
 bool InputMethodContext::SetReturnKeyEnabled(bool enabled)
@@ -398,62 +603,62 @@ bool InputMethodContext::IsReturnKeyEnabled() const
 
 bool InputMethodContext::SetInputPanelAutoShowEnabled(bool enabled)
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelAutoShowEnabled(enabled);
 }
 
 bool InputMethodContext::ShowInputPanel()
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).ShowInputPanel();
 }
 
 bool InputMethodContext::HideInputPanel()
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).HideInputPanel();
 }
 
 InputMethodContext::KeyboardType InputMethodContext::GetKeyboardType() const
 {
-  return SOFTWARE_KEYBOARD;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetKeyboardType();
 }
 
 bool InputMethodContext::SetInputPanelLanguageLocale(const Dali::String& locale)
 {
-  return false;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelLanguageLocale(locale);
 }
 
 Dali::String InputMethodContext::GetInputPanelLanguageLocale() const
 {
-  return Dali::String();
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetInputPanelLanguageLocale();
 }
 
 bool InputMethodContext::SetTextPredictionEnabled(bool enabled)
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetTextPredictionEnabled(enabled);
 }
 
 bool InputMethodContext::IsTextPredictionEnabled() const
 {
-  return false;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).IsTextPredictionEnabled();
 }
 
 bool InputMethodContext::SetFullScreenModeEnabled(bool enabled)
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetFullScreenModeEnabled(enabled);
 }
 
 bool InputMethodContext::IsFullScreenModeEnabled() const
 {
-  return false;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).IsFullScreenModeEnabled();
 }
 
 bool InputMethodContext::SetInputPanelPosition(uint32_t x, uint32_t y)
 {
-  return true;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelPosition(x, y);
 }
 
 bool InputMethodContext::SetInputPanelPositionAlign(int32_t x, int32_t y, InputPanelAlign align)
 {
-  return false;
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetInputPanelPositionAlign(x, y, align);
 }
 
 bool InputMethodContext::SetInputPanelLayout(Dali::InputMethod::PanelLayout layout)
@@ -542,6 +747,7 @@ Dali::InputMethodContext New()
 
 Dali::InputMethodContext New(Dali::Actor actor)
 {
+  (void)actor;
   return Dali::Internal::Adaptor::InputMethodContext::Create();
 }
 
@@ -597,7 +803,12 @@ void NotifyTextInputMultiLine(Dali::InputMethodContext context, bool multiLine)
 
 TextDirection GetTextDirection(Dali::InputMethodContext context)
 {
-  return LEFT_TO_RIGHT;
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).GetTextDirection();
+}
+
+void SetContentMimeTypes(Dali::InputMethodContext context, const Dali::String& mimeTypes)
+{
+  Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).SetContentMimeTypes(mimeTypes);
 }
 
 void ApplyOptions(Dali::InputMethodContext context, const Dali::Integration::InputMethodOptions& options)
@@ -607,12 +818,12 @@ void ApplyOptions(Dali::InputMethodContext context, const Dali::Integration::Inp
 
 bool SetInputPanelLanguage(Dali::InputMethodContext context, InputPanelLanguage language)
 {
-  return true;
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).SetInputPanelLanguage(language);
 }
 
 InputPanelLanguage GetInputPanelLanguage(Dali::InputMethodContext context)
 {
-  return InputPanelLanguage::AUTOMATIC;
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).GetInputPanelLanguage();
 }
 
 bool FilterEventKey(Dali::InputMethodContext context, const Dali::KeyEvent& keyEvent)
@@ -633,6 +844,36 @@ KeyboardEventSignalType& EventReceivedSignal(Dali::InputMethodContext context)
 KeyboardEventSignalType& KeyboardEventReceivedSignal(Dali::InputMethodContext context)
 {
   return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).KeyboardEventReceivedSignal();
+}
+
+ContentReceivedSignalType& ContentReceivedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).ContentReceivedSignal();
+}
+
+LegacyStatusChangedSignalType& LegacyStatusChangedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).LegacyStatusChangedSignal();
+}
+
+LegacyKeyboardTypeChangedSignalType& LegacyKeyboardTypeChangedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).LegacyKeyboardTypeChangedSignal();
+}
+
+LegacyKeyboardResizedSignalType& LegacyResizedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).LegacyResizedSignal();
+}
+
+LegacyLanguageChangedSignalType& LegacyLanguageChangedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).LegacyLanguageChangedSignal();
+}
+
+LegacyContentReceivedSignalType& LegacyContentReceivedSignal(Dali::InputMethodContext context)
+{
+  return Dali::Internal::Adaptor::InputMethodContext::GetImplementation(context).LegacyContentReceivedSignal();
 }
 
 namespace Test

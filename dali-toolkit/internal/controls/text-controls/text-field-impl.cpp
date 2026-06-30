@@ -21,13 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-common.h>
 #include <cstring>
 
@@ -1095,7 +1095,7 @@ void TextField::OnSceneConnect(Dali::Actor actor)
 }
 
 Dali::Integration::InputMethodContext::CallbackData TextField::OnInputMethodContextEvent(
-  Dali::InputMethodContext inputMethodContext,
+  Dali::InputMethodContext                                inputMethodContext,
   const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
@@ -1174,7 +1174,7 @@ void TextField::OnSceneConnection(int depth)
   // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
   ControlImpl::OnSceneConnection(depth);
 
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(window)
   {
     // Sets layoutDirection value
@@ -1186,8 +1186,8 @@ void TextField::OnSceneConnection(int depth)
     mDecorator->GetBoundingBox(boundingBox);
     if(boundingBox.IsEmpty())
     {
-      Dali::Window::WindowSize windowSize = window.GetSize();
-      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(windowSize.GetWidth()), static_cast<int32_t>(windowSize.GetHeight())));
+      Dali::PositionSize posSize = window.GetPositionSize();
+      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(posSize.width), static_cast<int32_t>(posSize.height)));
     }
   }
 }

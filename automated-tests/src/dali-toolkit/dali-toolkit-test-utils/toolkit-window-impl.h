@@ -42,29 +42,27 @@ public:
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const String& name, const String& className, bool isTransparent);
 
-  Dali::Window::WindowPosition GetPosition() const;
-  PositionSize                 GetPositionSize() const;
-  Dali::Window::WindowSize     GetSize() const;
-  std::string                  GetNativeResourceId() const;
-  void                         KeepRendering(float durationSeconds);
+  PositionSize GetPositionSize() const;
+  std::string  GetNativeResourceId() const;
+  void         KeepRendering(float durationSeconds);
 
   void SetPositionSize(PositionSize positionSize);
 
   Dali::Window::KeyEventSignalType&   KeyEventSignal();
-  Dali::Window::TouchEventSignalType& TouchedSignal();
+  Dali::Window::TouchEventSignalType& TouchEventSignal();
 
   void OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, Dali::KeyEvent event);
   void OnTouchEvent(Dali::Integration::SceneHolder sceneHolder, Dali::TouchEvent event);
 
-  FocusChangeSignalType                      mFocusChangeSignal;
-  ResizeSignalType                           mResizeSignal;
+  FocusChangedSignalType                     mFocusChangedSignal;
+  ResizedSignalType                          mResizedSignal;
   int                                        mRotationAngle;
   bool                                       mVisible;
-  DevelWindow::VisibilityChangedSignalType   mVisibilityChangedSignal;
+  Dali::Window::VisibilityChangedSignalType  mVisibilityChangedSignal;
   Dali::Window::KeyEventSignalType           mKeyEventSignal;
   Dali::Window::TouchEventSignalType         mTouchEventSignal;
+  Dali::Window::WheelEventSignalType         mWheelEventSignal;
   DevelWindow::KeyEventGeneratedSignalType   mKeyEventGeneratedSignal;
-  DevelWindow::WheelEventSignalType          mWheelEventSignal;
   DevelWindow::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
   Dali::SlotDelegate<Window>                 mSlotDelegate;
 };

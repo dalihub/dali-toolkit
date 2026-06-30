@@ -74,7 +74,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   auto renderTaskList = window.GetRenderTaskList();
   auto renderTask     = renderTaskList.GetTask(0);
-  auto windowSize     = window.GetSize();
+  auto posSize        = window.GetPositionSize();
 
   debugLayer                                 = Layer::New();
   debugLayer[Actor::Property::NAME]          = "PhysicsDebugLayer";
@@ -90,7 +90,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   auto world = static_cast<ChipmunkPhysicsWorld*>(mPhysicsWorld.Get());
 
-  UniquePtr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(windowSize.GetWidth(), windowSize.GetHeight(), renderTask.GetCameraActor(), this);
+  UniquePtr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(posSize.width, posSize.height, renderTask.GetCameraActor(), this);
 
   mDebugActor = DrawableActor::New(*(debugRenderer->GetCallback().Get()));
   world->SetDebugRenderer(debugRenderer.Release());

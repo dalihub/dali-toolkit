@@ -30,11 +30,11 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/object/property-array-devel.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 #include <dlfcn.h>
 #include <algorithm>
@@ -497,6 +497,9 @@ int UtcDaliControlAccessibilityRoleToggleButton(void)
   auto control = Dali::Toolkit::ToggleButton::New();
   auto button  = Dali::Accessibility::Role::TOGGLE_BUTTON;
 
+  control.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS,
+                      Dali::CreatePropertyArray({"option1", "option2"}));
+
   Dali::Accessibility::TestEnableSC(true, application.GetScene());
 
   control.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, button);
@@ -507,6 +510,8 @@ int UtcDaliControlAccessibilityRoleToggleButton(void)
 
   Dali::Accessibility::States states = q->GetStates();
   DALI_TEST_EQUALS(true, (bool)states[Dali::Accessibility::State::VISIBLE], TEST_LOCATION);
+
+  DALI_TEST_EQUALS("option1", q->GetDescription(), TEST_LOCATION);
 
   DALI_TEST_CHECK(q);
   q->GrabHighlight();
@@ -1255,11 +1260,11 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
   auto control = Control::New();
   application.GetScene().GetRootLayer().Add(control);
 
-  auto window = Dali::DevelWindow::Get(control);
+  auto window = Dali::Window::Get(control);
   DALI_TEST_CHECK(window);
 
   //window.SetPosition({0,0});
-  DevelWindow::SetPositionSize(window, PositionSize(0, 0, 480, 240));
+  window.SetPositionSize(PositionSize(0, 0, 480, 240));
 
   control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
   control.SetProperty(Actor::Property::SIZE, Vector2(10, 10));
@@ -1334,9 +1339,9 @@ int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
 
   auto control = Control::New();
   application.GetScene().GetRootLayer().Add(control);
-  auto window = Dali::DevelWindow::Get(control);
+  auto window = Dali::Window::Get(control);
   //window.SetPosition({33,33});
-  DevelWindow::SetPositionSize(window, PositionSize(33, 33, 480, 240));
+  window.SetPositionSize(PositionSize(33, 33, 480, 240));
 
   control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
   control.SetProperty(Actor::Property::SIZE, Vector2(10, 10));

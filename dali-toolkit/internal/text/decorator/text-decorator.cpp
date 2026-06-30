@@ -20,11 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/touch-event.h>
@@ -253,10 +253,10 @@ struct Decorator::Impl : public ConnectionTracker
 
     if(mBoundingBoxDirty)
     {
-      Dali::Window window = DevelWindow::Get(mActiveLayer);
+      Dali::Window window = Window::Get(mActiveLayer);
       if(window)
       {
-        LocalToWorldCoordinatesBoundingBox(mLocalBoundingBox, window.GetSize(), mBoundingBox);
+        LocalToWorldCoordinatesBoundingBox(mLocalBoundingBox, Vector2(window.GetPositionSize().width, window.GetPositionSize().height), mBoundingBox);
         mBoundingBoxDirty = false;
       }
     }
@@ -2004,10 +2004,10 @@ void Decorator::SetBoundingBox(const BoundsInteger& boundingBox)
 {
   mImpl->mLocalBoundingBox = boundingBox;
 
-  Dali::Window window = DevelWindow::Get(mImpl->mActiveLayer);
+  Dali::Window window = Window::Get(mImpl->mActiveLayer);
   if(window)
   {
-    LocalToWorldCoordinatesBoundingBox(boundingBox, window.GetSize(), mImpl->mBoundingBox);
+    LocalToWorldCoordinatesBoundingBox(boundingBox, Vector2(window.GetPositionSize().width, window.GetPositionSize().height), mImpl->mBoundingBox);
     mImpl->mBoundingBoxDirty = false;
   }
   else

@@ -172,6 +172,21 @@ TARGET_LINK_LIBRARIES(${EXEC_NAME}
     -lpthread --coverage -ldl -rdynamic
 )
 
+ADD_LIBRARY(dali2-file-download-plugin-test SHARED
+  file-download-plugin/test-file-download-plugin.cpp
+)
+
+TARGET_INCLUDE_DIRECTORIES(dali2-file-download-plugin-test PUBLIC
+  ../../../
+  ${${CAPI_LIB}_INCLUDE_DIRS}
+)
+
+TARGET_LINK_LIBRARIES(dali2-file-download-plugin-test
+  ${CMAKE_CXX_LINK_FLAGS}
+  ${${CAPI_LIB}_LIBRARIES}
+  -lpthread -ldl --coverage
+)
+
 INSTALL(PROGRAMS ${EXEC_NAME}
     DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )

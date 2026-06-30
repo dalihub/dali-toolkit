@@ -79,7 +79,8 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
                                                      const Dali::WrapMode::Type&         wrapModeU,
                                                      const Dali::WrapMode::Type&         wrapModeV,
                                                      bool                                isSynchronousLoading,
-                                                     bool                                preMultiplyOnLoad)
+                                                     bool                                preMultiplyOnLoad,
+                                                     TextureManager::ReloadPolicy        reloadPolicy)
 : ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, 0u, preMultiplyOnLoad),
   mImageUrl(animatedImageLoading.GetUrl()),
   mAnimatedImageLoading(animatedImageLoading),
@@ -88,7 +89,8 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&            
   mQueue(cacheSize),
   mWrapModeU(wrapModeU),
   mWrapModeV(wrapModeV),
-  mIsSynchronousLoading(isSynchronousLoading)
+  mIsSynchronousLoading(isSynchronousLoading),
+  mReloadPolicy(reloadPolicy)
 {
   mTextureIds.resize(mFrameCount);
   mTextureIds[0] = TextureManager::INVALID_TEXTURE_ID;
@@ -228,7 +230,9 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                                      mSamplingMode,
                                                                                      synchronousLoading,
                                                                                      this,
-                                                                                     preMultiplyOnLoading);
+                                                                                     preMultiplyOnLoading,
+                                                                                     mReloadPolicy);
+  mReloadPolicy = TextureManager::ReloadPolicy::CACHED;
   if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();

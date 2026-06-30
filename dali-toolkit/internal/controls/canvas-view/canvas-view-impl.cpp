@@ -19,7 +19,6 @@
 #include "canvas-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/texture-devel.h>
@@ -28,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -150,7 +150,7 @@ void CanvasView::OnSizeSet(const Vector3& targetSize)
 
 void CanvasView::OnSceneConnection(int depth)
 {
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(DALI_LIKELY(window))
   {
     mPlacementWindow = window;

@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -28,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
 #include <cstring>
@@ -1291,7 +1291,7 @@ void TextEditor::OnSceneConnect(Dali::Actor actor)
 }
 
 Dali::Integration::InputMethodContext::CallbackData TextEditor::OnInputMethodContextEvent(
-  Dali::InputMethodContext inputMethodContext,
+  Dali::InputMethodContext                                inputMethodContext,
   const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName);
@@ -1344,7 +1344,7 @@ void TextEditor::OnSceneConnection(int depth)
   // Call the ControlImpl::OnSceneConnection() to set the depth of the background.
   ControlImpl::OnSceneConnection(depth);
 
-  Dali::Window window = DevelWindow::Get(Self());
+  Dali::Window window = Window::Get(Self());
   if(window)
   {
     // Sets layoutDirection value
@@ -1356,8 +1356,8 @@ void TextEditor::OnSceneConnection(int depth)
     mDecorator->GetBoundingBox(boundingBox);
     if(boundingBox.IsEmpty())
     {
-      Dali::Window::WindowSize windowSize = window.GetSize();
-      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(windowSize.GetWidth()), static_cast<int32_t>(windowSize.GetHeight())));
+      Dali::PositionSize posSize = window.GetPositionSize();
+      mDecorator->SetBoundingBox(BoundsInteger(0, 0, static_cast<int32_t>(posSize.width), static_cast<int32_t>(posSize.height)));
     }
   }
 }

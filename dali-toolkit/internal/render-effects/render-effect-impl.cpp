@@ -41,6 +41,13 @@ namespace Internal
 namespace
 {
 static constexpr uint32_t RENDER_EFFECT_RENDER_PASS_TAG = 11;
+static constexpr float    DEFAULT_DITHER_NOISE_STRENGTH = 0.1f;
+static constexpr float    DITHER_NOISE_UNIFORM_SCALE    = 0.2f;
+
+float GetDitherNoiseUniformStrength(float strength)
+{
+  return Dali::Clamp(strength, 0.0f, 1.0f) * DITHER_NOISE_UNIFORM_SCALE;
+}
 } // namespace
 
 #if defined(DEBUG_ENABLED)
@@ -57,6 +64,7 @@ RenderEffectImpl::RenderEffectImpl()
 : mRenderer(),
   mOwnerControl(),
   mTargetSize(Vector2::ZERO),
+  mDitherNoiseStrength(DEFAULT_DITHER_NOISE_STRENGTH),
   mIsActivated(false)
 {
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::Verbose, "[RenderEffect:%p] Constructor\n", this);
@@ -162,6 +170,7 @@ void RenderEffectImpl::Initialize()
     mRenderer.RegisterProperty("uCornerRadius", Vector4::ZERO);
     mRenderer.RegisterProperty("uCornerSquareness", Vector4::ZERO);
     mRenderer.RegisterProperty("uCornerRadiusPolicy", static_cast<float>(1.0f));
+    mRenderer.RegisterProperty("uDitherNoiseStrength", GetDitherNoiseUniformStrength(mDitherNoiseStrength));
   }
 
   OnInitialize();
@@ -185,6 +194,22 @@ Renderer RenderEffectImpl::GetTargetRenderer() const
 Vector2 RenderEffectImpl::GetTargetSize() const
 {
   return mTargetSize;
+}
+
+void RenderEffectImpl::SetDitherNoiseStrength(float strength)
+{
+  mDitherNoiseStrength = Dali::Clamp(strength, 0.0f, 1.0f);
+
+  Renderer renderer = GetTargetRenderer();
+  if(renderer)
+  {
+    renderer.RegisterProperty("uDitherNoiseStrength", GetDitherNoiseUniformStrength(mDitherNoiseStrength));
+  }
+}
+
+float RenderEffectImpl::GetDitherNoiseStrength() const
+{
+  return mDitherNoiseStrength;
 }
 
 void RenderEffectImpl::Activate()

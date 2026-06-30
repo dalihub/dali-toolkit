@@ -1521,3 +1521,87 @@ int UtcDaliPopupSetPopupBackgroundBorderProperty(void)
 
   END_TEST;
 }
+
+int UtcDaliPopupGetNextKeyboardFocusableActorNoFocus(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPopupGetNextKeyboardFocusableActorNoFocus");
+
+  Popup popup = Popup::New();
+  popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
+  application.GetScene().Add(popup);
+
+  // Focusable content: with no current focused actor, focus should move to content
+  Control content = Control::New();
+  content.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  popup.SetContent(content);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor next = GetImplementation(popup).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, false);
+  DALI_TEST_CHECK(next == content);
+
+  // Non-focusable content with focusable footer: should return footer
+  content.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, false);
+
+  Control footer = Control::New();
+  footer.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  popup.SetFooter(footer);
+
+  next = GetImplementation(popup).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, false);
+  DALI_TEST_CHECK(next == footer);
+
+  END_TEST;
+}
+
+int UtcDaliPopupGetNextKeyboardFocusableActorFocusInsidePopup(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPopupGetNextKeyboardFocusableActorFocusInsidePopup");
+
+  Popup popup = Popup::New();
+  popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
+  application.GetScene().Add(popup);
+
+  popup.SetDisplayState(Popup::SHOWN);
+  application.SendNotification();
+  application.Render();
+
+  // Make content a separate focus group so buttons inside report content as their focus group
+  Control content = Control::New();
+  KeyboardFocusManager::Get().SetAsFocusGroup(content, true);
+  popup.SetContent(content);
+
+  PushButton button1 = PushButton::New();
+  button1.SetProperty(Actor::Property::NAME, "button1");
+  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  content.Add(button1);
+
+  PushButton button2 = PushButton::New();
+  button2.SetProperty(Actor::Property::NAME, "button2");
+  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  content.Add(button2);
+
+  application.SendNotification();
+  application.Render();
+
+  // button1's focus group is content (= mContent) => else branch: navigate among focusable actors
+  // RIGHT from button1 (not last): goes to button2
+  Actor next = GetImplementation(popup).GetNextKeyboardFocusableActor(button1, Control::KeyboardFocus::RIGHT, false);
+  DALI_TEST_CHECK(next == button2);
+
+  // LEFT from button1 (first): wraps to button2 (last)
+  next = GetImplementation(popup).GetNextKeyboardFocusableActor(button1, Control::KeyboardFocus::LEFT, false);
+  DALI_TEST_CHECK(next == button2);
+
+  // UP from button2: goes to first (button1)
+  next = GetImplementation(popup).GetNextKeyboardFocusableActor(button2, Control::KeyboardFocus::UP, false);
+  DALI_TEST_CHECK(next == button1);
+
+  // DOWN from button1: goes to last (button2)
+  next = GetImplementation(popup).GetNextKeyboardFocusableActor(button1, Control::KeyboardFocus::DOWN, false);
+  DALI_TEST_CHECK(next == button2);
+
+  END_TEST;
+}

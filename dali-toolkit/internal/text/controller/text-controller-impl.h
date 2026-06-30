@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/clipboard-integ.h>
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
@@ -426,7 +427,7 @@ public:
   {
     mModel = Model::New();
 
-    if(mEditableControlInterface != nullptr && Clipboard::IsAvailable())
+    if(mEditableControlInterface != nullptr && Dali::Integration::Clipboard::IsAvailable())
     {
       mClipboard = Clipboard::Get();
     }
@@ -669,7 +670,7 @@ public:
 
   bool IsClipboardVisible()
   {
-    bool result(Clipboard::IsAvailable() && EnsureClipboardCreated() && mClipboard.IsVisible());
+    bool result(Dali::Integration::Clipboard::IsAvailable() && EnsureClipboardCreated() && Dali::Integration::Clipboard::IsVisible(mClipboard));
     return result;
   }
 

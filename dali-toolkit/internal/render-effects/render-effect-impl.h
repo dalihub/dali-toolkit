@@ -149,6 +149,18 @@ protected:
   Vector2 GetTargetSize() const;
 
   /**
+   * @brief Sets dithering noise strength of the final render effect output.
+   * @param[in] strength The dithering noise strength, clamped to [0.0f, 1.0f].
+   */
+  void SetDitherNoiseStrength(float strength);
+
+  /**
+   * @brief Gets dithering noise strength of the final render effect output.
+   * @return The dithering noise strength.
+   */
+  float GetDitherNoiseStrength() const;
+
+  /**
    * @brief Get Owner control. It could be return empty handle if owner control is not set, or destroyed.
    * @return mOwnerControl
    */
@@ -213,6 +225,8 @@ private:
   WeakHandle<Dali::Integration::SceneHolder> mPlacementSceneHolder; ///< Weakhandle of scene
 
   Vector2 mTargetSize; // The final size of mOwnerControl
+
+  float mDitherNoiseStrength;
 
   bool mIsActivated : 1;
 };

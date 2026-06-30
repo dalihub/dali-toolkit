@@ -102,12 +102,25 @@ enum
   PADDING         = Control::Property::PADDING,
 
   /**
+   * @brief Displays a tooltip when the control is hovered over.
+   * @details Name "tooltip", type Property::STRING, Property::ARRAY or Property::MAP.
+   *          If Property::STRING, then the style specified in the stylesheet is used.
+   *          If Property::ARRAY of Visuals then all are displayed in one row.
+   *          If Property::MAP, then it should be a map of Tooltip properties.
+   * @note The tooltip is only activated if display content is received, i.e. a string (text) or visual to show.
+   *       The rest is used to just build up the style of the tooltip (i.e. background, text color/point-size etc.)
+   * @note When retrieved, a Property::MAP is returned.
+   * @see Toolkit::Tooltip
+   */
+  TOOLTIP = PADDING + 1,
+
+  /**
    * @brief The current state of the control.
    * @details Name "state", type DevelControl::State ( Property::INTEGER ) or Property::STRING
    *
    * @see DevelControl::State
    */
-  STATE = PADDING + 1,
+  STATE = PADDING + 2,
 
   /**
    * @brief The current sub state of the control.
@@ -115,41 +128,41 @@ enum
    *
    * @see DevelControl::State
    */
-  SUB_STATE = PADDING + 2,
+  SUB_STATE = PADDING + 3,
 
   /**
    * @brief The actor ID of the left focusable control.
    * @details Name "leftFocusableActorId", type Property::INTEGER.
    *
    */
-  LEFT_FOCUSABLE_ACTOR_ID = PADDING + 3,
+  LEFT_FOCUSABLE_ACTOR_ID = PADDING + 4,
 
   /**
    * @brief The actor ID of the right focusable control.
    * @details Name "rightFocusableActorId", type Property::INTEGER.
    *
    */
-  RIGHT_FOCUSABLE_ACTOR_ID = PADDING + 4,
+  RIGHT_FOCUSABLE_ACTOR_ID = PADDING + 5,
 
   /**
    * @brief The actor ID of the up focusable control.
    * @details Name "upFocusableActorId", type Property::INTEGER.
    *
    */
-  UP_FOCUSABLE_ACTOR_ID = PADDING + 5,
+  UP_FOCUSABLE_ACTOR_ID = PADDING + 6,
 
   /**
    * @brief The actor ID of the down focusable control.
    * @details Name "downFocusableActorId", type Property::INTEGER.
    *
    */
-  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 6,
+  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7,
 
   /**
    * @brief The shadow of the control.
    * @details Name "shadow", type Property::MAP.
    */
-  SHADOW = PADDING + 7,
+  SHADOW = PADDING + 8,
 
   /**
    * @brief The name of object visible in accessibility tree.

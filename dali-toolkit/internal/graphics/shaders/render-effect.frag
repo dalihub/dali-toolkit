@@ -12,6 +12,7 @@ UNIFORM_BLOCK FragBlock
 {
   UNIFORM lowp vec4 uColor;
   UNIFORM highp vec4 uCornerSquareness;
+  UNIFORM highp float uDitherNoiseStrength;
 };
 
 UNIFORM_BLOCK SharedBlock
@@ -23,15 +24,15 @@ UNIFORM sampler2D sTexture;
 
 highp float nrand(const in vec2 uv)
 {
-  const highp float a = 12.9898, b = 78.233, c = 43758.5453, pi = 3.141592653589793;
-  highp float dt = dot(uv, vec2(a, b)), sn = mod(dt, pi);
-  return fract(sin(sn) * c);
+  highp vec3 p = fract(vec3(uv.xyx) * 0.1031);
+  p += dot(p, p.yzx + 33.33);
+  return fract((p.x + p.y) * p.z);
 }
 
 vec3 applyDithering( vec3 inColor )
 {
-  float rnd = nrand(vTexCoord) - 0.5;
-  inColor.rgb += rnd * 0.0039215686;
+  float rnd = nrand(vTexCoord * uSize.xy) - 0.5;
+  inColor.rgb += rnd * uDitherNoiseStrength;
   return inColor;
 }
 

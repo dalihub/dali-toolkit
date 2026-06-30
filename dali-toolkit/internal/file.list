@@ -110,6 +110,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/text-controls/text-selection-popup-impl.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-popup-property-handler.cpp
    ${toolkit_src_dir}/controls/text-controls/text-selection-toolbar-impl.cpp
+   ${toolkit_src_dir}/controls/tooltip/tooltip.cpp
    ${toolkit_src_dir}/controls/video-view/video-view-impl.cpp
    ${toolkit_src_dir}/controls/video-view/video-view-rendering-strategy.cpp
    ${toolkit_src_dir}/controls/web-view/web-view-impl.cpp
@@ -122,6 +123,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/image-loader/async-image-loader-impl.cpp
    ${toolkit_src_dir}/image-loader/fast-track-loading-task.cpp
    ${toolkit_src_dir}/image-loader/loading-task.cpp
+   ${toolkit_src_dir}/image-loader/remote-decode-task.cpp
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp
    ${toolkit_src_dir}/property-bridge/property-bridge-impl.cpp
    ${toolkit_src_dir}/render-effects/render-effect-impl.cpp

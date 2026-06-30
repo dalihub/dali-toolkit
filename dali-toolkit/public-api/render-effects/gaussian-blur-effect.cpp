@@ -80,6 +80,16 @@ float GaussianBlurEffect::GetBlurDownscaleFactor() const
   return GetImplementation(*this).GetBlurDownscaleFactor();
 }
 
+void GaussianBlurEffect::SetDitherNoiseStrength(float strength)
+{
+  GetImplementation(*this).SetDitherNoiseStrength(strength);
+}
+
+float GaussianBlurEffect::GetDitherNoiseStrength() const
+{
+  return GetImplementation(*this).GetDitherNoiseStrength();
+}
+
 void GaussianBlurEffect::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   GetImplementation(*this).AddBlurStrengthAnimation(animation, alphaFunction, timePeriod, fromValue, toValue);

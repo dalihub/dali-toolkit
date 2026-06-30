@@ -74,6 +74,38 @@ int UtcDaliRenderEffectNewN(void)
   END_TEST;
 }
 
+int UtcDaliRenderEffectDitherNoiseStrengthP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliRenderEffectDitherNoiseStrengthP");
+
+  BackgroundBlurEffect backgroundBlur = BackgroundBlurEffect::New();
+  DALI_TEST_EQUALS(backgroundBlur.GetDitherNoiseStrength(), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  backgroundBlur.SetDitherNoiseStrength(0.5f);
+  DALI_TEST_EQUALS(backgroundBlur.GetDitherNoiseStrength(), 0.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  backgroundBlur.SetDitherNoiseStrength(-1.0f);
+  DALI_TEST_EQUALS(backgroundBlur.GetDitherNoiseStrength(), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  backgroundBlur.SetDitherNoiseStrength(2.0f);
+  DALI_TEST_EQUALS(backgroundBlur.GetDitherNoiseStrength(), 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  GaussianBlurEffect gaussianBlur = GaussianBlurEffect::New();
+  DALI_TEST_EQUALS(gaussianBlur.GetDitherNoiseStrength(), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  gaussianBlur.SetDitherNoiseStrength(0.25f);
+  DALI_TEST_EQUALS(gaussianBlur.GetDitherNoiseStrength(), 0.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  gaussianBlur.SetDitherNoiseStrength(-1.0f);
+  DALI_TEST_EQUALS(gaussianBlur.GetDitherNoiseStrength(), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  gaussianBlur.SetDitherNoiseStrength(2.0f);
+  DALI_TEST_EQUALS(gaussianBlur.GetDitherNoiseStrength(), 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderEffectActivateP01(void)
 {
   ToolkitTestApplication application;

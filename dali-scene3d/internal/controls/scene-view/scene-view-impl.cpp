@@ -999,7 +999,7 @@ int32_t SceneView::Capture(Dali::CameraActor camera, const Vector2& size)
     captureData->mCaptureImageView = Dali::Toolkit::ImageView::New(captureData->mCaptureUrl.GetUrl());
     captureData->mCaptureImageView.SetProperty(Dali::Actor::Property::SIZE, size);
 
-    Window window = DevelWindow::Get(Self());
+    Window window = Window::Get(Self());
     window.Add(captureData->mCaptureImageView);
 
     captureData->mCaptureInvertTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -1201,11 +1201,11 @@ void SceneView::OnSceneConnection(int depth)
     UpdateSkybox(mSkyboxUrl, mSkyboxEnvironmentMapType);
   }
 
-  Window window = DevelWindow::Get(Self());
+  Window window = Window::Get(Self());
   if(window)
   {
     // Only for on-screen window
-    window.ResizeSignal().Connect(this, &SceneView::OnWindowResized);
+    window.ResizedSignal().Connect(this, &SceneView::OnWindowResized);
 
     mWindow            = window;
     mWindowOrientation = DevelWindow::GetPhysicalOrientation(window);
@@ -1244,7 +1244,7 @@ void SceneView::OnSceneDisconnection()
   Window window = mWindow.GetHandle();
   if(window)
   {
-    window.ResizeSignal().Disconnect(this, &SceneView::OnWindowResized);
+    window.ResizedSignal().Disconnect(this, &SceneView::OnWindowResized);
   }
   mWindow.Reset();
 

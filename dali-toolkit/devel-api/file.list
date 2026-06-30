@@ -209,6 +209,10 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/spans/span-enumerations.h
 )
 
+SET( devel_api_tooltip_header_files
+  ${devel_api_src_dir}/controls/tooltip/tooltip-properties.h
+)
+
 SET( devel_api_gaussian_blur_view_header_files
   ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.h
 )
@@ -256,6 +260,7 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_styling_header_files}
   ${devel_api_text_controls_header_files}
   ${devel_api_text_header_files}
+  ${devel_api_tooltip_header_files}
   ${devel_api_gaussian_blur_view_header_files}
   ${devel_api_video_view_header_files}
   ${devel_api_web_view_header_files}

@@ -99,6 +99,16 @@ public:
   float GetBlurDownscaleFactor() const;
 
   /**
+   * @copydoc Toolkit::BackgroundBlurEffect::SetDitherNoiseStrength
+   */
+  void SetDitherNoiseStrength(float strength);
+
+  /**
+   * @copydoc Toolkit::BackgroundBlurEffect::GetDitherNoiseStrength
+   */
+  float GetDitherNoiseStrength() const;
+
+  /**
    * @copydoc Toolkit::BackgroundBlurEffect::AddBlurStrengthAnimation
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);

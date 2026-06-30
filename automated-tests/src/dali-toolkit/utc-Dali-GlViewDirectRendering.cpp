@@ -24,8 +24,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -405,7 +405,7 @@ int UtcDaliGlViewDirectRenderingWindowVisibilityChanged(void)
   application.SendNotification();
   application.Render();
 
-  Window window = DevelWindow::Get(view);
+  Window window = Window::Get(view);
   window.Hide();
   application.SendNotification();
   application.Render();

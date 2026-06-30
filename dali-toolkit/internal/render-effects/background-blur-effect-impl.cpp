@@ -234,6 +234,16 @@ float BackgroundBlurEffectImpl::GetBlurDownscaleFactor() const
   return mDownscaleFactor;
 }
 
+void BackgroundBlurEffectImpl::SetDitherNoiseStrength(float strength)
+{
+  RenderEffectImpl::SetDitherNoiseStrength(strength);
+}
+
+float BackgroundBlurEffectImpl::GetDitherNoiseStrength() const
+{
+  return RenderEffectImpl::GetDitherNoiseStrength();
+}
+
 void BackgroundBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
 {
   if(DALI_UNLIKELY(mSkipBlur))

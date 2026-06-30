@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
+#include <dali-toolkit/internal/image-loader/remote-decode-task.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
 #include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
@@ -223,6 +224,107 @@ int UtcTextureManagerRequestLoad(void)
   VisualUrl url = textureManager.GetVisualUrl(textureId);
 
   DALI_TEST_EQUALS(url.GetUrl().compare(filename), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerRemoteAsyncDownloadLoad(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerRemoteAsyncDownloadLoad");
+
+  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali2-file-download-plugin-test.so");
+  setenv("DALI_TEST_REMOTE_FILE_DOWNLOAD_PATH", TEST_IMAGE_FILE_NAME, 1);
+
+  TextureManager textureManager;
+
+  TestObserver              observer;
+  auto                      preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  TextureManager::TextureId textureId   = textureManager.RequestLoad(
+    VisualUrl("https://dali.test/remote-image.jpg"),
+    ImageDimensions(),
+    SamplingMode::BOX_THEN_LINEAR,
+    &observer,
+    true,
+    TextureManager::ReloadPolicy::FORCED,
+    preMultiply);
+
+  DALI_TEST_CHECK(textureId != TextureManager::INVALID_TEXTURE_ID);
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(observer.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerRemoteAsyncDownloadFailure(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerRemoteAsyncDownloadFailure");
+
+  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali2-file-download-plugin-test.so");
+  unsetenv("DALI_TEST_REMOTE_FILE_DOWNLOAD_PATH");
+
+  TextureManager textureManager;
+
+  TestObserver              observer;
+  auto                      preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  TextureManager::TextureId textureId   = textureManager.RequestLoad(
+    VisualUrl("https://dali.test/missing-remote-image.jpg"),
+    ImageDimensions(),
+    SamplingMode::BOX_THEN_LINEAR,
+    &observer,
+    true,
+    TextureManager::ReloadPolicy::FORCED,
+    preMultiply);
+
+  DALI_TEST_CHECK(textureId != TextureManager::INVALID_TEXTURE_ID);
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerRemoteDecodeTaskPremultiply(void)
+{
+  tet_infoline("UtcTextureManagerRemoteDecodeTaskPremultiply");
+
+  RemoteDecodeTaskPtr remoteDecodeTask = new RemoteDecodeTask(
+    1,
+    TEST_IMAGE_4_FILE_NAME,
+    ImageDimensions(),
+    SamplingMode::BOX_THEN_LINEAR,
+    true,
+    Dali::Toolkit::DevelAsyncImageLoader::PreMultiplyOnLoad::ON,
+    false,
+    nullptr);
+
+  remoteDecodeTask->Process();
+
+  DALI_TEST_CHECK(!remoteDecodeTask->pixelBuffers.empty());
 
   END_TEST;
 }

@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -60,6 +61,7 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ToggleButton, Toolkit::Button, Create)
 
 DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "stateVisuals", ARRAY, STATE_VISUALS)
+DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "tooltips", ARRAY, TOOLTIPS)
 DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "currentStateIndex", INTEGER, CURRENT_STATE_INDEX)
 
 DALI_TYPE_REGISTRATION_END()
@@ -89,6 +91,7 @@ ToggleButton::ToggleButton()
   mToggleSelectedVisuals(),
   mToggleDisabledVisuals(),
   mToggleDisabledSelectedVisuals(),
+  mToggleTooltips(),
   mCurrentToggleIndex(0)
 {
   DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n");
@@ -138,6 +141,33 @@ void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex
 
         break;
       }
+      case Toolkit::ToggleButton::Property::TOOLTIPS:
+      {
+        const Property::Array* tipArray = value.GetArray();
+        if(tipArray)
+        {
+          std::vector<std::string> tips;
+          size_t                   tipsCount = tipArray->Count();
+          tips.resize(tipsCount);
+
+          bool valid = true;
+          for(size_t i = 0; i != tipsCount; ++i)
+          {
+            if(DALI_UNLIKELY(!GetStdString(tipArray->GetElementAt(i), tips[i])))
+            {
+              // Given array is invalid. Fast out.
+              valid = false;
+              break;
+            }
+          }
+
+          if(DALI_LIKELY(valid))
+          {
+            toggleButtonImpl.SetToggleTooltips(tips);
+          }
+        }
+        break;
+      }
       default:
       {
         break;
@@ -163,6 +193,23 @@ Property::Value ToggleButton::GetProperty(BaseObject* object, Property::Index pr
       case Toolkit::ToggleButton::Property::STATE_VISUALS:
       {
         value = toggleButtonImpl.GetToggleStates();
+        break;
+      }
+      case Toolkit::ToggleButton::Property::TOOLTIPS:
+      {
+        Property::Value  value1(Property::ARRAY);
+        Property::Array* tipArray = value1.GetArray();
+
+        if(tipArray)
+        {
+          std::vector<std::string> tips = toggleButtonImpl.GetToggleTooltips();
+          size_t                   tipsCount(tips.size());
+          for(size_t i(0); i != tipsCount; ++i)
+          {
+            tipArray->PushBack(ToPropertyValue(tips[i]));
+          }
+        }
+        value = value1;
         break;
       }
       case Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX:
@@ -249,6 +296,28 @@ Property::Array ToggleButton::GetToggleStates() const
   return mToggleStates;
 }
 
+void ToggleButton::SetToggleTooltips(std::vector<std::string>& tips)
+{
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::SetToggleTooltips\n");
+  if(!tips.empty())
+  {
+    mToggleTooltips.clear();
+    mToggleTooltips.swap(tips);
+  }
+
+  if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
+  {
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, ToPropertyValue(mToggleTooltips[mCurrentToggleIndex]));
+  }
+
+  RelayoutRequest();
+}
+
+const std::vector<std::string>& ToggleButton::GetToggleTooltips() const
+{
+  return mToggleTooltips;
+}
+
 void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
   bool enabled = false; // Disabled by default
@@ -311,6 +380,12 @@ void ToggleButton::OnPressed()
   PrepareVisual(Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex]);
   PrepareVisual(Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex]);
 
+  //Need to check mCurrentToggleIndex, it must less than the size of mToggleTooltips.
+  if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
+  {
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, ToPropertyValue(mToggleTooltips[mCurrentToggleIndex]));
+  }
+
   RelayoutRequest();
 }
 
@@ -327,12 +402,16 @@ Dali::Accessibility::States ToggleButton::ToggleButtonAccessible::CalculateState
 
 std::string ToggleButton::ToggleButtonAccessible::GetDescriptionRaw() const
 {
-  return Button::ButtonAccessible::GetDescriptionRaw();
+  auto button   = Toolkit::ToggleButton::DownCast(Self());
+  auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
+  auto tooltips = button.GetProperty<Property::Array>(Toolkit::ToggleButton::Property::TOOLTIPS);
+
+  return ToStdString(tooltips[index]);
 }
 
-Dali::Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyIndex()
+Property::Index ToggleButton::ToggleButtonAccessible::GetDescriptionPropertyIndex()
 {
-  return Button::ButtonAccessible::GetDescriptionPropertyIndex();
+  return Toolkit::ToggleButton::Property::TOOLTIPS;
 }
 
 void ToggleButton::OnStateChange(State newState)

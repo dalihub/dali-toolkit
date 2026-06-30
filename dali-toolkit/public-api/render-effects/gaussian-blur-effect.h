@@ -133,6 +133,26 @@ public:
   float GetBlurDownscaleFactor() const;
 
   /**
+   * @brief Sets the dithering noise strength of the final blur output.
+   *
+   * The value is clamped to the range [0.0f, 1.0f].
+   * 0.0f disables dithering noise, while 1.0f applies the maximum noise strength.
+   * The default value is 0.1f.
+   *
+   * @param[in] strength The dithering noise strength.
+   * @SINCE_2_5.27
+   */
+  void SetDitherNoiseStrength(float strength);
+
+  /**
+   * @brief Gets the dithering noise strength of the final blur output.
+   *
+   * @return The dithering noise strength.
+   * @SINCE_2_5.27
+   */
+  float GetDitherNoiseStrength() const;
+
+  /**
    * @brief Adds blur strength animation. Blurifies clear texture within given animation parameters.
    * @param[in] animation Animation instance to which we add blur strength animation.
    * @param[in] alphaFunction AlphaFunction of blur strength animation.

@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/render-effects/offscreen-rendering-impl.h>
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -646,6 +647,9 @@ public:
 
   // Off screen rendering context
   std::unique_ptr<OffscreenRenderingContext> mOffScreenRenderingContext;
+
+  // Tooltip
+  Internal::TooltipPtr mTooltip;
 
   InputMethodContext mInputMethodContext;
   CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.

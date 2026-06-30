@@ -25,6 +25,8 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
@@ -110,9 +112,10 @@ private:
   Dali::CameraPlayer mCameraPlayer;
   Dali::Texture      mNativeTexture;
 
-  Dali::DisplayArea mDisplayArea;
-  Dali::Renderer    mOverlayRenderer;
-  Dali::Renderer    mTextureRenderer;
+  Dali::DisplayArea           mDisplayArea;
+  Dali::Toolkit::Visual::Base mOverlayVisual;
+  Dali::Property::Index       mOverlayVisualIndex{Dali::Property::INVALID_INDEX};
+  Dali::Renderer              mTextureRenderer;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;

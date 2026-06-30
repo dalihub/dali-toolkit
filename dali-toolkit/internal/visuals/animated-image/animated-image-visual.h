@@ -215,7 +215,7 @@ private:
   /**
    * @brief Create image cache for animated image or image array.
    */
-  void CreateImageCache();
+  void CreateImageCache(TextureManager::ReloadPolicy reloadPolicy = TextureManager::ReloadPolicy::CACHED);
 
   /**
    * @brief Adds the texture set to the renderer, and the renderer to the

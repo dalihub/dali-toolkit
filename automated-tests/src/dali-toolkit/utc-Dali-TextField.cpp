@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <iostream>
 
+#include "toolkit-clipboard.h"
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
@@ -35,7 +37,6 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
-#include "toolkit-clipboard.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -3286,8 +3287,8 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
-  Dali::Clipboard           clipboard = Clipboard::Get();
-  Dali::Clipboard::ClipData data("text/plain;charset=utf-8", "testTextFieldEvent");
+  Dali::Clipboard           clipboard = Dali::Clipboard::Get();
+  Dali::ClipboardData data("text/plain;charset=utf-8", "testTextFieldEvent");
   clipboard.SetData(data);
 
   // Checks Longpress when only place holder text
@@ -3352,7 +3353,7 @@ int utcDaliTextFieldEvent08(void)
   }
   DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), std::string("testTextFieldEvent"), TEST_LOCATION);
 
-  Dali::Clipboard::ClipData htmlData("application/xhtml+xml", "testTextFieldEventHtml");
+  Dali::ClipboardData htmlData("application/xhtml+xml", "testTextFieldEventHtml");
   clipboard.SetData(htmlData);
 
   field.SetProperty(TextField::Property::TEXT, "");

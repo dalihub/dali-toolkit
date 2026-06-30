@@ -20,12 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
@@ -456,11 +456,11 @@ void SnapWithVelocity(
     // v = 0 (Final Velocity)
     // t = Time (Velocity / Deceleration)
     // SnapWithVelocity is called during gesture handling, so the window is guaranteed to be available.
-    Dali::Window::WindowSize ws          = DevelWindow::Get(scrollView.Self()).GetSize();
-    float                    stageLength = Vector3(ws.GetWidth(), ws.GetHeight(), 0.0f).Length();
-    float                    a           = (stageLength * scrollView.GetFrictionCoefficient());
-    Vector3                  u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
-    float                    speed       = u.Length();
+    Dali::PositionSize ws          = Window::Get(scrollView.Self()).GetPositionSize();
+    float              stageLength = Vector3(ws.width, ws.height, 0.0f).Length();
+    float              a           = (stageLength * scrollView.GetFrictionCoefficient());
+    Vector3            u           = Vector3(velocity.x, velocity.y, 0.0f) * scrollView.GetFlickSpeedCoefficient();
+    float              speed       = u.Length();
     u /= speed;
 
     // TODO: Change this to a decay function. (faster you flick, the slower it should be)
