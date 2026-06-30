@@ -54,7 +54,6 @@ SET(TC_SOURCES
   utc-Dali-TextSelectionPopupMirroringLTR.cpp
   utc-Dali-TextSelectionPopupMirroringRTL.cpp
   utc-Dali-TextureManager.cpp
-  utc-Dali-Tooltip.cpp
   utc-Dali-Transition.cpp
   utc-Dali-TransitionData.cpp
   utc-Dali-Button.cpp

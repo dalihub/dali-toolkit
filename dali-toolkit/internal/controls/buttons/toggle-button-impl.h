@@ -96,18 +96,6 @@ private:
   Property::Array GetToggleStates() const;
 
   /**
-   * Called to set toggle tooltips when TOGGLE_TIPS is set in SetProperty function.
-   * @param[in] tips The array store toggle tips.
-   */
-  void SetToggleTooltips(std::vector<std::string>& tips);
-
-  /**
-   * Called to retrieve toggle tips.
-   * @return The toggle tips array.
-   */
-  const std::vector<std::string>& GetToggleTooltips() const;
-
-  /**
    * Called to prepare visual for next state.
    * @param[in] index The property index to set.
    * @param[in] visual The visual to set.
@@ -155,7 +143,6 @@ private:
   std::vector<Toolkit::Visual::Base> mToggleSelectedVisuals;         ///< Save all selected visuals.
   std::vector<Toolkit::Visual::Base> mToggleDisabledVisuals;         ///< Save all disabled unselected visuals.
   std::vector<Toolkit::Visual::Base> mToggleDisabledSelectedVisuals; ///< Save all disabled selected visuals.
-  std::vector<std::string>           mToggleTooltips;                ///< Toggle tooltips.
   unsigned int                       mCurrentToggleIndex;            ///< The index of state.
 
 protected:
