@@ -131,7 +131,7 @@ BoundsInteger CalculateDisplayArea(Dali::Actor self, DisplayAreaCalculateOption 
                                                                                        : self.GetProperty<Vector3>(Actor::Property::SIZE) * self.GetProperty<Vector3>(Actor::Property::SCALE);
   Vector3 pivotOffSet       = actorSize * (positionUsesPivot ? self.GetCurrentProperty<Vector3>(Actor::Property::PIVOT) : Pivot::TOP_LEFT);
   Vector2 screenPosition    = (option == DisplayAreaCalculateOption::CURRENT_PROPERTY) ? self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION)
-                                                                                       : Dali::DevelActor::CalculateScreenPosition(self);
+                                                                                       : self.CalculateScreenPosition();
 
   Dali::BoundsInteger displayArea;
   displayArea.x      = static_cast<int32_t>(std::roundf(screenPosition.x - pivotOffSet.x));
