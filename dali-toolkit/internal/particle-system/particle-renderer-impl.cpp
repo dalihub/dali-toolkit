@@ -266,9 +266,9 @@ void ParticleRenderer::CreateShader()
 
   if(mBlendingMode == BlendingMode::SCREEN)
   {
-    if(Dali::Capabilities::IsBlendEquationSupported(Dali::DevelBlendEquation::SCREEN))
+    if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN))
     {
-      mEmitter->GetActor().SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+      mEmitter->GetActor().SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
     }
     else // Fallback to default
     {
