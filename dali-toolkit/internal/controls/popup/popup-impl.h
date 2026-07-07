@@ -26,6 +26,7 @@
 #include <dali/public-api/common/extents.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
@@ -244,7 +245,7 @@ protected:
   class PopupAccessible : public DevelControl::ControlAccessible
   {
   public:
-    using DevelControl::ControlAccessible::ControlAccessible;
+    PopupAccessible(Dali::Actor self);
 
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::GetNameRaw()
@@ -254,7 +255,7 @@ protected:
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
      */
-    Dali::Accessibility::States CalculateStates() override;
+    Dali::Integration::Accessibility::States CalculateStates() override;
   };
 
   /**

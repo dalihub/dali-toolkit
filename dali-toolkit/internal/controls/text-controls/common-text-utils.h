@@ -112,12 +112,12 @@ public:
   /**
    * @copydoc Dali::Accessibility::Text::GetRangeExtents()
    */
-  Bounds GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type) override;
+  Bounds GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Dali::Devel::Accessibility::CoordinateType type) override;
 
   /**
    * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
    */
-  Accessibility::Range GetRangeOfSelection(std::size_t selectionIndex) const override;
+  Dali::Devel::Accessibility::Range GetRangeOfSelection(std::size_t selectionIndex) const override;
 
   /**
    * @copydoc Dali::Accessibility::Text::GetText()
@@ -127,7 +127,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
    */
-  Accessibility::Range GetTextAtOffset(std::size_t offset, Accessibility::TextBoundary boundary) const override;
+  Dali::Devel::Accessibility::Range GetTextAtOffset(std::size_t offset, Dali::Devel::Accessibility::TextBoundary boundary) const override;
 
   /**
    * @copydoc Dali::Accessibility::Text::RemoveSelection()
@@ -149,7 +149,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Hypertext::GetLink()
    */
-  Accessibility::Accessible* GetLink(std::int32_t linkIndex) const override;
+  Dali::Accessibility::Accessible* GetLink(std::int32_t linkIndex) const override;
 
   /**
    * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
@@ -220,7 +220,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
    */
-  Accessibility::States CalculateStates() override;
+  Dali::Integration::Accessibility::States CalculateStates() override;
 
   // Text
 

@@ -684,13 +684,13 @@ private:
   void SetPageZoomFactor(float zoomFactor);
 
   /**
-   * @brief Query the current zoom factor of the page。
+   * @brief Query the current zoom factor of the page.
    * @return The current page zoom factor.
    */
   float GetPageZoomFactor() const;
 
   /**
-   * @brief Set the current text zoom level。.
+   * @brief Set the current text zoom level.
    * @param[in] zoomFactor a new factor to be set.
    */
   void SetTextZoomFactor(float zoomFactor);
@@ -814,13 +814,13 @@ protected:
 
     void SetForceRefreshAddress(bool forceRefresh);
 
-    void SetRemoteChildAddress(Dali::Accessibility::Address address);
+    void SetRemoteChildAddress(Dali::Devel::Accessibility::Address address);
 
   protected:
     /**
      * @copydoc Dali::Accessibility::Accessible::GetAttributes()
      */
-    Dali::Accessibility::Attributes GetAttributes() const override;
+    Dali::Devel::Accessibility::Attributes GetAttributes() const override;
 
     /**
      * @copydoc Dali::Accessibility::ActorAccessible::DoGetChildren()

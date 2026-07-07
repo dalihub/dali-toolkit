@@ -111,7 +111,7 @@ void ToggleButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::TOGGLE_BUTTON);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::TOGGLE_BUTTON);
 }
 
 DevelControl::ControlAccessible* ToggleButton::CreateAccessibleObject()
@@ -389,13 +389,13 @@ void ToggleButton::OnPressed()
   RelayoutRequest();
 }
 
-Dali::Accessibility::States ToggleButton::ToggleButtonAccessible::CalculateStates()
+Dali::Integration::Accessibility::States ToggleButton::ToggleButtonAccessible::CalculateStates()
 {
   auto states = Button::ButtonAccessible::CalculateStates();
   auto button = Toolkit::ToggleButton::DownCast(Self());
   if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
   {
-    states[Dali::Accessibility::State::CHECKED] = true;
+    states[Dali::Integration::Accessibility::State::CHECKED] = true;
   }
   return states;
 }
@@ -422,8 +422,8 @@ void ToggleButton::OnStateChange(State newState)
     auto accessible = DynamicPointerCast<Dali::Accessibility::ActorAccessible>(GetAccessibleObject());
     if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
-      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+      accessible->EmitStateChanged(Dali::Integration::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
+      accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
     }
   }
 }

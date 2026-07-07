@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/key.h>
@@ -344,7 +345,7 @@ void Popup::OnInitialize()
 
   SetupTouch();
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::DIALOG);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::DIALOG);
 }
 
 DevelControl::ControlAccessible* Popup::CreateAccessibleObject()
@@ -575,7 +576,7 @@ void Popup::DisplayStateChangeComplete()
 
 bool Popup::OnAutoHideTimeReached()
 {
-  if(!Dali::Accessibility::IsUp() || true) // TODO: remove 'true' in sync with EFL (UX change)
+  if(!Dali::Integration::Accessibility::IsUp() || true) // TODO: remove 'true' in sync with EFL (UX change)
   {
     // Display timer has expired, auto hide the popup exactly as if the user had clicked outside.
     SetDisplayState(Toolkit::Popup::HIDDEN);
@@ -735,7 +736,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
   {
     // Update the state to indicate the current intent.
     mDisplayState = Toolkit::Popup::SHOWING;
-    DevelControl::EmitAccessibilityStateChanged(Self(), Accessibility::State::SHOWING, 1);
+    DevelControl::NotifyAccessibilityPresentationChanged(Self(), true);
 
     // We want the popup to have key input focus when it is displayed
     SetKeyInputFocus();
@@ -790,7 +791,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
   {
     mDisplayState = Toolkit::Popup::HIDING;
     ClearKeyInputFocus();
-    DevelControl::EmitAccessibilityStateChanged(Self(), Accessibility::State::SHOWING, 0);
+    DevelControl::NotifyAccessibilityPresentationChanged(Self(), false);
     // Restore the keyboard focus when popup is hidden.
     if(mPreviousFocusedActor && mPreviousFocusedActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
     {
@@ -2016,6 +2017,11 @@ void Popup::SetupTouch()
   }
 }
 
+Popup::PopupAccessible::PopupAccessible(Dali::Actor self)
+: DevelControl::ControlAccessible(self)
+{
+}
+
 std::pair<std::string, bool> Popup::PopupAccessible::GetNameRaw() const
 {
   auto        popup = Toolkit::Popup::DownCast(Self());
@@ -2038,13 +2044,13 @@ std::pair<std::string, bool> Popup::PopupAccessible::GetNameRaw() const
   return {title, false};
 }
 
-Dali::Accessibility::States Popup::PopupAccessible::CalculateStates()
+Dali::Integration::Accessibility::States Popup::PopupAccessible::CalculateStates()
 {
   auto states       = DevelControl::ControlAccessible::CalculateStates();
   auto popup        = Toolkit::Popup::DownCast(Self());
   auto displayState = ToStdString(popup.GetProperty(Toolkit::Popup::Property::DISPLAY_STATE));
 
-  states[Dali::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
+  states[Dali::Integration::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
 
   return states;
 }

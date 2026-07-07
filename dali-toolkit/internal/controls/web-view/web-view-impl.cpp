@@ -38,6 +38,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
@@ -340,7 +341,7 @@ void WebView::OnInitialize()
     mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CONTAINER);
 }
 
 DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
@@ -474,7 +475,7 @@ void WebView::Resume()
     DALI_LOG_DEBUG_INFO("WebView[%p] Resume()\n", this);
     mWebEngine.Resume();
 
-    if(Dali::Accessibility::IsUp())
+    if(Dali::Integration::Accessibility::IsUp())
     {
       SetKeyInputFocus();
     }
@@ -1619,10 +1620,10 @@ WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine&
 {
   mRemoteChild.SetParent(this);
 
-  Dali::Accessibility::Bridge::EnabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityEnabled);
-  Dali::Accessibility::Bridge::DisabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityDisabled);
+  Dali::Integration::Accessibility::Bridge::EnabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityEnabled);
+  Dali::Integration::Accessibility::Bridge::DisabledSignal().Connect(this, &WebViewAccessible::OnAccessibilityDisabled);
 
-  if(Dali::Accessibility::IsUp())
+  if(Dali::Integration::Accessibility::IsUp())
   {
     OnAccessibilityEnabled();
   }
@@ -1632,7 +1633,7 @@ WebView::WebViewAccessible::WebViewAccessible(Dali::Actor self, Dali::WebEngine&
   }
 }
 
-Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() const
+Dali::Devel::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() const
 {
   auto attributes = DevelControl::ControlAccessible::GetAttributes();
 
@@ -1646,7 +1647,7 @@ Dali::Accessibility::Attributes WebView::WebViewAccessible::GetAttributes() cons
 
 void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::Accessible*>& children)
 {
-  if(Dali::Accessibility::IsUp() && (!mRemoteChild.GetAddress() || mForceRefreshAddress))
+  if(Dali::Integration::Accessibility::IsUp() && (!mRemoteChild.GetAddress() || mForceRefreshAddress))
   {
     DALI_LOG_DEBUG_INFO("Try setting address as it has not not been set on initialize. (force:%d)\n", mForceRefreshAddress);
     SetRemoteChildAddress(mWebEngine.GetAccessibilityAddress());
@@ -1663,7 +1664,7 @@ void WebView::WebViewAccessible::DoGetChildren(std::vector<Dali::Accessibility::
 
     // DoGetChildren is called at most once per every OnChildrenChanged.
     // We have only one OnChildrenChanged in this case, so EmbedSocket will be called only once.
-    if(auto bridge = Accessibility::Bridge::GetCurrentBridge())
+    if(auto bridge = Integration::Accessibility::Bridge::GetCurrentBridge())
     {
       bridge->EmbedSocket(GetAddress(), mRemoteChild.GetAddress());
     }
@@ -1695,7 +1696,7 @@ void WebView::WebViewAccessible::OnAccessibilityDisabled()
   OnChildrenChanged();
 }
 
-void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Accessibility::Address address)
+void WebView::WebViewAccessible::SetRemoteChildAddress(Dali::Devel::Accessibility::Address address)
 {
   mRemoteChild.SetAddress(address);
   mForceRefreshAddress = false;

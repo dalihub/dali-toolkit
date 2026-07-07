@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <test-application.h>

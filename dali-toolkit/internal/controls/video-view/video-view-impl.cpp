@@ -148,7 +148,7 @@ void VideoView::OnInitialize()
   mVideoPlayer.EventSignal().Connect(this, &VideoView::OnVideoPlayerEvent);
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::VIDEO);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::VIDEO);
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   // update self property

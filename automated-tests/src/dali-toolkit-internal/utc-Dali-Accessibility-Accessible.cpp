@@ -25,8 +25,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali.h>
 
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
@@ -51,7 +51,7 @@ int utcDaliAccessibilityCheckBoxButtonGetStates(void)
   auto q                = Dali::Accessibility::Accessible::Get(check_box_button);
   DALI_TEST_CHECK(q);
   auto states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SELECTABLE], (int)true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SELECTABLE], (int)true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -112,17 +112,17 @@ int UtcDaliAccessibilityCheckShowingState(void)
   auto q = Dali::Accessibility::Accessible::Get(buttonA);
   DALI_TEST_CHECK(q);
   auto states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   q = Dali::Accessibility::Accessible::Get(buttonB);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   q = Dali::Accessibility::Accessible::Get(buttonC);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SHOWING], (int)true, TEST_LOCATION);
 
   // Make SHOWING object invisible
   buttonC.SetProperty(Actor::Property::VISIBLE, false);
@@ -131,7 +131,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   application.Render(16);
 
   states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
 
   // Make SHOWING parent invisible
   parentButton.SetProperty(Actor::Property::VISIBLE, false);
@@ -142,7 +142,7 @@ int UtcDaliAccessibilityCheckShowingState(void)
   q = Dali::Accessibility::Accessible::Get(buttonA);
   DALI_TEST_CHECK(q);
   states = q->GetStates();
-  DALI_TEST_EQUALS((int)states[Dali::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)states[Dali::Integration::Accessibility::State::SHOWING], (int)false, TEST_LOCATION);
 
   END_TEST;
 }
