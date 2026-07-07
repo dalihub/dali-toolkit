@@ -20,7 +20,6 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/graphics-api/graphics-buffer.h>
 #include <dali/graphics-api/graphics-controller.h>
@@ -29,6 +28,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/common/capabilities.h>
 
 using Dali::Integration::ToDaliStringView;
 
