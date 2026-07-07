@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1356,6 +1357,74 @@ int UtcDaliTextFieldMarkupSpanCharacterSpacing(void)
     float diffLineExpandedCharSpacing = positions[2u * numberOfGlyphsOneLine + i + 1].x - positions[2u * numberOfGlyphsOneLine + i].x;
     DALI_TEST_EQUALS(diffLineExpandedCharSpacing, diffLineNoCharSpacing + expandedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldImeInputAfterFocusGain(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldImeInputAfterFocusGain ");
+
+  TextField textField = TextField::New();
+  textField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 60.f));
+  textField.SetProperty(TextField::Property::PLACEHOLDER_TEXT, "Search");
+
+  application.GetScene().Add(textField);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& textFieldImpl     = GetImpl(textField);
+  ControllerPtr                 controller        = textFieldImpl.GetTextController();
+  Controller::Impl&             controllerImpl    = Controller::Impl::GetImplementation(*controller.Get());
+  InputMethodContext            inputMethodContext = textFieldImpl.GetInputMethodContext();
+
+  DALI_TEST_EQUALS(EventData::INACTIVE, controllerImpl.mEventData->mState, TEST_LOCATION);
+
+  textField.SetKeyInputFocus();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(EventData::EDITING, controllerImpl.mEventData->mState, TEST_LOCATION);
+
+  Dali::Integration::InputMethodContext::EventData imfEvent(Dali::Integration::InputMethodContext::PRE_EDIT,
+                                                            Dali::String("user"),
+                                                            0,
+                                                            4);
+  Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(inputMethodContext).Emit(inputMethodContext, imfEvent);
+
+  application.SendNotification();
+  application.Render();
+
+  std::string text;
+  controller->GetText(text);
+
+  DALI_TEST_EQUALS("user", text, TEST_LOCATION);
+  DALI_TEST_EQUALS(4u, controller->GetCursorPosition(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EventData::EDITING, controllerImpl.mEventData->mState, TEST_LOCATION);
+  DALI_TEST_CHECK(!controller->IsShowingPlaceholderText());
+
+  TextField placeholderTextField = TextField::New();
+  placeholderTextField.SetProperty(Actor::Property::SIZE, Vector2(300.f, 60.f));
+  placeholderTextField.SetProperty(TextField::Property::PLACEHOLDER_TEXT, "Search");
+
+  application.GetScene().Add(placeholderTextField);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& placeholderTextFieldImpl  = GetImpl(placeholderTextField);
+  ControllerPtr                 placeholderController     = placeholderTextFieldImpl.GetTextController();
+  Controller::Impl&             placeholderControllerImpl = Controller::Impl::GetImplementation(*placeholderController.Get());
+
+  placeholderControllerImpl.mEventData->mPrimaryCursorPosition = 1u;
+  placeholderControllerImpl.mOperationsPending                 = Text::Controller::ALL_OPERATIONS;
+  placeholderController->RequestRelayout();
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

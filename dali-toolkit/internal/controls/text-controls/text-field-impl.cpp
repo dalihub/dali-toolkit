@@ -758,12 +758,21 @@ Text::ControllerPtr TextField::GetTextController()
 
 void TextField::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
+  if(mController && IsEditable() && mController->IsShowingPlaceholderText() && (0u != mController->GetCursorPosition()))
+  {
+    DALI_LOG_RELEASE_INFO("TextField render placeholder cursor. c:%p upd:%u cur:%u\n",
+                          static_cast<void*>(mController.Get()),
+                          static_cast<unsigned int>(updateTextType),
+                          mController->GetCursorPosition());
+  }
+
   CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mCursorLayer, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
 }
 
 void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get());
+
   if(mInputMethodContext && IsEditable())
   {
     // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
@@ -773,17 +782,20 @@ void TextField::OnKeyInputFocusGained()
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextField::KeyboardStatusChanged);
 
     Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(mInputMethodContext).Connect(this, &TextField::OnInputMethodContextEvent);
-
-    // Notify that the text editing start.
-    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
-
-    // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
-    mInputMethodContext.SetRestoreAfterFocusLostEnabled(true);
   }
 
   if(IsEditable() && mController->IsUserInteractionEnabled())
   {
+    // Activate may synchronously deliver IME events; make the controller editable first.
     mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  }
+
+  if(mInputMethodContext && IsEditable())
+  {
+    // Notify that the text editing start.
+    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
+    // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
+    mInputMethodContext.SetRestoreAfterFocusLostEnabled(true);
   }
 
   EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.
