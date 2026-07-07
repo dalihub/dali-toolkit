@@ -810,6 +810,39 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
 InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextEvent(Controller& controller, InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_RELEASE_INFO("EventHandler eventName: [%d] predictveString: [%s]\n", inputMethodContextEvent.eventName, inputMethodContextEvent.predictiveString.c_str());
+  static_cast<void>(inputMethodContext);
+
+  EventData* const eventData          = controller.mImpl->mEventData;
+  const bool       isInputTextEvent   = (InputMethodContext::COMMIT == inputMethodContextEvent.eventName) ||
+                                      (InputMethodContext::PRE_EDIT == inputMethodContextEvent.eventName);
+  const bool       inputBeforeEditing = eventData &&
+                                      isInputTextEvent &&
+                                      ((EventData::INACTIVE == eventData->mState) ||
+                                       (EventData::INTERRUPTED == eventData->mState));
+
+  if(inputBeforeEditing)
+  {
+    DALI_LOG_RELEASE_INFO("TextController IME before edit. c:%p e:%d b:%zu st:%d ph:%d real:%d text:%u cur:%u pe:%d,%u,%u\n",
+                          static_cast<void*>(&controller),
+                          inputMethodContextEvent.eventName,
+                          inputMethodContextEvent.predictiveString.size(),
+                          eventData->mState,
+                          eventData->mIsShowingPlaceholderText,
+                          controller.mImpl->IsShowingRealText(),
+                          static_cast<unsigned int>(controller.mImpl->mModel->mLogicalModel->mText.Count()),
+                          eventData->mPrimaryCursorPosition,
+                          eventData->mPreEditFlag,
+                          eventData->mPreEditStartPosition,
+                          eventData->mPreEditLength);
+  }
+  else if(!eventData && isInputTextEvent)
+  {
+    DALI_LOG_RELEASE_INFO("TextController IME no event data. c:%p e:%d b:%zu edit:%d\n",
+                          static_cast<void*>(&controller),
+                          inputMethodContextEvent.eventName,
+                          inputMethodContextEvent.predictiveString.size(),
+                          controller.IsEditable());
+  }
 
   // Whether the text needs to be relaid-out.
   bool requestRelayout = false;
@@ -925,6 +958,33 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
   }
 
   InputMethodContext::CallbackData callbackData((retrieveText || retrieveCursor), cursorPosition, text, false);
+
+  if(controller.mImpl->mEventData)
+  {
+    EventData* const updatedEventData  = controller.mImpl->mEventData;
+    const unsigned int logicalTextCount = static_cast<unsigned int>(controller.mImpl->mModel->mLogicalModel->mText.Count());
+    const bool         placeholderWithInputState(updatedEventData->mIsShowingPlaceholderText &&
+                                           ((0u != logicalTextCount) ||
+                                            (0u != updatedEventData->mPrimaryCursorPosition) ||
+                                            updatedEventData->mPreEditFlag));
+
+    if(inputBeforeEditing || placeholderWithInputState)
+    {
+      DALI_LOG_RELEASE_INFO("TextController IME state. c:%p e:%d rel:%d st:%d ph:%d real:%d text:%u cur:%u pe:%d,%u,%u op:%x\n",
+                            static_cast<void*>(&controller),
+                            inputMethodContextEvent.eventName,
+                            requestRelayout,
+                            updatedEventData->mState,
+                            updatedEventData->mIsShowingPlaceholderText,
+                            controller.mImpl->IsShowingRealText(),
+                            logicalTextCount,
+                            updatedEventData->mPrimaryCursorPosition,
+                            updatedEventData->mPreEditFlag,
+                            updatedEventData->mPreEditStartPosition,
+                            updatedEventData->mPreEditLength,
+                            static_cast<unsigned int>(controller.mImpl->mOperationsPending));
+    }
+  }
 
   if(requestRelayout &&
      (NULL != controller.mImpl->mEditableControlInterface))
