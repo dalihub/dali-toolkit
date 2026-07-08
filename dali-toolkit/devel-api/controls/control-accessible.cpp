@@ -250,7 +250,8 @@ bool IsHighlightable(TriStateProperty highlightable, int32_t rawRole)
 } // unnamed namespace
 
 ControlAccessible::ControlAccessible(Dali::Actor self)
-: ActorAccessible(self)
+: ActorAccessible(self),
+  mStatesSnapshot(0u)
 {
 }
 
