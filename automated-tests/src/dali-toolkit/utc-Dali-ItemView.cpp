@@ -1341,6 +1341,16 @@ int UtcDaliItemViewWheelEvent(void)
   Vector3 stageSize(stage.GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
+  // Render and notify
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  // Perform a wheel event without connect wheel event signal, for line coverage.
+  Dali::Integration::WheelEvent wheelEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2(10.0f, 10.0f), 1, 1000u);
+  application.ProcessEvent(wheelEvent);
+
   // Connect to wheel event signal
   view.WheelEventSignal().Connect(&OnWheelEvent);
 
@@ -1353,7 +1363,6 @@ int UtcDaliItemViewWheelEvent(void)
   application.SendNotification();
 
   // Perform a wheel event
-  Dali::Integration::WheelEvent wheelEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2(10.0f, 10.0f), 1, 1000u);
   application.ProcessEvent(wheelEvent);
   DALI_TEST_CHECK(gOnWheelEventCalled);
 

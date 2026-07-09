@@ -689,9 +689,6 @@ void ScrollView::OnInitialize()
   ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
   mConstraints.SetInternalConstraints(*this);
 
-  // Connect wheel event
-  self.WheelEventSignal().Connect(this, &ScrollView::OnWheelEvent);
-
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::SCROLL_PANE);
 }
 
@@ -1606,7 +1603,12 @@ bool ScrollView::OnTouch(Actor actor, TouchEvent touch)
   return false;
 }
 
-bool ScrollView::OnWheelEvent(Actor actor, WheelEvent event)
+bool ScrollView::HasIntrinsicWheelHandling() const
+{
+  return true;
+}
+
+bool ScrollView::OnWheelEvent(const Dali::WheelEvent& event)
 {
   if(!mSensitive)
   {

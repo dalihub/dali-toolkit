@@ -306,9 +306,6 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::FOCUSABLE, true);
-  self.TouchEventSignal().Connect(this, &WebView::OnTouchEvent);
-  self.HoverEventSignal().Connect(this, &WebView::OnHoverEvent);
-  self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
   self.EffectiveVisibilityChangedSignal().Connect(this, &WebView::OnEffectiveVisibilityChanged);
   self.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true);
 
@@ -1194,7 +1191,12 @@ void WebView::OnSceneDisconnection()
   ControlImpl::OnSceneDisconnection();
 }
 
-bool WebView::OnTouchEvent(Actor actor, Dali::TouchEvent touch)
+bool WebView::HasIntrinsicTouchHandling() const
+{
+  return true;
+}
+
+bool WebView::OnTouchEvent(const Dali::TouchEvent& touch)
 {
   bool result = false;
 
@@ -1216,7 +1218,12 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
   return result;
 }
 
-bool WebView::OnHoverEvent(Actor actor, Dali::HoverEvent hover)
+bool WebView::HasIntrinsicHoverHandling() const
+{
+  return true;
+}
+
+bool WebView::OnHoverEvent(const Dali::HoverEvent& hover)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)
@@ -1226,7 +1233,12 @@ bool WebView::OnHoverEvent(Actor actor, Dali::HoverEvent hover)
   return result;
 }
 
-bool WebView::OnWheelEvent(Actor actor, Dali::WheelEvent wheel)
+bool WebView::HasIntrinsicWheelHandling() const
+{
+  return true;
+}
+
+bool WebView::OnWheelEvent(const Dali::WheelEvent& wheel)
 {
   bool result = false;
   if(mWebEngine && mMouseEventsEnabled)

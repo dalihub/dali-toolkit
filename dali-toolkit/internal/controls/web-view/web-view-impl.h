@@ -586,6 +586,37 @@ private: // From Control
    */
   void OnSceneDisconnection() override;
 
+private: // From CustomActorImpl
+  /**
+   * @copydoc Dali::CustomActorImpl::HasIntrinsicTouchHandling()
+   */
+  bool HasIntrinsicTouchHandling() const override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnTouchEvent()
+   */
+  bool OnTouchEvent(const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::HasIntrinsicHoverHandling()
+   */
+  bool HasIntrinsicHoverHandling() const override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnHoverEvent()
+   */
+  bool OnHoverEvent(const Dali::HoverEvent& hover) override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::HasIntrinsicWheelHandling()
+   */
+  bool HasIntrinsicWheelHandling() const override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnWheelEvent()
+   */
+  bool OnWheelEvent(const Dali::WheelEvent& wheel) override;
+
 private:
   // Undefined
   WebView(const WebView& webView);
@@ -747,30 +778,6 @@ private:
    * @return The new image view
    */
   Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel) const;
-
-  /**
-   * @brief Signal occurs when the Web View has been touched.
-   * @param[in] actor The Actor Touched
-   * @param[in] touch The Touch Data.
-   * @return Whether to consume event or not.
-   */
-  bool OnTouchEvent(Actor actor, Dali::TouchEvent touch);
-
-  /**
-   * @brief Signal occurs when the Web View has been hovered.
-   * @param[in] actor The Actor Hovered
-   * @param[in] hover The Hover Data.
-   * @return Whether to consume event or not.
-   */
-  bool OnHoverEvent(Actor actor, Dali::HoverEvent hover);
-
-  /**
-   * @brief Signal occurs when the Web View receives wheel event.
-   * @param[in] actor The Actor that receives Wheel event.
-   * @param[in] wheel The Wheel Data.
-   * @return Whether to consume event or not.
-   */
-  bool OnWheelEvent(Actor actor, Dali::WheelEvent wheel);
 
   /**
    * @brief Callback function to be called when frame is rendered.
