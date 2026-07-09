@@ -838,7 +838,7 @@ void FlexContainer::OnInitialize()
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   SetAsKeyboardFocusGroup(true);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CONTAINER);
 }
 
 } // namespace Internal

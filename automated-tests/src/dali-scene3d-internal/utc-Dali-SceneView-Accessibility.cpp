@@ -23,7 +23,7 @@
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 
 #include <dali-scene3d/public-api/controls/model/model.h>
@@ -35,6 +35,7 @@
 
 using namespace Dali::Toolkit;
 using namespace Dali::Toolkit::DevelControl;
+namespace ControlAccessibility = Dali::Toolkit::Accessibility;
 using Dali::Integration::ToDaliString;
 
 constexpr const char* OVERLAY_NAME   = "HighlightOverlay";
@@ -82,22 +83,22 @@ int UtcDaliSceneViewAccessibilityRole(void)
   sceneView.Add(model);
   application.GetScene().Add(sceneView);
 
-  model.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, AccessibilityRole::MODEL);
-  sceneView.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, AccessibilityRole::SCENE_3D);
+  model.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, ControlAccessibility::Role::MODEL);
+  sceneView.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, ControlAccessibility::Role::SCENE_3D);
 
   application.SendNotification();
   application.Render(1);
 
-  int32_t sceneRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
+  int32_t sceneRole = static_cast<uint32_t>(ControlAccessibility::Role::MAX_COUNT);
   if(sceneView.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get(sceneRole))
   {
-    DALI_TEST_EQUALS(sceneRole, static_cast<uint32_t>(AccessibilityRole::SCENE_3D), TEST_LOCATION);
+    DALI_TEST_EQUALS(sceneRole, static_cast<uint32_t>(ControlAccessibility::Role::SCENE_3D), TEST_LOCATION);
   }
 
-  int32_t modelRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
+  int32_t modelRole = static_cast<uint32_t>(ControlAccessibility::Role::MAX_COUNT);
   if(model.GetProperty(DevelControl::Property::ACCESSIBILITY_ROLE).Get(modelRole))
   {
-    DALI_TEST_EQUALS(modelRole, static_cast<uint32_t>(AccessibilityRole::MODEL), TEST_LOCATION);
+    DALI_TEST_EQUALS(modelRole, static_cast<uint32_t>(ControlAccessibility::Role::MODEL), TEST_LOCATION);
   }
 
   END_TEST;

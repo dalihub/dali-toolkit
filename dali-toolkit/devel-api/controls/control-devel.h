@@ -18,15 +18,17 @@
  *
  */
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <cstdint>
+#include <dali/devel-api/adaptor-framework/accessibility-devel.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/public-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -67,10 +69,10 @@ typedef Signal<void(std::string&)> AccessibilityGetNameSignalType;
 typedef Signal<void(std::string&)> AccessibilityGetDescriptionSignalType;
 
 /// @brief AccessibilityDoGesture signal type.
-typedef Signal<void(std::pair<Dali::Accessibility::GestureInfo, bool>&)> AccessibilityDoGestureSignalType;
+typedef Signal<void(std::pair<Dali::Devel::Accessibility::GestureInfo, bool>&)> AccessibilityDoGestureSignalType;
 
 /// @brief AccessibilityAction signal type.
-typedef Signal<bool(const Dali::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
+typedef Signal<bool(const Dali::Devel::Accessibility::ActionInfo&)> AccessibilityActionSignalType;
 
 /// @brief AccessibilityHighlighted signal type.
 /// @param bool highlighted true if control is highlighted, false if highlight is removed.
@@ -185,9 +187,9 @@ enum
   /**
    * @brief Role being performed in accessibility hierarchy.
    * @details Name "accessibilityRole", type Property::INTEGER.
-   * @note It gets integer value of AccessibilityRole enum then interprets to Dali::Accessibility::Role when requested by AT-SPI.
-   *  Note that setting Dali::Accessibility::Role value is still accepted for backward compatibility but not preferred.
-   * @see Dali::Accessibility::Role
+   * @note It gets integer value of Accessibility::Role enum then interprets to Dali::Integration::Accessibility::Role when requested by AT-SPI.
+   *  Note that setting Dali::Integration::Accessibility::Role value is still accepted for backward compatibility but not preferred.
+   * @see Dali::Integration::Accessibility::Role
    */
   ACCESSIBILITY_ROLE,
 
@@ -250,12 +252,6 @@ enum
    * @details Name "accessibilityScrollable", type Property::BOOLEAN.
    */
   ACCESSIBILITY_SCROLLABLE,
-
-  /**
-   * @brief Bitset integer of AccessibilityState which describes the current state of a control.
-   * @details Name "accessibilityStates", type Property::INTEGER.
-   */
-  ACCESSIBILITY_STATES,
 
   /**
    * @brief Indicates the accessibility services treat the controla as modal.
@@ -560,7 +556,7 @@ DALI_TOOLKIT_API Dali::Property GetVisualProperty(Control control, Dali::Propert
 DALI_TOOLKIT_API AccessibilityActivateSignalType& AccessibilityActivateSignal(Toolkit::Control control);
 
 /**
- * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * @brief The signal is emmited when text send via Dali::Integration::Accessibility::Bridge::Say
  * was placed in TTS queue but other text with higher priority prevented it from being read.
  *
  * @return The signal to connect to
@@ -582,7 +578,7 @@ DALI_TOOLKIT_API AccessibilityReadingPausedSignalType& AccessibilityReadingPause
 DALI_TOOLKIT_API AccessibilityReadingResumedSignalType& AccessibilityReadingResumedSignal(Toolkit::Control control);
 
 /**
- * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * @brief The signal is emmited when text send via Dali::Integration::Accessibility::Bridge::Say
  * was placed in TTS queue and reading was started but other text with higher priority cancelled it.
  *
  * @return The signal to connect to
@@ -590,7 +586,7 @@ DALI_TOOLKIT_API AccessibilityReadingResumedSignalType& AccessibilityReadingResu
 DALI_TOOLKIT_API AccessibilityReadingCancelledSignalType& AccessibilityReadingCancelledSignal(Toolkit::Control control);
 
 /**
- * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * @brief The signal is emmited when text send via Dali::Integration::Accessibility::Bridge::Say
  * was fully read by TTS module.
  *
  * @return The signal to connect to
@@ -648,7 +644,7 @@ DALI_TOOLKIT_API AccessibilityHighlightedSignalType& AccessibilityHighlightedSig
  * @param destination Actor object
  * @param relation    enumerated value describing relation
  */
-DALI_TOOLKIT_API void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation);
+DALI_TOOLKIT_API void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Toolkit::Accessibility::RelationType relation);
 
 /**
  * @brief The method allows removing relation
@@ -657,7 +653,7 @@ DALI_TOOLKIT_API void AppendAccessibilityRelation(Toolkit::Control control, Dali
  * @param destination Actor object
  * @param relation    enumerated value describing relation
  */
-DALI_TOOLKIT_API void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation);
+DALI_TOOLKIT_API void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Toolkit::Accessibility::RelationType relation);
 
 /**
  * @brief Returns a collection of Accessible objects related to current object and grouped by relation type.
@@ -667,7 +663,7 @@ DALI_TOOLKIT_API void RemoveAccessibilityRelation(Toolkit::Control control, Dali
  *
  * @see Dali::Accessibility::Accessible::GetRelationSet()
  */
-DALI_TOOLKIT_API std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control);
+DALI_TOOLKIT_API std::vector<Dali::Devel::Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control);
 
 /**
  * @brief The method removes all previously appended relations
@@ -706,7 +702,19 @@ DALI_TOOLKIT_API void ClearAccessibilityAttributes(Toolkit::Control control);
  * @param control object to append attribute to
  * @param types Reading information types
  */
-DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Accessibility::ReadingInfoTypes types);
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Integration::Accessibility::ReadingInfoTypes types);
+
+/**
+ * @brief The method inserts reading information of an accessible object into attributes.
+ *
+ * This overload keeps the toolkit/adaptor boundary thin by accepting the raw
+ * reading-info mask instead of exposing the adaptor bitset type to callers that
+ * only need to forward a stored value.
+ *
+ * @param control object to append attribute to
+ * @param types raw reading information type mask
+ */
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoTypeRaw(Toolkit::Control control, uint32_t types);
 
 /**
  * @brief The method returns reading information of an accessible object
@@ -714,7 +722,15 @@ DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, 
  * @param control object to append attribute to
  * @return Reading information types
  */
-DALI_TOOLKIT_API Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::Control control);
+DALI_TOOLKIT_API Dali::Integration::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::Control control);
+
+/**
+ * @brief The method returns reading information of an accessible object as raw mask.
+ *
+ * @param control object to append attribute to
+ * @return raw reading information type mask
+ */
+DALI_TOOLKIT_API uint32_t GetAccessibilityReadingInfoTypeRaw(Toolkit::Control control);
 
 /**
  * @brief The method erases highlight.
@@ -733,12 +749,20 @@ DALI_TOOLKIT_API bool ClearAccessibilityHighlight(Toolkit::Control control);
 DALI_TOOLKIT_API bool GrabAccessibilityHighlight(Toolkit::Control control);
 
 /**
- * @brief The metod presents bitset of control's states.
+ * @brief Gets the AT-SPI state set exported for a control.
+ *
+ * @param control The control whose exported accessibility states will be queried
+ * @return The integration accessibility state set
+ */
+DALI_TOOLKIT_API Dali::Integration::Accessibility::States GetAccessibilityStates(Toolkit::Control control);
+
+/**
+ * @brief The method presents raw bitset of control's states.
  *
  * @param control object to append attribute to
- * @return Dali::Accessibility::States is vector of enumerated State.
+ * @return raw accessibility states mask
  */
-DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control);
+DALI_TOOLKIT_API uint64_t GetAccessibilityStatesRaw(Toolkit::Control control);
 
 /**
  * @brief The method force sending notifications about current states to accessibility clients
@@ -747,7 +771,18 @@ DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Con
  * @param states  mask with states expected to broadcast
  * @param recurse flag pointing if notifications of children's state would be sent
  */
-DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse);
+DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Integration::Accessibility::States states, bool recurse);
+
+/**
+ * @brief The method force sending notifications about current states to accessibility clients.
+ *
+ * This overload accepts the raw state mask and converts it inside toolkit.
+ *
+ * @param control object to append attribute to
+ * @param states raw states mask expected to broadcast
+ * @param recurse flag pointing if notifications of children's state would be sent
+ */
+DALI_TOOLKIT_API void NotifyAccessibilityStateChangeRaw(Toolkit::Control control, uint64_t states, bool recurse);
 
 /**
  * @brief The method to get the control's accessibility created or not.
@@ -781,7 +816,18 @@ DALI_TOOLKIT_API bool IsCreateAccessibleEnabled(Toolkit::Control control);
  * @param state  The accessibility state.
  * @param newValue new value to set.
  */
-DALI_TOOLKIT_API void EmitAccessibilityStateChanged(Dali::Actor actor, Dali::Accessibility::State state, int newValue);
+DALI_TOOLKIT_API void EmitAccessibilityStateChanged(Dali::Actor actor, Dali::Integration::Accessibility::State state, int newValue);
+
+/**
+ * @brief Notifies accessibility clients that an actor's presentation state changed.
+ *
+ * This is the semantic wrapper used for presentation lifecycle changes such as
+ * showing or hiding modal content.
+ *
+ * @param actor The actor whose presentation state changed.
+ * @param presented True when the actor is presented, false when it is hidden.
+ */
+DALI_TOOLKIT_API void NotifyAccessibilityPresentationChanged(Dali::Actor actor, bool presented);
 
 } // namespace DevelControl
 

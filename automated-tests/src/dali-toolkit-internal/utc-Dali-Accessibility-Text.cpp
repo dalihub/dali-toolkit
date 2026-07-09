@@ -24,7 +24,7 @@
 
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
 
@@ -100,43 +100,43 @@ int utcDaliAccessibilityTextEditorGetTextAtOffset(void)
   DALI_TEST_CHECK(x);
   if(x)
   {
-    auto range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    auto range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text editor test sentence");
-    range = x->GetTextAtOffset(5, Dali::Accessibility::TextBoundary::CHARACTER);
+    range = x->GetTextAtOffset(5, Dali::Devel::Accessibility::TextBoundary::CHARACTER);
     DALI_TEST_EQUALS(range.content, "e", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 5, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 6, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(3, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(3, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 28, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 36, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(4, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(4, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "text    \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 9, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(6, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(6, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " editor  \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 14, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 24, TEST_LOCATION);
 
     editor.SetProperty(Toolkit::TextEditor::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(8, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(8, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " test sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 25, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 39, TEST_LOCATION);
@@ -211,7 +211,7 @@ int utcDaliAccessibilityTextEditorGetRangeExtents(void)
 
   if(x)
   {
-    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Accessibility::CoordinateType::WINDOW);
+    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Devel::Accessibility::CoordinateType::WINDOW);
     DALI_TEST_EQUALS((int)rangeExtents.x, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.width, 0, TEST_LOCATION);
@@ -233,7 +233,7 @@ int utcDaliAccessibilityTextEditorGetRangeExtents(void)
     application.Render();
 
     auto characterCount = x->GetCharacterCount();
-    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Accessibility::CoordinateType::WINDOW);
+    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Devel::Accessibility::CoordinateType::WINDOW);
 
     DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);
@@ -316,43 +316,43 @@ int utcDaliAccessibilityTextFieldGetTextAtOffset(void)
   DALI_TEST_CHECK(x);
   if(x)
   {
-    auto range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    auto range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text editor test sentence");
-    range = x->GetTextAtOffset(5, Dali::Accessibility::TextBoundary::CHARACTER);
+    range = x->GetTextAtOffset(5, Dali::Devel::Accessibility::TextBoundary::CHARACTER);
     DALI_TEST_EQUALS(range.content, "e", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 5, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 6, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(3, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(3, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 28, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 36, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(4, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(4, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "text    \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 9, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(6, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(6, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " editor  \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 14, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 24, TEST_LOCATION);
 
     field.SetProperty(Toolkit::TextField::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(8, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(8, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " test sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 25, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 39, TEST_LOCATION);
@@ -361,7 +361,7 @@ int utcDaliAccessibilityTextFieldGetTextAtOffset(void)
     hiddenInputSettings[Toolkit::HiddenInput::Property::MODE]                 = Toolkit::HiddenInput::Mode::HIDE_ALL;
     hiddenInputSettings[Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER] = 0x23;
     field.SetProperty(Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenInputSettings);
-    range = x->GetTextAtOffset(8, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(8, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
@@ -445,7 +445,7 @@ int utcDaliAccessibilityTextFieldGetRangeExtents(void)
 
   if(x)
   {
-    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Accessibility::CoordinateType::WINDOW);
+    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Devel::Accessibility::CoordinateType::WINDOW);
     DALI_TEST_EQUALS((int)rangeExtents.x, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.width, 0, TEST_LOCATION);
@@ -467,7 +467,7 @@ int utcDaliAccessibilityTextFieldGetRangeExtents(void)
     application.Render();
 
     auto characterCount = x->GetCharacterCount();
-    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Accessibility::CoordinateType::WINDOW);
+    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Devel::Accessibility::CoordinateType::WINDOW);
 
     DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);
@@ -536,43 +536,43 @@ int utcDaliAccessibilityTextLabelGetTextAtOffset(void)
   DALI_TEST_CHECK(x);
   if(x)
   {
-    auto range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    auto range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text editor test sentence");
-    range = x->GetTextAtOffset(5, Dali::Accessibility::TextBoundary::CHARACTER);
+    range = x->GetTextAtOffset(5, Dali::Devel::Accessibility::TextBoundary::CHARACTER);
     DALI_TEST_EQUALS(range.content, "e", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 5, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 6, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(3, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(3, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 28, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 36, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(4, Dali::Accessibility::TextBoundary::WORD);
+    range = x->GetTextAtOffset(4, Dali::Devel::Accessibility::TextBoundary::WORD);
     DALI_TEST_EQUALS(range.content, "", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 0, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(0, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(0, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, "text    \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 9, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(6, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(6, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " editor  \n", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 14, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 24, TEST_LOCATION);
 
     label.SetProperty(Toolkit::TextLabel::Property::TEXT, "text    \n\n\n\n\n\n editor  \n\n test sentence");
-    range = x->GetTextAtOffset(8, Dali::Accessibility::TextBoundary::LINE);
+    range = x->GetTextAtOffset(8, Dali::Devel::Accessibility::TextBoundary::LINE);
     DALI_TEST_EQUALS(range.content, " test sentence", TEST_LOCATION);
     DALI_TEST_EQUALS(range.startOffset, 25, TEST_LOCATION);
     DALI_TEST_EQUALS(range.endOffset, 39, TEST_LOCATION);
@@ -592,7 +592,7 @@ int utcDaliAccessibilityTextLabelGetRangeExtents(void)
 
   if(x)
   {
-    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Accessibility::CoordinateType::WINDOW);
+    auto rangeExtents = x->GetRangeExtents(0, 0, Dali::Devel::Accessibility::CoordinateType::WINDOW);
     DALI_TEST_EQUALS((int)rangeExtents.x, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y, 0, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.width, 0, TEST_LOCATION);
@@ -615,7 +615,7 @@ int utcDaliAccessibilityTextLabelGetRangeExtents(void)
     application.Render();
 
     auto characterCount = x->GetCharacterCount();
-    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Accessibility::CoordinateType::WINDOW);
+    rangeExtents        = x->GetRangeExtents(0, characterCount, Dali::Devel::Accessibility::CoordinateType::WINDOW);
 
     DALI_TEST_EQUALS((int)rangeExtents.x >= 0, true, TEST_LOCATION);
     DALI_TEST_EQUALS((int)rangeExtents.y >= 0, true, TEST_LOCATION);

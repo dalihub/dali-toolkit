@@ -16,6 +16,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/segmentation.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-utility.h>
@@ -106,7 +107,7 @@ void CommonTextUtils::SynchronizeTextAnchorsInParent(
   {
     parent.Remove(anchorActor);
   }
-  if(Dali::Accessibility::IsUp())
+  if(Dali::Integration::Accessibility::IsUp())
   {
     controller->GetAnchorActors(anchorActors);
     for(auto& anchorActor : anchorActors)
@@ -249,7 +250,7 @@ std::size_t TextControlAccessible::GetCursorOffset() const
   return 0u;
 }
 
-Bounds TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Accessibility::CoordinateType type)
+Bounds TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size_t endOffset, Dali::Devel::Accessibility::CoordinateType type)
 {
   if(!ValidateRange(GetWholeText(), startOffset, endOffset))
   {
@@ -265,7 +266,7 @@ Bounds TextControlAccessible::GetRangeExtents(std::size_t startOffset, std::size
   return rect;
 }
 
-Accessibility::Range TextControlAccessible::GetRangeOfSelection(std::size_t selectionIndex) const
+Dali::Devel::Accessibility::Range TextControlAccessible::GetRangeOfSelection(std::size_t selectionIndex) const
 {
   // Since DALi supports only one selection, indices other than 0 are ignored
   if(selectionIndex > 0)
@@ -309,9 +310,9 @@ std::string TextControlAccessible::GetText(std::size_t startOffset, std::size_t 
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, Accessibility::TextBoundary boundary) const
+Dali::Devel::Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, Dali::Devel::Accessibility::TextBoundary boundary) const
 {
-  Accessibility::Range range{};
+  Dali::Devel::Accessibility::Range range{};
 
   if(IsHiddenInput())
   {
@@ -325,7 +326,7 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
 
   switch(boundary)
   {
-    case Dali::Accessibility::TextBoundary::CHARACTER:
+    case Dali::Devel::Accessibility::TextBoundary::CHARACTER:
     {
       if(offset < textSize)
       {
@@ -336,12 +337,12 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
       break;
     }
 
-    case Dali::Accessibility::TextBoundary::WORD:
-    case Dali::Accessibility::TextBoundary::LINE:
+    case Dali::Devel::Accessibility::TextBoundary::WORD:
+    case Dali::Devel::Accessibility::TextBoundary::LINE:
     {
       std::vector<char> breaks(textSize, '\0');
 
-      if(boundary == Dali::Accessibility::TextBoundary::WORD)
+      if(boundary == Dali::Devel::Accessibility::TextBoundary::WORD)
       {
         TextAbstraction::Segmentation::Get().GetWordBreakPositionsUtf8(reinterpret_cast<const uint8_t*>(text.c_str()), textSize, breaks.data());
       }
@@ -366,11 +367,11 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
         }
         else
         {
-          if(boundary == Dali::Accessibility::TextBoundary::WORD)
+          if(boundary == Dali::Devel::Accessibility::TextBoundary::WORD)
           {
             index++;
           }
-          if(boundary == Dali::Accessibility::TextBoundary::LINE)
+          if(boundary == Dali::Devel::Accessibility::TextBoundary::LINE)
           {
             counter++;
           }
@@ -383,7 +384,7 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
           range.endOffset   = index + 1;
         }
 
-        if(boundary == Dali::Accessibility::TextBoundary::LINE)
+        if(boundary == Dali::Devel::Accessibility::TextBoundary::LINE)
         {
           index++;
         }
@@ -391,8 +392,8 @@ Accessibility::Range TextControlAccessible::GetTextAtOffset(std::size_t offset, 
       break;
     }
 
-    case Dali::Accessibility::TextBoundary::SENTENCE:  // Not supported by default
-    case Dali::Accessibility::TextBoundary::PARAGRAPH: // Not supported by libunibreak library
+    case Dali::Devel::Accessibility::TextBoundary::SENTENCE:  // Not supported by default
+    case Dali::Devel::Accessibility::TextBoundary::PARAGRAPH: // Not supported by libunibreak library
     default:
     {
       break;
@@ -435,7 +436,7 @@ bool TextControlAccessible::SetRangeOfSelection(std::size_t selectionIndex, std:
   return true;
 }
 
-Accessibility::Accessible* TextControlAccessible::GetLink(std::int32_t linkIndex) const
+Dali::Accessibility::Accessible* TextControlAccessible::GetLink(std::int32_t linkIndex) const
 {
   if(linkIndex < 0 || linkIndex >= GetLinkCount())
   {
@@ -444,7 +445,7 @@ Accessibility::Accessible* TextControlAccessible::GetLink(std::int32_t linkIndex
 
   auto anchor = GetTextAnchors()[linkIndex];
 
-  return Accessibility::Accessible::Get(anchor);
+  return Dali::Accessibility::Accessible::Get(anchor);
 }
 
 std::int32_t TextControlAccessible::GetLinkCount() const
@@ -496,9 +497,9 @@ void EditableTextControlAccessible::InitDefaultFeatures()
   AddFeature<Dali::Accessibility::EditableText>(SharedFromThis());
 }
 
-Accessibility::States EditableTextControlAccessible::CalculateStates()
+Dali::Integration::Accessibility::States EditableTextControlAccessible::CalculateStates()
 {
-  using Dali::Accessibility::State;
+  using Dali::Integration::Accessibility::State;
 
   auto states       = DevelControl::ControlAccessible::CalculateStates();
   auto focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();

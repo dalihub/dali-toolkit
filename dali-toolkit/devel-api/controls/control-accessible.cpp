@@ -25,6 +25,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-info.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-map.h>
@@ -50,6 +51,16 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CONTROL_ACCESSIBLE");
 #endif
+
+uint32_t ControlAccessibilityStateToMask(Accessibility::State state)
+{
+  return 1u << static_cast<uint32_t>(state);
+}
+
+bool HasAccessibilityState(uint32_t states, Accessibility::State state)
+{
+  return (states & ControlAccessibilityStateToMask(state)) != 0u;
+}
 
 constexpr const char* ATTR_IMG_SRC_KEY = "imgSrc";
 
@@ -119,30 +130,30 @@ std::string FetchImageSrc(const Toolkit::ImageView& imageView)
   return {};
 }
 
-bool IsAtspiRole(int32_t rawRole)
+bool IsAccessibilityRole(int32_t rawRole)
 {
-  return rawRole >= static_cast<int32_t>(Dali::Accessibility::Role::INVALID) && rawRole < static_cast<int32_t>(Dali::Accessibility::Role::MAX_COUNT);
+  return rawRole >= static_cast<int32_t>(Dali::Integration::Accessibility::Role::INVALID) && rawRole < static_cast<int32_t>(Dali::Integration::Accessibility::Role::MAX_COUNT);
 }
 
 bool IsRoleV2(int32_t rawRole)
 {
-  return rawRole >= static_cast<int32_t>(ROLE_START_INDEX) && rawRole < static_cast<int32_t>(AccessibilityRole::MAX_COUNT);
+  return rawRole >= static_cast<int32_t>(Accessibility::ROLE_START_INDEX) && rawRole < static_cast<int32_t>(Accessibility::Role::MAX_COUNT);
 }
 
 #define TO_V1_ROLE_TYPE(v2RoleType, v1RoleType) \
-  case AccessibilityRole::v2RoleType:           \
+  case Accessibility::Role::v2RoleType:           \
   {                                             \
     return Role::v1RoleType;                    \
   }
 #define TO_SAME_ROLE_TYPE(roleType) \
-  case AccessibilityRole::roleType: \
+  case Accessibility::Role::roleType: \
   {                                 \
     return Role::roleType;          \
   }
 
-Dali::Accessibility::Role ConvertV2RoleToAtspiRole(AccessibilityRole role)
+Dali::Integration::Accessibility::Role ConvertV2RoleToAccessibilityRole(Accessibility::Role role)
 {
-  using Dali::Accessibility::Role;
+  using Dali::Integration::Accessibility::Role;
   switch(role)
   {
     TO_V1_ROLE_TYPE(ADJUSTABLE, SLIDER)
@@ -183,37 +194,37 @@ Dali::Accessibility::Role ConvertV2RoleToAtspiRole(AccessibilityRole role)
   }
 }
 
-Dali::Accessibility::Role ConvertRawRoleToAtspiRole(int32_t rawRole)
+Dali::Integration::Accessibility::Role ConvertRawRoleToAccessibilityRole(int32_t rawRole)
 {
-  if(IsAtspiRole(rawRole))
+  if(IsAccessibilityRole(rawRole))
   {
-    return static_cast<Dali::Accessibility::Role>(rawRole);
+    return static_cast<Dali::Integration::Accessibility::Role>(rawRole);
   }
   else if(IsRoleV2(rawRole))
   {
-    return ConvertV2RoleToAtspiRole(static_cast<AccessibilityRole>(rawRole));
+    return ConvertV2RoleToAccessibilityRole(static_cast<Accessibility::Role>(rawRole));
   }
   else
   {
-    return Dali::Accessibility::Role::UNKNOWN;
+    return Dali::Integration::Accessibility::Role::UNKNOWN;
   }
 }
 
 bool IsModalRole(int32_t rawRole)
 {
-  return IsRoleV2(rawRole) && (static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::ALERT ||
-                               static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::DIALOG ||
-                               static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::POPUP_MENU);
+  return IsRoleV2(rawRole) && (static_cast<Accessibility::Role>(rawRole) == Accessibility::Role::ALERT ||
+                               static_cast<Accessibility::Role>(rawRole) == Accessibility::Role::DIALOG ||
+                               static_cast<Accessibility::Role>(rawRole) == Accessibility::Role::POPUP_MENU);
 }
 
 bool IsScene3DRole(int32_t rawRole)
 {
-  return IsRoleV2(rawRole) && (static_cast<AccessibilityRole>(rawRole) == AccessibilityRole::SCENE_3D);
+  return IsRoleV2(rawRole) && (static_cast<Accessibility::Role>(rawRole) == Accessibility::Role::SCENE_3D);
 }
 
 bool IsHighlightableRole(int32_t rawRole)
 {
-  return IsRoleV2(rawRole) && static_cast<AccessibilityRole>(rawRole) != AccessibilityRole::NONE;
+  return IsRoleV2(rawRole) && static_cast<Accessibility::Role>(rawRole) != Accessibility::Role::NONE;
 }
 
 using Dali::Toolkit::Internal::TriStateProperty;
@@ -312,10 +323,10 @@ std::string ControlAccessible::GetValue() const
   return Dali::Integration::ToStdString(Self().GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_VALUE));
 }
 
-Dali::Accessibility::Role ControlAccessible::GetRole() const
+Dali::Integration::Accessibility::Role ControlAccessible::GetRole() const
 {
   int32_t rawRole = Self().GetProperty<int32_t>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
-  return ConvertRawRoleToAtspiRole(rawRole);
+  return ConvertRawRoleToAccessibilityRole(rawRole);
 }
 
 std::string ControlAccessible::GetLocalizedRoleName() const
@@ -334,15 +345,15 @@ bool ControlAccessible::IsShowing()
   return true;
 }
 
-void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& states)
+void ControlAccessible::ApplyAccessibilityProps(Dali::Integration::Accessibility::States& states)
 {
-  using Dali::Accessibility::State;
+  using Dali::Integration::Accessibility::State;
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
   ControlImpl& controlImpl     = GetImplementation(control);
   auto&        internalControl = Internal::Control::Get(controlImpl);
 
-  DevelControl::AccessibilityStates controlStates;
+  uint32_t controlStates{};
 
   int32_t rawRole = control.GetProperty<int32_t>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
 
@@ -362,27 +373,27 @@ void ControlAccessible::ApplyAccessibilityProps(Dali::Accessibility::States& sta
   {
     // Default states
     // TODO : Couldn't we get this value from ControlImpl::AccessibilityData::GetDefaultControlAccessibilityStates();
-    controlStates[AccessibilityState::ENABLED] = true;
+    controlStates |= ControlAccessibilityStateToMask(Accessibility::State::ENABLED);
   }
 
   // Apply states
-  states[State::ENABLED]  = controlStates[AccessibilityState::ENABLED];
-  states[State::SELECTED] = controlStates[AccessibilityState::SELECTED];
-  states[State::CHECKED]  = controlStates[AccessibilityState::CHECKED];
-  states[State::BUSY]     = controlStates[AccessibilityState::BUSY];
-  states[State::EXPANDED] = controlStates[AccessibilityState::EXPANDED];
+  states[State::ENABLED]  = HasAccessibilityState(controlStates, Accessibility::State::ENABLED);
+  states[State::SELECTED] = HasAccessibilityState(controlStates, Accessibility::State::SELECTED);
+  states[State::CHECKED]  = HasAccessibilityState(controlStates, Accessibility::State::CHECKED);
+  states[State::BUSY]     = HasAccessibilityState(controlStates, Accessibility::State::BUSY);
+  states[State::EXPANDED] = HasAccessibilityState(controlStates, Accessibility::State::EXPANDED);
 
   // Apply traits
   states[State::MODAL]         = isModal || IsModalRole(rawRole);
   states[State::HIGHLIGHTABLE] = IsHighlightable(highlightable, rawRole);
 }
 
-Dali::Accessibility::States ControlAccessible::CalculateStates()
+Dali::Integration::Accessibility::States ControlAccessible::CalculateStates()
 {
-  using Dali::Accessibility::State;
+  using Dali::Integration::Accessibility::State;
 
   Dali::Actor                 self = Self();
-  Dali::Accessibility::States states;
+  Dali::Integration::Accessibility::States states;
 
   states[State::FOCUSABLE]   = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
   states[State::FOCUSED]     = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
@@ -397,17 +408,17 @@ Dali::Accessibility::States ControlAccessible::CalculateStates()
   return states;
 }
 
-Dali::Accessibility::States ControlAccessible::GetStates()
+Dali::Integration::Accessibility::States ControlAccessible::GetStates()
 {
   return CalculateStates();
 }
 
-Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
+Dali::Devel::Accessibility::Attributes ControlAccessible::GetAttributes() const
 {
   static const std::string automationIdKey = "automationId";
   static const std::string classKey        = "class";
 
-  Accessibility::Attributes result;
+  Dali::Devel::Accessibility::Attributes result;
   Toolkit::Control          control        = Toolkit::Control::DownCast(Self());
   Dali::Property::Value     property       = control.GetProperty(DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   Dali::Property::Map*      attributeMap   = property.GetMap();
@@ -542,7 +553,7 @@ bool ControlAccessible::GrabHighlight()
   Dali::Actor self                = Self();
   auto        oldHighlightedActor = GetCurrentlyHighlightedActor();
 
-  if(!Dali::Accessibility::IsUp())
+  if(!Dali::Integration::Accessibility::IsUp())
   {
     return false;
   }
@@ -601,7 +612,7 @@ bool ControlAccessible::GrabHighlight()
 
 bool ControlAccessible::ClearHighlight()
 {
-  if(!Dali::Accessibility::IsUp())
+  if(!Dali::Integration::Accessibility::IsUp())
   {
     return false;
   }
@@ -673,7 +684,7 @@ bool ControlAccessible::DoAction(const std::string& name)
   return Self().DoAction(Dali::Integration::ToDaliStringView(name), {});
 }
 
-bool ControlAccessible::DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo)
+bool ControlAccessible::DoGesture(const Dali::Devel::Accessibility::GestureInfo& gestureInfo)
 {
   auto  control         = Dali::Toolkit::Control::DownCast(Self());
   auto& controlImpl     = GetImplementation(control);
@@ -690,7 +701,7 @@ bool ControlAccessible::DoGesture(const Dali::Accessibility::GestureInfo& gestur
   return false;
 }
 
-std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
+std::vector<Dali::Devel::Accessibility::Relation> ControlAccessible::GetRelationSet()
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
@@ -714,7 +725,7 @@ bool ControlAccessible::ScrollToChild(Actor child)
 
   if(!DevelControl::AccessibilityActionSignal(control).Empty())
   {
-    success = DevelControl::AccessibilityActionSignal(control).Emit({Accessibility::ActionType::SCROLL_TO_CHILD, child});
+    success = DevelControl::AccessibilityActionSignal(control).Emit({Dali::Devel::Accessibility::ActionType::SCROLL_TO_CHILD, child});
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Performed AccessibilityAction: scrollToChild, success : %d\n", success);
   }
 
@@ -741,23 +752,25 @@ Vector2 ControlAccessible::GetLastPosition() const
   return mLastPosition;
 }
 
-void ControlAccessible::OnStatePropertySet(AccessibilityStates newStates)
+void ControlAccessible::OnStatePropertySet(uint32_t newStates)
 {
   int32_t rawRole = Self().GetProperty<int32_t>(Property::ACCESSIBILITY_ROLE);
   if(IsRoleV2(rawRole))
   {
-    AccessibilityRole role = static_cast<AccessibilityRole>(rawRole);
+    Accessibility::Role role = static_cast<Accessibility::Role>(rawRole);
 
-    if(newStates[AccessibilityState::CHECKED] != mStatesSnapshot[AccessibilityState::CHECKED] &&
-       (role == AccessibilityRole::CHECK_BOX || role == AccessibilityRole::RADIO_BUTTON || role == AccessibilityRole::TOGGLE_BUTTON))
+    const bool newChecked = HasAccessibilityState(newStates, Accessibility::State::CHECKED);
+    if(newChecked != HasAccessibilityState(mStatesSnapshot, Accessibility::State::CHECKED) &&
+       (role == Accessibility::Role::CHECK_BOX || role == Accessibility::Role::RADIO_BUTTON || role == Accessibility::Role::TOGGLE_BUTTON))
     {
-      EmitStateChanged(Accessibility::State::CHECKED, newStates[AccessibilityState::CHECKED]);
+      EmitStateChanged(Dali::Integration::Accessibility::State::CHECKED, newChecked);
     }
 
-    if(newStates[AccessibilityState::SELECTED] != mStatesSnapshot[AccessibilityState::SELECTED] &&
-       (role == AccessibilityRole::BUTTON || role == AccessibilityRole::LIST_ITEM || role == AccessibilityRole::MENU_ITEM || role == AccessibilityRole::TAB || role == AccessibilityRole::SCROLL_BAR))
+    const bool newSelected = HasAccessibilityState(newStates, Accessibility::State::SELECTED);
+    if(newSelected != HasAccessibilityState(mStatesSnapshot, Accessibility::State::SELECTED) &&
+       (role == Accessibility::Role::BUTTON || role == Accessibility::Role::LIST_ITEM || role == Accessibility::Role::MENU_ITEM || role == Accessibility::Role::TAB || role == Accessibility::Role::SCROLL_BAR))
     {
-      EmitStateChanged(Accessibility::State::SELECTED, newStates[AccessibilityState::SELECTED]);
+      EmitStateChanged(Dali::Integration::Accessibility::State::SELECTED, newSelected);
     }
   }
   else
@@ -782,7 +795,7 @@ bool ControlAccessible::IsModal(Actor actor)
 
 bool ControlAccessible::IsScene3D(Actor actor)
 {
-  int32_t rawRole = static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT);
+  int32_t rawRole = static_cast<uint32_t>(Accessibility::Role::MAX_COUNT);
   if(actor.GetProperty(Property::ACCESSIBILITY_ROLE).Get(rawRole))
   {
     return IsScene3DRole(rawRole);

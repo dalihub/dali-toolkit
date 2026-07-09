@@ -71,7 +71,7 @@ void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::RADIO_BUTTON);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::RADIO_BUTTON);
 }
 
 DevelControl::ControlAccessible* RadioButton::CreateAccessibleObject()
@@ -112,22 +112,22 @@ void RadioButton::OnStateChange(State newState)
     auto accessible = DynamicPointerCast<Dali::Accessibility::ActorAccessible>(GetAccessibleObject());
     if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+      accessible->EmitStateChanged(Dali::Integration::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
     }
   }
 }
 
-Dali::Accessibility::States RadioButton::RadioButtonAccessible::CalculateStates()
+Dali::Integration::Accessibility::States RadioButton::RadioButtonAccessible::CalculateStates()
 {
   auto state = Button::ButtonAccessible::CalculateStates();
   auto self  = Toolkit::Button::DownCast(Self());
 
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
   {
-    state[Dali::Accessibility::State::CHECKED] = true;
+    state[Dali::Integration::Accessibility::State::CHECKED] = true;
   }
 
-  state[Dali::Accessibility::State::SELECTABLE] = true;
+  state[Dali::Integration::Accessibility::State::SELECTABLE] = true;
   return state;
 }
 

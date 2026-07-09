@@ -132,7 +132,7 @@ protected:
     /**
      * @copydoc Dali::Toolkit::DevelControl::ControlAccessible::CalculateStates()
      */
-    Dali::Accessibility::States CalculateStates() override;
+    Dali::Integration::Accessibility::States CalculateStates() override;
   };
 
   void OnStateChange(State newState) override;

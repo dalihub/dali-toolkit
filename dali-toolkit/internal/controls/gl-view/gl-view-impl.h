@@ -126,7 +126,7 @@ private:
   /**
    * Callback when the inherited visibility of the GlView is changed
    */
-  void OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible);
+  void OnControlEffectiveVisibilityChanged(Dali::Actor actor, bool visible);
 
   /**
    * Callback when the visibility of the window is changed

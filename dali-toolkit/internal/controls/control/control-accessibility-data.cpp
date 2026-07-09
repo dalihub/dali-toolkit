@@ -23,6 +23,9 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
+
 using Dali::Integration::GetStdString;
 using Dali::Integration::InsertToMap;
 using Dali::Integration::ToDaliString;
@@ -48,7 +51,7 @@ Dali::Bounds GetShowingGeometry(Dali::Bounds rect, Dali::Toolkit::DevelControl::
 
   while(parent)
   {
-    parentRect = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+    parentRect = parent->GetExtents(Dali::Devel::Accessibility::CoordinateType::WINDOW);
 
     currentPosition.x = rect.x;
     currentPosition.y = rect.y;
@@ -73,16 +76,16 @@ static bool IsShowingGeometryOnScreen(Dali::Bounds rect)
   return rect.width > 0 && rect.height > 0;
 }
 
-static constexpr uint32_t DEFAULT_READING_INFO_TYPES_RAW_DATA = (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::NAME)) |
-                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::ROLE)) |
-                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::DESCRIPTION)) |
-                                                                (1u << static_cast<uint32_t>(Dali::Accessibility::ReadingInfoType::STATE));
+static constexpr uint32_t DEFAULT_READING_INFO_TYPES_RAW_DATA = (1u << static_cast<uint32_t>(Dali::Integration::Accessibility::ReadingInfoType::NAME)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Integration::Accessibility::ReadingInfoType::ROLE)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Integration::Accessibility::ReadingInfoType::DESCRIPTION)) |
+                                                                (1u << static_cast<uint32_t>(Dali::Integration::Accessibility::ReadingInfoType::STATE));
 
-static constexpr uint32_t DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA = (1u << static_cast<uint32_t>(DevelControl::AccessibilityState::ENABLED)) |
-                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::SELECTED)) |
-                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::CHECKED)) |
-                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::BUSY)) |
-                                                                                (0u << static_cast<uint32_t>(DevelControl::AccessibilityState::EXPANDED));
+static constexpr uint32_t DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA = (1u << static_cast<uint32_t>(Accessibility::State::ENABLED)) |
+                                                                                (0u << static_cast<uint32_t>(Accessibility::State::SELECTED)) |
+                                                                                (0u << static_cast<uint32_t>(Accessibility::State::CHECKED)) |
+                                                                                (0u << static_cast<uint32_t>(Accessibility::State::BUSY)) |
+                                                                                (0u << static_cast<uint32_t>(Accessibility::State::EXPANDED));
 
 } // unnamed namespace
 
@@ -116,46 +119,46 @@ void Control::AccessibilityData::CheckHighlightedObjectGeometry()
   if(DALI_LIKELY(accessible))
   {
     auto lastPosition   = accessible->GetLastPosition();
-    auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+    auto accessibleRect = accessible->GetExtents(Dali::Devel::Accessibility::CoordinateType::WINDOW);
     auto rect           = GetShowingGeometry(accessibleRect, accessible.Get());
 
     switch(mAccessibilityLastScreenRelativeMoveType)
     {
-      case Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE:
+      case Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTSIDE:
       {
         if(IsShowingGeometryOnScreen(rect))
         {
-          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+          mAccessibilityLastScreenRelativeMoveType = Dali::Devel::Accessibility::ScreenRelativeMoveType::INSIDE;
         }
         break;
       }
-      case Dali::Accessibility::ScreenRelativeMoveType::INSIDE:
+      case Dali::Devel::Accessibility::ScreenRelativeMoveType::INSIDE:
       {
         if(rect.width < 0 && !Dali::Equals(accessibleRect.x, lastPosition.x))
         {
-          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
         }
         if(rect.height < 0 && !Dali::Equals(accessibleRect.y, lastPosition.y))
         {
-          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+          mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
         }
         // notify AT-clients on outgoing moves only
-        if(mAccessibilityLastScreenRelativeMoveType != Dali::Accessibility::ScreenRelativeMoveType::INSIDE)
+        if(mAccessibilityLastScreenRelativeMoveType != Dali::Devel::Accessibility::ScreenRelativeMoveType::INSIDE)
         {
           accessible->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
         }
         break;
       }
-      case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT:
-      case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT:
+      case Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT:
+      case Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT:
       {
         if(IsShowingGeometryOnScreen(rect))
         {
-          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+          mAccessibilityLastScreenRelativeMoveType = Dali::Devel::Accessibility::ScreenRelativeMoveType::INSIDE;
         }
         else
         {
-          mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
+          mAccessibilityLastScreenRelativeMoveType = Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTSIDE;
         }
         break;
       }
@@ -176,7 +179,7 @@ void Control::AccessibilityData::RegisterAccessibilityPositionPropertyNotificati
     return;
   }
   // set default value until first move of object is detected
-  mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
+  mAccessibilityLastScreenRelativeMoveType = Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTSIDE;
   // recalculate mAccessibilityLastScreenRelativeMoveType accordingly to the initial position
   CheckHighlightedObjectGeometry();
   mAccessibilityPositionNotification = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
@@ -221,7 +224,7 @@ void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle handle,
     {
       if(index == DevelControl::Property::ACCESSIBILITY_NAME || (mAccessibilityProps.name.empty() && index == accessible->GetNamePropertyIndex()))
       {
-        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+        accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::NAME);
         return;
       }
     }
@@ -230,26 +233,21 @@ void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle handle,
     {
       if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (mAccessibilityProps.description.empty() && index == accessible->GetDescriptionPropertyIndex()))
       {
-        accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+        accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
         return;
       }
     }
 
     if(index == DevelControl::Property::ACCESSIBILITY_VALUE)
     {
-      accessible->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+      accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::VALUE);
       return;
     }
 
-    if(index == DevelControl::Property::ACCESSIBILITY_STATES)
-    {
-      accessible->OnStatePropertySet(mAccessibilityProps.states);
-      return;
-    }
   }
 }
 
-Dali::Accessibility::ReadingInfoTypes Control::AccessibilityData::GetAccessibilityReadingInfoType() const
+Dali::Integration::Accessibility::ReadingInfoTypes Control::AccessibilityData::GetAccessibilityReadingInfoType() const
 {
   std::string value{};
   auto        place = mAccessibilityProps.extraAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
@@ -264,23 +262,23 @@ Dali::Accessibility::ReadingInfoTypes Control::AccessibilityData::GetAccessibili
     return {};
   }
 
-  Dali::Accessibility::ReadingInfoTypes types;
+  Dali::Integration::Accessibility::ReadingInfoTypes types;
 
   if(value.find(READING_INFO_TYPE_NAME) != std::string::npos)
   {
-    types[Dali::Accessibility::ReadingInfoType::NAME] = true;
+    types[Dali::Integration::Accessibility::ReadingInfoType::NAME] = true;
   }
   if(value.find(READING_INFO_TYPE_ROLE) != std::string::npos)
   {
-    types[Dali::Accessibility::ReadingInfoType::ROLE] = true;
+    types[Dali::Integration::Accessibility::ReadingInfoType::ROLE] = true;
   }
   if(value.find(READING_INFO_TYPE_DESCRIPTION) != std::string::npos)
   {
-    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
+    types[Dali::Integration::Accessibility::ReadingInfoType::DESCRIPTION] = true;
   }
   if(value.find(READING_INFO_TYPE_STATE) != std::string::npos)
   {
-    types[Dali::Accessibility::ReadingInfoType::STATE] = true;
+    types[Dali::Integration::Accessibility::ReadingInfoType::STATE] = true;
   }
 
   return types;
@@ -300,14 +298,14 @@ void Control::AccessibilityData::ClearAccessibilityAttributes()
   mAccessibilityProps.extraAttributes.Clear();
 }
 
-void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
+void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Integration::Accessibility::ReadingInfoTypes types)
 {
   std::string value{};
-  if(types[Dali::Accessibility::ReadingInfoType::NAME])
+  if(types[Dali::Integration::Accessibility::ReadingInfoType::NAME])
   {
     value += READING_INFO_TYPE_NAME;
   }
-  if(types[Dali::Accessibility::ReadingInfoType::ROLE])
+  if(types[Dali::Integration::Accessibility::ReadingInfoType::ROLE])
   {
     if(!value.empty())
     {
@@ -315,7 +313,7 @@ void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Acc
     }
     value += READING_INFO_TYPE_ROLE;
   }
-  if(types[Dali::Accessibility::ReadingInfoType::DESCRIPTION])
+  if(types[Dali::Integration::Accessibility::ReadingInfoType::DESCRIPTION])
   {
     if(!value.empty())
     {
@@ -323,7 +321,7 @@ void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Acc
     }
     value += READING_INFO_TYPE_DESCRIPTION;
   }
-  if(types[Dali::Accessibility::ReadingInfoType::STATE])
+  if(types[Dali::Integration::Accessibility::ReadingInfoType::STATE])
   {
     if(!value.empty())
     {
@@ -336,17 +334,17 @@ void Control::AccessibilityData::SetAccessibilityReadingInfoType(const Dali::Acc
 
 SharedPtr<DevelControl::ControlAccessible> Control::AccessibilityData::GetAccessibleObject()
 {
-  return DynamicPointerCast<DevelControl::ControlAccessible>(Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
+  return DynamicPointerCast<DevelControl::ControlAccessible>(Dali::Accessibility::Accessible::GetOwningPtr(mControlImpl.Self()));
 }
 
-Accessibility::ReadingInfoTypes Control::AccessibilityData::GetDefaultReadingInfoTypes()
+Dali::Integration::Accessibility::ReadingInfoTypes Control::AccessibilityData::GetDefaultReadingInfoTypes()
 {
-  return Dali::Accessibility::ReadingInfoTypes{DEFAULT_READING_INFO_TYPES_RAW_DATA};
+  return Dali::Integration::Accessibility::ReadingInfoTypes{DEFAULT_READING_INFO_TYPES_RAW_DATA};
 }
 
-DevelControl::AccessibilityStates Control::AccessibilityData::GetDefaultControlAccessibilityStates()
+uint32_t Control::AccessibilityData::GetDefaultControlAccessibilityStates()
 {
-  return DevelControl::AccessibilityStates{DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA};
+  return DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA;
 }
 
 } // namespace Dali::Toolkit::Internal

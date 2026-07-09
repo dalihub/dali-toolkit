@@ -443,7 +443,7 @@ int UtcDaliControlSignalConnectDisconnect(void)
     DummyControl dummy = DummyControlImpl::New();
 
     Actor actor = Actor::New();
-    DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.SceneConnectedSignal().GetConnectionCount(), 0u, TEST_LOCATION);
     Toolkit::ControlImpl& control   = Toolkit::GetImplementation(dummy);
     DummyControlImpl*     dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
 
@@ -453,16 +453,16 @@ int UtcDaliControlSignalConnectDisconnect(void)
       END_TEST;
     }
 
-    actor.OnSceneSignal().Connect(dummyImpl, &DummyControlImpl::CustomSlot1);
-    DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+    actor.SceneConnectedSignal().Connect(dummyImpl, &DummyControlImpl::CustomSlot1);
+    DALI_TEST_EQUALS(actor.SceneConnectedSignal().GetConnectionCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(dummyImpl->mCustomSlot1Called, false, TEST_LOCATION);
 
     application.GetScene().Add(actor);
     DALI_TEST_EQUALS(dummyImpl->mCustomSlot1Called, true, TEST_LOCATION);
 
     dummyImpl->mCustomSlot1Called = false;
-    actor.OnSceneSignal().Disconnect(dummyImpl, &DummyControlImpl::CustomSlot1);
-    DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+    actor.SceneConnectedSignal().Disconnect(dummyImpl, &DummyControlImpl::CustomSlot1);
+    DALI_TEST_EQUALS(actor.SceneConnectedSignal().GetConnectionCount(), 0u, TEST_LOCATION);
     application.GetScene().Remove(actor);
     application.GetScene().Add(actor);
     DALI_TEST_EQUALS(dummyImpl->mCustomSlot1Called, false, TEST_LOCATION);
@@ -487,8 +487,8 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
       END_TEST;
     }
 
-    actor.OnSceneSignal().Connect(dummyImpl, &DummyControlImpl::CustomSlot1);
-    DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+    actor.SceneConnectedSignal().Connect(dummyImpl, &DummyControlImpl::CustomSlot1);
+    DALI_TEST_EQUALS(actor.SceneConnectedSignal().GetConnectionCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(dummyImpl->mCustomSlot1Called, false, TEST_LOCATION);
 
     application.GetScene().Add(actor);
@@ -497,7 +497,7 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
   }
   // dummyControl automatically disconnects
 
-  DALI_TEST_EQUALS(actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.SceneConnectedSignal().GetConnectionCount(), 0u, TEST_LOCATION);
 
   const Vector3 ignoredSize(20, 20, 0);
   actor.SetProperty(Actor::Property::SIZE, ignoredSize);
@@ -2848,5 +2848,46 @@ int UtcDaliControlCornerPropertiesOverrideCleanupOnDestructionP(void)
   // The test passes if it reaches this point without any crashes or sanitizer errors.
   // The testing framework (e.g., LeakSanitizer, AddressSanitizer if enabled) would catch
   // issues like memory leaks or invalid accesses during destruction.
+  END_TEST;
+}
+
+int UtcDaliControlAccessibilityStateApi(void)
+{
+  ToolkitTestApplication application;
+  Control                control = Control::New();
+
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::ENABLED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  DALI_TEST_CHECK(control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
+  control.RemoveAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED);
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED);
+  control.AddAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY);
+  control.ClearAccessibilityStates();
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::ENABLED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::SELECTED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::CHECKED));
+  DALI_TEST_CHECK(!control.HasAccessibilityState(Dali::Toolkit::Accessibility::State::BUSY));
+
   END_TEST;
 }

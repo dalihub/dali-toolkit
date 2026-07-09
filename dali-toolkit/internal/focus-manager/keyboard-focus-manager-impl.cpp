@@ -47,7 +47,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 
 namespace Dali
 {
@@ -278,7 +278,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor, const FocusChange
       actor.Add(GetFocusIndicatorActor());
     }
 
-    actor.OffSceneSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
+    actor.SceneDisconnectedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
 
     // Save the current focused actor
     mCurrentFocusActor = actor;
@@ -756,7 +756,7 @@ void KeyboardFocusManager::ClearFocus(Actor actor)
   if(actor)
   {
     DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID));
-    actor.OffSceneSignal().Disconnect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
+    actor.SceneDisconnectedSignal().Disconnect(mSlotDelegate, &KeyboardFocusManager::OnSceneDisconnection);
 
     // Remove the actor from mCurrentFocusActors if present
     for(auto iter = mCurrentFocusActors.begin(); iter != mCurrentFocusActors.end(); ++iter)

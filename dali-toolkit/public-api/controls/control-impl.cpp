@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraint.h>
@@ -32,6 +33,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -94,12 +96,12 @@ void RegisterControlAccessibleGetter()
   if(DALI_UNLIKELY(!onceFlag))
   {
     onceFlag = true;
-    Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<SharedPtr<Accessibility::Accessible>, bool>
+    Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter([](Dali::Actor actor) -> std::pair<SharedPtr<Dali::Accessibility::Accessible>, bool>
     {
       auto control = Toolkit::Control::DownCast(actor);
       if(!control)
       {
-        return {SharedPtr<Accessibility::Accessible>(), true};
+        return {SharedPtr<Dali::Accessibility::Accessible>(), true};
       }
 
       if(Toolkit::DevelControl::IsCreateAccessibleEnabled(control))
@@ -108,7 +110,7 @@ void RegisterControlAccessibleGetter()
         return {SharedPtr<DevelControl::ControlAccessible>(controlImpl.CreateAccessibleObject()), true};
       }
 
-      return {SharedPtr<Accessibility::Accessible>(), false}; });
+      return {SharedPtr<Dali::Accessibility::Accessible>(), false}; });
   }
 }
 } // unnamed namespace
@@ -620,14 +622,14 @@ void ControlImpl::EmitKeyInputFocusSignal(bool focusGained)
 {
   Dali::Toolkit::Control handle(GetOwner());
 
-  if(Accessibility::IsUp())
+  if(Integration::Accessibility::IsUp())
   {
     auto accessible = GetAccessibleObject();
     if(DALI_LIKELY(accessible))
     {
       accessible->EmitFocused(focusGained);
       auto parent = dynamic_cast<Dali::Accessibility::ActorAccessible*>(accessible->GetParent());
-      if(parent && !accessible->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
+      if(parent && !accessible->GetStates()[Dali::Integration::Accessibility::State::MANAGES_DESCENDANTS])
       {
         parent->EmitActiveDescendantChanged(accessible.Get());
       }
@@ -813,7 +815,7 @@ void ControlImpl::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
   }
 
-  if(Accessibility::IsUp())
+  if(Integration::Accessibility::IsUp())
   {
     auto accessible = GetAccessibleObject();
     if(DALI_LIKELY(accessible))

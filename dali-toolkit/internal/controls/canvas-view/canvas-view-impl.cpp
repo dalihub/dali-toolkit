@@ -119,7 +119,7 @@ void CanvasView::OnInitialize()
   // CanvasView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to CanvasView
   Dali::Toolkit::Control handle(GetOwner());
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::IMAGE);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::IMAGE);
 
   // Request rasterization once at very first time.
   RequestRasterization();

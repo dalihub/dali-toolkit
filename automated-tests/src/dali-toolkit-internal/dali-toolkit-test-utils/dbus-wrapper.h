@@ -38,7 +38,8 @@
 //#include <dali/public-api/adaptor-framework/accessibility.h>
 //#include <dali/internal/accessibility/bridge/optional.h>
 
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/accessibility-types.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 
 #define ATSPI_PREFIX_PATH "/org/a11y/atspi/accessible/"
 #define ATSPI_NULL_PATH "/org/a11y/atspi/null"
@@ -904,13 +905,13 @@ struct Encoder<std::array<T, I>>
   }
 };
 template<>
-struct Encoder<Dali::Accessibility::Address>
+struct Encoder<Dali::Devel::Accessibility::Address>
 {
-  static void encode(TestDBusWrapper& w, const TestDBusWrapper::MessageIterPtr& tgt, const Dali::Accessibility::Address& src)
+  static void encode(TestDBusWrapper& w, const TestDBusWrapper::MessageIterPtr& tgt, const Dali::Devel::Accessibility::Address& src)
   {
     Encoder<std::tuple<std::string, ObjectPath>>::encode(w, tgt, std::tuple<std::string, ObjectPath>{src.GetBus(), ObjectPath{"/org/a11y/atspi/accessible/" + src.GetPath()}});
   }
-  static void decode(TestDBusWrapper& w, Dali::Accessibility::Address& tgt, const TestDBusWrapper::MessageIterPtr& src)
+  static void decode(TestDBusWrapper& w, Dali::Devel::Accessibility::Address& tgt, const TestDBusWrapper::MessageIterPtr& src)
   {
     std::tuple<std::string, ObjectPath> tmp;
     Encoder<std::tuple<std::string, ObjectPath>>::decode(w, tmp, src);

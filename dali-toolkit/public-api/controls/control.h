@@ -27,6 +27,7 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
@@ -442,6 +443,41 @@ public:
    * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
    */
   Visual::ResourceStatus GetVisualResourceStatus(const Dali::Property::Index index);
+
+  /**
+   * @brief Adds the given accessibility state to this control.
+   *
+   * @SINCE_2_5.30
+   * @param[in] state The accessibility state to enable
+   * @see Dali::Toolkit::Accessibility::State
+   */
+  void AddAccessibilityState(Accessibility::State state);
+
+  /**
+   * @brief Removes the given accessibility state from this control.
+   *
+   * @SINCE_2_5.30
+   * @param[in] state The accessibility state to disable
+   * @see Dali::Toolkit::Accessibility::State
+   */
+  void RemoveAccessibilityState(Accessibility::State state);
+
+  /**
+   * @brief Clears all accessibility states from this control.
+   *
+   * @SINCE_2_5.30
+   */
+  void ClearAccessibilityStates();
+
+  /**
+   * @brief Returns whether the given accessibility state is set on this control.
+   *
+   * @SINCE_2_5.30
+   * @param[in] state The accessibility state to query
+   * @return True if the state is set
+   * @see Dali::Toolkit::Accessibility::State
+   */
+  bool HasAccessibilityState(Accessibility::State state) const;
 
   // Signals
 

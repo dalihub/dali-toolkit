@@ -68,63 +68,90 @@ private: // Internal accessors for Rendering Strategies
    *
    * @return True if video is playing, false otherwise.
    */
-  bool IsPlay() const { return mIsPlay; }
+  bool IsPlay() const
+  {
+    return mIsPlay;
+  }
 
   /**
    * @brief Checks if overlay texture rendering is enabled.
    *
    * @return True if overlay texture is being used, false otherwise.
    */
-  bool IsUsingOverlayTexture() const { return mIsUsingOverlayTexture; }
+  bool IsUsingOverlayTexture() const
+  {
+    return mIsUsingOverlayTexture;
+  }
 
   /**
    * @brief Gets the native texture used for video rendering.
    *
    * @return The native texture handle.
    */
-  Texture GetNativeTexture() const { return mNativeTexture; }
+  Texture GetNativeTexture() const
+  {
+    return mNativeTexture;
+  }
 
   /**
    * @brief Sets the native texture used for video rendering.
    *
    * @param[in] texture The texture to set.
    */
-  void SetNativeTexture(Texture texture) { mNativeTexture = texture; }
+  void SetNativeTexture(Texture texture)
+  {
+    mNativeTexture = texture;
+  }
 
   /**
    * @brief Gets the effect property map.
    *
    * @return Const reference to the effect property map.
    */
-  const Property::Map& GetEffectPropertyMap() const { return mEffectPropertyMap; }
+  const Property::Map& GetEffectPropertyMap() const
+  {
+    return mEffectPropertyMap;
+  }
 
   /**
    * @brief Gets the texture visual used for rendering.
    *
    * @return The texture visual base handle.
    */
-  Dali::Toolkit::Visual::Base GetTextureVisual() const { return mTextureVisual; }
+  Dali::Toolkit::Visual::Base GetTextureVisual() const
+  {
+    return mTextureVisual;
+  }
 
   /**
    * @brief Sets the texture visual used for rendering.
    *
    * @param[in] visual The visual to set.
    */
-  void SetTextureVisual(Dali::Toolkit::Visual::Base visual) { mTextureVisual = visual; }
+  void SetTextureVisual(Dali::Toolkit::Visual::Base visual)
+  {
+    mTextureVisual = visual;
+  }
 
   /**
    * @brief Gets the overlay visual used for rendering.
    *
    * @return The overlay visual base handle.
    */
-  Dali::Toolkit::Visual::Base GetOverlayVisual() const { return mOverlayVisual; }
+  Dali::Toolkit::Visual::Base GetOverlayVisual() const
+  {
+    return mOverlayVisual;
+  }
 
   /**
    * @brief Sets the overlay visual used for rendering.
    *
    * @param[in] visual The visual to set.
    */
-  void SetOverlayVisual(Dali::Toolkit::Visual::Base visual) { mOverlayVisual = visual; }
+  void SetOverlayVisual(Dali::Toolkit::Visual::Base visual)
+  {
+    mOverlayVisual = visual;
+  }
 
   /**
    * @brief Applies backup properties to the VideoView.
@@ -507,7 +534,7 @@ private:
    *
    * @param[in] actor parent actor.
    */
-  void OnChildOrderChanged(Actor actor);
+  void OnChildOrderChanged(Actor parent, Actor child);
 
 private:
   Dali::VideoPlayer     mVideoPlayer;
@@ -518,7 +545,7 @@ private:
 
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
 
-  std::string       mUrl;
+  std::string mUrl;
 
   bool                        mIsUsingOverlayTexture{false};
   Property::Index             mOverlayTextureVisualIndex{Property::INVALID_INDEX};

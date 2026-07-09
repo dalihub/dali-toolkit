@@ -19,10 +19,12 @@
 #include "control-devel.h"
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/internal/controls/control/control-accessibility-data.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -35,6 +37,11 @@ Dali::Toolkit::Internal::Control& GetControlImplementation(Dali::Toolkit::Contro
   auto& internalControl = Dali::Toolkit::GetImplementation(control);
 
   return Dali::Toolkit::Internal::Control::Get(internalControl);
+}
+
+Dali::Integration::Accessibility::RelationType ToIntegrationRelationType(Dali::Toolkit::Accessibility::RelationType relation)
+{
+  return static_cast<Dali::Integration::Accessibility::RelationType>(relation);
 }
 
 } // unnamed namespace
@@ -200,22 +207,22 @@ Toolkit::DevelControl::AccessibilityHighlightedSignalType& AccessibilityHighligh
   return GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityHighlightedSignal;
 }
 
-void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
+void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Toolkit::Accessibility::RelationType relation)
 {
-  if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
+  if(auto destinationAccessible = Dali::Accessibility::Accessible::Get(destination))
   {
     GetControlImplementation(control).GetOrCreateAccessibilityData().mAccessibilityProps.relations[relation].insert(destinationAccessible);
   }
 }
 
-void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation)
+void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Toolkit::Accessibility::RelationType relation)
 {
   auto& controlImpl = GetControlImplementation(control);
 
   auto* accessibilityData = controlImpl.GetAccessibilityData();
   if(DALI_LIKELY(accessibilityData))
   {
-    if(auto destinationAccessible = Accessibility::Accessible::Get(destination))
+    if(auto destinationAccessible = Dali::Accessibility::Accessible::Get(destination))
     {
       auto& relations = accessibilityData->mAccessibilityProps.relations;
 
@@ -229,9 +236,9 @@ void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destinati
   }
 }
 
-std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
+std::vector<Dali::Devel::Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control control)
 {
-  std::vector<Accessibility::Relation> result;
+  std::vector<Dali::Devel::Accessibility::Relation> result;
 
   auto& controlImpl = GetControlImplementation(control);
 
@@ -243,7 +250,7 @@ std::vector<Accessibility::Relation> GetAccessibilityRelations(Toolkit::Control 
     {
       const auto& targets = relation.second;
 
-      result.emplace_back(Accessibility::Relation{relation.first, {}});
+      result.emplace_back(Dali::Devel::Accessibility::Relation{ToIntegrationRelationType(relation.first), {}});
       std::copy(targets.begin(), targets.end(), std::back_inserter(result.back().mTargets));
     }
   }
@@ -277,14 +284,24 @@ void ClearAccessibilityAttributes(Toolkit::Control control)
   GetControlImplementation(control).ClearAccessibilityAttributes();
 }
 
-void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Accessibility::ReadingInfoTypes types)
+void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Integration::Accessibility::ReadingInfoTypes types)
 {
   GetControlImplementation(control).SetAccessibilityReadingInfoType(types);
 }
 
-Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::Control control)
+void SetAccessibilityReadingInfoTypeRaw(Toolkit::Control control, uint32_t types)
+{
+  SetAccessibilityReadingInfoType(control, Dali::Integration::Accessibility::ReadingInfoTypes{types});
+}
+
+Dali::Integration::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::Control control)
 {
   return GetControlImplementation(control).GetAccessibilityReadingInfoType();
+}
+
+uint32_t GetAccessibilityReadingInfoTypeRaw(Toolkit::Control control)
+{
+  return GetAccessibilityReadingInfoType(control).GetRawData()[0];
 }
 
 bool ClearAccessibilityHighlight(Toolkit::Control control)
@@ -307,23 +324,33 @@ bool GrabAccessibilityHighlight(Toolkit::Control control)
   return false;
 }
 
-Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
+Dali::Integration::Accessibility::States GetAccessibilityStates(Toolkit::Control control)
 {
   auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     return controlAccessible->GetStates();
   }
-  return Dali::Accessibility::States{};
+  return Dali::Integration::Accessibility::States{};
 }
 
-void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse)
+uint64_t GetAccessibilityStatesRaw(Toolkit::Control control)
+{
+  return GetAccessibilityStates(control).GetRawData64();
+}
+
+void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Integration::Accessibility::States states, bool recurse)
 {
   auto controlAccessible = GetControlImplementation(control).GetAccessibleObject();
   if(DALI_LIKELY(controlAccessible))
   {
     controlAccessible->NotifyAccessibilityStateChange(std::move(states), recurse);
   }
+}
+
+void NotifyAccessibilityStateChangeRaw(Toolkit::Control control, uint64_t states, bool recurse)
+{
+  NotifyAccessibilityStateChange(control, Dali::Integration::Accessibility::States{states}, recurse);
 }
 
 bool IsAccessibleCreated(Toolkit::Control control)
@@ -341,13 +368,13 @@ bool IsCreateAccessibleEnabled(Toolkit::Control control)
   return GetControlImplementation(control).IsCreateAccessibleEnabled();
 }
 
-void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state, int newValue)
+void EmitAccessibilityStateChanged(Dali::Actor actor, Dali::Integration::Accessibility::State state, int newValue)
 {
-  auto bridge  = Accessibility::Bridge::GetCurrentBridge();
+  auto bridge  = Integration::Accessibility::Bridge::GetCurrentBridge();
   auto control = Toolkit::Control::DownCast(actor);
   if(DALI_LIKELY(control && bridge))
   {
-    if(state == Accessibility::State::SHOWING)
+    if(state == Dali::Integration::Accessibility::State::SHOWING)
     {
       bool isModal = ControlAccessible::IsModal(control);
       if(isModal)
@@ -366,12 +393,17 @@ void EmitAccessibilityStateChanged(Dali::Actor actor, Accessibility::State state
 
   if(bridge && bridge->IsUp())
   {
-    auto accessible = dynamic_cast<Accessibility::ActorAccessible*>(Accessibility::Accessible::Get(actor));
+    auto accessible = dynamic_cast<Dali::Accessibility::ActorAccessible*>(Dali::Accessibility::Accessible::Get(actor));
     if(DALI_LIKELY(accessible))
     {
       accessible->EmitStateChanged(state, newValue, 0);
     }
   }
+}
+
+void NotifyAccessibilityPresentationChanged(Dali::Actor actor, bool presented)
+{
+  EmitAccessibilityStateChanged(actor, Dali::Integration::Accessibility::State::SHOWING, presented ? 1 : 0);
 }
 
 } // namespace DevelControl

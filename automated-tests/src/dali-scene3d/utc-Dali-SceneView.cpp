@@ -26,6 +26,7 @@
 
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 
@@ -759,7 +760,7 @@ int UtcDaliSceneViewResourceReady(void)
   gResourceReadyCalled      = false;
   Scene3D::SceneView view   = Scene3D::SceneView::New();
   view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  view.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  DevelActor::OnRelayoutSignal(view).Connect(OnRelayoutCallback);
   view.ResourceReadySignal().Connect(OnResourceReady);
   // SceneView::IsResourceReady() returns true by default.
   DALI_TEST_EQUALS(view.IsResourceReady(), true, TEST_LOCATION);

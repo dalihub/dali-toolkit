@@ -23,6 +23,7 @@
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
@@ -594,7 +595,7 @@ void TextEditor::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired(2);
   GetTapGestureDetector().ReceiveAllTapEvents(true);
 
-  self.TouchedSignal().Connect(this, &TextEditor::OnTouched);
+  self.TouchEventSignal().Connect(this, &TextEditor::OnTouched);
 
   // Whether to flip the selection handles as soon as they cross.
   mDecorator->FlipSelectionHandlesOnCrossEnabled(true);
@@ -605,7 +606,7 @@ void TextEditor::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
-  self.OnSceneSignal().Connect(this, &TextEditor::OnSceneConnect);
+  self.SceneConnectedSignal().Connect(this, &TextEditor::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
@@ -630,10 +631,10 @@ void TextEditor::OnInitialize()
   }
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::ENTRY);
 
-  Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
-  Accessibility::Bridge::DisabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::DisabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
 }
 
 DevelControl::ControlAccessible* TextEditor::CreateAccessibleObject()

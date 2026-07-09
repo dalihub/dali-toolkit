@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ void ColliderMeshProcessor::ColliderMeshChanged(Collidable& collidable)
     else
     {
       // TODO: Check if signal already connected
-      collidable.GetCollidableActor().OnSceneSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
+      collidable.GetCollidableActor().SceneConnectedSignal().Connect(this, &ColliderMeshProcessor::ModelOnScene);
     }
   }
 }
@@ -156,7 +156,7 @@ void ColliderMeshProcessor::ModelOnScene(Actor actor)
   {
     AddSceneViewParentToProcessingQueue(model);
   }
-  model.OnSceneSignal().Disconnect(this, &ColliderMeshProcessor::ModelOnScene);
+  model.SceneConnectedSignal().Disconnect(this, &ColliderMeshProcessor::ModelOnScene);
 }
 
 void ColliderMeshProcessor::AddSceneViewParentToProcessingQueue(Actor actor)
@@ -193,7 +193,7 @@ void ColliderMeshProcessor::Process(bool /* postProcess */)
       {
         mConnectedSceneViews.push_back(sceneView);
         // TODO: Consider passing in camera parameters and meshData into SceneViewTouchHandler
-        sceneView.TouchedSignal().Connect(this, SceneViewTouchHandler());
+        sceneView.TouchEventSignal().Connect(this, SceneViewTouchHandler());
       }
     }
   }

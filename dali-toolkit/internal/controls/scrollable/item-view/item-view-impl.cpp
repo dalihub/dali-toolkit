@@ -356,7 +356,7 @@ void ItemView::OnInitialize()
 
   Actor self = Self();
 
-  self.TouchedSignal().Connect(this, &ItemView::OnTouch);
+  self.TouchEventSignal().Connect(this, &ItemView::OnTouch);
   EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
   mWheelEventFinishedTimer = Timer::New(WHEEL_EVENT_FINISHED_TIME_OUT);
@@ -367,7 +367,7 @@ void ItemView::OnInitialize()
   // Connect wheel event
   self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::SCROLL_PANE);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::SCROLL_PANE);
 }
 
 void ItemView::OnRelayout(const Vector2& size, RelayoutContainer& container)

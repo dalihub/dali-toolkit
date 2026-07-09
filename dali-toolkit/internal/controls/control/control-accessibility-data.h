@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <map>
 #include <set>
 
 // INTERNAL INCLUDES
@@ -55,12 +56,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::SetAccessibilityReadingInfoType()
    */
-  void SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types);
+  void SetAccessibilityReadingInfoType(const Dali::Integration::Accessibility::ReadingInfoTypes types);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::Impl::GetAccessibilityReadingInfoType()
    */
-  Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
+  Dali::Integration::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
 
   /**
    * @brief Checks highlighted object geometry if it is showing or not
@@ -105,12 +106,12 @@ public:
   /**
    * @brief Helper function to get default reading info type attributes
    */
-  static Dali::Accessibility::ReadingInfoTypes GetDefaultReadingInfoTypes();
+  static Dali::Integration::Accessibility::ReadingInfoTypes GetDefaultReadingInfoTypes();
 
   /**
    * @brief Helper function to get control's default state attributes
    */
-  static Toolkit::DevelControl::AccessibilityStates GetDefaultControlAccessibilityStates();
+  static uint32_t GetDefaultControlAccessibilityStates();
 
 public:
   Toolkit::DevelControl::AccessibilityActivateSignalType         mAccessibilityActivateSignal;
@@ -145,8 +146,8 @@ public:
     std::string value{};
     std::string automationId{};
 
-    DevelControl::AccessibilityStates                                                 states{};
-    std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> relations{};
+    uint32_t                                                                           states{};
+    std::map<Dali::Toolkit::Accessibility::RelationType, std::set<Dali::Accessibility::Accessible*>> relations{};
     Property::Map                                                                     extraAttributes{};
 
     Internal::TriStateProperty isHighlightable : 3;
@@ -158,7 +159,7 @@ public:
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
   Dali::PropertyNotification                  mAccessibilityPositionNotification;
-  Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
+  Dali::Devel::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTSIDE};
 
   Toolkit::ControlImpl& mControlImpl;
 

@@ -214,7 +214,7 @@ private:
    * @param[in] actor The actor
    * @param[in] visible Whether this actor is visible or not.
    */
-  void OnControlInheritedVisibilityChanged(Actor actor, bool visible);
+  void OnControlEffectiveVisibilityChanged(Actor actor, bool visible);
 
 private:
   Dali::Renderer mRenderer; // An additional renderer for mOwnerControl

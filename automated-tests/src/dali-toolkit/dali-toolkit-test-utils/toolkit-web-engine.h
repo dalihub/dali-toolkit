@@ -27,7 +27,7 @@ namespace Test
 namespace WebEngine
 {
 void SetWebViewAccessible(Dali::Accessibility::Accessible* webAccessible);
-void SetWebAccessibleActivatedAddress(Dali::Accessibility::Address address);
+void SetWebAccessibleActivatedAddress(Dali::Devel::Accessibility::Address address);
 } // namespace WebEngine
 } // namespace Test
 

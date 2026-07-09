@@ -175,7 +175,7 @@ void GlView::OnInitialize()
   }
 
   // Adding VisibilityChange Signal.
-  self.InheritedVisibilityChangedSignal().Connect(this, &GlView::OnControlInheritedVisibilityChanged);
+  self.EffectiveVisibilityChangedSignal().Connect(this, &GlView::OnControlEffectiveVisibilityChanged);
 }
 
 void GlView::OnSizeSet(const Vector3& targetSize)
@@ -209,7 +209,7 @@ Shader GlView::CreateShader()
                      "GL_VIEW");
 }
 
-void GlView::OnControlInheritedVisibilityChanged(Dali::Actor actor, bool visible)
+void GlView::OnControlEffectiveVisibilityChanged(Dali::Actor actor, bool visible)
 {
   Actor self = Self();
   if(mRenderThread)

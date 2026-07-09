@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
@@ -388,12 +389,12 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         if(impl.mController->HasAnchors())
         {
           impl.mIsHasAnchors = true;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Connect(&impl, &TextLabel::OnInterceptTouched);
+          impl.Self().InterceptTouchEventSignal().Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
           impl.mIsHasAnchors = false;
-          Dali::DevelActor::InterceptTouchedSignal(impl.Self()).Disconnect(&impl, &TextLabel::OnInterceptTouched);
+          impl.Self().InterceptTouchEventSignal().Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
         break;
       }
@@ -1218,7 +1219,7 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
-  self.InheritedVisibilityChangedSignal().Connect(this, &TextLabel::OnControlInheritedVisibilityChanged);
+  self.EffectiveVisibilityChangedSignal().Connect(this, &TextLabel::OnControlEffectiveVisibilityChanged);
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
   if(Dali::Adaptor::IsAvailable())
@@ -1230,10 +1231,10 @@ void TextLabel::OnInitialize()
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::TEXT);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::TEXT);
 
-  Accessibility::Bridge::EnabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
-  Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::EnabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
 }
 
 bool TextLabel::IsVisible()
@@ -1710,7 +1711,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
       SetUpAutoScrolling(contentSize, originSize);
     }
 
-    if(Dali::Accessibility::IsUp() && (mAnchorActors.empty() || mTextUpdateNeeded || sizeChanged))
+    if(Dali::Integration::Accessibility::IsUp() && (mAnchorActors.empty() || mTextUpdateNeeded || sizeChanged))
     {
       CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
     }
@@ -1826,12 +1827,12 @@ void TextLabel::UpdateText(const std::string& text)
   if(mController->HasAnchors())
   {
     mIsHasAnchors = true;
-    Dali::DevelActor::InterceptTouchedSignal(Self()).Connect(this, &TextLabel::OnInterceptTouched);
+    Self().InterceptTouchEventSignal().Connect(this, &TextLabel::OnInterceptTouched);
   }
   else
   {
     mIsHasAnchors = false;
-    Dali::DevelActor::InterceptTouchedSignal(Self()).Disconnect(this, &TextLabel::OnInterceptTouched);
+    Self().InterceptTouchEventSignal().Disconnect(this, &TextLabel::OnInterceptTouched);
   }
 }
 
@@ -2151,7 +2152,7 @@ void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
   }
 }
 
-void TextLabel::OnControlInheritedVisibilityChanged(Actor actor, bool visible)
+void TextLabel::OnControlEffectiveVisibilityChanged(Actor actor, bool visible)
 {
   mIsVisible            = visible;
   mIsVisibleInitialized = true;

@@ -19,11 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-notification.h>
+#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -313,6 +314,42 @@ public:
   [[nodiscard]] AccessibilityData* GetAccessibilityData() const;
 
   /**
+   * @brief Sets the accessibility states.
+   * @param[in] states The accessibility state mask
+   */
+  void SetAccessibilityStates(uint32_t states);
+
+  /**
+   * @brief Gets the accessibility states.
+   * @return The accessibility state mask
+   */
+  uint32_t GetAccessibilityStates() const;
+
+  /**
+   * @brief Adds the accessibility state.
+   * @param[in] state The state to add
+   */
+  void AddAccessibilityState(Toolkit::Accessibility::State state);
+
+  /**
+   * @brief Removes the accessibility state.
+   * @param[in] state The state to remove
+   */
+  void RemoveAccessibilityState(Toolkit::Accessibility::State state);
+
+  /**
+   * @brief Clears all accessibility states.
+   */
+  void ClearAccessibilityStates();
+
+  /**
+   * @brief Returns whether the accessibility state is set.
+   * @param[in] state The state to query
+   * @return True if the state is set
+   */
+  bool HasAccessibilityState(Toolkit::Accessibility::State state) const;
+
+  /**
    * @brief Adds accessibility attribute
    * @param[in] key Attribute name to set
    * @param[in] value Attribute value to set
@@ -342,12 +379,12 @@ public:
    * This function sets, which part of object will be read out
    * by screen-reader.
    */
-  void SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types);
+  void SetAccessibilityReadingInfoType(const Dali::Integration::Accessibility::ReadingInfoTypes types);
 
   /**
    * @brief Gets currently active reading info type attributes
    */
-  Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
+  Dali::Integration::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
 
   /**
    * @copydoc DevelControl::VisualEventSignal()
@@ -659,7 +696,7 @@ public:
 
   // Frequencly touched accessibility relative values.
   // Keep it on Impl to avoid AccessibilityData creation.
-  int32_t mAccessibilityRole : Dali::Log<static_cast<uint32_t>(DevelControl::AccessibilityRole::MAX_COUNT)>::value + 2;
+  int32_t mAccessibilityRole : Dali::Log<static_cast<uint32_t>(Accessibility::Role::MAX_COUNT)>::value + 2;
 
   bool mIsKeyboardNavigationSupported : 1; ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup : 1;          ///< Stores whether the control is a focus group.
@@ -698,7 +735,6 @@ public:
   static const PropertyRegistration PROPERTY_26;
   static const PropertyRegistration PROPERTY_27;
   static const PropertyRegistration PROPERTY_28;
-  static const PropertyRegistration PROPERTY_29;
   static const PropertyRegistration PROPERTY_30;
   static const PropertyRegistration PROPERTY_31;
   static const PropertyRegistration PROPERTY_32;

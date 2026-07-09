@@ -48,7 +48,7 @@ public:
     stage.Add( mTextLabel );
 
     // Respond to a click anywhere on the stage
-    stage.GetRootLayer().TouchedSignal().Connect( this, &HelloWorldController::OnTouch );
+    stage.GetRootLayer().TouchEventSignal().Connect( this, &HelloWorldController::OnTouch );
   }
 
   bool OnTouch( Actor actor, const TouchEvent& touch )

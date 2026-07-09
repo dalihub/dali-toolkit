@@ -518,11 +518,11 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
         auto mode = map->Find(Toolkit::HiddenInput::Property::MODE);
         if(mode && (mode->Get<int>() != Toolkit::HiddenInput::Mode::HIDE_NONE))
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::PASSWORD_TEXT);
+          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::PASSWORD_TEXT);
         }
         else
         {
-          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+          textField.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::ENTRY);
         }
       }
       break;

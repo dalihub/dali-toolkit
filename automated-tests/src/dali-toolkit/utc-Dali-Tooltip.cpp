@@ -116,7 +116,7 @@ int UtcDaliTooltipCreateWithString(void)
   DALI_TEST_EQUALS("Hello Test", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent valid text, so ensure the hover signal has been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -154,7 +154,7 @@ int UtcDaliTooltipCreateWithTextVisualMap(void)
   DALI_TEST_EQUALS("Hello TextVisual Test", textStringValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent a text visual with TEXT property set, so ensure the hover signal has been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -192,7 +192,7 @@ int UtcDaliTooltipCreateWithTextVisualMapWithoutString(void)
   DALI_TEST_EQUALS(20, pointSizeValue->Get<int>(), TEST_LOCATION);
 
   tet_infoline("We sent a text visual without a TEXT property set, so ensure the hover signal has NOT been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -230,7 +230,7 @@ int UtcDaliTooltipCreateWithImageVisualMap(void)
   DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent an ImageVisual, so ensure the hover signal has been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -279,7 +279,7 @@ int UtcDaliTooltipCreateWithArray(void)
   DALI_TEST_EQUALS("Hello Array Test", textValue->Get<Dali::String>(), TEST_LOCATION);
 
   tet_infoline("We sent an array, so ensure the hover signal has been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -364,7 +364,7 @@ int UtcDaliTooltipCreateWithFullMap(void)
   DALI_TEST_EQUALS(disappearOnMovementValue->Get<bool>(), true, TEST_LOCATION);
 
   tet_infoline("We sent a text visual with TEXT property set, so ensure the hover signal has been connected to");
-  DALI_TEST_EQUALS(control.HoveredSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.HoverEventSignal().GetConnectionCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }

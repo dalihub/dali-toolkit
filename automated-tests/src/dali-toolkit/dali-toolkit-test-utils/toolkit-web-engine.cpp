@@ -72,7 +72,7 @@ MockWebEngineContext*       gWebEngineContextInstance   = nullptr;
 MockWebEngineCookieManager* gMockWebEngineCookieManager = nullptr;
 
 Dali::Accessibility::ActorAccessible* gWebAccessible = nullptr;
-Dali::Accessibility::Address          gWebAccessibleActivatedAddress{};
+Dali::Devel::Accessibility::Address          gWebAccessibleActivatedAddress{};
 
 bool OnGoBack();
 bool OnGoForward();
@@ -114,7 +114,7 @@ inline void SetTestWebViewAccessible(Dali::Accessibility::ActorAccessible* webAc
   gWebAccessible = webAccessible;
 }
 
-inline void SetTestWebAccessibleActivatedAddress(Dali::Accessibility::Address address)
+inline void SetTestWebAccessibleActivatedAddress(Dali::Devel::Accessibility::Address address)
 {
   gWebAccessibleActivatedAddress = address;
 }
@@ -1440,9 +1440,9 @@ public:
   void ActivateAccessibility(bool activated) override
   {
   }
-  Accessibility::Address GetAccessibilityAddress() override
+  Dali::Devel::Accessibility::Address GetAccessibilityAddress() override
   {
-    return Accessibility::Address();
+    return Dali::Devel::Accessibility::Address();
   }
   bool SetVisibility(bool visible) override
   {
@@ -1978,7 +1978,7 @@ public:
     return true;
   }
 
-  Dali::Accessibility::Address GetAccessibilityAddress()
+  Dali::Devel::Accessibility::Address GetAccessibilityAddress()
   {
     return mAccessibilityAddress;
   }
@@ -2215,7 +2215,7 @@ public:
   Dali::Vector2                mContentSize;
   WebEngineBackForwardList*    mockWebEngineBackForwardList;
   WebEngineSettings*           mockWebEngineSettings;
-  Dali::Accessibility::Address mAccessibilityAddress{};
+  Dali::Devel::Accessibility::Address mAccessibilityAddress{};
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
 
@@ -2916,7 +2916,7 @@ void WebEngine::ActivateAccessibility(bool activated)
 {
 }
 
-Accessibility::Address WebEngine::GetAccessibilityAddress()
+Dali::Devel::Accessibility::Address WebEngine::GetAccessibilityAddress()
 {
   return Internal::Adaptor::GetImplementation(*this).GetAccessibilityAddress();
 }
@@ -3267,7 +3267,7 @@ void SetWebViewAccessible(Dali::Accessibility::Accessible* webAccessible)
 {
   Dali::Internal::Adaptor::SetTestWebViewAccessible(dynamic_cast<Dali::Accessibility::ActorAccessible*>(webAccessible));
 }
-void SetWebAccessibleActivatedAddress(Dali::Accessibility::Address address)
+void SetWebAccessibleActivatedAddress(Dali::Devel::Accessibility::Address address)
 {
   Dali::Internal::Adaptor::SetTestWebAccessibleActivatedAddress(address);
 }

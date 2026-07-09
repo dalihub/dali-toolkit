@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>

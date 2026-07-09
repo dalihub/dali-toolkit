@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
@@ -517,7 +518,7 @@ void TextField::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired(2);
   GetTapGestureDetector().ReceiveAllTapEvents(true);
 
-  self.TouchedSignal().Connect(this, &TextField::OnTouched);
+  self.TouchEventSignal().Connect(this, &TextField::OnTouched);
 
   // Flip vertically the 'left' selection handle
   mDecorator->FlipHandleVertically(LEFT_SELECTION_HANDLE, true);
@@ -525,7 +526,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
-  self.OnSceneSignal().Connect(this, &TextField::OnSceneConnect);
+  self.SceneConnectedSignal().Connect(this, &TextField::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
 
@@ -535,10 +536,10 @@ void TextField::OnInitialize()
   }
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, DevelControl::AccessibilityRole::ENTRY);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::ENTRY);
 
-  Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
-  Accessibility::Bridge::DisabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
+  Integration::Accessibility::Bridge::DisabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
 }
 
 DevelControl::ControlAccessible* TextField::CreateAccessibleObject()
@@ -757,12 +758,21 @@ Text::ControllerPtr TextField::GetTextController()
 
 void TextField::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
+  if(mController && IsEditable() && mController->IsShowingPlaceholderText() && (0u != mController->GetCursorPosition()))
+  {
+    DALI_LOG_RELEASE_INFO("TextField render placeholder cursor. c:%p upd:%u cur:%u\n",
+                          static_cast<void*>(mController.Get()),
+                          static_cast<unsigned int>(updateTextType),
+                          mController->GetCursorPosition());
+  }
+
   CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mCursorLayer, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
 }
 
 void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO(gTextFieldLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get());
+
   if(mInputMethodContext && IsEditable())
   {
     // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
@@ -772,17 +782,20 @@ void TextField::OnKeyInputFocusGained()
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextField::KeyboardStatusChanged);
 
     Dali::Integration::InputMethodContext::KeyboardEventReceivedSignal(mInputMethodContext).Connect(this, &TextField::OnInputMethodContextEvent);
-
-    // Notify that the text editing start.
-    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
-
-    // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
-    mInputMethodContext.SetRestoreAfterFocusLostEnabled(true);
   }
 
   if(IsEditable() && mController->IsUserInteractionEnabled())
   {
+    // Activate may synchronously deliver IME events; make the controller editable first.
     mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
+  }
+
+  if(mInputMethodContext && IsEditable())
+  {
+    // Notify that the text editing start.
+    Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
+    // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
+    mInputMethodContext.SetRestoreAfterFocusLostEnabled(true);
   }
 
   EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.

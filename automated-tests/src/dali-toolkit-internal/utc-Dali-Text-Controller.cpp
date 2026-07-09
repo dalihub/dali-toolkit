@@ -193,6 +193,12 @@ int UtcDaliTextControllerImfEvent(void)
 
   DALI_TEST_CHECK(controller);
 
+  // For coverage. IME input can arrive before text input is fully enabled.
+  InputMethodContext inputMethodContextBeforeEnable = Dali::Integration::InputMethodContext::New();
+  imfEvent                                          = CreateInputMethodEvent(Dali::Integration::InputMethodContext::PRE_EDIT, "u", 0, 1);
+  DALI_TEST_ASSERTION(controller->OnInputMethodContextEvent(inputMethodContextBeforeEnable, imfEvent), "nullptr != eventData");
+  TestApplication::EnableLogging(true);
+
   // Enable the text input.
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New(*controller,

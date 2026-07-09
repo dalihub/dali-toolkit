@@ -1,13 +1,17 @@
 #ifndef __DALI_TOOLKIT_ACCESSIBILITY_TEST_UTILS__
 #define __DALI_TOOLKIT_ACCESSIBILITY_TEST_UTILS__
 
-#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
+#include <dali/devel-api/adaptor-framework/accessibility-devel.h>
 #include <dali/integration-api/scene.h>
 
 namespace Dali
 {
 namespace Accessibility
 {
+using Dali::Devel::Accessibility::Address;
+using Dali::Devel::Accessibility::ComponentLayer;
+
 void                                                                           TestEnableSC(bool b, Dali::Integration::Scene scene);
 std::vector<Address>                                                           TestGetChildren(const Address& adr);
 std::string                                                                    TestGetName(const Address& adr);
@@ -18,15 +22,15 @@ Address                                                                        T
 std::string                                                                    TestGetLocalizedRoleName(const Address& adr);
 std::array<uint32_t, 2>                                                        TestGetStates(const Address& adr);
 std::unordered_map<std::string, std::string>                                   TestGetAttributes(const Address& adr);
-bool                                                                           TestDoGesture(const Address& adr, Dali::Accessibility::Gesture type, int32_t xBeg, int32_t xEnd, int32_t yBeg, int32_t yEnd, Dali::Accessibility::GestureState state, uint32_t eventTime);
-std::vector<std::tuple<uint32_t, std::vector<Dali::Accessibility::Address> > > TestGetRelationSet(const Address& adr);
+bool                                                                           TestDoGesture(const Address& adr, Dali::Devel::Accessibility::Gesture type, int32_t xBeg, int32_t xEnd, int32_t yBeg, int32_t yEnd, Dali::Devel::Accessibility::GestureState state, uint32_t eventTime);
+std::vector<std::tuple<uint32_t, std::vector<Dali::Devel::Accessibility::Address> > > TestGetRelationSet(const Address& adr);
 Address                                                                        TestGetChildAtIndex(const Address& adr, int index);
 ComponentLayer                                                                 TestGetLayer(const Address& adr);
 int                                                                            TestGetIndexInParent(const Address& adr);
 bool                                                                           TestGrabFocus(const Address& adr);
 bool                                                                           TestGrabHighlight(const Address& adr);
 bool                                                                           TestClearHighlight(const Address& adr);
-std::tuple<int32_t, int32_t, int32_t, int32_t>                                 TestGetExtents(const Address& adr, Dali::Accessibility::CoordinateType coordinateType);
+std::tuple<int32_t, int32_t, int32_t, int32_t>                                 TestGetExtents(const Address& adr, Dali::Devel::Accessibility::CoordinateType coordinateType);
 int                                                                            TestGetMdiZOrder(const Address& adr);
 double                                                                         TestGetAlpha(const Address& adr);
 void                                                                           PrintTree(const Address& root, size_t depth = 0);

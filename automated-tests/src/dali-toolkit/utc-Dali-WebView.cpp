@@ -588,7 +588,7 @@ int UtcDaliWebViewTouchAndKeys(void)
   application.Render();
 
   view.GetNaturalSize();
-  view.TouchedSignal().Connect(&OnTouched);
+  view.TouchEventSignal().Connect(&OnTouched);
 
   // Touch event
   Dali::Integration::TouchEvent event;
@@ -833,7 +833,7 @@ int UtcDaliWebViewHoverAndWheel(void)
   application.Render();
 
   view.GetNaturalSize();
-  view.HoveredSignal().Connect(&OnHovered);
+  view.HoverEventSignal().Connect(&OnHovered);
   view.WheelEventSignal().Connect(&OnWheelEvent);
 
   // Hover event

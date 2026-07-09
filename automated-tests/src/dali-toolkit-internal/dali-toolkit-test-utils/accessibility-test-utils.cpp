@@ -1,6 +1,6 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/integration-api/scene.h>
 #include "dbus-wrapper.h"
@@ -30,7 +30,7 @@ void TestEnableSC(bool b, Dali::Integration::Scene scene)
     gPropertyChangeCalled = false;
     gStateChangedResult   = {};
     firstTime             = false;
-    auto bridge           = Accessibility::Bridge::GetCurrentBridge();
+    auto bridge           = Integration::Accessibility::Bridge::GetCurrentBridge();
     auto accessible       = Accessibility::Accessible::Get(scene.GetRootLayer());
     bridge->ApplicationResumed();
     bridge->AddTopLevelWindow(accessible);
@@ -129,6 +129,11 @@ void TestEnableSC(bool b, Dali::Integration::Scene scene)
     {
       return wr->newReplyMessage(m);
     };
+    wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible/1", "org.a11y.atspi.Event.Window", "Destroy", MethodType::Method}] =
+      [wr](const MessagePtr& m) -> MessagePtr
+    {
+      return wr->newReplyMessage(m);
+    };
   }
   auto wr = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
   wr->fromTestChangeProperty("/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", b);
@@ -198,17 +203,17 @@ std::unordered_map<std::string, std::string> TestGetAttributes(const Address& ad
   return std::move(std::get<0>(chs));
 }
 
-bool TestDoGesture(const Address& adr, Dali::Accessibility::Gesture type, int32_t xBeg, int32_t xEnd, int32_t yBeg, int32_t yEnd, Dali::Accessibility::GestureState state, uint32_t eventTime)
+bool TestDoGesture(const Address& adr, Dali::Devel::Accessibility::Gesture type, int32_t xBeg, int32_t xEnd, int32_t yBeg, int32_t yEnd, Dali::Devel::Accessibility::GestureState state, uint32_t eventTime)
 {
   auto wr  = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
-  auto chs = wr->fromTestCall<bool>(adr.GetPath(), "org.a11y.atspi.Accessible", "DoGesture", std::tuple<Dali::Accessibility::Gesture, int32_t, int32_t, int32_t, int32_t, Dali::Accessibility::GestureState, uint32_t>(type, xBeg, xEnd, yBeg, yEnd, state, eventTime));
+  auto chs = wr->fromTestCall<bool>(adr.GetPath(), "org.a11y.atspi.Accessible", "DoGesture", std::tuple<Dali::Devel::Accessibility::Gesture, int32_t, int32_t, int32_t, int32_t, Dali::Devel::Accessibility::GestureState, uint32_t>(type, xBeg, xEnd, yBeg, yEnd, state, eventTime));
   return std::move(std::get<0>(chs));
 }
 
-std::vector<std::tuple<uint32_t, std::vector<Dali::Accessibility::Address>>> TestGetRelationSet(const Address& adr)
+std::vector<std::tuple<uint32_t, std::vector<Dali::Devel::Accessibility::Address>>> TestGetRelationSet(const Address& adr)
 {
   auto wr  = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
-  auto chs = wr->fromTestCall<std::vector<std::tuple<uint32_t, std::vector<Dali::Accessibility::Address>>>>(adr.GetPath(), "org.a11y.atspi.Accessible", "GetRelationSet", std::tuple<>());
+  auto chs = wr->fromTestCall<std::vector<std::tuple<uint32_t, std::vector<Dali::Devel::Accessibility::Address>>>>(adr.GetPath(), "org.a11y.atspi.Accessible", "GetRelationSet", std::tuple<>());
   return std::move(std::get<0>(chs));
 }
 
@@ -222,7 +227,7 @@ Address TestGetChildAtIndex(const Address& adr, int index)
 ComponentLayer TestGetLayer(const Address& adr)
 {
   auto wr  = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
-  auto chs = wr->fromTestCall<Dali::Accessibility::ComponentLayer>(adr.GetPath(), "org.a11y.atspi.Component", "GetLayer", std::tuple<>());
+  auto chs = wr->fromTestCall<Dali::Devel::Accessibility::ComponentLayer>(adr.GetPath(), "org.a11y.atspi.Component", "GetLayer", std::tuple<>());
   return std::move(std::get<0>(chs));
 }
 
@@ -254,7 +259,7 @@ bool TestClearHighlight(const Address& adr)
   return std::move(std::get<0>(chs));
 }
 
-std::tuple<int32_t, int32_t, int32_t, int32_t> TestGetExtents(const Address& adr, Dali::Accessibility::CoordinateType coordinateType)
+std::tuple<int32_t, int32_t, int32_t, int32_t> TestGetExtents(const Address& adr, Dali::Devel::Accessibility::CoordinateType coordinateType)
 {
   auto wr  = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
   auto chs = wr->fromTestCall<std::tuple<int32_t, int32_t, int32_t, int32_t>>(adr.GetPath(), "org.a11y.atspi.Component", "GetExtents", std::make_tuple(static_cast<uint32_t>(coordinateType)));

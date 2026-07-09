@@ -173,11 +173,11 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 
   popup.SetFooter(footerActor);
 
-  // Tell the confirmation popup to connect to the signal in our button called "onScene".
-  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene");
+  // Tell the confirmation popup to connect to the signal in our button called "sceneConnected".
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "sceneConnected");
   Dali::String resultProperty;
   DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED).Get(resultProperty));
-  DALI_TEST_EQUALS(resultProperty, "onScene", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultProperty, "sceneConnected", TEST_LOCATION);
 
   // Connect to the confirmation popup's OK signal. This signal is dynamically created upon connection.
   gSignalReceivedOK                        = false;
@@ -198,9 +198,9 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 
   // Remove the popup from the stage, and connect the cancel signal.
   popup.Unparent();
-  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "onScene");
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "sceneConnected");
   DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED).Get(resultProperty));
-  DALI_TEST_EQUALS(resultProperty, "onScene", TEST_LOCATION);
+  DALI_TEST_EQUALS(resultProperty, "sceneConnected", TEST_LOCATION);
 
   popup.ConnectSignal(testTracker, "controlSignalCancel", ConfirmationPopupCancelTestFunctor());
 
@@ -237,8 +237,8 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
   buttonOK.SetProperty(Dali::Actor::Property::NAME, "controlOkMisnamed");
   popup.SetFooter(buttonOK);
 
-  // Tell the confirmation popup to connect to the signal in our button called "onScene".
-  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene");
+  // Tell the confirmation popup to connect to the signal in our button called "sceneConnected".
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "sceneConnected");
 
   // Connect to the confirmation popup's OK signal.
   gSignalReceivedOK = false;

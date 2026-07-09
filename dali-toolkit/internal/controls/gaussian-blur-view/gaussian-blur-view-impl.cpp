@@ -325,7 +325,7 @@ void GaussianBlurView::OnInitialize()
   mInternalRoot.Add(mVerticalBlurActor);
   mInternalRoot.Add(mRenderDownsampledCamera);
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::FILLER);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CONTAINER);
 }
 
 void GaussianBlurView::OnSizeSet(const Vector3& targetSize)

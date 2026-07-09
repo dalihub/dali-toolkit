@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -99,7 +99,7 @@ ToolkitTestApplication::~ToolkitTestApplication()
 {
   if(!mPreInitialized)
   {
-    auto bridge = Dali::Accessibility::Bridge::GetCurrentBridge();
+    auto bridge = Dali::Integration::Accessibility::Bridge::GetCurrentBridge();
     if(bridge)
     {
       bridge->Terminate();

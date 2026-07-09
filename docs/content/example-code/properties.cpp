@@ -78,7 +78,7 @@ public:
     mTagPropertyIndex = mImageView.RegisterProperty(TAG_PROPERTY_NAME, 0, Property::READ_WRITE /* Event-side only, i.e. not animatable */);
 
     // Connect to the touch-event
-    mImageView.TouchedSignal().Connect(this, &PropertyController::OnTouched);
+    mImageView.TouchEventSignal().Connect(this, &PropertyController::OnTouched);
 
     // Create text label
     mTagText = Toolkit::TextLabel::New("0");

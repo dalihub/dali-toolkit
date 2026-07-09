@@ -134,7 +134,7 @@ private:
   /**
    * Callback when the visibility of the GlView is changed
    */
-  void OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::DevelActor::VisibilityChange::Type type);
+  void OnControlVisibilityChanged(Dali::Actor actor, bool visible, Dali::VisibilityChangeType type);
 
   /**
    * Callback when the visibility of the window is changed

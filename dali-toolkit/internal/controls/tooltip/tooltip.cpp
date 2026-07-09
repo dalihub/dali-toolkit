@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cmath>
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>
@@ -282,7 +283,7 @@ void Tooltip::SetContent(Toolkit::Control& control, const Property::Value& value
 
   if(connectSignals && !mSignalsConnected)
   {
-    control.HoveredSignal().Connect(this, &Tooltip::OnHovered);
+    control.HoverEventSignal().Connect(this, &Tooltip::OnHovered);
     control.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
     mSignalsConnected = true;
   }
@@ -558,7 +559,7 @@ bool Tooltip::OnTimeout()
     Actor popupBackground = GetImpl(mPopup).GetPopupBackgroundImage();
     if(popupBackground)
     {
-      popupBackground.OnRelayoutSignal().Connect(this, &Tooltip::OnRelayout);
+      DevelActor::OnRelayoutSignal(popupBackground).Connect(this, &Tooltip::OnRelayout);
     }
 
     mPopup.SetDisplayState(Toolkit::Popup::SHOWN);

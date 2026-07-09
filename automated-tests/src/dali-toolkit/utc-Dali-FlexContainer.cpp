@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,7 +347,7 @@ int UtcDaliToolkitFlexContainerRemoveChildP(void)
   application.GetScene().Add(flexContainer);
 
   RelayoutSignalHandler relayoutSignal(flexContainer);
-  flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(flexContainer).Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
 
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();
@@ -472,7 +472,7 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
   Size stageSize = application.GetScene().GetSize();
 
   RelayoutSignalHandler relayoutSignal(flexContainer);
-  flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(flexContainer).Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
   flexContainer.SetProperty(Actor::Property::SIZE, stageSize);
 
   // Create two actors and add them to the container

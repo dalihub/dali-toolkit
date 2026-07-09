@@ -148,7 +148,7 @@ void VideoView::OnInitialize()
   mVideoPlayer.EventSignal().Connect(this, &VideoView::OnVideoPlayerEvent);
 
   // Accessibility
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::VIDEO);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::VIDEO);
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   // update self property
@@ -672,7 +672,7 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
   ControlImpl::OnSizeSet(targetSize);
 }
 
-void VideoView::OnChildOrderChanged(Actor actor)
+void VideoView::OnChildOrderChanged(Actor parent, Actor child)
 {
   Actor self                = Self();
   int   currentSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);

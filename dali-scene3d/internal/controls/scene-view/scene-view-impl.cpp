@@ -367,7 +367,7 @@ SceneView::~SceneView()
       Dali::AsyncTaskManager::Get().RemoveTask(mSkyboxLoadTask);
       mSkyboxLoadTask.Reset();
     }
-    mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+    mSelectedCamera.SceneDisconnectedSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
 
     if(mInCameraTransition)
     {
@@ -1323,7 +1323,7 @@ void SceneView::OnInitialize()
   self.Add(mRootLayer);
 
   Dali::Toolkit::DevelControl::AppendAccessibilityAttribute(Dali::Toolkit::Control::DownCast(self), "forceChildSearch", "1");
-  self.SetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Toolkit::DevelControl::AccessibilityRole::SCENE_3D);
+  self.SetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Toolkit::Accessibility::Role::SCENE_3D);
 
   mDefaultCamera = Dali::CameraActor::New3DCamera();
   mDefaultCamera.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -1383,11 +1383,11 @@ void SceneView::UpdateCamera(CameraActor camera)
     {
       if(mSelectedCamera)
       {
-        mSelectedCamera.OffSceneSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
+        mSelectedCamera.SceneDisconnectedSignal().Disconnect(this, &SceneView::OnCameraDisconnected);
       }
 
       mSelectedCamera = camera;
-      camera.OffSceneSignal().Connect(this, &SceneView::OnCameraDisconnected);
+      camera.SceneDisconnectedSignal().Connect(this, &SceneView::OnCameraDisconnected);
     }
 
     bool isCameraIncluded = CheckInside(mRootLayer, camera);

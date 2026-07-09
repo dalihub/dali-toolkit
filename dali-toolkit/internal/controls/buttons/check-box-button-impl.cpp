@@ -77,7 +77,7 @@ void CheckBoxButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Accessibility::Role::CHECK_BOX);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CHECK_BOX);
 }
 
 DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()
@@ -85,13 +85,13 @@ DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()
   return new CheckBoxButton::CheckBoxButtonAccessible(Self());
 }
 
-Dali::Accessibility::States CheckBoxButton::CheckBoxButtonAccessible::CalculateStates()
+Dali::Integration::Accessibility::States CheckBoxButton::CheckBoxButtonAccessible::CalculateStates()
 {
   auto state = Button::ButtonAccessible::CalculateStates();
   auto self  = Toolkit::Button::DownCast(Self());
   if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
   {
-    state[Dali::Accessibility::State::CHECKED] = true;
+    state[Dali::Integration::Accessibility::State::CHECKED] = true;
   }
   return state;
 }
@@ -104,7 +104,7 @@ void CheckBoxButton::OnStateChange(State newState)
     auto accessible = DynamicPointerCast<Dali::Accessibility::ActorAccessible>(GetAccessibleObject());
     if(DALI_LIKELY(accessible) && accessible->IsHighlighted())
     {
-      accessible->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+      accessible->EmitStateChanged(Dali::Integration::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
     }
   }
 }
