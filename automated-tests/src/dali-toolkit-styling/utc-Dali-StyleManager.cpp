@@ -1572,7 +1572,7 @@ int UtcDaliStyleManagerConfigSectionTestP(void)
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
-  editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  editor.SetProperty(Actor::Property::FOCUSABLE, true);
   application.GetScene().Add(editor);
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
@@ -1602,7 +1602,7 @@ int UtcDaliStyleManagerConfigSectionTestN(void)
 
     // For coverage
     Toolkit::TextEditor editor = Toolkit::TextEditor::New();
-    editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+    editor.SetProperty(Actor::Property::FOCUSABLE, true);
     application.GetScene().Add(editor);
 
     Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(editor);

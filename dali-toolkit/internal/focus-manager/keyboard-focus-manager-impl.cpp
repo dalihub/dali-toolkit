@@ -240,19 +240,19 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor, const FocusChange
   Dali::Integration::SceneHolder currentWindow;
 
   // Check whether the actor is in the stage and is keyboard focusable.
-  if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
-     actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED) &&
+  if(actor && actor.GetProperty<bool>(Actor::Property::FOCUSABLE) &&
+     actor.GetProperty<bool>(Actor::Property::ENABLED) &&
      actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) &&
      (currentWindow = Dali::Integration::SceneHolder::Get(actor))) ///< Note : SceneHolder might not be valid even if actor is connected to scene.
                                                                    ///         (e.g. Adaptor Stopped, SceneHolder removed but Scene is still alive)
   {
-    // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
+    // If an ancestor's ALLOW_DESCENDANT_FOCUS is false, it cannot have focus.
     Actor parent = actor.GetParent();
     while(parent)
     {
-      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
+      if(!parent.GetProperty<bool>(Actor::Property::ALLOW_DESCENDANT_FOCUS))
       {
-        DALI_LOG_DEBUG_INFO("Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false\n");
+        DALI_LOG_DEBUG_INFO("Ancestor Actor has ALLOW_DESCENDANT_FOCUS false\n");
         return false;
       }
       parent = parent.GetParent();
@@ -623,8 +623,8 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       }
     }
 
-    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
-       nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
+    if(nextFocusableActor && nextFocusableActor.GetProperty<bool>(Actor::Property::FOCUSABLE) &&
+       nextFocusableActor.GetProperty<bool>(Actor::Property::ENABLED))
     {
       // Whether the next focusable actor is a layout control
       if(IsLayoutControl(nextFocusableActor))
@@ -650,8 +650,8 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
   Actor nextFocusableActor = GetImplementation(control).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
   if(nextFocusableActor)
   {
-    if(!(nextFocusableActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) ||
-         nextFocusableActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED)))
+    if(!(nextFocusableActor.GetProperty<bool>(Actor::Property::FOCUSABLE) ||
+         nextFocusableActor.GetProperty<bool>(Actor::Property::ENABLED)))
     {
       // If the actor is not focusable, ask the same layout control for the next actor to focus
       return DoMoveFocusWithinLayoutControl(control, nextFocusableActor, direction, context);
@@ -670,8 +670,8 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
 
-      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
-         committedFocusActor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED))
+      if(committedFocusActor && committedFocusActor.GetProperty<bool>(Actor::Property::FOCUSABLE) &&
+         committedFocusActor.GetProperty<bool>(Actor::Property::ENABLED))
       {
         // Whether the commited focusable actor is a layout control
         if(IsLayoutControl(committedFocusActor) && committedFocusActor != control)
@@ -1147,9 +1147,9 @@ void KeyboardFocusManager::OnTouch(Dali::Integration::SceneHolder sceneHolder, T
       ClearFocusIndicator(GetCurrentFocusActor());
     }
 
-    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
-    if(hitActor && hitActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
-       hitActor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE))
+    // If FOCUSABLE and FOCUS_ON_TOUCH is true, set focus actor
+    if(hitActor && hitActor.GetProperty<bool>(Actor::Property::FOCUSABLE) &&
+       hitActor.GetProperty<bool>(Actor::Property::FOCUS_ON_TOUCH))
     {
       DoSetCurrentFocusActor(hitActor, {device, touch.GetDeviceName(0)});
     }

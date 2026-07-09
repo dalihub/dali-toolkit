@@ -761,16 +761,16 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
     {
       mPreviousFocusedActor = keyboardFocusManager.GetCurrentFocusActor();
 
-      if(Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+      if(Self().GetProperty<bool>(Actor::Property::FOCUSABLE))
       {
         // Setup the actgor to start focus from.
         Actor focusActor;
-        if(mContent && mContent.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+        if(mContent && mContent.GetProperty<bool>(Actor::Property::FOCUSABLE))
         {
           // If the content is focusable, move the focus to the content.
           focusActor = mContent;
         }
-        else if(mFooter && mFooter.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+        else if(mFooter && mFooter.GetProperty<bool>(Actor::Property::FOCUSABLE))
         {
           // If the footer is focusable, move the focus to the footer.
           focusActor = mFooter;
@@ -793,7 +793,7 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
     ClearKeyInputFocus();
     DevelControl::NotifyAccessibilityPresentationChanged(Self(), false);
     // Restore the keyboard focus when popup is hidden.
-    if(mPreviousFocusedActor && mPreviousFocusedActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(mPreviousFocusedActor && mPreviousFocusedActor.GetProperty<bool>(Actor::Property::FOCUSABLE))
     {
       Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
       if(keyboardFocusManager)
@@ -1853,7 +1853,7 @@ void Popup::AddFocusableChildrenRecursive(Actor parent, std::vector<Actor>& focu
     Toolkit::Control control       = Toolkit::Control::DownCast(parent);
     bool             layoutControl = control && GetImplementation(control).IsKeyboardNavigationSupported();
 
-    if(parent.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || layoutControl)
+    if(parent.GetProperty<bool>(Actor::Property::FOCUSABLE) || layoutControl)
     {
       focusableActors.push_back(parent);
 
@@ -1911,12 +1911,12 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
      (currentFocusedActor && ((!mContent || (currentFocusGroup != mContent)) && (!mFooter || (currentFocusGroup != mFooter)))))
   {
     // The current focused actor is not within popup.
-    if(mContent && mContent.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    if(mContent && mContent.GetProperty<bool>(Actor::Property::FOCUSABLE))
     {
       // If the content is focusable, move the focus to the content.
       nextFocusableActor = mContent;
     }
-    else if(mFooter && mFooter.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+    else if(mFooter && mFooter.GetProperty<bool>(Actor::Property::FOCUSABLE))
     {
       // If the footer is focusable, move the focus to the footer.
       nextFocusableActor = mFooter;

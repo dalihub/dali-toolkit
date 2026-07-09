@@ -31,9 +31,9 @@
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
@@ -894,15 +894,15 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS(field.GetProperty<BoundsInteger>(TextField::Property::DECORATION_BOUNDING_BOX), BoundsInteger(0, 0, 1, 1), TEST_LOCATION);
 
   // Check the input method setting
-  Property::Map                   propertyMap;
-  InputMethod::PanelLayout  panelLayout    = InputMethod::PanelLayout::NUMBER;
-  InputMethod::AutoCapitalType  autoCapital    = InputMethod::AutoCapitalType::WORD;
-  InputMethod::ReturnKeyType buttonAction   = InputMethod::ReturnKeyType::GO;
-  int                             inputVariation = 1;
-  propertyMap["PANEL_LAYOUT"]                    = panelLayout;
-  propertyMap["AUTO_CAPITALIZE"]                 = autoCapital;
-  propertyMap["BUTTON_ACTION"]                   = buttonAction;
-  propertyMap["VARIATION"]                       = inputVariation;
+  Property::Map                propertyMap;
+  InputMethod::PanelLayout     panelLayout    = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapitalType autoCapital    = InputMethod::AutoCapitalType::WORD;
+  InputMethod::ReturnKeyType   buttonAction   = InputMethod::ReturnKeyType::GO;
+  int                          inputVariation = 1;
+  propertyMap["PANEL_LAYOUT"]                 = panelLayout;
+  propertyMap["AUTO_CAPITALIZE"]              = autoCapital;
+  propertyMap["BUTTON_ACTION"]                = buttonAction;
+  propertyMap["VARIATION"]                    = inputVariation;
   field.SetProperty(TextField::Property::INPUT_METHOD_SETTINGS, propertyMap);
 
   Property::Value value = field.GetProperty(TextField::Property::INPUT_METHOD_SETTINGS);
@@ -1927,7 +1927,7 @@ int utcDaliTextFieldFocusWithInputMethodContext(void)
   application.Render();
 
   // set focus and keyboard shown
-  field.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  field.SetProperty(Actor::Property::FOCUSABLE, true);
   KeyboardFocusManager::Get().SetCurrentFocusActor(field);
 
   inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::SHOW);
@@ -3287,7 +3287,7 @@ int utcDaliTextFieldEvent08(void)
   ToolkitTestApplication application;
   tet_infoline(" utcDaliTextFieldEvent08");
 
-  Dali::Clipboard           clipboard = Dali::Clipboard::Get();
+  Dali::Clipboard     clipboard = Dali::Clipboard::Get();
   Dali::ClipboardData data("text/plain;charset=utf-8", "testTextFieldEvent");
   clipboard.SetData(data);
 
@@ -3788,7 +3788,7 @@ int utcDaliTextFieldSizeUpdate(void)
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
-  field.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  field.SetProperty(Actor::Property::FOCUSABLE, true);
   KeyboardFocusManager::Get().SetCurrentFocusActor(field);
 
   application.SendNotification();
@@ -4449,8 +4449,8 @@ int UtcDaliTextFieldEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  textField.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
-  DALI_TEST_EQUALS(textField.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), true, TEST_LOCATION);
+  textField.SetProperty(Actor::Property::ENABLED, true);
+  DALI_TEST_EQUALS(textField.GetProperty(Actor::Property::ENABLED).Get<bool>(), true, TEST_LOCATION);
 
   textField.SetKeyInputFocus();
   textField.SetProperty(DevelTextField::Property::ENABLE_EDITING, false);
@@ -4482,7 +4482,7 @@ int UtcDaliTextFieldEnableEditing(void)
   application.Render();
 
   textField.SetKeyInputFocus();
-  textField.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  textField.SetProperty(Actor::Property::ENABLED, false);
   application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -4490,7 +4490,7 @@ int UtcDaliTextFieldEnableEditing(void)
   application.Render();
 
   DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
-  DALI_TEST_EQUALS(textField.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(textField.GetProperty(Actor::Property::ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
 }

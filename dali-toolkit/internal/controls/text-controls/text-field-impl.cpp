@@ -618,7 +618,7 @@ void TextField::OnPropertySet(Property::Index index, const Property::Value& prop
 
   switch(index)
   {
-    case DevelActor::Property::USER_INTERACTION_ENABLED:
+    case Actor::Property::ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
       mController->SetUserInteractionEnabled(enabled);

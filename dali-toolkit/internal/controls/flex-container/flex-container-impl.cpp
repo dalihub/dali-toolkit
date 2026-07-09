@@ -753,7 +753,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
               {
                 break;
               }
-            } while(!mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE));
+            } while(!mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty<bool>(Actor::Property::FOCUSABLE));
             break;
           }
           case Toolkit::Control::KeyboardFocus::RIGHT:
@@ -775,7 +775,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
               {
                 break;
               }
-            } while(!mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE));
+            } while(!mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty<bool>(Actor::Property::FOCUSABLE));
             break;
           }
           default:
@@ -835,7 +835,7 @@ void FlexContainer::OnInitialize()
   YGNodeStyleSetAlignContent(mRootNode.node, static_cast<YGAlign>(mAlignContent));
 
   // Make self as keyboard focusable and focus group
-  self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.SetProperty(Actor::Property::FOCUSABLE, true);
   SetAsKeyboardFocusGroup(true);
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CONTAINER);

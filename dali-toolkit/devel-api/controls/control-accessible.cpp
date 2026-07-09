@@ -141,14 +141,14 @@ bool IsRoleV2(int32_t rawRole)
 }
 
 #define TO_V1_ROLE_TYPE(v2RoleType, v1RoleType) \
-  case Accessibility::Role::v2RoleType:           \
+  case Accessibility::Role::v2RoleType:         \
   {                                             \
     return Role::v1RoleType;                    \
   }
-#define TO_SAME_ROLE_TYPE(roleType) \
+#define TO_SAME_ROLE_TYPE(roleType)   \
   case Accessibility::Role::roleType: \
-  {                                 \
-    return Role::roleType;          \
+  {                                   \
+    return Role::roleType;            \
   }
 
 Dali::Integration::Accessibility::Role ConvertV2RoleToAccessibilityRole(Accessibility::Role role)
@@ -393,10 +393,10 @@ Dali::Integration::Accessibility::States ControlAccessible::CalculateStates()
 {
   using Dali::Integration::Accessibility::State;
 
-  Dali::Actor                 self = Self();
+  Dali::Actor                              self = Self();
   Dali::Integration::Accessibility::States states;
 
-  states[State::FOCUSABLE]   = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
+  states[State::FOCUSABLE]   = self.GetProperty<bool>(Actor::Property::FOCUSABLE);
   states[State::FOCUSED]     = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
   states[State::HIGHLIGHTED] = IsHighlighted();
   states[State::SENSITIVE]   = (Dali::DevelActor::IsHittable(self) && Dali::DevelActor::GetTouchRequired(self));
@@ -420,10 +420,10 @@ Dali::Devel::Accessibility::Attributes ControlAccessible::GetAttributes() const
   static const std::string classKey        = "class";
 
   Dali::Devel::Accessibility::Attributes result;
-  Toolkit::Control          control        = Toolkit::Control::DownCast(Self());
-  Dali::Property::Value     property       = control.GetProperty(DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
-  Dali::Property::Map*      attributeMap   = property.GetMap();
-  std::size_t               attributeCount = attributeMap ? attributeMap->Count() : 0U;
+  Toolkit::Control                       control        = Toolkit::Control::DownCast(Self());
+  Dali::Property::Value                  property       = control.GetProperty(DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
+  Dali::Property::Map*                   attributeMap   = property.GetMap();
+  std::size_t                            attributeCount = attributeMap ? attributeMap->Count() : 0U;
 
   for(std::size_t i = 0; i < attributeCount; i++)
   {
