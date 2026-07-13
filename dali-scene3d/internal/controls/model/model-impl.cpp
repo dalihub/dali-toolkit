@@ -33,6 +33,13 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/integration-api/loader/camera-parameters.h>
+#include <dali-scene3d/integration-api/loader/light-parameters.h>
+#include <dali-scene3d/integration-api/loader/load-result.h>
+#include <dali-scene3d/integration-api/loader/node-definition.h>
+#include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
@@ -41,13 +48,6 @@
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 #include <dali-scene3d/public-api/controls/model/model.h>
-#include <dali-scene3d/integration-api/loader/animation-definition.h>
-#include <dali-scene3d/integration-api/loader/camera-parameters.h>
-#include <dali-scene3d/integration-api/loader/light-parameters.h>
-#include <dali-scene3d/integration-api/loader/load-result.h>
-#include <dali-scene3d/integration-api/loader/node-definition.h>
-#include <dali-scene3d/integration-api/loader/scene-definition.h>
-#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/blend-shape-index.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
@@ -129,7 +129,8 @@ void ConfigureBlendShapeShaders(
   Dali::Scene3D::Loader::ResourceBundle& resources, const Dali::Scene3D::Loader::SceneDefinition& scene, Actor root, Dali::Vector<Dali::Scene3D::Loader::BlendshapeShaderConfigurationRequest>&& requests)
 {
   std::vector<std::string> errors;
-  auto                     onError = [&errors](const std::string& msg) { errors.push_back(msg); };
+  auto                     onError = [&errors](const std::string& msg)
+  { errors.push_back(msg); };
   if(!scene.ConfigureBlendshapeShaders(resources, root, std::move(requests), onError))
   {
     Dali::Scene3D::Loader::ExceptionFlinger flinger(ASSERT_LOCATION);
@@ -320,7 +321,8 @@ void Model::RegisterColliderMesh(Scene3D::ModelNode& modelNode)
 void Model::RemoveColliderMesh(Scene3D::ModelNode& node)
 {
   auto id   = node.GetProperty<int>(Actor::Property::ID);
-  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item) {
+  auto iter = std::find_if(mColliderMeshes.begin(), mColliderMeshes.end(), [id](auto& item)
+  {
     return item.first == id;
   });
   if(iter != mColliderMeshes.end())
@@ -369,8 +371,8 @@ void Model::SetChildrenFocusable(bool enable)
     mModelChildrenFocusable = enable;
     if(mModelRoot)
     {
-      mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
-      mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
+      mModelRoot.SetProperty(Dali::Actor::Property::FOCUSABLE, mModelChildrenFocusable);
+      mModelRoot.SetProperty(Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS, mModelChildrenFocusable);
     }
   }
 }
@@ -957,8 +959,8 @@ void Model::CreateModelRoot()
   mModelRoot.SetProperty(Actor::Property::COLOR_MODE, ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR);
   mModelRoot.SetProperty(Dali::Actor::Property::SCALE, Y_DIRECTION);
   mModelRoot.SetProperty(Dali::Actor::Property::SENSITIVE, mModelChildrenSensitive);
-  mModelRoot.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, mModelChildrenFocusable);
-  mModelRoot.SetProperty(Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, mModelChildrenFocusable);
+  mModelRoot.SetProperty(Dali::Actor::Property::FOCUSABLE, mModelChildrenFocusable);
+  mModelRoot.SetProperty(Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS, mModelChildrenFocusable);
   Self().Add(mModelRoot);
 }
 
@@ -1252,7 +1254,8 @@ void Model::CreateAnimations(Dali::Scene3D::Loader::SceneDefinition& scene)
   mAnimations.clear();
   if(!mModelLoadTask->GetAnimations().Empty())
   {
-    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property) {
+    auto getActor = [&](const Scene3D::Loader::AnimatedProperty& property)
+    {
       if(property.mNodeIndex == Scene3D::Loader::INVALID_INDEX)
       {
         return mModelRoot.FindChildByName(property.mNodeName);

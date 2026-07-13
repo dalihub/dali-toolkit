@@ -1533,7 +1533,7 @@ int UtcDaliPopupGetNextKeyboardFocusableActorNoFocus(void)
 
   // Focusable content: with no current focused actor, focus should move to content
   Control content = Control::New();
-  content.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  content.SetProperty(Actor::Property::FOCUSABLE, true);
   popup.SetContent(content);
 
   application.SendNotification();
@@ -1543,10 +1543,10 @@ int UtcDaliPopupGetNextKeyboardFocusableActorNoFocus(void)
   DALI_TEST_CHECK(next == content);
 
   // Non-focusable content with focusable footer: should return footer
-  content.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, false);
+  content.SetProperty(Actor::Property::FOCUSABLE, false);
 
   Control footer = Control::New();
-  footer.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  footer.SetProperty(Actor::Property::FOCUSABLE, true);
   popup.SetFooter(footer);
 
   next = GetImplementation(popup).GetNextKeyboardFocusableActor(Actor(), Control::KeyboardFocus::RIGHT, false);
@@ -1575,12 +1575,12 @@ int UtcDaliPopupGetNextKeyboardFocusableActorFocusInsidePopup(void)
 
   PushButton button1 = PushButton::New();
   button1.SetProperty(Actor::Property::NAME, "button1");
-  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  button1.SetProperty(Actor::Property::FOCUSABLE, true);
   content.Add(button1);
 
   PushButton button2 = PushButton::New();
   button2.SetProperty(Actor::Property::NAME, "button2");
-  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  button2.SetProperty(Actor::Property::FOCUSABLE, true);
   content.Add(button2);
 
   application.SendNotification();

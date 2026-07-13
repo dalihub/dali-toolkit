@@ -478,8 +478,8 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
-  actor1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  actor2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  actor1.SetProperty(Actor::Property::FOCUSABLE, true);
+  actor2.SetProperty(Actor::Property::FOCUSABLE, true);
   DALI_TEST_CHECK(actor1);
   DALI_TEST_CHECK(actor2);
 

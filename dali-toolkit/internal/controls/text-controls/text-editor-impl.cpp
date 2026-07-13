@@ -22,8 +22,8 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
@@ -713,7 +713,7 @@ void TextEditor::OnPropertySet(Property::Index index, const Property::Value& pro
 
   switch(index)
   {
-    case DevelActor::Property::USER_INTERACTION_ENABLED:
+    case Actor::Property::ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
       mController->SetUserInteractionEnabled(enabled);

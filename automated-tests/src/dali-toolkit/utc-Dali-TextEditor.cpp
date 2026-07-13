@@ -1216,15 +1216,15 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS(editor.GetProperty<bool>(DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP), false, TEST_LOCATION);
 
   // Check the input method setting
-  Property::Map                   propertyMap;
-  InputMethod::PanelLayout  panelLayout    = InputMethod::PanelLayout::NUMBER;
-  InputMethod::AutoCapitalType  autoCapital    = InputMethod::AutoCapitalType::WORD;
-  InputMethod::ReturnKeyType buttonAction   = InputMethod::ReturnKeyType::GO;
-  int                             inputVariation = 1;
-  propertyMap["PANEL_LAYOUT"]                    = panelLayout;
-  propertyMap["AUTO_CAPITALIZE"]                 = autoCapital;
-  propertyMap["BUTTON_ACTION"]                   = buttonAction;
-  propertyMap["VARIATION"]                       = inputVariation;
+  Property::Map                propertyMap;
+  InputMethod::PanelLayout     panelLayout    = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapitalType autoCapital    = InputMethod::AutoCapitalType::WORD;
+  InputMethod::ReturnKeyType   buttonAction   = InputMethod::ReturnKeyType::GO;
+  int                          inputVariation = 1;
+  propertyMap["PANEL_LAYOUT"]                 = panelLayout;
+  propertyMap["AUTO_CAPITALIZE"]              = autoCapital;
+  propertyMap["BUTTON_ACTION"]                = buttonAction;
+  propertyMap["VARIATION"]                    = inputVariation;
   editor.SetProperty(DevelTextEditor::Property::INPUT_METHOD_SETTINGS, propertyMap);
 
   Property::Value value = editor.GetProperty(DevelTextEditor::Property::INPUT_METHOD_SETTINGS);
@@ -1566,7 +1566,7 @@ int utcDaliTextEditorFocusWithInputMethodContext(void)
   application.Render();
 
   // set focus and keyboard shown
-  editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  editor.SetProperty(Actor::Property::FOCUSABLE, true);
   KeyboardFocusManager::Get().SetCurrentFocusActor(editor);
 
   inputMethodContext.StatusChangedSignal().Emit(inputMethodContext, Dali::InputMethodContext::State::SHOW);
@@ -3605,7 +3605,7 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   editor.SetProperty(TextEditor::Property::ENABLE_SCROLL_BAR, true);
-  editor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  editor.SetProperty(Actor::Property::FOCUSABLE, true);
 
   bool startedCalled  = false;
   bool finishedCalled = false;
@@ -4106,8 +4106,8 @@ int UtcDaliTextEditorEnableEditing(void)
   application.SendNotification();
   application.Render();
 
-  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
-  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), true, TEST_LOCATION);
+  textEditor.SetProperty(Actor::Property::ENABLED, true);
+  DALI_TEST_EQUALS(textEditor.GetProperty(Actor::Property::ENABLED).Get<bool>(), true, TEST_LOCATION);
 
   textEditor.SetKeyInputFocus();
   textEditor.SetProperty(DevelTextEditor::Property::ENABLE_EDITING, false);
@@ -4139,7 +4139,7 @@ int UtcDaliTextEditorEnableEditing(void)
   application.Render();
 
   textEditor.SetKeyInputFocus();
-  textEditor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  textEditor.SetProperty(Actor::Property::ENABLED, false);
   application.ProcessEvent(GenerateKey("D", "", "D", KEY_D_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -4147,7 +4147,7 @@ int UtcDaliTextEditorEnableEditing(void)
   application.Render();
 
   DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "D", TEST_LOCATION);
-  DALI_TEST_EQUALS(textEditor.GetProperty(DevelActor::Property::USER_INTERACTION_ENABLED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(textEditor.GetProperty(Actor::Property::ENABLED).Get<bool>(), false, TEST_LOCATION);
 
   END_TEST;
 }

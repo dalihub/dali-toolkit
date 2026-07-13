@@ -305,12 +305,12 @@ void WebView::OnInitialize()
 
   Actor self = Self();
 
-  self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.SetProperty(Actor::Property::FOCUSABLE, true);
   self.TouchEventSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoverEventSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
   self.EffectiveVisibilityChangedSignal().Connect(this, &WebView::OnEffectiveVisibilityChanged);
-  self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
+  self.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));

@@ -29,12 +29,12 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/devel-api/property-bridge/property-bridge.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/atspi-interfaces/collection.h>
 #include <dali/devel-api/object/property-array-devel.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/window.h>
 
@@ -1280,8 +1280,8 @@ int UtcDaliAccessibilityGrabFocus(void)
   application.GetScene().Add(controla);
   application.GetScene().Add(controlb);
 
-  controla.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  controlb.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  controla.SetProperty(Actor::Property::FOCUSABLE, true);
+  controlb.SetProperty(Actor::Property::FOCUSABLE, true);
 
   auto a = AtspiAccessibility::Accessible::Get(controla);
   auto b = AtspiAccessibility::Accessible::Get(controlb);
@@ -1778,7 +1778,7 @@ int UtcDaliAccessibilityScrollToChildCustomScrollable(void)
   ToolkitTestApplication application;
 
   thread_local Dali::Devel::Accessibility::ActionInfo action_done;
-  const auto                                   check_scroll_to_child_action_done_and_reset = [&](Actor child)
+  const auto                                          check_scroll_to_child_action_done_and_reset = [&](Actor child)
   {
     DALI_TEST_CHECK(action_done.type == Dali::Devel::Accessibility::ActionType::SCROLL_TO_CHILD);
     DALI_TEST_CHECK(action_done.target == child);
@@ -2540,7 +2540,7 @@ private:
   {
     auto actor = Control::New(Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
     actor.SetProperty(Actor::Property::SENSITIVE, true);
-    actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+    actor.SetProperty(Actor::Property::ENABLED, true);
     actor.TouchEventSignal().Connect(TestTouchCallback);
     return actor;
   }
@@ -2626,9 +2626,9 @@ public:
 
 static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::Integration::Accessibility::State> states, std::vector<Dali::Integration::Accessibility::Role> roles)
 {
-  Dali::Integration::Accessibility::States  statesRule;
-  MatchType              stateMatchType = MatchType::INVALID;
-  std::array<int32_t, 2> statesConverted{0, 0};
+  Dali::Integration::Accessibility::States statesRule;
+  MatchType                                stateMatchType = MatchType::INVALID;
+  std::array<int32_t, 2>                   statesConverted{0, 0};
   if(!states.empty())
   {
     for(auto state : states)
@@ -2641,8 +2641,8 @@ static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::
   }
 
   Dali::Integration::Accessibility::EnumBitSet<Dali::Integration::Accessibility::Role, Dali::Integration::Accessibility::Role::MAX_COUNT> rolesRule;
-  MatchType                                                                      roleMatchType = MatchType::INVALID;
-  std::array<int32_t, 4>                                                         rolesConverted{0, 0, 0, 0};
+  MatchType                                                                                                                               roleMatchType = MatchType::INVALID;
+  std::array<int32_t, 4>                                                                                                                  rolesConverted{0, 0, 0, 0};
   if(!roles.empty())
   {
     for(auto role : roles)

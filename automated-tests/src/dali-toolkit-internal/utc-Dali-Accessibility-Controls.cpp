@@ -22,7 +22,6 @@
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
 #include <dali/devel-api/atspi-interfaces/editable-text.h>
@@ -30,6 +29,7 @@
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 
@@ -987,7 +987,7 @@ int UtcDaliAccessibilityTextFieldGetNameRaw(void)
 
   // Test with PLACEHOLDER_TEXT_FOCUSED property set - GetName should return placeholder string
   textfield.SetProperty(Toolkit::TextField::Property::PLACEHOLDER_TEXT_FOCUSED, "placeholder-focused-content");
-  textfield.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  textfield.SetProperty(Actor::Property::FOCUSABLE, true);
   application.GetScene().Add(textfield);
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(textfield);
   DALI_TEST_EQUALS(accessible->GetName(), "placeholder-focused-content", TEST_LOCATION);
@@ -1040,7 +1040,7 @@ int UtcDaliAccessibilityTextEditorGetNameRaw(void)
   // Test with PLACEHOLDER_TEXT_FOCUSED property set - GetName should return placeholder string
   propertyMap[Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED] = "placeholder-focused-content";
   texteditor.SetProperty(TextEditor::Property::PLACEHOLDER, propertyMap);
-  texteditor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  texteditor.SetProperty(Actor::Property::FOCUSABLE, true);
   application.GetScene().Add(texteditor);
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(texteditor);
   DALI_TEST_EQUALS(accessible->GetName(), "placeholder-focused-content", TEST_LOCATION);

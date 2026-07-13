@@ -1124,7 +1124,7 @@ void TableView::OnInitialize()
 {
   // Make self as keyboard focusable and focus group
   Actor self = Self();
-  self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.SetProperty(Actor::Property::FOCUSABLE, true);
   SetAsKeyboardFocusGroup(true);
 
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::TABLE);

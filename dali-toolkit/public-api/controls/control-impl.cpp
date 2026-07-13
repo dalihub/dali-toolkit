@@ -700,7 +700,7 @@ void ControlImpl::OnPropertySet(Property::Index index, const Property::Value& pr
       }
       break;
     }
-    case DevelActor::Property::USER_INTERACTION_ENABLED:
+    case Actor::Property::ENABLED:
     {
       const bool enabled = propertyValue.Get<bool>();
       if(!enabled && Self() == Dali::Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor())

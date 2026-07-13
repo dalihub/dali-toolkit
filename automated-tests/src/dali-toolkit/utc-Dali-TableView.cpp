@@ -892,7 +892,7 @@ int UtcDaliTableViewKeyboardFocus(void)
   ToolkitTestApplication application;
 
   TableView tableView = TableView::New(4, 4);
-  tableView.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  tableView.SetProperty(Actor::Property::FOCUSABLE, true);
   tableView.SetProperty(Dali::Actor::Property::NAME, "TableView");
 
   for(int row = 0; row < 4; ++row)
@@ -903,7 +903,7 @@ int UtcDaliTableViewKeyboardFocus(void)
       std::ostringstream str;
       str << row << "-" << col;
       control.SetProperty(Dali::Actor::Property::NAME, Property::Value(ToDaliStringView(str.str())));
-      control.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+      control.SetProperty(Actor::Property::FOCUSABLE, true);
       tableView.AddChild(control, TableView::CellPosition(row, col));
     }
   }
@@ -973,7 +973,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
   ToolkitTestApplication application;
 
   TableView tableView = TableView::New(3, 3);
-  tableView.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  tableView.SetProperty(Actor::Property::FOCUSABLE, true);
   tableView.SetProperty(Dali::Actor::Property::NAME, "TableView");
 
   for(int row = 0; row < 3; ++row)
@@ -997,7 +997,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
             std::ostringstream nameStr;
             nameStr << row << "-" << col << "-" << childRow << "-" << childCol;
             control.SetProperty(Dali::Actor::Property::NAME, Property::Value(ToDaliStringView(nameStr.str())));
-            control.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+            control.SetProperty(Actor::Property::FOCUSABLE, true);
             childTableView.AddChild(control, TableView::CellPosition(childRow, childCol));
           }
         }
@@ -1007,7 +1007,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
       {
         Control control = Control::New();
         control.SetProperty(Dali::Actor::Property::NAME, Property::Value(ToDaliStringView(str.str())));
-        control.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+        control.SetProperty(Actor::Property::FOCUSABLE, true);
         tableView.AddChild(control, TableView::CellPosition(row, col));
       }
     }

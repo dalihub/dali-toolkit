@@ -611,7 +611,7 @@ void Button::OnInitialize()
   mTapDetector.Attach(self);
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
-  self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.SetProperty(Actor::Property::FOCUSABLE, true);
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   self.TouchEventSignal().Connect(this, &Button::OnTouch);
@@ -1339,9 +1339,9 @@ Property::Index Button::ButtonAccessible::GetNamePropertyIndex()
 
 Dali::Integration::Accessibility::States Button::ButtonAccessible::CalculateStates()
 {
-  auto tmp                                    = DevelControl::ControlAccessible::CalculateStates();
+  auto tmp                                                 = DevelControl::ControlAccessible::CalculateStates();
   tmp[Dali::Integration::Accessibility::State::SELECTABLE] = true;
-  auto slf                                    = Toolkit::Button::DownCast(Self());
+  auto slf                                                 = Toolkit::Button::DownCast(Self());
   tmp[Dali::Integration::Accessibility::State::ENABLED]    = !slf.GetProperty<bool>(Toolkit::Button::Property::DISABLED);
   tmp[Dali::Integration::Accessibility::State::CHECKED]    = slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return tmp;

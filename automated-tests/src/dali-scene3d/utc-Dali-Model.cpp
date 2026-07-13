@@ -980,7 +980,7 @@ int UtcDaliModelChildrenFocusable01(void)
 
   // connect focusable signal
   gFocusChangedCallBackCalled = false;
-  meshActor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  meshActor.SetProperty(Actor::Property::FOCUSABLE, true);
   manager.FocusChangedSignal().Connect(TestFocusChangedCallback);
 
   // Initialize with some left-positioned actor
@@ -989,7 +989,7 @@ int UtcDaliModelChildrenFocusable01(void)
   focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
   focusStartActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
+  focusStartActor.SetProperty(Dali::Actor::Property::FOCUSABLE, true);
   application.GetScene().Add(focusStartActor);
 
   // Clear
@@ -1088,7 +1088,7 @@ int UtcDaliModelModelChildrenFocusable02(void)
 
   // connect focusable signal
   gFocusChangedCallBackCalled = false;
-  meshActor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  meshActor.SetProperty(Actor::Property::FOCUSABLE, true);
   manager.FocusChangedSignal().Connect(TestFocusChangedCallback);
 
   // Initialize with some left-positioned actor
@@ -1097,7 +1097,7 @@ int UtcDaliModelModelChildrenFocusable02(void)
   focusStartActor.SetProperty(Dali::Actor::Property::POSITION, Vector3(-200, 0, 0));
   focusStartActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   focusStartActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  focusStartActor.SetProperty(Dali::Actor::Property::KEYBOARD_FOCUSABLE, true);
+  focusStartActor.SetProperty(Dali::Actor::Property::FOCUSABLE, true);
   application.GetScene().Add(focusStartActor);
 
   // Clear
