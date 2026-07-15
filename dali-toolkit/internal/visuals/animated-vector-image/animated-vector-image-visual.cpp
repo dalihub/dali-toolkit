@@ -729,6 +729,12 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
       }
       break;
     }
+    case DevelAnimatedVectorImageVisual::Action::REFRESH_DYNAMIC_PROPERTY:
+    {
+      mAnimationData.resendFlag |= VectorAnimationTask::RESEND_REFRESH_DYNAMIC_PROPERTY;
+      DALI_LOG_DEBUG_INFO("[%p] Refresh dynamic property request (url:%s)\n", this, mImageUrl.GetEllipsedUrl().c_str());
+      break;
+    }
   }
 
   TriggerVectorRasterization();

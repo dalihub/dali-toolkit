@@ -33,6 +33,7 @@ namespace VectorAnimationRenderer
 void     DelayRendering(uint32_t delay);
 uint32_t GetDroppedFrames();
 void     UseNativeImageTexture(bool useNativeImage);
+uint32_t GetRefreshDynamicPropertyCallCount();
 
 } // namespace VectorAnimationRenderer
 } // namespace Test

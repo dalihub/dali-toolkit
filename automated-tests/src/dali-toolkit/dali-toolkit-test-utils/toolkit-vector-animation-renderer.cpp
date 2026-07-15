@@ -220,6 +220,24 @@ public:
     mDynamicPropertyCallbacks.emplace_back(id, std::unique_ptr<CallbackBase>(callback));
   }
 
+  void RefreshDynamicProperty()
+  {
+    Dali::Mutex::ScopedLock lock(mMutex);
+    mRefreshDynamicPropertyCallCount++;
+
+    // Mimic re-evaluating dynamic properties at the current (unchanged) frame, the way
+    // Render() would if the underlying engine did not skip an unchanged frame number.
+    for(auto&& dynamicPropertyCallbackPair : mDynamicPropertyCallbacks)
+    {
+      CallbackBase::ExecuteReturn<Property::Value>(*dynamicPropertyCallbackPair.second, dynamicPropertyCallbackPair.first, 0, mPreviousFrame);
+    }
+
+    // Let the test thread know this ran on the (real) vector animation worker thread, the
+    // same way Render() does via mNeedTrigger - otherwise a test waiting on this call would
+    // have no reliable synchronization point and would have to guess with a timed poll.
+    mEventThreadCallback->Trigger();
+  }
+
   void KeepRasterizedBuffer()
   {
     Dali::Mutex::ScopedLock lock(mMutex);
@@ -294,6 +312,7 @@ public:
   bool     mEnableFixedCache{false};
   bool     mUseNativeImage{false};
   bool     mEnableAspectFit{true};
+  uint32_t mRefreshDynamicPropertyCallCount{0};
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr<EventThreadCallback>                     mEventThreadCallback;
@@ -429,6 +448,11 @@ void VectorAnimationRenderer::AddPropertyValueCallback(const std::string& keyPat
   Internal::Adaptor::GetImplementation(*this).AddPropertyValueCallback(keyPath, property, callback, id);
 }
 
+void VectorAnimationRenderer::RefreshDynamicProperty()
+{
+  Internal::Adaptor::GetImplementation(*this).RefreshDynamicProperty();
+}
+
 void VectorAnimationRenderer::KeepRasterizedBuffer()
 {
   Internal::Adaptor::GetImplementation(*this).KeepRasterizedBuffer();
@@ -469,6 +493,11 @@ uint32_t GetDroppedFrames()
 void UseNativeImageTexture(bool useNativeImage)
 {
   Dali::Internal::Adaptor::gVectorAnimationRenderer->mUseNativeImage = useNativeImage;
+}
+
+uint32_t GetRefreshDynamicPropertyCallCount()
+{
+  return Dali::Internal::Adaptor::gVectorAnimationRenderer->mRefreshDynamicPropertyCallCount;
 }
 
 } // namespace VectorAnimationRenderer

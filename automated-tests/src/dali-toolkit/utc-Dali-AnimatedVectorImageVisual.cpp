@@ -2865,6 +2865,97 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
 
 namespace
 {
+std::map<int32_t, int32_t> gDynamicPropertyCallbackCountMap;
+
+Property::Value CountingFillColorCallback(int32_t id, VectorAnimationRenderer::VectorProperty property, uint32_t frameNumber)
+{
+  gDynamicPropertyCallbackCountMap[id]++;
+  return Vector3(0, 0, 1);
+}
+} // namespace
+
+int UtcDaliAnimatedVectorImageVisualRefreshDynamicPropertyAction(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualRefreshDynamicPropertyAction");
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base  visual  = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  gDynamicPropertyCallbackCountMap.clear();
+
+  // Set dynamic property
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info;
+  info.id       = 1;
+  info.keyPath  = "Test.Path";
+  info.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_COLOR);
+  info.callback = MakeCallback(CountingFillColorCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info));
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  WaitForAsyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
+
+  // Sanity check : the callback fires while playing.
+  DALI_TEST_CHECK(gDynamicPropertyCallbackCountMap[1] > 0);
+
+  tet_printf("Pause the animation\n");
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PAUSE, attributes);
+
+  // PAUSE alone does not trigger the mock's event thread callback (mNeedTrigger was already
+  // consumed by the initial resource-ready render above), so there is nothing to wait for here -
+  // just let the pause resend flag reach the vector animation task.
+  application.SendNotification();
+  application.Render();
+
+  uint32_t refreshCallCountBefore  = Test::VectorAnimationRenderer::GetRefreshDynamicPropertyCallCount();
+  int32_t  callbackCallCountBefore = gDynamicPropertyCallbackCountMap[1];
+
+  tet_printf("Refresh dynamic property while paused\n");
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::REFRESH_DYNAMIC_PROPERTY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // RefreshDynamicProperty() on the mock renderer triggers the event thread callback once it
+  // has actually run on the (real) vector animation worker thread, so this deterministically
+  // waits for it instead of polling and hoping it lands within a retry budget.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // This is the behavior this test exists for: the resend flag set by the
+  // REFRESH_DYNAMIC_PROPERTY action must reach VectorAnimationRenderer::RefreshDynamicProperty(),
+  // separately from the ordinary Render() call, even though the animation is paused and the
+  // frame number did not change.
+  DALI_TEST_EQUALS(Test::VectorAnimationRenderer::GetRefreshDynamicPropertyCallCount(), refreshCallCountBefore + 1, TEST_LOCATION);
+
+  // The registered dynamic property callback should also have been re-invoked as a result.
+  DALI_TEST_CHECK(gDynamicPropertyCallbackCountMap[1] > callbackCallCountBefore);
+
+  END_TEST;
+}
+
+namespace
+{
 bool gResourceReadySignalFired = false;
 
 void ResourceReadySignal(Control control)

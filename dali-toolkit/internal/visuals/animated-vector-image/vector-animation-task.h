@@ -78,6 +78,7 @@ public:
     RESEND_DYNAMIC_PROPERTY           = 1 << 8,
     RESEND_NOTIFY_AFTER_RASTERIZATION = 1 << 9,
     RESEND_FRAME_SPEED_FACTOR         = 1 << 10,
+    RESEND_REFRESH_DYNAMIC_PROPERTY   = 1 << 11,
   };
 
   /**
@@ -445,6 +446,7 @@ private:
   bool                                 mNotifyAfterRasterization : 1;
   bool                                 mSizeUpdated : 1;
   bool                                 mEnableAspectFit : 1;
+  bool                                 mForceRefreshDynamicProperty : 1;
 };
 
 } // namespace Internal

@@ -122,7 +122,8 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mEnableFrameCache(false),
   mNotifyAfterRasterization(false),
   mSizeUpdated(false),
-  mEnableAspectFit(true)
+  mEnableAspectFit(true),
+  mForceRefreshDynamicProperty(false)
 {
   mVectorRenderer.UploadCompletedSignal().Connect(this, &VectorAnimationTask::OnUploadCompleted);
 }
@@ -699,6 +700,16 @@ bool VectorAnimationTask::Rasterize()
   bool renderSuccess = false;
   if(mVectorRenderer)
   {
+    if(mForceRefreshDynamicProperty)
+    {
+      // Force registered dynamic property callbacks to be re-evaluated at currentFrame before
+      // rendering, since currentFrame may be unchanged from the previous Render() call (e.g.
+      // while paused), in which case Render() alone would leave the underlying engine's cached
+      // scene untouched and the callbacks' updated return values would never be picked up.
+      mVectorRenderer.RefreshDynamicProperty();
+      mForceRefreshDynamicProperty = false;
+    }
+
     renderSuccess = mVectorRenderer.Render(currentFrame);
     if(!renderSuccess)
     {
@@ -910,6 +921,18 @@ void VectorAnimationTask::ApplyAnimationData()
       for(auto&& iter : animationData.dynamicProperties)
       {
         mVectorRenderer.AddPropertyValueCallback(iter.keyPath, static_cast<VectorAnimationRenderer::VectorProperty>(iter.property), iter.callback, iter.id);
+      }
+    }
+
+    if(animationData.resendFlag & VectorAnimationTask::RESEND_REFRESH_DYNAMIC_PROPERTY)
+    {
+      mForceRefreshDynamicProperty = true; // Consumed in Rasterize(), right before the Render() call.
+      if(mPlayState != PlayState::PLAYING)
+      {
+        // Same reasoning as SetCurrentFrameNumber(): while paused/stopped, the renderer's
+        // RENDERING_BEHAVIOR is IF_REQUIRED, so a rasterized buffer update alone would not
+        // get presented unless we explicitly ask for one more render.
+        mNeedForceRenderOnceTrigger = true;
       }
     }
 
