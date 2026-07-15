@@ -36,9 +36,9 @@ VideoView New(VideoSyncMode syncMode)
   return videoView;
 }
 
-VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode)
+VideoView New(Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode)
 {
-  VideoView videoView = Internal::VideoView::New(playerHandle, syncMode);
+  VideoView videoView = Internal::VideoView::New(source, syncMode);
   return videoView;
 }
 

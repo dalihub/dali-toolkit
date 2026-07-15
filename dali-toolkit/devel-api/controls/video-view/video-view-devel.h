@@ -52,16 +52,17 @@ DALI_TOOLKIT_API Any GetMediaPlayer(VideoView videoView);
 DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
 
 /**
- * @brief Creates an initialized VideoView wrapper using an externally created native player handle with type information.
+ * @brief Creates an initialized VideoView from a video source descriptor.
  *
- * This overload allows specifying the player type explicitly, which is needed to distinguish between
- * different player implementations
+ * The descriptor describes an externally created native player/session. The video plugin
+ * interprets it (providerId / nativeSession); the toolkit forwards it without interpreting.
  *
- * @param[in] playerHandle The externally created player handle with type information.
+ * @param[in] source The video source descriptor.
  * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer.
  * @return A handle to a newly allocated Dali VideoView
  */
-DALI_TOOLKIT_API VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
+DALI_TOOLKIT_API VideoView New(Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
+
 
 /**
  * @brief Play the resize or move animation with synchronization between UI(transparent hole) and video player
