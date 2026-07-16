@@ -681,7 +681,7 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   Popup popup = Popup::New();
   popup.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   popup.SetProperty(Actor::Property::PIVOT, ParentOrigin::CENTER);
-  popup.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(popup, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   popup.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
   application.GetScene().Add(popup);
@@ -962,7 +962,7 @@ int UtcDaliPopupPropertyContextualMode(void)
   placement.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   placement.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   placement.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  placement.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(placement, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(placement);
 
   placement.Add(popup);
@@ -1174,14 +1174,14 @@ int UtcDaliPopupPropertyTouchTransparent(void)
   popup.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   popup.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   popup.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  popup.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(popup, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   // Create a button (to go underneath the popup).
   PushButton button = Toolkit::PushButton::New();
   button.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   button.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   button.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  button.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(button, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   button.ClickedSignal().Connect(&PushButtonClicked);
 
@@ -1251,7 +1251,7 @@ int UtcDaliPopupPropertyTail(void)
   popup.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   popup.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   popup.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  popup.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(popup, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   TextLabel content = TextLabel::New("text");
   popup.SetContent(content);
 

@@ -278,7 +278,7 @@ void TextSelectionPopup::OnInitialize()
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextSelectionPopup::OnInitialize\n");
   Actor self = Self();
-  self.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   self.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
 
   // Accessibility
@@ -567,7 +567,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
   option.SetProperty(Dali::Actor::Property::NAME, ToPropertyValue(button.name));
-  option.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(option, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   option.SetProperty(DevelActor::Property::MINIMUM_SIZE, mLabelMinimumSize);
 
   switch(button.id)
@@ -666,7 +666,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
     divider.SetProperty(Dali::Actor::Property::NAME, "Text's popup divider");
 #endif
     divider.SetProperty(Actor::Property::SIZE, size);
-    divider.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(divider, ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
     divider.SetProperty(DevelActor::Property::PADDING, padding);
     divider.SetBackgroundColor(mDividerColor);
     mToolbar.AddDivider(divider);

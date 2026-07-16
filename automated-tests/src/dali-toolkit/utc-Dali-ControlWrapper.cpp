@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/csharp-type-registry.h>
 #include <dali/public-api/dali-core.h>
@@ -385,7 +386,7 @@ int UtcDaliControlWrapperCalculateChildSizeBase(void)
   ControlWrapper           controlWrapper     = ControlWrapper::New(customControlTypeName, *controlWrapperImpl);
 
   Actor child = Actor::New();
-  child.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
   child.SetProperty(Actor::Property::SIZE, Vector2(150, 150));
 
   application.SendNotification();
@@ -413,7 +414,7 @@ int UtcDaliControlWrapperRelayoutDependentOnChildrenBase(void)
 
   DALI_TEST_EQUALS(v, true, TEST_LOCATION);
 
-  controlWrapper.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(controlWrapper, Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
   v = controlWrapperImpl->TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
   application.SendNotification();
   application.Render();
@@ -631,7 +632,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
   ControlWrapper           controlWrapper     = ControlWrapper::New(customControlTypeName, *controlWrapperImpl);
 
   //DummyControl actor = DummyControl::New();
-  controlWrapper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(controlWrapper, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   controlWrapper.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   controlWrapper.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(controlWrapper);

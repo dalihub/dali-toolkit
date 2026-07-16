@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -510,7 +511,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   DALI_TEST_CHECK(asyncTextRendered);
 
   float expectedWidth  = 300.0f;
-  float expectedHeight = label.GetHeightForWidth(expectedWidth);
+  float expectedHeight = DevelActor::GetHeightForWidth(label, expectedWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -542,7 +543,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  expectedHeight = label.GetHeightForWidth(expectedWidth);
+  expectedHeight = DevelActor::GetHeightForWidth(label, expectedWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -1132,7 +1133,7 @@ int UtcDaliToolkitTextLabelRequestAsyncHeightForWidth(void)
   DALI_TEST_CHECK(asyncSizeComputed);
 
   float expectedWidth     = 300.0f;
-  float expectedHeight    = label.GetHeightForWidth(expectedWidth);
+  float expectedHeight    = DevelActor::GetHeightForWidth(label, expectedWidth);
   int   expectedLineCount = label.GetProperty<int>(TextLabel::Property::LINE_COUNT);
   int   asyncLineCount    = label.GetProperty<int>(DevelTextLabel::Property::ASYNC_LINE_COUNT);
 
@@ -1165,7 +1166,7 @@ int UtcDaliToolkitTextLabelRequestAsyncHeightForWidth(void)
   DALI_TEST_CHECK(asyncSizeComputed);
 
   expectedWidth     = 300.0f;
-  expectedHeight    = label.GetHeightForWidth(expectedWidth);
+  expectedHeight    = DevelActor::GetHeightForWidth(label, expectedWidth);
   expectedLineCount = label.GetProperty<int>(TextLabel::Property::LINE_COUNT);
   asyncLineCount    = label.GetProperty<int>(DevelTextLabel::Property::ASYNC_LINE_COUNT);
 
@@ -1964,7 +1965,7 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll04(void)
   DALI_TEST_CHECK(asyncTextRendered);
 
   float expectedWidth  = labelWidth;
-  float expectedHeight = label.GetHeightForWidth(labelWidth);
+  float expectedHeight = DevelActor::GetHeightForWidth(label, labelWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -2422,7 +2423,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  float expectedHeight = label.GetHeightForWidth(expectedWidth);
+  float expectedHeight = DevelActor::GetHeightForWidth(label, expectedWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -2483,7 +2484,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  expectedHeight = label.GetHeightForWidth(expectedWidth);
+  expectedHeight = DevelActor::GetHeightForWidth(label, expectedWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -2754,7 +2755,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   DALI_TEST_CHECK(asyncSizeComputed);
 
   float expectedWidth  = 300.0f;
-  float expectedHeight = label.GetHeightForWidth(expectedWidth);
+  float expectedHeight = DevelActor::GetHeightForWidth(label, expectedWidth);
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncSizeComputedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncSizeComputedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);

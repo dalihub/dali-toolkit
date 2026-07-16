@@ -177,8 +177,8 @@ int UtcDaliLightSize(void)
   application.SendNotification();
   application.Render();
 
-  float widthForHeight = light.GetWidthForHeight(light.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT));
-  float heightForWidth = light.GetHeightForWidth(light.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH));
+  float widthForHeight = DevelActor::GetWidthForHeight(light, light.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT));
+  float heightForWidth = DevelActor::GetHeightForWidth(light, light.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH));
   DALI_TEST_EQUALS(0.0f, widthForHeight, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, heightForWidth, 0.01f, TEST_LOCATION);
 

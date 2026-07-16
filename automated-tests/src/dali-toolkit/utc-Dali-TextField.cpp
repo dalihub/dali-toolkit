@@ -3781,8 +3781,8 @@ int utcDaliTextFieldSizeUpdate(void)
 
   // "ㅁ" is bigger then "ኢ"
   field.SetProperty(Actor::Property::SIZE, Vector2(fieldWidth, 10.0f));
-  field.SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
-  field.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(field, ResizePolicy::FIXED, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(field, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
 
   field.SetProperty(TextField::Property::TEXT, "ኢ");
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -3794,7 +3794,7 @@ int utcDaliTextFieldSizeUpdate(void)
   application.SendNotification();
   application.Render();
 
-  previousHeight = field.GetHeightForWidth(fieldWidth);
+  previousHeight = DevelActor::GetHeightForWidth(field, fieldWidth);
   DALI_TEST_EQUALS(previousHeight, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
 
   // Add  another script characters ( glyph height is defferent )
@@ -3804,7 +3804,7 @@ int utcDaliTextFieldSizeUpdate(void)
   application.SendNotification();
   application.Render();
 
-  currentHeight = field.GetHeightForWidth(fieldWidth);
+  currentHeight = DevelActor::GetHeightForWidth(field, fieldWidth);
   DALI_TEST_EQUALS(currentHeight, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
   DALI_TEST_EQUALS((previousHeight < currentHeight), true, TEST_LOCATION);
 

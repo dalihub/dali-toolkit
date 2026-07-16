@@ -85,8 +85,8 @@ BaseHandle CreateToast()
 
   // Setup for Toast Popup type.
   popup.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_TOAST_WIDTH_OF_SCENE_RATIO);
-  popup.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
-  popup.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(popup, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(popup, ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
   popup.SetProperty(Toolkit::Popup::Property::CONTEXTUAL_MODE, Toolkit::Popup::NON_CONTEXTUAL);
   popup.SetProperty(Toolkit::Popup::Property::ANIMATION_DURATION, DEFAULT_TOAST_TRANSITION_TIME);
   popup.SetProperty(Toolkit::Popup::Property::TAIL_VISIBILITY, false);
@@ -290,8 +290,8 @@ void Popup::OnInitialize()
   self.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   self.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_POPUP_PARENT_RELATIVE_SIZE);
-  self.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
-  self.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(self, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(self, ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
 
   // Create a new layer so all Popup components can appear above all other actors.
   mLayer = Layer::New();
@@ -299,7 +299,7 @@ void Popup::OnInitialize()
 
   mLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mLayer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  mLayer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mLayer, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Important to set as invisible as otherwise, if the popup is parented,
   // but not shown yet it will appear statically on the screen.
@@ -316,7 +316,7 @@ void Popup::OnInitialize()
   mPopupContainer.SetProperty(Dali::Actor::Property::NAME, "popupContainer");
   mPopupContainer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mPopupContainer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  mPopupContainer.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mPopupContainer, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   mLayer.Add(mPopupContainer);
 
   // Create the Popup layout to contain all main content.
@@ -330,8 +330,8 @@ void Popup::OnInitialize()
   mPopupLayout.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mPopupLayout.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
-  mPopupLayout.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
-  mPopupLayout.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
 
   mPopupLayout.SetFitHeight(0); // Set row to fit.
   mPopupLayout.SetFitHeight(1); // Set row to fit.
@@ -702,7 +702,7 @@ void Popup::SetFooter(Actor footer)
 
   if(mFooter)
   {
-    mFooter.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
+    DevelActor::SetResizePolicy(mFooter, ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
 
     // The control container has a fixed height.
     mPopupLayout.SetFitHeight(2u);
@@ -1036,7 +1036,7 @@ void Popup::UpdateBackgroundPositionAndSize()
 {
   if(mPopupBackgroundImage)
   {
-    mPopupBackgroundImage.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(mPopupBackgroundImage, ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
     mPopupBackgroundImage.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, Vector3(mBackgroundBorder.start + mBackgroundBorder.end, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f));
 
     // Adjust the position of the background so the transparent areas are set appropriately
@@ -1598,7 +1598,7 @@ void Popup::OnSceneConnection(int depth)
     Vector2 windowSize(positionSize.width, positionSize.height);
 
     // Backing must cover the full window.
-    mBacking.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(mBacking, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     mBacking.SetProperty(Actor::Property::SIZE, windowSize);
 
     // Popup layout default width is a fraction of the window width.
@@ -1647,7 +1647,7 @@ void Popup::LayoutContext(const Vector2& size)
   Vector3 halfWindowSize(windowSize.width / 2.0f, windowSize.height / 2.0f, 0.0f);
   Vector3 parentPosition(parent.GetCurrentProperty<Vector3>(Actor::Property::POSITION));
   Vector2 halfSize(size / 2.0f);
-  Vector2 halfParentSize(parent.GetRelayoutSize(Dimension::WIDTH) / 2.0f, parent.GetRelayoutSize(Dimension::HEIGHT) / 2.0f);
+  Vector2 halfParentSize(DevelActor::GetRelayoutSize(parent, Dimension::WIDTH) / 2.0f, DevelActor::GetRelayoutSize(parent, Dimension::HEIGHT) / 2.0f);
   Vector3 newPosition(Vector3::ZERO);
 
   // Perform different positioning based on the specified contextual layout mode.
@@ -1718,22 +1718,22 @@ void Popup::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   // Use the Popup layouts size, unless requested to use a fixed size.
   // In which case take the size set for the Popup itself.
-  ResizePolicy::Type widthPolicy  = Self().GetResizePolicy(Dimension::WIDTH);
-  ResizePolicy::Type heightPolicy = Self().GetResizePolicy(Dimension::HEIGHT);
+  ResizePolicy::Type widthPolicy  = DevelActor::GetResizePolicy(Self(), Dimension::WIDTH);
+  ResizePolicy::Type heightPolicy = DevelActor::GetResizePolicy(Self(), Dimension::HEIGHT);
 
   // Width calculations:
   if(widthPolicy == ResizePolicy::USE_NATURAL_SIZE || widthPolicy == ResizePolicy::FIT_TO_CHILDREN)
   {
     // If we using a child-based policy, take the size from the popup layout.
-    mPopupLayout.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
-    useSize.width = mPopupLayout.GetRelayoutSize(Dimension::WIDTH);
+    DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
+    useSize.width = DevelActor::GetRelayoutSize(mPopupLayout, Dimension::WIDTH);
 
     mPopupLayout.SetFitWidth(0u);
   }
   else
   {
     // If we using a parent-based policy, take the size from the popup object itself (self).
-    mPopupLayout.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
+    DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
 
     mPopupLayout.SetFixedWidth(0u, useSize.width);
   }
@@ -1745,7 +1745,7 @@ void Popup::OnRelayout(const Vector2& size, RelayoutContainer& container)
   // Footer: Convert the footer's resize policy to a TableView row policy.
   if(mFooter)
   {
-    ResizePolicy::Type footerHeightPolicy = mFooter.GetResizePolicy(Dimension::HEIGHT);
+    ResizePolicy::Type footerHeightPolicy = DevelActor::GetResizePolicy(mFooter, Dimension::HEIGHT);
     if((footerHeightPolicy == ResizePolicy::USE_NATURAL_SIZE) ||
        (footerHeightPolicy == ResizePolicy::FIT_TO_CHILDREN))
     {
@@ -1753,7 +1753,7 @@ void Popup::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
     else if(footerHeightPolicy == ResizePolicy::FIXED)
     {
-      mPopupLayout.SetFixedHeight(2u, mFooter.GetRelayoutSize(Dimension::HEIGHT));
+      mPopupLayout.SetFixedHeight(2u, DevelActor::GetRelayoutSize(mFooter, Dimension::HEIGHT));
     }
     else
     {
@@ -1768,19 +1768,19 @@ void Popup::OnRelayout(const Vector2& size, RelayoutContainer& container)
   // Popup contents: Adjust the tableview's policies based on the popup's policies.
   if(heightPolicy == ResizePolicy::USE_NATURAL_SIZE || heightPolicy == ResizePolicy::FIT_TO_CHILDREN)
   {
-    mPopupLayout.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
 
     // Let both the contents expand as necessary.
     mPopupLayout.SetFitHeight(1u);
-    useSize.height = mPopupLayout.GetRelayoutSize(Dimension::HEIGHT);
+    useSize.height = DevelActor::GetRelayoutSize(mPopupLayout, Dimension::HEIGHT);
   }
   else
   {
-    mPopupLayout.SetResizePolicy(heightPolicy, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(mPopupLayout, heightPolicy, Dimension::HEIGHT);
 
     // Let the content expand to fill the remaining space.
     mPopupLayout.SetRelativeHeight(1u, 1.0f);
-    mPopupLayout.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(mPopupLayout, ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT);
   }
 
   // Relayout the popup-layout to give it it's new size this frame.
@@ -1788,7 +1788,7 @@ void Popup::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
   if(mContent)
   {
-    container.Add(mContent, Vector2(mContent.GetRelayoutSize(Dimension::WIDTH), mContent.GetRelayoutSize(Dimension::HEIGHT)));
+    container.Add(mContent, Vector2(DevelActor::GetRelayoutSize(mContent, Dimension::WIDTH), DevelActor::GetRelayoutSize(mContent, Dimension::HEIGHT)));
   }
 
   // Perform contextual layout setup if required.
@@ -1802,7 +1802,7 @@ void Popup::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimensi
   // To get the popup to emulate fit-to-children, we need to actually set use-natural-size.
   if((dimension & Dimension::HEIGHT) && (policy == ResizePolicy::FIT_TO_CHILDREN))
   {
-    Self().SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(Self(), ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT);
   }
 
   mLayoutDirty = true;
@@ -1816,12 +1816,12 @@ Vector3 Popup::GetNaturalSize()
 
 float Popup::GetHeightForWidth(float width)
 {
-  return mPopupLayout.GetHeightForWidth(width);
+  return DevelActor::GetHeightForWidth(mPopupLayout, width);
 }
 
 float Popup::GetWidthForHeight(float height)
 {
-  return mPopupLayout.GetWidthForHeight(height);
+  return DevelActor::GetWidthForHeight(mPopupLayout, height);
 }
 
 bool Popup::OnKeyEvent(const KeyEvent& event)

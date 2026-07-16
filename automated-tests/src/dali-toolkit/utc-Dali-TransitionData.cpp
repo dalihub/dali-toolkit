@@ -19,9 +19,12 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+
 #include <stdlib.h>
 #include <iostream>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -227,7 +230,7 @@ int UtcDaliTransitionDataMap1P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -291,7 +294,7 @@ int UtcDaliTransitionDataMap2P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -356,7 +359,7 @@ int UtcDaliTransitionDataMap2Pb(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -425,7 +428,7 @@ int UtcDaliTransitionDataMap3P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   application.GetScene().Add(actor);
 
@@ -487,7 +490,7 @@ int UtcDaliTransitionDataMap4P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(Property::Array().Add(map1).Add(map2));
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   application.GetScene().Add(actor);
 
@@ -546,7 +549,7 @@ int UtcDaliTransitionDataMap5P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -630,7 +633,7 @@ int UtcDaliTransitionDataMap6P(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -712,7 +715,7 @@ int UtcDaliTransitionDataMap1N(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -743,7 +746,7 @@ int UtcDaliTransitionDataMapN4(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -792,7 +795,7 @@ int UtcDaliTransitionDataMapN5(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -840,7 +843,7 @@ int UtcDaliTransitionDataMapN6(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);
@@ -907,7 +910,7 @@ int UtcDaliTransitionDataArrayP(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(array);
 
   DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
   actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
   application.GetScene().Add(actor);

@@ -21,6 +21,7 @@
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/string-utils.h>
 
@@ -575,7 +576,7 @@ int UtcDaliRenderEffectResize02(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(control, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   parent.Add(control);
 
   RenderTaskList taskList = scene.GetRenderTaskList();

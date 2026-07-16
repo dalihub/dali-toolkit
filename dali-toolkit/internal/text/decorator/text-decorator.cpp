@@ -600,7 +600,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     // Retrieves the popup's size after relayout.
-    const Vector3 popupSize(mCopyPastePopup.actor.GetRelayoutSize(Dimension::WIDTH), mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT), 0.0f);
+    const Vector3 popupSize(DevelActor::GetRelayoutSize(mCopyPastePopup.actor, Dimension::WIDTH), DevelActor::GetRelayoutSize(mCopyPastePopup.actor, Dimension::HEIGHT), 0.0f);
     const Vector3 popupHalfSize = popupSize * 0.5f;
 
     if(mPopupSetNewPosition)
@@ -773,7 +773,7 @@ struct Decorator::Impl : public ConnectionTracker
       }
 
       layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      layer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      DevelActor::SetResizePolicy(layer, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
       mController.AddDecoration(layer, type, needsClipping);
     }
@@ -822,7 +822,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         grabHandle.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         grabHandle.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
-        grabHandle.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
+        DevelActor::SetResizePolicy(grabHandle.grabArea, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         grabHandle.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE);
         grabHandle.actor.Add(grabHandle.grabArea);
         grabHandle.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
@@ -856,7 +856,7 @@ struct Decorator::Impl : public ConnectionTracker
       handle.markerActor.SetProperty(Actor::Property::COLOR, mHandleColor);
       handle.actor.Add(handle.markerActor);
 
-      handle.markerActor.SetResizePolicy(ResizePolicy::FIXED, Dimension::HEIGHT);
+      DevelActor::SetResizePolicy(handle.markerActor, ResizePolicy::FIXED, Dimension::HEIGHT);
 
       if(LEFT_SELECTION_HANDLE == handleType)
       {
@@ -891,7 +891,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
         primary.grabArea.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleOneGrabArea");
 #endif
-        primary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
+        DevelActor::SetResizePolicy(primary.grabArea, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         primary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         primary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         primary.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
@@ -936,7 +936,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
         secondary.grabArea.SetProperty(Dali::Actor::Property::NAME, "SelectionHandleTwoGrabArea");
 #endif
-        secondary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
+        DevelActor::SetResizePolicy(secondary.grabArea, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         secondary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         secondary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         secondary.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
@@ -1707,7 +1707,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     float alternativePosition = 0.0f;
 
-    const float halfPopupHeight = 0.5f * mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT);
+    const float halfPopupHeight = 0.5f * DevelActor::GetRelayoutSize(mCopyPastePopup.actor, Dimension::HEIGHT);
 
     const HandleImpl& primaryHandle   = mHandle[LEFT_SELECTION_HANDLE];
     const HandleImpl& secondaryHandle = mHandle[RIGHT_SELECTION_HANDLE];
@@ -1750,7 +1750,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void PopUpLeavesTopBoundary(PropertyNotification source)
   {
-    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT);
+    const float popupHeight = DevelActor::GetRelayoutSize(mCopyPastePopup.actor, Dimension::HEIGHT);
 
     // Sets the position of the popup below.
     mCopyPastePopup.actor.SetProperty(Actor::Property::POSITION_Y, floorf(CalculateVerticalPopUpPosition(0.5f * popupHeight, true)));
@@ -1758,7 +1758,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void PopUpLeavesBottomBoundary(PropertyNotification source)
   {
-    const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize(Dimension::HEIGHT);
+    const float popupHeight = DevelActor::GetRelayoutSize(mCopyPastePopup.actor, Dimension::HEIGHT);
 
     // Sets the position of the popup above.
     mCopyPastePopup.actor.SetProperty(Actor::Property::POSITION_Y, floorf(CalculateVerticalPopUpPosition(0.5f * popupHeight, false)));
