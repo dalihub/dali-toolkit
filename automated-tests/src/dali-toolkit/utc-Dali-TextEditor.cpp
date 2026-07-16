@@ -5967,7 +5967,7 @@ int utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize(void)
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
-  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+  editor.SetProperty(Dali::DevelActor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
 
   // Render and notify
   application.SendNotification();
@@ -6022,7 +6022,7 @@ int utcDaliTextEditorRemoveCharacterAfterInitWithResizePolicyNaturalSize(void)
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
-  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+  editor.SetProperty(Dali::DevelActor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
 
   // Set currsor
   editor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 5);
@@ -6070,7 +6070,7 @@ int utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize(void)
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
-  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+  editor.SetProperty(Dali::DevelActor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
 
   //Select text at initialization (before the first render)
   DevelTextEditor::SelectText(editor, 3, 5);
@@ -6120,7 +6120,7 @@ int utcDaliTextEditorDoubleEnterAfterInitWithResizePolicyNaturalSize(void)
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   //Set ResizePolicy to NaturalSize
-  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+  editor.SetProperty(Dali::DevelActor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
 
   // Set currsor
   editor.SetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 5);

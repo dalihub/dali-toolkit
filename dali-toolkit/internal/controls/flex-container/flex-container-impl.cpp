@@ -611,10 +611,10 @@ void FlexContainer::ComputeLayout()
       Actor     childActor = mChildrenNodes[i].actor.GetHandle();
 
       // Intialize the style of the child.
-      YGNodeStyleSetMinWidth(childNode, childActor.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE).x);
-      YGNodeStyleSetMinHeight(childNode, childActor.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE).y);
-      YGNodeStyleSetMaxWidth(childNode, childActor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).x);
-      YGNodeStyleSetMaxHeight(childNode, childActor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).y);
+      YGNodeStyleSetMinWidth(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE).x);
+      YGNodeStyleSetMinHeight(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE).y);
+      YGNodeStyleSetMaxWidth(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).x);
+      YGNodeStyleSetMaxHeight(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).y);
 
       // Check child properties on the child for how to layout it.
       // These properties should be dynamically registered to the child which
@@ -680,7 +680,7 @@ void FlexContainer::ComputeLayout()
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint(mRootNode.node, (YGPrintOptions)(YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren));
 #endif
-    YGNodeCalculateLayout(mRootNode.node, Self().GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).x, Self().GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).y, nodeLayoutDirection);
+    YGNodeCalculateLayout(mRootNode.node, Self().GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).x, Self().GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).y, nodeLayoutDirection);
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint(mRootNode.node, (YGPrintOptions)(YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren));
 #endif

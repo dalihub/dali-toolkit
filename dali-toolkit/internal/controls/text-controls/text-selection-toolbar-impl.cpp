@@ -19,12 +19,13 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cfloat>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
+#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -186,8 +187,8 @@ void TextSelectionToolbar::SetPopupMaxSize(const Size& maxSize)
   mMaxSize = maxSize;
   if(mScrollView && mToolbarActor)
   {
-    mScrollView.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
-    mToolbarActor.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
+    mScrollView.SetProperty(DevelActor::Property::MAXIMUM_SIZE, mMaxSize);
+    mToolbarActor.SetProperty(DevelActor::Property::MAXIMUM_SIZE, mMaxSize);
   }
 }
 
