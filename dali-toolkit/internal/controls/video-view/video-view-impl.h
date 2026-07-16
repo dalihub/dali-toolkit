@@ -177,13 +177,13 @@ public:
   static Toolkit::VideoView New(VideoSyncMode syncMode);
 
   /**
-   * @brief Creates a new VideoView wrapper using an externally created native player handle.
+   * @brief Creates a new VideoView wrapper from a video source descriptor.
    *
-   * @param[in] playerHandle The externally created player handle with type information.
+   * @param[in] source The video source descriptor describing an externally created player.
    * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer
    * @return A handle to a newly allocated Dali VideoView
    */
-  static Toolkit::VideoView New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
+  static Toolkit::VideoView New(Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
 
   /**
    * @brief Sets a video url to play.

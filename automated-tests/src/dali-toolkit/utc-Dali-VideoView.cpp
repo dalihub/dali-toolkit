@@ -1063,17 +1063,17 @@ int UtcDaliVideoViewPlayWithOverlayTextureVisualSetVideoBuffer(void)
   END_TEST;
 }
 
-int UtcDaliVideoViewWithPlayerHandle(void)
+int UtcDaliVideoViewWithVideoSource(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliVideoViewWithPlayerHandle");
+  tet_infoline("UtcDaliVideoViewWithVideoSource");
 
-  // Create a dummy player handle with type (nullptr for test purposes)
-  Dali::VideoPlayerPlugin::PlayerHandle playerHandle;
-  playerHandle.handle     = nullptr;
-  playerHandle.playerType = Dali::VideoPlayerPlugin::PlayerHandleType::DEFAULT;
+  // Describe an externally created player session (nullptr handle for test purposes).
+  Dali::VideoPlayerPlugin::VideoSourceDescriptor source;
+  source.providerId    = "tizen.mmplayer";
+  source.nativeSession = Dali::Any(static_cast<void*>(nullptr));
 
-  VideoView videoView = DevelVideoView::New(playerHandle);
+  VideoView videoView = DevelVideoView::New(source);
   DALI_TEST_CHECK(videoView);
 
   application.GetScene().Add(videoView);
@@ -1088,3 +1088,4 @@ int UtcDaliVideoViewWithPlayerHandle(void)
 
   END_TEST;
 }
+

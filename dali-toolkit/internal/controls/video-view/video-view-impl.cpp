@@ -132,12 +132,12 @@ Toolkit::VideoView VideoView::New(VideoSyncMode syncMode)
   return handle;
 }
 
-Toolkit::VideoView VideoView::New(Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode)
+Toolkit::VideoView VideoView::New(Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode)
 {
   VideoView*         impl   = new VideoView(syncMode);
   Toolkit::VideoView handle = Toolkit::VideoView(*impl);
 
-  impl->mVideoPlayer = Dali::VideoPlayer::New(impl->Self(), playerHandle, syncMode);
+  impl->mVideoPlayer = Dali::VideoPlayer::New(impl->Self(), source, syncMode);
   impl->Initialize();
   return handle;
 }

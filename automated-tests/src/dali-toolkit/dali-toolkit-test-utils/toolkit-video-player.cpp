@@ -230,7 +230,7 @@ VideoPlayer VideoPlayer::New(Dali::Actor actor, Dali::VideoSyncMode syncMode)
   return VideoPlayer(player);
 }
 
-VideoPlayer VideoPlayer::New(Dali::Actor actor, Dali::VideoPlayerPlugin::PlayerHandle playerHandle, VideoSyncMode syncMode)
+VideoPlayer VideoPlayer::New(Dali::Actor actor, Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode)
 {
   Internal::Adaptor::VideoPlayer* player = new Internal::Adaptor::VideoPlayer();
 
