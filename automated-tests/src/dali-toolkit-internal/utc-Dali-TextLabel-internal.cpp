@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <memory>
 #include <thread>
 
 #include <toolkit-event-thread-callback.h>
@@ -1422,11 +1423,11 @@ int UtcDaliTextLabelLocaleChange02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -1548,11 +1549,11 @@ int UtcDaliTextLabelCustomFontAdded(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;

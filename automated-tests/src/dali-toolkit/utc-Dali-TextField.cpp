@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <memory>
 
 #include "toolkit-clipboard.h"
 
@@ -1371,10 +1372,10 @@ int utcDaliTextFieldAnchorClicked01(void)
   application.GetScene().Add(field);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::AnchorClickedSignal(field).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  field.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  field.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
@@ -1417,10 +1418,10 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.GetScene().Add(field);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::AnchorClickedSignal(field).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  field.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  field.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
@@ -1667,10 +1668,10 @@ int utcDaliTextFieldTextChangedP(void)
   application.GetScene().Add(field);
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
   bool textChangedSignal = false;
-  field.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
+  field.ConnectSignal(testTracker.get(), "textChanged", CallbackFunctor(&textChangedSignal));
 
   gTextChangedCallBackCalled = false;
   field.SetProperty(TextField::Property::TEXT, "ABC");
@@ -1710,10 +1711,10 @@ int utcDaliTextFieldTextChangedWithInputMethodContext(void)
   application.GetScene().Add(field);
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
   bool textChangedSignal = false;
-  field.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
+  field.ConnectSignal(testTracker.get(), "textChanged", CallbackFunctor(&textChangedSignal));
 
   // get InputMethodContext
   std::string                                      text;
@@ -1781,10 +1782,10 @@ int utcDaliTextFieldSelectionWithInputMethodContext(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::SelectionChangedSignal(field).Connect(&TestSelectionChangedCallback);
   bool selectionChangedSignal = false;
-  field.ConnectSignal(testTracker, "selectionChanged", CallbackFunctor(&selectionChangedSignal));
+  field.ConnectSignal(testTracker.get(), "selectionChanged", CallbackFunctor(&selectionChangedSignal));
 
   // get InputMethodContext
   std::string                                      text;
@@ -1820,10 +1821,10 @@ int utcDaliTextFieldPositionWithInputMethodContext(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::CursorPositionChangedSignal(field).Connect(&TestCursorPositionChangedCallback);
   bool cursorPositionChangedSignal = false;
-  field.ConnectSignal(testTracker, "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
+  field.ConnectSignal(testTracker.get(), "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
 
   // get InputMethodContext
   std::string                                      text;
@@ -1863,10 +1864,10 @@ int utcDaliTextFieldInputFilterWithInputMethodContext(void)
   application.GetScene().Add(field);
 
   // connect to the input filtered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
   bool inputFilteredSignal = false;
-  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+  field.ConnectSignal(testTracker.get(), "inputFiltered", CallbackFunctor(&inputFilteredSignal));
 
   // get InputMethodContext
   std::string                                      text;
@@ -1955,10 +1956,10 @@ int utcDaliTextFieldTextChangedN(void)
   application.GetScene().Add(field);
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
   bool textChangedSignal = false;
-  field.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
+  field.ConnectSignal(testTracker.get(), "textChanged", CallbackFunctor(&textChangedSignal));
 
   gTextChangedCallBackCalled = false;
   field.SetProperty(TextField::Property::PLACEHOLDER_TEXT, "ABC"); // Setting placeholder, not TEXT
@@ -1986,10 +1987,10 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
   field.SetKeyInputFocus();
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
   bool maxLengthReachedSignal = false;
-  field.ConnectSignal(testTracker, "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
+  field.ConnectSignal(testTracker.get(), "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
 
   gMaxCharactersCallBackCalled = false;
 
@@ -2018,10 +2019,10 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
   field.SetKeyInputFocus();
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
   bool maxLengthReachedSignal = false;
-  field.ConnectSignal(testTracker, "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
+  field.ConnectSignal(testTracker.get(), "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
 
   gMaxCharactersCallBackCalled = false;
 
@@ -2060,10 +2061,10 @@ int utcDaliTextFieldInputFilteredP(void)
   field.SetKeyInputFocus();
 
   // connect to the input filtered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
   bool inputFilteredSignal = false;
-  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+  field.ConnectSignal(testTracker.get(), "inputFiltered", CallbackFunctor(&inputFilteredSignal));
 
   gInputFilteredAcceptedCallbackCalled = false;
 
@@ -2113,10 +2114,10 @@ int utcDaliTextFieldInputFilteredN(void)
   field.SetKeyInputFocus();
 
   // connect to the input filtered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
   bool inputFilteredSignal = false;
-  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+  field.ConnectSignal(testTracker.get(), "inputFiltered", CallbackFunctor(&inputFilteredSignal));
 
   gInputFilteredAcceptedCallbackCalled = false;
 
@@ -2201,10 +2202,10 @@ int utcDaliTextFieldInputStyleChanged01(void)
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  field.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  field.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(field);
 
@@ -2409,10 +2410,10 @@ int utcDaliTextFieldInputStyleChanged02(void)
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  field.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  field.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(field);
 
@@ -2614,10 +2615,10 @@ int utcDaliTextFieldInputStyleChanged03(void)
   field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   field.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  field.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  field.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(field);
 
@@ -4579,9 +4580,9 @@ int utcDaliTextFieldMaxCharactersReachedAfterSetText(void)
   field.SetKeyInputFocus();
 
   // connect to the text max lengh reached signal.
-  ConnectionTracker* testTracker            = new ConnectionTracker();
-  bool               maxLengthReachedSignal = false;
-  field.ConnectSignal(testTracker, "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
+  std::unique_ptr<ConnectionTracker> testTracker            = std::make_unique<ConnectionTracker>();
+  bool                               maxLengthReachedSignal = false;
+  field.ConnectSignal(testTracker.get(), "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
 
   application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -5015,10 +5016,10 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::CursorPositionChangedSignal(field).Connect(&TestCursorPositionChangedCallback);
   bool cursorPositionChangedSignal = false;
-  field.ConnectSignal(testTracker, "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
+  field.ConnectSignal(testTracker.get(), "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
 
   field.SetProperty(TextField::Property::TEXT, "Hello world Hello world");
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
@@ -5342,10 +5343,10 @@ int utcDaliTextFieldSelectionClearedSignal(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::SelectionClearedSignal(field).Connect(&TestSelectionClearedCallback);
   bool selectionClearedSignal = false;
-  field.ConnectSignal(testTracker, "selectionCleared", CallbackFunctor(&selectionClearedSignal));
+  field.ConnectSignal(testTracker.get(), "selectionCleared", CallbackFunctor(&selectionClearedSignal));
 
   field.SetProperty(TextField::Property::TEXT, "Hello\nworld\nHello world");
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
@@ -5476,10 +5477,10 @@ int utcDaliTextFieldSelectionStartedSignal(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::SelectionStartedSignal(field).Connect(&TestSelectionStartedCallback);
   bool selectionStartedSignal = false;
-  field.ConnectSignal(testTracker, "selectionStarted", CallbackFunctor(&selectionStartedSignal));
+  field.ConnectSignal(testTracker.get(), "selectionStarted", CallbackFunctor(&selectionStartedSignal));
 
   field.SetProperty(TextField::Property::TEXT, "Hello\nworld\nHello world");
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
@@ -5542,10 +5543,10 @@ int utcDaliTextFieldSelectionChangedSignal(void)
   application.GetScene().Add(field);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextField::SelectionChangedSignal(field).Connect(&TestSelectionChangedCallback);
   bool selectionChangedSignal = false;
-  field.ConnectSignal(testTracker, "selectionChanged", CallbackFunctor(&selectionChangedSignal));
+  field.ConnectSignal(testTracker.get(), "selectionChanged", CallbackFunctor(&selectionChangedSignal));
 
   field.SetProperty(TextField::Property::TEXT, "Hello world Hello world");
   field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
