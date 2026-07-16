@@ -1070,8 +1070,8 @@ int UtcDaliVideoViewWithVideoSource(void)
 
   // Describe an externally created player session (nullptr handle for test purposes).
   Dali::VideoPlayerPlugin::VideoSourceDescriptor source;
-  source.providerId    = "tizen.mmplayer";
-  source.nativeSession = Dali::Any(static_cast<void*>(nullptr));
+  source.SetProviderId("tizen.mmplayer");
+  source.SetNativeSession(Dali::Any(static_cast<void*>(nullptr)));
 
   VideoView videoView = DevelVideoView::New(source);
   DALI_TEST_CHECK(videoView);
