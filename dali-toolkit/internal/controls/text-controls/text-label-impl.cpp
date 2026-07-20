@@ -23,8 +23,8 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
@@ -1213,8 +1213,8 @@ void TextLabel::OnInitialize()
   mController->SetAnchorControlInterface(this);
 
   // Use height-for-width negotiation by default
-  self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
-  self.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(self, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
 
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow

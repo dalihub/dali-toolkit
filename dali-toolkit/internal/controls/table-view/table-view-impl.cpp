@@ -50,7 +50,7 @@ namespace
  */
 bool FitToChild(Actor actor, Dimension::Type dimension)
 {
-  return actor.GetResizePolicy(dimension) != ResizePolicy::FILL_TO_PARENT && actor.GetRelayoutSize(dimension) > 0.0f;
+  return DevelActor::GetResizePolicy(actor, dimension) != ResizePolicy::FILL_TO_PARENT && DevelActor::GetRelayoutSize(actor, dimension) > 0.0f;
 }
 
 #if defined(DEBUG_ENABLED)
@@ -866,11 +866,11 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
         }
         else if(cellData.horizontalAlignment == HorizontalAlignment::RIGHT)
         {
-          actor.SetProperty(Actor::Property::POSITION_X, right - mPadding.width - padding.y - actor.GetRelayoutSize(Dimension::WIDTH));
+          actor.SetProperty(Actor::Property::POSITION_X, right - mPadding.width - padding.y - DevelActor::GetRelayoutSize(actor, Dimension::WIDTH));
         }
         else //if( cellData.horizontalAlignment ==  HorizontalAlignment::CENTER )
         {
-          actor.SetProperty(Actor::Property::POSITION_X, (left + right + padding.x - padding.y - actor.GetRelayoutSize(Dimension::WIDTH)) * 0.5f);
+          actor.SetProperty(Actor::Property::POSITION_X, (left + right + padding.x - padding.y - DevelActor::GetRelayoutSize(actor, Dimension::WIDTH)) * 0.5f);
         }
 
         if(cellData.verticalAlignment == VerticalAlignment::TOP)
@@ -879,11 +879,11 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
         }
         else if(cellData.verticalAlignment == VerticalAlignment::BOTTOM)
         {
-          actor.SetProperty(Actor::Property::POSITION_Y, bottom - mPadding.height - padding.w - actor.GetRelayoutSize(Dimension::HEIGHT));
+          actor.SetProperty(Actor::Property::POSITION_Y, bottom - mPadding.height - padding.w - DevelActor::GetRelayoutSize(actor, Dimension::HEIGHT));
         }
         else //if( cellData.verticalAlignment = VerticalAlignment::CENTER )
         {
-          actor.SetProperty(Actor::Property::POSITION_Y, (top + bottom + padding.z - padding.w - actor.GetRelayoutSize(Dimension::HEIGHT)) * 0.5f);
+          actor.SetProperty(Actor::Property::POSITION_Y, (top + bottom + padding.z - padding.w - DevelActor::GetRelayoutSize(actor, Dimension::HEIGHT)) * 0.5f);
         }
       }
     }
@@ -1711,7 +1711,7 @@ void TableView::CalculateFitSizes(RowColumnArray& data, Dimension::Type dimensio
         {
           if(FitToChild(actor, dimension) && (dimension == Dimension::WIDTH) ? (cellData.position.columnSpan == 1) : (cellData.position.rowSpan == 1))
           {
-            maxActorHeight = Max(maxActorHeight, actor.GetRelayoutSize(dimension) + cellPadding.x + cellPadding.y);
+            maxActorHeight = Max(maxActorHeight, DevelActor::GetRelayoutSize(actor, dimension) + cellPadding.x + cellPadding.y);
           }
         }
       }

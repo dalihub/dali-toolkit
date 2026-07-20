@@ -65,10 +65,10 @@ the height of the root actor will fit to the height of the child image.
 
 @code
 Actor rootActor = Actor::New();
-rootActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-rootActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(rootActor,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(rootActor,  ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 Toolkit::ImageView image = Toolkit::ImageView::New( MY_IMAGE_PATH );
-image.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+DevelActor::SetResizePolicy(image,  ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 rootActor.Add( image );
 @endcode
 
@@ -88,8 +88,8 @@ is a text view that wraps its text. The following example snippet shows a text v
 contents and then determines its height based on the width.
 @code
 TextLabel text = TextLabel::New( "Example" );
-text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(text,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(text,  ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 @endcode
 
 <h3>Specifying Sizes and Size Limits</h3>
@@ -127,30 +127,30 @@ mPopup.SetTitle( "Warning" );
 
 // Content
 Toolkit::TableView content = Toolkit::TableView::New( 2, 2 );
-content.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-content.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(content,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(content,  ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 content.SetFitHeight( 0 );
 content.SetFitHeight( 1 );
 content.SetProperty( DevelActor::Property::PADDING, Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
 
 // Text
 Toolkit::TextLabel text = Toolkit::TextLabel::New( "Do you really want to quit?" );
-text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(text,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(text,  ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
 content.AddChild( text, Toolkit::TableView::CellPosition( 0, 0 ) );
 
 // Image
 Toolkit::ImageView image = Toolkit::ImageView::New( IMAGE_PATH );
-image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-image.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(image,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(image,  ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 image.SetProperty( DevelActor::Property::PADDING, Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 content.AddChild( image, Toolkit::TableView::CellPosition( 0, 1 ) );
 
 // Checkbox and text
 Toolkit::TableView root = Toolkit::TableView::New( 1, 2 );
-root.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-root.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(root,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(root,  ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 root.SetFitHeight( 0 );
 root.SetFitWidth( 0 );
 root.SetProperty( DevelActor::Property::PADDING, Padding( 0.0f, 0.0f, 0.0f, 20.0f ) );
@@ -182,8 +182,8 @@ The content table view is set to ResizePolicy::FILL_TO_PARENT for its width and 
 in the table view expanding its width to fit the available space in the popup while also expanding/contracting its
 height based on the size of the contents in its cells.
 @code
-content.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-content.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(content,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(content,  ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
 To add a little space around the left, right and bottom of the table view, some padding is added.
 @code
@@ -193,14 +193,14 @@ The first text view has its width set to ResizePolicy::FILL_TO_PARENT and its he
 will result in a text view that fills up its width to available space in the table cell and then then calculates its
 height based on its new width. The table view will then fit its height taking the height of the text view into account.
 @code
-text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(text,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(text,  ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 @endcode
 The image view performs a similar relayout. It fits its width to the size of the cell and calculates its height based on the new
 width. Some padding is added to the left of it as well to center it more.
 @code
-image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-image.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(image,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(image,  ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 image.SetProperty( DevelActor::Property::PADDING, Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 @endcode
 The sub table view is similar as well in that it expands its width to the size of its cell. When it is added to the table view it
@@ -208,12 +208,12 @@ will span two columns. Its height is set to natural size so that it will grow or
 a container like table view, USE_NATURAL_SIZE acts in a similar manner to ResizePolicy::FIT_TO_CHILDREN in that the size of the container could
 grow or shrink based on the sizes of the child actors.
 @code
-root.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-root.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(root,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(root,  ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
 The checkbox is set to have a fixed size.
 @code
-checkBox.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+DevelActor::SetResizePolicy(checkBox,  ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 @endcode
 The second text view has not specified a resize policy so will use its default of USE_NATURAL_SIZE.
 

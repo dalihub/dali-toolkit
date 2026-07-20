@@ -2765,7 +2765,7 @@ int utcDaliTextEditorEvent06(void)
   application.SendNotification();
   application.Render();
 
-  float layoutHeight = editor.GetHeightForWidth(100.f);
+  float layoutHeight = DevelActor::GetHeightForWidth(editor, 100.f);
 
   // Add  another script characters ( glyph height is defferent )
   application.ProcessEvent(GenerateKey("d", "", "ㅁ", KEY_D_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
@@ -2775,7 +2775,7 @@ int utcDaliTextEditorEvent06(void)
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
-  DALI_TEST_EQUALS(layoutHeight, editor.GetHeightForWidth(100.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(layoutHeight, DevelActor::GetHeightForWidth(editor, 100.f), TEST_LOCATION);
 
   // Render and notify
   application.SendNotification();
@@ -4325,7 +4325,7 @@ int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountScrollingCase(void)
   //Failed case is the GetHeightForWidth change LineCount then the scrollor will not arrive to latest line
   //GetHeightForWidth is a retrieval method which should not modify object
   lineCountBefore = textEditor.GetProperty<int>(TextEditor::Property::LINE_COUNT);
-  textEditor.GetHeightForWidth(200.f);
+  DevelActor::GetHeightForWidth(textEditor, 200.f);
 
   //This is to simulate focus into text editor after calling GetHeightForWidth
   //Create a tap event to touch the text editor.
@@ -4372,7 +4372,7 @@ int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountLineWrapCharCase(voi
   //Failed case is the GetHeightForWidth change LineCount which make position of cursor invalid in TextEditor
   //GetHeightForWidth is a retrieval method which should not modify object
   lineCountBefore = textEditor.GetProperty<int>(TextEditor::Property::LINE_COUNT);
-  textEditor.GetHeightForWidth(200.f);
+  DevelActor::GetHeightForWidth(textEditor, 200.f);
 
   //This is to simulate focus into text editor after calling GetHeightForWidth
   //Create a tap event to touch the text editor.

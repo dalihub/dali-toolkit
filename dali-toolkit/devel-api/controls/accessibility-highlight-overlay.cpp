@@ -54,7 +54,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CON
 Dali::Actor CreateOverlayActor()
 {
   auto actor = Control::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   actor.SetProperty(Actor::Property::NAME, OVERLAY_NAME);
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
@@ -72,7 +72,7 @@ Dali::Actor CreateOverlayHighlightActor()
 
   auto actor = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
   actor.SetProperty(Actor::Property::NAME, HIGHLIGHT_NAME);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
   return actor;
 }

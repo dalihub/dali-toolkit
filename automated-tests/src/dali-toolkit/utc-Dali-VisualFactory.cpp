@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry.h>
@@ -1374,7 +1375,7 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
   dummyImpl.SetLayout(DummyControl::Property::TEST_VISUAL, transformMap);
-  dummy.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(dummy, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   dummy.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   application.GetScene().Add(dummy);
 
@@ -1568,7 +1569,7 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
 
   DummyControl      actor     = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS); // Only rasterizes when it knows control size.
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS); // Only rasterizes when it knows control size.
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
   application.GetScene().Add(actor);
 

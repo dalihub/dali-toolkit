@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/string-utils.h>
@@ -517,9 +518,9 @@ int UtcDaliControlTestParameters(void)
   application.Render();
 
   float width  = 640.0f;
-  float height = test.GetHeightForWidth(width);
+  float height = DevelActor::GetHeightForWidth(test, width);
   DALI_TEST_EQUALS(640.0f, height, TEST_LOCATION);
-  DALI_TEST_EQUALS(640.0f, test.GetWidthForHeight(height), TEST_LOCATION);
+  DALI_TEST_EQUALS(640.0f, DevelActor::GetWidthForHeight(test, height), TEST_LOCATION);
 
   test.KeyEventSignal();
 
@@ -1191,7 +1192,7 @@ int UtcDaliControlMarginProperty(void)
   // Parent control has one ImageView as a Child.
   ImageView image = ImageView::New();
   image.SetBackgroundColor(Color::RED);
-  image.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(image, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   image.SetProperty(Control::Property::PADDING, Extents(10, 10, 10, 10));
   control.Add(image);
 

@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/string-utils.h>
@@ -674,7 +675,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     Property::Map attributes;
     tet_infoline("Test Play action");
@@ -3419,7 +3420,7 @@ int UtcDaliAnimatedVectorImageVisualFlushAction(void)
   DummyControl        dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
-  dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(dummyControl);
 

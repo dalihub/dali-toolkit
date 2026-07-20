@@ -53,26 +53,26 @@ the popup and that the desired behaviour is to fit the height of the popup to th
 void Popup::OnInitialize()
 ...
 Actor self = Self();
-self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(self,  ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 @endcode
 The popup will use a layer to place its content in. The layer is created and specified to fill the whole screen by using the following command.
 @code
-mLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+DevelActor::SetResizePolicy(mLayer,  ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 @endcode
 A half transparent backing image is added to the layer and told to fill the layer with the following.
 @code
-mBacking.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+DevelActor::SetResizePolicy(mBacking,  ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 @endcode
 The popup control is added to the layer and a background image is specified to fill the size of the popup and add a border by the following.
 @code
-mBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
+DevelActor::SetResizePolicy(mBackgroundImage,  ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
 Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
 mBackgroundImage.SetProperty( DevelActor::Property::SIZE_MODE_FACTOR, border );
 @endcode
 A table view is added to the popup to specify layout. It will fill to the width of the popup and expand/contract around its children cell heights.
 @code
-mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
-mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
+DevelActor::SetResizePolicy(mPopupLayout,  ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+DevelActor::SetResizePolicy(mPopupLayout,  ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
 Override the OnRelayout method to position and resize the buttons.
 @code
@@ -87,7 +87,7 @@ void Popup::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimens
 if( policy == ResizePolicy::FIT_TO_CHILDREN )
 {
   // Make content fit to children
-  mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, dimension );
+  DevelActor::SetResizePolicy(mPopupLayout,  ResizePolicy::USE_NATURAL_SIZE, dimension );
   if( dimension & Dimension::HEIGHT )
   {
     mPopupLayout.SetFitHeight( 1 );
@@ -95,7 +95,7 @@ if( policy == ResizePolicy::FIT_TO_CHILDREN )
 }
 else
 {
-  mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, dimension );
+  DevelActor::SetResizePolicy(mPopupLayout,  ResizePolicy::FILL_TO_PARENT, dimension );
   // Make the content cell fill the whole of the available space
   if( dimension & Dimension::HEIGHT )
   {
