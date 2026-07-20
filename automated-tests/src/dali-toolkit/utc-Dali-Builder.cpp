@@ -1888,7 +1888,7 @@ int UtcDaliBuilderTypeCasts(void)
   application.Render();
 
   Actor createdActor = rootActor.GetChildAt(0);
-  DALI_TEST_EQUALS(createdActor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE), Vector2(100.0f, 15.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(createdActor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE), Vector2(100.0f, 15.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(createdActor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(100.0f, 10.0f, 1.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(createdActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(0.5f, 0.5f, 0.5f, 1.0f), TEST_LOCATION);
   DALI_TEST_EQUALS(createdActor.GetProperty<bool>(Actor::Property::SENSITIVE), false, TEST_LOCATION);

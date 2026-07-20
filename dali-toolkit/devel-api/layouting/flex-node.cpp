@@ -18,6 +18,7 @@
 #include "flex-node.h"
 
 //EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/actor.h>
@@ -120,8 +121,8 @@ Node* Node::AddChild(Actor child, Extents margin, MeasureCallback measureFunctio
     childNode->mImpl->mMeasureCallback = measureFunction;
 
     childNode->mImpl->mActor = child;
-    Vector2 minumumSize      = child.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE);
-    Vector2 maximumSize      = child.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE);
+    Vector2 minumumSize      = child.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE);
+    Vector2 maximumSize      = child.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE);
 
     YGNodeStyleSetMaxWidth(childNode->mImpl->mYogaNode, maximumSize.width);
     YGNodeStyleSetMaxHeight(childNode->mImpl->mYogaNode, maximumSize.height);

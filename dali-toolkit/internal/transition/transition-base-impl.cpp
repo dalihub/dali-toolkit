@@ -46,8 +46,8 @@ Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
   propertyMap.Insert(Dali::Actor::Property::INHERIT_ORIENTATION, control[Dali::Actor::Property::INHERIT_ORIENTATION]);
   propertyMap.Insert(Dali::Actor::Property::INHERIT_SCALE, control[Dali::Actor::Property::INHERIT_SCALE]);
   propertyMap.Insert(Dali::Actor::Property::COLOR_MODE, control[Dali::Actor::Property::COLOR_MODE]);
-  propertyMap.Insert(Dali::Actor::Property::HEIGHT_RESIZE_POLICY, control[Dali::Actor::Property::HEIGHT_RESIZE_POLICY]);
-  propertyMap.Insert(Dali::Actor::Property::WIDTH_RESIZE_POLICY, control[Dali::Actor::Property::WIDTH_RESIZE_POLICY]);
+  propertyMap.Insert(Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY, control[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY]);
+  propertyMap.Insert(Dali::DevelActor::Property::WIDTH_RESIZE_POLICY, control[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]);
   propertyMap.Insert(Dali::Actor::Property::POSITION, control[Dali::Actor::Property::POSITION]);
   propertyMap.Insert(Dali::Actor::Property::ORIENTATION, control[Dali::Actor::Property::ORIENTATION]);
   propertyMap.Insert(Dali::Actor::Property::SCALE, control[Dali::Actor::Property::SCALE]);
@@ -145,12 +145,12 @@ void TransitionBase::Play()
   Vector4 targetColor = DevelActor::GetWorldColor(mTarget);
 
   mTarget[Dali::Actor::Property::PIVOT]               = Pivot::CENTER;
-  mTarget[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
+  mTarget[Dali::Actor::Property::PARENT_ORIGIN]       = ParentOrigin::CENTER;
   mTarget[Dali::Actor::Property::POSITION_USES_PIVOT] = true;
-  mTarget[Dali::Actor::Property::INHERIT_POSITION]           = false;
-  mTarget[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
-  mTarget[Dali::Actor::Property::INHERIT_SCALE]              = false;
-  mTarget[Dali::Actor::Property::COLOR_MODE]                 = Dali::ColorMode::USE_OWN_COLOR;
+  mTarget[Dali::Actor::Property::INHERIT_POSITION]    = false;
+  mTarget[Dali::Actor::Property::INHERIT_ORIENTATION] = false;
+  mTarget[Dali::Actor::Property::INHERIT_SCALE]       = false;
+  mTarget[Dali::Actor::Property::COLOR_MODE]          = Dali::ColorMode::USE_OWN_COLOR;
 
   mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
   mTarget[Dali::Actor::Property::SCALE]       = targetScale;

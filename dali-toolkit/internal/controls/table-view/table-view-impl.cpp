@@ -842,7 +842,7 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
         actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
         // x, y, z, w = left, right, top, bottom
-        Vector4 padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
+        Vector4 padding = actor.GetProperty<Vector4>(DevelActor::Property::PADDING);
 
         float left = (column > 0) ? mColumnData[column - 1].position : 0.f;
         float right;

@@ -823,7 +823,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         grabHandle.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
         grabHandle.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
-        grabHandle.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE);
+        grabHandle.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE);
         grabHandle.actor.Add(grabHandle.grabArea);
         grabHandle.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
@@ -894,7 +894,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         primary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         primary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
-        primary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
+        primary.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
         primary.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnHandleOneTouched);
 
@@ -939,7 +939,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         secondary.grabArea.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
         secondary.grabArea.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
-        secondary.grabArea.SetProperty(Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
+        secondary.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE);
 
         secondary.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnHandleTwoTouched);
 
