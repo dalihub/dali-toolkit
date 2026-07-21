@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/size-negotiated-actor.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
@@ -65,7 +66,7 @@ class Control;
  * be disconnected automatically when the control is destroyed.
  * @SINCE_1_0.0
  */
-class DALI_TOOLKIT_API ControlImpl : public CustomActorImpl, public ConnectionTrackerInterface
+class DALI_TOOLKIT_API ControlImpl : public CustomActorImpl, public SizeNegotiatedActor, public ConnectionTrackerInterface
 {
 public:
   class Extension; ///< Forward declare future extension interface
@@ -420,48 +421,49 @@ protected: // From CustomActorImpl
    */
   void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override;
 
+protected: // From SizeNegotiatedActor
   /**
-   * @copydoc CustomActorImpl::OnRelayout()
+   * @copydoc SizeNegotiatedActor::OnRelayout()
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
-   * @copydoc CustomActorImpl::OnSetResizePolicy()
+   * @copydoc SizeNegotiatedActor::OnSetResizePolicy()
    */
   void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override;
 
   /**
-   * @copydoc CustomActorImpl::GetNaturalSize()
+   * @copydoc SizeNegotiatedActor::GetNaturalSize()
    */
   Vector3 GetNaturalSize() override;
 
   /**
-   * @copydoc CustomActorImpl::CalculateChildSize()
+   * @copydoc SizeNegotiatedActor::CalculateChildSize()
    */
   float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override;
 
   /**
-   * @copydoc CustomActorImpl::GetHeightForWidth()
+   * @copydoc SizeNegotiatedActor::GetHeightForWidth()
    */
   float GetHeightForWidth(float width) override;
 
   /**
-   * @copydoc CustomActorImpl::GetWidthForHeight()
+   * @copydoc SizeNegotiatedActor::GetWidthForHeight()
    */
   float GetWidthForHeight(float height) override;
 
   /**
-   * @copydoc CustomActorImpl::RelayoutDependentOnChildren()
+   * @copydoc SizeNegotiatedActor::RelayoutDependentOnChildren()
    */
   bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override;
 
   /**
-   * @copydoc CustomActorImpl::OnCalculateRelayoutSize()
+   * @copydoc SizeNegotiatedActor::OnCalculateRelayoutSize()
    */
   void OnCalculateRelayoutSize(Dimension::Type dimension) override;
 
   /**
-   * @copydoc CustomActorImpl::OnLayoutNegotiated()
+   * @copydoc SizeNegotiatedActor::OnLayoutNegotiated()
    */
   void OnLayoutNegotiated(float size, Dimension::Type dimension) override;
 
