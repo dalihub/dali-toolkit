@@ -283,7 +283,7 @@ struct AtlasRenderer::Impl
     else
     {
       // We have 2+ copies of the same glyph
-      mGlyphManager.AdjustReferenceCount(glyph.fontId, glyph.index, style, 1); //increment
+      mGlyphManager.AdjustReferenceCount(glyph.fontId, slot.mImageId, 1); //increment
     }
   }
 
@@ -824,11 +824,13 @@ struct AtlasRenderer::Impl
   {
     for(Vector<TextCacheEntry>::Iterator oldTextIter = mTextCache.Begin(); oldTextIter != mTextCache.End(); ++oldTextIter)
     {
-      AtlasGlyphManager::GlyphStyle style;
-      style.outline  = oldTextIter->mOutlineWidth;
-      style.isItalic = oldTextIter->isItalic;
-      style.isBold   = oldTextIter->isBold;
-      mGlyphManager.AdjustReferenceCount(oldTextIter->mFontId, oldTextIter->mIndex, style, -1 /*decrement*/);
+      if(oldTextIter->mImageId != 0u)
+      {
+        mGlyphManager.AdjustReferenceCount(
+          oldTextIter->mFontId,
+          oldTextIter->mImageId,
+          -1 /*decrement*/);
+      }
     }
     mTextCache.Resize(0);
   }
