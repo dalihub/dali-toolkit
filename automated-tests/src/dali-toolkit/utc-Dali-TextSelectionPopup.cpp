@@ -19,7 +19,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/string-utils.h>
+
 #include <stdlib.h>
 #include <iostream>
 
@@ -182,17 +184,17 @@ int UtcDaliToolkitTextSelectionToolBarP(void)
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
   option.SetProperty(Dali::Actor::Property::NAME, "test-option");
-  option.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(option, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   toolbar.AddOption(option);
 
   Toolkit::Control divider = Toolkit::Control::New();
   divider.SetProperty(Actor::Property::SIZE, Vector2(2.0f, 0.0f));
-  divider.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(divider, ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
   toolbar.AddDivider(divider);
 
   Toolkit::PushButton option2 = Toolkit::PushButton::New();
   option2.SetProperty(Dali::Actor::Property::NAME, "test-option-2");
-  option2.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(option2, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   toolbar.AddOption(option2);
 
   Size newSize = Size(3.0f, 0.0f);
@@ -213,7 +215,7 @@ int UtcDaliToolkitTextSelectionToolBarScrollBarP(void)
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
   option.SetProperty(Dali::Actor::Property::NAME, "test-option");
-  option.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(option, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   toolbar.AddOption(option);
 
   // Add a scroll-bar

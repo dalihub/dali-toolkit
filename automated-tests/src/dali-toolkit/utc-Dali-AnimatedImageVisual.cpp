@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
@@ -312,7 +313,7 @@ int UtcDaliAnimatedImageVisualReloadAction01(void)
   Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-  dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(dummyControl);
 
   application.SendNotification();
@@ -727,7 +728,7 @@ int UtcDaliAnimatedImageVisualImageLoadingFail01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -773,7 +774,7 @@ int UtcDaliAnimatedImageVisualImageLoadingFail02(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
 
@@ -825,7 +826,7 @@ int UtcDaliAnimatedImageVisualImageLoadingFail03(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
 
@@ -900,7 +901,7 @@ int UtcDaliAnimatedImageVisualImageLoadingFail04(void)
         Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
         dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-        dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+        DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
         DALI_TEST_EQUALS(dummyControl.GetRendererCount(), 0u, TEST_LOCATION);
 
@@ -1061,7 +1062,7 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -1134,7 +1135,7 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -1196,7 +1197,7 @@ int UtcDaliAnimatedImageVisualSynchronousLoadingWithAlphaMask02(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -1253,7 +1254,7 @@ int UtcDaliAnimatedImageVisualJumpToAction(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(20);
@@ -1326,7 +1327,7 @@ int UtcDaliAnimatedImageVisualStopBehavior(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(20);
@@ -1397,7 +1398,7 @@ int UtcDaliAnimatedImageVisualStopBehavior02(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     tet_infoline("Ready the visual after the visual is on stage");
@@ -1469,7 +1470,7 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1578,7 +1579,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1629,7 +1630,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask02(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     Property::Map attributes;
@@ -1682,7 +1683,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask03(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1733,7 +1734,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask04(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1787,7 +1788,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask05(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1842,7 +1843,7 @@ int UtcDaliAnimatedImageVisualAnimatedImageWithAlphaMask06(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
 
     application.SendNotification();
@@ -1897,7 +1898,7 @@ int UtcDaliAnimatedImageVisualMultiImage01(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(16);
@@ -2013,7 +2014,7 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
     visual.Reset();
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(16);
@@ -2067,7 +2068,7 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
     visual.Reset();
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(16);
@@ -2151,7 +2152,7 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
     DummyControl        dummyControl1 = DummyControl::New(true);
     Impl::DummyControl& dummyImpl1    = static_cast<Impl::DummyControl&>(dummyControl1.GetImplementation());
     dummyImpl1.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual1);
-    dummyControl1.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl1, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl1);
 
     application.SendNotification();
@@ -2167,7 +2168,7 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
     DummyControl        dummyControl2        = DummyControl::New(true);
     Impl::DummyControl& dummyImpl2           = static_cast<Impl::DummyControl&>(dummyControl2.GetImplementation());
     dummyImpl2.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual2);
-    dummyControl2.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl2, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl2);
     application.SendNotification();
     application.Render(16);
@@ -2231,7 +2232,7 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(16);
@@ -2320,7 +2321,7 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(dummyControl);
     application.SendNotification();
     application.Render(16);
@@ -2423,7 +2424,7 @@ int UtcDaliAnimatedImageVisualExternalImage01(void)
       Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
       dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-      dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
       application.GetScene().Add(dummyControl);
       application.SendNotification();
       application.Render(16);
@@ -2539,7 +2540,7 @@ int UtcDaliAnimatedImageVisualExternalMultiImage01(void)
       Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
       dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
 
-      dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
       application.GetScene().Add(dummyControl);
       application.SendNotification();
       application.Render(16);
@@ -2797,7 +2798,7 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
 
     TestLoopCount(application, dummyControl, 4, 0, true, TEST_LOCATION);
@@ -2867,7 +2868,7 @@ int UtcDaliAnimatedImageVisualLoopCountMultiImage01(void)
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
 
     TestLoopCount(application, dummyControl, 5, 0, true, TEST_LOCATION);
@@ -2940,7 +2941,7 @@ int UtcDaliAnimatedImageVisualLoopCountMultiImage02(void)
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     DevelControl::VisualEventSignal(dummyControl).Connect(&VisualEventSignal);
 
     TestLoopCount(application, dummyControl, 5, 0, loadFile, TEST_LOCATION);
@@ -3014,7 +3015,7 @@ int UtcDaliAnimatedImageVisualPlayback(void)
     DummyControl        dummyControl = DummyControl::New(true);
     Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
-    dummyControl.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     textureTrace.Enable(true);
     application.GetScene().Add(dummyControl);

@@ -2376,7 +2376,7 @@ int UtcDaliGradientVisualTextureFormat(void)
     Property::Map().Add(Toolkit::Visual::Property::TYPE, Visual::GRADIENT).Add(GradientVisual::Property::START_POSITION, Vector2(-0.5f, -0.5f)).Add(GradientVisual::Property::END_POSITION, Vector2(0.5f, 0.5f)).Add(GradientVisual::Property::STOP_COLOR, Property::Array().Add(Color::RED).Add(Vector4(1.0f, 1.0f, 1.0f, 0.5f))));
 
   DummyControl control = DummyControl::New(true);
-  control.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(control, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(control);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(control.GetImplementation());

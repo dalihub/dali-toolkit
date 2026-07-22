@@ -42,6 +42,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 
@@ -1075,8 +1076,8 @@ int UtcDaliImageViewHeightForWidthBackground(void)
 
   Control control = Control::DownCast(imageView);
   DALI_TEST_CHECK(control);
-  DALI_TEST_EQUALS(imageView.GetHeightForWidth(123.f), control.GetHeightForWidth(123.f), TEST_LOCATION);
-  DALI_TEST_EQUALS(imageView.GetWidthForHeight(321.f), control.GetWidthForHeight(321.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetHeightForWidth(imageView, 123.f), DevelActor::GetHeightForWidth(control, 123.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetWidthForHeight(imageView, 321.f), DevelActor::GetWidthForHeight(control, 321.f), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1104,8 +1105,8 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetHeightForWidth(width), (float)height, TEST_LOCATION);
-  DALI_TEST_EQUALS(imageView.GetWidthForHeight(height), (float)width, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetHeightForWidth(imageView, width), (float)height, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetWidthForHeight(imageView, height), (float)width, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1460,11 +1461,11 @@ int UtcDaliImageViewReplaceImageAndGetNaturalSize(void)
 
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New(TEST_IMAGE_1);
-  imageView.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(imageView, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   DummyControl        dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl    = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-  dummyControl.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(dummyControl, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
 
   dummyControl.Add(imageView);
   dummyImpl.SetRelayoutCallback(&OnRelayoutOverride);

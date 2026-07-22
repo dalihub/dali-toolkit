@@ -896,7 +896,7 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
     mFocusIndicatorActor           = Toolkit::ImageView::New(Dali::Integration::ToDaliString(imageDirPath + FOCUS_BORDER_IMAGE_FILE_NAME));
 
     // Apply size constraint to the focus indicator
-    mFocusIndicatorActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(mFocusIndicatorActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   }
 
   mFocusIndicatorActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);

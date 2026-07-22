@@ -604,8 +604,8 @@ void TextEditor::OnInitialize()
   mDecorator->SetScrollSpeed(DEFAULT_SCROLL_SPEED);
 
   // Fill-parent area by default
-  self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
-  self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
   self.SceneConnectedSignal().Connect(this, &TextEditor::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
@@ -622,7 +622,7 @@ void TextEditor::OnInitialize()
 
   // Enable the clipping property.
   mStencil.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  mStencil.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mStencil, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   self.Add(mStencil);
   if(mCursorLayer)
@@ -1209,8 +1209,8 @@ void TextEditor::UpdateScrollBar()
     mScrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
     mScrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
     mScrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
-    mScrollBar.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
-    mScrollBar.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH);
+    DevelActor::SetResizePolicy(mScrollBar, ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+    DevelActor::SetResizePolicy(mScrollBar, ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH);
 
     // Register the scroll position property
     Property::Index propertyScrollPosition = self.RegisterProperty(SCROLL_BAR_POSITION, scrollPosition);

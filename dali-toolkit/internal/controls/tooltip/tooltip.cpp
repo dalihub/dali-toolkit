@@ -477,7 +477,7 @@ bool Tooltip::OnTimeout()
     mPopup = Toolkit::Popup::New();
 
     // General set up of popup
-    mPopup.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(mPopup, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
     mPopup.SetProperty(Toolkit::Popup::Property::CONTEXTUAL_MODE, "NON_CONTEXTUAL");
     mPopup.SetProperty(Toolkit::Popup::Property::ANIMATION_MODE, "NONE");
     mPopup.SetProperty(Toolkit::Popup::Property::BACKING_ENABLED, false);  // Disable the dimmed backing.
@@ -533,7 +533,7 @@ bool Tooltip::OnTimeout()
       }
 
       Toolkit::TableView tableView = Toolkit::TableView::New(rows, columns);
-      tableView.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+      DevelActor::SetResizePolicy(tableView, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
       for(unsigned int currentContent = 0, currentRow = 0; currentRow < rows && currentContent < visuals; ++currentRow)
       {
@@ -578,8 +578,8 @@ void Tooltip::OnRelayout(Actor actor)
 {
   if(mPopup && actor)
   {
-    float popupWidth  = actor.GetRelayoutSize(Dimension::WIDTH);
-    float popupHeight = actor.GetRelayoutSize(Dimension::HEIGHT);
+    float popupWidth  = DevelActor::GetRelayoutSize(actor, Dimension::WIDTH);
+    float popupHeight = DevelActor::GetRelayoutSize(actor, Dimension::HEIGHT);
     float tailHeight  = 0.0f;
     Actor tail;
 
@@ -591,7 +591,7 @@ void Tooltip::OnRelayout(Actor actor)
         tail = actor.GetChildAt(0);
         if(tail)
         {
-          tailHeight = tail.GetRelayoutSize(Dimension::HEIGHT);
+          tailHeight = DevelActor::GetRelayoutSize(tail, Dimension::HEIGHT);
         }
       }
     }
@@ -621,7 +621,7 @@ void Tooltip::OnRelayout(Actor actor)
         if(control)
         {
           Vector3 worldPos = control.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
-          float   height   = control.GetRelayoutSize(Dimension::HEIGHT);
+          float   height   = DevelActor::GetRelayoutSize(control, Dimension::HEIGHT);
 
           position.x = windowSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
           position.y = windowSize.height * 0.5f + worldPos.y - height * 0.5f - popupHeight * 1.0f - tailHeight;
@@ -635,7 +635,7 @@ void Tooltip::OnRelayout(Actor actor)
         if(control)
         {
           Vector3 worldPos = control.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION);
-          float   height   = control.GetRelayoutSize(Dimension::HEIGHT);
+          float   height   = DevelActor::GetRelayoutSize(control, Dimension::HEIGHT);
 
           position.x = windowSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
           position.y = windowSize.height * 0.5f + worldPos.y + height * 0.5f + tailHeight;

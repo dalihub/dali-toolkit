@@ -58,6 +58,13 @@ AtlasGlyphManager AtlasGlyphManager::Get()
       singletonService.Register(typeid(manager), manager);
     }
   }
+
+  // Ensure locale changed signal connection is established
+  if(manager)
+  {
+    GetImplementation(manager).EnsureLocaleChangedConnection();
+  }
+
   return manager;
 }
 
@@ -116,9 +123,14 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return GetImplementation(*this).GetMetrics();
 }
 
-void AtlasGlyphManager::AdjustReferenceCount(Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta)
+void AtlasGlyphManager::AdjustReferenceCount(Text::FontId fontId, uint32_t imageId, int32_t delta)
 {
-  GetImplementation(*this).AdjustReferenceCount(fontId, index, style, delta);
+  GetImplementation(*this).AdjustReferenceCount(fontId, imageId, delta);
+}
+
+void AtlasGlyphManager::InvalidateGlyphCache()
+{
+  GetImplementation(*this).InvalidateGlyphCache();
 }
 
 } // namespace Toolkit

@@ -666,7 +666,7 @@ void ScrollView::OnInitialize()
 
   mInternalActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mInternalActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  mInternalActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mInternalActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   mAlterChild = true;
 

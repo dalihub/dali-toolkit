@@ -51,6 +51,11 @@ enum Type
   SET_DYNAMIC_PROPERTY = DevelAnimatedImageVisual::Action::ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX, ///< Set the dynamic property.
 
   FLUSH, ///< Flush animation data. It will make ensure that changeness of animated vector image properties flushed.
+
+  REFRESH_DYNAMIC_PROPERTY, ///< Force previously set dynamic properties to be re-evaluated at the
+                            ///< current frame, without changing which frame is displayed. Useful
+                            ///< while the animation is paused or stopped, where JUMP_TO for the
+                            ///< same frame number would otherwise be a no-op.
 };
 
 } // namespace Action

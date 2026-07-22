@@ -524,8 +524,8 @@ void TextField::OnInitialize()
   mDecorator->FlipHandleVertically(LEFT_SELECTION_HANDLE, true);
 
   // Fill-parent area by default
-  self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
-  self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
   self.SceneConnectedSignal().Connect(this, &TextField::OnSceneConnect);
 
   DevelControl::SetInputMethodContext(*this, mInputMethodContext);
@@ -1142,7 +1142,7 @@ void TextField::EnableClipping()
 
     // Enable the clipping property.
     mStencil.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-    mStencil.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(mStencil, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
     Self().Add(mStencil);
     if(mCursorLayer)

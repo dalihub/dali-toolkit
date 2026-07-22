@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
@@ -638,7 +639,7 @@ int UtcDaliToolkitScrollModeP1(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -707,7 +708,7 @@ int UtcDaliToolkitScrollModeP2(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -765,7 +766,7 @@ int UtcDaliToolkitScrollModeP3(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -822,7 +823,7 @@ int UtcDaliToolkitScrollModeP4(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
@@ -2804,7 +2805,7 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -3026,7 +3027,7 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
 
   // Do not rely on stage size for UTC tests.
   Vector2 viewPageSize(720.0f, 1280.0f);
-  scrollView.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(scrollView, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   scrollView.SetProperty(Actor::Property::SIZE, viewPageSize);
   scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);

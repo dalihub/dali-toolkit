@@ -514,8 +514,8 @@ void FlexContainer::OnRelayout(const Vector2& size, RelayoutContainer& container
       }
       child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
-      float negotiatedWidth  = child.GetRelayoutSize(Dimension::WIDTH);
-      float negotiatedHeight = child.GetRelayoutSize(Dimension::HEIGHT);
+      float negotiatedWidth  = DevelActor::GetRelayoutSize(child, Dimension::WIDTH);
+      float negotiatedHeight = DevelActor::GetRelayoutSize(child, Dimension::HEIGHT);
 
       if(negotiatedWidth > 0)
       {
@@ -543,13 +543,13 @@ void FlexContainer::OnRelayout(const Vector2& size, RelayoutContainer& container
       {
         // Only Set to USE_ASSIGNED_SIZE if the child actor is flexible.
 
-        if(child.GetResizePolicy(Dimension::WIDTH) != ResizePolicy::USE_ASSIGNED_SIZE)
+        if(DevelActor::GetResizePolicy(child, Dimension::WIDTH) != ResizePolicy::USE_ASSIGNED_SIZE)
         {
-          child.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
+          DevelActor::SetResizePolicy(child, ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH);
         }
-        if(child.GetResizePolicy(Dimension::HEIGHT) != ResizePolicy::USE_ASSIGNED_SIZE)
+        if(DevelActor::GetResizePolicy(child, Dimension::HEIGHT) != ResizePolicy::USE_ASSIGNED_SIZE)
         {
-          child.SetResizePolicy(ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT);
+          DevelActor::SetResizePolicy(child, ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT);
         }
       }
       container.Add(child, Vector2(YGNodeLayoutGetWidth(mChildrenNodes[i].node), YGNodeLayoutGetHeight(mChildrenNodes[i].node)));
@@ -611,10 +611,10 @@ void FlexContainer::ComputeLayout()
       Actor     childActor = mChildrenNodes[i].actor.GetHandle();
 
       // Intialize the style of the child.
-      YGNodeStyleSetMinWidth(childNode, childActor.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE).x);
-      YGNodeStyleSetMinHeight(childNode, childActor.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE).y);
-      YGNodeStyleSetMaxWidth(childNode, childActor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).x);
-      YGNodeStyleSetMaxHeight(childNode, childActor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).y);
+      YGNodeStyleSetMinWidth(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE).x);
+      YGNodeStyleSetMinHeight(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE).y);
+      YGNodeStyleSetMaxWidth(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).x);
+      YGNodeStyleSetMaxHeight(childNode, childActor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).y);
 
       // Check child properties on the child for how to layout it.
       // These properties should be dynamically registered to the child which
@@ -680,7 +680,7 @@ void FlexContainer::ComputeLayout()
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint(mRootNode.node, (YGPrintOptions)(YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren));
 #endif
-    YGNodeCalculateLayout(mRootNode.node, Self().GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).x, Self().GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE).y, nodeLayoutDirection);
+    YGNodeCalculateLayout(mRootNode.node, Self().GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).x, Self().GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE).y, nodeLayoutDirection);
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint(mRootNode.node, (YGPrintOptions)(YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren));
 #endif

@@ -172,14 +172,27 @@ public:
   const Metrics& GetMetrics();
 
   /**
-   * @brief Adjust the reference count for glyph
+   * @brief Adjusts the reference count of an atlas glyph image.
    *
-   * @param[in] fontId The font this image came from
-   * @param[in] index The index of the glyph
-   * @param[in] style The style of this glyph
-   * @param[in] delta The adjustment to make to the reference count
+   * The font ID limits the lookup to matching font records, while the image ID
+   * identifies the exact atlas image across cache generations. When the
+   * reference count reaches zero, the image and glyph record are removed.
+   *
+   * @param[in] fontId The font identifier used to narrow the lookup.
+   * @param[in] imageId The exact atlas image identifier.
+   * @param[in] delta The value added to the current reference count.
    */
-  void AdjustReferenceCount(Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta);
+  void AdjustReferenceCount(Text::FontId fontId, uint32_t imageId, int32_t delta);
+
+  /**
+   * @brief Invalidates cached glyph lookup identities.
+   *
+   * Increments the cache generation, causing subsequent glyph lookups to not reuse
+   * records created before this call. Existing atlas images remain alive while referenced
+   * by active renderers and are removed when their reference count reaches 0.
+   * This should be called when a font cache reset is needed (e.g., on locale change).
+   */
+  void InvalidateGlyphCache();
 
 public:
   // Default copy and move operator

@@ -83,7 +83,7 @@ Dali::Actor CreateHighlightIndicatorActor()
   // Create the default if it hasn't been set and one that's shared by all the
   // keyboard focusable actors
   auto actor = Toolkit::ImageView::New(ToDaliString(focusBorderImagePath));
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
@@ -588,7 +588,7 @@ bool ControlAccessible::GrabHighlight()
   // Need to set resize policy again, to update SIZE property which is set by
   // NUIViewAccessible. The highlight could move from NUIViewAccessible to
   // ControlAccessible. In this case, highlight has incorrect size.
-  highlight.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(highlight, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Remember the highlight actor, so that when the default is changed with
   // SetHighlightActor(), the currently displayed highlight can still be cleared.

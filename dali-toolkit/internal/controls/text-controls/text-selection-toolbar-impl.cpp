@@ -19,12 +19,13 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cfloat>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
+#include <cfloat>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -186,8 +187,8 @@ void TextSelectionToolbar::SetPopupMaxSize(const Size& maxSize)
   mMaxSize = maxSize;
   if(mScrollView && mToolbarActor)
   {
-    mScrollView.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
-    mToolbarActor.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
+    mScrollView.SetProperty(DevelActor::Property::MAXIMUM_SIZE, mMaxSize);
+    mToolbarActor.SetProperty(DevelActor::Property::MAXIMUM_SIZE, mMaxSize);
   }
 }
 
@@ -199,7 +200,7 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
 void TextSelectionToolbar::SetUpScrollView()
 {
   mScrollView.SetProperty(Dali::Actor::Property::NAME, "TextSelectionScrollView");
-  mScrollView.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mScrollView, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   mScrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
   mScrollView.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
 
@@ -222,11 +223,11 @@ void TextSelectionToolbar::SetUp()
 {
   Actor self = Self();
 
-  self.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(self, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
 
   // Create Actor to house the toolbar.
   mToolbarActor = Actor::New();
-  mToolbarActor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(mToolbarActor, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   mToolbarActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   mToolbarActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
@@ -265,7 +266,7 @@ void TextSelectionToolbar::SetUpScrollBar(bool enable)
       mScrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
       mScrollBar.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mScrollBar.SetProperty(Actor::Property::POSITION, Vector2(mScrollBarPadding.x, -mScrollBarPadding.y));
-      mScrollBar.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
+      DevelActor::SetResizePolicy(mScrollBar, Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
       mScrollBar.SetProperty(Actor::Property::ORIENTATION, Quaternion(Quaternion(Radian(1.5f * Math::PI), Vector3::ZAXIS)));
       mScrollBar.SetScrollIndicator(indicator);
       mScrollBar.GetPanGestureDetector().DetachAll();

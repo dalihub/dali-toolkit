@@ -28,8 +28,8 @@
 
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-
 using namespace Dali;
 using namespace Toolkit;
 
@@ -768,7 +768,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(pushButton, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(pushButton);
 
@@ -778,8 +778,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   // First test the size is zero.
   // No padding should be added as there is no label or icon.
   Vector2 size(Vector2::ZERO);
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button Natural Size(%f,%f)\n", pushButton.GetNaturalSize().width, pushButton.GetNaturalSize().height);
 
   DALI_TEST_EQUALS(size, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -791,8 +791,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.Render();
 
   Vector2 sizeWithLabelWithoutPadding(Vector2::ZERO);
-  sizeWithLabelWithoutPadding.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  sizeWithLabelWithoutPadding.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  sizeWithLabelWithoutPadding.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  sizeWithLabelWithoutPadding.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   tet_printf("Button RelayoutSize label without padding (%f,%f)\n", sizeWithLabelWithoutPadding.width, sizeWithLabelWithoutPadding.height);
 
@@ -802,8 +802,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.Render();
 
   Vector2 sizeLabelAndPadding(Vector2::ZERO);
-  sizeLabelAndPadding.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  sizeLabelAndPadding.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  sizeLabelAndPadding.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  sizeLabelAndPadding.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize after label padding(%f,%f)\n", sizeLabelAndPadding.width, sizeLabelAndPadding.height);
 
   // If control size has increased beyond size of just label then padding has been applied
@@ -817,7 +817,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(pushButton, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(pushButton);
 
@@ -829,8 +829,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.Render();
 
   // Size of button with just icon
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize with icon(%f,%f)\n", size.width, size.height);
 
   pushButton.SetProperty(Toolkit::PushButton::Property::ICON_PADDING, TEST_ICON_PADDING);
@@ -839,8 +839,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.Render();
   DALI_TEST_EQUALS(size, TEST_IMAGE_SIZE, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize after icon padding(%f,%f)\n", size.width, size.height);
   const Vector2 expectedIconAndPaddingSize(TEST_ICON_PADDING.x + TEST_ICON_PADDING.y + TEST_IMAGE_SIZE.width, TEST_ICON_PADDING.w + TEST_ICON_PADDING.z + TEST_IMAGE_SIZE.height);
   DALI_TEST_EQUALS(size, expectedIconAndPaddingSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -851,8 +851,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.SendNotification();
   application.Render();
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize after label added(%f,%f)\n", size.width, size.height);
 
   pushButton.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, TEST_LABEL_PADDING);
@@ -860,8 +860,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   application.SendNotification();
   application.Render();
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize after icon and label padding(%f,%f)\n", size.width, size.height);
 
   DALI_TEST_EQUALS(size.width, sizeLabelAndPadding.width + expectedIconAndPaddingSize.width, TEST_LOCATION);
@@ -914,7 +914,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
   pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(pushButton, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(pushButton);
 
@@ -925,8 +925,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   // First get the size of control with just label
   Vector2 justLabelSize(Vector2::ZERO);
-  justLabelSize.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  justLabelSize.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  justLabelSize.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  justLabelSize.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
   tet_printf("Button RelayoutSize with just label and no padding(%f,%f)\n", justLabelSize.width, justLabelSize.height);
 
   pushButton.SetProperty(Toolkit::PushButton::Property::LABEL_PADDING, TEST_LABEL_PADDING);
@@ -939,8 +939,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   expectedLabelAndPaddingSize.height = justLabelSize.height + TEST_LABEL_PADDING.w + TEST_LABEL_PADDING.z;
 
   Vector2 labelAndPaddingSize(Vector2::ZERO);
-  labelAndPaddingSize.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  labelAndPaddingSize.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  labelAndPaddingSize.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  labelAndPaddingSize.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   DALI_TEST_EQUALS(labelAndPaddingSize, expectedLabelAndPaddingSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -957,8 +957,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   application.Render();
 
   Vector2 size(Vector2::ZERO);
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   /*
    * Test Icon right alignment.
@@ -982,8 +982,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   application.SendNotification();
   application.Render();
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   /*
    * Test Icon left alignment.
@@ -1024,8 +1024,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   application.SendNotification();
   application.Render();
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   tet_printf("Natural width (%f)\n", pushButton.GetNaturalSize().width);
   tet_printf("Natural height (%f)\n", pushButton.GetNaturalSize().height);
@@ -1059,8 +1059,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   application.SendNotification();
   application.Render();
 
-  size.width  = pushButton.GetRelayoutSize(Dimension::WIDTH);
-  size.height = pushButton.GetRelayoutSize(Dimension::HEIGHT);
+  size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
+  size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
   DALI_TEST_EQUALS(size.width, (std::max(testImageWithPaddingSize.width, labelAndPaddingSize.width)), TEST_LOCATION);
   DALI_TEST_EQUALS(size.height, (testImageWithPaddingSize.height + labelAndPaddingSize.height), TEST_LOCATION);
@@ -1131,7 +1131,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
 
   pushButton.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   pushButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  pushButton.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(pushButton, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(pushButton);
   application.SendNotification();
