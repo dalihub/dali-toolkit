@@ -2,7 +2,7 @@
 #define DALI_RENDERING_ADDON_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 #include <dali/devel-api/common/addon-binder.h>
+#include <memory>
 
 namespace Dali
 {
@@ -75,15 +76,15 @@ public:
    */
   static RenderingAddOn& Get()
   {
-    static RenderingAddOn* addon = nullptr;
-    if(!addon)
+    static std::unique_ptr<RenderingAddOn> addon = []
     {
-      addon = new RenderingAddOn();
-      if(addon->IsValid())
+      auto instance = std::make_unique<RenderingAddOn>();
+      if(instance->IsValid())
       {
-        addon->Initialize();
+        instance->Initialize();
       }
-    }
+      return instance;
+    }();
     return *addon;
   }
 };
