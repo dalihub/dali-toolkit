@@ -306,7 +306,7 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::FOCUSABLE, true);
-  self.EffectiveVisibilityChangedSignal().Connect(this, &WebView::OnEffectiveVisibilityChanged);
+  Dali::DevelActor::OnSceneVisibilityChangedSignal(self).Connect(this, &WebView::OnEffectiveVisibilityChanged);
   self.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));

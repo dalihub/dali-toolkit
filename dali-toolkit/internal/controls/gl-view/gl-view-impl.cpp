@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/gl-view/gl-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
@@ -175,7 +176,7 @@ void GlView::OnInitialize()
   }
 
   // Adding VisibilityChange Signal.
-  self.EffectiveVisibilityChangedSignal().Connect(this, &GlView::OnControlEffectiveVisibilityChanged);
+  Dali::DevelActor::OnSceneVisibilityChangedSignal(self).Connect(this, &GlView::OnControlEffectiveVisibilityChanged);
 }
 
 void GlView::OnSizeSet(const Vector3& targetSize)

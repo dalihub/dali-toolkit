@@ -602,7 +602,7 @@ private: // Data
   bool mManualRendered : 1;
   bool mIsIntercepted : 1;        // whether the touch event is intercepted or not.
   bool mIsHasAnchors : 1;         // whether the text has anchors or not.
-  bool mIsVisible : 1;            // cached result of IsEffectivelyVisible().
+  bool mIsVisible : 1;            // cached result of IsOnSceneVisible().
   bool mIsVisibleInitialized : 1; // whether mIsVisible has been initialized.
 
 protected:

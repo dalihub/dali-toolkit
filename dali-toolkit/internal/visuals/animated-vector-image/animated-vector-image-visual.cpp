@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -567,7 +568,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
     mSizeNotification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition(3.0f));
     mSizeNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnSizeNotification);
 
-    actor.EffectiveVisibilityChangedSignal().Connect(this, &AnimatedVectorImageVisual::OnControlEffectiveVisibilityChanged);
+    Dali::DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(this, &AnimatedVectorImageVisual::OnControlEffectiveVisibilityChanged);
 
     if(mImpl->mEventObserver)
     {
@@ -608,7 +609,7 @@ void AnimatedVectorImageVisual::DoSetOffScene(Actor& actor)
   actor.RemovePropertyNotification(mScaleNotification);
   actor.RemovePropertyNotification(mSizeNotification);
 
-  actor.EffectiveVisibilityChangedSignal().Disconnect(this, &AnimatedVectorImageVisual::OnControlEffectiveVisibilityChanged);
+  Dali::DevelActor::OnSceneVisibilityChangedSignal(actor).Disconnect(this, &AnimatedVectorImageVisual::OnControlEffectiveVisibilityChanged);
 
   mPlacementActor.Reset();
 

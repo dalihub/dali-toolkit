@@ -1219,7 +1219,7 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   mController->SetTextElideEnabled(true); // If false then text larger than control will overflow
 
-  self.EffectiveVisibilityChangedSignal().Connect(this, &TextLabel::OnControlEffectiveVisibilityChanged);
+  Dali::DevelActor::OnSceneVisibilityChangedSignal(self).Connect(this, &TextLabel::OnControlEffectiveVisibilityChanged);
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
   if(Dali::Adaptor::IsAvailable())
@@ -1241,7 +1241,7 @@ bool TextLabel::IsVisible()
 {
   if(!mIsVisibleInitialized)
   {
-    mIsVisible            = DevelActor::IsEffectivelyVisible(Self());
+    mIsVisible            = DevelActor::IsOnSceneVisible(Self());
     mIsVisibleInitialized = true;
   }
   return mIsVisible;
