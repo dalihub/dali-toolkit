@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <locale.h>
 #include <iostream>
+#include <memory>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -130,11 +131,11 @@ int UtcDaliToolkitTextICU(void)
   label.SetProperty(DevelTextLabel::Property::RENDER_MODE, DevelTextLabel::Render::ASYNC_AUTO);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;

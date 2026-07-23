@@ -16,6 +16,7 @@
  */
 
 #include <stdlib.h>
+#include <memory>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -1435,16 +1436,16 @@ int UtcDaliPopupPropertyTypeRegistryConnectSignal(void)
   // Create the Popup actor
   Popup popup = Popup::New();
 
-  TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
+  std::unique_ptr<TestConnectionTrackerObject> testTracker = std::make_unique<TestConnectionTrackerObject>();
   // Note: The emmision of this signals has already been tested in other tests.
-  DALI_TEST_CHECK(popup.ConnectSignal(testTracker, "touchedOutside", PopupTestFunctor()));
-  DALI_TEST_CHECK(popup.ConnectSignal(testTracker, "showing", PopupTestFunctor()));
-  DALI_TEST_CHECK(popup.ConnectSignal(testTracker, "shown", PopupTestFunctor()));
-  DALI_TEST_CHECK(popup.ConnectSignal(testTracker, "hiding", PopupTestFunctor()));
-  DALI_TEST_CHECK(popup.ConnectSignal(testTracker, "hidden", PopupTestFunctor()));
+  DALI_TEST_CHECK(popup.ConnectSignal(testTracker.get(), "touchedOutside", PopupTestFunctor()));
+  DALI_TEST_CHECK(popup.ConnectSignal(testTracker.get(), "showing", PopupTestFunctor()));
+  DALI_TEST_CHECK(popup.ConnectSignal(testTracker.get(), "shown", PopupTestFunctor()));
+  DALI_TEST_CHECK(popup.ConnectSignal(testTracker.get(), "hiding", PopupTestFunctor()));
+  DALI_TEST_CHECK(popup.ConnectSignal(testTracker.get(), "hidden", PopupTestFunctor()));
 
   // Test connecting to an invalid signal does not work.
-  DALI_TEST_CHECK(!popup.ConnectSignal(testTracker, "invalid", PopupTestFunctor()));
+  DALI_TEST_CHECK(!popup.ConnectSignal(testTracker.get(), "invalid", PopupTestFunctor()));
 
   END_TEST;
 }

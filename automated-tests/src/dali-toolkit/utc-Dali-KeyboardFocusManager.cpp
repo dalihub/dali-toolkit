@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <memory>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -1313,11 +1314,11 @@ int UtcDaliKeyboardFocusManagerSignals(void)
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker, "keyboardPreFocusChange", CallbackFunctor()), TEST_LOCATION);
-  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker, "keyboardFocusChanged", CallbackFunctor()), TEST_LOCATION);
-  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker, "keyboardFocusGroupChanged", CallbackFunctor()), TEST_LOCATION);
-  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker, "keyboardFocusedActorEnterKey", CallbackFunctor()), TEST_LOCATION);
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
+  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker.get(), "keyboardPreFocusChange", CallbackFunctor()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker.get(), "keyboardFocusChanged", CallbackFunctor()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker.get(), "keyboardFocusGroupChanged", CallbackFunctor()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, manager.ConnectSignal(testTracker.get(), "keyboardFocusedActorEnterKey", CallbackFunctor()), TEST_LOCATION);
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -791,6 +791,9 @@ int UtcDaliTextLayoutMultilineText01(void)
   }
 
   tet_result(TET_PASS);
+
+  // Delete Run2 familyName storage. Note that Run1 familyName deleted at ~LogicalModel()
+  delete[] fontDescriptionRun2.familyName;
   END_TEST;
 }
 
