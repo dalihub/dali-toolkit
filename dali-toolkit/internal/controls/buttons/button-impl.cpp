@@ -24,11 +24,11 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES

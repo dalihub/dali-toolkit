@@ -23,10 +23,10 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <sstream>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
