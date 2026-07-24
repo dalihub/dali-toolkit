@@ -61,19 +61,19 @@ GlView::~GlView()
   Terminate();
 }
 
-void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void GlView::RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback)
 {
   if(mRenderThread)
   {
-    mRenderThread->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+    mRenderThread->RegisterGlCallbacks(std::move(initCallback), std::move(renderFrameCallback), std::move(terminateCallback));
   }
 }
 
-void GlView::SetResizeCallback(CallbackBase* resizeCallback)
+void GlView::SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback)
 {
   if(mRenderThread)
   {
-    mRenderThread->SetResizeCallback(resizeCallback);
+    mRenderThread->SetResizeCallback(std::move(resizeCallback));
   }
 }
 

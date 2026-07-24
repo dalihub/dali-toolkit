@@ -105,19 +105,19 @@ DrawableView::~DrawableView()
   OnTerminateCompleted();
 }
 
-void DrawableView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void DrawableView::RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback)
 {
   if(DALI_LIKELY(!mTerminateRequested.load()))
   {
-    mNativeRenderer->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+    mNativeRenderer->RegisterGlCallbacks(std::move(initCallback), std::move(renderFrameCallback), std::move(terminateCallback));
   }
 }
 
-void DrawableView::SetResizeCallback(CallbackBase* resizeCallback)
+void DrawableView::SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback)
 {
   if(DALI_LIKELY(!mTerminateRequested.load()))
   {
-    mOnResizeCallback.reset(resizeCallback);
+    mOnResizeCallback.reset(resizeCallback.release());
   }
 }
 
