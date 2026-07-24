@@ -16,6 +16,7 @@
  */
 
 #include <stdlib.h>
+#include <memory>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -180,10 +181,10 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   DALI_TEST_EQUALS(resultProperty, "sceneConnected", TEST_LOCATION);
 
   // Connect to the confirmation popup's OK signal. This signal is dynamically created upon connection.
-  gSignalReceivedOK                        = false;
-  gSignalReceivedCancel                    = false;
-  TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-  popup.ConnectSignal(testTracker, "controlSignalOk", ConfirmationPopupOKTestFunctor());
+  gSignalReceivedOK                                        = false;
+  gSignalReceivedCancel                                    = false;
+  std::unique_ptr<TestConnectionTrackerObject> testTracker = std::make_unique<TestConnectionTrackerObject>();
+  popup.ConnectSignal(testTracker.get(), "controlSignalOk", ConfirmationPopupOKTestFunctor());
 
   // Check no signal has occurred yet.
   DALI_TEST_CHECK(!gSignalReceivedOK);
@@ -202,7 +203,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED).Get(resultProperty));
   DALI_TEST_EQUALS(resultProperty, "sceneConnected", TEST_LOCATION);
 
-  popup.ConnectSignal(testTracker, "controlSignalCancel", ConfirmationPopupCancelTestFunctor());
+  popup.ConnectSignal(testTracker.get(), "controlSignalCancel", ConfirmationPopupCancelTestFunctor());
 
   // Check the cancel signal has not occurred yet.
   DALI_TEST_CHECK(gSignalReceivedOK);
@@ -244,8 +245,8 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
   gSignalReceivedOK = false;
 
   // The connection will fail at this point as no actor with the name "controlOk" will be located.
-  TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-  popup.ConnectSignal(testTracker, "controlSignalOk", ConfirmationPopupOKTestFunctor());
+  std::unique_ptr<TestConnectionTrackerObject> testTracker = std::make_unique<TestConnectionTrackerObject>();
+  popup.ConnectSignal(testTracker.get(), "controlSignalOk", ConfirmationPopupOKTestFunctor());
 
   // Check no signal has occurred yet.
   DALI_TEST_CHECK(!gSignalReceivedOK);

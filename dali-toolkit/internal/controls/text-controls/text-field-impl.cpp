@@ -1191,7 +1191,7 @@ void TextField::OnSceneConnection(int depth)
   if(window)
   {
     // Sets layoutDirection value
-    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(window.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+    Dali::LayoutDirection::Type layoutDirection = window.GetRootLayer().GetEffectiveLayoutDirection();
     mController->SetLayoutDirection(layoutDirection);
 
     // Set BoundingBox to window size if not already set.

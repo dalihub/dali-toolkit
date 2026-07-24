@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,10 @@ int UtcDaliJsonReaderStrCmp(void)
     {JSON_STRING(hellew)},
   };
   DALI_TEST_EQUAL(json::StrCmp(jstr[0], "hello"), 0);
-  DALI_TEST_EQUAL(json::StrCmp(jstr[1], "hello"), 'e' - 'o');
+
+  // return value of strncmp could be changed by the compile options.
+  int ret = json::StrCmp(jstr[1], "hello");
+  DALI_TEST_CHECK((ret == 'e' - 'o') || (ret == -1));
 
   END_TEST;
 }

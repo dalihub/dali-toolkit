@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <memory>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -2769,10 +2770,10 @@ int UtcDaliToolkitTextlabelTextFit(void)
   label.SetProperty(TextLabel::Property::TEXT, "Hello world");
 
   // connect to the text git changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
   bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
   gTextFitChangedCallBackCalled = false;
 
   // check point size
@@ -2827,10 +2828,10 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   label.SetProperty(TextLabel::Property::TEXT, "Hello world");
 
   // connect to the text git changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
   bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
   gTextFitChangedCallBackCalled = false;
 
   // check point size with veryvery big range
@@ -2867,10 +2868,10 @@ int UtcDaliToolkitTextlabelFastTextFitStressTest(void)
   label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
 
   // connect to the text git changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
   bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
   gTextFitChangedCallBackCalled = false;
 
   application.GetScene().Add(label);
@@ -2912,10 +2913,10 @@ int UtcDaliToolkitTextlabelTextFitMultiLine(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   // connect to the text git changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
   bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
   gTextFitChangedCallBackCalled = false;
 
   Property::Map textFitMapSet;
@@ -3314,10 +3315,10 @@ int UtcDaliToolkitTextlabelAnchorColor(void)
   application.GetScene().Add(label);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  label.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
@@ -3365,10 +3366,10 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
   application.GetScene().Add(label);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  label.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
@@ -4316,10 +4317,10 @@ int utcDaliTextLabelRequestUpdateManually(void)
   application.GetScene().Add(label);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  label.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");

@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <memory>
 
 #include <toolkit-async-task-manager.h>
 #include <toolkit-event-thread-callback.h>
@@ -144,11 +145,11 @@ int UtcDaliToolkitTextLabelAsyncRender01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -230,11 +231,11 @@ int UtcDaliToolkitTextLabelAsyncRender02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -332,11 +333,11 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedSize01(void)
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -417,19 +418,19 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedSize02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testSizeTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testSizeTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testSizeTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -489,11 +490,11 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth01(void)
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -582,19 +583,19 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testSizeTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testSizeTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testSizeTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -654,11 +655,11 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight01(void)
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -747,19 +748,19 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testSizeTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testSizeTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testSizeTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -819,11 +820,11 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -953,19 +954,19 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testSizeTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testSizeTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testSizeTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -1021,11 +1022,11 @@ int UtcDaliToolkitTextLabelRequestAsyncNaturalSize(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -1111,11 +1112,11 @@ int UtcDaliToolkitTextLabelRequestAsyncHeightForWidth(void)
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   // Connect to the async height for width computed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncHeightForWidthComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testTracker, "asyncHeightForWidthComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testTracker.get(), "asyncHeightForWidthComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -1215,19 +1216,19 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the text fit changed signal.
-  ConnectionTracker* testFitTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testFitTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChanged);
 
   bool textFitChanged = false;
-  label.ConnectSignal(testFitTracker, "textFitChanged", CallbackFunctor(&textFitChanged));
+  label.ConnectSignal(testFitTracker.get(), "textFitChanged", CallbackFunctor(&textFitChanged));
   gTextFitChangedCalled = false;
 
   // Request render automatically.
@@ -1380,19 +1381,19 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the text fit changed signal.
-  ConnectionTracker* testFitTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testFitTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChanged);
 
   bool textFitChanged = false;
-  label.ConnectSignal(testFitTracker, "textFitChanged", CallbackFunctor(&textFitChanged));
+  label.ConnectSignal(testFitTracker.get(), "textFitChanged", CallbackFunctor(&textFitChanged));
   gTextFitChangedCalled = false;
 
   gAsyncTextRenderedWidth  = 0.0f;
@@ -1479,19 +1480,19 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit03(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the text fit changed signal.
-  ConnectionTracker* testFitTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testFitTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChanged);
 
   bool textFitChanged = false;
-  label.ConnectSignal(testFitTracker, "textFitChanged", CallbackFunctor(&textFitChanged));
+  label.ConnectSignal(testFitTracker.get(), "textFitChanged", CallbackFunctor(&textFitChanged));
   gTextFitChangedCalled = false;
 
   gAsyncTextRenderedWidth  = 0.0f;
@@ -1610,11 +1611,11 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Request render automatically.
@@ -1727,11 +1728,11 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -1825,11 +1826,11 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll03(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Request render automatically.
@@ -1943,11 +1944,11 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll04(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -2038,11 +2039,11 @@ int UtcDaliToolkitTextLabelAsyncRenderCutout(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Request render automatically.
@@ -2113,11 +2114,11 @@ int UtcDaliToolkitTextLabelAsyncRenderHyphenation(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Request render automatically.
@@ -2187,11 +2188,11 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   label.SetProperty(TextLabel::Property::TEXT, "<color value='white'>Markup</color><color value='cyan'>Text</color>");
@@ -2298,11 +2299,11 @@ int UtcDaliToolkitTextLabelAsyncRenderMarkup02(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testRenderTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testRenderTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testRenderTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testRenderTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // underline
@@ -2400,11 +2401,11 @@ int UtcDaliToolkitTextLabelAsyncRenderTiling01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -2520,7 +2521,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   // dummy text for test.
@@ -2539,7 +2540,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   dummy2.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -2609,7 +2610,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   application.GetScene().Add(label);
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   // dummy text for test.
@@ -2628,7 +2629,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   dummy2.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -2701,7 +2702,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   application.GetScene().Add(label);
 
   // Connect to the async height for width computed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncHeightForWidthComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   // dummy text for test.
@@ -2720,7 +2721,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   dummy2.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   bool asyncSizeComputed = false;
-  label.ConnectSignal(testTracker, "asyncHeightForWidthComputed", CallbackFunctor(&asyncSizeComputed));
+  label.ConnectSignal(testTracker.get(), "asyncHeightForWidthComputed", CallbackFunctor(&asyncSizeComputed));
 
   gAsyncSizeComputedCalled = false;
   gAsyncSizeComputedWidth  = 0.0f;
@@ -2785,11 +2786,11 @@ int UtcDaliToolkitTextLabelAsyncSceneDisconnection(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -2834,11 +2835,11 @@ int UtcDaliToolkitTextLabelAsyncUnparentAndReset01(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -2917,26 +2918,26 @@ int UtcDaliToolkitTextLabelAsyncUnparentAndReset02(void)
   dummy4.SetProperty(TextLabel::Property::MULTI_LINE, true);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
   gAsyncTextRenderedCalled = false;
 
   // Connect to the async natural size computed signal.
-  ConnectionTracker* testNaturalSizeTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testNaturalSizeTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncNaturalSizeComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncNaturalSizeComputed = false;
-  label.ConnectSignal(testNaturalSizeTracker, "asyncNaturalSizeComputed", CallbackFunctor(&asyncNaturalSizeComputed));
+  label.ConnectSignal(testNaturalSizeTracker.get(), "asyncNaturalSizeComputed", CallbackFunctor(&asyncNaturalSizeComputed));
 
   // Connect to the async height for width computed signal.
-  ConnectionTracker* testHeightForWidthTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testHeightForWidthTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncHeightForWidthComputedSignal(label).Connect(&TestAsyncSizeComputed);
 
   bool asyncHeightForWidthComputed = false;
-  label.ConnectSignal(testHeightForWidthTracker, "asyncHeightForWidthComputed", CallbackFunctor(&asyncHeightForWidthComputed));
+  label.ConnectSignal(testHeightForWidthTracker.get(), "asyncHeightForWidthComputed", CallbackFunctor(&asyncHeightForWidthComputed));
 
   gAsyncSizeComputedCalled = false;
 
@@ -3011,11 +3012,11 @@ int UtcDaliToolkitTextLabelAsyncSetText(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -3137,11 +3138,11 @@ int UtcDaliToolkitTextLabelAsyncTextMultiline(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -3378,11 +3379,11 @@ int UtcDaliToolkitTextLabelAsyncFontVariations(void)
   DALI_TEST_CHECK(label.GetProperty(fontVariationsIndex).Get<float>() == WGHT_VALUE);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;
@@ -3426,11 +3427,11 @@ int UtcDaliToolkitTextLabelAsyncRenderScale(void)
   application.GetScene().Add(label);
 
   // Connect to the async text rendered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextLabel::AsyncTextRenderedSignal(label).Connect(&TestAsyncTextRendered);
 
   bool asyncTextRendered = false;
-  label.ConnectSignal(testTracker, "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
+  label.ConnectSignal(testTracker.get(), "asyncTextRendered", CallbackFunctor(&asyncTextRendered));
 
   gAsyncTextRenderedCalled = false;
   gAsyncTextRenderedWidth  = 0.0f;

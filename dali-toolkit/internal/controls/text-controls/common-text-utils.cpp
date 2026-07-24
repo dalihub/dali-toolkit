@@ -174,7 +174,7 @@ void CommonTextUtils::RenderText(
       padding = textActor.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
       // Support Right-To-Left of padding
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(textActor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      Dali::LayoutDirection::Type layoutDirection = textActor.GetEffectiveLayoutDirection();
       if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
       {
         std::swap(padding.start, padding.end);

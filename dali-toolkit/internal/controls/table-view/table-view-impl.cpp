@@ -811,7 +811,7 @@ void TableView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   // Go through the layout data
   float totalWidth = 0.0;
 
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  Dali::LayoutDirection::Type layoutDirection = Self().GetEffectiveLayoutDirection();
 
   if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
   {

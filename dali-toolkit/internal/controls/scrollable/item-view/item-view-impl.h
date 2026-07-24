@@ -405,12 +405,14 @@ private: // From CustomActorImpl
   void OnChildAdd(Actor& child) override;
 
   /**
-   * Called after a wheel-event is received by the owning actor.
-   * @param[in] actor Actor associated with the wheel event.
-   * @param[in] event The wheel event.
-   * @return True if the event should be consumed.
+   * @copydoc Dali::CustomActorImpl::HasIntrinsicWheelHandling()
    */
-  bool OnWheelEvent(Actor actor, WheelEvent event);
+  bool HasIntrinsicWheelHandling() const override;
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnWheelEvent()
+   */
+  bool OnWheelEvent(const Dali::WheelEvent& event) override;
 
 private: // From Control
   /**

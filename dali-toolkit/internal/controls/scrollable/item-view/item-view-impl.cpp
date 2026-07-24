@@ -364,9 +364,6 @@ void ItemView::OnInitialize()
 
   SetRefreshInterval(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS);
 
-  // Connect wheel event
-  self.WheelEventSignal().Connect(this, &ItemView::OnWheelEvent);
-
   self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Dali::Integration::Accessibility::Role::SCROLL_PANE);
 }
 
@@ -1039,7 +1036,12 @@ void ItemView::OnChildAdd(Actor& child)
   Scrollable::OnChildAdd(child);
 }
 
-bool ItemView::OnWheelEvent(Actor actor, WheelEvent event)
+bool ItemView::HasIntrinsicWheelHandling() const
+{
+  return true;
+}
+
+bool ItemView::OnWheelEvent(const Dali::WheelEvent& event)
 {
   // Respond the wheel event to scroll
   if(mActiveLayout)

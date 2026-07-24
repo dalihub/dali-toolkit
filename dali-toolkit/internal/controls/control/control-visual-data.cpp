@@ -1354,8 +1354,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
 
       bool zeroPadding = (padding == Extents());
 
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
-        self.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      Dali::LayoutDirection::Type layoutDirection = self.GetEffectiveLayoutDirection();
       if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
       {
         std::swap(padding.start, padding.end);
@@ -1412,7 +1411,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
 
             // scale to fit the padded area
             finalSize = naturalSize * Min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0),
-                                               (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
+                                          (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0));
 
             // calculate final offset within the padded area
             finalOffset += (availableVisualSize - finalSize) * .5f;
@@ -1426,7 +1425,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
           {
             auto availableVisualSize = finalSize;
             finalSize                = naturalSize * Max((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                                              (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+                                                         (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
 
             auto originalOffset = finalOffset;
 
@@ -1455,7 +1454,7 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
             else
             {
               finalSize = naturalSize * Min((!Dali::EqualsZero(naturalSize.width) ? (availableVisualSize.width / naturalSize.width) : 0.0f),
-                                                 (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
+                                            (!Dali::EqualsZero(naturalSize.height) ? (availableVisualSize.height / naturalSize.height) : 0.0f));
             }
 
             finalOffset += (availableVisualSize - finalSize) * .5f;

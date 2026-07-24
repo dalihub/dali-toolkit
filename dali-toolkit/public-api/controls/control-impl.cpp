@@ -793,7 +793,7 @@ void ControlImpl::OnRelayout(const Vector2& size, RelayoutContainer& container)
       Extents padding = mInternal->mPadding;
 
       Dali::CustomActor           ownerActor(GetOwner());
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(ownerActor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      Dali::LayoutDirection::Type layoutDirection = ownerActor.GetEffectiveLayoutDirection();
 
       if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
       {

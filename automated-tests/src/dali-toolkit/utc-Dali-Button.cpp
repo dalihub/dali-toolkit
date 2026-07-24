@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <memory>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
@@ -410,13 +411,13 @@ int UtcDaliButtonAutoRepeatingP(void)
   button.SetProperty(Toolkit::Button::Property::AUTO_REPEATING, true);
   button.SetProperty(Toolkit::Button::Property::INITIAL_AUTO_REPEATING_DELAY, AUTO_REPEATING_DELAY);
   // connect to its touch signal
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   button.PressedSignal().Connect(&ButtonCallback);
   button.ClickedSignal().Connect(&ButtonCallback);
   bool clickedSignal = false;
   bool pressedSignal = false;
-  button.ConnectSignal(testTracker, "pressed", CallbackFunctor(&pressedSignal));
-  button.ConnectSignal(testTracker, "clicked", CallbackFunctor(&clickedSignal));
+  button.ConnectSignal(testTracker.get(), "pressed", CallbackFunctor(&pressedSignal));
+  button.ConnectSignal(testTracker.get(), "clicked", CallbackFunctor(&clickedSignal));
 
   Dali::Integration::TouchEvent event;
 
@@ -630,13 +631,13 @@ int UtcDaliButtonPressedSignalP(void)
   application.Render();
 
   // connect to its touch signal
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   button.PressedSignal().Connect(&ButtonCallback);
   button.ReleasedSignal().Connect(&ButtonCallback);
   bool pressedSignal  = false;
   bool releasedSignal = false;
-  button.ConnectSignal(testTracker, "pressed", CallbackFunctor(&pressedSignal));
-  button.ConnectSignal(testTracker, "released", CallbackFunctor(&releasedSignal));
+  button.ConnectSignal(testTracker.get(), "pressed", CallbackFunctor(&pressedSignal));
+  button.ConnectSignal(testTracker.get(), "released", CallbackFunctor(&releasedSignal));
 
   Dali::Integration::TouchEvent event;
 
@@ -738,9 +739,9 @@ int UtcDaliButtonClickedSignalP(void)
 
   // connect to its touch signal
   button.ClickedSignal().Connect(&ButtonCallback);
-  bool               clickedSignal = false;
-  ConnectionTracker* testTracker   = new ConnectionTracker();
-  button.ConnectSignal(testTracker, "clicked", CallbackFunctor(&clickedSignal));
+  bool                               clickedSignal = false;
+  std::unique_ptr<ConnectionTracker> testTracker   = std::make_unique<ConnectionTracker>();
+  button.ConnectSignal(testTracker.get(), "clicked", CallbackFunctor(&clickedSignal));
 
   Dali::Integration::TouchEvent event;
 
@@ -829,9 +830,9 @@ int UtcDaliButtonStateChangedSignalP(void)
 
   // connect to its signal
   button.StateChangedSignal().Connect(&ButtonCallback);
-  bool               stateChangedSignal = false;
-  ConnectionTracker* testTracker        = new ConnectionTracker();
-  button.ConnectSignal(testTracker, "stateChanged", CallbackFunctor(&stateChangedSignal));
+  bool                               stateChangedSignal = false;
+  std::unique_ptr<ConnectionTracker> testTracker        = std::make_unique<ConnectionTracker>();
+  button.ConnectSignal(testTracker.get(), "stateChanged", CallbackFunctor(&stateChangedSignal));
 
   gIsCalledButtonCallback = false;
   button.SetProperty(Button::Property::SELECTED, true);

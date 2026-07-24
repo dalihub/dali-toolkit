@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <memory>
 #include "test-text-geometry-utils.h"
 
 using namespace Dali;
@@ -1381,10 +1382,10 @@ int utcDaliTextEditorAnchorClickedP(void)
   application.GetScene().Add(editor);
 
   // connect to the anchor clicked signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::AnchorClickedSignal(editor).Connect(&TestAnchorClickedCallback);
   bool anchorClickedSignal = false;
-  editor.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+  editor.ConnectSignal(testTracker.get(), "anchorClicked", CallbackFunctor(&anchorClickedSignal));
 
   gAnchorClickedCallBackCalled = false;
   editor.SetProperty(TextEditor::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
@@ -1427,10 +1428,10 @@ int utcDaliTextEditorTextChangedP(void)
   application.GetScene().Add(editor);
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   editor.TextChangedSignal().Connect(&TestTextChangedCallback);
   bool textChangedSignal = false;
-  editor.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "textChanged", CallbackFunctor(&textChangedSignal));
 
   gTextChangedCallBackCalled = false;
   editor.SetProperty(TextEditor::Property::TEXT, "ABC");
@@ -1477,10 +1478,10 @@ int utcDaliTextEditorTextChangedWithInputMethodContext(void)
   application.GetScene().Add(editor);
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   editor.TextChangedSignal().Connect(&TestTextChangedCallback);
   bool textChangedSignal = false;
-  editor.ConnectSignal(testTracker, "textChanged", CallbackFunctor(&textChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "textChanged", CallbackFunctor(&textChangedSignal));
 
   // get InputMethodContext
   String                                           text;
@@ -1616,10 +1617,10 @@ int utcDaliTextEditorInputStyleChanged01(void)
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   editor.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  editor.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(editor);
 
@@ -1829,10 +1830,10 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   editor.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  editor.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(editor);
 
@@ -2075,10 +2076,10 @@ int utcDaliTextEditorInputStyleChanged03(void)
   editor.SetProperty(TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>");
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   editor.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
   bool inputStyleChangedSignal = false;
-  editor.ConnectSignal(testTracker, "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
 
   application.GetScene().Add(editor);
 
@@ -3827,10 +3828,10 @@ int utcDaliTextEditorMaxCharactersReached(void)
   editor.SetKeyInputFocus();
 
   // connect to the text changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::MaxLengthReachedSignal(editor).Connect(&TestMaxLengthReachedCallback);
   bool maxLengthReachedSignal = false;
-  editor.ConnectSignal(testTracker, "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
+  editor.ConnectSignal(testTracker.get(), "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal));
 
   gMaxCharactersCallBackCalled = false;
 
@@ -3863,10 +3864,10 @@ int utcDaliTextEditorInputFiltered(void)
   editor.SetKeyInputFocus();
 
   // connect to the input filtered signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::InputFilteredSignal(editor).Connect(&TestInputFilteredCallback);
   bool inputFilteredSignal = false;
-  editor.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+  editor.ConnectSignal(testTracker.get(), "inputFiltered", CallbackFunctor(&inputFilteredSignal));
 
   gInputFilteredAcceptedCallbackCalled = false;
 
@@ -5091,10 +5092,10 @@ int utcDaliTextEditorCursorPositionChangedSignal(void)
   application.GetScene().Add(editor);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::CursorPositionChangedSignal(editor).Connect(&TestCursorPositionChangedCallback);
   bool cursorPositionChangedSignal = false;
-  editor.ConnectSignal(testTracker, "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "cursorPositionChanged", CallbackFunctor(&cursorPositionChangedSignal));
 
   editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
@@ -5537,10 +5538,10 @@ int utcDaliTextEditorSelectionClearedSignal(void)
   application.GetScene().Add(editor);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::SelectionClearedSignal(editor).Connect(&TestSelectionClearedCallback);
   bool selectionClearedSignal = false;
-  editor.ConnectSignal(testTracker, "selectionCleared", CallbackFunctor(&selectionClearedSignal));
+  editor.ConnectSignal(testTracker.get(), "selectionCleared", CallbackFunctor(&selectionClearedSignal));
 
   editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
@@ -5671,10 +5672,10 @@ int utcDaliTextEditorSelectionStartedSignal(void)
   application.GetScene().Add(editor);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::SelectionStartedSignal(editor).Connect(&TestSelectionStartedCallback);
   bool selectionStartedSignal = false;
-  editor.ConnectSignal(testTracker, "selectionStarted", CallbackFunctor(&selectionStartedSignal));
+  editor.ConnectSignal(testTracker.get(), "selectionStarted", CallbackFunctor(&selectionStartedSignal));
 
   editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
@@ -5784,10 +5785,10 @@ int utcDaliTextEditorSelectionChangedSignal(void)
   application.GetScene().Add(editor);
 
   // connect to the selection changed signal.
-  ConnectionTracker* testTracker = new ConnectionTracker();
+  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
   DevelTextEditor::SelectionChangedSignal(editor).Connect(&TestSelectionChangedCallback);
   bool selectionChangedSignal = false;
-  editor.ConnectSignal(testTracker, "selectionChanged", CallbackFunctor(&selectionChangedSignal));
+  editor.ConnectSignal(testTracker.get(), "selectionChanged", CallbackFunctor(&selectionChangedSignal));
 
   editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);

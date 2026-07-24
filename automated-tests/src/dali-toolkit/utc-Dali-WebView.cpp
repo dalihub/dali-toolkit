@@ -817,9 +817,12 @@ int UtcDaliWebViewPropertyKeyEventsEnabled(void)
   END_TEST;
 }
 
-int UtcDaliWebViewHoverAndWheel(void)
+int UtcDaliWebViewHoverAndWheel01(void)
 {
   ToolkitTestApplication application;
+
+  gHovered           = false;
+  gWheelEventHandled = false;
 
   WebView view = WebView::New();
   DALI_TEST_CHECK(view);
@@ -833,8 +836,8 @@ int UtcDaliWebViewHoverAndWheel(void)
   application.Render();
 
   view.GetNaturalSize();
-  view.HoverEventSignal().Connect(&OnHovered);
-  view.WheelEventSignal().Connect(&OnWheelEvent);
+
+  // Send hover and wheel events before connecting signals, for line coverage.
 
   // Hover event
   Dali::Integration::HoverEvent event = Dali::Integration::HoverEvent();
@@ -864,6 +867,17 @@ int UtcDaliWebViewHoverAndWheel(void)
   wheelEvent.direction = 0;
   wheelEvent.point     = Vector2(20, 20);
   wheelEvent.delta     = 10;
+  application.ProcessEvent(wheelEvent);
+  application.SendNotification();
+
+  view.HoverEventSignal().Connect(&OnHovered);
+  view.WheelEventSignal().Connect(&OnWheelEvent);
+
+  DALI_TEST_CHECK(!gHovered);
+  DALI_TEST_CHECK(!gWheelEventHandled);
+
+  // Send hover and wheel events.
+  application.ProcessEvent(event);
   application.ProcessEvent(wheelEvent);
   application.SendNotification();
 

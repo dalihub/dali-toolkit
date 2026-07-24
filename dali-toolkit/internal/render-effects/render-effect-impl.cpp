@@ -120,7 +120,7 @@ void RenderEffectImpl::SetOwnerControl(Dali::Toolkit::Control control)
         }
       }
 
-      ownerControl.EffectiveVisibilityChangedSignal().Connect(this, &RenderEffectImpl::OnControlEffectiveVisibilityChanged);
+      Dali::DevelActor::OnSceneVisibilityChangedSignal(ownerControl).Connect(this, &RenderEffectImpl::OnControlEffectiveVisibilityChanged);
 
       Activate(); // Dev note : Activate after set the owner control.
     }
@@ -141,7 +141,7 @@ void RenderEffectImpl::ClearOwnerControl()
   DALI_LOG_INFO(gRenderEffectLogFilter, Debug::General, "[RenderEffect:%p] ClearOwnerControl [ID:%d]\n", this, ownerControl ? ownerControl.GetProperty<int>(Actor::Property::ID) : -1);
   if(ownerControl)
   {
-    ownerControl.EffectiveVisibilityChangedSignal().Disconnect(this, &RenderEffectImpl::OnControlEffectiveVisibilityChanged);
+    Dali::DevelActor::OnSceneVisibilityChangedSignal(ownerControl).Disconnect(this, &RenderEffectImpl::OnControlEffectiveVisibilityChanged);
 
     auto previousOwnerControl = ownerControl;
     mOwnerControl.Reset();
@@ -298,7 +298,7 @@ bool RenderEffectImpl::IsActivateValid() const
   if(size.x > Math::MACHINE_EPSILON_1000 && size.y > Math::MACHINE_EPSILON_1000)
   {
     Dali::Toolkit::Control ownerControl = mOwnerControl.GetHandle();
-    if(ownerControl && DevelActor::IsEffectivelyVisible(ownerControl))
+    if(ownerControl && DevelActor::IsOnSceneVisible(ownerControl))
     {
       ret = true;
     }

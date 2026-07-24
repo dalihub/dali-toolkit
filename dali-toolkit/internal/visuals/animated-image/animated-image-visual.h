@@ -291,7 +291,7 @@ private:
   void SetTexturesToRenderer(TextureSet& textureSet);
 
   /**
-   * @brief Callback when the inherited visibility of the actor is changed.
+   * @brief Callback when the on-scene visibility of the actor is changed.
    */
   void OnControlEffectiveVisibilityChanged(Actor actor, bool visible);
 

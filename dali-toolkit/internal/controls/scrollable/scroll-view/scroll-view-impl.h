@@ -649,12 +649,17 @@ private: // private overridden functions from CustomActorImpl and Controls
   void OnChildRemove(Actor& child) override;
 
   /**
+   * @copydoc Dali::CustomActorImpl::HasIntrinsicWheelHandling()
+   */
+  bool HasIntrinsicWheelHandling() const override;
+
+  /**
    * Called after a wheelEvent is received by the owning actor.
    * @param[in] actor Actor associated with the event.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  bool OnWheelEvent(Actor actor, WheelEvent event);
+  bool OnWheelEvent(const Dali::WheelEvent& event) override;
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
