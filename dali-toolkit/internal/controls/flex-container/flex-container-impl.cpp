@@ -189,22 +189,14 @@ void FlexContainer::SetContentDirection(Toolkit::FlexContainer::ContentDirection
     {
       mContentDirection = contentDirection;
 
-      ownerActor.SetProperty(Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, false);
-
-      if(Toolkit::FlexContainer::LTR == contentDirection)
-      {
-        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT);
-      }
-      else
-      {
-        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
-      }
+      // Setting an explicit direction disables inheritance automatically.
+      ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, (Toolkit::FlexContainer::LTR == contentDirection) ? Dali::LayoutDirection::LEFT_TO_RIGHT : Dali::LayoutDirection::RIGHT_TO_LEFT);
     }
     else
     {
-      ownerActor.SetProperty(Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, true);
+      ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::INHERIT);
 
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(ownerActor.GetParent().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      Dali::LayoutDirection::Type layoutDirection = ownerActor.GetParent().GetEffectiveLayoutDirection();
 
       if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
       {
