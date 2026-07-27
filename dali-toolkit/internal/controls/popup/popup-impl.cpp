@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -32,7 +33,6 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES

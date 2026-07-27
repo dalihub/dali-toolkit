@@ -76,31 +76,31 @@ public:
    */
   static Dali::Toolkit::ControlWrapper New(const std::string& typeName, ControlWrapper* controlWrapper);
 
-public: // From CustomActorImpl
+public: // From SizeNegotiatedActor
   // Size negotiation helpers
 
   /**
-   * @copydoc Dali::CustomActorImpl::RelayoutRequest()
+   * @copydoc Dali::SizeNegotiatedActor::RelayoutRequest()
    */
   void RelayoutRequest();
 
   /**
-   * @copydoc Dali::CustomActorImpl::GetHeightForWidthBase()
+   * @copydoc Dali::SizeNegotiatedActor::GetHeightForWidthBase()
    */
   float GetHeightForWidthBase(float width);
 
   /**
-   * @copydoc Dali::CustomActorImpl::GetWidthForHeightBase()
+   * @copydoc Dali::SizeNegotiatedActor::GetWidthForHeightBase()
    */
   float GetWidthForHeightBase(float height);
 
   /**
-   * @copydoc Dali::CustomActorImpl::CalculateChildSizeBase()
+   * @copydoc Dali::SizeNegotiatedActor::CalculateChildSizeBase()
    */
   float CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension);
 
   /**
-   * @copydoc Dali::CustomActorImpl::RelayoutDependentOnChildrenBase()
+   * @copydoc Dali::SizeNegotiatedActor::RelayoutDependentOnChildrenBase()
    */
   bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 

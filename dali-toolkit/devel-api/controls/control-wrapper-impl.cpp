@@ -95,27 +95,27 @@ ControlWrapper::~ControlWrapper()
 
 void ControlWrapper::RelayoutRequest()
 {
-  CustomActorImpl::RelayoutRequest();
+  SizeNegotiatedActor::RelayoutRequest();
 }
 
 float ControlWrapper::GetHeightForWidthBase(float width)
 {
-  return CustomActorImpl::GetHeightForWidthBase(width);
+  return SizeNegotiatedActor::GetHeightForWidthBase(width);
 }
 
 float ControlWrapper::GetWidthForHeightBase(float height)
 {
-  return CustomActorImpl::GetWidthForHeightBase(height);
+  return SizeNegotiatedActor::GetWidthForHeightBase(height);
 }
 
 float ControlWrapper::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return CustomActorImpl::CalculateChildSizeBase(child, dimension);
+  return SizeNegotiatedActor::CalculateChildSizeBase(child, dimension);
 }
 
 bool ControlWrapper::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return CustomActorImpl::RelayoutDependentOnChildrenBase(dimension);
+  return SizeNegotiatedActor::RelayoutDependentOnChildrenBase(dimension);
 }
 
 void ControlWrapper::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
