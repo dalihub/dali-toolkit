@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>

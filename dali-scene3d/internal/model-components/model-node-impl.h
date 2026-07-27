@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/unique-ptr.h>
@@ -27,13 +28,13 @@
 #include <vector>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
-#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
-#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/integration-api/loader/mesh-definition.h>
 #include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/integration-api/loader/shader-option.h>
 #include <dali-scene3d/integration-api/loader/skinning-details.h>
+#include <dali-scene3d/internal/model-components/model-primitive-modify-observer.h>
+#include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
+#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 #include "dali-scene3d/public-api/controls/model/model.h"

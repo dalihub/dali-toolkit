@@ -32,6 +32,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/csharp-type-registry.h>
 #include <dali/public-api/dali-core.h>

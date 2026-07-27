@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/table-view/table-view-impl.h>
 

@@ -20,6 +20,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 #include <stdlib.h>
