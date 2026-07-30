@@ -21,6 +21,7 @@
 #include <thread>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-async-task-manager.h>
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>
 #include <toolkit-vector-animation-renderer.h>
@@ -2860,6 +2861,209 @@ int UtcDaliAnimatedVectorImageVisualDynamicProperty02(void)
     }
   }
   DALI_TEST_EQUALS(gDynamicPropertyCallbackFiredMap[3], true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+uint32_t gReferencedCallbackCount = 0;
+class ReferencedCallback : public Dali::CallbackBase
+{
+public:
+  ReferencedCallback(Dali::CallbackBase::StaticFunction function)
+  : Dali::CallbackBase(function)
+  {
+    ++gReferencedCallbackCount;
+  }
+  ~ReferencedCallback()
+  {
+    --gReferencedCallbackCount;
+  }
+};
+
+template<typename R, typename... Args>
+Dali::CallbackBase* MakeReferencedCallback(R (*function)(Args... args))
+{
+  return new ReferencedCallback(reinterpret_cast<Dali::CallbackBase::StaticFunction>(function));
+}
+} // namespace
+
+int UtcDaliAnimatedVectorImageVisualDynamicPropertyCallbackOwnership01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicPropertyCallbackOwnership01");
+  tet_infoline("The case that callback reference hold at visual");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  // Register DiscardVisual callback as idle, to make ensure that visual be deleted before vector animation trigger.
+  {
+    Visual::Base temporalVisual = factory.CreateVisual(
+      Property::Map()
+        .Add(Toolkit::Visual::Property::TYPE, Visual::COLOR)
+        .Add(ColorVisual::Property::MIX_COLOR, Color::RED));
+    factory.DiscardVisual(temporalVisual);
+  }
+
+  Visual::Base visual = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  gReferencedCallbackCount = 0u;
+  gDynamicPropertyCallbackFiredMap.clear();
+
+  // Set dynamic property
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info;
+  info.id       = 1;
+  info.keyPath  = "Test.Path";
+  info.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_COLOR);
+  info.callback = MakeReferencedCallback(FillColorCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info));
+
+  DALI_TEST_EQUALS(gReferencedCallbackCount, 1u, TEST_LOCATION);
+
+  // Do not wait resource ready for this UTC.
+
+  // Unparent and reset visual reference counts before application.SendNotification();
+  // It will make ensure that DynamicPropertyInfo hold at visual itself without send it to the task.
+  // DevNote : UnregisterVisual don't discard the visual. If this behavior be changed in future, we might need to fix this UTC too.
+  dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+  actor.Unparent();
+  actor.Reset();
+  visual.Reset();
+
+  if(gReferencedCallbackCount)
+  {
+    // If UnregisterVisual() call DiscardVisual, then process idle callback once.
+    application.SendNotification();
+    application.Render();
+
+    Test::AsyncTaskManager::ProcessAllCompletedTasks();
+  }
+  DALI_TEST_EQUALS(gReferencedCallbackCount, 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualDynamicPropertyCallbackOwnership02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualDynamicPropertyCallbackOwnership02");
+  tet_infoline("The case that callback reference hold at VectorAnimationTask");
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Visual::Base visual = factory.CreateVisual(
+    Property::Map()
+      .Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+      .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+      .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  gReferencedCallbackCount = 0u;
+  gDynamicPropertyCallbackFiredMap.clear();
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
+  WaitForAsyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
+
+  // UTC Trick! Forcibly sleep worker thread 2500 ms
+  Test::VectorAnimationRenderer::DelayRendering(2500);
+
+  // Flush some action
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3);
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::FLUSH, attributes);
+
+  // Dummy sleep 1 second. (We need to wait until worker thread process the task, and sleep 2500 ms)
+  Test::WaitForEventThreadTrigger(1, 0);
+
+  // Set dynamic property
+  DevelAnimatedVectorImageVisual::DynamicPropertyInfo info;
+  info.id       = 1;
+  info.keyPath  = "Test.Path";
+  info.property = static_cast<int>(VectorAnimationRenderer::VectorProperty::FILL_COLOR);
+  info.callback = MakeReferencedCallback(FillColorCallback);
+
+  DevelControl::DoActionExtension(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::SET_DYNAMIC_PROPERTY, Any(info));
+
+  DALI_TEST_EQUALS(gReferencedCallbackCount, 1u, TEST_LOCATION);
+
+  // Flush so make ensure that callback ownership moved to VectorAnimationTask
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::FLUSH, attributes);
+
+  // Unparent and reset visual reference counts before application.SendNotification();
+  dummyImpl.UnregisterVisual(DummyControl::Property::TEST_VISUAL);
+  actor.Unparent();
+  actor.Reset();
+  visual.Reset();
+
+  Test::AsyncTaskManager::ProcessAllCompletedTasks();
+
+  int  tryCount    = 0;
+  int  tryCountMax = 10;
+  bool testPassed  = false;
+  // callback might not be applied to vector animation tasks. Retry again until it successed.
+  while(tryCount++ < tryCountMax)
+  {
+    tet_printf("callback fired [%d] callback count [%u]\n", gDynamicPropertyCallbackFiredMap[1], gReferencedCallbackCount);
+
+    // If callback fired, mean dynamic callback already send ownership to VectorAnimationRenderer. We cannot test this case.
+    if(gDynamicPropertyCallbackFiredMap[1])
+    {
+      tet_printf("Just skip to test UtcDaliAnimatedVectorImageVisualDynamicPropertyCallbackOwnership02\n");
+      testPassed = true;
+      break;
+    }
+    const bool tryAgain = gReferencedCallbackCount > 0;
+    if(tryAgain)
+    {
+      tet_printf("Retry to get value again! [%d]\n", tryCount);
+      application.SendNotification();
+      application.Render();
+
+      // Dummy sleep 1 second.
+      Test::WaitForEventThreadTrigger(1, 0);
+
+      application.SendNotification();
+      application.Render();
+
+      Test::AsyncTaskManager::ProcessAllCompletedTasks();
+
+      continue;
+    }
+    else
+    {
+      testPassed = true;
+      break;
+    }
+  }
+  DALI_TEST_EQUALS(testPassed, true, TEST_LOCATION);
 
   END_TEST;
 }

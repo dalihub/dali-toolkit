@@ -185,6 +185,15 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
     mVectorAnimationTask->ResourceReadySignal().Disconnect(this, &AnimatedVectorImageVisual::OnResourceReady);
     mVectorAnimationTask->Finalize();
   }
+
+  if(DALI_UNLIKELY(!mAnimationData.dynamicProperties.empty()))
+  {
+    // Delete owned dynamic properties callback if exist
+    for(auto&& dynamicPropertyInfo : mAnimationData.dynamicProperties)
+    {
+      delete dynamicPropertyInfo.callback;
+    }
+  }
 }
 
 void AnimatedVectorImageVisual::GetNaturalSize(Vector2& naturalSize)
@@ -880,6 +889,7 @@ void AnimatedVectorImageVisual::SendAnimationData()
     if(mAnimationData.resendFlag & VectorAnimationTask::RESEND_DYNAMIC_PROPERTY)
     {
       // Remove applied dynamic properties
+      // DevNote : Ownership of dynamicProperties.callback moved to the task.
       mAnimationData.dynamicProperties.clear();
     }
 

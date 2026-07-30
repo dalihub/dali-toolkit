@@ -119,6 +119,8 @@ Contain po / sounds / common images / style / style images
 Summary:    Application development package for Dali 3D engine toolkit
 Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
+# control-impl.h includes dali/devel-api headers
+Requires:   dali2-integration-devel
 
 %description devel
 Application development package for Dali 3D engine toolkit - headers and package config
