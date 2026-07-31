@@ -25,12 +25,12 @@
 #include <dali/integration-api/string-utils.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -1455,7 +1455,7 @@ int utcDaliTextEditorTextChangedP(void)
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in texteditor.
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   editor.SetProperty(DevelTextEditor::Property::ENABLE_DEFERRED_RELAYOUT, true);
@@ -2809,7 +2809,7 @@ int utcDaliTextEditorEvent06(void)
   application.Render();
   DALI_TEST_EQUALS(editor.GetProperty(DevelTextEditor::Property::PRIMARY_CURSOR_POSITION).Get<int>(), 0, TEST_LOCATION);
 
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS("ffiff", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
@@ -2838,15 +2838,15 @@ int utcDaliTextEditorEvent06(void)
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_RIGHT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_RIGHT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -2903,7 +2903,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Cut the selected text
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("x", "", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -2923,7 +2923,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Copy the selected text
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("c", "", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -2939,7 +2939,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Paste the selected text at the current cursor position
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("v", "", "v", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -2962,7 +2962,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Cut the selected text
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("x", "", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -2983,7 +2983,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Copy the selected text
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("c", "", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -3018,7 +3018,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Copy the selected text using logical keys
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("ؤ", "c", "ؤ", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -3033,14 +3033,14 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Paste the selected using logical keys
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("ر", "v", "ر", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //text is "cc"
   DALI_TEST_EQUALS("cc", editor.GetProperty<Dali::String>(TextEditor::Property::TEXT), TEST_LOCATION);
 
   // select all using logical keys
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("ش", "a", "ش", KEY_A_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -3048,7 +3048,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // cut text using logical keys
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("ء", "x", "ء", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -6081,7 +6081,7 @@ int utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize(void)
   application.Render();
 
   //Cut text
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_CONTROL_LEFT, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.ProcessEvent(GenerateKey("x", "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Dali::Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
@@ -6677,7 +6677,7 @@ int utcDaliTextEditorClusteredEmojiDeletionDeleteKey(void)
 
   // Set focus and remove Emoji
   textEditor.SetKeyInputFocus();
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
   DALI_TEST_EQUALS(textEditor.GetProperty(TextEditor::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);
