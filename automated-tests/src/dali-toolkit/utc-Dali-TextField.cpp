@@ -29,13 +29,13 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/rendering/renderer.h>
 #include "test-text-geometry-utils.h"
 
@@ -1507,7 +1507,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.Render();
 
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -1526,7 +1526,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.Render();
 
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -1545,7 +1545,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.Render();
 
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -1650,7 +1650,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
 
@@ -1695,7 +1695,7 @@ int utcDaliTextFieldTextChangedP(void)
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in textfield.
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   DALI_TEST_CHECK(!gTextChangedCallBackCalled);
 
   END_TEST;
@@ -2129,7 +2129,7 @@ int utcDaliTextFieldInputFilteredN(void)
 
   // Backspace, Delete should not be filtered.
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
   application.SendNotification();
@@ -2157,7 +2157,7 @@ int utcDaliTextFieldInputFilteredN(void)
 
   // Backspace, Delete should not be filtered.
   application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   // Render and notify
   application.SendNotification();
@@ -2828,7 +2828,7 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Pressing delete key should be fine even if there is no text in TextField.
-  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -6063,7 +6063,7 @@ int utcDaliTextFieldClusteredEmojiDeletionDeleteKey(void)
 
   // Set focus and remove Emoji
   textField.SetKeyInputFocus();
-  application.ProcessEvent(GenerateKey("", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", Dali::DALI_KEY_DELETE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
 
   //Check the changed text and cursor position
   DALI_TEST_EQUALS(textField.GetProperty(TextField::Property::TEXT).Get<Dali::String>(), "ABCXY", TEST_LOCATION);

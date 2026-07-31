@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
@@ -892,8 +891,8 @@ bool TextField::OnKeyEvent(const KeyEvent& event)
 
     return true;
   }
-  else if((Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() && strcmp(KEY_RETURN_NAME, event.GetKeyName().CStr()) == 0) ||
-          Dali::DevelKey::DALI_KEY_KP_ENTER == event.GetKeyCode())
+  else if((Dali::DALI_KEY_RETURN == event.GetKeyCode() && strcmp(KEY_RETURN_NAME, event.GetKeyName().CStr()) == 0) ||
+          Dali::DALI_KEY_KP_ENTER == event.GetKeyCode())
   {
     // Do nothing when enter is comming.
     return false;

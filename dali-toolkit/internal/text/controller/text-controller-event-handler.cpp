@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/controller/text-controller-event-handler.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/adaptor-framework/key.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
@@ -212,7 +212,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       // Will request for relayout.
       relayoutNeeded = true;
     }
-    else if(Dali::DevelKey::DALI_KEY_CONTROL_LEFT == keyCode || Dali::DevelKey::DALI_KEY_CONTROL_RIGHT == keyCode)
+    else if(Dali::DALI_KEY_CONTROL_LEFT == keyCode || Dali::DALI_KEY_CONTROL_RIGHT == keyCode)
     {
       // Left or Right Control key event is received before Ctrl-C/V/X key event is received
       // If not handle it here, any selected text will be deleted
@@ -253,7 +253,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       return consumed;
     }
     else if((Dali::DALI_KEY_BACKSPACE == keyCode) ||
-            (Dali::DevelKey::DALI_KEY_DELETE == keyCode))
+            (Dali::DALI_KEY_DELETE == keyCode))
     {
       textChanged = DeleteEvent(controller, keyCode);
 
@@ -786,7 +786,7 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
     removed = TextUpdater::RemoveText(controller, -1, 1, UPDATE_INPUT_STYLE, false);
   }
   else if((controller.mImpl->mEventData->mPrimaryCursorPosition < controller.mImpl->mModel->mLogicalModel->mText.Count()) &&
-          (keyCode == Dali::DevelKey::DALI_KEY_DELETE))
+          (keyCode == Dali::DALI_KEY_DELETE))
   {
     // Remove the character after the current cursor position
     removed = TextUpdater::RemoveText(controller, 0, 1, UPDATE_INPUT_STYLE, false);
