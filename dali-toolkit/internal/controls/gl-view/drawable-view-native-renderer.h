@@ -65,7 +65,7 @@ public:
   /**
    * Registers GlView callbacks
    */
-  void RegisterGlCallbacks(Dali::CallbackBase* onInitCallback, Dali::CallbackBase* onRenderCallback, Dali::CallbackBase* onTerminateCallback);
+  void RegisterGlCallbacks(std::unique_ptr<Dali::CallbackBase> onInitCallback, std::unique_ptr<Dali::CallbackBase> onRenderCallback, std::unique_ptr<Dali::CallbackBase> onTerminateCallback);
 
   /**
    * Dispatches the GlView init callback

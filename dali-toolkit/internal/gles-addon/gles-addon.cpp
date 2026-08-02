@@ -18,6 +18,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/addons/addon-base.h>
 #include <dali/integration-api/debug.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/drawable-view-impl.h>
@@ -55,17 +56,17 @@ GlView GlViewNew(BackendMode backendMode, GlView::ColorFormat colorFormat)
 }
 
 void GlViewRegisterGlCallbacks(
-  GlViewImpl&&  glView,
-  CallbackBase* initCallback,
-  CallbackBase* renderFrameCallback,
-  CallbackBase* terminateCallback)
+  GlViewImpl&&                  glViewImpl,
+  std::unique_ptr<CallbackBase> initCallback,
+  std::unique_ptr<CallbackBase> renderFrameCallback,
+  std::unique_ptr<CallbackBase> terminateCallback)
 {
-  glView.RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
+  glViewImpl.RegisterGlCallbacks(std::move(initCallback), std::move(renderFrameCallback), std::move(terminateCallback));
 }
 
-void GlViewSetResizeCallback(GlViewImpl& glViewImpl, CallbackBase* resizeCallback)
+void GlViewSetResizeCallback(GlViewImpl& glViewImpl, std::unique_ptr<CallbackBase> resizeCallback)
 {
-  glViewImpl.SetResizeCallback(resizeCallback);
+  glViewImpl.SetResizeCallback(std::move(resizeCallback));
 }
 
 bool GlViewSetGraphicsConfig(

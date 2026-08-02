@@ -28,6 +28,7 @@
 #include <dali/integration-api/adaptor-framework/trace-factory-interface.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/signals/callback.h>
+#include <memory> ///< for std::unique_ptr
 
 namespace Dali
 {
@@ -57,12 +58,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
-  void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
+  void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback);
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetResizeCallback()
    */
-  void SetResizeCallback(CallbackBase* resizeCallback);
+  void SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback);
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetGraphicsConfig()

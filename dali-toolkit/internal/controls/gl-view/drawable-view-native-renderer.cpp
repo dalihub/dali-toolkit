@@ -805,11 +805,11 @@ DrawableViewNativeRenderer::DrawableViewNativeRenderer(const NativeRendererCreat
 
 DrawableViewNativeRenderer::~DrawableViewNativeRenderer() = default;
 
-void DrawableViewNativeRenderer::RegisterGlCallbacks(Dali::CallbackBase* onInitCallback, Dali::CallbackBase* onRenderCallback, Dali::CallbackBase* onTerminateCallback)
+void DrawableViewNativeRenderer::RegisterGlCallbacks(std::unique_ptr<Dali::CallbackBase> onInitCallback, std::unique_ptr<Dali::CallbackBase> onRenderCallback, std::unique_ptr<Dali::CallbackBase> onTerminateCallback)
 {
-  mImpl->mOnInitCallback.reset(onInitCallback);
-  mImpl->mOnRenderCallback.reset(onRenderCallback);
-  mImpl->mOnTerminateCallback.reset(onTerminateCallback);
+  mImpl->mOnInitCallback.reset(onInitCallback.release());
+  mImpl->mOnRenderCallback.reset(onRenderCallback.release());
+  mImpl->mOnTerminateCallback.reset(onTerminateCallback.release());
 }
 
 void DrawableViewNativeRenderer::InvokeGlInitCallback(const RenderCallbackInput& renderCallbackInput)
