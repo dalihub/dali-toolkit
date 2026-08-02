@@ -26,6 +26,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <algorithm>
 #include <cmath>
 
 // INTERNAL INCLUDES
