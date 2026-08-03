@@ -1174,6 +1174,16 @@ public:
   {
   }
 
+  bool SetExtraFeatureValue(const std::string& feature, const std::string& value) override
+  {
+    return false;
+  }
+
+  std::string GetExtraFeatureValue(const std::string& feature) const override
+  {
+    return {};
+  }
+
 private:
   int         mockDefaultFontSize;
   bool        mockJavaScriptEnabled;
@@ -1332,6 +1342,9 @@ public:
   {
   }
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, JavaScriptMessageHandlerCallback handler) override
+  {
+  }
+  void RemoveJavaScriptMessageHandler(const std::string& exposedObjectName) override
   {
   }
   void AddJavaScriptEntireMessageHandler(const std::string& exposedObjectName, JavaScriptEntireMessageHandlerCallback handler) override
