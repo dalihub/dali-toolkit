@@ -4602,7 +4602,6 @@ int UtcDaliVisualGetPropertyObject01(void)
     }
 
     Dali::Property property = visual.GetPropertyObject(std::move(key));
-    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
 
     if(expect)
     {
@@ -4656,7 +4655,6 @@ int UtcDaliVisualGetPropertyObject02(void)
     }
 
     Dali::Property property = visual.GetPropertyObject(std::move(key));
-    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
 
     if(expect)
     {
@@ -4708,7 +4706,6 @@ int UtcDaliVisualGetPropertyObject03(void)
     }
 
     Dali::Property property = visual.GetPropertyObject(std::move(key));
-    tet_printf("Result object[%p] index of property[%d]\n", property.object.GetObjectPtr(), property.propertyIndex);
 
     if(expect)
     {

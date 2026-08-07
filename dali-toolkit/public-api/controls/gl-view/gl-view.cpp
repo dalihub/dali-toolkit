@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dlfcn.h>
+#include <memory>
 
 namespace Dali::Toolkit
 {
@@ -44,8 +45,8 @@ struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder
   ~ToolkitGlesAddOn() = default;
 
   ADDON_BIND_FUNCTION(GlViewNew, GlView(GlView::BackendMode, GlView::ColorFormat));
-  ADDON_BIND_FUNCTION(GlViewRegisterGlCallbacks, void(Internal::GlViewImpl&, CallbackBase*, CallbackBase*, CallbackBase*));
-  ADDON_BIND_FUNCTION(GlViewSetResizeCallback, void(Internal::GlViewImpl&, CallbackBase*));
+  ADDON_BIND_FUNCTION(GlViewRegisterGlCallbacks, void(Internal::GlViewImpl&, std::unique_ptr<CallbackBase>, std::unique_ptr<CallbackBase>, std::unique_ptr<CallbackBase>));
+  ADDON_BIND_FUNCTION(GlViewSetResizeCallback, void(Internal::GlViewImpl&, std::unique_ptr<CallbackBase>));
   ADDON_BIND_FUNCTION(GlViewSetGraphicsConfig, bool(Internal::GlViewImpl&, bool, bool, int, GlView::GraphicsApiVersion));
   ADDON_BIND_FUNCTION(GlViewSetRenderingMode, void(Internal::GlViewImpl&, GlView::RenderingMode));
   ADDON_BIND_FUNCTION(GlViewGetRenderingMode, GlView::RenderingMode(const Internal::GlViewImpl&));
@@ -96,19 +97,25 @@ GlView GlView::DownCast(BaseHandle handle)
 
 void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
+  std::unique_ptr<CallbackBase> initCallbackPtr(initCallback);
+  std::unique_ptr<CallbackBase> renderFrameCallbackPtr(renderFrameCallback);
+  std::unique_ptr<CallbackBase> terminateCallbackPtr(terminateCallback);
+
   Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
   if(gToolkitGlesAddon)
   {
-    gToolkitGlesAddon->GlViewRegisterGlCallbacks(impl, initCallback, renderFrameCallback, terminateCallback);
+    gToolkitGlesAddon->GlViewRegisterGlCallbacks(impl, std::move(initCallbackPtr), std::move(renderFrameCallbackPtr), std::move(terminateCallbackPtr));
   }
 }
 
 void GlView::SetResizeCallback(CallbackBase* resizeCallback)
 {
+  std::unique_ptr<CallbackBase> resizeCallbackPtr(resizeCallback);
+
   Internal::GlViewImpl& impl = GetImpl(*this); // Get Impl here to catch uninitialized usage
   if(gToolkitGlesAddon)
   {
-    gToolkitGlesAddon->GlViewSetResizeCallback(impl, resizeCallback);
+    gToolkitGlesAddon->GlViewSetResizeCallback(impl, std::move(resizeCallbackPtr));
   }
 }
 

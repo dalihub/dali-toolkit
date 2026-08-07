@@ -23,6 +23,7 @@
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
+#include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gl-view/gl-view-render-thread.h>
@@ -53,12 +54,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
-  virtual void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback) = 0;
+  virtual void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback) = 0;
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetResizeCallback()
    */
-  virtual void SetResizeCallback(CallbackBase* resizeCallback) = 0;
+  virtual void SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback) = 0;
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetGraphisConfig()

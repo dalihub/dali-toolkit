@@ -28,6 +28,7 @@ TestAnimationData::TestAnimationData()
 
 TestAnimationData::~TestAnimationData()
 {
+  Clear();
 }
 
 TestAnimationData::AnimationDataElement::AnimationDataElement()

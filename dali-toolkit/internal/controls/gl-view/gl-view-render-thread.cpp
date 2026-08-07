@@ -73,32 +73,32 @@ GlViewRenderThread::GlViewRenderThread(Dali::NativeImageQueuePtr queue)
   }
 }
 
-void GlViewRenderThread::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void GlViewRenderThread::RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback)
 {
   if(!mGlInitCallback && !mGlRenderFrameCallback && !mGlTerminateCallback)
   {
     if(initCallback)
     {
-      mGlInitCallback = std::unique_ptr<CallbackBase>(initCallback);
+      mGlInitCallback.reset(initCallback.release());
     }
 
     if(renderFrameCallback)
     {
-      mGlRenderFrameCallback = std::unique_ptr<CallbackBase>(renderFrameCallback);
+      mGlRenderFrameCallback.reset(renderFrameCallback.release());
     }
 
     if(terminateCallback)
     {
-      mGlTerminateCallback = std::unique_ptr<CallbackBase>(terminateCallback);
+      mGlTerminateCallback.reset(terminateCallback.release());
     }
   }
 }
 
-void GlViewRenderThread::SetResizeCallback(CallbackBase* resizeCallback)
+void GlViewRenderThread::SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback)
 {
   if(!mResizeCallback && resizeCallback)
   {
-    mResizeCallback = std::unique_ptr<CallbackBase>(resizeCallback);
+    mResizeCallback.reset(resizeCallback.release());
   }
 }
 

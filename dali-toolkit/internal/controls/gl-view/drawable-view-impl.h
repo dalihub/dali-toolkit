@@ -68,12 +68,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
-  void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback) override;
+  void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback) override;
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetResizeCallback()
    */
-  void SetResizeCallback(CallbackBase* resizeCallback) override;
+  void SetResizeCallback(std::unique_ptr<CallbackBase> resizeCallback) override;
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetGraphicsConfig()
