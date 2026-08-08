@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/text-abstraction/bidirectional-support.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -23,6 +24,7 @@
 #include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/public-api/object/base-object.h>
+#include <algorithm>
 #include <cstring>
 
 using namespace Dali;
@@ -51,6 +53,18 @@ constexpr unsigned int CHAR_LTRM = 0x200E; ///< Left to Right Mark.
 constexpr unsigned int CHAR_RTLM = 0x200F; ///< Right to Left Mark.
 constexpr unsigned int CHAR_TS   = 0x2009; ///< Thin Space.
 constexpr unsigned int CHAR_BOM  = 0xFEFF; ///< Byte Order Mark.
+
+constexpr PointSize26Dot6 DEFAULT_POINT_SIZE_26DOT6 = 10u << 6u;
+
+FontId GetMockFontId(PointSize26Dot6 pointSize)
+{
+  return pointSize > 0u ? static_cast<FontId>(pointSize) : static_cast<FontId>(DEFAULT_POINT_SIZE_26DOT6);
+}
+
+float GetMockFontPixelSize(FontId fontId)
+{
+  return static_cast<float>(fontId > 0u ? fontId : DEFAULT_POINT_SIZE_26DOT6) / 64.0f;
+}
 } // namespace
 
 namespace Internal
@@ -64,6 +78,11 @@ public:
 
   ~BidirectionalSupport()
   {
+  }
+
+  static TextAbstraction::BidirectionalSupport New()
+  {
+    return TextAbstraction::BidirectionalSupport(new BidirectionalSupport);
   }
 
   static TextAbstraction::BidirectionalSupport Get()
@@ -83,7 +102,7 @@ public:
       }
       else // create and register the object
       {
-        bidirectionalSupportHandle = TextAbstraction::BidirectionalSupport(new BidirectionalSupport);
+        bidirectionalSupportHandle = Dali::TextAbstraction::Internal::BidirectionalSupport::New();
         service.Register(typeid(bidirectionalSupportHandle), bidirectionalSupportHandle);
       }
     }
@@ -121,12 +140,18 @@ class FontClient : public BaseObject
 {
 public:
   FontClient()
-  : mGlyphInfo()
+  : mIsAtlasLimitationEnabled(TextAbstraction::FontClient::DEFAULT_ATLAS_LIMITATION_ENABLED),
+    mCurrentMaximumBlockSizeFitInAtlas(TextAbstraction::FontClient::MAX_SIZE_FIT_IN_ATLAS)
   {
   }
 
   ~FontClient()
   {
+  }
+
+  static Dali::TextAbstraction::FontClient New()
+  {
+    return Dali::TextAbstraction::FontClient(new FontClient);
   }
 
   static Dali::TextAbstraction::FontClient Get()
@@ -146,7 +171,7 @@ public:
       }
       else // create and register the object
       {
-        fontClientHandle = Dali::TextAbstraction::FontClient(new FontClient);
+        fontClientHandle = Dali::TextAbstraction::Internal::FontClient::New();
         service.Register(typeid(fontClientHandle), fontClientHandle);
       }
     }
@@ -174,6 +199,10 @@ public:
   {
     return 10;
   }
+  uint32_t GetNumberOfPointsPerOneUnitOfPointSize() const
+  {
+    return 64u;
+  }
   void ResetSystemDefaults()
   {
   }
@@ -198,23 +227,23 @@ public:
   }
   PointSize26Dot6 GetPointSize(FontId id)
   {
-    return 9;
+    return id > 0u ? static_cast<PointSize26Dot6>(id) : DEFAULT_POINT_SIZE_26DOT6;
   }
   FontId FindDefaultFont(Character charcode, PointSize26Dot6 pointSize, bool preferColor)
   {
-    return 0;
+    return GetMockFontId(pointSize);
   }
   FontId FindFallbackFont(Character charcode, const FontDescription& fontDescription, PointSize26Dot6 pointSize, bool preferColor)
   {
-    return 0;
+    return GetMockFontId(pointSize);
   }
   FontId GetFontId(const FontPath& path, PointSize26Dot6 pointSize, FaceIndex faceIndex)
   {
-    return 0;
+    return GetMockFontId(pointSize);
   }
   FontId GetFontId(const FontDescription& fontDescription, PointSize26Dot6 pointSize, FaceIndex faceIndex, Property::Map* variationsMapPtr)
   {
-    return 0;
+    return GetMockFontId(pointSize);
   }
   bool IsScalable(const FontPath& path)
   {
@@ -236,6 +265,13 @@ public:
   }
   void GetFontMetrics(FontId fontId, FontMetrics& metrics)
   {
+    const float pixelSize = GetMockFontPixelSize(fontId);
+
+    metrics.ascender           = pixelSize * 0.8f;
+    metrics.descender          = -pixelSize * 0.2f;
+    metrics.height             = pixelSize;
+    metrics.underlinePosition  = -pixelSize * 0.1f;
+    metrics.underlineThickness = std::max(1.0f, pixelSize * 0.05f);
   }
   GlyphIndex GetGlyphIndex(FontId fontId, Character charcode)
   {
@@ -247,6 +283,18 @@ public:
   }
   bool GetGlyphMetrics(GlyphInfo* array, uint32_t size, bool horizontal)
   {
+    for(uint32_t i = 0u; i < size; ++i)
+    {
+      GlyphInfo&  glyph     = array[i];
+      const float pixelSize = GetMockFontPixelSize(glyph.fontId);
+      const float width     = std::max(1.0f, pixelSize * 0.5f);
+
+      glyph.width    = width;
+      glyph.height   = pixelSize;
+      glyph.xBearing = 0.0f;
+      glyph.yBearing = pixelSize * 0.8f;
+      glyph.advance  = width;
+    }
     return true;
   }
   void CreateBitmap(FontId fontId, GlyphIndex glyphIndex, bool softwareItailc, bool softwareBold, Dali::TextAbstraction::GlyphBufferData& data, int outlineWidth)
@@ -296,9 +344,33 @@ public:
   {
     blobLength = 0;
   }
+  GlyphIndex CreateEmbeddedItem(const Dali::TextAbstraction::FontClient::EmbeddedItemDescription&,
+                                Pixel::Format& pixelFormat)
+  {
+    static thread_local GlyphIndex nextEmbeddedItemIndex = 1u;
+    pixelFormat                                          = Pixel::RGBA8888;
+    return nextEmbeddedItemIndex++;
+  }
   const GlyphInfo& GetEllipsisGlyph(PointSize26Dot6 pointSize)
   {
-    return mGlyphInfo;
+    // Some internal UTCs register the production FontClient object while the
+    // test API symbols are interposed. Do not write through this test class's
+    // instance layout in that case; return independent deterministic storage.
+    static thread_local GlyphInfo ellipsisGlyph;
+    const FontId                  fontId    = GetMockFontId(pointSize);
+    const float                   pixelSize = GetMockFontPixelSize(fontId);
+    ellipsisGlyph.fontId                    = fontId;
+    ellipsisGlyph.index                     = 0x2026u;
+    ellipsisGlyph.width                     = std::max(1.0f, pixelSize * 0.5f);
+    ellipsisGlyph.height                    = pixelSize;
+    ellipsisGlyph.xBearing                  = 0.0f;
+    ellipsisGlyph.yBearing                  = pixelSize * 0.8f;
+    ellipsisGlyph.advance                   = ellipsisGlyph.width;
+    ellipsisGlyph.scaleFactor               = 1.0f;
+    ellipsisGlyph.isItalicRequired          = false;
+    ellipsisGlyph.isBoldRequired            = false;
+    ellipsisGlyph.isShaped                  = false;
+    return ellipsisGlyph;
   }
   bool IsColorGlyph(FontId fontId, GlyphIndex glyphIndex)
   {
@@ -317,8 +389,49 @@ public:
     return false;
   }
 
+  void EnableAtlasLimitation(bool enabled)
+  {
+    mIsAtlasLimitationEnabled = enabled;
+  }
+
+  bool IsAtlasLimitationEnabled() const
+  {
+    return mIsAtlasLimitationEnabled;
+  }
+
+  Size GetMaximumTextAtlasSize() const
+  {
+    return TextAbstraction::FontClient::MAX_TEXT_ATLAS_SIZE;
+  }
+
+  Size GetDefaultTextAtlasSize() const
+  {
+    return TextAbstraction::FontClient::DEFAULT_TEXT_ATLAS_SIZE;
+  }
+
+  Size GetCurrentMaximumBlockSizeFitInAtlas() const
+  {
+    return mCurrentMaximumBlockSizeFitInAtlas;
+  }
+
+  bool SetCurrentMaximumBlockSizeFitInAtlas(const Size& currentMaximumBlockSizeFitInAtlas)
+  {
+    bool            isChanged        = false;
+    const Size&     maxTextAtlasSize = TextAbstraction::FontClient::MAX_TEXT_ATLAS_SIZE;
+    const uint16_t& padding          = TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK;
+
+    if(currentMaximumBlockSizeFitInAtlas.width <= maxTextAtlasSize.width - padding && currentMaximumBlockSizeFitInAtlas.height <= maxTextAtlasSize.height - padding)
+    {
+      mCurrentMaximumBlockSizeFitInAtlas = currentMaximumBlockSizeFitInAtlas;
+      isChanged                          = true;
+    }
+
+    return isChanged;
+  }
+
 private:
-  GlyphInfo mGlyphInfo;
+  bool mIsAtlasLimitationEnabled;
+  Size mCurrentMaximumBlockSizeFitInAtlas;
 }; // class FontClient
 
 class Shaping : public BaseObject
@@ -334,6 +447,11 @@ public:
   ~Shaping()
   {
     delete[] mText;
+  }
+
+  static Dali::TextAbstraction::Shaping New()
+  {
+    return Dali::TextAbstraction::Shaping(new Shaping);
   }
 
   static Dali::TextAbstraction::Shaping Get()
@@ -353,7 +471,7 @@ public:
       }
       else // create and register the object
       {
-        shapingHandle = Dali::TextAbstraction::Shaping(new Shaping);
+        shapingHandle = Dali::TextAbstraction::Internal::Shaping::New();
         service.Register(typeid(shapingHandle), shapingHandle);
       }
     }
@@ -468,6 +586,11 @@ BidirectionalSupport BidirectionalSupport::Get()
   return Internal::BidirectionalSupport::Get();
 }
 
+BidirectionalSupport BidirectionalSupport::New()
+{
+  return Internal::BidirectionalSupport::New();
+}
+
 BidiInfoIndex BidirectionalSupport::CreateInfo(const Character* const paragraph,
                                                Length                 numberOfCharacters,
                                                bool                   matchSystemLanguageDirection,
@@ -511,6 +634,11 @@ void BidirectionalSupport::GetCharactersDirection(BidiInfoIndex       bidiInfoIn
 FontClient FontClient::Get()
 {
   return Internal::FontClient::Get();
+}
+
+FontClient FontClient::New()
+{
+  return Internal::FontClient::New();
 }
 
 FontClient::FontClient()
@@ -568,6 +696,11 @@ void FontClient::GetDpi(unsigned int& horizontalDpi, unsigned int& verticalDpi)
 int FontClient::GetDefaultFontSize()
 {
   return GetImplementation(*this).GetDefaultFontSize();
+}
+
+uint32_t FontClient::GetNumberOfPointsPerOneUnitOfPointSize() const
+{
+  return GetImplementation(*this).GetNumberOfPointsPerOneUnitOfPointSize();
 }
 
 void FontClient::ResetSystemDefaults()
@@ -702,9 +835,25 @@ void FontClient::CreateVectorBlob(FontId        fontId,
   GetImplementation(*this).CreateVectorBlob(fontId, glyphIndex, blob, blobLength, nominalWidth, nominalHeight);
 }
 
+GlyphIndex FontClient::CreateEmbeddedItem(const EmbeddedItemDescription& description, Pixel::Format& pixelFormat)
+{
+  return GetImplementation(*this).CreateEmbeddedItem(description, pixelFormat);
+}
 const GlyphInfo& FontClient::GetEllipsisGlyph(PointSize26Dot6 pointSize)
 {
   return GetImplementation(*this).GetEllipsisGlyph(pointSize);
+}
+
+const FontPathList& FontClient::GetCustomFontDirectories()
+{
+  static const FontPathList customFontDirectories;
+  return customFontDirectories;
+}
+
+CustomFontAddedSignalType& FontClient::CustomFontAddedSignal()
+{
+  static CustomFontAddedSignalType customFontAddedSignal;
+  return customFontAddedSignal;
 }
 
 bool FontClient::IsColorGlyph(FontId fontId, GlyphIndex glyphIndex)
@@ -725,6 +874,36 @@ bool FontClient::IsRenderableColrV1Font(FontId fontId)
 bool FontClient::IsRenderableColrV1Glyph(FontId fontId, GlyphIndex glyphIndex)
 {
   return GetImplementation(*this).IsRenderableColrV1Glyph(fontId, glyphIndex);
+}
+
+void FontClient::EnableAtlasLimitation(bool enabled)
+{
+  GetImplementation(*this).EnableAtlasLimitation(enabled);
+}
+
+bool FontClient::IsAtlasLimitationEnabled() const
+{
+  return GetImplementation(*this).IsAtlasLimitationEnabled();
+}
+
+Size FontClient::GetMaximumTextAtlasSize() const
+{
+  return GetImplementation(*this).GetMaximumTextAtlasSize();
+}
+
+Size FontClient::GetDefaultTextAtlasSize() const
+{
+  return GetImplementation(*this).GetDefaultTextAtlasSize();
+}
+
+Size FontClient::GetCurrentMaximumBlockSizeFitInAtlas() const
+{
+  return GetImplementation(*this).GetCurrentMaximumBlockSizeFitInAtlas();
+}
+
+bool FontClient::SetCurrentMaximumBlockSizeFitInAtlas(const Size& currentMaximumBlockSizeFitInAtlas)
+{
+  return GetImplementation(*this).SetCurrentMaximumBlockSizeFitInAtlas(currentMaximumBlockSizeFitInAtlas);
 }
 
 FontClient::FontClient(Internal::FontClient* internal)
@@ -882,6 +1061,11 @@ void Segmentation::GetWordBreakPositionsUtf8(unsigned char const* text, unsigned
 Shaping Shaping::Get()
 {
   return TextAbstraction::Internal::Shaping::Get();
+}
+
+Shaping Shaping::New()
+{
+  return TextAbstraction::Internal::Shaping::New();
 }
 
 Shaping::Shaping()
