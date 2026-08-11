@@ -22,8 +22,8 @@
 #include <dali-toolkit/public-api/controls/control.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
+#include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
+#include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
 
 namespace Dali
 {
@@ -174,7 +174,7 @@ public:
    * This method is similar to registration. The added shape is drawn on the inner canvas.
    * @param[in] drawable the drawable object.
    */
-  void AddDrawable(Dali::CanvasRenderer::Drawable& drawable);
+  void AddDrawable(Dali::CanvasRenderer::Drawable drawable);
 
   /**
    * @brief Remove drawable object to the CanvasView.
@@ -182,7 +182,7 @@ public:
    * @param[in] drawable the drawable object.
    * @return Returns True when it's successful. False otherwise.
    */
-  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable drawable);
 
   /**
    * @brief Remove all drawable objects added to the CanvasView.

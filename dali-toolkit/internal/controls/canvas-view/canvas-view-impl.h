@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
-#include <dali/devel-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
+#include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
+#include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
+#include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/window.h>
@@ -64,7 +64,7 @@ public:
   /**
    * @copydoc Toolkit::Control::CanvasView::AddDrawable
    */
-  bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable);
+  bool AddDrawable(Dali::CanvasRenderer::Drawable drawable);
 
   /**
    * Called when a property of an object of this type is set.
@@ -85,7 +85,7 @@ public:
   /**
    * @copydoc Toolkit::Control::CanvasView::RemoveDrawable
    */
-  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable drawable);
 
   /**
    * @copydoc Toolkit::Control::CanvasView::RemoveAllDrawables
@@ -135,7 +135,7 @@ public:
    * @brief This is the viewbox of the Canvas.
    * @return Returns The size of viewbox.
    */
-  const Vector2& GetViewBox();
+  Vector2 GetViewBox();
 
   /**
    * @brief Set to load the canvas synchronously.
