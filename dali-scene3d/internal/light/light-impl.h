@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <string_view>

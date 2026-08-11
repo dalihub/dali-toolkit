@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>

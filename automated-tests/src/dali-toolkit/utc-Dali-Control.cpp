@@ -22,6 +22,7 @@
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/string-utils.h>

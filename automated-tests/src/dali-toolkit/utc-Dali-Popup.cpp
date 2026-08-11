@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/events/key-event-integ.h>

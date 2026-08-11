@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry.h>

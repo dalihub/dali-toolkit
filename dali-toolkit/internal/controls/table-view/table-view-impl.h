@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES

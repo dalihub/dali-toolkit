@@ -20,6 +20,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/integration-api/string-utils.h>
 
 #include <stdlib.h>

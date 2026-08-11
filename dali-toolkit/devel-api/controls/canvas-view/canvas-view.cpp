@@ -68,12 +68,12 @@ CanvasView CanvasView::DownCast(BaseHandle handle)
   return Control::DownCast<CanvasView, Internal::CanvasView>(handle);
 }
 
-void CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
+void CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable drawable)
 {
   Dali::Toolkit::GetImpl(*this).AddDrawable(drawable);
 }
 
-bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable drawable)
 {
   return Dali::Toolkit::GetImpl(*this).RemoveDrawable(drawable);
 }

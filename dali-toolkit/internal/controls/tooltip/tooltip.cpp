@@ -22,6 +22,7 @@
 #include <cmath>
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>

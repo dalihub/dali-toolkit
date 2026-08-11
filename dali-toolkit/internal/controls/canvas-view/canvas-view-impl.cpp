@@ -358,7 +358,7 @@ void CanvasView::ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task)
   }
 }
 
-bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
+bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable drawable)
 {
   if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.AddDrawable(drawable))
   {
@@ -367,7 +367,7 @@ bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
   return false;
 }
 
-bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable drawable)
 {
   if(DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.RemoveDrawable(drawable))
   {
@@ -404,7 +404,7 @@ bool CanvasView::SetViewBox(const Vector2& viewBox)
   return false;
 }
 
-const Vector2& CanvasView::GetViewBox()
+Vector2 CanvasView::GetViewBox()
 {
   if(DALI_LIKELY(mCanvasRenderer))
   {

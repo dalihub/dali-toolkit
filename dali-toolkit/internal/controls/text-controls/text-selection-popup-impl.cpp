@@ -23,6 +23,7 @@
 #include <libintl.h>
 #endif
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>

@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/animation/animation-data.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
