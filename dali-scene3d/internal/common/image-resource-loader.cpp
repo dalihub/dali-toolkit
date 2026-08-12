@@ -23,7 +23,7 @@
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
@@ -169,10 +169,10 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
     oss << "u:" << info.mUrl << "]";
   });
   // Load the image synchronously (block the thread here).
-  Dali::Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mSamplingMode, true);
+  Dali::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mSamplingMode, true);
   if(pixelBuffer)
   {
-    pixelData = Dali::Devel::PixelBuffer::Convert(pixelBuffer, releasePixelData);
+    pixelData = Dali::DevelPixelBuffer::Convert(pixelBuffer, releasePixelData);
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
     // Store URL mapping for this PixelData (called from worker thread)
     if(DALI_LIKELY(!!gCacheImpl) && DALI_LIKELY(pixelData) && SupportPixelDataCache(pixelData))
@@ -716,10 +716,10 @@ Dali::PixelData GetDefaultBrdfPixelData()
 
     if(DALI_UNLIKELY(!defaultBrdfPixelData))
     {
-      Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Toolkit::AssetManager::GetDaliImagePath() + std::string(PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME));
+      PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Toolkit::AssetManager::GetDaliImagePath() + std::string(PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME));
       if(pixelBuffer)
       {
-        defaultBrdfPixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+        defaultBrdfPixelData = PixelBuffer::Convert(pixelBuffer);
       }
     }
     return defaultBrdfPixelData;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ uint32_t Load(AsyncImageLoader                         asyncImageLoader,
 }
 
 uint32_t ApplyMask(AsyncImageLoader                         asyncImageLoader,
-                   Devel::PixelBuffer                       pixelBuffer,
-                   Devel::PixelBuffer                       maskPixelBuffer,
+                   PixelBuffer                              pixelBuffer,
+                   PixelBuffer                              maskPixelBuffer,
                    float                                    contentScale,
                    bool                                     cropToMask,
                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)

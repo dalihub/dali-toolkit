@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,8 +212,8 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
 
   loader.ImageLoadedSignal().Connect(&loadedSignalVerifier, &ImageLoadedSignalVerifier::ImageLoaded);
 
-  loader.Load(gImage_34_RGBA);                                                                                                             // Trigger 1
-  uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));                                                                    // Trigger 2
+  loader.Load(gImage_34_RGBA);                                                                                 // Trigger 1
+  uint32_t id02 = loader.Load(gImage_50_RGBA, ImageDimensions(25, 25));                                        // Trigger 2
   uint32_t id03 = loader.Load(gImage_128_RGB, ImageDimensions(100, 100), SamplingMode::BOX_THEN_LINEAR, true); // Trigger 3
 
   // Try load animted image
@@ -221,8 +221,8 @@ int UtcDaliAsyncImageLoaderLoadAndLoadedSignal(void)
   DevelAsyncImageLoader::LoadAnimatedImage(loader, animatedImageLoading, 0, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF); // Trigger 4
 
   // Try apply mask image
-  Devel::PixelBuffer imageData = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
-  Devel::PixelBuffer maskData  = Devel::PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
+  PixelBuffer imageData = PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
+  PixelBuffer maskData  = PixelBuffer::New(50, 50, Dali::Pixel::RGBA8888);
   DevelAsyncImageLoader::ApplyMask(loader, imageData, maskData, 0.0f, false, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF); // Trigger 5 - ApplyMask also uses AsyncTask
 
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5), true, TEST_LOCATION); // Wait for 5 triggers

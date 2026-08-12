@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -255,7 +255,7 @@ public:
    * @param [in] pixelBuffer loaded pixel buffer.
    * @param [in] preMultiplied whether the loaded image is premultiplied or not
    */
-  void SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied);
+  void SetLoadedNPatchData(PixelBuffer& pixelBuffer, bool preMultiplied);
 
   /**
    * @brief Send LoadComplete notify with current setuped NPatchData

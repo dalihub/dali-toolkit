@@ -91,8 +91,8 @@ public:
    * @param [in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    */
   void ApplyMask(const TextureManager::TextureId                textureId,
-                 Devel::PixelBuffer                             pixelBuffer,
-                 Devel::PixelBuffer                             maskPixelBuffer,
+                 PixelBuffer                                    pixelBuffer,
+                 PixelBuffer                                    maskPixelBuffer,
                  const float                                    contentScale,
                  const bool                                     cropToMask,
                  const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);

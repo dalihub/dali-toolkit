@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 // EXTERNAL HEADERS
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/addons/addon-base.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 
@@ -56,7 +56,7 @@ static Geometry GetGeometryInternal(TextureManager::TextureId textureId, uint32_
   return Dali::Geometry::New();
 }
 
-static Geometry CreateGeometryInternal(TextureManager::TextureId textureId, const Devel::PixelBuffer& pixelBuffer)
+static Geometry CreateGeometryInternal(TextureManager::TextureId textureId, const PixelBuffer& pixelBuffer)
 {
   gCallStack.emplace_back("CreateGeometry");
   fprintf(stderr, "AddOn::CreateGeometryInternal()\n");
@@ -73,7 +73,7 @@ static Geometry CreateGeometryMapInternal(const void*       opacityMap,
   return Dali::Geometry::New();
 }
 
-static void* NPatchBuildInternal(const Devel::PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchData* data)
+static void* NPatchBuildInternal(const PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchData* data)
 {
   gCallStack.emplace_back("BuildNPatch");
   fprintf(stderr, "AddOn::NPatchBuild()\n");

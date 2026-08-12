@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/signals/dali-signal.h>
 
@@ -53,19 +53,19 @@ public:
   {
     TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const bool preMultiplied);
     TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const std::string& url, const bool preMultiplied);
-    TextureInformation(const ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied);
+    TextureInformation(const ReturnType returnType, PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied);
     TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval, const bool preMultiplied);
 
     TextureInformation();
 
-    ReturnType         returnType;    ///< Returned Texture type.
-    int32_t            textureId;     ///< The textureId of the loaded texture in the TextureManager
-    TextureSet         textureSet;    ///< The TextureSet containing the Texture
-    bool               preMultiplied; ///< True if the image had pre-multiplied alpha applied
-    Devel::PixelBuffer pixelBuffer;   ///< The PixelBuffer of the loaded image.
-    std::string_view   url;           ///< The url address of the loaded image.
-    uint32_t           frameCount{0}; ///< The frameCount of the animated image
-    uint32_t           interval{0};   ///< Time interval between currently loaded frame and next frame.
+    ReturnType       returnType;    ///< Returned Texture type.
+    int32_t          textureId;     ///< The textureId of the loaded texture in the TextureManager
+    TextureSet       textureSet;    ///< The TextureSet containing the Texture
+    bool             preMultiplied; ///< True if the image had pre-multiplied alpha applied
+    PixelBuffer      pixelBuffer;   ///< The PixelBuffer of the loaded image.
+    std::string_view url;           ///< The url address of the loaded image.
+    uint32_t         frameCount{0}; ///< The frameCount of the animated image
+    uint32_t         interval{0};   ///< Time interval between currently loaded frame and next frame.
   };
 
 public:

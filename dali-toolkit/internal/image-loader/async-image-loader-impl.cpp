@@ -91,8 +91,8 @@ uint32_t AsyncImageLoader::LoadEncodedImageBuffer(const EncodedImageBuffer&     
   return mLoadTaskId;
 }
 
-uint32_t AsyncImageLoader::ApplyMask(Devel::PixelBuffer                       pixelBuffer,
-                                     Devel::PixelBuffer                       maskPixelBuffer,
+uint32_t AsyncImageLoader::ApplyMask(PixelBuffer                              pixelBuffer,
+                                     PixelBuffer                              maskPixelBuffer,
                                      float                                    contentScale,
                                      bool                                     cropToMask,
                                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
@@ -164,7 +164,7 @@ void AsyncImageLoader::ProcessLoadedImage(LoadingTaskPtr task)
     PixelData pixelData;
     if(!task->pixelBuffers.empty())
     {
-      pixelData = Devel::PixelBuffer::Convert(task->pixelBuffers[0]);
+      pixelData = PixelBuffer::Convert(task->pixelBuffers[0]);
     }
     mLoadedSignal.Emit(task->id, pixelData);
   }

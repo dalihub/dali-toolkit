@@ -223,7 +223,7 @@ void SvgRasterizingTask::Process()
     oss << "[s:" << mWidth << "x" << mHeight << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
-  Devel::PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
+  PixelBuffer pixelBuffer = mVectorRenderer.Rasterize(mWidth, mHeight);
   if(!pixelBuffer)
   {
     DALI_LOG_ERROR("Rasterize is failed!\n");
@@ -238,7 +238,7 @@ void SvgRasterizingTask::Process()
     return;
   }
 
-  mPixelData    = Devel::PixelBuffer::Convert(pixelBuffer);
+  mPixelData    = PixelBuffer::Convert(pixelBuffer);
   mHasSucceeded = true;
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SVG_RASTERIZE_TASK", [&](std::ostringstream& oss)

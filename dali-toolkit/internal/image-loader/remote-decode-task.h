@@ -20,8 +20,8 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
@@ -45,14 +45,14 @@ using RemoteDecodeTaskPtr = IntrusivePtr<RemoteDecodeTask>;
 class RemoteDecodeTask : public AsyncTask
 {
 public:
-  RemoteDecodeTask(TextureManagerType::TextureId             textureId,
-                   const std::string&                        localFilePath,
-                   const Dali::ImageDimensions&              desiredSize,
-                   Dali::SamplingMode::Type                  samplingMode,
-                   bool                                      orientationCorrection,
+  RemoteDecodeTask(TextureManagerType::TextureId            textureId,
+                   const std::string&                       localFilePath,
+                   const Dali::ImageDimensions&             desiredSize,
+                   Dali::SamplingMode::Type                 samplingMode,
+                   bool                                     orientationCorrection,
                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                   bool                                      loadYuvPlanes,
-                   CallbackBase*                             callback);
+                   bool                                     loadYuvPlanes,
+                   CallbackBase*                            callback);
 
   ~RemoteDecodeTask() override;
 
@@ -65,8 +65,8 @@ public: // Implementation of AsyncTask
   }
 
 public:
-  TextureManagerType::TextureId   textureId;
-  std::vector<Devel::PixelBuffer> pixelBuffers;
+  TextureManagerType::TextureId textureId;
+  std::vector<PixelBuffer>      pixelBuffers;
 
 private:
   std::string                              mLocalFilePath;

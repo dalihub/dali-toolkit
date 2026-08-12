@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>

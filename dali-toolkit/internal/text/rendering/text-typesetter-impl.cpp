@@ -135,7 +135,7 @@ else                                                                            
  */
 struct GlyphData
 {
-  Devel::PixelBuffer               bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
+  PixelBuffer                      bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
   Vector2*                         position;         ///< The position of the glyph.
   TextAbstraction::GlyphBufferData glyphBitmap;      ///< The glyph's bitmap.
   uint32_t                         width;            ///< The bitmap's width.
@@ -1089,9 +1089,9 @@ void CreateImageBufferForEachLine(TextAbstraction::FontClient fontClient, GlyphD
  *
  * @return An image buffer.
  */
-inline Devel::PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat)
+inline PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat)
 {
-  Devel::PixelBuffer imageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
+  PixelBuffer imageBuffer = PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
 
   if(Pixel::RGBA8888 == pixelFormat)
   {
@@ -1128,12 +1128,12 @@ TextAbstraction::FontClient& Typesetter::Impl::GetFontClient()
   return mFontClient;
 }
 
-Devel::PixelBuffer Typesetter::Impl::CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat)
+PixelBuffer Typesetter::Impl::CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat)
 {
   return Dali::Toolkit::Text::CreateTransparentImageBuffer(bufferWidth, bufferHeight, pixelFormat);
 }
 
-void Typesetter::Impl::DrawGlyphsBackground(Devel::PixelBuffer& buffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const int32_t horizontalOffset, const int32_t verticalOffset)
+void Typesetter::Impl::DrawGlyphsBackground(PixelBuffer& buffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const int32_t horizontalOffset, const int32_t verticalOffset)
 {
   // Use l-value to make ensure it is not nullptr, so compiler happy.
   auto& viewModel = *(mModel.get());
@@ -1264,7 +1264,7 @@ void Typesetter::Impl::DrawGlyphsBackground(Devel::PixelBuffer& buffer, const ui
   }
 }
 
-Devel::PixelBuffer Typesetter::Impl::CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const GlyphIndex fromGlyphIndex, const GlyphIndex toGlyphIndex)
+PixelBuffer Typesetter::Impl::CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const GlyphIndex fromGlyphIndex, const GlyphIndex toGlyphIndex)
 {
   // Use l-value to make ensure it is not nullptr, so compiler happy.
   auto& viewModel = *(mModel.get());

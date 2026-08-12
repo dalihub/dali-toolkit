@@ -1102,7 +1102,7 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   return newLayoutSize;
 }
 
-Devel::PixelBuffer RenderText(const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters)
+PixelBuffer RenderText(const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters)
 {
   ////////////////////////////////////////////////////////////////////////////////
   // Render the text.
@@ -1115,13 +1115,13 @@ Devel::PixelBuffer RenderText(const RendererParameters& textParameters, TextAbst
   return renderer.Render(rendererParameters);
 }
 
-Devel::PixelBuffer Render(const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout)
+PixelBuffer Render(const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout)
 {
   if(textParameters.text.empty())
   {
-    Dali::Devel::PixelBuffer pixelBuffer = Dali::Devel::PixelBuffer::New(textParameters.textWidth,
-                                                                         textParameters.textHeight,
-                                                                         Dali::Pixel::RGBA8888);
+    Dali::PixelBuffer pixelBuffer = Dali::PixelBuffer::New(textParameters.textWidth,
+                                                           textParameters.textHeight,
+                                                           Dali::Pixel::RGBA8888);
 
     const unsigned int bufferSize = textParameters.textWidth * textParameters.textHeight * Dali::Pixel::GetBytesPerPixel(Dali::Pixel::RGBA8888);
     unsigned char*     buffer     = pixelBuffer.GetBuffer();
@@ -1196,7 +1196,7 @@ Devel::PixelBuffer Render(const RendererParameters& textParameters, Vector<Embed
   return RenderText(textParameters, rendererParameters);
 }
 
-Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowParameters)
+PixelBuffer CreateShadow(const ShadowParameters& shadowParameters)
 {
   // The size of the pixel data.
   const int width  = static_cast<int>(shadowParameters.input.GetWidth());
@@ -1212,7 +1212,7 @@ Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowParameters)
   const bool          isA8           = Pixel::A8 == inputFormat;
 
   // Creates the output pixel buffer.
-  Devel::PixelBuffer outputPixelBuffer = Devel::PixelBuffer::New(width, height, Pixel::RGBA8888);
+  PixelBuffer outputPixelBuffer = PixelBuffer::New(width, height, Pixel::RGBA8888);
 
   // Clear the output buffer
   unsigned char* outputPixelBufferPtr = outputPixelBuffer.GetBuffer();
@@ -1354,7 +1354,7 @@ Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowParameters)
   return outputPixelBuffer;
 }
 
-Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBuffer, const Vector4& color, bool multiplyByAlpha)
+PixelBuffer ConvertToRgba8888(PixelBuffer pixelBuffer, const Vector4& color, bool multiplyByAlpha)
 {
   if(Dali::Pixel::A8 != pixelBuffer.GetPixelFormat())
   {
@@ -1364,7 +1364,7 @@ Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBuffer, const Vecto
 
   const unsigned int width          = pixelBuffer.GetWidth();
   const unsigned int height         = pixelBuffer.GetHeight();
-  Devel::PixelBuffer newPixelBuffer = Devel::PixelBuffer::New(width, height, Dali::Pixel::RGBA8888);
+  PixelBuffer        newPixelBuffer = PixelBuffer::New(width, height, Dali::Pixel::RGBA8888);
 
   unsigned char*             dstBuffer = newPixelBuffer.GetBuffer();
   const unsigned char* const srcBuffer = pixelBuffer.GetBuffer();
@@ -1406,7 +1406,7 @@ Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBuffer, const Vecto
   return newPixelBuffer;
 }
 
-void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x, unsigned int y, bool blend)
+void UpdateBuffer(PixelBuffer src, PixelBuffer dst, unsigned int x, unsigned int y, bool blend)
 {
   const Dali::Pixel::Format pixelFormat = dst.GetPixelFormat();
   if(src.GetPixelFormat() != pixelFormat)

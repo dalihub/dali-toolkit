@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/object/property-array.h>
 #include <string>
 
@@ -112,11 +112,11 @@ struct DALI_TOOLKIT_API EmbeddedItemInfo
  */
 struct DALI_TOOLKIT_API ShadowParameters
 {
-  Devel::PixelBuffer input;       ///< The input pixel buffer used to create the shadow.
-  Vector4            textColor;   ///< The color of the text.
-  Vector4            color;       ///< The color of the shadow.
-  Vector2            offset;      ///< The offset of the shadow.
-  bool               blendShadow; ///< Whether to blend the shadow.
+  PixelBuffer input;       ///< The input pixel buffer used to create the shadow.
+  Vector4     textColor;   ///< The color of the text.
+  Vector4     color;       ///< The color of the shadow.
+  Vector2     offset;      ///< The offset of the shadow.
+  bool        blendShadow; ///< Whether to blend the shadow.
 };
 
 /**
@@ -152,7 +152,7 @@ struct DALI_TOOLKIT_API ShadowParameters
  *
  * @return A pixel buffer with the text rendered on it.
  */
-DALI_TOOLKIT_API Devel::PixelBuffer Render(const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout);
+DALI_TOOLKIT_API PixelBuffer Render(const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout);
 
 /**
  * @brief Creates a shadow for the text given in the input pixel buffer.
@@ -167,7 +167,7 @@ DALI_TOOLKIT_API Devel::PixelBuffer Render(const RendererParameters& textParamet
  *
  * @return A pixel buffer with the text and the shadow rendered on it.
  */
-DALI_TOOLKIT_API Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowParameters);
+DALI_TOOLKIT_API PixelBuffer CreateShadow(const ShadowParameters& shadowParameters);
 
 /**
  * @brief Converts a @p pixelBuffer with pixel format A8 to RGBA8888 using the given @p color.
@@ -180,7 +180,7 @@ DALI_TOOLKIT_API Devel::PixelBuffer CreateShadow(const ShadowParameters& shadowP
  *
  * @return The pixel buffer converted to RGBA8888.
  */
-DALI_TOOLKIT_API Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBuffer, const Vector4& color, bool multiplyByAlpha);
+DALI_TOOLKIT_API PixelBuffer ConvertToRgba8888(PixelBuffer pixelBuffer, const Vector4& color, bool multiplyByAlpha);
 
 /**
  * @brief Updates the @p dst pixel buffer with the data from @p src pixel buffer.
@@ -196,7 +196,7 @@ DALI_TOOLKIT_API Devel::PixelBuffer ConvertToRgba8888(Devel::PixelBuffer pixelBu
  * @param[in] y The top left corner's y within the destination pixel buffer.
  * @param[in] blend Whether to blend the source pixel buffer with the destination pixel buffer as background.
  */
-DALI_TOOLKIT_API void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x, unsigned int y, bool blend);
+DALI_TOOLKIT_API void UpdateBuffer(PixelBuffer src, PixelBuffer dst, unsigned int x, unsigned int y, bool blend);
 
 /**
  * @brief Splits the text in pages of the size given in @p textParameters

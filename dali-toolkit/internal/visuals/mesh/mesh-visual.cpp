@@ -50,11 +50,11 @@ Texture LoadTexture(const char* imageUrl, bool generateMipmaps)
 {
   Texture texture;
 
-  Devel::PixelBuffer pixelBuffer = LoadImageFromFile(imageUrl);
+  PixelBuffer pixelBuffer = LoadImageFromFile(imageUrl);
   if(pixelBuffer)
   {
     texture             = Texture::New(TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
-    PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+    PixelData pixelData = PixelBuffer::Convert(pixelBuffer);
     texture.Upload(pixelData);
 
     if(generateMipmaps)

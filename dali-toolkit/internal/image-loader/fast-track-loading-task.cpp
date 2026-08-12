@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/debug.h>
@@ -188,8 +189,8 @@ void FastTrackLoadingTask::Load()
     mStartTimeNanoSceonds = GetNanoseconds();
     oss << "[u:" << mUrl.GetEllipsedUrl() << "]"; });
 
-  Devel::PixelBuffer              pixelBuffer;
-  std::vector<Devel::PixelBuffer> pixelBuffers;
+  PixelBuffer              pixelBuffer;
+  std::vector<PixelBuffer> pixelBuffers;
 
   if(mUrl.IsValid() && mUrl.IsLocalResource())
   {
@@ -226,7 +227,7 @@ void FastTrackLoadingTask::Load()
     uint32_t index = 0u;
     for(auto&& pixelBuffer : pixelBuffers)
     {
-      mPixelData[index++] = Dali::Devel::PixelBuffer::Convert(pixelBuffer);
+      mPixelData[index++] = Dali::PixelBuffer::Convert(pixelBuffer);
     }
 
     if(pixelBuffers.size() > 1u)
@@ -275,12 +276,12 @@ void FastTrackLoadingTask::Load()
     oss << "u:" << mUrl.GetEllipsedUrl() << "]"; });
 }
 
-void FastTrackLoadingTask::MultiplyAlpha(Dali::Devel::PixelBuffer pixelBuffer)
+void FastTrackLoadingTask::MultiplyAlpha(Dali::PixelBuffer pixelBuffer)
 {
   if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
-    pixelBuffer.MultiplyColorByAlpha();
-    mPremultiplied = pixelBuffer.IsAlphaPreMultiplied();
+    DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffer);
+    mPremultiplied = DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer);
   }
 }
 

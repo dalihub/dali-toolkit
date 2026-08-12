@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -29,14 +30,14 @@ namespace Toolkit
 namespace Internal
 {
 
-RemoteDecodeTask::RemoteDecodeTask(TextureManagerType::TextureId             textureId,
-                                   const std::string&                        localFilePath,
-                                   const Dali::ImageDimensions&              desiredSize,
-                                   Dali::SamplingMode::Type                  samplingMode,
-                                   bool                                      orientationCorrection,
-                                   DevelAsyncImageLoader::PreMultiplyOnLoad  preMultiplyOnLoad,
-                                   bool                                      loadYuvPlanes,
-                                   CallbackBase*                             callback)
+RemoteDecodeTask::RemoteDecodeTask(TextureManagerType::TextureId            textureId,
+                                   const std::string&                       localFilePath,
+                                   const Dali::ImageDimensions&             desiredSize,
+                                   Dali::SamplingMode::Type                 samplingMode,
+                                   bool                                     orientationCorrection,
+                                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                                   bool                                     loadYuvPlanes,
+                                   CallbackBase*                            callback)
 : AsyncTask(callback),
   textureId(textureId),
   pixelBuffers(),
@@ -53,7 +54,7 @@ RemoteDecodeTask::~RemoteDecodeTask() = default;
 
 void RemoteDecodeTask::Process()
 {
-  Devel::PixelBuffer pixelBuffer;
+  PixelBuffer pixelBuffer;
 
   if(!mLocalFilePath.empty())
   {
@@ -74,7 +75,7 @@ void RemoteDecodeTask::Process()
 
   if(!pixelBuffers.empty() && mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
-    pixelBuffers[0].MultiplyColorByAlpha();
+    DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffers[0]);
   }
 
   if(pixelBuffers.empty())

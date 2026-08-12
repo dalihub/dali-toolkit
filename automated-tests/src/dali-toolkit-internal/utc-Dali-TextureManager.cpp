@@ -24,16 +24,16 @@
 #include <toolkit-event-thread-callback.h>
 #include <toolkit-timer.h>
 
+#include <dali-toolkit/internal/image-loader/remote-decode-task.h>
 #include <dali-toolkit/internal/texture-manager/texture-async-loading-helper.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
-#include <dali-toolkit/internal/image-loader/remote-decode-task.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
 #include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 
 #include <test-encoded-image-buffer.h>
 
@@ -410,7 +410,7 @@ int UtcTextureManagerEncodedImageBuffer(void)
 
   TestObserver observer2;
   // Syncload
-  Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+  PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
     SamplingMode::BOX_THEN_LINEAR,
@@ -936,8 +936,8 @@ int UtcTextureManagerEncodedImageBufferReferenceCount(void)
   DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
 
   // LoadPixelBuffer doen't use cache. url2 will not be cached
-  TestObserver       observer2;
-  Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+  TestObserver observer2;
+  PixelBuffer  pixelBuffer = textureManager.LoadPixelBuffer(
     url2,
     ImageDimensions(),
     SamplingMode::BOX_THEN_LINEAR,
@@ -1011,8 +1011,8 @@ int UtcTextureManagerCachingForDifferentLoadingType(void)
   DALI_TEST_EQUALS(observer1.mObserverCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS(observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION);
 
-  TestObserver       observer2;
-  Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+  TestObserver observer2;
+  PixelBuffer  pixelBuffer = textureManager.LoadPixelBuffer(
     filename,
     ImageDimensions(),
     SamplingMode::BOX_THEN_LINEAR,
@@ -1187,7 +1187,7 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
 
   // CAPTION : HARD-CODING for coverage.
   {
-    Dali::Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+    Dali::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
       filename,
       ImageDimensions(),
       SamplingMode::BOX_THEN_LINEAR,
@@ -1196,10 +1196,10 @@ int UtcTextureManagerUseInvalidMaskAndMaskLoadedLater(void)
       true, ///< orientationCorrection
       preMultiply);
 
-    std::vector<Devel::PixelBuffer> pixelBuffers;
+    std::vector<PixelBuffer> pixelBuffers;
     pixelBuffers.push_back(pixelBuffer);
     textureManager.AsyncLoadComplete(textureId, pixelBuffers);
-    std::vector<Devel::PixelBuffer> maskBuffers;
+    std::vector<PixelBuffer> maskBuffers;
     textureManager.AsyncLoadComplete(maskInfo->mAlphaMaskId, maskBuffers);
     textureManager.RequestRemove(maskInfo->mAlphaMaskId, nullptr);
     textureManager.RequestRemove(textureId, &observer);
@@ -1578,7 +1578,7 @@ int UtcTextureManagerRemoveDuringApplyMasking(void)
 
   // CAPTION : HARD-CODING.
   {
-    std::vector<Devel::PixelBuffer> pixelBuffers;
+    std::vector<PixelBuffer> pixelBuffers;
     textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
     textureManager.RequestRemove(textureId2, &observer2);
   }
@@ -1929,16 +1929,16 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
   // CAPTION : HARD-CODING.
   {
     // Complete async load 1, 2, 3.
-    std::vector<Devel::PixelBuffer> pixelBuffers;
+    std::vector<PixelBuffer> pixelBuffers;
 
     pixelBuffers.clear();
-    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
     textureManager.AsyncLoadComplete(textureId1, pixelBuffers);
     pixelBuffers.clear();
-    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
     textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
     pixelBuffers.clear();
-    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
     textureManager.AsyncLoadComplete(textureId3, pixelBuffers);
 
     // Ensure textureId3 remove request processed.
@@ -1954,7 +1954,7 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
 
     // Complete mask load.
     pixelBuffers.clear();
-    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::L8));
+    pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::L8));
     textureManager.AsyncLoadComplete(maskInfo[0]->mAlphaMaskId, pixelBuffers);
 
     tet_printf("Id info after observer notify - mask : {%d}, 1 : {%d}, 2 : {%d}, 3 : {%d}, 4 : {%d}\n", static_cast<int>(maskInfo[0]->mAlphaMaskId), static_cast<int>(textureId1), static_cast<int>(textureId2), static_cast<int>(textureId3), static_cast<int>(textureId4));
@@ -1974,7 +1974,7 @@ int UtcTextureManagerRemoveDuringGPUMasking(void)
 
     // Complete 4.
     pixelBuffers.clear();
-    pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+    pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
     textureManager.AsyncLoadComplete(textureId4, pixelBuffers);
 
     DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
@@ -2232,10 +2232,10 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
     do
     {
       tet_printf("Complete async load 1 first.\n");
-      std::vector<Devel::PixelBuffer> pixelBuffers;
+      std::vector<PixelBuffer> pixelBuffers;
 
       pixelBuffers.clear();
-      pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+      pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
       textureManager.AsyncLoadComplete(textureId1, pixelBuffers);
 
       if(forciblyExit)
@@ -2265,7 +2265,7 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
 
       tet_printf("Complete async load 2. Let we check old version observer2 ignored and newly observer2 loaded.\n");
       pixelBuffers.clear();
-      pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+      pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
       textureManager.AsyncLoadComplete(textureId2, pixelBuffers);
 
       DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);
@@ -2280,7 +2280,7 @@ int UtcTextureManagerDestroyObserverDuringObserve(void)
 
       tet_printf("Complete async load 3.\n");
       pixelBuffers.clear();
-      pixelBuffers.push_back(Devel::PixelBuffer::New(1, 1, Pixel::Format::RGB888));
+      pixelBuffers.push_back(PixelBuffer::New(1, 1, Pixel::Format::RGB888));
       textureManager.AsyncLoadComplete(textureId3, pixelBuffers);
 
       DALI_TEST_EQUALS(observer1.mLoaded, true, TEST_LOCATION);

@@ -27,7 +27,7 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-void InitialiseRegionsToZeroAlpha(Dali::Devel::PixelBuffer pixelBuffer, uint32_t width, uint32_t height, Pixel::Format pixelFormat)
+void InitialiseRegionsToZeroAlpha(Dali::PixelBuffer pixelBuffer, uint32_t width, uint32_t height, Pixel::Format pixelFormat)
 {
   unsigned char* buffer        = pixelBuffer.GetBuffer();
   uint32_t       bytesPerPixel = GetBytesPerPixel(pixelFormat);
@@ -49,7 +49,7 @@ void InitialiseRegionsToZeroAlpha(Dali::Devel::PixelBuffer pixelBuffer, uint32_t
   }
 }
 
-void AddStretchRegionsToImage(Dali::Devel::PixelBuffer pixelBuffer, uint32_t width, uint32_t height, const Vector4& requiredStretchBorder, Pixel::Format pixelFormat)
+void AddStretchRegionsToImage(Dali::PixelBuffer pixelBuffer, uint32_t width, uint32_t height, const Vector4& requiredStretchBorder, Pixel::Format pixelFormat)
 {
   unsigned char* buffer        = pixelBuffer.GetBuffer();
   uint32_t       bytesPerPixel = GetBytesPerPixel(pixelFormat);
@@ -73,9 +73,9 @@ void AddStretchRegionsToImage(Dali::Devel::PixelBuffer pixelBuffer, uint32_t wid
   }
 }
 
-Dali::Devel::PixelBuffer CreateEmptyPixelBuffer(uint32_t width, uint32_t height, Pixel::Format pixelFormat)
+Dali::PixelBuffer CreateEmptyPixelBuffer(uint32_t width, uint32_t height, Pixel::Format pixelFormat)
 {
-  Dali::Devel::PixelBuffer pixelBuffer = Dali::Devel::PixelBuffer::New(width, height, pixelFormat);
+  Dali::PixelBuffer pixelBuffer = Dali::PixelBuffer::New(width, height, pixelFormat);
 
   unsigned char* buffer = pixelBuffer.GetBuffer();
   memset(buffer, 0, width * height * Dali::Pixel::GetBytesPerPixel(pixelFormat));
@@ -83,10 +83,10 @@ Dali::Devel::PixelBuffer CreateEmptyPixelBuffer(uint32_t width, uint32_t height,
   return pixelBuffer;
 }
 
-Dali::Devel::PixelBuffer CustomizeNPatch(uint32_t width, uint32_t height, const Vector4& requiredStretchBorder)
+Dali::PixelBuffer CustomizeNPatch(uint32_t width, uint32_t height, const Vector4& requiredStretchBorder)
 {
-  Pixel::Format            pixelFormat = Pixel::RGBA8888;
-  Dali::Devel::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(width, height, pixelFormat);
+  Pixel::Format     pixelFormat = Pixel::RGBA8888;
+  Dali::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(width, height, pixelFormat);
 
   InitialiseRegionsToZeroAlpha(pixelBuffer, width, height, pixelFormat);
 
@@ -266,7 +266,7 @@ int UtcDaliNPatchUtilityParseBorders(void)
   const unsigned int imageWidth  = 28;
   const Vector4      requiredStretchBorder(3, 4, 5, 6);
 
-  Dali::Devel::PixelBuffer pixelBuffer = CustomizeNPatch(imageHeight, imageWidth, requiredStretchBorder);
+  Dali::PixelBuffer pixelBuffer = CustomizeNPatch(imageHeight, imageWidth, requiredStretchBorder);
   DALI_TEST_CHECK(pixelBuffer);
 
   if(pixelBuffer)
@@ -305,7 +305,7 @@ int UtcDaliNPatchUtilityParseBordersN(void)
   for(const std::pair<uint32_t, uint32_t>& imageSizePair : std::initializer_list<std::pair<uint32_t, uint32_t>>{{1u, 1u}, {2u, 2u}, {0xFFFF, 0xFFFF}, {2u, 129u}})
   {
     tet_printf("Parse for image size : %u x %u\n", imageSizePair.first, imageSizePair.second);
-    Dali::Devel::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(imageSizePair.first, imageSizePair.second, Pixel::RGBA8888);
+    Dali::PixelBuffer pixelBuffer = CreateEmptyPixelBuffer(imageSizePair.first, imageSizePair.second, Pixel::RGBA8888);
     DALI_TEST_CHECK(pixelBuffer);
 
     if(pixelBuffer)

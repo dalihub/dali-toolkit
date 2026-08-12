@@ -34,8 +34,8 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 
 #include "dummy-control.h"
@@ -106,8 +106,8 @@ ImageUrl ConvertFileToImageUrl(const char* url, ExternalUrlType type)
 
   if(type == ExternalUrlType::EXTERNAL_TEXTURE)
   {
-    Devel::PixelBuffer pixelBuffer = LoadImageFromFile(url);
-    PixelData          pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
+    PixelBuffer pixelBuffer = LoadImageFromFile(url);
+    PixelData   pixelData   = PixelBuffer::Convert(pixelBuffer);
 
     imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   }

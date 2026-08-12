@@ -19,9 +19,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <memory>
@@ -147,7 +147,7 @@ public:
    *
    * @return                          The pixel buffer containing the image, or empty if still loading.
    */
-  Devel::PixelBuffer LoadPixelBuffer(
+  PixelBuffer LoadPixelBuffer(
     const VisualUrl&                url,
     const Dali::ImageDimensions&    desiredSize,
     const Dali::SamplingMode::Type  samplingMode,
@@ -439,12 +439,12 @@ private: // Internal Load Request API
    * @return PixelBuffer of loaded image.
    */
   void LoadImageSynchronously(
-    const VisualUrl&                 url,
-    const Dali::ImageDimensions&     desiredSize,
-    const Dali::SamplingMode::Type   samplingMode,
-    const bool                       orientationCorrection,
-    const bool                       loadYuvPlanes,
-    std::vector<Devel::PixelBuffer>& pixelBuffers);
+    const VisualUrl&               url,
+    const Dali::ImageDimensions&   desiredSize,
+    const Dali::SamplingMode::Type samplingMode,
+    const bool                     orientationCorrection,
+    const bool                     loadYuvPlanes,
+    std::vector<PixelBuffer>&      pixelBuffers);
 
 public: // Remove Request API
   /**
@@ -541,7 +541,7 @@ private:
    * @param[in] pixelBuffers The image pixelBuffer
    * @return    True if successful
    */
-  void PostLoad(TextureManager::TextureInfo& textureInfo, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void PostLoad(TextureManager::TextureInfo& textureInfo, std::vector<PixelBuffer>& pixelBuffers);
 
   /**
    * Check if there is a texture waiting to be masked. If there
@@ -562,7 +562,7 @@ private:
    * @param[in] pixelBuffers The image data to upload
    * @param[in] textureInfo  The texture info containing the location to store the data to.
    */
-  void UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffers, TextureManager::TextureInfo& textureInfo);
+  void UploadTextures(std::vector<PixelBuffer>& pixelBuffers, TextureManager::TextureInfo& textureInfo);
 
   /**
    * Notify the current observers that the texture upload is complete,
@@ -610,7 +610,7 @@ public:
    * @param[in] textureId    The ID of the texture load complete.
    * @param[in] pixelBuffers The loaded image data
    */
-  void AsyncLoadComplete(const TextureManager::TextureId textureId, std::vector<Devel::PixelBuffer>& pixelBuffers);
+  void AsyncLoadComplete(const TextureManager::TextureId textureId, std::vector<PixelBuffer>& pixelBuffers);
 
 protected: // Implementation of Processor
   /**

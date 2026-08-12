@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_IMAGE_LOADER_ASYNC_IMAGE_LOADER_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 // EXTERNAL HEADER
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 // INTERNAL HEADER
@@ -31,7 +31,7 @@ namespace Toolkit
 {
 namespace DevelAsyncImageLoader
 {
-typedef Signal<void(uint32_t, std::vector<Devel::PixelBuffer>&)> PixelBufferLoadedSignalType;
+typedef Signal<void(uint32_t, std::vector<PixelBuffer>&)> PixelBufferLoadedSignalType;
 
 /**
  * @brief Whether to multiply alpha into color channels on load
@@ -89,8 +89,8 @@ DALI_TOOLKIT_API uint32_t Load(AsyncImageLoader                         asyncIma
  * @return The masking task id
  */
 DALI_TOOLKIT_API uint32_t ApplyMask(AsyncImageLoader                         asyncImageLoader,
-                                    Devel::PixelBuffer                       pixelBuffer,
-                                    Devel::PixelBuffer                       maskPixelBuffer,
+                                    PixelBuffer                              pixelBuffer,
+                                    PixelBuffer                              maskPixelBuffer,
                                     float                                    contentScale,
                                     bool                                     cropToMask,
                                     DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
