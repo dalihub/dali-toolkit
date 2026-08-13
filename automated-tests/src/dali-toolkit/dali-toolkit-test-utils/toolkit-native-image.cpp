@@ -109,11 +109,6 @@ int NativeImage::GetTextureTarget() const
   return 0;
 }
 
-bool NativeImage::ApplyNativeFragmentShader(String& shader)
-{
-  return ApplyNativeFragmentShader(shader, 1);
-}
-
 bool NativeImage::ApplyNativeFragmentShader(String& shader, int mask)
 {
   shader = String(Dali::NativeImageTest::GetCustomFragmentPrefix()) + shader;
