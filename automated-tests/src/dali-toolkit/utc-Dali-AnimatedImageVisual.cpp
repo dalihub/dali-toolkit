@@ -33,8 +33,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 

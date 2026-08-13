@@ -19,11 +19,12 @@
 #include <dali-toolkit/internal/image-loader/loading-task.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
@@ -238,7 +239,7 @@ void LoadingTask::Load()
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, samplingMode, orientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(url.GetUrl()), dimensions, samplingMode, orientationCorrection);
     }
   }
   else if(url.IsValid())

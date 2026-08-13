@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/object/type-registry-helper.h>

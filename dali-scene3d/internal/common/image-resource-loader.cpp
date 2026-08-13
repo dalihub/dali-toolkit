@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/common/hash.h>
@@ -34,6 +33,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
@@ -169,7 +169,7 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
     oss << "u:" << info.mUrl << "]";
   });
   // Load the image synchronously (block the thread here).
-  Dali::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(info.mUrl, info.mDimensions, info.mSamplingMode, true);
+  Dali::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(info.mUrl), info.mDimensions, info.mSamplingMode, true);
   if(pixelBuffer)
   {
     pixelData = Dali::DevelPixelBuffer::Convert(pixelBuffer, releasePixelData);
@@ -716,7 +716,7 @@ Dali::PixelData GetDefaultBrdfPixelData()
 
     if(DALI_UNLIKELY(!defaultBrdfPixelData))
     {
-      PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Toolkit::AssetManager::GetDaliImagePath() + std::string(PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME));
+      PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(Dali::Toolkit::AssetManager::GetDaliImagePath() + std::string(PRE_COMPUTED_BRDF_TEXTURE_FILE_NAME)));
       if(pixelBuffer)
       {
         defaultBrdfPixelData = PixelBuffer::Convert(pixelBuffer);

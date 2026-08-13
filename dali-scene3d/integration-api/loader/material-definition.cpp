@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/pixel-data-integ.h>

@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>

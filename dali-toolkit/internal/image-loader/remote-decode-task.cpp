@@ -19,9 +19,10 @@
 #include <dali-toolkit/internal/image-loader/remote-decode-task.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 
 namespace Dali
 {
@@ -64,7 +65,7 @@ void RemoteDecodeTask::Process()
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(mLocalFilePath, mDesiredSize, mSamplingMode, mOrientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(mLocalFilePath), mDesiredSize, mSamplingMode, mOrientationCorrection);
     }
   }
 

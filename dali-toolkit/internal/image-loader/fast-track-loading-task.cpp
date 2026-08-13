@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/image-loader/fast-track-loading-task.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/devel-api/common/vector-wrapper.h>
@@ -200,7 +200,7 @@ void FastTrackLoadingTask::Load()
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(mUrl.GetUrl(), mDimensions, mSamplingMode, mOrientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(mUrl.GetUrl()), mDimensions, mSamplingMode, mOrientationCorrection);
     }
   }
   else if(mUrl.IsValid())

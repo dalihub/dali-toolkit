@@ -19,16 +19,16 @@
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/animation/constraint.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/environment-definition.h>
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
-#include <dali-scene3d/integration-api/loader/environment-definition.h>
 
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>

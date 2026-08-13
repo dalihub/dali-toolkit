@@ -29,7 +29,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/string-utils.h>

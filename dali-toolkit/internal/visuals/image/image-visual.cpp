@@ -20,7 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>

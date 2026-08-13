@@ -29,7 +29,8 @@
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
-#include <devel-api/adaptor-framework/image-loading.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 
 using namespace std;
 using namespace Dali;
@@ -71,7 +72,7 @@ bool CircularRenderTest(const CircularTextData& data)
     int x      = static_cast<int>(itemLayout.position.x);
     int y      = static_cast<int>(itemLayout.position.y);
 
-    Dali::PixelBuffer itemPixelBuffer = Dali::LoadImageFromFile(data.embeddedItems[index++]);
+    Dali::PixelBuffer itemPixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(data.embeddedItems[index++]));
     itemPixelBuffer.Resize(width, height);
     DevelPixelBuffer::Rotate(itemPixelBuffer, itemLayout.angle);
 
