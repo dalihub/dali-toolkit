@@ -63,8 +63,8 @@ void NewAnimator(const Property::Map& map, TestAnimationData::AnimationDataEleme
   // Now set the properties, or create children
   for(unsigned int i = 0, animationMapCount = map.Count(); i < animationMapCount; ++i)
   {
-    const StringValuePair& pair(map.GetPair(i));
-    const Dali::String&    key(pair.first);
+    const KeyValuePair     pair(map.GetKeyValue(i));
+    const Dali::String&    key(pair.first.stringKey);
     const Property::Value& value(pair.second);
 
     if(key == "actor" || key == "target")
@@ -141,12 +141,12 @@ void NewAnimator(const Property::Map& map, TestAnimationData::AnimationDataEleme
       Property::Map timeMap = value.Get<Property::Map>();
       for(unsigned int i = 0; i < timeMap.Count(); ++i)
       {
-        const StringValuePair& pair(timeMap.GetPair(i));
-        if(pair.first == "delay")
+        const KeyValuePair pair(timeMap.GetKeyValue(i));
+        if(pair.first.stringKey == "delay")
         {
           element.timePeriodDelay = pair.second.Get<float>();
         }
-        else if(pair.first == "duration")
+        else if(pair.first.stringKey == "duration")
         {
           element.timePeriodDuration = pair.second.Get<float>();
         }
