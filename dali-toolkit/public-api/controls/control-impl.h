@@ -476,14 +476,9 @@ public: // Helpers for deriving classes
   {
     CONTROL_BEHAVIOUR_DEFAULT = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
 
-    // The following flags are not in use, but their bit positions must be kept. Applications
-    // built against the C# binding carry these flag values, so moving the flags below them
-    // would change the meaning of the values that those applications pass in.
-    NOT_IN_USE_1 = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 0),
-    NOT_IN_USE_2 = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1),
-    NOT_IN_USE_3 = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 2),
-    NOT_IN_USE_4 = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 3),
-
+    // The offsets below start at 4 as the first four bits are not in use. Their positions must
+    // be kept as applications built against the C# binding carry the current flag values, and
+    // shifting the flags down would change the meaning of the values that they pass in.
     REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 4), ///< True if needs to support keyboard navigation @SINCE_1_0.0
     DISABLE_STYLE_CHANGE_SIGNALS         = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 5), ///< True if control should not monitor style change signals @SINCE_1_2_10
     DISABLE_VISUALS                      = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 6), ///< True if control should not use visuals @SINCE_2_3.6
