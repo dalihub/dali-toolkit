@@ -15,13 +15,13 @@
  *
  */
 
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/object/property-array-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
 #include <toolkit-event-thread-callback.h>
@@ -278,8 +278,8 @@ public:
         Dali::Texture texture = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight);
         textureSet.SetTexture(0, texture);
 
-        Devel::PixelBuffer pixelBuffer = Devel::PixelBuffer::New(mWidth, mHeight, Pixel::RGBA8888);
-        Dali::PixelData    pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
+        Dali::PixelBuffer pixelBuffer = Dali::PixelBuffer::New(mWidth, mHeight, Pixel::RGBA8888);
+        Dali::PixelData   pixelData   = Dali::PixelBuffer::Convert(pixelBuffer);
         texture.Upload(pixelData);
       }
 

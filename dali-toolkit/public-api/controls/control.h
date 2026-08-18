@@ -195,6 +195,7 @@ public: // Creation & Destruction
    * @brief Additional control behaviour flags for the control constructor.
    * @note TODO : Currunt code is hard-coded. We Should sync type values as
    * CustomActorImpl::ActorFlag and ControlImpl::ControlBehaviour in future.
+   * @note Bits 1 to 4 are reserved and unused, see ControlImpl::ControlBehaviour.
    * @SINCE_2_1.8
    */
   enum ControlBehaviour

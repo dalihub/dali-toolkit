@@ -20,14 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/integration-api/loader/environment-map-loader.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 
 using Dali::Integration::ToStdString;
 
@@ -53,7 +53,8 @@ EnvironmentDefinition::LoadRaw(const Dali::String& environmentsPath)
 {
   RawData     raw;
   std::string envPath = ToStdString(environmentsPath);
-  auto        loadFn  = [&envPath](const Dali::String& path, EnvironmentMapData& environmentMapData) {
+  auto        loadFn  = [&envPath](const Dali::String& path, EnvironmentMapData& environmentMapData)
+  {
     if(path.Empty())
     {
       environmentMapData.mPixelData.Resize(6);

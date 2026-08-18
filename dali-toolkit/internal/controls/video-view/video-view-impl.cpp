@@ -45,7 +45,7 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;

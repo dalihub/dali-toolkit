@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
@@ -1477,16 +1477,16 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size)
   uint32_t                                textureSetIndex = 0u;
   // Create a texture for the text without any styles
 
-  Devel::PixelBuffer cutoutData;
-  float              cutoutAlpha = mController->GetTextModel()->GetDefaultColor().a;
+  PixelBuffer cutoutData;
+  float       cutoutAlpha = mController->GetTextModel()->GetDefaultColor().a;
   if(cutoutEnabled)
   {
     cutoutData = mTypesetter->RenderWithPixelBuffer(size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat);
 
     // Make transparent buffer.
     // If the cutout is enabled, a separate texture is not used for the text.
-    Devel::PixelBuffer buffer = mTypesetter->CreateFullBackgroundBuffer(1, 1, Vector4(0.f, 0.f, 0.f, 0.f));
-    PixelData          data   = Devel::PixelBuffer::Convert(buffer);
+    PixelBuffer buffer = mTypesetter->CreateFullBackgroundBuffer(1, 1, Vector4(0.f, 0.f, 0.f, 0.f));
+    PixelData   data   = PixelBuffer::Convert(buffer);
     AddTexture(textureSet, data, sampler, textureSetIndex);
     ++textureSetIndex;
   }

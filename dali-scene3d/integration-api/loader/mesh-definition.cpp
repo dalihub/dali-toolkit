@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-stream.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/compile-time-math.h>
 
@@ -1318,8 +1318,8 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, Dali::Vector<MeshDefiniti
     const uint32_t numberOfBlendShapes = blendShapes.Size();
     rawData.mBlendShapeUnnormalizeFactor.Resize(numberOfBlendShapes);
 
-    Devel::PixelBuffer geometryPixelBuffer = Devel::PixelBuffer::New(textureWidth, textureHeight, Pixel::RGB32F);
-    uint8_t*           geometryBuffer      = geometryPixelBuffer.GetBuffer();
+    PixelBuffer geometryPixelBuffer = PixelBuffer::New(textureWidth, textureHeight, Pixel::RGB32F);
+    uint8_t*    geometryBuffer      = geometryPixelBuffer.GetBuffer();
 
     if(calculateGltf2BlendShapes)
     {
@@ -1344,7 +1344,7 @@ void LoadBlendShapes(MeshDefinition::RawData& rawData, Dali::Vector<MeshDefiniti
         ReadBlob(unnormalizeFactorBlob, *fileStream, reinterpret_cast<uint8_t*>(&rawData.mBlendShapeUnnormalizeFactor[0u]));
       }
     }
-    rawData.mBlendShapeData = Devel::PixelBuffer::Convert(geometryPixelBuffer);
+    rawData.mBlendShapeData = PixelBuffer::Convert(geometryPixelBuffer);
   }
 }
 

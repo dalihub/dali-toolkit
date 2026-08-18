@@ -75,7 +75,7 @@ inline uint8_t MultiplyAndSummationAndNormalizeColor(const uint8_t x1, const uin
   const uint32_t xy1 = static_cast<const uint32_t>(x1) * y1;
   const uint32_t xy2 = static_cast<const uint32_t>(x2) * y2;
   const uint32_t res = Min(65025u, xy1 + xy2); // 65025 is 255 * 255.
-  return ((res + ((res + 257) >> 8)) >> 8);         // fast divide by 255.
+  return ((res + ((res + 257) >> 8)) >> 8);    // fast divide by 255.
 }
 
 /**
@@ -98,7 +98,7 @@ inline uint8_t MultiplyAndSummationAndNormalizeColor(const uint8_t x1, const uin
  * False if we store the combined image buffer result into bottomPixelBuffer.
  *
  */
-void CombineImageBuffer(Devel::PixelBuffer& __restrict__ topPixelBuffer, Devel::PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, bool storeResultIntoTop)
+void CombineImageBuffer(PixelBuffer& __restrict__ topPixelBuffer, PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, bool storeResultIntoTop)
 {
   // Assume that we always combine two RGBA images
   // Jump with 4bytes for optimize runtime.
@@ -204,23 +204,23 @@ void Typesetter::SetFontClient(TextAbstraction::FontClient& fontClient)
 
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
 {
-  Devel::PixelBuffer result    = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
-  PixelData          pixelData = Devel::PixelBuffer::Convert(result);
+  PixelBuffer result    = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
+  PixelData   pixelData = PixelBuffer::Convert(result);
 
   return pixelData;
 }
 
-PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, Devel::PixelBuffer mask, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, float originAlpha, const Vector2& originSize)
+PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, PixelBuffer mask, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, float originAlpha, const Vector2& originSize)
 {
-  Devel::PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
+  PixelBuffer result = RenderWithPixelBuffer(size, textDirection, behaviour, ignoreHorizontalAlignment, pixelFormat, originSize);
   SetMaskForImageBuffer(mask, result, size.width, size.height, originAlpha);
 
-  PixelData pixelData = Devel::PixelBuffer::Convert(result);
+  PixelData pixelData = PixelBuffer::Convert(result);
 
   return pixelData;
 }
 
-Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
+PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
   // @todo. This initial implementation for a TextLabel has only one visible page.
@@ -305,7 +305,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
   auto startIndexOfGlyphs = viewModel.GetStartIndexOfElidedGlyphs();
   auto endIndexOfGlyphs   = viewModel.GetEndIndexOfElidedGlyphs();
 
-  Devel::PixelBuffer imageBuffer;
+  PixelBuffer imageBuffer;
 
   if(RENDER_MASK == behaviour)
   {
@@ -315,7 +315,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
   else if(RENDER_NO_TEXT == behaviour || RENDER_OVERLAY_STYLE == behaviour)
   {
     // Generate an empty image buffer so that it can been combined with the image buffers for styles
-    imageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
+    imageBuffer = PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
     memset(imageBuffer.GetBuffer(), 0u, bufferSizeChar);
   }
   else
@@ -332,7 +332,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     if(outlineWidth != 0u && fabsf(outlineAlpha) > Math::MACHINE_EPSILON_1 && RENDER_OVERLAY_STYLE != behaviour)
     {
       // Create the image buffer for outline
-      Devel::PixelBuffer outlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
+      PixelBuffer outlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
       const float& blurRadius = viewModel.GetOutlineBlurRadius();
 
@@ -353,7 +353,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     if(RENDER_OVERLAY_STYLE != behaviour && fabsf(shadowAlpha) > Math::MACHINE_EPSILON_1 && (fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1))
     {
       // Create the image buffer for shadow
-      Devel::PixelBuffer shadowImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
+      PixelBuffer shadowImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
       // Check whether it will be a soft shadow
       const float& blurRadius = viewModel.GetShadowBlurRadius();
@@ -372,7 +372,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     const bool backgroundMarkupSet = viewModel.IsMarkupBackgroundColorSet();
     if((backgroundEnabled || backgroundMarkupSet) && RENDER_OVERLAY_STYLE != behaviour)
     {
-      Devel::PixelBuffer backgroundImageBuffer;
+      PixelBuffer backgroundImageBuffer;
 
       if(backgroundEnabled)
       {
@@ -396,7 +396,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
     const bool backgroundWithCutoutEnabled = viewModel.IsBackgroundWithCutoutEnabled();
     if((backgroundWithCutoutEnabled) && RENDER_OVERLAY_STYLE != behaviour)
     {
-      Devel::PixelBuffer backgroundImageBuffer;
+      PixelBuffer backgroundImageBuffer;
 
       backgroundImageBuffer = CreateFullBackgroundBuffer(bufferWidth, bufferHeight, viewModel.GetBackgroundColorWithCutout());
 
@@ -409,7 +409,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
       if(viewModel.IsUnderlineEnabled())
       {
         // Create the image buffer for underline
-        Devel::PixelBuffer underlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
+        PixelBuffer underlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
         // Combine the two buffers
         CombineImageBuffer(imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight, true);
@@ -418,7 +418,7 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
       if(viewModel.IsStrikethroughEnabled())
       {
         // Create the image buffer for strikethrough
-        Devel::PixelBuffer strikethroughImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, endIndexOfGlyphs);
+        PixelBuffer strikethroughImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, endIndexOfGlyphs);
 
         // Combine the two buffers
         CombineImageBuffer(imageBuffer, strikethroughImageBuffer, bufferWidth, bufferHeight, true);
@@ -443,12 +443,12 @@ Devel::PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolki
   return imageBuffer;
 }
 
-Devel::PixelBuffer Typesetter::CreateFullBackgroundBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Vector4& backgroundColor)
+PixelBuffer Typesetter::CreateFullBackgroundBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Vector4& backgroundColor)
 {
   const uint32_t bufferSizeInt        = bufferWidth * bufferHeight;
   uint8_t        backgroundColorAlpha = static_cast<uint8_t>(backgroundColor.a * 255.f);
 
-  Devel::PixelBuffer buffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
+  PixelBuffer buffer = PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
 
   uint32_t* bitmapBuffer = reinterpret_cast<uint32_t*>(buffer.GetBuffer());
 
@@ -466,7 +466,7 @@ Devel::PixelBuffer Typesetter::CreateFullBackgroundBuffer(const uint32_t bufferW
   return buffer;
 }
 
-Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset)
+PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset)
 {
   // Use l-value to make ensure it is not nullptr, so compiler happy.
   auto& viewModel = *(mImpl->GetViewModel());
@@ -490,7 +490,7 @@ Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffe
     endGlyphIndex   = startGlyphIndex + itGlyphRun->glyphRun.numberOfGlyphs - 1;
 
     // Create the image buffer for underline
-    Devel::PixelBuffer underlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+    PixelBuffer underlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
     // Combine the two buffers
     // Result pixel buffer will be stored into topPixelBuffer.
     CombineImageBuffer(underlineImageBuffer, topPixelBuffer, bufferWidth, bufferHeight, false);
@@ -501,7 +501,7 @@ Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffe
   return topPixelBuffer;
 }
 
-Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset)
+PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(PixelBuffer topPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset)
 {
   // Use l-value to make ensure it is not nullptr, so compiler happy.
   auto& viewModel = *(mImpl->GetViewModel());
@@ -525,7 +525,7 @@ Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelB
     endGlyphIndex   = startGlyphIndex + itGlyphRun->glyphRun.numberOfGlyphs - 1;
 
     // Create the image buffer for strikethrough
-    Devel::PixelBuffer strikethroughImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+    PixelBuffer strikethroughImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
     // Combine the two buffers
     // Result pixel buffer will be stored into topPixelBuffer.
     CombineImageBuffer(strikethroughImageBuffer, topPixelBuffer, bufferWidth, bufferHeight, false);
@@ -536,7 +536,7 @@ Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelB
   return topPixelBuffer;
 }
 
-void Typesetter::SetMaskForImageBuffer(Devel::PixelBuffer& __restrict__ topPixelBuffer, Devel::PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, float originAlpha)
+void Typesetter::SetMaskForImageBuffer(PixelBuffer& __restrict__ topPixelBuffer, PixelBuffer& __restrict__ bottomPixelBuffer, const uint32_t bufferWidth, const uint32_t bufferHeight, float originAlpha)
 {
   // Assume that we always combine two RGBA images
   // Jump with 4bytes for optimize runtime.

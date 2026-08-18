@@ -19,11 +19,11 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/common/dali-utility.h>
 
 #include <locale>
@@ -134,7 +134,7 @@ void NPatchVisual::GetNaturalSize(Vector2& naturalSize)
   {
     if(mImageUrl.IsValid())
     {
-      ImageDimensions dimensions = Dali::GetOriginalImageSize(mImageUrl.GetUrl());
+      ImageDimensions dimensions = Dali::GetOriginalImageSize(Dali::Integration::ToDaliStringView(mImageUrl.GetUrl()));
       if(dimensions != ImageDimensions(0, 0))
       {
         naturalSize.x = dimensions.GetWidth();

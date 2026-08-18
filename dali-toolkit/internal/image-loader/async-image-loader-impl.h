@@ -125,8 +125,8 @@ public:
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @return The loading task id
    */
-  uint32_t ApplyMask(Devel::PixelBuffer                       pixelBuffer,
-                     Devel::PixelBuffer                       maskPixelBuffer,
+  uint32_t ApplyMask(PixelBuffer                              pixelBuffer,
+                     PixelBuffer                              maskPixelBuffer,
                      float                                    contentScale,
                      bool                                     cropToMask,
                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);

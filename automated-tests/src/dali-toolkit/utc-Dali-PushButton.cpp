@@ -30,7 +30,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 using namespace Dali;
 using namespace Toolkit;
 

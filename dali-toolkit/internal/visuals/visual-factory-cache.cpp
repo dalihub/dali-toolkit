@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -28,6 +27,7 @@
 #include <dali/integration-api/shader-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/math/math-utils.h>
 
 #include <locale>
@@ -361,11 +361,11 @@ Texture VisualFactoryCache::GetBrokenVisualImage(uint32_t brokenIndex)
 {
   if(!(mBrokenImageInfoContainer[brokenIndex].texture))
   {
-    PixelData          pixelData;
-    Devel::PixelBuffer pixelBuffer = LoadImageFromFile(mBrokenImageInfoContainer[brokenIndex].url);
+    PixelData   pixelData;
+    PixelBuffer pixelBuffer = LoadImageFromFile(Dali::Integration::ToDaliStringView(mBrokenImageInfoContainer[brokenIndex].url));
     if(pixelBuffer)
     {
-      pixelData                                      = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      pixelData                                      = PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
       mBrokenImageInfoContainer[brokenIndex].texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
       Dali::Integration::TextureUploadWithContent(mBrokenImageInfoContainer[brokenIndex].texture, pixelData, ToDaliString(mBrokenImageInfoContainer[brokenIndex].url), Integration::TextureContextTypeHint::BROKEN_IMAGE);

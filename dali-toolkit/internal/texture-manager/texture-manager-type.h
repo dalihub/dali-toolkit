@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_TYPE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -256,7 +256,7 @@ struct TextureInfo
   typedef Dali::Vector<TextureUploadObserver*> ObserverListType;
 
   ObserverListType           observerList;         ///< Container used to store all observer clients of this Texture
-  Dali::Devel::PixelBuffer   pixelBuffer;          ///< The PixelBuffer holding the image data (May be empty after upload)
+  Dali::PixelBuffer          pixelBuffer;          ///< The PixelBuffer holding the image data (May be empty after upload)
   std::vector<Dali::Texture> textures;             ///< The Textures
   VisualUrl                  url;                  ///< The URL of the image
   Dali::ImageDimensions      desiredSize;          ///< The size requested

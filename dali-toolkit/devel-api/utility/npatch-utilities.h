@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/int-pair.h>
 #include <string>
@@ -55,7 +55,7 @@ DALI_TOOLKIT_API void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int& 
  * @param[out] stretchPixelsY The vertical stretchable pixels in the cropped image space.
  * @return True if parse success. False otherwise. If parse failed, strechPixels become empty.
  */
-DALI_TOOLKIT_API bool ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY);
+DALI_TOOLKIT_API bool ParseBorders(PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY);
 
 /**
  * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.

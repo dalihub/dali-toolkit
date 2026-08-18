@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType r
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied)
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied)
 : returnType(returnType),
   textureId(Internal::TextureManagerType::INVALID_TEXTURE_ID),
   textureSet(),

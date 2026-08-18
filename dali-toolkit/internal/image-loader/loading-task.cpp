@@ -19,10 +19,12 @@
 #include <dali-toolkit/internal/image-loader/loading-task.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
@@ -134,7 +136,7 @@ LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuff
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t id, PixelBuffer pixelBuffer, PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(""),
   encodedImageBuffer(),
@@ -198,7 +200,7 @@ void LoadingTask::Process()
     if(!pixelBuffers.empty())
     {
       oss << "s:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
-      oss << "p:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
+      oss << "p:" << DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffers[0]) << " ";
     }
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {
@@ -209,7 +211,7 @@ void LoadingTask::Process()
 
 void LoadingTask::Load()
 {
-  Devel::PixelBuffer pixelBuffer;
+  PixelBuffer pixelBuffer;
   if(animatedImageLoading)
   {
     bool planeLoaded = false;
@@ -237,7 +239,7 @@ void LoadingTask::Load()
     }
     else
     {
-      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, samplingMode, orientationCorrection);
+      pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(url.GetUrl()), dimensions, samplingMode, orientationCorrection);
     }
   }
   else if(url.IsValid())
@@ -260,7 +262,7 @@ void LoadingTask::ApplyMask()
 {
   if(!pixelBuffers.empty())
   {
-    pixelBuffers[0].ApplyMask(maskPixelBuffer, contentScale, cropToMask);
+    DevelPixelBuffer::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
   }
 }
 
@@ -270,7 +272,7 @@ void LoadingTask::MultiplyAlpha()
   {
     if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {
-      pixelBuffers[0].MultiplyColorByAlpha();
+      DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffers[0]);
     }
   }
 }

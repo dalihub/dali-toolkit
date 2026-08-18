@@ -16,8 +16,8 @@
 
 // CLASS HEADER
 #include "sync-image-loader.h"
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 
 namespace Dali
 {
@@ -41,10 +41,10 @@ PixelData Load(const Dali::String& url,
                bool                orientationCorrection)
 {
   // Load the image synchronously (block the thread here).
-  Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToStdString(url), dimensions, samplingMode, orientationCorrection);
+  PixelBuffer pixelBuffer = Dali::LoadImageFromFile(url, dimensions, samplingMode, orientationCorrection);
   if(pixelBuffer)
   {
-    return Devel::PixelBuffer::Convert(pixelBuffer);
+    return PixelBuffer::Convert(pixelBuffer);
   }
   return Dali::PixelData(); // return empty handle
 }

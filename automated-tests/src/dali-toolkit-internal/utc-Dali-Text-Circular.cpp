@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,15 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <toolkit-text-utils.h>
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
-#include <devel-api/adaptor-framework/image-loading.h>
+#include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 
 using namespace std;
 using namespace Dali;
@@ -57,7 +59,7 @@ bool CircularRenderTest(const CircularTextData& data)
 
   Dali::Vector<Dali::Toolkit::DevelText::EmbeddedItemInfo> embeddedItemLayout;
 
-  Devel::PixelBuffer pixelBuffer = Toolkit::DevelText::Render(data.textParameters, embeddedItemLayout);
+  PixelBuffer pixelBuffer = Toolkit::DevelText::Render(data.textParameters, embeddedItemLayout);
 
   const int dstWidth  = static_cast<int>(pixelBuffer.GetWidth());
   const int dstHeight = static_cast<int>(pixelBuffer.GetHeight());
@@ -70,9 +72,9 @@ bool CircularRenderTest(const CircularTextData& data)
     int x      = static_cast<int>(itemLayout.position.x);
     int y      = static_cast<int>(itemLayout.position.y);
 
-    Dali::Devel::PixelBuffer itemPixelBuffer = Dali::LoadImageFromFile(data.embeddedItems[index++]);
+    Dali::PixelBuffer itemPixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(data.embeddedItems[index++]));
     itemPixelBuffer.Resize(width, height);
-    itemPixelBuffer.Rotate(itemLayout.angle);
+    DevelPixelBuffer::Rotate(itemPixelBuffer, itemLayout.angle);
 
     width  = static_cast<int>(itemPixelBuffer.GetWidth());
     height = static_cast<int>(itemPixelBuffer.GetHeight());
@@ -137,15 +139,15 @@ bool CircularRenderTest(const CircularTextData& data)
 
     if(crop)
     {
-      itemPixelBuffer.Crop(uiCropX, uiCropY, uiNewWidth, uiNewHeight);
+      DevelPixelBuffer::Crop(itemPixelBuffer, uiCropX, uiCropY, uiNewWidth, uiNewHeight);
     }
 
     // Blend the item pixel buffer with the text's color according its blending mode.
     if(Dali::TextAbstraction::ColorBlendingMode::MULTIPLY == itemLayout.colorBlendingMode)
     {
-      Dali::Devel::PixelBuffer buffer = Dali::Devel::PixelBuffer::New(uiNewWidth,
-                                                                      uiNewHeight,
-                                                                      itemPixelFormat);
+      Dali::PixelBuffer buffer = Dali::PixelBuffer::New(uiNewWidth,
+                                                        uiNewHeight,
+                                                        itemPixelFormat);
 
       unsigned char*       bufferPtr     = buffer.GetBuffer();
       const unsigned char* itemBufferPtr = itemPixelBuffer.GetBuffer();
@@ -212,8 +214,8 @@ int UtcDaliTextCircularShadowText(void)
   tet_infoline(" UtcDaliTextCircularShadowText");
 
   Dali::Toolkit::DevelText::ShadowParameters shadowParameters;
-  Devel::PixelBuffer                         outPixelBuffer;
-  shadowParameters.input       = Devel::PixelBuffer::New(100, 100, Pixel::RGBA8888);
+  PixelBuffer                                outPixelBuffer;
+  shadowParameters.input       = PixelBuffer::New(100, 100, Pixel::RGBA8888);
   shadowParameters.textColor   = Color::BLACK;
   shadowParameters.color       = Color::BLACK;
   shadowParameters.offset.x    = 10u;
@@ -228,7 +230,7 @@ int UtcDaliTextCircularShadowText(void)
   DALI_TEST_CHECK(outPixelBuffer);
   DALI_TEST_EQUALS(outPixelBuffer.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
 
-  shadowParameters.input = Devel::PixelBuffer::New(100, 100, Pixel::A8);
+  shadowParameters.input = PixelBuffer::New(100, 100, Pixel::A8);
   outPixelBuffer         = Dali::Toolkit::DevelText::CreateShadow(shadowParameters);
   DALI_TEST_CHECK(outPixelBuffer);
   DALI_TEST_EQUALS(outPixelBuffer.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
@@ -242,14 +244,14 @@ int UtcDaliTextCircularPixelBufferText(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCircularPixelBufferText");
 
-  Devel::PixelBuffer pixbuf = Devel::PixelBuffer::New(10, 10, Pixel::A8);
-  Vector4            color;
-  Devel::PixelBuffer pixelBufferRgba = Dali::Toolkit::DevelText::ConvertToRgba8888(pixbuf, color, true);
-  pixelBufferRgba                    = Dali::Toolkit::DevelText::ConvertToRgba8888(pixbuf, color, false);
+  PixelBuffer pixbuf = PixelBuffer::New(10, 10, Pixel::A8);
+  Vector4     color;
+  PixelBuffer pixelBufferRgba = Dali::Toolkit::DevelText::ConvertToRgba8888(pixbuf, color, true);
+  pixelBufferRgba             = Dali::Toolkit::DevelText::ConvertToRgba8888(pixbuf, color, false);
   DALI_TEST_CHECK(pixelBufferRgba);
   DALI_TEST_EQUALS(pixelBufferRgba.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
 
-  pixbuf          = Devel::PixelBuffer::New(10, 10, Pixel::RGBA8888);
+  pixbuf          = PixelBuffer::New(10, 10, Pixel::RGBA8888);
   pixelBufferRgba = Dali::Toolkit::DevelText::ConvertToRgba8888(pixbuf, color, false);
   DALI_TEST_CHECK(pixelBufferRgba);
   DALI_TEST_EQUALS(pixelBufferRgba.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);
@@ -772,13 +774,13 @@ int UtcDaliTextUpdateBufferFormatCheck(void)
   tet_infoline(" UtcDaliTextUpdateBufferFormatCheck");
   ToolkitTestApplication application;
 
-  Devel::PixelBuffer srcBuffer = Devel::PixelBuffer::New(10, 10, Pixel::RGBA8888);
-  Devel::PixelBuffer dstBuffer = Devel::PixelBuffer::New(10, 10, Pixel::A8);
+  PixelBuffer srcBuffer = PixelBuffer::New(10, 10, Pixel::RGBA8888);
+  PixelBuffer dstBuffer = PixelBuffer::New(10, 10, Pixel::A8);
 
   Dali::Toolkit::DevelText::UpdateBuffer(srcBuffer, dstBuffer, 0, 0, true);
 
-  Devel::PixelBuffer compressedSrcBuffer = Devel::PixelBuffer::New(10, 10, Pixel::COMPRESSED_R11_EAC);
-  Devel::PixelBuffer compressedDstBuffer = Devel::PixelBuffer::New(10, 10, Pixel::COMPRESSED_R11_EAC);
+  PixelBuffer compressedSrcBuffer = PixelBuffer::New(10, 10, Pixel::COMPRESSED_R11_EAC);
+  PixelBuffer compressedDstBuffer = PixelBuffer::New(10, 10, Pixel::COMPRESSED_R11_EAC);
   Dali::Toolkit::DevelText::UpdateBuffer(compressedSrcBuffer, compressedDstBuffer, 0, 0, true);
 
   tet_result(TET_PASS);

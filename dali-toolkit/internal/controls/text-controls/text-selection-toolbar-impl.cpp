@@ -346,9 +346,9 @@ void TextSelectionToolbar::ConfigureScrollview(const Property::Map& properties)
   // Set any properties specified for the label by iterating through all property key-value pairs.
   for(unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i)
   {
-    const StringValuePair& propertyPair(properties.GetPair(i));
+    const KeyValuePair propertyPair(properties.GetKeyValue(i));
 
-    // Convert the property string to a property index.
+    // Convert the property key to a property index.
     Property::Index setPropertyIndex = mScrollView.GetPropertyIndex(propertyPair.first);
     if(setPropertyIndex != Property::INVALID_INDEX)
     {

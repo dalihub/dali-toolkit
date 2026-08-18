@@ -25,6 +25,7 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
+#include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
@@ -34,6 +35,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-mode.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
@@ -56,18 +58,28 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
-#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/particle-system/particle-domain.h>
+#include <dali-toolkit/public-api/particle-system/particle-emitter.h>
+#include <dali-toolkit/public-api/particle-system/particle-list.h>
+#include <dali-toolkit/public-api/particle-system/particle-modifier.h>
+#include <dali-toolkit/public-api/particle-system/particle-renderer.h>
+#include <dali-toolkit/public-api/particle-system/particle-source.h>
+#include <dali-toolkit/public-api/particle-system/particle-types.h>
+#include <dali-toolkit/public-api/particle-system/particle.h>
 
 #include <dali-toolkit/public-api/render-effects/background-blur-effect.h>
 #include <dali-toolkit/public-api/render-effects/gaussian-blur-effect.h>
 #include <dali-toolkit/public-api/render-effects/mask-effect.h>
 #include <dali-toolkit/public-api/render-effects/render-effect.h>
 
+#include <dali-toolkit/public-api/styling/style-manager.h>
+
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/public-api/transition/fade-transition.h>
 #include <dali-toolkit/public-api/transition/scale-transition.h>
 #include <dali-toolkit/public-api/transition/slide-transition.h>
+#include <dali-toolkit/public-api/transition/transition-base.h>
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 
@@ -83,6 +95,7 @@
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/dali-toolkit-version.h>
 #include <dali-toolkit/public-api/enums.h>
+#include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
 #endif // DALI_TOOLKIT_H

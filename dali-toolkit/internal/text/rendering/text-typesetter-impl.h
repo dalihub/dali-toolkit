@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_TYPESETTER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/ref-object.h>
@@ -58,7 +58,7 @@ public:
    *
    * @return An image buffer.
    */
-  static Devel::PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat);
+  static PixelBuffer CreateTransparentImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Pixel::Format pixelFormat);
 
 public: // Constructor & Destructor
   /**
@@ -93,7 +93,7 @@ public:
   TextAbstraction::FontClient& GetFontClient();
 
 public: // Image buffer creation
-  void DrawGlyphsBackground(Devel::PixelBuffer& buffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const int32_t horizontalOffset, const int32_t verticalOffset);
+  void DrawGlyphsBackground(PixelBuffer& buffer, const uint32_t bufferWidth, const uint32_t bufferHeight, const bool ignoreHorizontalAlignment, const int32_t horizontalOffset, const int32_t verticalOffset);
 
   /**
    * @brief Create & draw the image buffer for the given range of the glyphs in the given style.
@@ -115,7 +115,7 @@ public: // Image buffer creation
    *
    * @return An image buffer with the text.
    */
-  Devel::PixelBuffer CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const TextAbstraction::GlyphIndex fromGlyphIndex, const TextAbstraction::GlyphIndex toGlyphIndex);
+  PixelBuffer CreateImageBuffer(const uint32_t bufferWidth, const uint32_t bufferHeight, const Typesetter::Style style, const bool ignoreHorizontalAlignment, const Pixel::Format pixelFormat, const int32_t horizontalOffset, const int32_t verticalOffset, const TextAbstraction::GlyphIndex fromGlyphIndex, const TextAbstraction::GlyphIndex toGlyphIndex);
 
 private:
   std::unique_ptr<ViewModel>  mModel;

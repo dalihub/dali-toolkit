@@ -103,14 +103,14 @@ public:
     return mLoadSuccess;
   }
 
-  Dali::Devel::PixelBuffer Rasterize(uint32_t width, uint32_t height)
+  Dali::PixelBuffer Rasterize(uint32_t width, uint32_t height)
   {
     if(mRasterizeSuccess)
     {
-      Devel::PixelBuffer pixelBuffer = Devel::PixelBuffer::New(width, height, Dali::Pixel::RGBA8888);
+      Dali::PixelBuffer pixelBuffer = Dali::PixelBuffer::New(width, height, Dali::Pixel::RGBA8888);
       return pixelBuffer;
     }
-    return Dali::Devel::PixelBuffer();
+    return Dali::PixelBuffer();
   }
 
   void GetDefaultSize(uint32_t& width, uint32_t& height) const
@@ -181,7 +181,7 @@ bool VectorImageRenderer::IsLoaded() const
   return Internal::Adaptor::GetImplementation(*this).IsLoaded();
 }
 
-Dali::Devel::PixelBuffer VectorImageRenderer::Rasterize(uint32_t width, uint32_t height)
+Dali::PixelBuffer VectorImageRenderer::Rasterize(uint32_t width, uint32_t height)
 {
   return Internal::Adaptor::GetImplementation(*this).Rasterize(width, height);
 }

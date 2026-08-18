@@ -18,6 +18,7 @@ SET(TC_SOURCES
   utc-Dali-FacialAnimation.cpp
   utc-Dali-KtxLoader.cpp
   utc-Dali-Material.cpp
+  utc-Dali-MaterialDefinition.cpp
   utc-Dali-Model.cpp
   utc-Dali-ModelNode.cpp
   utc-Dali-ModelPrimitive.cpp

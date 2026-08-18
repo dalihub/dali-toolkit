@@ -21,11 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/common/dali-utility.h>
@@ -1800,7 +1800,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void SetHandleImage(HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName)
   {
-    ImageDimensions dimensions = Dali::GetOriginalImageSize(imageFileName);
+    ImageDimensions dimensions = Dali::GetOriginalImageSize(Dali::Integration::ToDaliStringView(imageFileName));
 
     HandleImpl& handle = mHandle[handleType];
     handle.size        = Size(dimensions.GetWidth(), dimensions.GetHeight());

@@ -33,9 +33,9 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/window.h>
 
 #include "dummy-control.h"
@@ -106,8 +106,8 @@ ImageUrl ConvertFileToImageUrl(const char* url, ExternalUrlType type)
 
   if(type == ExternalUrlType::EXTERNAL_TEXTURE)
   {
-    Devel::PixelBuffer pixelBuffer = LoadImageFromFile(url);
-    PixelData          pixelData   = Devel::PixelBuffer::Convert(pixelBuffer);
+    PixelBuffer pixelBuffer = LoadImageFromFile(url);
+    PixelData   pixelData   = PixelBuffer::Convert(pixelBuffer);
 
     imageUrl = Dali::Toolkit::ImageUrlUtils::GenerateUrl(pixelData);
   }
@@ -3691,7 +3691,7 @@ int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage01(void)
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
     dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
 
-    actor.SetProperty(Actor::Property::SIZE, Vector2(20.f, 20.f)); // set size(1), no renderer yet
+    actor.SetProperty(Actor::Property::SIZE, Vector2(20.f, 10.f)); // set size(1), no renderer yet
     DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
 
@@ -3705,14 +3705,17 @@ int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage01(void)
 
     application.SendNotification(); // require to load size(1)
 
-    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    // Request a non-square visual size. The square GIF texture keeps its aspect ratio.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
 
-    actor.SetProperty(Actor::Property::SIZE, Vector2(10.f, 10.f)); // set size(2), no renderer yet
-    visual.GetNaturalSize(size);                                   // get size(1)
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(20.0f, 10.0f, 0.0f), 0.001f, TEST_LOCATION);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.f, 5.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                  // get decoded texture size(1)
     DALI_TEST_EQUALS(size, Vector2(20.0f, 20.0f), 0.001f, TEST_LOCATION);
 
     application.SendNotification(); // require to load size(2)
@@ -3721,8 +3724,10 @@ int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage01(void)
     // reload image
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
-    visual.GetNaturalSize(size); // get size(2)
+    visual.GetNaturalSize(size); // get decoded texture size(2)
     DALI_TEST_EQUALS(size, Vector2(10.0f, 10.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(10.0f, 5.0f, 0.0f), 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
@@ -3771,24 +3776,30 @@ int UtcDaliAnimatedImageVisualSynchronousSizingAnimatedImage02(void)
 
     application.SendNotification(); // require to load size(1)
 
-    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    // Request a 200x200 synchronous size. The decoded WebP texture preserves
+    // the source aspect ratio while the actor keeps the requested visual size.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
 
-    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
-    visual.GetNaturalSize(size);                                     // get size(1)
-    DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(200.0f, 200.0f, 0.0f), 0.001f, TEST_LOCATION);
 
-    application.SendNotification(); // require to load size(2)
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                     // get decoded texture size(1)
+    DALI_TEST_EQUALS(size, Vector2(381.0f, 200.0f), 0.001f, TEST_LOCATION);
+
+    application.SendNotification(); // request decoded texture size(2)
     application.Render();
 
     // reload image
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-    visual.GetNaturalSize(size); // get size(2)
-    DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+    visual.GetNaturalSize(size); // get decoded texture size(2)
+    DALI_TEST_EQUALS(size, Vector2(191.0f, 100.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(100.0f, 100.0f, 0.0f), 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
@@ -3829,7 +3840,7 @@ int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage01(void)
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
     dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
 
-    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f)); // set size(1), no renderer yet
+    actor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f)); // set size(1), no renderer yet
     DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), false, TEST_LOCATION);
 
@@ -3843,14 +3854,17 @@ int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage01(void)
 
     application.SendNotification(); // require to load size(1)
 
-    // load image as size 200x200 (Now we can ensure the size of actor is 200x200)
+    // Request a non-square visual size. The square PNG textures keep their aspect ratio.
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
 
-    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f)); // set size(2), no renderer yet
-    visual.GetNaturalSize(size);                                     // get size(1)
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(200.0f, 100.0f, 0.0f), 0.001f, TEST_LOCATION);
+
+    actor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f)); // set size(2), no renderer yet
+    visual.GetNaturalSize(size);                                    // get decoded texture size(1)
     DALI_TEST_EQUALS(size, Vector2(200.0f, 200.0f), 0.001f, TEST_LOCATION);
 
     application.SendNotification(); // require to load size(2)
@@ -3859,8 +3873,10 @@ int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage01(void)
     // reload image
     DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
 
-    visual.GetNaturalSize(size); // get size(2)
+    visual.GetNaturalSize(size); // get decoded texture size(2)
     DALI_TEST_EQUALS(size, Vector2(100.0f, 100.0f), 0.001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE),
+                     Vector3(100.0f, 50.0f, 0.0f), 0.001f, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
     DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);

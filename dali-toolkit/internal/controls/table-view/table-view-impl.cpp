@@ -1230,7 +1230,7 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       Property::Value& item     = map->GetValue(i);
       Property::Map*   childMap = item.GetMap();
 
-      auto iss = std::istringstream(ToStdString(map->GetKey(i)));
+      auto iss = std::istringstream(ToStdString(map->GetKeyAt(i).stringKey));
       iss.imbue(std::locale::classic());
       iss >> index;
       if(childMap)

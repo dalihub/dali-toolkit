@@ -20,8 +20,8 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/adaptor-framework/file-download/remote-file-download-manager.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
@@ -44,15 +44,15 @@ namespace
 {
 constexpr size_t MAXIMUM_DOWNLOAD_IMAGE_SIZE = 50 * 1024 * 1024;
 
-void SubmitRemoteDecodeTask(Dali::AsyncTaskManager                  asyncTaskManager,
-                            TextureManager::TextureId               textureId,
-                            const std::string&                      localFilePath,
-                            const Dali::ImageDimensions&            desiredSize,
-                            Dali::SamplingMode::Type                samplingMode,
-                            bool                                    orientationCorrection,
+void SubmitRemoteDecodeTask(Dali::AsyncTaskManager                   asyncTaskManager,
+                            TextureManager::TextureId                textureId,
+                            const std::string&                       localFilePath,
+                            const Dali::ImageDimensions&             desiredSize,
+                            Dali::SamplingMode::Type                 samplingMode,
+                            bool                                     orientationCorrection,
                             DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                            bool                                    loadYuvPlanes,
-                            CallbackBase*                           callback)
+                            bool                                     loadYuvPlanes,
+                            CallbackBase*                            callback)
 {
   if(DALI_UNLIKELY(!asyncTaskManager || !callback))
   {
@@ -64,7 +64,7 @@ void SubmitRemoteDecodeTask(Dali::AsyncTaskManager                  asyncTaskMan
   RemoteDecodeTaskPtr remoteDecodeTask = new RemoteDecodeTask(textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, callback);
   asyncTaskManager.AddTask(remoteDecodeTask);
 }
-}
+} //namespace
 
 TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureManager)
 : mTextureManager(textureManager),
@@ -113,19 +113,20 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
     Dali::RemoteFileDownloadManager::Get().StartDownload(
       url.GetUrl(),
       MAXIMUM_DOWNLOAD_IMAGE_SIZE,
-      [asyncLoadingHelper, asyncTaskManager, textureId, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes](bool success, const std::string& localFilePath) {
-        // Called on the download completion thread. Only enqueue AsyncTaskManager tasks here.
-        if(!success || localFilePath.empty())
-        {
-          DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper: textureId[%d] download failed, notifying load failure\n", textureId);
-          SubmitRemoteDecodeTask(asyncTaskManager, textureId, {}, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(asyncLoadingHelper, &TextureAsyncLoadingHelper::RemoteDecodeComplete));
-          return;
-        }
+      [asyncLoadingHelper, asyncTaskManager, textureId, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes](bool success, const std::string& localFilePath)
+    {
+      // Called on the download completion thread. Only enqueue AsyncTaskManager tasks here.
+      if(!success || localFilePath.empty())
+      {
+        DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper: textureId[%d] download failed, notifying load failure\n", textureId);
+        SubmitRemoteDecodeTask(asyncTaskManager, textureId, {}, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(asyncLoadingHelper, &TextureAsyncLoadingHelper::RemoteDecodeComplete));
+        return;
+      }
 
-        // Submit a decode-only LoadingTask using the locally cached file.
-        DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper: textureId[%d] download done, submitting decode task filePath[%s]\n", textureId, localFilePath.c_str());
-        SubmitRemoteDecodeTask(asyncTaskManager, textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(asyncLoadingHelper, &TextureAsyncLoadingHelper::RemoteDecodeComplete));
-      });
+      // Submit a decode-only LoadingTask using the locally cached file.
+      DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper: textureId[%d] download done, submitting decode task filePath[%s]\n", textureId, localFilePath.c_str());
+      SubmitRemoteDecodeTask(asyncTaskManager, textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(asyncLoadingHelper, &TextureAsyncLoadingHelper::RemoteDecodeComplete));
+    });
     return;
   }
 
@@ -137,8 +138,8 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
 }
 
 void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId                textureId,
-                                          Devel::PixelBuffer                             pixelBuffer,
-                                          Devel::PixelBuffer                             maskPixelBuffer,
+                                          PixelBuffer                                    pixelBuffer,
+                                          PixelBuffer                                    maskPixelBuffer,
                                           const float                                    contentScale,
                                           const bool                                     cropToMask,
                                           const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)

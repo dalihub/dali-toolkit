@@ -20,12 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/public-api/adaptor-framework/image-loading.h>
 #include <dali/public-api/adaptor-framework/window.h>
 
 //INTERNAL INCLUDES
@@ -50,11 +50,11 @@ Texture LoadTexture(const char* imageUrl, bool generateMipmaps)
 {
   Texture texture;
 
-  Devel::PixelBuffer pixelBuffer = LoadImageFromFile(imageUrl);
+  PixelBuffer pixelBuffer = LoadImageFromFile(imageUrl);
   if(pixelBuffer)
   {
     texture             = Texture::New(TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight());
-    PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer);
+    PixelData pixelData = PixelBuffer::Convert(pixelBuffer);
     texture.Upload(pixelData);
 
     if(generateMipmaps)

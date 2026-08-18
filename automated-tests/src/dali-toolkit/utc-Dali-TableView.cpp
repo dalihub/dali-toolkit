@@ -676,22 +676,22 @@ int UtcDaliTableViewSetGetProperty(void)
 
   Property::Map layoutRowsGet = tableView.GetProperty(TableView::Property::LAYOUT_ROWS).Get<Property::Map>();
 
-  DALI_TEST_EQUALS(ToStdString(layoutRowsGet.GetKey(1)).compare(ToStdString(layoutRows.GetKey(0))), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(ToStdString(layoutRowsGet.GetKeyAt(1).stringKey).compare(ToStdString(layoutRows.GetKeyAt(0).stringKey)), 0, TEST_LOCATION);
   Property::Map* childMap = layoutRowsGet.GetValue(1).GetMap();
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fixed");
   DALI_TEST_EQUALS(childMap->Find("value")->Get<float>(), 30.f, TEST_LOCATION);
 
   childMap = layoutRowsGet.GetValue(3).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKey(3)).compare(ToStdString(layoutRows.GetKey(1))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKeyAt(3).stringKey).compare(ToStdString(layoutRows.GetKeyAt(1).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "relative");
   DALI_TEST_EQUALS(childMap->Find("value")->Get<float>(), 0.2f, TEST_LOCATION);
 
   childMap = layoutRowsGet.GetValue(4).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKey(4)).compare(ToStdString(layoutRows.GetKey(2))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKeyAt(4).stringKey).compare(ToStdString(layoutRows.GetKeyAt(2).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fill");
 
   childMap = layoutRowsGet.GetValue(6).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKey(6)).compare(ToStdString(layoutRows.GetKey(3))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutRowsGet.GetKeyAt(6).stringKey).compare(ToStdString(layoutRows.GetKeyAt(3).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fit");
 
   // Test "layoutColumns" property
@@ -718,22 +718,22 @@ int UtcDaliTableViewSetGetProperty(void)
 
   Property::Map layoutColumnsGet = tableView.GetProperty(TableView::Property::LAYOUT_COLUMNS).Get<Property::Map>();
 
-  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKey(2)).compare(ToStdString(layoutColumns.GetKey(0))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKeyAt(2).stringKey).compare(ToStdString(layoutColumns.GetKeyAt(0).stringKey)) == 0);
   childMap = layoutColumnsGet.GetValue(2).GetMap();
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "relative");
   DALI_TEST_EQUALS(childMap->Find("value")->Get<float>(), 0.2f, TEST_LOCATION);
 
   childMap = layoutColumnsGet.GetValue(3).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKey(3)).compare(ToStdString(layoutColumns.GetKey(1))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKeyAt(3).stringKey).compare(ToStdString(layoutColumns.GetKeyAt(1).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fixed");
   DALI_TEST_EQUALS(childMap->Find("value")->Get<float>(), 30.f, TEST_LOCATION);
 
   childMap = layoutColumnsGet.GetValue(5).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKey(5)).compare(ToStdString(layoutColumns.GetKey(2))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKeyAt(5).stringKey).compare(ToStdString(layoutColumns.GetKeyAt(2).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fit");
 
   childMap = layoutColumnsGet.GetValue(7).GetMap();
-  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKey(7)).compare(ToStdString(layoutColumns.GetKey(3))) == 0);
+  DALI_TEST_CHECK(ToStdString(layoutColumnsGet.GetKeyAt(7).stringKey).compare(ToStdString(layoutColumns.GetKeyAt(3).stringKey)) == 0);
   DALI_TEST_CHECK(childMap->Find("policy")->Get<Dali::String>() == "fill");
 
   END_TEST;

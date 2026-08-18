@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
