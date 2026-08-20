@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-mode.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 namespace Dali::Toolkit::Internal
 {
@@ -190,7 +191,7 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
 void ScrollViewPropertyHandler::UpdatePropertyDomain(ScrollView& scrollView)
 {
   Actor   self                  = scrollView.Self();
-  Vector3 size                  = self.GetTargetSize();
+  Vector3 size                  = DevelActor::GetTargetSize(self);
   Vector2 min                   = scrollView.mMinScroll;
   Vector2 max                   = scrollView.mMaxScroll;
   bool    scrollPositionChanged = false;

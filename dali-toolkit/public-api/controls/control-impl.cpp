@@ -513,7 +513,7 @@ Dali::Texture ControlImpl::GetOffScreenRenderingOutput() const
 }
 
 ControlImpl::ControlImpl(ControlBehaviour behaviourFlags)
-: CustomActorImpl(static_cast<ActorFlags>(behaviourFlags)),
+: CustomActorImpl(),
   mInternal(new Internal::Control(*this))
 {
   mInternal->mFlags = behaviourFlags;
@@ -529,6 +529,10 @@ ControlImpl::~ControlImpl()
 
 void ControlImpl::Initialize()
 {
+  // Set relayout enabled state based on DISABLE_SIZE_NEGOTIATION flag
+  bool relayoutEnabled = !(mInternal->mFlags & DISABLE_SIZE_NEGOTIATION);
+  DevelActor::SetRelayoutEnabled(Self(), relayoutEnabled);
+
   if(!(mInternal->mFlags & DISABLE_VISUALS))
   {
     mInternal->InitializeVisualData();

@@ -100,7 +100,7 @@ const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
 } // namespace
 
 VideoView::VideoView(Dali::VideoSyncMode syncMode)
-: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(ACTOR_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
+: ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(CONTROL_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
   mCurrentVideoPlayPosition(0),
   mFrameID(0),
   mIsPlay(false),
