@@ -779,7 +779,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     application.Render(16);
 
     // Size should be changed
-    Vector3 naturalSize = dummyControl.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(dummyControl);
     DALI_TEST_CHECK(naturalSize == newSize);
 
     dummyControl.Unparent();

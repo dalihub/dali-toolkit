@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context-menu-item.h>
@@ -483,7 +484,7 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS(gUrlChangedCallbackCalled, 0, TEST_LOCATION);
 
   view.LoadUrl(TEST_URL1);
-  view.GetNaturalSize();
+  DevelActor::GetNaturalSize(view);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(view.CanGoBack(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(gPageLoadStartedCallbackCalled, 1, TEST_LOCATION);
@@ -587,7 +588,7 @@ int UtcDaliWebViewTouchAndKeys(void)
   application.SendNotification();
   application.Render();
 
-  view.GetNaturalSize();
+  DevelActor::GetNaturalSize(view);
   view.TouchEventSignal().Connect(&OnTouched);
 
   // Touch event
@@ -835,7 +836,7 @@ int UtcDaliWebViewHoverAndWheel01(void)
   application.SendNotification();
   application.Render();
 
-  view.GetNaturalSize();
+  DevelActor::GetNaturalSize(view);
 
   // Send hover and wheel events before connecting signals, for line coverage.
 

@@ -4023,7 +4023,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 originalSize = field.GetNaturalSize();
+  Vector3 originalSize = DevelActor::GetNaturalSize(field);
 
   field.SetProperty(Toolkit::Control::Property::PADDING, Extents(10, 10, 10, 10));
 
@@ -4032,7 +4032,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
 
   DALI_TEST_EQUALS(field.GetProperty<Extents>(Toolkit::Control::Property::PADDING), Extents(10, 10, 10, 10), TEST_LOCATION);
 
-  Vector3 paddingAddedSize = field.GetNaturalSize();
+  Vector3 paddingAddedSize = DevelActor::GetNaturalSize(field);
 
   DALI_TEST_EQUALS(originalSize.width + 10 + 10, paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -4505,24 +4505,24 @@ int UtcDaliToolkitTextFieldFontSizeScale(void)
   TextField textField = TextField::New();
   textField.SetProperty(TextField::Property::POINT_SIZE, 30.f);
   textField.SetProperty(TextField::Property::TEXT, "Test");
-  Vector3 nonScaledSize = textField.GetNaturalSize();
+  Vector3 nonScaledSize = DevelActor::GetNaturalSize(textField);
 
   TextField textFieldScaled = TextField::New();
   textFieldScaled.SetProperty(TextField::Property::POINT_SIZE, 15.f);
   textFieldScaled.SetProperty(Toolkit::DevelTextField::Property::FONT_SIZE_SCALE, 2.f);
   textFieldScaled.SetProperty(TextField::Property::TEXT, "Test");
-  Vector3 scaledSize = textFieldScaled.GetNaturalSize();
+  Vector3 scaledSize = DevelActor::GetNaturalSize(textFieldScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
   textField.SetProperty(TextField::Property::PIXEL_SIZE, 30.f);
   textField.SetProperty(TextField::Property::TEXT, "Test");
-  nonScaledSize = textField.GetNaturalSize();
+  nonScaledSize = DevelActor::GetNaturalSize(textField);
 
   textFieldScaled.SetProperty(TextField::Property::PIXEL_SIZE, 15.f);
   textFieldScaled.SetProperty(Toolkit::DevelTextField::Property::FONT_SIZE_SCALE, 2.f);
   textFieldScaled.SetProperty(TextField::Property::TEXT, "Test");
-  scaledSize = textFieldScaled.GetNaturalSize();
+  scaledSize = DevelActor::GetNaturalSize(textFieldScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
@@ -4621,7 +4621,7 @@ int UtcDaliTextFieldAtlasLimitationIsEnabledForLargeFontPointSize(void)
   application.SendNotification();
   application.Render();
   //Use GetNaturalSize to verify that size of block does not exceed Atlas size
-  Vector3 naturalSize = textField.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(textField);
 
   DALI_TEST_GREATER(lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION);
   DALI_TEST_GREATER(lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION);
@@ -4657,7 +4657,7 @@ int UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases(void)
     application.GetScene().Add(textField);
     application.SendNotification();
     application.Render();
-    naturalSize = textField.GetNaturalSize();
+    naturalSize = DevelActor::GetNaturalSize(textField);
     DALI_TEST_GREATER(lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION);
     DALI_TEST_GREATER(lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION);
   }
@@ -5987,8 +5987,8 @@ int UtcDaliToolkitTextfieldParagraphTag(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 textNaturalSizeNewlineSeparator = fieldNewlineSeparator.GetNaturalSize();
-  Vector3 textNaturalSizeParagraphTag     = fieldParagraphTag.GetNaturalSize();
+  Vector3 textNaturalSizeNewlineSeparator = DevelActor::GetNaturalSize(fieldNewlineSeparator);
+  Vector3 textNaturalSizeParagraphTag     = DevelActor::GetNaturalSize(fieldParagraphTag);
 
   DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
 
