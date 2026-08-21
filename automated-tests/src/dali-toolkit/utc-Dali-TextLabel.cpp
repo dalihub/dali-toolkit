@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
@@ -641,10 +642,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // test natural size with multi-line and line spacing
   {
     TextLabel label3             = TextLabel::New("Some text here\nend there\nend here");
-    Vector3   oneLineNaturalSize = label3.GetNaturalSize();
+    Vector3   oneLineNaturalSize = DevelActor::GetNaturalSize(label3);
     label3.SetProperty(TextLabel::Property::MULTI_LINE, true);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    Vector3 multiLineNaturalSize = label3.GetNaturalSize();
+    Vector3 multiLineNaturalSize = DevelActor::GetNaturalSize(label3);
 
     // The width of the text when multi-line is enabled will be smaller (lines separated on '\n')
     // The height of the text when multi-line is enabled will be larger
@@ -657,7 +658,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
     label3.SetProperty(TextLabel::Property::LINE_SPACING, lineSpacing);
     Vector3 expectedAfterLineSpacingApplied(multiLineNaturalSize);
     expectedAfterLineSpacingApplied.height += 3 * lineSpacing;
-    DALI_TEST_EQUALS(expectedAfterLineSpacingApplied, label3.GetNaturalSize(), TEST_LOCATION);
+    DALI_TEST_EQUALS(expectedAfterLineSpacingApplied, DevelActor::GetNaturalSize(label3), TEST_LOCATION);
   }
 
   // single line, line spacing must not affect natural size of the text, only add the spacing to the height
@@ -665,12 +666,12 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
     TextLabel label3 = TextLabel::New("Some text here end there end here");
     label3.SetProperty(TextLabel::Property::MULTI_LINE, false);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    Vector3 textNaturalSize = label3.GetNaturalSize();
+    Vector3 textNaturalSize = DevelActor::GetNaturalSize(label3);
     int     lineSpacing     = 20;
     label3.SetProperty(TextLabel::Property::LINE_SPACING, lineSpacing);
     Vector3 expectedNaturalSizeWithLineSpacing(textNaturalSize);
     expectedNaturalSizeWithLineSpacing.height += lineSpacing;
-    DALI_TEST_EQUALS(expectedNaturalSizeWithLineSpacing, label3.GetNaturalSize(), TEST_LOCATION);
+    DALI_TEST_EQUALS(expectedNaturalSizeWithLineSpacing, DevelActor::GetNaturalSize(label3), TEST_LOCATION);
   }
   // Check the line spacing property
   DALI_TEST_EQUALS(label.GetProperty<float>(TextLabel::Property::LINE_SPACING), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -2736,7 +2737,7 @@ int UtcDaliToolkitTextLabelBitmapFont(void)
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Digits");
 
   // The text has been laid out with the bitmap font if the natural size is the sum of all the width (322) and 34 height.
-  DALI_TEST_EQUALS(label.GetNaturalSize(), Vector3(322.f, 34.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetNaturalSize(label), Vector3(322.f, 34.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   application.GetScene().Add(label);
 
@@ -2794,7 +2795,7 @@ int UtcDaliToolkitTextlabelTextFit(void)
   application.Render();
 
   const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
   DALI_TEST_CHECK(textFitChangedSignal);
@@ -2812,7 +2813,7 @@ int UtcDaliToolkitTextlabelTextFit(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   END_TEST;
 }
@@ -2852,7 +2853,7 @@ int UtcDaliToolkitTextlabelTextFitStressTest(void)
   application.Render();
 
   const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
   DALI_TEST_CHECK(textFitChangedSignal);
@@ -2981,7 +2982,7 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   DALI_TEST_EQUALS(7u, numberOfFitOptions, TEST_LOCATION);
 
   const Vector3 EXPECTED_NATURAL_SIZE(276.0f, 16.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   std::vector<DevelTextLabel::FitOption> emptyFitOptions;
   DevelTextLabel::SetTextFitArray(label, false, emptyFitOptions);
@@ -2993,7 +2994,7 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   DALI_TEST_EQUALS(false, enable, TEST_LOCATION);
 
   const Vector3 EXPECTED_NATURAL_SIZE_DISABLE(690.0f, 80.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE_DISABLE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE_DISABLE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   // make unsorted options.
   std::vector<DevelTextLabel::FitOption> unorderedFitOptions;
@@ -3007,7 +3008,7 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   END_TEST;
 }
@@ -3282,24 +3283,24 @@ int UtcDaliToolkitTextlabelFontSizeScale(void)
   TextLabel label = TextLabel::New();
   label.SetProperty(TextLabel::Property::POINT_SIZE, 30.f);
   label.SetProperty(TextLabel::Property::TEXT, "Test");
-  Vector3 nonScaledSize = label.GetNaturalSize();
+  Vector3 nonScaledSize = DevelActor::GetNaturalSize(label);
 
   TextLabel labelScaled = TextLabel::New();
   labelScaled.SetProperty(TextLabel::Property::POINT_SIZE, 15.f);
   labelScaled.SetProperty(Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE, 2.f);
   labelScaled.SetProperty(TextLabel::Property::TEXT, "Test");
-  Vector3 scaledSize = labelScaled.GetNaturalSize();
+  Vector3 scaledSize = DevelActor::GetNaturalSize(labelScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 30.f);
   label.SetProperty(TextLabel::Property::TEXT, "Test");
-  nonScaledSize = label.GetNaturalSize();
+  nonScaledSize = DevelActor::GetNaturalSize(label);
 
   labelScaled.SetProperty(TextLabel::Property::PIXEL_SIZE, 15.f);
   labelScaled.SetProperty(Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE, 2.f);
   labelScaled.SetProperty(TextLabel::Property::TEXT, "Test");
-  scaledSize = labelScaled.GetNaturalSize();
+  scaledSize = DevelActor::GetNaturalSize(labelScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
@@ -3455,7 +3456,7 @@ int UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize(void)
   application.SendNotification();
   application.Render();
   //Use GetNaturalSize to verify that size of block does not exceed Atlas size
-  Vector3 naturalSize = textLabel.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(textLabel);
 
   DALI_TEST_GREATER(lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION);
   DALI_TEST_GREATER(lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION);
@@ -3894,9 +3895,9 @@ int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize               = label.GetNaturalSize();
-  Vector3 relativeSingleNaturalSize = labelSingleLineParagraph.GetNaturalSize();
-  Vector3 relativeMultiNaturalSize  = labelMultiLineParagraph.GetNaturalSize();
+  Vector3 naturalSize               = DevelActor::GetNaturalSize(label);
+  Vector3 relativeSingleNaturalSize = DevelActor::GetNaturalSize(labelSingleLineParagraph);
+  Vector3 relativeMultiNaturalSize  = DevelActor::GetNaturalSize(labelMultiLineParagraph);
 
   float lineSize = naturalSize.y / 5.0f; //total size/number of lines
 
@@ -3922,14 +3923,14 @@ int UtcDaliToolkitTextLabelRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize = label.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(label);
 
   label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 0.5f);
 
   application.SendNotification();
   application.Render();
 
-  Vector3 relativeNaturalSize = label.GetNaturalSize();
+  Vector3 relativeNaturalSize = DevelActor::GetNaturalSize(label);
 
   DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y, TEST_LOCATION);
 
@@ -3938,7 +3939,7 @@ int UtcDaliToolkitTextLabelRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  relativeNaturalSize = label.GetNaturalSize();
+  relativeNaturalSize = DevelActor::GetNaturalSize(label);
 
   DALI_TEST_EQUALS(naturalSize.y * 2, relativeNaturalSize.y, TEST_LOCATION);
   END_TEST;
@@ -3966,7 +3967,7 @@ int UtcDaliToolkitTextLabelRelativeLineHeight2(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize = label.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(label);
 
   DALI_TEST_EQUALS(40.f, naturalSize.y, TEST_LOCATION);
 
@@ -3977,14 +3978,14 @@ int UtcDaliToolkitTextLabelRelativeLineHeight2(void)
   application.SendNotification();
   application.Render();
 
-  naturalSize = label.GetNaturalSize();
+  naturalSize = DevelActor::GetNaturalSize(label);
 
   TextLabel singleLabel = TextLabel::New();
   singleLabel.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
   singleLabel.SetProperty(TextLabel::Property::PIXEL_SIZE, 10);
   singleLabel.SetProperty(TextLabel::Property::TEXT, "Hello World");
 
-  Vector3 refNaturalSize = singleLabel.GetNaturalSize();
+  Vector3 refNaturalSize = DevelActor::GetNaturalSize(singleLabel);
 
   DALI_TEST_EQUALS(refNaturalSize.y, naturalSize.y, TEST_LOCATION);
 
@@ -3993,7 +3994,7 @@ int UtcDaliToolkitTextLabelRelativeLineHeight2(void)
   application.SendNotification();
   application.Render();
 
-  naturalSize = label.GetNaturalSize();
+  naturalSize = DevelActor::GetNaturalSize(label);
 
   DALI_TEST_EQUALS(100.f, naturalSize.y, TEST_LOCATION);
   END_TEST;
@@ -4119,8 +4120,8 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 textNaturalSizeNewlineSeparator = labelNewlineSeparator.GetNaturalSize();
-  Vector3 textNaturalSizeParagraphTag     = labelParagraphTag.GetNaturalSize();
+  Vector3 textNaturalSizeNewlineSeparator = DevelActor::GetNaturalSize(labelNewlineSeparator);
+  Vector3 textNaturalSizeParagraphTag     = DevelActor::GetNaturalSize(labelParagraphTag);
 
   DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
 
@@ -4375,13 +4376,13 @@ int utcDaliTextLabelNaturalSize(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize = label.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(label);
   DALI_TEST_CHECK(naturalSize.x > 0);
   DALI_TEST_CHECK(naturalSize.y > 0);
 
   // Set empty text.
   label.SetProperty(TextLabel::Property::TEXT, "");
-  DALI_TEST_EQUALS(Vector3(0.f, 0.f, 0.f), label.GetNaturalSize(), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.f, 0.f, 0.f), DevelActor::GetNaturalSize(label), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   END_TEST;
 }

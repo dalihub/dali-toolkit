@@ -1812,7 +1812,7 @@ void Popup::OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimensi
 
 Vector3 Popup::GetNaturalSize()
 {
-  return mPopupLayout.GetNaturalSize();
+  return DevelActor::GetNaturalSize(mPopupLayout);
 }
 
 float Popup::GetHeightForWidth(float width)

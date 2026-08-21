@@ -453,8 +453,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedSize02(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -618,8 +618,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedWidth02(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -676,7 +676,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  float expectedWidth  = label.GetNaturalSize().width;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
   float expectedHeight = 300.0f;
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -709,7 +709,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  expectedWidth = label.GetNaturalSize().width;
+  expectedWidth = DevelActor::GetNaturalSize(label).width;
 
   DALI_TEST_EQUALS(expectedWidth, gAsyncTextRenderedWidth, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedHeight, gAsyncTextRenderedHeight, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
@@ -783,8 +783,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithFixedHeight02(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -841,8 +841,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncTextRenderedWidth  = ConvertToEven(gAsyncTextRenderedWidth);
   gAsyncTextRenderedHeight = ConvertToEven(gAsyncTextRenderedHeight);
@@ -877,8 +877,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  expectedWidth  = label.GetNaturalSize().width;
-  expectedHeight = label.GetNaturalSize().height;
+  expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncTextRenderedWidth  = ConvertToEven(gAsyncTextRenderedWidth);
   gAsyncTextRenderedHeight = ConvertToEven(gAsyncTextRenderedHeight);
@@ -904,7 +904,7 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint01(void)
   DALI_TEST_EQUALS(true, label.GetProperty<bool>(DevelTextLabel::Property::NEED_REQUEST_ASYNC_RENDER), TEST_LOCATION);
 
   expectedWidth  = 50.0f;
-  expectedHeight = label.GetNaturalSize().height;
+  expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   // Request render with small constraint
   DevelTextLabel::RequestAsyncRenderWithConstraint(label, expectedWidth, expectedHeight);
@@ -989,8 +989,8 @@ int UtcDaliToolkitTextLabelRequestAsyncRenderWithConstraint02(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -1043,8 +1043,8 @@ int UtcDaliToolkitTextLabelRequestAsyncNaturalSize(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -1075,8 +1075,8 @@ int UtcDaliToolkitTextLabelRequestAsyncNaturalSize(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  expectedWidth  = label.GetNaturalSize().width;
-  expectedHeight = label.GetNaturalSize().height;
+  expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);
@@ -1254,7 +1254,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit01(void)
   sizeLabel.SetProperty(TextLabel::Property::MULTI_LINE, false);
   sizeLabel.SetProperty(TextLabel::Property::POINT_SIZE, textFitFontSize);
 
-  DALI_TEST_EQUALS(sizeLabel.GetNaturalSize(), label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetNaturalSize(sizeLabel), DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1280,7 +1280,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  DALI_TEST_EQUALS(sizeLabel.GetNaturalSize(), label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetNaturalSize(sizeLabel), DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1337,7 +1337,7 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit01(void)
   DALI_TEST_CHECK(gAsyncTextRenderedCalled);
   DALI_TEST_CHECK(asyncTextRendered);
 
-  DALI_TEST_EQUALS(sizeLabel.GetNaturalSize(), label.GetNaturalSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetNaturalSize(sizeLabel), DevelActor::GetNaturalSize(label), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1424,8 +1424,8 @@ int UtcDaliToolkitTextLabelAsyncRenderTextFit02(void)
   sizeLabel.SetProperty(TextLabel::Property::MULTI_LINE, false);
   sizeLabel.SetProperty(TextLabel::Property::POINT_SIZE, textFitFontSize);
 
-  float minWidth  = sizeLabel.GetNaturalSize().width;
-  float minHeight = sizeLabel.GetNaturalSize().height;
+  float minWidth  = DevelActor::GetNaturalSize(sizeLabel).width;
+  float minHeight = DevelActor::GetNaturalSize(sizeLabel).height;
 
   gAsyncTextRenderedWidth  = ConvertToEven(gAsyncTextRenderedWidth);
   gAsyncTextRenderedHeight = ConvertToEven(gAsyncTextRenderedHeight);
@@ -1750,7 +1750,7 @@ int UtcDaliToolkitTextLabelAsyncRenderAutoScroll02(void)
   DALI_TEST_CHECK(asyncTextRendered);
 
   float expectedWidth  = labelWidth;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncTextRenderedHeight = ConvertToEven(gAsyncTextRenderedHeight);
 
@@ -2663,8 +2663,8 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   DALI_TEST_CHECK(gAsyncSizeComputedCalled);
   DALI_TEST_CHECK(asyncSizeComputed);
 
-  float expectedWidth  = label.GetNaturalSize().width;
-  float expectedHeight = label.GetNaturalSize().height;
+  float expectedWidth  = DevelActor::GetNaturalSize(label).width;
+  float expectedHeight = DevelActor::GetNaturalSize(label).height;
 
   gAsyncSizeComputedWidth  = ConvertToEven(gAsyncSizeComputedWidth);
   gAsyncSizeComputedHeight = ConvertToEven(gAsyncSizeComputedHeight);

@@ -321,7 +321,7 @@ void RenderEffectImpl::UpdateTargetSize()
     size = ownerControl.GetProperty<Vector2>(Actor::Property::SIZE);
     if(size == Vector2::ZERO)
     {
-      size = ownerControl.GetNaturalSize();
+      size = DevelActor::GetNaturalSize(ownerControl);
     }
 
     if(size.x < 0.0f || size.y < 0.0f)

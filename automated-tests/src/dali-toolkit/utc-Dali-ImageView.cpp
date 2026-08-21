@@ -2942,7 +2942,7 @@ int UtcDaliImageViewSyncSVGLoading(void)
     DALI_TEST_CHECK(imageView);
 
     application.SendNotification();
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
 
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
@@ -3010,7 +3010,7 @@ int UtcDaliImageViewSyncSVGLoading02(void)
     // Image Visual should be positioned depending on ImageView's padding
     DALI_TEST_EQUALS(retMap->Find(Visual::Transform::Property::SIZE)->Get<Vector2>(), Vector2(100, 100), TEST_LOCATION);
 
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
 
@@ -3051,7 +3051,7 @@ int UtcDaliImageViewAsyncSVGLoading(void)
     application.SendNotification();
     application.Render(16);
 
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
   }
@@ -3078,7 +3078,7 @@ int UtcDaliImageViewAsyncSVGLoading02(void)
 
     // Check that natural size return invalid values now
     // Note : This logic might be changed if we decide to decode the svg synchronously.
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
     DALI_TEST_NOT_EQUALS(naturalSize.width, 100.0f, 0.01f, TEST_LOCATION);
     DALI_TEST_NOT_EQUALS(naturalSize.height, 100.0f, 0.01f, TEST_LOCATION);
 
@@ -3090,7 +3090,7 @@ int UtcDaliImageViewAsyncSVGLoading02(void)
     application.SendNotification();
     application.Render(16);
 
-    naturalSize = imageView.GetNaturalSize();
+    naturalSize = DevelActor::GetNaturalSize(imageView);
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
 
@@ -3102,7 +3102,7 @@ int UtcDaliImageViewAsyncSVGLoading02(void)
     imageView2.SetProperty(ImageView::Property::IMAGE, propertyMap);
 
     // Check whether natural size is same as cached image size.
-    naturalSize = imageView2.GetNaturalSize();
+    naturalSize = DevelActor::GetNaturalSize(imageView2);
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
   }
@@ -3143,7 +3143,7 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
     application.SendNotification();
     application.Render(16);
 
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
 
@@ -3443,7 +3443,7 @@ int UtcDaliImageViewTVGLoading(void)
     application.SendNotification();
     application.Render(16);
 
-    Vector3 naturalSize = imageView.GetNaturalSize();
+    Vector3 naturalSize = DevelActor::GetNaturalSize(imageView);
 
     DALI_TEST_EQUALS(naturalSize.width, 100.0f, TEST_LOCATION);
     DALI_TEST_EQUALS(naturalSize.height, 100.0f, TEST_LOCATION);
