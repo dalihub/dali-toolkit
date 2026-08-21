@@ -2642,7 +2642,7 @@ static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::
 
   Dali::Integration::Accessibility::EnumBitSet<Dali::Integration::Accessibility::Role, Dali::Integration::Accessibility::Role::MAX_COUNT> rolesRule;
   MatchType                                                                                                                               roleMatchType = MatchType::INVALID;
-  std::array<int32_t, 4>                                                                                                                  rolesConverted{0, 0, 0, 0};
+  AtspiAccessibility::Collection::RoleMask                                                                                               rolesConverted{};
   if(!roles.empty())
   {
     for(auto role : roles)
@@ -2650,7 +2650,7 @@ static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::
       rolesRule[role] = true;
     }
     const auto rolesRaw = rolesRule.GetRawData();
-    rolesConverted      = {static_cast<int32_t>(rolesRaw[0]), static_cast<int32_t>(rolesRaw[1]), static_cast<int32_t>(rolesRaw[2]), static_cast<int32_t>(rolesRaw[3])};
+    std::copy(rolesRaw.begin(), rolesRaw.end(), rolesConverted.begin());
     roleMatchType       = MatchType::ALL;
   }
 

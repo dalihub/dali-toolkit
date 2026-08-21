@@ -1575,6 +1575,54 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedVectorImageVisualIgnoreFinishedWhilePlayStatePending(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualIgnoreFinishedWhilePlayStatePending");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME)
+    .Add(DevelImageVisual::Property::LOOP_COUNT, 1);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+  DevelControl::VisualEventSignal(actor).Connect(&VisualEventSignal);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.f, 30.f));
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  WaitForSyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+  application.SendNotification();
+  application.Render();
+
+  // Let the worker finish without consuming its event-thread callback.
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // Queue the next play-state request before handling the previous Finished.
+  gAnimationFinishedSignalFired = false;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::PLAY_STATE);
+  DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::PlayState::PLAYING);
+  DALI_TEST_EQUALS(gAnimationFinishedSignalFired, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 {
   ToolkitTestApplication application;
