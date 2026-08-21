@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/focused-actor-provider.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
@@ -118,6 +119,29 @@ const unsigned int MAX_HISTORY_AMOUNT = 30; ///< Max length of focus history sta
 
 } // unnamed namespace
 
+/**
+ * Bridge that exposes the focused Actor to dali-adaptor.
+ */
+class FocusedActorProviderImpl : public Dali::Integration::FocusedActorProvider
+{
+public:
+  /**
+   * @brief Constructor.
+   */
+  explicit FocusedActorProviderImpl(KeyboardFocusManager& focusManager)
+  : mFocusManager(focusManager)
+  {
+  }
+
+  Dali::Actor GetFocusedActor() override
+  {
+    return mFocusManager.GetCurrentFocusActor();
+  }
+
+private:
+  KeyboardFocusManager& mFocusManager;
+};
+
 Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
 {
   Toolkit::KeyboardFocusManager manager;
@@ -158,10 +182,12 @@ KeyboardFocusManager::KeyboardFocusManager()
   mEnableDefaultAlgorithm(false),
   mClearFocusOnWindowFocusLost(true),
   mCurrentWindowId(0),
-  mLastFocusChangeContext()
+  mLastFocusChangeContext(),
+  mFocusedActorProvider(std::make_unique<FocusedActorProviderImpl>(*this))
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
+  Dali::Integration::RegisterFocusedActorProvider(mFocusedActorProvider.get());
   LifecycleController::Get().PreInitSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnAdaptorInit);
 }
 
@@ -206,6 +232,7 @@ void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& 
 
 KeyboardFocusManager::~KeyboardFocusManager()
 {
+  Dali::Integration::UnregisterFocusedActorProvider(mFocusedActorProvider.get());
 }
 
 void KeyboardFocusManager::GetConfigurationFromStyleManger()
