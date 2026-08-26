@@ -286,6 +286,22 @@ bool DrawableView::OnRenderCallback(const RenderCallbackInput& renderCallbackInp
 {
   if(DALI_LIKELY(!mTerminated.load()) && mNativeRenderer)
   {
+    // A terminate invocation is delivered even when the GL resources it would have released
+    // are already gone - the view was never drawn, or its render target has been destroyed.
+    // Nothing that needs DALi's rendering context can run then, so the init and terminate
+    // callbacks are skipped.
+    //
+    // The threaded backend is still shut down, because none of that applies to it: it owns
+    // its own thread and EGL context, stopping it costs no GL call here, and its terminate
+    // callback runs on that thread where the context is still perfectly good.
+    if(renderCallbackInput.isTerminated && !renderCallbackInput.isNativeApiUsable)
+    {
+      mCurrentViewState = ViewState::TERMINATE;
+      mNativeRenderer->Terminate(); // Does nothing for the non-threaded backends
+      mTerminated.store(true);
+      return true;
+    }
+
     mNativeRenderer->PushRenderCallbackInputData(renderCallbackInput);
 
     // Init state
