@@ -3699,7 +3699,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 originalSize = editor.GetNaturalSize();
+  Vector3 originalSize = DevelActor::GetNaturalSize(editor);
 
   editor.SetProperty(Toolkit::Control::Property::PADDING, Extents(10, 10, 10, 10));
 
@@ -3708,7 +3708,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
 
   DALI_TEST_EQUALS(editor.GetProperty<Extents>(Toolkit::Control::Property::PADDING), Extents(10, 10, 10, 10), TEST_LOCATION);
 
-  Vector3 paddingAddedSize = editor.GetNaturalSize();
+  Vector3 paddingAddedSize = DevelActor::GetNaturalSize(editor);
 
   DALI_TEST_EQUALS(originalSize.width + 10 + 10, paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -4208,24 +4208,24 @@ int UtcDaliToolkitTextEditorFontSizeScale(void)
   TextEditor textEditor = TextEditor::New();
   textEditor.SetProperty(TextEditor::Property::POINT_SIZE, 30.f);
   textEditor.SetProperty(TextEditor::Property::TEXT, "Test");
-  Vector3 nonScaledSize = textEditor.GetNaturalSize();
+  Vector3 nonScaledSize = DevelActor::GetNaturalSize(textEditor);
 
   TextEditor textEditorScaled = TextEditor::New();
   textEditorScaled.SetProperty(TextEditor::Property::POINT_SIZE, 15.f);
   textEditorScaled.SetProperty(Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE, 2.f);
   textEditorScaled.SetProperty(TextEditor::Property::TEXT, "Test");
-  Vector3 scaledSize = textEditorScaled.GetNaturalSize();
+  Vector3 scaledSize = DevelActor::GetNaturalSize(textEditorScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
   textEditor.SetProperty(TextEditor::Property::PIXEL_SIZE, 30.f);
   textEditor.SetProperty(TextEditor::Property::TEXT, "Test");
-  nonScaledSize = textEditor.GetNaturalSize();
+  nonScaledSize = DevelActor::GetNaturalSize(textEditor);
 
   textEditorScaled.SetProperty(TextEditor::Property::PIXEL_SIZE, 15.f);
   textEditorScaled.SetProperty(Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE, 2.f);
   textEditorScaled.SetProperty(TextEditor::Property::TEXT, "Test");
-  scaledSize = textEditorScaled.GetNaturalSize();
+  scaledSize = DevelActor::GetNaturalSize(textEditorScaled);
 
   DALI_TEST_EQUALS(nonScaledSize, scaledSize, TEST_LOCATION);
 
@@ -4285,7 +4285,7 @@ int UtcDaliTextEditorLineCountAfterGetNaturalSize(void)
   lineCount     = textEditor.GetProperty<int>(TextEditor::Property::LINE_COUNT);
   DALI_TEST_EQUALS(lineCount, 7, TEST_LOCATION);
 
-  textEditor.GetNaturalSize();
+  DevelActor::GetNaturalSize(textEditor);
 
   // Create a tap event to touch the text editor.
   TestGenerateTap(application, 18.0f, 25.0f);
@@ -4459,7 +4459,7 @@ int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountScrollingCase(void)
   //Failed case is the GetNaturalSize change LineCount then the scrollor will not arrive to latest line
   //GetNaturalSize is a retrieval method which should not modify object
   lineCountBefore = textEditor.GetProperty<int>(TextEditor::Property::LINE_COUNT);
-  textEditor.GetNaturalSize();
+  DevelActor::GetNaturalSize(textEditor);
 
   //This is to simulate focus into text editor after calling GetNaturalSize
   //Create a tap event to touch the text editor.
@@ -4506,7 +4506,7 @@ int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountLineWrapCharCase(void)
   //Failed case is the GetNaturalSize change LineCount which make position of cursor invalid in TextEditor
   //GetNaturalSize is a retrieval method which should not modify object
   lineCountBefore = textEditor.GetProperty<int>(TextEditor::Property::LINE_COUNT);
-  textEditor.GetNaturalSize();
+  DevelActor::GetNaturalSize(textEditor);
 
   //This is to simulate focus into text editor after calling GetNaturalSize
   //Create a tap event to touch the text editor.
@@ -4549,7 +4549,7 @@ int UtcDaliTextEditorAtlasLimitationIsEnabledForLargeFontPointSize(void)
   application.SendNotification();
   application.Render();
   //Use GetNaturalSize to verify that size of block does not exceed Atlas size
-  Vector3 naturalSize = textEditor.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(textEditor);
 
   DALI_TEST_GREATER(lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION);
   DALI_TEST_GREATER(lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION);
@@ -4584,7 +4584,7 @@ int UtcDaliTextEditorAtlasLimitationIsEnabledPerformanceCases(void)
     application.GetScene().Add(textEditor);
     application.SendNotification();
     application.Render();
-    naturalSize = textEditor.GetNaturalSize();
+    naturalSize = DevelActor::GetNaturalSize(textEditor);
     DALI_TEST_GREATER(lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION);
     DALI_TEST_GREATER(lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION);
   }
@@ -5007,12 +5007,12 @@ int UtcDaliTextEditorLineSpacing(void)
   textEditor.SetProperty(TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3");
   textEditor.SetProperty(DevelTextEditor::Property::LINE_SPACING, 0);
 
-  Vector3 sizeBefore = textEditor.GetNaturalSize();
+  Vector3 sizeBefore = DevelActor::GetNaturalSize(textEditor);
 
   textEditor.SetProperty(DevelTextEditor::Property::LINE_SPACING, 20);
 
   //add 20 for each line  20 * 3
-  DALI_TEST_EQUALS(sizeBefore.height + 60.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeBefore.height + 60.0f, DevelActor::GetNaturalSize(textEditor).height, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5070,14 +5070,14 @@ int UtcDaliTextEditorMinLineSize(void)
   textEditor.SetProperty(TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3");
   textEditor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 0);
 
-  Vector3 sizeBefore = textEditor.GetNaturalSize();
+  Vector3 sizeBefore = DevelActor::GetNaturalSize(textEditor);
 
   textEditor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 60);
 
-  DALI_TEST_NOT_EQUALS(sizeBefore, textEditor.GetNaturalSize(), 0.0f, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(sizeBefore, DevelActor::GetNaturalSize(textEditor), 0.0f, TEST_LOCATION);
 
   //60 * 3 lines
-  DALI_TEST_EQUALS(180.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+  DALI_TEST_EQUALS(180.0f, DevelActor::GetNaturalSize(textEditor).height, TEST_LOCATION);
 
   END_TEST;
 }
@@ -6393,9 +6393,9 @@ int UtcDaliToolkitTextEditorMarkupRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize               = editor.GetNaturalSize();
-  Vector3 relativeSingleNaturalSize = editorSingleLineParagraph.GetNaturalSize();
-  Vector3 relativeMultiNaturalSize  = editorMultiLineParagraph.GetNaturalSize();
+  Vector3 naturalSize               = DevelActor::GetNaturalSize(editor);
+  Vector3 relativeSingleNaturalSize = DevelActor::GetNaturalSize(editorSingleLineParagraph);
+  Vector3 relativeMultiNaturalSize  = DevelActor::GetNaturalSize(editorMultiLineParagraph);
 
   float lineSize = naturalSize.y / 5.0f; //total size/number of lines
 
@@ -6421,14 +6421,14 @@ int UtcDaliToolkitTextEditorRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 naturalSize = editor.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(editor);
 
   editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 0.5f);
 
   application.SendNotification();
   application.Render();
 
-  Vector3 relativeNaturalSize = editor.GetNaturalSize();
+  Vector3 relativeNaturalSize = DevelActor::GetNaturalSize(editor);
 
   DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y, TEST_LOCATION);
 
@@ -6437,7 +6437,7 @@ int UtcDaliToolkitTextEditorRelativeLineHeight(void)
   application.SendNotification();
   application.Render();
 
-  relativeNaturalSize = editor.GetNaturalSize();
+  relativeNaturalSize = DevelActor::GetNaturalSize(editor);
 
   DALI_TEST_EQUALS(naturalSize.y * 2, relativeNaturalSize.y, TEST_LOCATION);
   END_TEST;
@@ -6601,8 +6601,8 @@ int UtcDaliToolkitTexteditorParagraphTag(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 textNaturalSizeNewlineSeparator = editorNewlineSeparator.GetNaturalSize();
-  Vector3 textNaturalSizeParagraphTag     = editorParagraphTag.GetNaturalSize();
+  Vector3 textNaturalSizeNewlineSeparator = DevelActor::GetNaturalSize(editorNewlineSeparator);
+  Vector3 textNaturalSizeParagraphTag     = DevelActor::GetNaturalSize(editorParagraphTag);
 
   DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
 

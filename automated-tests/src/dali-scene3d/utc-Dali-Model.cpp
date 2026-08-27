@@ -548,7 +548,7 @@ int UtcDaliModelGetNaturalSize(void)
 
   Scene3D::Model model = Scene3D::Model::New(TEST_GLTF_FILE_NAME);
 
-  Vector3 naturalSize = model.GetNaturalSize();
+  Vector3 naturalSize = DevelActor::GetNaturalSize(model);
   DALI_TEST_EQUALS(Vector3::ZERO, naturalSize, TEST_LOCATION);
 
   application.GetScene().Add(model);
@@ -562,7 +562,7 @@ int UtcDaliModelGetNaturalSize(void)
 
   DALI_TEST_EQUALS(gResourceReadyCalled, true, TEST_LOCATION);
 
-  naturalSize = model.GetNaturalSize();
+  naturalSize = DevelActor::GetNaturalSize(model);
   DALI_TEST_EQUALS(Vector3(2, 2, 2), naturalSize, TEST_LOCATION);
 
   Scene3D::ModelNode rootNode = model.GetModelRoot();

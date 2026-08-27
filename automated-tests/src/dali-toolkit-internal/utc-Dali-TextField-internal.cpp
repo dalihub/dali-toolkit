@@ -20,6 +20,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
@@ -1099,13 +1100,13 @@ int UtcDaliTextFieldTextWithSpan(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 originalSize = field.GetNaturalSize();
+  Vector3 originalSize = DevelActor::GetNaturalSize(field);
   field.SetProperty(TextField::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span");
 
   application.SendNotification();
   application.Render();
 
-  Vector3 spanSize = field.GetNaturalSize();
+  Vector3 spanSize = DevelActor::GetNaturalSize(field);
 
   DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
 
@@ -1375,9 +1376,9 @@ int UtcDaliTextFieldImeInputAfterFocusGain(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextField& textFieldImpl     = GetImpl(textField);
-  ControllerPtr                 controller        = textFieldImpl.GetTextController();
-  Controller::Impl&             controllerImpl    = Controller::Impl::GetImplementation(*controller.Get());
+  Toolkit::Internal::TextField& textFieldImpl      = GetImpl(textField);
+  ControllerPtr                 controller         = textFieldImpl.GetTextController();
+  Controller::Impl&             controllerImpl     = Controller::Impl::GetImplementation(*controller.Get());
   InputMethodContext            inputMethodContext = textFieldImpl.GetInputMethodContext();
 
   DALI_TEST_EQUALS(EventData::INACTIVE, controllerImpl.mEventData->mState, TEST_LOCATION);

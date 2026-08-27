@@ -1,7 +1,7 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.5.35
-Release:    3
+Version:    2.5.36
+Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary

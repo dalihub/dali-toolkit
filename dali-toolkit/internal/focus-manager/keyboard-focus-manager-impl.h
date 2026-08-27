@@ -23,6 +23,7 @@
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -42,6 +43,8 @@ namespace Toolkit
 {
 namespace Internal
 {
+class FocusedActorProviderImpl;
+
 /**
  * @copydoc Toolkit::KeyboardFocusManager
  */
@@ -456,6 +459,8 @@ private:
   uint32_t mCurrentWindowId; ///< The current native window id
 
   FocusChangeContext mLastFocusChangeContext; ///< The last focus change context (device & name)
+
+  std::unique_ptr<FocusedActorProviderImpl> mFocusedActorProvider; ///< Bridge that exposes the focused Actor to dali-adaptor
 };
 
 } // namespace Internal

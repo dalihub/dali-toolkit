@@ -20,6 +20,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <test-application.h>
@@ -290,14 +291,14 @@ int UtcDaliCheckBoxSetLabelPadding(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 orginalSize = checkBox.GetNaturalSize();
+  Vector3 orginalSize = DevelActor::GetNaturalSize(checkBox);
 
   checkBox.SetProperty(Toolkit::DevelButton::Property::LABEL_PADDING, Vector4(10.0f, 10.0f, 10.0f, 10.0f));
 
   application.SendNotification();
   application.Render();
 
-  Vector3 paddingAddedSize = checkBox.GetNaturalSize();
+  Vector3 paddingAddedSize = DevelActor::GetNaturalSize(checkBox);
 
   DALI_TEST_EQUALS(checkBox.GetProperty<Vector4>(Toolkit::DevelButton::Property::LABEL_PADDING), Vector4(10.0f, 10.0f, 10.0f, 10.0f), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -330,7 +331,7 @@ int UtcDaliCheckBoxSetForegroundPadding(void)
   application.SendNotification();
   application.Render();
 
-  tet_printf("Button RelayoutSize with text(%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height);
+  tet_printf("Button RelayoutSize with text(%f,%f)\n", DevelActor::GetNaturalSize(checkBox).width, DevelActor::GetNaturalSize(checkBox).height);
 
   checkBox.SetProperty(Toolkit::Button::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE);
   checkBox.SetProperty(Toolkit::Button::Property::SELECTED_VISUAL, TEST_IMAGE_ONE);
@@ -338,18 +339,18 @@ int UtcDaliCheckBoxSetForegroundPadding(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 preVisualPaddingSize = checkBox.GetNaturalSize();
+  Vector3 preVisualPaddingSize = DevelActor::GetNaturalSize(checkBox);
 
-  tet_printf("Button RelayoutSize with text and icon (%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height);
+  tet_printf("Button RelayoutSize with text and icon (%f,%f)\n", DevelActor::GetNaturalSize(checkBox).width, DevelActor::GetNaturalSize(checkBox).height);
 
   checkBox.SetProperty(Toolkit::DevelButton::Property::VISUAL_PADDING, Vector4(25.0f, 25.0f, 25.0f, 25.0f));
 
   application.SendNotification();
   application.Render();
 
-  Vector3 paddingAddedSize = checkBox.GetNaturalSize();
+  Vector3 paddingAddedSize = DevelActor::GetNaturalSize(checkBox);
 
-  tet_printf("Button RelayoutSize with text, icon and padding (%f,%f)\n", checkBox.GetNaturalSize().width, checkBox.GetNaturalSize().height);
+  tet_printf("Button RelayoutSize with text, icon and padding (%f,%f)\n", DevelActor::GetNaturalSize(checkBox).width, DevelActor::GetNaturalSize(checkBox).height);
 
   DALI_TEST_EQUALS(checkBox.GetProperty<Vector4>(Toolkit::DevelButton::Property::VISUAL_PADDING), Vector4(25.0f, 25.0f, 25.0f, 25.0f), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 

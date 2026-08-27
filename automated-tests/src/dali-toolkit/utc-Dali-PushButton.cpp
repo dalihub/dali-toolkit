@@ -781,7 +781,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   Vector2 size(Vector2::ZERO);
   size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
   size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
-  tet_printf("Button Natural Size(%f,%f)\n", pushButton.GetNaturalSize().width, pushButton.GetNaturalSize().height);
+  tet_printf("Button Natural Size(%f,%f)\n", DevelActor::GetNaturalSize(pushButton).width, DevelActor::GetNaturalSize(pushButton).height);
 
   DALI_TEST_EQUALS(size, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
@@ -1028,8 +1028,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
   size.width  = DevelActor::GetRelayoutSize(pushButton, Dimension::WIDTH);
   size.height = DevelActor::GetRelayoutSize(pushButton, Dimension::HEIGHT);
 
-  tet_printf("Natural width (%f)\n", pushButton.GetNaturalSize().width);
-  tet_printf("Natural height (%f)\n", pushButton.GetNaturalSize().height);
+  tet_printf("Natural width (%f)\n", DevelActor::GetNaturalSize(pushButton).width);
+  tet_printf("Natural height (%f)\n", DevelActor::GetNaturalSize(pushButton).height);
 
   tet_printf(" UtcDaliPushButtonAlignmentLayout Top layout - Image and Padding size (%f,%f)\n", testImageWithPaddingSize.width, testImageWithPaddingSize.height);
   tet_printf(" UtcDaliPushButtonAlignmentLayout Top layout - Text and Padding size (%f,%f)\n", labelAndPaddingSize.width, labelAndPaddingSize.height);

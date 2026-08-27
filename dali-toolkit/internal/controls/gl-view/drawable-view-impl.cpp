@@ -179,7 +179,7 @@ void DrawableView::Terminate()
     Actor self = Self();
 
     // Make render callback execute forcibly next frame.
-    mRenderer.TerminateRenderCallback(true);
+    DevelRenderer::TerminateRenderCallback(mRenderer, true);
     self.RemoveRenderer(mRenderer);
 
     if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
@@ -220,7 +220,7 @@ void DrawableView::OnInitialize()
   Actor self = Self();
 
   // Initialize Renderer
-  mRenderer = Renderer::New(*mRenderCallback);
+  mRenderer = DevelRenderer::New(*mRenderCallback);
   self.AddRenderer(mRenderer);
 
   // Adding VisibilityChange Signal.

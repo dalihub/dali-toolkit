@@ -167,7 +167,7 @@ int UtcDaliLightSize(void)
 
   light.SetProperty(Dali::Actor::Property::SIZE, Vector3::ONE);
   DALI_TEST_EQUALS(Vector3::ONE, light.GetProperty<Vector3>(Dali::Actor::Property::SIZE), 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector3::ZERO, light.GetNaturalSize(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3::ZERO, DevelActor::GetNaturalSize(light), 0.01f, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

@@ -172,13 +172,13 @@ void TextSelectionToolbar::OnInitialize()
 
 void TextSelectionToolbar::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  float width = Max(mTableOfButtons.GetNaturalSize().width, size.width);
+  float width = Max(DevelActor::GetNaturalSize(mTableOfButtons).width, size.width);
   mRulerX->SetDomain(RulerDomain(0.0, width, true));
   mScrollView.SetRulerX(mRulerX);
 
   if(mScrollBar)
   {
-    float barWidth = Min(mTableOfButtons.GetNaturalSize().width, size.width) - 2.f * mScrollBarPadding.x;
+    float barWidth = Min(DevelActor::GetNaturalSize(mTableOfButtons).width, size.width) - 2.f * mScrollBarPadding.x;
     mScrollBar.SetProperty(Actor::Property::SIZE, Vector2(0.0f, barWidth));
   }
 }

@@ -29,6 +29,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/focused-actor-provider.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
@@ -547,6 +548,10 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActor(void)
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
+  auto* provider = Dali::Integration::GetFocusedActorProvider();
+  DALI_TEST_CHECK(provider);
+  DALI_TEST_CHECK(provider->GetFocusedActor() == Actor());
+
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   first.SetProperty(Actor::Property::FOCUSABLE, true);
@@ -569,10 +574,12 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActor(void)
   // Check that the focus is set on the first actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(provider->GetFocusedActor() == first);
 
   // Check that the focus is set on the second actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+  DALI_TEST_CHECK(provider->GetFocusedActor() == second);
 
   // Check that it will fail to set focus on the third actor as it's not in the stage
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == false);
@@ -591,6 +598,32 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActor(void)
   // Check that the focus is successfully moved to the third actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+  DALI_TEST_CHECK(provider->GetFocusedActor() == third);
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerFocusedActorProvider(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerFocusedActorProvider");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  auto* provider = Dali::Integration::GetFocusedActorProvider();
+  DALI_TEST_CHECK(provider);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::FOCUSABLE, true);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(actor));
+  DALI_TEST_CHECK(provider->GetFocusedActor() == actor);
+
+  manager.ClearFocus();
+  DALI_TEST_CHECK(!provider->GetFocusedActor());
+
   END_TEST;
 }
 
