@@ -339,7 +339,7 @@ std::string ControlAccessible::GetLocalizedRoleName() const
 bool ControlAccessible::IsShowing()
 {
   Dali::Actor self = Self();
-  if(Dali::EqualsZero(self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a) || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED) || !DevelActor::IsOnSceneVisible(self))
+  if(Dali::EqualsZero(self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER).a) || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED) || !DevelActor::IsOnSceneVisible(self))
   {
     return false;
   }

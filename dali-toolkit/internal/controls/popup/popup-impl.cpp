@@ -461,11 +461,11 @@ void Popup::StartTransitionAnimation(bool transitionIn, bool instantaneous /* fa
       {
         if(transitionIn)
         {
-          mAnimation.AnimateTo(Property(mPopupContainer, Actor::Property::COLOR_ALPHA), 1.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.30f, duration * 0.70f));
+          mAnimation.AnimateTo(Property(mPopupContainer, Actor::Property::COLOR_MULTIPLIER_ALPHA), 1.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.30f, duration * 0.70f));
         }
         else
         {
-          mAnimation.AnimateTo(Property(mPopupContainer, Actor::Property::COLOR_ALPHA), 0.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.70f));
+          mAnimation.AnimateTo(Property(mPopupContainer, Actor::Property::COLOR_MULTIPLIER_ALPHA), 0.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.70f));
         }
       }
       else
@@ -507,16 +507,16 @@ void Popup::StartTransitionAnimation(bool transitionIn, bool instantaneous /* fa
     {
       if(transitionIn)
       {
-        mAnimation.AnimateTo(Property(mBacking, Actor::Property::COLOR_ALPHA), targetAlpha, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.70f));
+        mAnimation.AnimateTo(Property(mBacking, Actor::Property::COLOR_MULTIPLIER_ALPHA), targetAlpha, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.70f));
       }
       else
       {
-        mAnimation.AnimateTo(Property(mBacking, Actor::Property::COLOR_ALPHA), 0.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.30f, duration * 0.70f));
+        mAnimation.AnimateTo(Property(mBacking, Actor::Property::COLOR_MULTIPLIER_ALPHA), 0.0f, AlphaFunction::EASE_IN_OUT, TimePeriod(0.30f, duration * 0.70f));
       }
     }
     else
     {
-      mBacking.SetProperty(Actor::Property::COLOR_ALPHA, transitionIn ? targetAlpha : 0.0f);
+      mBacking.SetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA, transitionIn ? targetAlpha : 0.0f);
     }
   }
 
@@ -947,7 +947,7 @@ Toolkit::Control Popup::CreateBacking()
   backing.SetProperty(Actor::Property::SENSITIVE, true);
 
   // Default to being transparent.
-  backing.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
+  backing.SetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA, 0.0f);
   backing.WheelEventSignal().Connect(this, &Popup::OnBackingWheelEvent);
   return backing;
 }

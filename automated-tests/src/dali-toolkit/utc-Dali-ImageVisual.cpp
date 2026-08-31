@@ -1746,7 +1746,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -1774,7 +1774,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
 
   Animation animation = dummyImpl.CreateTransition(transition);
 
-  animation.AnimateTo(Property(actor, Actor::Property::COLOR), Color::WHITE);
+  animation.AnimateTo(Property(actor, Actor::Property::COLOR_MULTIPLIER), Color::WHITE);
   animation.Play();
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -1802,7 +1802,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE * TARGET_MIX_COLOR), true, TEST_LOCATION);
 
   // (Don't test for caching of capabilities, toolkit uses Test graphics backend, not actual backend)
@@ -1831,7 +1831,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -1945,7 +1945,7 @@ int UtcDaliImageVisualAnimateOpacity02(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
 
   tet_infoline("Test that the opacity doesn't animate when actor not staged");
 
@@ -2040,7 +2040,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -2064,7 +2064,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
   Animation animation = dummyImpl.CreateTransition(transition);
-  animation.AnimateTo(Property(actor, Actor::Property::COLOR), Color::WHITE);
+  animation.AnimateTo(Property(actor, Actor::Property::COLOR_MULTIPLIER), Color::WHITE);
   animation.Play();
 
   application.SendNotification();
@@ -4960,7 +4960,7 @@ int UtcDaliImageVisualUpdatePixelAreaByAction(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);

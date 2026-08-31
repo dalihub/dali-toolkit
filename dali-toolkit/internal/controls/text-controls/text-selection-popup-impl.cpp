@@ -256,7 +256,7 @@ void TextSelectionPopup::ShowPopup()
     AddPopupOptionsToToolbar(mShowIcons, mShowCaptions);
 
     Animation animation = Animation::New(mFadeInDuration);
-    animation.AnimateTo(Property(self, Actor::Property::COLOR_ALPHA), 1.0f);
+    animation.AnimateTo(Property(self, Actor::Property::COLOR_MULTIPLIER_ALPHA), 1.0f);
     animation.Play();
     mPopupShowing = true;
   }
@@ -269,7 +269,7 @@ void TextSelectionPopup::HidePopup()
     mPopupShowing       = false;
     Actor     self      = Self();
     Animation animation = Animation::New(mFadeOutDuration);
-    animation.AnimateTo(Property(self, Actor::Property::COLOR_ALPHA), 0.0f);
+    animation.AnimateTo(Property(self, Actor::Property::COLOR_MULTIPLIER_ALPHA), 0.0f);
     animation.FinishedSignal().Connect(this, &TextSelectionPopup::HideAnimationFinished);
     animation.Play();
   }
@@ -280,7 +280,7 @@ void TextSelectionPopup::OnInitialize()
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextSelectionPopup::OnInitialize\n");
   Actor self = Self();
   DevelActor::SetResizePolicy(self, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
-  self.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
+  self.SetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA, 0.0f);
 
   // Accessibility
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);

@@ -98,7 +98,7 @@ void Light::OnInitialize()
   // TODO : We need to check this is enough.
   Toolkit::DevelControl::EnableCreateAccessible(Toolkit::Control::DownCast(self), false);
 
-  self.SetProperty(Dali::Actor::Property::COLOR, Color::WHITE);
+  self.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
 
   // Directional Light setting
   mLightSourceActor = Dali::CameraActor::New();

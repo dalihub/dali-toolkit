@@ -54,7 +54,7 @@ class Light;
  * @code
  * Scene3D::SceneView sceneView = Scene3D::SceneView::New();
  * Scene3D::Lightlight = Scene3D::Light::New();
- * light.SetProperty(Dali::Actor::Property::COLOR, Color::BROWN);
+ * light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BROWN);
  * Dali::DevelActor::LookAt(light, Vector3(1.0f, 1.0f, 1.0f));
  * sceneView.Add(light);
  * @endcode

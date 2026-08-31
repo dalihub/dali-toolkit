@@ -216,21 +216,21 @@ Builder.AnimateTo("light-theme", myActor, TimePeriod(0, 10));
    {                                   //
    "light-theme":                      // Style-set name
    {                                   //
-     "color":[1,1,1,1]                 // }
+     "colorMultiplier":[1,1,1,1]                 // }
      "position":[0,-120,0],            // } properties to set on the given actor
      "rotation":[0,0,30],              // }
      "actors":                         //
      {                                 // Sub Actors are referenced by name
        "title-text":                   // Actor name to search for under given actor
        {                               //
-         "color":[1,1,1,1]             // }
+         "colorMultiplier":[1,1,1,1]             // }
          "position":[0,-120,0],        // } properties to set if 'title-text' is found
          "rotation":[0,0,30],          // }
        }
      },                                //
      "icon":                           //
      {                                 //
-       "color":[1,1,1,1]               //
+       "colorMultiplier":[1,1,1,1]               //
      }                                 //
     },                                 //
     "dark-theme":                      //
