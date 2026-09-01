@@ -1858,6 +1858,90 @@ int UtcDaliBuilderMappingCycleCheck(void)
   END_TEST;
 }
 
+int UtcDaliBuilderInsetsTypeCastP(void)
+{
+  ToolkitTestApplication application;
+
+  // "insets" typeCast registers a custom property of type Property::INSETS,
+  // mirroring how "extents" registers one of type Property::EXTENTS.
+  std::string json(
+    "{"
+    "\"stage\":"
+    "[{"
+    "\"type\": \"Actor\","
+    "\"properties\": {"
+    "  \"customInsets\": { \"typeCast\":\"insets\", \"value\":[1,2,3,4] }"
+    "}"
+    "}]"
+    "}");
+
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  Builder builder = Builder::New();
+  builder.LoadFromString(json);
+  builder.AddActors(rootActor);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor createdActor = rootActor.GetChildAt(0);
+
+  Property::Index index = createdActor.GetPropertyIndex("customInsets");
+  DALI_TEST_CHECK(Property::INVALID_INDEX != index);
+
+  Property::Value value = createdActor.GetProperty(index);
+  DALI_TEST_EQUALS(value.GetType(), Property::INSETS, TEST_LOCATION);
+  DALI_TEST_CHECK(value.Get<Insets>() == Insets(1.0f, 2.0f, 3.0f, 4.0f));
+
+  END_TEST;
+}
+
+int UtcDaliBuilderInsetsConstantReplacementP(void)
+{
+  ToolkitTestApplication application;
+
+  // A constant that is itself typeCast to "insets" produces a Property::INSETS
+  // value. Referencing it with "{...}" must resolve through the full-replacement
+  // path (Replacement::IsInsets(const TreeNode&)) and keep the INSETS type,
+  // rather than falling through to some other conversion.
+  std::string json(
+    "{"
+    "\"constants\":"
+    "{"
+    "  \"MY_INSETS\": { \"typeCast\":\"insets\", \"value\":[1,2,3,4] }"
+    "},"
+    "\"stage\":"
+    "[{"
+    "\"type\": \"Actor\","
+    "\"properties\": {"
+    "  \"customInsets\": { \"typeCast\":\"insets\", \"value\":\"{MY_INSETS}\" }"
+    "}"
+    "}]"
+    "}");
+
+  Actor rootActor = Actor::New();
+  application.GetScene().Add(rootActor);
+
+  Builder builder = Builder::New();
+  builder.LoadFromString(json);
+  builder.AddActors(rootActor);
+
+  application.SendNotification();
+  application.Render();
+
+  Actor createdActor = rootActor.GetChildAt(0);
+
+  Property::Index index = createdActor.GetPropertyIndex("customInsets");
+  DALI_TEST_CHECK(Property::INVALID_INDEX != index);
+
+  Property::Value value = createdActor.GetProperty(index);
+  DALI_TEST_EQUALS(value.GetType(), Property::INSETS, TEST_LOCATION);
+  DALI_TEST_CHECK(value.Get<Insets>() == Insets(1.0f, 2.0f, 3.0f, 4.0f));
+
+  END_TEST;
+}
+
 int UtcDaliBuilderTypeCasts(void)
 {
   ToolkitTestApplication application;

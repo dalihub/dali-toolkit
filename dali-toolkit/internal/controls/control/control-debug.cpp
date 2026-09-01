@@ -177,6 +177,11 @@ public:
         stream << mValue.Get<Extents>();
         break;
       }
+      case Dali::Property::INSETS:
+      {
+        stream << mValue.Get<Insets>();
+        break;
+      }
       case Dali::Property::NONE:
       {
         stream << "undefined type";

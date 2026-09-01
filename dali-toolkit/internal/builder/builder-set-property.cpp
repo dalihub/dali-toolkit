@@ -101,6 +101,10 @@ bool Disambiguated(const TreeNode&        child,
     {
       return DeterminePropertyFromNode(*childValue, Dali::Property::EXTENTS, value, replacement);
     }
+    else if(*childType == "insets")
+    {
+      return DeterminePropertyFromNode(*childValue, Dali::Property::INSETS, value, replacement);
+    }
   }
 
   // else we failed to disambiguate
@@ -322,6 +326,15 @@ bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Proper
     case Property::EXTENTS:
     {
       if(OptionalExtents v = replacer.IsExtents(node))
+      {
+        value = *v;
+        done  = true;
+      }
+      break;
+    }
+    case Property::INSETS:
+    {
+      if(OptionalInsets v = replacer.IsInsets(node))
       {
         value = *v;
         done  = true;

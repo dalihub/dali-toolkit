@@ -91,6 +91,26 @@ int UtcDaliControlDebugHierarchy(void)
   END_TEST;
 }
 
+int UtcDaliControlDebugHierarchyInsetsProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Dump a control hierarchy that has a custom Property::INSETS property, and check that Property::INSETS is handled without asserting.");
+
+  auto tableView = Toolkit::TableView::New(1, 1);
+  application.GetScene().Add(tableView);
+
+  Property::Value v(Insets(1.0f, 2.0f, 3.0f, 4.0f));
+  tableView.RegisterProperty("SomeInsets", v, Property::READ_WRITE);
+
+  std::ostringstream oss;
+  Dali::Toolkit::Internal::DumpControlHierarchy(oss, application.GetScene().GetRootLayer());
+  DALI_TEST_CHECK(oss.str().length() != 0);
+  DALI_TEST_CHECK(oss.str().find("[1, 2, 3, 4]") != std::string::npos);
+  tet_printf("Control hierarchy: \n%s\n", oss.str().c_str());
+
+  END_TEST;
+}
+
 int UtcDaliControlOverrideCornerProperties(void)
 {
   ToolkitTestApplication application;
