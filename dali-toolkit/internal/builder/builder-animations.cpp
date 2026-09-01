@@ -170,7 +170,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
 
   if(OptionalBoolean looping = constant.IsBoolean(IsChild(child, "loop")))
   {
-    animation.SetLooping(*looping);
+    animation.SetLoopCount(*looping ? Animation::INFINITE_LOOP : 1);
   }
 
   if(OptionalString endAction = constant.IsString(IsChild(child, "endAction")))
