@@ -438,7 +438,7 @@ void ShaderManager::SetLightConstraint(uint32_t lightIndex)
     auto             lightColorPropertyIndex = mImpl->mLightUniformBlock.RegisterProperty(ToDaliStringView(lightColorPropertyName), Vector3(Color::WHITE));
     Dali::Constraint lightColorConstraint    = Dali::Constraint::New<Vector3>(mImpl->mLightUniformBlock, lightColorPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
        { output = Vector3(inputs[0]->GetVector4()); });
-    lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR});
+    lightColorConstraint.AddSource(Source{mImpl->mLights[lightIndex], Dali::Actor::Property::COLOR_MULTIPLIER});
     ConstraintSetInternalTag(lightColorConstraint, INDEX_FOR_LIGHT_CONSTRAINT_TAG + lightIndex);
     lightColorConstraint.ApplyPost();
   }

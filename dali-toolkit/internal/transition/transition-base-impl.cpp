@@ -51,7 +51,7 @@ Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
   propertyMap.Insert(Dali::Actor::Property::POSITION, control[Dali::Actor::Property::POSITION]);
   propertyMap.Insert(Dali::Actor::Property::ORIENTATION, control[Dali::Actor::Property::ORIENTATION]);
   propertyMap.Insert(Dali::Actor::Property::SCALE, control[Dali::Actor::Property::SCALE]);
-  propertyMap.Insert(Dali::Actor::Property::COLOR, control[Dali::Actor::Property::COLOR]);
+  propertyMap.Insert(Dali::Actor::Property::COLOR_MULTIPLIER, control[Dali::Actor::Property::COLOR_MULTIPLIER]);
 
   return propertyMap;
 }
@@ -142,7 +142,7 @@ void TransitionBase::Play()
   Vector3    targetPosition, targetScale;
   Quaternion targetOrientation;
   targetWorldTransform.GetTransformComponents(targetPosition, targetOrientation, targetScale);
-  Vector4 targetColor = DevelActor::GetWorldColor(mTarget);
+  Vector4 targetColor = DevelActor::GetWorldColorMultiplier(mTarget);
 
   mTarget[Dali::Actor::Property::PIVOT]               = Pivot::CENTER;
   mTarget[Dali::Actor::Property::PARENT_ORIGIN]       = ParentOrigin::CENTER;
@@ -155,7 +155,7 @@ void TransitionBase::Play()
   mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
   mTarget[Dali::Actor::Property::SCALE]       = targetScale;
   mTarget[Dali::Actor::Property::ORIENTATION] = targetOrientation;
-  mTarget[Dali::Actor::Property::COLOR]       = targetColor;
+  mTarget[Dali::Actor::Property::COLOR_MULTIPLIER]       = targetColor;
 
   OnPlay();
 

@@ -1586,7 +1586,7 @@ void ItemView::SetOvershootEffectColor(const Vector4& color)
   mOvershootEffectColor = color;
   if(mOvershootOverlay)
   {
-    mOvershootOverlay.SetProperty(Actor::Property::COLOR, color);
+    mOvershootOverlay.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
 }
 
@@ -1599,7 +1599,7 @@ void ItemView::EnableScrollOvershoot(bool enable)
     {
       Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
       mOvershootOverlay                            = CreateBouncingEffectActor(effectOvershootPropertyIndex);
-      mOvershootOverlay.SetProperty(Actor::Property::COLOR, mOvershootEffectColor);
+      mOvershootOverlay.SetProperty(Actor::Property::COLOR_MULTIPLIER, mOvershootEffectColor);
       mOvershootOverlay.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
       mOvershootOverlay.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
       mOvershootOverlay.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);

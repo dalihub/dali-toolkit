@@ -387,14 +387,14 @@ void ScrollBar::ShowIndicator()
   if(mIndicatorFirstShow)
   {
     // Preserve the alpha value from the stylesheet
-    mIndicatorShowAlpha = Self().GetCurrentProperty<Vector4>(Actor::Property::COLOR).a;
+    mIndicatorShowAlpha = Self().GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a;
     mIndicatorFirstShow = false;
   }
 
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New(mIndicatorShowDuration);
-    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_ALPHA), mIndicatorShowAlpha, AlphaFunction::EASE_IN);
+    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_MULTIPLIER_ALPHA), mIndicatorShowAlpha, AlphaFunction::EASE_IN);
     mAnimation.Play();
   }
   else
@@ -415,7 +415,7 @@ void ScrollBar::HideIndicator()
   if(mIndicatorHideDuration > 0.0f)
   {
     mAnimation = Animation::New(mIndicatorHideDuration);
-    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_ALPHA), 0.0f, AlphaFunction::EASE_IN);
+    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_MULTIPLIER_ALPHA), 0.0f, AlphaFunction::EASE_IN);
     mAnimation.Play();
   }
   else
@@ -436,7 +436,7 @@ void ScrollBar::ShowTransientIndicator()
   mAnimation = Animation::New(mIndicatorShowDuration + mTransientIndicatorDuration + mIndicatorHideDuration);
   if(mIndicatorShowDuration > 0.0f)
   {
-    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_ALPHA),
+    mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_MULTIPLIER_ALPHA),
                          mIndicatorShowAlpha,
                          AlphaFunction::EASE_IN,
                          TimePeriod(0, mIndicatorShowDuration));
@@ -445,7 +445,7 @@ void ScrollBar::ShowTransientIndicator()
   {
     mIndicator.SetProperty(Actor::Property::OPACITY, mIndicatorShowAlpha);
   }
-  mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_ALPHA),
+  mAnimation.AnimateTo(Property(mIndicator, Actor::Property::COLOR_MULTIPLIER_ALPHA),
                        0.0f,
                        AlphaFunction::EASE_IN,
                        TimePeriod((mIndicatorShowDuration + mTransientIndicatorDuration), mIndicatorHideDuration));

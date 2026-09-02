@@ -127,7 +127,7 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple(bool vertical, Scrollab
   mAnimationStateFlags(0)
 {
   mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
-  mOvershootOverlay.SetProperty(Actor::Property::COLOR, mAttachedScrollView.GetOvershootEffectColor());
+  mOvershootOverlay.SetProperty(Actor::Property::COLOR_MULTIPLIER, mAttachedScrollView.GetOvershootEffectColor());
   mOvershootOverlay.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   mOvershootOverlay.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   mOvershootOverlay.SetProperty(Actor::Property::VISIBLE, false);
@@ -217,7 +217,7 @@ void ScrollOvershootEffectRipple::SetOvershootEffectColor(const Vector4& color)
 {
   if(mOvershootOverlay)
   {
-    mOvershootOverlay.SetProperty(Actor::Property::COLOR, color);
+    mOvershootOverlay.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
 }
 

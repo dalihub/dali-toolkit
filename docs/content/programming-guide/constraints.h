@@ -90,7 +90,7 @@ Finally, you can base your source on the properties of another handle altogether
 For example, a sibling actor's color could be used as a constraint input source.
 
 @code
-Dali::ConstraintSource source( Dali::Source( anotherHandle, Dali::Actor::Property::COLOR ) );
+Dali::ConstraintSource source( Dali::Source( anotherHandle, Dali::Actor::Property::COLOR_MULTIPLIER ) );
 @endcode
 
 <h1 class="pg">The Constraint Function</h1>
@@ -134,7 +134,7 @@ For example, the color of an actor could be changed based on its position along 
 @code
 Dali::Actor actor = Actor::New();
 
-Dali::Constraint constraint = Dali::Constraint::New< Vector4 >( actor, Dali::Actor::Property::COLOR, MyConstraintFunction ); // Creates a constraint that targets actor
+Dali::Constraint constraint = Dali::Constraint::New< Vector4 >( actor, Dali::Actor::Property::COLOR_MULTIPLIER, MyConstraintFunction ); // Creates a constraint that targets actor
 constraint.AddSource( Dali::LocalSource( Dali::Actor::Property::POSITION ) ); // Adds the POSITION property as a constraint input
 constraint.Apply(); // The constraint is applied
 @endcode
@@ -171,7 +171,7 @@ Reusing the last example, the color of an actor is changed based on its position
 @code
 Dali::Actor actor = Actor::New();
 
-Dali::Constraint constraint = Dali::Constraint::New< Vector4 >( actor, Dali::Actor::Property::COLOR, MyFunctor( 200 ) ); // Creates a constraint that targets actor, and uses MyFunctor with a distance of 200
+Dali::Constraint constraint = Dali::Constraint::New< Vector4 >( actor, Dali::Actor::Property::COLOR_MULTIPLIER, MyFunctor( 200 ) ); // Creates a constraint that targets actor, and uses MyFunctor with a distance of 200
 constraint.AddSource( Dali::LocalSource( Dali::Actor::Property::POSITION ) ); // Adds the POSITION property as a constraint input
 constraint.Apply(); // The constraint is applied
 @endcode

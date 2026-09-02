@@ -231,7 +231,7 @@ int UtcDaliLightAdd01(void)
   application.Render();
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   sceneView.Add(light);
 
@@ -287,7 +287,7 @@ int UtcDaliLightAdd02(void)
   sceneView.Add(actor);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   actor.Add(light);
 
@@ -340,7 +340,7 @@ int UtcDaliLightAdd03(void)
   application.Render();
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.Enable(false);
   sceneView.Add(light);
@@ -405,12 +405,12 @@ int UtcDaliLightAdd04(void)
   application.Render();
 
   Scene3D::Light light1 = Scene3D::Light::New();
-  light1.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light1.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light1, Vector3(1.0f, 0.0f, 0.0f));
   sceneView.Add(light1);
 
   Scene3D::Light light2 = Scene3D::Light::New();
-  light2.SetProperty(Dali::Actor::Property::COLOR, Color::RED);
+  light2.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::RED);
   Dali::DevelActor::LookAt(light2, Vector3(0.0f, 0.0f, -1.0f));
   sceneView.Add(light2);
 
@@ -478,14 +478,14 @@ int UtcDaliLightAdd05(void)
   for(uint32_t i = 0; i < maxLightCount; ++i)
   {
     Scene3D::Light light = Scene3D::Light::New();
-    light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+    light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
     Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
     sceneView.Add(light);
     lightList.push_back(light);
   }
 
   Scene3D::Light light2 = Scene3D::Light::New();
-  light2.SetProperty(Dali::Actor::Property::COLOR, Color::RED);
+  light2.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::RED);
   Dali::DevelActor::LookAt(light2, Vector3(0.0f, 0.0f, -1.0f));
   sceneView.Add(light2);
   lightList.push_back(light2);
@@ -573,7 +573,7 @@ int UtcDaliLightModelAddAndRemove(void)
   application.GetScene().Add(sceneView);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   sceneView.Add(light);
 
@@ -650,7 +650,7 @@ int UtcDaliLightEnableShadowOnScene01(void)
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
 
@@ -700,7 +700,7 @@ int UtcDaliLightEnableShadowOnScene02(void)
   // DALI_TEST_EQUALS(0, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   sceneView.Add(light);
 
@@ -733,7 +733,7 @@ int UtcDaliLightEnableShadowOnScene03(void)
   application.GetScene().Add(sceneView);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
   sceneView.Add(light);
@@ -782,7 +782,7 @@ int UtcDaliLightDisableShadow01(void)
   sceneView.Add(model);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
   sceneView.Add(light);
@@ -840,7 +840,7 @@ int UtcDaliLightDisableShadow02(void)
   sceneView.Add(model);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
   sceneView.Add(light);
@@ -875,7 +875,7 @@ int UtcDaliLightDisableShadow02(void)
   // DALI_TEST_EQUALS(1, shader.GetProperty<int32_t>(shadowEnabledIndex), TEST_LOCATION);
 
   Scene3D::Light newLight = Scene3D::Light::New();
-  newLight.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  newLight.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(newLight, Vector3(1.0f, 0.0f, 0.0f));
   newLight.EnableShadow(true);
   sceneView.Add(newLight);
@@ -930,14 +930,14 @@ int UtcDaliLightEnableShadowOfNotEnabledLight(void)
   for(uint32_t i = 0; i < maxLightCount; ++i)
   {
     Scene3D::Light light = Scene3D::Light::New();
-    light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+    light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
     Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
     sceneView.Add(light);
     lights.push_back(light);
   }
 
   Scene3D::Light shadowLight = Scene3D::Light::New();
-  shadowLight.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  shadowLight.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(shadowLight, Vector3(1.0f, 0.0f, 0.0f));
   sceneView.Add(shadowLight);
 
@@ -989,7 +989,7 @@ int UtcDaliLightSetGetProperty(void)
   sceneView.Add(model);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
   sceneView.Add(light);
@@ -1030,7 +1030,7 @@ int UtcDaliLightShadowSoftFiltering(void)
   sceneView.Add(model);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
   sceneView.Add(light);
@@ -1099,7 +1099,7 @@ int UtcDaliLightShadowRenderTask(void)
   DALI_TEST_EQUALS(SCENE_ORDER_INDEX, taskList.GetTask(baseRenderTaskCount).GetOrderIndex(), TEST_LOCATION);
 
   Scene3D::Light light = Scene3D::Light::New();
-  light.SetProperty(Dali::Actor::Property::COLOR, Color::BLUE);
+  light.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
   Dali::DevelActor::LookAt(light, Vector3(1.0f, 0.0f, 0.0f));
   light.EnableShadow(true);
 

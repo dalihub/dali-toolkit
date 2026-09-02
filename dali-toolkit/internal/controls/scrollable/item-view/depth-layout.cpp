@@ -483,7 +483,7 @@ void DepthLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector3
     constraint.Apply();
 
     // Color constraint
-    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, DepthColorConstraint(itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows * 0.5f, itemId % mImpl->mNumberOfColumns));
+    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, DepthColorConstraint(itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows * 0.5f, itemId % mImpl->mNumberOfColumns));
     constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_POSITION));
     constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();

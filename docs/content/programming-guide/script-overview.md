@@ -55,7 +55,7 @@ JSON file contains different sections:
           "size":"{DEFAULT_MENU_USER_SIZE}",
           "colorMode":"USE_OWN_COLOR",
           "image":{ "url":"{IMAGE_PATH}white-pixel.png" },
-          "color":"{DEFAULT_MENU_BACKGROUND_COLOR}"
+          "colorMultiplier":"{DEFAULT_MENU_BACKGROUND_COLOR}"
         },
         {
           "name":"icon",
@@ -96,7 +96,7 @@ Actor userActorTree = builder.Create("users");
         "background":
         {
           "image":{ "filename":"{IMAGE_PATH}live_tv_background.png" },
-          "color":"{DEFAULT_MENU_ITEM_COLOR_1}"
+          "colorMultiplier":"{DEFAULT_MENU_ITEM_COLOR_1}"
         },
         "icon":
         {
@@ -104,7 +104,7 @@ Actor userActorTree = builder.Create("users");
         },
         "label":
         {
-          "colorAlpha":1,
+          "colorMultiplierAlpha":1,
           "text":"<font size='20' weight='bold'><b>LIVE</b></font>"
         }
       }
@@ -136,14 +136,14 @@ builder.ApplyStyle( "live-tv-focus", tvIcon );
         },
         {
           "actor":"itemsBackground",
-          "property":"colorAlpha",
+          "property":"colorMultiplierAlpha",
           "value":0.85,
           "timePeriod": {"delay": 0.25, "duration": 0.25 },
           "alphaFunction":"EASE_IN_OUT"
         },
         {
           "actor":"usersBackground",
-          "property":"colorAlpha",
+          "property":"colorMultiplierAlpha",
           "value":0.85,
           "timePeriod": {"delay": 0.25, "duration": 0.25 },
           "alphaFunction":"EASE_IN_OUT"

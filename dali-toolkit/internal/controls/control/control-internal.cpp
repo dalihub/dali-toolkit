@@ -50,6 +50,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/controls/control/control-accessibility-data.h>
 #include <dali-toolkit/internal/controls/control/control-visual-data.h>
+#include <dali-toolkit/internal/helpers/actor-property-name.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -801,7 +802,7 @@ void Control::AddTransitions(Dali::Animation&               animation,
       Actor child = mControlImpl.Self().FindChildByName(ToDaliStringView(animator->objectName));
       if(child)
       {
-        Property::Index propertyIndex = child.GetPropertyIndex(animator->propertyKey);
+        Property::Index propertyIndex = GetPropertyIndexWithCompatibility(child, animator->propertyKey);
         if(propertyIndex != Property::INVALID_INDEX)
         {
           if(animator->animate == false)

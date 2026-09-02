@@ -39,7 +39,7 @@ namespace Internal
 
  *  // set size and color
  *  bounceActor.SetProperty( Actor::Property::SIZE, Vector2(720.f, 42.f );
- *  bounceActor.SetProperty( Actor::Property::COLOR, Vector4( 0.0,0.64f,0.85f,0.25f ) );
+ *  bounceActor.SetProperty( Actor::Property::COLOR_MULTIPLIER, Vector4( 0.0,0.64f,0.85f,0.25f ) );
  *
  *  // add to window
  *  bounceActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );

@@ -635,7 +635,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
   //DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(controlWrapper, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   controlWrapper.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  controlWrapper.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  controlWrapper.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(controlWrapper);
 
   Animation anim = controlWrapperImpl->CreateTransition(transition);

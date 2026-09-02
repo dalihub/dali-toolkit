@@ -110,10 +110,10 @@ void Transition::OnPlay()
   startPropertyMap.Insert(Dali::Actor::Property::SCALE, sourceScale);
   finishPropertyMap.Insert(Dali::Actor::Property::SCALE, destinationScale);
 
-  Vector4 sourceColor      = DevelActor::GetWorldColor(sourceControl);
-  Vector4 destinationColor = DevelActor::GetWorldColor(destinationControl);
-  startPropertyMap.Insert(Dali::Actor::Property::COLOR, sourceColor);
-  finishPropertyMap.Insert(Dali::Actor::Property::COLOR, destinationColor);
+  Vector4 sourceColor      = DevelActor::GetWorldColorMultiplier(sourceControl);
+  Vector4 destinationColor = DevelActor::GetWorldColorMultiplier(destinationControl);
+  startPropertyMap.Insert(Dali::Actor::Property::COLOR_MULTIPLIER, sourceColor);
+  finishPropertyMap.Insert(Dali::Actor::Property::COLOR_MULTIPLIER, destinationColor);
 
   // Set animation for other properties if source and destination is different.
   Vector3 sourceSize      = sourceControl[Dali::Actor::Property::SIZE];

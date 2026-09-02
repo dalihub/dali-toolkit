@@ -288,7 +288,7 @@ void GaussianBlurView::OnInitialize()
     renderer.SetProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
     mCompositingActor.AddRenderer(renderer);
 
-    Constraint blurStrengthConstraint = Constraint::New<float>(mCompositingActor, Actor::Property::COLOR_ALPHA, EqualToConstraint());
+    Constraint blurStrengthConstraint = Constraint::New<float>(mCompositingActor, Actor::Property::COLOR_MULTIPLIER_ALPHA, EqualToConstraint());
     blurStrengthConstraint.AddSource(Source(self, mBlurStrengthPropertyIndex));
     blurStrengthConstraint.Apply();
 

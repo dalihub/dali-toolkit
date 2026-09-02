@@ -49,6 +49,7 @@
 #include <dali-toolkit/internal/builder/builder-set-property.h>
 #include <dali-toolkit/internal/builder/replacement.h>
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
+#include <dali-toolkit/internal/helpers/actor-property-name.h>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
@@ -415,7 +416,7 @@ bool Builder::GetStyleProperties(const std::string& styleName, const Handle& con
       // If controlType is provided, try to convert to Property::Index
       if(controlType)
       {
-        Property::Index index = controlType.GetPropertyIndex(key);
+        Property::Index index = GetPropertyIndexWithCompatibility(controlType, key);
         if(index != Property::INVALID_INDEX)
         {
           result.Insert(index, value); // Use Property::Index as key
@@ -1529,7 +1530,7 @@ bool Builder::MapToTargetProperty(
 {
   bool mapped = false;
 
-  index = propertyObject.GetPropertyIndex(ToDaliStringView(key));
+  index = GetPropertyIndexWithCompatibility(propertyObject, Property::Key(ToDaliStringView(key)));
   if(Property::INVALID_INDEX != index)
   {
     Property::Type type = propertyObject.GetPropertyType(index);

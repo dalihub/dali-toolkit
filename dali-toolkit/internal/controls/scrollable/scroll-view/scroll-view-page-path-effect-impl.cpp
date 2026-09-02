@@ -84,7 +84,7 @@ void ScrollViewPagePathEffect::ApplyToPage(Actor page, unsigned int pageOrder)
                          wrap);
 
   //Alpha
-  mLinearConstrainer.Apply(Dali::Property(page, Dali::Actor::Property::COLOR_ALPHA),
+  mLinearConstrainer.Apply(Dali::Property(page, Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA),
                            Dali::Property(scrollView, mInputPropertyIndex),
                            range,
                            wrap);

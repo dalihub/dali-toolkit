@@ -1844,7 +1844,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
     actor.SetProperty(Actor::Property::SIZE, Vector2(2000.f, 2000.f));
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-    actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
     application.GetScene().Add(actor);
 
     DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -1866,7 +1866,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     Dali::Toolkit::TransitionData transition = TransitionData::New(map);
 
     Animation animation = dummyImpl.CreateTransition(transition);
-    animation.AnimateTo(Property(actor, Actor::Property::COLOR), Color::WHITE);
+    animation.AnimateTo(Property(actor, Actor::Property::COLOR_MULTIPLIER), Color::WHITE);
     animation.Play();
 
     TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
@@ -1890,7 +1890,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     application.Render(2001u);      // go past end
     application.SendNotification(); // Trigger signals
 
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
     DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, 1.0f) * TARGET_MIX_COLOR), true, TEST_LOCATION);
 
     DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Disable", blendStr.str()));
@@ -4202,7 +4202,7 @@ int UtcDaliVisualBorderlineColorAnimateTest(void)
     application.Render(2001u);      // go past end
     application.SendNotification(); // Trigger signals
 
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY), TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY), TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uColor", GetAlphaPreMultipliedColor(Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY) * TARGET_MIX_COLOR)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY)), true, TEST_LOCATION);
     DALI_TEST_EQUALS(glAbstraction.CheckUniformValue<Vector4>("borderlineColor", TARGET_BORDERLINE_COLOR), true, TEST_LOCATION);

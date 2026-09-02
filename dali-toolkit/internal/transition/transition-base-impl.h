@@ -226,7 +226,7 @@ private:
    * Set the pair of Property::Map by using SetStartPropertyMap() and SetFinishPropertyMap(),
    * then the properties of mTarget will be animated between them during transition duration.
    * If the transition requires the information of world transform, let them be in this method.
-   * World transform and World color can be retrieved by using GetWorldTransform() and GetWorldColor() methods.
+   * World transform and world color multiplier can be retrieved by using GetWorldTransform() and GetWorldColorMultiplier() methods.
    * And If it is needed to add additional custom animation than use GetAnimation() and add them.
    *
    * @note Do not set any properties in this methods.

@@ -231,7 +231,7 @@ int UtcDaliTransitionBetweenControlPair(void)
   control1.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
   control1.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
   control1.SetProperty(Actor::Property::SCALE, Vector3(1, 2, 0));
-  control1.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 1.0f, 1.0f, 0.5f));
+  control1.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 1.0f, 1.0f, 0.5f));
   control1.SetProperty(Actor::Property::OPACITY, 0.5f);
   Property::Map controlProperty1;
   controlProperty1.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -249,7 +249,7 @@ int UtcDaliTransitionBetweenControlPair(void)
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, destinationSize);
   control2.SetProperty(Actor::Property::SCALE, destinationScale);
-  control2.SetProperty(Actor::Property::COLOR, destinationColor);
+  control2.SetProperty(Actor::Property::COLOR_MULTIPLIER, destinationColor);
   control2.SetProperty(Actor::Property::OPACITY, destinationOpacity);
   Property::Map controlProperty2;
   controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -323,7 +323,7 @@ int UtcDaliTransitionBetweenControlPair(void)
   DALI_TEST_EQUALS(destinationPosition, control2.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationSize, control2.GetCurrentProperty<Vector3>(Actor::Property::SIZE), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationScale, control2.GetCurrentProperty<Vector3>(Actor::Property::SCALE), TEST_LOCATION);
-  DALI_TEST_EQUALS(destinationColor, control2.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationColor, control2.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationOpacity, control2.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
   DALI_TEST_EQUALS(1, control2.GetRendererCount(), TEST_LOCATION);
   renderer     = control2.GetRendererAt(0);
@@ -378,7 +378,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
   control1.SetProperty(Actor::Property::POSITION, sourcePosition);
   control1.SetProperty(Actor::Property::SIZE, sourceSize);
   control1.SetProperty(Actor::Property::SCALE, sourceScale);
-  control1.SetProperty(Actor::Property::COLOR, sourceColor);
+  control1.SetProperty(Actor::Property::COLOR_MULTIPLIER, sourceColor);
   control1.SetProperty(Actor::Property::OPACITY, sourceOpacity);
   Property::Map controlProperty1;
   controlProperty1.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -396,7 +396,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
   control2.SetProperty(Actor::Property::POSITION, destinationPosition);
   control2.SetProperty(Actor::Property::SIZE, destinationSize);
   control2.SetProperty(Actor::Property::SCALE, destinationScale);
-  control2.SetProperty(Actor::Property::COLOR, destinationColor);
+  control2.SetProperty(Actor::Property::COLOR_MULTIPLIER, destinationColor);
   control2.SetProperty(Actor::Property::OPACITY, destinationOpacity);
   Property::Map controlProperty2;
   controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
@@ -474,7 +474,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
   DALI_TEST_EQUALS(destinationPosition, control1.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationSize, control1.GetCurrentProperty<Vector3>(Actor::Property::SIZE), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationScale, control1.GetCurrentProperty<Vector3>(Actor::Property::SCALE), TEST_LOCATION);
-  DALI_TEST_EQUALS(destinationColor, control1.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationColor, control1.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
   DALI_TEST_EQUALS(destinationOpacity, control1.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
   DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
@@ -498,7 +498,7 @@ int UtcDaliTransitionBetweenControlPair2(void)
   DALI_TEST_EQUALS(sourcePosition, control1.GetProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
   DALI_TEST_EQUALS(sourceSize, control1.GetProperty<Vector3>(Actor::Property::SIZE), TEST_LOCATION);
   DALI_TEST_EQUALS(sourceScale, control1.GetProperty<Vector3>(Actor::Property::SCALE), TEST_LOCATION);
-  DALI_TEST_EQUALS(sourceColor, control1.GetProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceColor, control1.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
   DALI_TEST_EQUALS(sourceOpacity, control1.GetProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
   application.SendNotification();
