@@ -329,7 +329,7 @@ bool IsFocusable(Actor& actor)
           actor.GetProperty<bool>(Actor::Property::ENABLED) &&
           actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
           !actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED) &&
-          actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a > FULLY_TRANSPARENT);
+          actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER).a > FULLY_TRANSPARENT);
 }
 
 Actor FindNextFocus(Actor& actor, Actor& focusedActor, Bounds& focusedRect, Bounds& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)

@@ -233,7 +233,7 @@ int UtcDaliTransitionDataMap1P(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -297,7 +297,7 @@ int UtcDaliTransitionDataMap2P(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -362,7 +362,7 @@ int UtcDaliTransitionDataMap2Pb(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -552,7 +552,7 @@ int UtcDaliTransitionDataMap5P(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -636,7 +636,7 @@ int UtcDaliTransitionDataMap6P(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -718,7 +718,7 @@ int UtcDaliTransitionDataMap1N(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -749,7 +749,7 @@ int UtcDaliTransitionDataMapN4(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -798,7 +798,7 @@ int UtcDaliTransitionDataMapN5(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -846,7 +846,7 @@ int UtcDaliTransitionDataMapN6(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -913,7 +913,7 @@ int UtcDaliTransitionDataArrayP(void)
   DummyControl actor = DummyControl::New();
   DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Quaternion>(Actor::Property::ORIENTATION), Quaternion(Radian(0), Vector3::ZAXIS), TEST_LOCATION);
 
@@ -922,7 +922,7 @@ int UtcDaliTransitionDataArrayP(void)
   DALI_TEST_CHECK(anim);
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::MAGENTA, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::MAGENTA, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Quaternion>(Actor::Property::ORIENTATION), Quaternion(Radian(Math::PI_2), Vector3::ZAXIS), TEST_LOCATION);
   anim.Play();
 
@@ -938,11 +938,11 @@ int UtcDaliTransitionDataArrayP(void)
   application.Render(500); // Halfway thru map1 anim, end of map2 anim
   application.SendNotification();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(0, 100, 0), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), (Color::MAGENTA + Color::RED) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), (Color::MAGENTA + Color::RED) * 0.5f, TEST_LOCATION);
 
   application.Render(500); // End of map1 anim
   application.SendNotification();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::RED, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::RED, TEST_LOCATION);
 
   END_TEST;
 }

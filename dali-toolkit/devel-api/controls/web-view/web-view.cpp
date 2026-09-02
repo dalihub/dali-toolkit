@@ -514,6 +514,31 @@ void WebView::RegisterDeviceListGetCallback(Dali::WebEnginePlugin::WebEngineDevi
   Dali::Toolkit::GetImpl(*this).RegisterDeviceListGetCallback(callback);
 }
 
+void WebView::RegisterPlaybackVideoReadyCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoReadyCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterPlaybackVideoReadyCallback(callback);
+}
+
+void WebView::RegisterPlaybackVideoStartedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStartedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterPlaybackVideoStartedCallback(callback);
+}
+
+void WebView::RegisterPlaybackVideoFinishedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoFinishedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterPlaybackVideoFinishedCallback(callback);
+}
+
+void WebView::RegisterPlaybackVideoStoppedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoStoppedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterPlaybackVideoStoppedCallback(callback);
+}
+
+void WebView::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEnginePlaybackVideoPausedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterPlaybackVideoPausedCallback(callback);
+}
+
 void WebView::FeedMouseWheel(bool yDirection, int step, int x, int y)
 {
   Dali::Toolkit::GetImpl(*this).FeedMouseWheel(yDirection, step, x, y);

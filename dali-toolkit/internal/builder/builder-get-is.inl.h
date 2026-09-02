@@ -280,6 +280,23 @@ inline OptionalRect IsRect(const OptionalChild& node)
   return ret;
 }
 
+inline OptionalInsets IsInsets(const OptionalChild& node)
+{
+  OptionalInsets insets;
+  if(node && (*node).Size())
+  {
+    if((*node).Size() >= 4)
+    {
+      float v[4];
+      if(CopyNumbers((*node).CBegin(), v))
+      {
+        insets = OptionalInsets(Dali::Insets(v[0], v[1], v[2], v[3]));
+      }
+    }
+  }
+  return insets;
+}
+
 inline OptionalExtents IsExtents(const OptionalChild& node)
 {
   OptionalExtents extents;
@@ -355,6 +372,11 @@ inline OptionalExtents IsExtents(const TreeNode& parent, const std::string& chil
   return IsExtents(IsChild(&parent, childName));
 }
 
+inline OptionalInsets IsInsets(const TreeNode& parent, const std::string& childName)
+{
+  return IsInsets(IsChild(&parent, childName));
+}
+
 //
 //
 //
@@ -411,6 +433,11 @@ inline OptionalRect IsRect(const TreeNode& node)
 inline OptionalExtents IsExtents(const TreeNode& node)
 {
   return IsExtents(OptionalChild(node));
+}
+
+inline OptionalInsets IsInsets(const TreeNode& node)
+{
+  return IsInsets(OptionalChild(node));
 }
 
 //

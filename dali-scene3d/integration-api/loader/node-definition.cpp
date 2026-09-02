@@ -443,7 +443,7 @@ void ModelRenderable::OnCreate(const NodeDefinition& nodeDefinition, NodeDefinit
   renderer.RegisterProperty(IBL_INTENSITY_STRING.data(), resources.mEnvironmentMaps[envIndex].first.mIblIntensity);
   renderer.RegisterProperty(IBL_Y_DIRECTION.data(), resources.mEnvironmentMaps[envIndex].first.mYDirection);
 
-  node.SetProperty(Actor::Property::COLOR, mColor);
+  node.SetProperty(Actor::Property::COLOR_MULTIPLIER, mColor);
 
   // If user uses customshader, the properties of the shader could not be changed by Material.
   if(mShaderIdx == INVALID_INDEX)

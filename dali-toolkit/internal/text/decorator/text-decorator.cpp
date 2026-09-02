@@ -826,7 +826,7 @@ struct Decorator::Impl : public ConnectionTracker
         DevelActor::SetResizePolicy(grabHandle.grabArea, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
         grabHandle.grabArea.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE);
         grabHandle.actor.Add(grabHandle.grabArea);
-        grabHandle.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
+        grabHandle.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, mHandleColor);
 
         grabHandle.grabArea.TouchEventSignal().Connect(this, &Decorator::Impl::OnGrabHandleTouched);
 
@@ -854,7 +854,7 @@ struct Decorator::Impl : public ConnectionTracker
     if(image.size())
     {
       handle.markerActor = ImageView::New(ToDaliString(image));
-      handle.markerActor.SetProperty(Actor::Property::COLOR, mHandleColor);
+      handle.markerActor.SetProperty(Actor::Property::COLOR_MULTIPLIER, mHandleColor);
       handle.actor.Add(handle.markerActor);
 
       DevelActor::SetResizePolicy(handle.markerActor, ResizePolicy::FIXED, Dimension::HEIGHT);
@@ -886,7 +886,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
         primary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(primary.actor).SetDepthIndex(DepthIndex::DECORATION);
-        primary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
+        primary.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, mHandleColor);
 
         primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -931,7 +931,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
         secondary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
         GetImpl(secondary.actor).SetDepthIndex(DepthIndex::DECORATION);
-        secondary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
+        secondary.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, mHandleColor);
 
         secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -1200,7 +1200,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightActor.SetProperty(Dali::Actor::Property::NAME, "HighlightActor");
       mHighlightActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
       mHighlightActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-      mHighlightActor.SetProperty(Actor::Property::COLOR, mHighlightColor);
+      mHighlightActor.SetProperty(Actor::Property::COLOR_MULTIPLIER, mHighlightColor);
       mHighlightActor.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_COLOR);
     }
 
@@ -2245,15 +2245,15 @@ void Decorator::SetHandleColor(const Vector4& color)
 
   if(grabHandle.actor)
   {
-    grabHandle.actor.SetProperty(Actor::Property::COLOR, color);
+    grabHandle.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
   if(primaryHandle.actor)
   {
-    primaryHandle.actor.SetProperty(Actor::Property::COLOR, color);
+    primaryHandle.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
   if(secondaryHandle.actor)
   {
-    secondaryHandle.actor.SetProperty(Actor::Property::COLOR, color);
+    secondaryHandle.actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
 }
 
@@ -2344,7 +2344,7 @@ void Decorator::SetHighlightColor(const Vector4& color)
 
   if(mImpl->mHighlightActor)
   {
-    mImpl->mHighlightActor.SetProperty(Actor::Property::COLOR, color);
+    mImpl->mHighlightActor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   }
 }
 

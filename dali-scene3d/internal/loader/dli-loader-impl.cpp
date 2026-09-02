@@ -35,6 +35,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/loader/json-util.h>
+#include <dali-toolkit/internal/helpers/actor-property-name.h>
 #include <dali-scene3d/integration-api/loader/alpha-function-helper.h>
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h>
@@ -1463,7 +1464,7 @@ void DliLoaderImpl::Impl::ParseNodesInternal(const TreeNode* const nodes, Index 
         }
         else
         {
-          cDef.mProperty = eConstraint.first;
+          cDef.mProperty = Toolkit::Internal::GetCompatibleActorPropertyName(Dali::StringView(eConstraint.first));
 
           auto iInsert = std::lower_bound(constraints.begin(), constraints.end(), cDef);
           if(iInsert != constraints.end() && *iInsert == cDef)
@@ -1654,7 +1655,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
             mOnError(ToStdString(FormatString("Animation '%s': Failed to read the 'property' tag", animDef.GetName().CStr())));
             continue;
           }
-          animProp.mPropertyName = ToDaliString(std::move(propertyName));
+          animProp.mPropertyName = Toolkit::Internal::GetCompatibleActorPropertyName(ToDaliStringView(propertyName));
         }
 
         // these are the defaults

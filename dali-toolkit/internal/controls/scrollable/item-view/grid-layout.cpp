@@ -586,7 +586,7 @@ void GridLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector3&
     constraint.Apply();
 
     // Color constraint
-    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, &GridColorConstraint);
+    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, &GridColorConstraint);
     constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
 

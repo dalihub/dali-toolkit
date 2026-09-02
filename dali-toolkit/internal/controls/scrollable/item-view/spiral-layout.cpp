@@ -474,7 +474,7 @@ void SpiralLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector
     constraint.Apply();
 
     // Color constraint
-    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, SpiralColorConstraint(itemId, mImpl->mItemSpacingRadians));
+    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, SpiralColorConstraint(itemId, mImpl->mItemSpacingRadians));
     constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_POSITION));
     constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();

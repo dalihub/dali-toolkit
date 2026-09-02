@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
+#include <dali-toolkit/internal/helpers/actor-property-name.h>
 #include <dali/integration-api/string-utils.h>
 
 using Dali::Integration::ToDaliStringView;
@@ -170,7 +171,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
 
   if(OptionalBoolean looping = constant.IsBoolean(IsChild(child, "loop")))
   {
-    animation.SetLooping(*looping);
+    animation.SetLoopCount(*looping ? Animation::INFINITE_LOOP : 1);
   }
 
   if(OptionalString endAction = constant.IsString(IsChild(child, "endAction")))
@@ -224,7 +225,7 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
       Property::Index propIndex = Property::INVALID_INDEX;
       if(property)
       {
-        propIndex = targetHandle.GetPropertyIndex(Property::Key(ToDaliStringView(*property)));
+        propIndex = GetPropertyIndexWithCompatibility(targetHandle, Property::Key(ToDaliStringView(*property)));
 
         // if the property is not found from the (actor) handle, try to downcast it to renderable actor
         // to allow animating shader uniforms

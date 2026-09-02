@@ -44,7 +44,7 @@ class MotionPropertyIndex;
  *
  * @code
  *
- * MotionPropertyIndex color = MotionPropertyIndex::New("nodeName", Dali::Actor::Property::COLOR);
+ * MotionPropertyIndex color = MotionPropertyIndex::New("nodeName", Dali::Actor::Property::COLOR_MULTIPLIER);
  *
  * // We can change the property later.
  * MotionPropertyIndex custom = MotionPropertyIndex::New();

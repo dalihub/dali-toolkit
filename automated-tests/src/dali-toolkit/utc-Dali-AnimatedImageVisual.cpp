@@ -3546,7 +3546,7 @@ int UtcDaliAnimatedImageVisualAnimatePixelArea(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -3555,7 +3555,7 @@ int UtcDaliAnimatedImageVisualAnimatePixelArea(void)
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, ImageVisual::Property::PIXEL_AREA), Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-  animation.AnimateTo(Property(actor, Actor::Property::COLOR), Color::WHITE);
+  animation.AnimateTo(Property(actor, Actor::Property::COLOR_MULTIPLIER), Color::WHITE);
   animation.Play();
 
   application.SendNotification();
@@ -3612,7 +3612,7 @@ int UtcDaliAnimatedImageVisualUpdatePixelAreaByAction(void)
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(2000, 2000));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::COLOR, Color::BLACK);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLACK);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);

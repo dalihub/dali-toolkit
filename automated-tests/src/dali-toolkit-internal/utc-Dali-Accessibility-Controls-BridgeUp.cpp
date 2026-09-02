@@ -2564,7 +2564,7 @@ private:
   {
     Actor   container = isClickable ? MakeClickableActor() : MakeNonClickableActor();
     Vector4 color(0.5f, 0.6f, 0.5f, 1.0f);
-    container.SetProperty(Actor::Property::COLOR, color);
+    container.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
     container.SetProperty(Actor::Property::VISIBLE, true);
     container.SetProperty(Actor::Property::SIZE, Vector2(480.f / N, 480.f / N));
 

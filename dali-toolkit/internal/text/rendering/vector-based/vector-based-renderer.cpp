@@ -189,7 +189,7 @@ Actor VectorBasedRenderer::Render(Text::ViewInterface& view,
   mImpl->mActor = Actor::New();
   mImpl->mActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mImpl->mActor.SetProperty(Actor::Property::SIZE, Vector2(view.GetControlSize()));
-  mImpl->mActor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  mImpl->mActor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
 #if defined(DEBUG_ENABLED)
   mImpl->mActor.SetProperty(Dali::Actor::Property::NAME, "Text renderable actor");
 #endif

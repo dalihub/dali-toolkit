@@ -389,6 +389,44 @@ int UtcDaliGlViewDirectRenderingTerminate(void)
   END_TEST;
 }
 
+int UtcDaliGlViewDirectRenderingTerminateNeverDrawn(void)
+{
+  ToolkitTestApplication application;
+  Test::AddOnManager::Initialize(); // GlView requires GLES addon so initialize the manager
+
+  tet_infoline("UtcDaliGlViewDirectRenderingTerminateNeverDrawn");
+  GlView view = Toolkit::GlView::New(GlView::BackendMode::DIRECT_RENDERING, GlView::ColorFormat::RGB888);
+
+  // Never added to the scene, so the GL callbacks have never run.
+  view.RegisterGlCallbacks(Dali::MakeCallback(DirectRenderingCode::glInit),
+                           Dali::MakeCallback(DirectRenderingCode::glRenderFrame),
+                           Dali::MakeCallback(DirectRenderingCode::glTerminate));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+
+  view.Terminate();
+
+  // The terminate invocation is delivered all the same, reporting through
+  // RenderCallbackInput::isNativeApiUsable that there is no context to call GL from.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  Test::WaitForEventThreadTrigger(1, 5);
+
+  // Nothing was ever created, so nothing runs - in particular the init callback must not
+  // be invoked on the way into the terminate.
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameInitializedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameRenderedCount, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(DirectRenderingCode::gDRFrameTerminatedCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliGlViewDirectRenderingWindowVisibilityChanged(void)
 {
   ToolkitTestApplication application;
