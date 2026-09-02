@@ -90,9 +90,10 @@ animation.AnimateTo( Property( actor1, Dali::Actor::Property::POSITION ), Vector
 
 ### Other Actions
 
-An animation can be looped:
+An animation can be played a set number of times, or looped forever:
 ~~~{.cpp}
-animation.SetLooping( true );
+animation.SetLoopCount( 3 );                            // play three times
+animation.SetLoopCount( Animation::INFINITE_LOOP );     // repeat forever
 ~~~
 
 By default, when an animation ends, the properties that it was animating are BAKED.
