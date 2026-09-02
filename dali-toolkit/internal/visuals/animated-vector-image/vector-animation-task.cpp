@@ -514,29 +514,28 @@ void VectorAnimationTask::GetPlayRange(uint32_t& startFrame, uint32_t& endFrame)
 
 void VectorAnimationTask::SetCurrentFrameNumber(uint32_t frameNumber)
 {
-  if(mCurrentFrame == frameNumber)
+  const uint32_t clampedFrame = Min(Max(frameNumber, mStartFrame), mEndFrame);
+  if(frameNumber != clampedFrame)
   {
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: Set same frame [%d] [%p]\n", frameNumber, this);
+    DALI_LOG_WARNING("VectorAnimationTask::SetCurrentFrameNumber: Clamp frame [%u] to [%u, %u] [%p]\n", frameNumber, mStartFrame, mEndFrame, this);
+  }
+
+  if(mCurrentFrame == clampedFrame)
+  {
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: Set same frame [%u] [%p]\n", clampedFrame, this);
     return;
   }
 
-  if(frameNumber >= mStartFrame && frameNumber <= mEndFrame)
-  {
-    mCurrentFrame      = frameNumber;
-    mUpdateFrameNumber = false;
+  mCurrentFrame      = clampedFrame;
+  mUpdateFrameNumber = false;
 
-    if(mPlayState != PlayState::PLAYING)
-    {
-      // Ensure to render current frame.
-      mNeedForceRenderOnceTrigger = true;
-    }
-
-    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %d [%p]\n", mCurrentFrame, this);
-  }
-  else
+  if(mPlayState != PlayState::PLAYING)
   {
-    DALI_LOG_ERROR("Invalid frame number [%d (%d, %d)] [%p]\n", frameNumber, mStartFrame, mEndFrame, this);
+    // Ensure to render current frame.
+    mNeedForceRenderOnceTrigger = true;
   }
+
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %u [%p]\n", mCurrentFrame, this);
 }
 
 uint32_t VectorAnimationTask::GetCurrentFrameNumber() const

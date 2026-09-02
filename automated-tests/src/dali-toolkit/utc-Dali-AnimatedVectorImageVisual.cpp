@@ -1654,19 +1654,25 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   // Trigger count is 3 - load & render a frame + for discarded tasks at worker thread.
   WaitForAsyncLoadingAnimatedVectorFrameRendered(actor, TEST_LOCATION);
 
-  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 2);
+  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  Property::Value* value = map.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
+  DALI_TEST_CHECK(value);
+  int totalFrameNumber = value->Get<int>();
+
+  // A frame equal to the total frame count is one past the last valid index.
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, totalFrameNumber);
 
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 2 - Jump to during stopped + for discarded tasks at worker thread.
+  // Trigger count is 2 - clamped jump while stopped + for discarded tasks at worker thread.
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
-  Property::Map    map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
-  Property::Value* value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
-  DALI_TEST_EQUALS(value->Get<int>(), 2, TEST_LOCATION);
+  map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
+  value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);
+  DALI_TEST_EQUALS(value->Get<int>(), totalFrameNumber - 1, TEST_LOCATION);
 
-  tet_printf("2. The current frame number is [%d].\n", value->Get<int>());
+  tet_printf("2. The out-of-range frame is clamped to [%d].\n", value->Get<int>());
 
   Property::Array array;
   array.PushBack(0);
@@ -1681,8 +1687,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - Jump to during stopped but failed, so force render not requested + for discarded tasks at worker thread.
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - clamped jump while stopped + for discarded tasks at worker thread.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   map   = actor.GetProperty<Property::Map>(DummyControl::Property::TEST_VISUAL);
   value = map.Find(DevelImageVisual::Property::CURRENT_FRAME_NUMBER);

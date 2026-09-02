@@ -45,7 +45,7 @@ enum Type
   PLAY    = DevelAnimatedImageVisual::Action::PLAY,    ///< Play the animated vector image.
   PAUSE   = DevelAnimatedImageVisual::Action::PAUSE,   ///< Pause the animated vector image.
   STOP    = DevelAnimatedImageVisual::Action::STOP,    ///< Stop the animated vector image. This is also Default playback mode.
-  JUMP_TO = DevelAnimatedImageVisual::Action::JUMP_TO, ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  JUMP_TO = DevelAnimatedImageVisual::Action::JUMP_TO, ///< Jump to the specified frame, clamped to the current playback range. Property::INTEGER value should be passed.
 
   // AnimatedVectorImageVisual only actions
   SET_DYNAMIC_PROPERTY = DevelAnimatedImageVisual::Action::ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX, ///< Set the dynamic property.
