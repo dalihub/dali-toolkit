@@ -150,7 +150,7 @@ void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
 
   if(!mSkipBlur && IsActivated())
   {
-    if(!mSourceRenderTask)
+    if(!mSourceRenderTask || !mHorizontalBlurTask || !mVerticalBlurTask)
     {
       OnRefresh();
     }
@@ -528,7 +528,8 @@ void GaussianBlurEffectImpl::OnRefresh()
   // Reset buffers and renderers
   CreateFrameBuffers(ImageDimensions(sourceDownsampledWidth, sourceDownsampledHeight), ImageDimensions(downsampledWidth, downsampledHeight));
 
-  const bool recreateRenderTasks = !mSourceRenderTask || (static_cast<bool>(mDownsampleTask) != useIntermediateDownsample);
+  const bool recreateRenderTasks = !mSourceRenderTask || !mHorizontalBlurTask || !mVerticalBlurTask ||
+                                   (static_cast<bool>(mDownsampleTask) != useIntermediateDownsample);
   if(recreateRenderTasks)
   {
     Toolkit::Control ownerControl = GetOwnerControl();
@@ -748,10 +749,26 @@ void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
 {
   if(DALI_LIKELY(mVerticalBlurTask == renderTask))
   {
-    mFinishedSignal.Emit();
+    auto sceneHolder = GetSceneHolder();
+    if(DALI_LIKELY(sceneHolder))
+    {
+      RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+      taskList.RemoveTask(mHorizontalBlurTask);
+      taskList.RemoveTask(mVerticalBlurTask);
+      if(mDownsampleTask)
+      {
+        taskList.RemoveTask(mDownsampleTask);
+      }
+    }
 
-    DestroyFrameBuffers();
-    DestroyRenderTasks();
+    mHorizontalBlurTask.Reset();
+    mVerticalBlurTask.Reset();
+    mDownsampleTask.Reset();
+
+    // Keep only the source task as the exclusive-rendering marker. The empty
+    // framebuffer releases the source image while the owner keeps displaying
+    // the final texture held by its cache renderer.
+    mSourceRenderTask.SetFrameBuffer(FrameBuffer());
 
     if(mDownsampleActor)
     {
@@ -759,7 +776,9 @@ void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
     }
     SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
     SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
-    mInternalRoot.Unparent();
+    DestroyFrameBuffers();
+
+    mFinishedSignal.Emit();
   }
 }
 
