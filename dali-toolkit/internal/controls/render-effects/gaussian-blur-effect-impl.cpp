@@ -115,7 +115,7 @@ void GaussianBlurEffectImpl::SetBlurOnce(bool blurOnce)
 
   if(!mSkipBlur && IsActivated())
   {
-    if(!mSourceRenderTask)
+    if(!mSourceRenderTask || !mHorizontalBlurTask || !mVerticalBlurTask)
     {
       OnRefresh();
     }
@@ -440,10 +440,18 @@ void GaussianBlurEffectImpl::OnRefresh()
   // Reset buffers and renderers
   CreateFrameBuffers(ImageDimensions(downsampledWidth, downsampledHeight));
 
-  if(!mSourceRenderTask)
+  const bool recreateRenderTasks = !mSourceRenderTask || !mHorizontalBlurTask || !mVerticalBlurTask;
+  if(recreateRenderTasks)
   {
     Toolkit::Control ownerControl = GetOwnerControl();
-    ownerControl.Add(mInternalRoot);
+    if(mSourceRenderTask)
+    {
+      DestroyRenderTasks();
+    }
+    else
+    {
+      ownerControl.Add(mInternalRoot);
+    }
     CreateRenderTasks(GetSceneHolder(), ownerControl);
     GetImplementation(ownerControl).RequestRenderTaskReorder();
   }
@@ -574,14 +582,27 @@ void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask& renderTask)
 {
   if(DALI_LIKELY(mVerticalBlurTask == renderTask))
   {
-    mFinishedSignal.Emit();
+    auto sceneHolder = GetSceneHolder();
+    if(DALI_LIKELY(sceneHolder))
+    {
+      RenderTaskList taskList = sceneHolder.GetRenderTaskList();
+      taskList.RemoveTask(mHorizontalBlurTask);
+      taskList.RemoveTask(mVerticalBlurTask);
+    }
 
-    DestroyFrameBuffers();
-    DestroyRenderTasks();
+    mHorizontalBlurTask.Reset();
+    mVerticalBlurTask.Reset();
+
+    // Keep only the source task as the exclusive-rendering marker. The empty
+    // framebuffer releases the source image while the owner keeps displaying
+    // the final texture held by its cache renderer.
+    mSourceRenderTask.SetFrameBuffer(FrameBuffer());
 
     SetRendererTexture(mHorizontalBlurActor.GetRendererAt(0u), Dali::Texture());
     SetRendererTexture(mVerticalBlurActor.GetRendererAt(0u), Dali::Texture());
-    mInternalRoot.Unparent();
+    DestroyFrameBuffers();
+
+    mFinishedSignal.Emit();
   }
 }
 

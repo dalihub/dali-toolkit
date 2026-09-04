@@ -1423,7 +1423,9 @@ int UtcDaliBlurEffectBlurOnce(void)
   }
   {
     // Add render effect during scene on.
+    control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
     GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    effect.SetBlurDownscaleFactor(0.25f);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
     effect.SetBlurOnce(true);
@@ -1444,8 +1446,22 @@ int UtcDaliBlurEffectBlurOnce(void)
 
     RenderTaskList taskList = scene.GetRenderTaskList();
 
-    // Render effect activated.
-    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    // Only the empty source task remains as the exclusive-rendering marker.
+    DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_CHECK(!taskList.GetTask(1u).GetFrameBuffer());
+
+    effect.Refresh();
+    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_CHECK(!taskList.GetTask(1u).GetFrameBuffer());
 
     effect.SetBlurOnce(false);
     effect.SetBlurOnce(false);
