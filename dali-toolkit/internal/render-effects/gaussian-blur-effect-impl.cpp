@@ -94,10 +94,13 @@ GaussianBlurEffectImpl::GaussianBlurEffectImpl(uint32_t blurRadius)
   mInternalRoot(Actor::New()),
   mDownscaleFactor(BLUR_EFFECT_DOWNSCALE_FACTOR),
   mBlurRadius(blurRadius),
+  mBlurStrength(1.0f),
   mSkipBlur(false),
-  mBlurOnce(false)
+  mBlurOnce(false),
+  mBlurStrengthAnimationActive(false),
+  mZeroStrengthBypass(false)
 {
-  UpdateDownscaledBlurRadius();
+  UpdateDownscaledBlurRadius(mDownscaleFactor);
 }
 
 GaussianBlurEffectImpl::~GaussianBlurEffectImpl()
@@ -118,7 +121,7 @@ GaussianBlurEffectImplPtr GaussianBlurEffectImpl::New(uint32_t blurRadius)
 
 OffScreenRenderable::Type GaussianBlurEffectImpl::GetOffScreenRenderableType() const
 {
-  return mSkipBlur ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::FORWARD;
+  return (mSkipBlur || mZeroStrengthBypass) ? OffScreenRenderable::Type::NONE : OffScreenRenderable::Type::FORWARD;
 }
 
 void GaussianBlurEffectImpl::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
@@ -203,7 +206,7 @@ void GaussianBlurEffectImpl::SetBlurRadius(uint32_t blurRadius)
     }
 
     mBlurRadius = blurRadius;
-    UpdateDownscaledBlurRadius();
+    UpdateDownscaledBlurRadius((mBlurStrengthAnimationActive || !Dali::Equals(mBlurStrength, 1.0f)) ? 1.0f : mDownscaleFactor);
 
     if(DALI_UNLIKELY(mSkipBlur))
     {
@@ -242,7 +245,7 @@ void GaussianBlurEffectImpl::SetBlurDownscaleFactor(float downscaleFactor)
     }
 
     mDownscaleFactor = downscaleFactor;
-    UpdateDownscaledBlurRadius();
+    UpdateDownscaledBlurRadius((mBlurStrengthAnimationActive || !Dali::Equals(mBlurStrength, 1.0f)) ? 1.0f : mDownscaleFactor);
 
     if(DALI_UNLIKELY(mSkipBlur))
     {
@@ -296,6 +299,9 @@ void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Alph
   fromValue = Dali::Clamp(fromValue, 0.0f, 1.0f);
   toValue   = Dali::Clamp(toValue, 0.0f, 1.0f);
 
+  mBlurStrengthAnimationActive = true;
+  ApplyInternalDownscaleFactor(1.0f);
+
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, fromValue);
   keyFrames.Add(1.0f, toValue);
@@ -304,6 +310,8 @@ void GaussianBlurEffectImpl::AddBlurStrengthAnimation(Animation& animation, Alph
   animation.AnimateBetween(Property(mHorizontalBlurActor, horizontalAnimationIndex), keyFrames, alphaFunction, timePeriod);
   Property::Index verticalAnimationIndex = mVerticalBlurActor.GetPropertyIndex(UNIFORM_BLUR_STRENGTH_NAME.data());
   animation.AnimateBetween(Property(mVerticalBlurActor, verticalAnimationIndex), keyFrames, alphaFunction, timePeriod);
+
+  animation.FinishedSignal().Connect(this, &GaussianBlurEffectImpl::OnBlurStrengthAnimationFinished);
 }
 
 void GaussianBlurEffectImpl::AddBlurOpacityAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue)
@@ -373,7 +381,7 @@ void GaussianBlurEffectImpl::OnInitialize()
 
 void GaussianBlurEffectImpl::OnActivate()
 {
-  if(DALI_UNLIKELY(mSkipBlur))
+  if(DALI_UNLIKELY(mSkipBlur || mZeroStrengthBypass))
   {
     return;
   }
@@ -423,6 +431,7 @@ void GaussianBlurEffectImpl::OnActivate()
   }
   mRenderDownsampledCamera.SetPerspectiveProjection(Size(downsampledWidth, downsampledHeight));
 
+  mDownsampleActor.SetProperty(Actor::Property::VISIBLE, useIntermediateDownsample);
   if(useIntermediateDownsample)
   {
     mDownsampleActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
@@ -462,7 +471,7 @@ void GaussianBlurEffectImpl::OnActivate()
 
 void GaussianBlurEffectImpl::OnDeactivate()
 {
-  if(DALI_UNLIKELY(mSkipBlur))
+  if(DALI_UNLIKELY(mSkipBlur || mZeroStrengthBypass))
   {
     return;
   }
@@ -492,7 +501,7 @@ void GaussianBlurEffectImpl::OnDeactivate()
 
 void GaussianBlurEffectImpl::OnRefresh()
 {
-  if(DALI_UNLIKELY(mSkipBlur))
+  if(DALI_UNLIKELY(mSkipBlur || mZeroStrengthBypass))
   {
     return;
   }
@@ -518,6 +527,7 @@ void GaussianBlurEffectImpl::OnRefresh()
   // Set size
   mCamera.SetPerspectiveProjection(size);
   mRenderDownsampledCamera.SetPerspectiveProjection(Size(downsampledWidth, downsampledHeight));
+  mDownsampleActor.SetProperty(Actor::Property::VISIBLE, useIntermediateDownsample);
   if(useIntermediateDownsample)
   {
     mDownsampleActor.SetProperty(Actor::Property::SIZE, Vector2(downsampledWidth, downsampledHeight));
@@ -782,9 +792,60 @@ void GaussianBlurEffectImpl::OnRenderFinished(Dali::RenderTask renderTask)
   }
 }
 
-void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius()
+void GaussianBlurEffectImpl::ApplyInternalDownscaleFactor(float downscaleFactor)
 {
-  mInternalDownscaleFactor = mDownscaleFactor;
+  downscaleFactor = Dali::Clamp(downscaleFactor, MINIMUM_BLUR_DOWNSCALE_FACTOR, MAXIMUM_BLUR_DOWNSCALE_FACTOR);
+  if(Dali::Equals(mInternalDownscaleFactor, downscaleFactor) && !mZeroStrengthBypass)
+  {
+    return;
+  }
+
+  const bool reactivate = IsActivated();
+  if(reactivate && !mZeroStrengthBypass)
+  {
+    OnDeactivate();
+  }
+
+  mZeroStrengthBypass = false;
+  UpdateDownscaledBlurRadius(downscaleFactor);
+
+  Renderer horizontalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+  mHorizontalBlurActor.RemoveRenderer(0u);
+  mHorizontalBlurActor.AddRenderer(horizontalBlurRenderer);
+
+  Renderer verticalBlurRenderer = GaussianBlurAlgorithm::CreateRenderer(mDownscaledBlurRadius);
+  mVerticalBlurActor.RemoveRenderer(0u);
+  mVerticalBlurActor.AddRenderer(verticalBlurRenderer);
+
+  if(reactivate)
+  {
+    OnActivate();
+  }
+}
+
+void GaussianBlurEffectImpl::OnBlurStrengthAnimationFinished(Animation)
+{
+  mBlurStrengthAnimationActive = false;
+
+  Property::Index strengthIndex = mHorizontalBlurActor.GetPropertyIndex(UNIFORM_BLUR_STRENGTH_NAME.data());
+  mBlurStrength                 = Dali::Clamp(mHorizontalBlurActor.GetCurrentProperty<float>(strengthIndex), 0.0f, 1.0f);
+
+  if(Dali::EqualsZero(mBlurStrength))
+  {
+    if(IsActivated() && !mZeroStrengthBypass)
+    {
+      OnDeactivate();
+    }
+    mZeroStrengthBypass = true;
+    return;
+  }
+
+  ApplyInternalDownscaleFactor(Dali::Equals(mBlurStrength, 1.0f) ? mDownscaleFactor : 1.0f);
+}
+
+void GaussianBlurEffectImpl::UpdateDownscaledBlurRadius(float downscaleFactor)
+{
+  mInternalDownscaleFactor = downscaleFactor;
   mInternalBlurRadius      = mBlurRadius;
   mDownscaledBlurRadius    = GaussianBlurAlgorithm::GetDownscaledBlurRadius(mInternalDownscaleFactor, mInternalBlurRadius);
 
