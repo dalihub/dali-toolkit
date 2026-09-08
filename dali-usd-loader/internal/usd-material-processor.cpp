@@ -32,7 +32,7 @@ using namespace Dali;
 using namespace pxr;
 using namespace Dali::Scene3D::Loader;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -61,19 +61,19 @@ UsdMaterialProcessor::UsdMaterialProcessor(const UsdStageRefPtr& stage, Material
   mShaderInputHandlers =
     {
       {MaterialDefinition::Flags::ALBEDO, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessDiffuseColor(input, materialDefinition, material, uvTexture); }},
+  { ProcessDiffuseColor(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::METALLIC, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessMetallic(input, materialDefinition, material, uvTexture); }},
+  { ProcessMetallic(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::ROUGHNESS, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessRoughness(input, materialDefinition, material, uvTexture); }},
+  { ProcessRoughness(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::NORMAL, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessNormal(input, materialDefinition, material, uvTexture); }},
+  { ProcessNormal(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::OCCLUSION, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessOcclusion(input, materialDefinition, material, uvTexture); }},
+  { ProcessOcclusion(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::EMISSIVE, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessEmissiveColor(input, materialDefinition, material, uvTexture); }},
+  { ProcessEmissiveColor(input, materialDefinition, material, uvTexture); }},
       {MaterialDefinition::Flags::SPECULAR_COLOR, [&](const UsdShadeInput& input, MaterialDefinition& materialDefinition, const UsdShadeMaterial& material, const UsdShadeShader& uvTexture)
-       { ProcessSpecularColor(input, materialDefinition, material, uvTexture); }}};
+  { ProcessSpecularColor(input, materialDefinition, material, uvTexture); }}};
 }
 
 void UsdMaterialProcessor::TraverseMaterials(LoadResult& output)
@@ -483,4 +483,4 @@ void UsdMaterialProcessor::ProcessSpecularColor(const UsdShadeInput& input, Mate
     materialDefinition.mSpecularColorFactor = Vector3(specularColor[0], specularColor[1], specularColor[2]);
   }
 }
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

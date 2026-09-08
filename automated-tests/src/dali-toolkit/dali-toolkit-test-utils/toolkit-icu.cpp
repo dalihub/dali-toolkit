@@ -24,7 +24,7 @@
 #include <toolkit-icu.h>
 #include <toolkit-test-application.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace TextAbstraction
 {
@@ -132,7 +132,7 @@ void ICU::UpdateLineBreakInfoByLocale(const std::string& text,
 }
 
 } // namespace TextAbstraction
-} //namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

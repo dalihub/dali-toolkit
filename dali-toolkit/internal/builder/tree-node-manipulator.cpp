@@ -24,7 +24,7 @@
 
 #include <dali-toolkit/devel-api/builder/tree-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -595,4 +595,4 @@ char* CopyString(const char* fromString, VectorCharIter& iter, const VectorCharI
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

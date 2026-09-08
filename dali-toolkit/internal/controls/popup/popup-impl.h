@@ -33,7 +33,7 @@
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -600,6 +600,6 @@ inline const Toolkit::Internal::Popup& GetImpl(const Toolkit::Popup& publicObjec
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_POPUP_H

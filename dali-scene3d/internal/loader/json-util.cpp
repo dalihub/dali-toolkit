@@ -30,7 +30,7 @@
 #include <dali/public-api/object/property-value.h>
 #include <array>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using namespace Toolkit;
 
@@ -540,4 +540,4 @@ Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn)
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

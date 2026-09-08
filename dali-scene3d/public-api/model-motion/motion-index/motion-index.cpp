@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-motion/motion-index/motion-index-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -78,4 +78,4 @@ Property::Index MotionIndex::GetPropertyIndex(ModelNode node)
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -25,7 +25,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct DALI_SCENE3D_API MeshGeometry
 {
@@ -35,6 +35,6 @@ struct DALI_SCENE3D_API MeshGeometry
   unsigned int  blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape. @SINCE_2_0.20
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_MESH_GEOMETRY_H

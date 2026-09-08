@@ -27,7 +27,7 @@
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Factory to create a NavigationMesh from various sources.
@@ -96,6 +96,6 @@ public:
    */
   static Dali::Vector<uint8_t> GetMeshBinary(const Dali::Scene3D::Algorithm::NavigationMesh& navigationMesh);
 };
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_INTERNAL_LOADER_NAVIGATION_MESH_FACTORY_H

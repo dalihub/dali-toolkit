@@ -24,12 +24,12 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/common/environment-map.h>
 #include <dali-scene3d/integration-api/loader/environment-map-data.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/public-api/common/environment-map.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -110,6 +110,6 @@ private:
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_ENVIRONMENT_MAP_LOAD_TASK_H

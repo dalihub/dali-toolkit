@@ -29,16 +29,16 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/material-definition.h>
+#include <dali-scene3d/public-api/api.h>
 #include <dali-usd-loader/internal/usd-texture-converter.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class TextureSet;
 }
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct LoadResult;
 
@@ -165,6 +165,6 @@ private:
   using ShaderHandlerMap = std::unordered_map<MaterialDefinition::Flags, std::function<void(const pxr::UsdShadeInput&, MaterialDefinition&, const pxr::UsdShadeMaterial&, const pxr::UsdShadeShader&)>>;
   ShaderHandlerMap mShaderInputHandlers;
 };
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_USD_MATERIAL_PROCESSOR_H

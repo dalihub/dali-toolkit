@@ -51,7 +51,7 @@ struct DijkstraComparer
 };
 } // namespace
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 PathFinderAlgorithmDijkstra::PathFinderAlgorithmDijkstra(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
@@ -334,4 +334,4 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmDijkstra::OptimizeWaypoints(
 
   return optimizedWaypoints;
 }
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm

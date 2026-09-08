@@ -48,7 +48,7 @@ Vector4 HexStringToVector4(const char* s)
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -91,4 +91,4 @@ bool ConvertPropertyToColor(const Property::Value& colorValue, Vector4& outColor
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

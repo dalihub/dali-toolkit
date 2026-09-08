@@ -23,7 +23,7 @@
 #include <dali-scene3d/internal/algorithm/path-finder-spfa-double-way.h>
 #include <dali-scene3d/internal/algorithm/path-finder-spfa.h>
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 UniquePtr<PathFinder> PathFinder::New(NavigationMesh& navigationMesh, PathFinderAlgorithm algorithm)
 {
@@ -73,4 +73,4 @@ PathFinder::PathFinder(UniquePtr<PathFinderBase>&& baseImpl)
   mImpl = std::move(baseImpl);
 }
 
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm

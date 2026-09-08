@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1093,4 +1093,4 @@ bool JsonParserState::HandleCharacterComma(const char* name)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

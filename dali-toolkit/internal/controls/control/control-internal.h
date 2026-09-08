@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-notification.h>
@@ -34,7 +34,7 @@
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 namespace Visual
 {
@@ -749,6 +749,6 @@ public:
 };
 
 } // namespace Internal
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_CONTROL_H

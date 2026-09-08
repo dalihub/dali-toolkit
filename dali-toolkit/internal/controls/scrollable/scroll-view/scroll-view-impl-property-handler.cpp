@@ -23,7 +23,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-mode.h>
 #include <dali/devel-api/actors/actor-devel.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 
 void ScrollViewPropertyHandler::Set(BaseObject* object, Property::Index index, const Property::Value& value)
@@ -284,4 +284,4 @@ void ScrollViewPropertyHandler::UpdatePropertyDomain(ScrollView& scrollView)
   }
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

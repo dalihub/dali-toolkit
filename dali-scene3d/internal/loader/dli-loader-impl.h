@@ -22,7 +22,6 @@
 #include <dali/public-api/common/unique-ptr.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/integration-api/loader/customization.h>
 #include <dali-scene3d/integration-api/loader/dli-input-parameter.h>
@@ -30,8 +29,9 @@
 #include <dali-scene3d/integration-api/loader/model-loader-impl.h>
 #include <dali-scene3d/integration-api/loader/node-definition.h>
 #include <dali-scene3d/integration-api/loader/string-callback.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader::Internal
+namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 {
 typedef std::pair<std::string, std::string> Metadata;
 
@@ -71,6 +71,6 @@ private:
   Dali::UniquePtr<Impl> mImpl;
 };
 
-} // namespace Dali::Scene3D::Loader::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_DLI_LOADER_IMPL_H

@@ -30,7 +30,7 @@
 #include <memory>
 #include <utility>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 constexpr uint32_t DEFAULT_PARTICLE_COUNT = 100u; ///< Default number of particles in system if not set by user
 
@@ -442,8 +442,8 @@ ParticleEmitter::~ParticleEmitter()
   }
 }
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
-namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 Dali::ThreadPool& GetThreadPool()
 {
@@ -461,4 +461,4 @@ Dali::ThreadPool& GetThreadPool()
 
   return *gThreadPool;
 }
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

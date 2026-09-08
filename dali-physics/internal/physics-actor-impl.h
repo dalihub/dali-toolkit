@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PHYSICS_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali-physics/public-api/physics-actor.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 namespace Internal
 {
@@ -118,6 +118,6 @@ inline const Internal::PhysicsActor& GetImplementation(const Physics::PhysicsAct
   return static_cast<const Internal::PhysicsActor&>(handle);
 }
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics
 
 #endif //DALI_TOOLKIT_PHYSICS_INTERNAL_ACTOR_H

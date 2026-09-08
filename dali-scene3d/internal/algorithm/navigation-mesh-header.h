@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_NAVIGATION_MESH_HEADER_H
 #define DALI_SCENE3D_NAVIGATION_MESH_HEADER_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <inttypes.h>
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 /**
  * @struct NavigationMeshHeader
@@ -54,5 +55,5 @@ struct NavigationMeshHeader_V10 : public NavigationMeshHeader
   float gravityVector[3]; /// Gravity vector for the data (down vector)
 };
 
-} //namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 #endif // DALI_SCENE3D_NAVIGATION_MESH_HEADER_H

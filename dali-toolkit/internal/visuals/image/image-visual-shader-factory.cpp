@@ -29,7 +29,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -322,4 +322,4 @@ bool ImageVisualShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderTy
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

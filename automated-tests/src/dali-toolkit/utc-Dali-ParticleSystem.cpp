@@ -50,7 +50,7 @@ static void                      AdvanceTimeByMs(uint32_t ms)
   currentTime += std::chrono::milliseconds(ms);
 }
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 // Create fake time getter
 class ParticleEmitter
@@ -62,7 +62,7 @@ std::chrono::milliseconds ParticleEmitter::GetCurrentTimeMillis() const
   [[maybe_unused]] auto value = InvokeNext<std::chrono::milliseconds>(this);
   return std::chrono::milliseconds(currentTime);
 }
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 
 using ParticleEmitterWrapper = Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter;
 

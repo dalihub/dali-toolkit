@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-scene3d/integration-api/loader/animated-property.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 void AnimatedProperty::Animate(Animation& anim, GetActor getActor) const
 {
@@ -46,4 +46,4 @@ void AnimatedProperty::Animate(Animation& anim, GetActor getActor) const
   }
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

@@ -31,7 +31,7 @@
 #include <dali/public-api/signals/dali-signal.h>
 #include <cstdint>
 
-namespace Dali DALI_IMPORT_API
+namespace DALI_NAMESPACE
 {
 
 /**
@@ -50,10 +50,10 @@ public:
   ClipboardData& operator=(ClipboardData&& rhs) noexcept;
   ~ClipboardData();
 
-  void SetMimeType(const Dali::String& mimeType);
+  void         SetMimeType(const Dali::String& mimeType);
   Dali::String GetMimeType() const;
 
-  void SetContent(const Dali::String& content);
+  void         SetContent(const Dali::String& content);
   Dali::String GetContent() const;
 
 private:
@@ -129,9 +129,9 @@ public:
   DataOfferedSignalType& DataOfferedSignal();
 };
 
-} // namespace Dali DALI_IMPORT_API
+} //namespace DALI_NAMESPACE
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -162,6 +162,6 @@ bool IsVisible(const Dali::Clipboard& clipboard);
 
 } // namespace Clipboard
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TOOLKIT_CLIPBOARD_H

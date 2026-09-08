@@ -30,7 +30,7 @@ namespace
 const uint32_t MAXIMUM_TEXTURE_RESOLUTION(512u);
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -289,4 +289,4 @@ float Gradient::GetStartOffset() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

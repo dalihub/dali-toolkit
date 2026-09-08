@@ -20,8 +20,8 @@
 
 #include <dali-physics/public-api/physics-adaptor.h>
 
-namespace Dali::Toolkit::Physics::Integration
+namespace DALI_NAMESPACE::Toolkit::Physics::Integration
 {
 DALI_TOOLKIT_API PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle);
 
-} // namespace Dali::Toolkit::Physics::Integration
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Integration

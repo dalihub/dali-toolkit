@@ -23,7 +23,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <cstdint>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -145,6 +145,6 @@ public: //Methods
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_RANGE_H

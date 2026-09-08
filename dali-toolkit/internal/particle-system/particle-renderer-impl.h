@@ -31,18 +31,18 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
 
-namespace Dali::Graphics
+namespace DALI_NAMESPACE::Graphics
 {
 class Controller;
 class Shader;
-} // namespace Dali::Graphics
+} //namespace DALI_NAMESPACE::Graphics
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 class ParticleEmitter;
 }
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleEmitter;
 class ParticleRenderer;
@@ -96,8 +96,8 @@ public:
 
   bool mInitialized{false};
 };
-} // namespace Dali::Toolkit::ParticleSystem::Internal
-namespace Dali
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE
 {
 inline Toolkit::ParticleSystem::Internal::ParticleRenderer& GetImplementation(Toolkit::ParticleSystem::ParticleRenderer& source)
 {
@@ -117,6 +117,6 @@ inline const Toolkit::ParticleSystem::Internal::ParticleRenderer& GetImplementat
   return static_cast<const Toolkit::ParticleSystem::Internal::ParticleRenderer&>(handle);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_RENDERER_H

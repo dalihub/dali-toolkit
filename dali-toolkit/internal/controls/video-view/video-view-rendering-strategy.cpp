@@ -38,7 +38,7 @@
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -535,4 +535,4 @@ Property::Map NativeImageStrategy::CreateShader()
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

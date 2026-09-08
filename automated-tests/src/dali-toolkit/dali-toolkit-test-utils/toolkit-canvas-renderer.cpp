@@ -32,7 +32,7 @@ namespace
 std::atomic_uint32_t gRasterizeCalledCount = 0u;
 std::atomic_uint32_t gRasterizeResult      = true; ///< Default rasterization result as success
 } // namespace
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -243,7 +243,7 @@ Vector2 CanvasRenderer::GetViewBox() const
   return Internal::Adaptor::GetImplementation(*this).GetViewBox();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::CanvasRenderer
 {

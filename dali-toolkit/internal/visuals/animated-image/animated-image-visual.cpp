@@ -46,7 +46,7 @@ using Dali::Integration::ToDaliStringView;
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1624,4 +1624,4 @@ void AnimatedImageVisual::OnControlEffectiveVisibilityChanged(Actor actor, bool 
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -26,7 +26,7 @@
 extern Debug::Filter* gLogButtonFilter;
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -135,4 +135,4 @@ Dali::Integration::Accessibility::States RadioButton::RadioButtonAccessible::Cal
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -27,7 +27,7 @@
 #include <toolkit-scene-holder-impl.h>
 #include <toolkit-window.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using PositionSize = Dali::BoundsInteger;
 
@@ -71,6 +71,6 @@ public:
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TOOLKIT_WINDOW_IMPL_H

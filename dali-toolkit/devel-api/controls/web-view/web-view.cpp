@@ -22,7 +22,7 @@
 #include <dali-toolkit/internal/controls/web-view/web-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -562,4 +562,4 @@ WebView::WebView(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

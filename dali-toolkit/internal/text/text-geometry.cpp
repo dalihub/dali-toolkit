@@ -30,7 +30,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -524,4 +524,4 @@ int GetCharIndexAtPosition(ModelPtr textModel, float visualX, float visualY)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

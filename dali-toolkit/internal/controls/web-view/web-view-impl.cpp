@@ -68,7 +68,7 @@
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1763,4 +1763,4 @@ void WebView::WebViewAccessible::SetForceRefreshAddress(bool forceRefresh)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

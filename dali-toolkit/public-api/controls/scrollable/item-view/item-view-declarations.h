@@ -23,7 +23,7 @@
 #include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -52,6 +52,6 @@ class ItemLayout;
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ITEM_VIEW_DECLARATIONS_H

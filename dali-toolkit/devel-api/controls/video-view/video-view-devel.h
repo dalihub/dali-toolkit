@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali/public-api/animation/animation.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -62,7 +62,6 @@ DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
  * @return A handle to a newly allocated Dali VideoView
  */
 DALI_TOOLKIT_API VideoView New(Dali::VideoPlayerPlugin::VideoSourceDescriptor source, VideoSyncMode syncMode = VideoSyncMode::DISABLED);
-
 
 /**
  * @brief Play the resize or move animation with synchronization between UI(transparent hole) and video player
@@ -157,6 +156,6 @@ DALI_TOOLKIT_API void SetVideoFrameBuffer(VideoView videoView, Dali::NativeImage
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_VIDEO_VIEW_DEVEL_H

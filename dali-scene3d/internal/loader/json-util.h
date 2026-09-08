@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/index.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 bool ReadBool(const Toolkit::TreeNode* node, bool& num);
 
@@ -86,6 +86,6 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const Toolkit:
  */
 Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_JSON_UTIL_H_

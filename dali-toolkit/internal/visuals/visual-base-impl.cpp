@@ -55,7 +55,7 @@ const char* const SIZE_POLICY("sizePolicy");
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1727,4 +1727,4 @@ void Visual::Base::StopConstraintFeature(Property::Index index)
 
 } //namespace Toolkit
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

@@ -45,7 +45,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -694,4 +694,4 @@ void GradientVisual::GetStopColors(const Property::Value* value, Vector<Vector4>
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

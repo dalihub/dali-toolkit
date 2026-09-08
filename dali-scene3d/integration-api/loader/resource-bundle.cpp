@@ -27,7 +27,7 @@
 #include <fstream>
 #include <istream>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using namespace Toolkit;
 using Dali::Integration::ToDaliString;
@@ -56,7 +56,7 @@ ResourceBundle::ResourceBundle()
 : mRawResourcesLoading(false),
   mResourcesGenerating(false),
   mRawResourcesLoaded(false),
-  mResourcesGenerated(false){};
+  mResourcesGenerated(false) {};
 
 ResourceRefCounts ResourceBundle::CreateRefCounter() const
 {
@@ -345,4 +345,4 @@ void ResourceBundle::GenerateResources(Options::Type options)
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

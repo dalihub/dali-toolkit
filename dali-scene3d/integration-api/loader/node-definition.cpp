@@ -24,18 +24,18 @@
 #include <dali/public-api/common/dali-utility.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/renderer-state.h>
+#include <dali-scene3d/integration-api/loader/utils.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/model-components/material-impl.h>
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/internal/model-components/model-primitive-impl.h>
-#include <dali-scene3d/integration-api/loader/renderer-state.h>
-#include <dali-scene3d/integration-api/loader/utils.h>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -519,4 +519,4 @@ void ArcRenderable::GetEndVectorWithDiffAngle(float startAngle, float diffAngle,
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

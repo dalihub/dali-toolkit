@@ -22,7 +22,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -203,5 +203,5 @@ public: // Not intended for use by Application developers
   ///@endcond
 };
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 #endif // DALI_TOOLKIT_BLUR_EFFECT_H

@@ -27,7 +27,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 class PhysicsActor;
 
@@ -518,6 +518,6 @@ UniquePtr<CallbackBase> MakePhysicsCallback(T&& functor)
   return UniquePtr<CallbackBase>(new CallbackFunctor0<typename DecayType<T>::type>(Forward<T>(functor)));
 }
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics
 
 #endif //DALI_TOOLKIT_PHYSICS_ADAPTOR_H

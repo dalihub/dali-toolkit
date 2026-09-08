@@ -78,7 +78,7 @@ constexpr float QUAD_UV[] = {
 // clang-format on
 } // namespace
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 struct DrawableViewNativeRenderer::Impl
 {
@@ -842,4 +842,4 @@ void DrawableViewNativeRenderer::Terminate()
   mImpl->Terminate();
 }
 
-} // namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal

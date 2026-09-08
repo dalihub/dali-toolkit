@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -103,6 +103,6 @@ inline const Toolkit::Internal::ImageUrl& GetImpl(const Dali::Toolkit::ImageUrl&
   return static_cast<const Toolkit::Internal::ImageUrl&>(handle);
 }
 
-} // End of namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_IMAGE_URL_H

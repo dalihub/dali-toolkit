@@ -37,7 +37,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_PHYSI
 
 } // namespace
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 PhysicsAdaptorPtr CreateNewPhysicsAdaptor(const Dali::Matrix& transform, Uint16Pair worldSize)
 {
@@ -236,4 +236,4 @@ Vector3 ChipmunkPhysicsAdaptor::ProjectPoint(Vector3 origin, Vector3 direction, 
   return TranslateToPhysicsSpace(origin);
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

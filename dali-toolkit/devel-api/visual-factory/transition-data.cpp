@@ -17,7 +17,7 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -73,4 +73,4 @@ TransitionData::TransitionData(Internal::TransitionData* pointer)
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

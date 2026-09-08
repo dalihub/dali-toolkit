@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -47,6 +50,6 @@ const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_RENDERING_BACKEND_DEVEL_H

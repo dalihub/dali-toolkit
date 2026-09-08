@@ -230,7 +230,7 @@ void OvershootOverlayVisibilityConstraint(bool& current, const PropertyInputCont
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -2000,4 +2000,4 @@ void ItemView::SetRefreshNotificationEnabled(bool enabled)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

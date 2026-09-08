@@ -20,7 +20,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Adaptor;
 
@@ -123,4 +123,4 @@ int SoundPlayer::PlaySound(const std::string fileName)
   return GetImplementation(*this).PlaySound(fileName);
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

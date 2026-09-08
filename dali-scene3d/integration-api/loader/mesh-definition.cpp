@@ -37,7 +37,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -1633,4 +1633,4 @@ void MeshDefinition::RetrieveBlendShapeComponents(bool& hasPositions, bool& hasN
   }
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

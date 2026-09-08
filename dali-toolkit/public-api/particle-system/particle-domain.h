@@ -23,12 +23,12 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleDomain;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 
 /**
@@ -73,6 +73,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_DOMAIN_H

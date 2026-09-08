@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_HASH_H_
 #define DALI_SCENE3D_LOADER_HASH_H_
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <cstdint>
 #include <cstring>
 #include <string>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Rudimentary hash generator that follows a builder pattern.
@@ -116,6 +117,6 @@ Hash& Hash::AddObjectBytes(const T& value)
   return *this;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_HASH_H_

@@ -56,7 +56,7 @@ static void PostBodyFree(cpBody* body, cpSpace* space)
 }
 } // namespace
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 UniquePtr<PhysicsWorld> ChipmunkPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
 {
@@ -143,4 +143,4 @@ Dali::Any ChipmunkPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector
   return bodyPtr;
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

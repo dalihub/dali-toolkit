@@ -38,7 +38,7 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <memory>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -588,6 +588,6 @@ inline const Toolkit::Internal::VideoView& GetImpl(const Toolkit::VideoView& han
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_VIDEO_VIEW_H

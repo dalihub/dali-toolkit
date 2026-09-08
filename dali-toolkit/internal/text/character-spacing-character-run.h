@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CHARACTER_SPACING_CHARACTER_RUN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/abstract-style-character-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -61,6 +61,6 @@ struct TypeTraits<Dali::Toolkit::Text::CharacterSpacingCharacterRun> : public Da
   };
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_CHARACTER_SPACING_CHARACTER_RUN_H

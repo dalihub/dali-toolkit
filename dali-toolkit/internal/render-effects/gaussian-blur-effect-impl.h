@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/render-effects/gaussian-blur-effect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -281,6 +281,6 @@ inline const Toolkit::Internal::GaussianBlurEffectImpl& GetImplementation(const 
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H

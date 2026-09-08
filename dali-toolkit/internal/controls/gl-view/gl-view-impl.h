@@ -32,7 +32,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 class GlView;
 
@@ -167,6 +167,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_GL_VIEW_H

@@ -22,7 +22,7 @@
 #include <dali/public-api/signals/callback.h>
 #include <memory>
 
-namespace Dali::Internal
+namespace DALI_NAMESPACE::Internal
 {
 /**
  * The structure containing the initialization data for the
@@ -109,6 +109,6 @@ private:
   struct Impl;
   std::unique_ptr<Impl> mImpl;
 };
-} //namespace Dali::Internal
+} //namespace DALI_NAMESPACE::Internal
 
 #endif // DALI_PROJECT_DRAWABLE_VIEW_NATIVE_RENDERER_H

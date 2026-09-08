@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_CONVERSION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/public-api/object/property.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector4;
 
@@ -53,6 +53,6 @@ bool ConvertPropertyToColor(const Property::Value& colorValue, Vector4& outColor
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_COLOR_CONVERSION_H

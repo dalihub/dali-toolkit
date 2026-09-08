@@ -34,7 +34,7 @@
 extern Debug::Filter* gLogButtonFilter;
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -196,8 +196,8 @@ Property::Value PushButton::GetProperty(BaseObject* object, Property::Index prop
 
 Dali::Integration::Accessibility::States PushButton::PushButtonAccessible::CalculateStates()
 {
-  auto state                                 = Button::ButtonAccessible::CalculateStates();
-  auto self                                  = Toolkit::Button::DownCast(Self());
+  auto state                                              = Button::ButtonAccessible::CalculateStates();
+  auto self                                               = Toolkit::Button::DownCast(Self());
   state[Dali::Integration::Accessibility::State::PRESSED] = self.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return state;
 }
@@ -224,4 +224,4 @@ void PushButton::OnStateChange(State newState)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

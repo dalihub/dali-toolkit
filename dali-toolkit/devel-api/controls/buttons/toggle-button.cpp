@@ -23,7 +23,7 @@
 
 #include <dali-toolkit/internal/controls/buttons/toggle-button-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -73,4 +73,4 @@ ToggleButton ToggleButton::DownCast(BaseHandle handle)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

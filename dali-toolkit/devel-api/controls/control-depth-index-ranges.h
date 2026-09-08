@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/layer-devel.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -70,6 +70,6 @@ static_assert(!(MINIMUM_DEPTH_INDEX <= AUTO_INDEX && AUTO_INDEX <= MAXIMUM_DEPTH
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H

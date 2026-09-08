@@ -22,7 +22,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-array.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -67,4 +67,4 @@ bool GetStringFromProperty(const Property::Value& value, std::string& output)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

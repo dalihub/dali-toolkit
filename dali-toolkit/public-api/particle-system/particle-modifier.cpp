@@ -20,7 +20,7 @@
 #include <dali-toolkit/internal/particle-system/particle-modifier-impl.h>
 #include <dali-toolkit/public-api/particle-system/particle-modifier.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleModifier ParticleModifier::New(UniquePtr<ParticleModifierInterface>&& modifierUpdater)
 {
@@ -42,4 +42,4 @@ ParticleModifierInterface& ParticleModifier::GetModifierCallback()
   return GetImplementation(*this).GetUpdater();
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

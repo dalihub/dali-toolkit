@@ -21,7 +21,7 @@
 #include <dali-toolkit/internal/image-loader/image-url-impl.h>
 #include <dali/integration-api/string-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -70,4 +70,4 @@ ImageUrl::ImageUrl(Toolkit::Internal::ImageUrl* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -88,6 +88,6 @@ DALI_TOOLKIT_API void EncodeBase64PropertyData(Property::Value& value, const std
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_BASE64_ENCODING_H

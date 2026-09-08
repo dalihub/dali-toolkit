@@ -29,7 +29,7 @@
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -203,4 +203,4 @@ void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint8_t>
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

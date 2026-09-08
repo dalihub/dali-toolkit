@@ -57,7 +57,7 @@ using Dali::Integration::ToStdStringView;
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -1296,4 +1296,4 @@ void Model::UpdateBlendShapeNodeMap()
 
 } // namespace Internal
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -88,7 +88,7 @@ DALI_ENUM_TO_STRING_TABLE_END(SHADER_OPTION_FLAG);
 // clang-format on
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -228,4 +228,4 @@ uint32_t PrecompileShaderOption::GetNpatchYStretchCount() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

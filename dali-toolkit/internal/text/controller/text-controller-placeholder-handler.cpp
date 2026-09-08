@@ -98,7 +98,7 @@ static Dali::Property::Index GetIntKey(const Dali::Property::Key& key)
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -600,4 +600,4 @@ void Controller::PlaceholderHandler::CreatePlaceholderFont(Controller& controlle
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

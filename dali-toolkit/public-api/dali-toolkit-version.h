@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -30,6 +30,6 @@ DALI_TOOLKIT_API extern const unsigned int TOOLKIT_MINOR_VERSION; ///< The minor
 DALI_TOOLKIT_API extern const unsigned int TOOLKIT_MICRO_VERSION; ///< The micro version number of the Toolkit.
 DALI_TOOLKIT_API extern const char* const  TOOLKIT_BUILD_DATE;    ///< The date/time the Toolkit library was built.
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_VERSION_H

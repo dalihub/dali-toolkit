@@ -24,7 +24,7 @@
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
 #include <dali-scene3d/internal/algorithm/path-finder-waypoint-data.h>
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 WayPoint::WayPoint()
 {
@@ -66,4 +66,4 @@ WayPoint::operator Internal::Algorithm::WayPointData&()
   return *mImpl;
 }
 
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm

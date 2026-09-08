@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -92,6 +92,6 @@ DALI_TOOLKIT_API BrokenImageChangedSignalType& BrokenImageChangedSignal(StyleMan
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_STYLE_MANAGER_DEVEL_H

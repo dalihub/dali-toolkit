@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EMOJI_HELPER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali/devel-api/text-abstraction/emoji-helper.h>
 #include <dali/devel-api/text-abstraction/script.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -103,6 +103,6 @@ Character GetVariationSelectorByScript(const TextAbstraction::Script& script);
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_EMOJI_HELPER_H

@@ -19,7 +19,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Adaptor;
 
@@ -63,4 +63,4 @@ StatusSignalType& StatusChangedSignal()
 }
 
 } //namespace VirtualKeyboard
-} //namespace Dali
+} //namespace DALI_NAMESPACE

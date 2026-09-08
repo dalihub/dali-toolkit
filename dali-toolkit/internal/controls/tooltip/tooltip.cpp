@@ -42,7 +42,7 @@ using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -682,4 +682,4 @@ void Tooltip::OnRelayout(Actor actor)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

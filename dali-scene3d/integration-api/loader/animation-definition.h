@@ -21,10 +21,10 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/animated-property.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Animation handle + name + definition of properties.
@@ -237,10 +237,10 @@ private: // DATA
 
 struct AnimationGroupDefinition
 {
-  Dali::String              mName;
+  Dali::String               mName;
   Dali::Vector<Dali::String> mAnimations;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ANIMATION_DEFINITION_H

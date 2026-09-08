@@ -19,10 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/video-view/video-view.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
+#include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
@@ -30,7 +30,7 @@
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -51,7 +51,8 @@ public:
    */
   VideoRenderingStrategy(Toolkit::VideoView videoViewHandle)
   : mVideoViewWeakHandle(videoViewHandle)
-  {}
+  {
+  }
 
   /**
    * @brief Virtual destructor
@@ -87,12 +88,16 @@ public:
   /**
    * @brief Hook for when visual properties are updated, specifically for shader or texture recreation
    */
-  virtual void UpdateProperties(const Property::Map& properties) {}
+  virtual void UpdateProperties(const Property::Map& properties)
+  {
+  }
 
   /**
    * @brief Hook to enable or disable offscreen frame rendering
    */
-  virtual void EnableOffscreenFrameRendering(bool useOffScreenFrame) {}
+  virtual void EnableOffscreenFrameRendering(bool useOffScreenFrame)
+  {
+  }
 
 protected:
   /**
@@ -215,10 +220,10 @@ private:
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
 
-  Dali::Texture mPreviousFrameTexture;
-  Dali::Texture mCurrentFrameTexture;
+  Dali::Texture               mPreviousFrameTexture;
+  Dali::Texture               mCurrentFrameTexture;
   Dali::Toolkit::Visual::Base mOverlayTextureVisual;
-  Dali::Property::Index mOverlayTextureVisualIndex{Dali::Property::INVALID_INDEX};
+  Dali::Property::Index       mOverlayTextureVisualIndex{Dali::Property::INVALID_INDEX};
 };
 
 /**
@@ -309,6 +314,6 @@ private:
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_RENDERING_STRATEGY_H

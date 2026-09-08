@@ -29,7 +29,7 @@
 #include <locale>
 #include <memory>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -280,4 +280,4 @@ bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapDat
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

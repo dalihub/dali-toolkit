@@ -24,12 +24,12 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-types.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleSource;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 class ParticleEmitter;
 
@@ -150,6 +150,6 @@ private:
   ParticleSource(Internal::ParticleSource* impl);
   /// @endcond
 };
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_SOURCE_H

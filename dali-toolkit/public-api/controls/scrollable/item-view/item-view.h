@@ -24,7 +24,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -644,6 +644,6 @@ public: // Not intended for application developers
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ITEM_VIEW_H

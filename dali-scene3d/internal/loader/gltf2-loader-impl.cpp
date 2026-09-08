@@ -23,16 +23,16 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/gltf2-util.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/loader/gltf2-util.h>
 
 using Dali::Integration::ToStdString;
 
 namespace gt = gltf2;
 namespace js = json;
 
-namespace Dali::Scene3D::Loader::Internal
+namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 {
 bool Gltf2LoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result)
 {
@@ -68,4 +68,4 @@ bool Gltf2LoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::
   return true;
 }
 
-} // namespace Dali::Scene3D::Loader::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Loader::Internal

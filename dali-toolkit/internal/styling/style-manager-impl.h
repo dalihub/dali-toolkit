@@ -33,7 +33,7 @@
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -304,6 +304,6 @@ inline const Internal::StyleManager& GetImpl(const Dali::Toolkit::StyleManager& 
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_STYLE_MANAGER_H

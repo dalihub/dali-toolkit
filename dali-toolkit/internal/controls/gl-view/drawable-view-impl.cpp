@@ -30,7 +30,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 /**
  * FrameCallback implementation. Will run the OnUpdate method.
@@ -344,4 +344,4 @@ bool DrawableView::OnRenderCallback(const RenderCallbackInput& renderCallbackInp
   return true;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

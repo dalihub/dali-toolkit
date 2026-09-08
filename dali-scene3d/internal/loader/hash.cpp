@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 
 // CLASS HEADER
 #include <dali-scene3d/internal/loader/hash.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 Hash::Hash(uint64_t initial)
 : mValue(initial)
@@ -91,4 +92,4 @@ uint64_t Hash::Concatenate(uint64_t value)
   return mValue * 31 + value;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <memory.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -46,4 +46,4 @@ float ProcessFloatAttribute(const Attribute& attribute)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

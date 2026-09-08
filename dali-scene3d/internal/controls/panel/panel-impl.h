@@ -38,7 +38,7 @@
 #include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -314,6 +314,6 @@ inline const Dali::Scene3D::Internal::Panel& GetImpl(const Dali::Scene3D::Panel&
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_INTERNAL_PANEL_H

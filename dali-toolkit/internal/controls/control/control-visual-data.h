@@ -33,7 +33,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/common/owner-container.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 namespace Visual
 {
@@ -363,5 +363,5 @@ private:
   bool mCornerRadiusValueAdded : 1;     ///< True if corner radius value setted at least 1 time. Could not be reset to false.
   bool mCornerSquarenessValueAdded : 1; ///< True if corner squareness value setted at least 1 time. Could not be reset to false.
 };
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 #endif // DALI_TOOLKIT_CONTROL_DATA_VISUAL_DATA_H

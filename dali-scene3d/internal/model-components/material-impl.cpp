@@ -28,13 +28,13 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-scene3d/internal/light/light-impl.h>
-#include <dali-scene3d/internal/model-components/material-modify-observer.h>
 #include <dali-scene3d/integration-api/loader/node-definition.h>
 #include <dali-scene3d/integration-api/loader/renderer-state.h>
 #include <dali-scene3d/integration-api/loader/shader-option.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/light/light-impl.h>
+#include <dali-scene3d/internal/model-components/material-modify-observer.h>
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToDaliString;
@@ -42,7 +42,7 @@ using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -881,4 +881,4 @@ void Material::ResourcesLoadComplete()
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

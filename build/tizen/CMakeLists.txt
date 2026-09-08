@@ -741,6 +741,39 @@ IF( DOXYGEN_FOUND )
     SET( DOXYGEN_VERSION_OVER_1_9_8_BLOCKED "# ")
   ENDIF()
 
+  # The documented namespace follows how dali-core was actually built, read from
+  # the installed dali-namespace.h. Deriving it from the header rather than from
+  # an option of our own means the two cannot disagree.
+  #
+  # Doxygen cannot follow the namespace alias that makes Tizen::Dali reachable as
+  # Dali, so for a Tizen namespace build the hand written pages under docs/content,
+  # which refer to Dali::X, are put through a filter that rewrites those
+  # references. Without it every one of them would fail to resolve, and a warning
+  # fails the documentation build.
+  SET( DALI_DOXYGEN_NAMESPACE "Dali" )
+  SET( DALI_DOXYGEN_TIZEN_NAMESPACE_VALUE 0 )
+  SET( DALI_DOXYGEN_CONTENT_FILTER "" )
+  FOREACH( dali_core_include_dir ${DALICORE_INCLUDE_DIRS} ${INCLUDE_DIR} )
+    SET( dali_namespace_header "${dali_core_include_dir}/dali/public-api/common/dali-namespace.h" )
+    IF( EXISTS "${dali_namespace_header}" )
+      FILE( STRINGS "${dali_namespace_header}" dali_tizen_namespace_enabled
+            REGEX "^#define[ \t]+DALI_TIZEN_NAMESPACE[ \t]+1" )
+      IF( dali_tizen_namespace_enabled )
+        SET( DALI_DOXYGEN_NAMESPACE "Tizen::Dali" )
+        SET( DALI_DOXYGEN_TIZEN_NAMESPACE_VALUE 1 )
+        IF( UNIX )
+          SET( DALI_DOXYGEN_CONTENT_FILTER "*/content/*=${CMAKE_CURRENT_SOURCE_DIR}/docs/tizen-namespace-filter.sh" )
+        ELSE()
+          MESSAGE( WARNING "Tizen namespace documentation needs the content filter, which is a shell script; documenting as Dali instead." )
+          SET( DALI_DOXYGEN_NAMESPACE "Dali" )
+          SET( DALI_DOXYGEN_TIZEN_NAMESPACE_VALUE 0 )
+        ENDIF()
+      ENDIF()
+      BREAK()
+    ENDIF()
+  ENDFOREACH()
+  MESSAGE( STATUS "Doxygen namespace " ${DALI_DOXYGEN_NAMESPACE} )
+
   SET( DOXYGEN_DOCS_DIR ${ROOT_SRC_DIR}/docs )
   SET( DOXYGEN_ROOT_DIR ${ROOT_SRC_DIR} )
   SET( DOXYGEN_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs )

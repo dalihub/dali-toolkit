@@ -584,7 +584,7 @@ void DestroyCacheImpl()
 
 } // namespace
 
-namespace Dali::Scene3D::Internal
+namespace DALI_NAMESPACE::Scene3D::Internal
 {
 namespace ImageResourceLoader
 {
@@ -747,4 +747,4 @@ Dali::PixelData GetCachedPixelData(const std::string& url,
   }
 }
 } // namespace ImageResourceLoader
-} // namespace Dali::Scene3D::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Internal

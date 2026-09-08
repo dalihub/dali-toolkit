@@ -45,7 +45,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -821,4 +821,4 @@ void ImageView::OnTransitionAnimationFinishedCallback(Animation animation)
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

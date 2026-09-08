@@ -117,7 +117,7 @@ void PrintVector(std::vector<float>& array)
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1739,4 +1739,4 @@ bool TableView::FindFit(const RowColumnArray& data)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

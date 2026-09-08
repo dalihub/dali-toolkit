@@ -25,7 +25,7 @@
 // INTERNAL INCLUDE
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -97,4 +97,4 @@ void CreateBitmapFont(const BitmapFontDescription& description, TextAbstraction:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

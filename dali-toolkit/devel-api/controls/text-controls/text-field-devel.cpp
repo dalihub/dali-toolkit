@@ -19,7 +19,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -134,4 +134,4 @@ Dali::Property::Index RegisterFontVariationProperty(TextField textField, std::st
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

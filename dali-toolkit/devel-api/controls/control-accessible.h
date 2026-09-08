@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
@@ -29,7 +29,7 @@
 #include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::DevelControl
+namespace DALI_NAMESPACE::Toolkit::DevelControl
 {
 /**
  * @brief Represents the Accessible object for Dali::Toolkit::Control and derived classes
@@ -286,10 +286,10 @@ private:
   /**
    * @brief Grabs snapshot of previous state when the control is highlighted.
    */
-  uint32_t           mStatesSnapshot;
+  uint32_t                      mStatesSnapshot;
   AccessibilityHighlightOverlay mHighlightOverlay;
 };
 
-} // namespace Dali::Toolkit::DevelControl
+} //namespace DALI_NAMESPACE::Toolkit::DevelControl
 
 #endif // DALI_TOOLKIT_CONTROL_ACCESSIBLE_H

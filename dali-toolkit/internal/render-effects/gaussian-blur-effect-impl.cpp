@@ -34,8 +34,8 @@
 #include <locale>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 using Dali::Integration::ToDaliString;
@@ -74,7 +74,7 @@ inline static Dali::Sampler GetCachedLinearSampler()
 }
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -872,4 +872,4 @@ Dali::Toolkit::GaussianBlurEffect::FinishedSignalType& GaussianBlurEffectImpl::F
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -25,7 +25,7 @@
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -116,6 +116,6 @@ private:
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_MOTION_MOTION_DATA_LOAD_TASK_H

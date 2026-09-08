@@ -44,7 +44,7 @@ using Dali::Integration::ToStdString;
 extern Debug::Filter* gLogButtonFilter;
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -432,4 +432,4 @@ void ToggleButton::OnStateChange(State newState)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

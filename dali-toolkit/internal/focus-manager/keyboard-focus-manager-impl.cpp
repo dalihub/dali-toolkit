@@ -51,7 +51,7 @@
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1395,4 +1395,4 @@ void KeyboardFocusManager::OnSceneDisconnection(Dali::Actor actor)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

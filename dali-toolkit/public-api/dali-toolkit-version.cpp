@@ -23,7 +23,7 @@
 #include <iostream>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -49,4 +49,4 @@ PrintVersion TOOLKIT_VERSION;
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

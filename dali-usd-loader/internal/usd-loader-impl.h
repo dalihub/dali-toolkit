@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/model-loader-impl.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class UsdLoaderImpl : public ModelLoaderImpl
 {
@@ -42,6 +42,6 @@ private:
   UniquePtr<Impl> mImpl;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_USD_LOADER_IMPL_H

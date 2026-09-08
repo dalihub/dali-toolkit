@@ -31,7 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -126,6 +126,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_TYPESETTER_IMPL_H

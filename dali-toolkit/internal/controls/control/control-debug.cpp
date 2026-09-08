@@ -36,7 +36,7 @@ using Dali::Integration::ToStdString;
 
 #if defined(DEBUG_ENABLED)
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 class JsonWriter
 {
@@ -364,6 +364,6 @@ void DumpControlHierarchy(std::ostream& o, Actor actor)
   o << "]}\n";
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 
 #endif

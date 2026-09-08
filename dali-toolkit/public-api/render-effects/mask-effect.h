@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/render-effects/render-effect.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -137,6 +137,6 @@ public: // Not intended for use by Application developers
   ///@endcond
 };
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_MASK_EFFECT_H

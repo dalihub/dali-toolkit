@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class DALI_TOOLKIT_API EventThreadCallback
 {
@@ -50,7 +50,7 @@ private:
   Impl* mImpl;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

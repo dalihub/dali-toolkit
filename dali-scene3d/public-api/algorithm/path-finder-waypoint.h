@@ -27,12 +27,12 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 struct WayPointData;
 }
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 /**
  * @class WayPoint
@@ -113,6 +113,6 @@ private:
 public:
   DALI_INTERNAL operator Internal::Algorithm::WayPointData&();
 };
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm
 
 #endif // DALI_SCENE3D_PATH_FINDER_WAYPOINT_H

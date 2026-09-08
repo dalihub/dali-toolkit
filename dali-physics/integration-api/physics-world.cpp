@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <dali-physics/internal/physics-world-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali::Toolkit::Physics::Integration
+namespace DALI_NAMESPACE::Toolkit::Physics::Integration
 {
 PhysicsWorld::PhysicsWorld(Dali::Toolkit::Physics::Internal::PhysicsWorld* internalWorld)
 : impl(internalWorld)
@@ -57,4 +57,4 @@ Dali::Any PhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 rayToW
   return impl->HitTest(rayFromWorld, rayToWorld, nativeFilter, localPivot, distanceFromCamera);
 }
 
-} // namespace Dali::Toolkit::Physics::Integration
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Integration

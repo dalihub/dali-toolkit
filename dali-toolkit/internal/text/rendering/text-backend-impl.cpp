@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-based-renderer.h>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -116,4 +116,4 @@ RendererPtr Backend::NewRenderer(unsigned int renderingType)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

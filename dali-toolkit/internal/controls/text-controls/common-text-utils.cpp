@@ -31,7 +31,7 @@
 #include <dali-toolkit/internal/text/text-geometry.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 namespace
 {
@@ -584,4 +584,4 @@ bool EditableTextControlAccessible::SetTextContents(std::string newContents)
   return true;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

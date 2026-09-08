@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -36,4 +36,4 @@ Renderer::~Renderer()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -34,8 +34,6 @@
 #include <locale>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/json-util.h>
-#include <dali-toolkit/internal/helpers/actor-property-name.h>
 #include <dali-scene3d/integration-api/loader/alpha-function-helper.h>
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h>
@@ -47,10 +45,12 @@
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-scene3d/integration-api/loader/skinning-details.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/loader/json-util.h>
+#include <dali-toolkit/internal/helpers/actor-property-name.h>
 
 #define DLI_0_1_COMPATIBILITY
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using namespace Toolkit;
 
@@ -1975,4 +1975,4 @@ void DliLoaderImpl::Impl::GetLightParameters(Dali::Vector<Dali::Scene3D::Loader:
 } // namespace Internal
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -28,7 +28,7 @@
 #include <dali-physics/internal/physics-world-impl.h>
 #include <dali-physics/public-api/physics-adaptor.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 namespace Internal
 {
@@ -213,6 +213,6 @@ inline const Internal::PhysicsAdaptor& GetImplementation(const Dali::Toolkit::Ph
   return static_cast<const Internal::PhysicsAdaptor&>(object);
 }
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics
 
 #endif //DALI_TOOLKIT_PHYSICS_INTERNAL_ADAPTOR_H

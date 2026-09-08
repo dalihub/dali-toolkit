@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -165,4 +165,4 @@ ScrollBar::ScrollPositionIntervalReachedSignalType& ScrollBar::ScrollPositionInt
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -22,7 +22,7 @@
 #include <dali/integration-api/adaptor-framework/input-method-options.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -33,14 +33,14 @@ class RenderSurface;
 class InputMethodContext : public Dali::BaseObject
 {
 public:
-  using ActivatedSignalType              = Dali::InputMethodContext::ActivatedSignalType;
-  using KeyboardEventSignalType          = Dali::Integration::InputMethodContext::KeyboardEventSignalType;
-  using ContentReceivedSignalType        = Dali::Integration::InputMethodContext::ContentReceivedSignalType;
-  using StatusChangedSignalType          = Dali::InputMethodContext::StatusChangedSignalType;
-  using KeyboardResizedSignalType        = Dali::InputMethodContext::KeyboardResizedSignalType;
-  using LanguageChangedSignalType        = Dali::InputMethodContext::LanguageChangedSignalType;
-  using KeyboardTypeChangedSignalType    = Dali::InputMethodContext::KeyboardTypeChangedSignalType;
-  using PrivateCommandReceivedSignalType = Dali::InputMethodContext::PrivateCommandReceivedSignalType;
+  using ActivatedSignalType                 = Dali::InputMethodContext::ActivatedSignalType;
+  using KeyboardEventSignalType             = Dali::Integration::InputMethodContext::KeyboardEventSignalType;
+  using ContentReceivedSignalType           = Dali::Integration::InputMethodContext::ContentReceivedSignalType;
+  using StatusChangedSignalType             = Dali::InputMethodContext::StatusChangedSignalType;
+  using KeyboardResizedSignalType           = Dali::InputMethodContext::KeyboardResizedSignalType;
+  using LanguageChangedSignalType           = Dali::InputMethodContext::LanguageChangedSignalType;
+  using KeyboardTypeChangedSignalType       = Dali::InputMethodContext::KeyboardTypeChangedSignalType;
+  using PrivateCommandReceivedSignalType    = Dali::InputMethodContext::PrivateCommandReceivedSignalType;
   using LegacyStatusChangedSignalType       = Dali::Integration::InputMethodContext::LegacyStatusChangedSignalType;
   using LegacyKeyboardTypeChangedSignalType = Dali::Integration::InputMethodContext::LegacyKeyboardTypeChangedSignalType;
   using LegacyKeyboardResizedSignalType     = Dali::Integration::InputMethodContext::LegacyKeyboardResizedSignalType;
@@ -58,17 +58,17 @@ public:
   void Deactivate();
   void Reset();
 
-  bool IsRestoreAfterFocusLostEnabled() const;
-  bool SetRestoreAfterFocusLostEnabled(bool enabled);
-  bool SetReturnKeyEnabled(bool enabled);
-  bool IsReturnKeyEnabled() const;
-  Dali::BoundsInteger GetInputPanelArea() const;
-  bool                SetInputPanelUserData(const Dali::String& data);
-  Dali::String        GetInputPanelUserData() const;
-  Dali::InputMethodContext::State GetInputPanelState() const;
-  bool                            SetInputPanelAutoShowEnabled(bool enabled);
-  bool                            ShowInputPanel();
-  bool                            HideInputPanel();
+  bool                                   IsRestoreAfterFocusLostEnabled() const;
+  bool                                   SetRestoreAfterFocusLostEnabled(bool enabled);
+  bool                                   SetReturnKeyEnabled(bool enabled);
+  bool                                   IsReturnKeyEnabled() const;
+  Dali::BoundsInteger                    GetInputPanelArea() const;
+  bool                                   SetInputPanelUserData(const Dali::String& data);
+  Dali::String                           GetInputPanelUserData() const;
+  Dali::InputMethodContext::State        GetInputPanelState() const;
+  bool                                   SetInputPanelAutoShowEnabled(bool enabled);
+  bool                                   ShowInputPanel();
+  bool                                   HideInputPanel();
   Dali::InputMethodContext::KeyboardType GetKeyboardType() const;
   bool                                   SetInputPanelLanguageLocale(const Dali::String& locale);
   Dali::String                           GetInputPanelLanguageLocale() const;
@@ -79,28 +79,28 @@ public:
   bool                                   SetInputPanelPosition(uint32_t x, uint32_t y);
   bool                                   SetInputPanelPositionAlign(int32_t x, int32_t y, Dali::InputMethodContext::InputPanelAlign align);
 
-  void         NotifyCursorPosition();
-  void         SetCursorPosition(uint32_t cursorPosition);
-  uint32_t     GetCursorPosition() const;
-  void         SetSurroundingText(const Dali::String& text);
-  Dali::String GetSurroundingText() const;
-  void         NotifyTextInputMultiLine(bool multiLine);
-  Dali::Integration::InputMethodContext::TextDirection GetTextDirection() const;
-  void         SetContentMimeTypes(const Dali::String& mimeTypes);
-  void         ApplyOptions(const Dali::Integration::InputMethodOptions& options);
-  bool         SetInputPanelLanguage(Dali::Integration::InputMethodContext::InputPanelLanguage language);
+  void                                                      NotifyCursorPosition();
+  void                                                      SetCursorPosition(uint32_t cursorPosition);
+  uint32_t                                                  GetCursorPosition() const;
+  void                                                      SetSurroundingText(const Dali::String& text);
+  Dali::String                                              GetSurroundingText() const;
+  void                                                      NotifyTextInputMultiLine(bool multiLine);
+  Dali::Integration::InputMethodContext::TextDirection      GetTextDirection() const;
+  void                                                      SetContentMimeTypes(const Dali::String& mimeTypes);
+  void                                                      ApplyOptions(const Dali::Integration::InputMethodOptions& options);
+  bool                                                      SetInputPanelLanguage(Dali::Integration::InputMethodContext::InputPanelLanguage language);
   Dali::Integration::InputMethodContext::InputPanelLanguage GetInputPanelLanguage() const;
-  bool         FilterEventKey(const Dali::KeyEvent& keyEvent);
-  void         GetPreeditStyle(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
-  void         SetPreeditStyle(Dali::Integration::InputMethodContext::PreeditStyle type);
+  bool                                                      FilterEventKey(const Dali::KeyEvent& keyEvent);
+  void                                                      GetPreeditStyle(Dali::Integration::InputMethodContext::PreEditAttributeDataContainer& attrs) const;
+  void                                                      SetPreeditStyle(Dali::Integration::InputMethodContext::PreeditStyle type);
 
-  bool                                      SetInputPanelLayout(Dali::InputMethod::PanelLayout layout);
-  Dali::InputMethod::PanelLayout      GetInputPanelLayout() const;
-  bool                                      SetInputPanelReturnKeyType(Dali::InputMethod::ReturnKeyType action);
-  Dali::InputMethod::ReturnKeyType     GetInputPanelReturnKeyType() const;
-  bool                                      SetInputPanelAutoCapitalType(Dali::InputMethod::AutoCapitalType autoCapital);
+  bool                                    SetInputPanelLayout(Dali::InputMethod::PanelLayout layout);
+  Dali::InputMethod::PanelLayout          GetInputPanelLayout() const;
+  bool                                    SetInputPanelReturnKeyType(Dali::InputMethod::ReturnKeyType action);
+  Dali::InputMethod::ReturnKeyType        GetInputPanelReturnKeyType() const;
+  bool                                    SetInputPanelAutoCapitalType(Dali::InputMethod::AutoCapitalType autoCapital);
   Dali::InputMethod::AutoCapitalType      GetInputPanelAutoCapitalType() const;
-  bool                                      SetInputPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation variation);
+  bool                                    SetInputPanelLayoutVariation(Dali::InputMethod::PanelLayoutVariation variation);
   Dali::InputMethod::PanelLayoutVariation GetInputPanelLayoutVariation() const;
 
 public: // Signals
@@ -173,37 +173,37 @@ private:
   InputMethodContext& operator=(InputMethodContext&);
 
 private:
-  uint32_t                                                            mIMFCursorPosition;
-  Dali::String                                                        mSurroundingText;
-  Dali::String                                                        mInputPanelUserData;
-  Dali::String                                                        mLanguageLocale;
-  Dali::String                                                        mContentMimeTypes;
-  Dali::BoundsInteger                                                 mInputPanelArea;
-  Dali::InputMethodContext::State                                     mInputPanelState;
-  Dali::InputMethodContext::KeyboardType                              mKeyboardType;
-  Dali::Integration::InputMethodContext::InputPanelLanguage           mInputPanelLanguage;
-  bool                                                                mRestoreAfterFocusLost : 1;
-  bool                                                                mReturnKeyEnabled : 1;
-  bool                                                                mAutoShowEnabled : 1;
-  bool                                                                mTextPredictionEnabled : 1;
-  bool                                                                mFullScreenModeEnabled : 1;
-  bool                                                                mIdleCallbackConnected : 1;
+  uint32_t                                                             mIMFCursorPosition;
+  Dali::String                                                         mSurroundingText;
+  Dali::String                                                         mInputPanelUserData;
+  Dali::String                                                         mLanguageLocale;
+  Dali::String                                                         mContentMimeTypes;
+  Dali::BoundsInteger                                                  mInputPanelArea;
+  Dali::InputMethodContext::State                                      mInputPanelState;
+  Dali::InputMethodContext::KeyboardType                               mKeyboardType;
+  Dali::Integration::InputMethodContext::InputPanelLanguage            mInputPanelLanguage;
+  bool                                                                 mRestoreAfterFocusLost : 1;
+  bool                                                                 mReturnKeyEnabled : 1;
+  bool                                                                 mAutoShowEnabled : 1;
+  bool                                                                 mTextPredictionEnabled : 1;
+  bool                                                                 mFullScreenModeEnabled : 1;
+  bool                                                                 mIdleCallbackConnected : 1;
   Dali::Integration::InputMethodContext::PreEditAttributeDataContainer mPreeditAttrs;
 
   Dali::InputMethod::PanelLayout          mPanelLayout;
-  Dali::InputMethod::ReturnKeyType         mButtonAction;
-  Dali::InputMethod::AutoCapitalType          mAutoCapital;
+  Dali::InputMethod::ReturnKeyType        mButtonAction;
+  Dali::InputMethod::AutoCapitalType      mAutoCapital;
   Dali::InputMethod::PanelLayoutVariation mPanelLayoutVariation;
 
-  ActivatedSignalType              mActivatedSignal;
-  KeyboardEventSignalType          mEventSignal;
-  KeyboardEventSignalType          mKeyboardEventSignal;
-  ContentReceivedSignalType        mContentReceivedSignal;
-  StatusChangedSignalType          mKeyboardStatusSignal;
-  KeyboardResizedSignalType        mKeyboardResizeSignal;
-  LanguageChangedSignalType        mKeyboardLanguageChangedSignal;
-  KeyboardTypeChangedSignalType    mKeyboardTypeChangedSignal;
-  PrivateCommandReceivedSignalType mPrivateCommandReceivedSignal;
+  ActivatedSignalType                 mActivatedSignal;
+  KeyboardEventSignalType             mEventSignal;
+  KeyboardEventSignalType             mKeyboardEventSignal;
+  ContentReceivedSignalType           mContentReceivedSignal;
+  StatusChangedSignalType             mKeyboardStatusSignal;
+  KeyboardResizedSignalType           mKeyboardResizeSignal;
+  LanguageChangedSignalType           mKeyboardLanguageChangedSignal;
+  KeyboardTypeChangedSignalType       mKeyboardTypeChangedSignal;
+  PrivateCommandReceivedSignalType    mPrivateCommandReceivedSignal;
   LegacyStatusChangedSignalType       mLegacyKeyboardStatusSignal;
   LegacyKeyboardTypeChangedSignalType mLegacyKeyboardTypeChangedSignal;
   LegacyKeyboardResizedSignalType     mLegacyKeyboardResizeSignal;
@@ -885,4 +885,4 @@ void SetPreeditStyle(Dali::InputMethodContext context, PreeditStyle type)
 } // namespace Test
 } // namespace InputMethodContext
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE

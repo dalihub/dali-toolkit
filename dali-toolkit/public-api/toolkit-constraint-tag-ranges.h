@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONSTRAINT_TAG_RANGES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraint-tag-ranges.h>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 /**
  * @brief Enumeration for the start and end property ranges.
@@ -33,6 +33,6 @@ enum ConstraintTagRanges
   TOOLKIT_CONSTRAINT_TAG_END   = TOOLKIT_CONSTRAINT_TAG_START + Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION,
 };
 
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_CONSTRAINT_TAG_RANGES_H

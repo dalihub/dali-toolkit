@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * @brief DALi Toolkit namespace.
@@ -76,6 +76,6 @@ DALI_TOOLKIT_API bool IsHorizontal(ControlOrientation::Type orientation);
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ENUMS_H

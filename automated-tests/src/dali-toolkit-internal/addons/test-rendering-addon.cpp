@@ -29,7 +29,7 @@
 
 using Dali::Toolkit::Internal::TextureManager;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace AddOns
 {
@@ -105,7 +105,7 @@ static std::vector<std::string> GetCallStack(bool clear)
 
 } // namespace GeometryTiler
 } // namespace AddOns
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 /**
  * OverdrawingAddOn implementation

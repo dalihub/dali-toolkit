@@ -37,7 +37,7 @@ namespace
 std::vector<Dali::EventThreadCallback*> gEventThreadCallbacks;
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct EventThreadCallback::Impl
 {
@@ -92,7 +92,7 @@ CallbackBase* EventThreadCallback::GetCallback()
   return mImpl->callback.get();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/utils.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 MatrixStack::MatrixStack()
 {
@@ -63,4 +63,4 @@ void MatrixStack::PopAll()
   mStack.Clear();
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

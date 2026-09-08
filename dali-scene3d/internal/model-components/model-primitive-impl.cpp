@@ -34,7 +34,7 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -499,4 +499,4 @@ void ModelPrimitive::UpdateRendererProperty()
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

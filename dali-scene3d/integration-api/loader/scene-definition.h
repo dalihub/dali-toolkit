@@ -32,7 +32,7 @@
 #include <dali-scene3d/integration-api/loader/string-callback.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class MatrixStack;
 
@@ -285,6 +285,6 @@ private:                                          // DATA
   Dali::Vector<Index>                     mRootNodeIds;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_SCENE_DEFINITION_H_

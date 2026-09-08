@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/drag-drop-detector/drag-and-drop-detector-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -110,4 +110,4 @@ DragAndDropDetector::DragAndDropDetector(Internal::DragAndDropDetector* detector
 
 } //namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

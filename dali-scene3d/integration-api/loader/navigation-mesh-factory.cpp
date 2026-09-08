@@ -29,7 +29,7 @@
 
 using Dali::Integration::ToStdString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali::String filename)
 {
@@ -212,4 +212,4 @@ Dali::Vector<uint8_t> NavigationMeshFactory::GetMeshBinary(const Dali::Scene3D::
   return meshImpl.GetData();
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

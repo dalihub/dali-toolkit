@@ -1,11 +1,11 @@
 #ifndef DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_TREE_UTILITY_H
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_TREE_UTILITY_H
 
-#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/integration-api/loader/shader-manager.h>
+#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Scene3D
@@ -53,6 +53,6 @@ void UpdateImageBasedLightScaleFactorRecursively(Scene3D::ModelNode node, float 
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_TREE_UTILITY_H

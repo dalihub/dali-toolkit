@@ -34,7 +34,7 @@
 #include <thread>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -269,4 +269,4 @@ PixelData SvgRasterizingTask::GetPixelData() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

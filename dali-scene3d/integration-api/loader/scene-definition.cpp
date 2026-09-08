@@ -27,11 +27,11 @@
 #include <locale>
 
 // INTERNAL
-#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-scene3d/internal/model-components/model-node-impl.h>
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h>
 #include <dali-scene3d/integration-api/loader/skinning-details.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-scene3d/internal/model-components/model-node-impl.h>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
@@ -48,7 +48,7 @@ using Dali::Integration::ToStdString;
 
 #define LOGD(x) DEBUG_ONLY(printf x; printf("\n"); fflush(stdout))
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -456,7 +456,7 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
         }
         customization->nodes.PushBack(n.mName);
         customization->numOptions = Max(customization->numOptions,
-                                             static_cast<uint32_t>(n.mChildren.Size()));
+                                        static_cast<uint32_t>(n.mChildren.Size()));
       }
     }
 
@@ -1002,4 +1002,4 @@ bool SceneDefinition::FindNode(const Dali::String& name, UniquePtr<NodeDefinitio
   return false;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

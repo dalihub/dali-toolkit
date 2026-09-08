@@ -20,8 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Scene3D::BlendShapes
+namespace DALI_NAMESPACE::Scene3D::BlendShapes
 {
 /**
  * @brief Type alias for blend shape index.
@@ -35,6 +36,6 @@ using Index = uint32_t;
  */
 static constexpr Index INVALID_INDEX = static_cast<Index>(~Index(0));
 
-} // namespace Dali::Scene3D::BlendShapes
+} //namespace DALI_NAMESPACE::Scene3D::BlendShapes
 
 #endif // DALI_SCENE3D_BLEND_SHAPE_TYPES_H

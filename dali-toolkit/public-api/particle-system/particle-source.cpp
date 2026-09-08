@@ -18,7 +18,7 @@
 #include <dali-toolkit/internal/particle-system/particle-source-impl.h>
 #include <dali-toolkit/public-api/particle-system/particle-source.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 
 ParticleSource ParticleSource::New(UniquePtr<ParticleSourceInterface>&& sourceUpdater)
@@ -41,4 +41,4 @@ ParticleSourceInterface& ParticleSource::GetSourceCallback()
   return GetImplementation(*this).GetUpdater();
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

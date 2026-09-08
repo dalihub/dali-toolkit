@@ -19,10 +19,10 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/gltf2-asset.h>
-#include <dali-scene3d/internal/loader/json-reader.h>
 #include <dali-scene3d/integration-api/loader/load-scene-metadata.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/loader/gltf2-asset.h>
+#include <dali-scene3d/internal/loader/json-reader.h>
 
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
@@ -30,7 +30,7 @@ using Dali::Integration::ToStdString;
 namespace js = json;
 namespace gt = gltf2;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -145,4 +145,4 @@ void LoadSceneMetadata(const Dali::String& url, SceneMetadata& sceneMetadata)
   }
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

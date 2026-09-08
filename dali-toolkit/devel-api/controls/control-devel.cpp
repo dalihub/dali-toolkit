@@ -46,7 +46,7 @@ Dali::Integration::Accessibility::RelationType ToIntegrationRelationType(Dali::T
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -410,4 +410,4 @@ void NotifyAccessibilityPresentationChanged(Dali::Actor actor, bool presented)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

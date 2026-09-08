@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Defines a buffer that is loaded from input uri.
@@ -43,7 +43,7 @@ struct DALI_SCENE3D_API BufferDefinition
 
   ~BufferDefinition();
 
-  BufferDefinition(const BufferDefinition& other) = delete;
+  BufferDefinition(const BufferDefinition& other)            = delete;
   BufferDefinition& operator=(const BufferDefinition& other) = delete;
 
   BufferDefinition(BufferDefinition&& other);
@@ -93,6 +93,6 @@ private:
   bool mIsEmbedded{false};
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BUFFER_DEFINITION_H

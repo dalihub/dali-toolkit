@@ -20,7 +20,7 @@
 #include <dali-toolkit/public-api/render-effects/mask-effect.h>
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/render-effects/mask-effect-impl.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -69,4 +69,4 @@ MaskEffect MaskEffect::New(Toolkit::Control maskControl, MaskMode maskMode, Vect
   return MaskEffect(internal.Get());
 }
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

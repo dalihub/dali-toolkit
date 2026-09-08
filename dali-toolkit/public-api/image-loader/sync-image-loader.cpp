@@ -19,7 +19,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/image-loading.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -53,4 +53,4 @@ PixelData Load(const Dali::String& url,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

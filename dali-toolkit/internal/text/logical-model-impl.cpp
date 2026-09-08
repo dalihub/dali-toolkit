@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -148,8 +148,8 @@ CharacterIndex LogicalModel::GetLogicalCursorIndex(CharacterIndex visualCursorIn
     const CharacterIndex previousVisualCursorIndex  = visualCursorIndex - 1u;
     const CharacterIndex previousLogicalCursorIndex = bidirectionalLineInfo->characterRun.characterIndex +
                                                       (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(previousVisualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
-    const CharacterIndex currentLogicalCursorIndex  = bidirectionalLineInfo->characterRun.characterIndex +
-                                                      (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
+    const CharacterIndex currentLogicalCursorIndex = bidirectionalLineInfo->characterRun.characterIndex +
+                                                     (bidirectionalLineInfo->visualToLogicalMap ? *(bidirectionalLineInfo->visualToLogicalMap + static_cast<std::size_t>(visualCursorIndex - bidirectionalLineInfo->characterRun.characterIndex)) : 0u);
 
     const CharacterDirection previousCharacterDirection = *(modelCharacterDirections + previousLogicalCursorIndex);
     const CharacterDirection currentCharacterDirection  = *(modelCharacterDirections + currentLogicalCursorIndex);
@@ -706,4 +706,4 @@ LogicalModel::LogicalModel()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -47,7 +47,7 @@
 
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using namespace TextAbstraction;
 
@@ -1596,4 +1596,4 @@ Dali::Property::Array GetLastCharacterIndex(RendererParameters& textParameters)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

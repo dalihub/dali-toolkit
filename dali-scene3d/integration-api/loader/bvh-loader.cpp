@@ -32,7 +32,7 @@
 #include <sstream>
 #include <string_view>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -485,4 +485,4 @@ AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLen
 
   return LoadBvhInternal(stream, ToStdString(animationName), useRootTranslationOnly, scale);
 }
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

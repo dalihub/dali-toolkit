@@ -25,8 +25,8 @@
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
 #if defined(DEBUG_ENABLED)
@@ -37,7 +37,7 @@ using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 const char* const TextEditor::PropertyHandler::IMAGE_MAP_FILENAME_STRING{"filename"};
 
@@ -1252,4 +1252,4 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
   return value;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

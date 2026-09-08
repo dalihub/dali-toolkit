@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-model.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -131,6 +131,6 @@ float GetCharacterWidth(const GlyphInfo& glyph);
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_GEOMETRY_H

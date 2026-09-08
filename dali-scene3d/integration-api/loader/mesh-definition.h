@@ -24,14 +24,14 @@
 #include <dali/public-api/common/unique-ptr.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h>
 #include <dali-scene3d/integration-api/loader/buffer-definition.h>
 #include <dali-scene3d/integration-api/loader/index.h>
 #include <dali-scene3d/integration-api/loader/mesh-geometry.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Defines a mesh with its attributes, the primitive type to render it as,
@@ -428,6 +428,6 @@ public: // DATA
   ModelPrimitive mModelPrimitive;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_MESH_DEFINITION_H

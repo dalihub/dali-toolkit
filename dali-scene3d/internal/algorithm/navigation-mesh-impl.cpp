@@ -26,7 +26,7 @@
 
 using Dali::Vector3;
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 using Poly   = Dali::Scene3D::Algorithm::NavigationMesh::Face;
 using Edge   = Dali::Scene3D::Algorithm::NavigationMesh::Edge;
@@ -215,7 +215,8 @@ bool NavigationMesh::FindFloor(const Dali::Vector3& position, Dali::Vector3& out
     return false;
   }
 
-  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs) { return lhs.distance < rhs.distance; });
+  std::sort(results.begin(), results.end(), [](const IntersectResult& lhs, const IntersectResult& rhs)
+  { return lhs.distance < rhs.distance; });
 
   outPosition  = PointLocalToScene(results.front().point);
   outFaceIndex = results.front().faceIndex;
@@ -326,4 +327,4 @@ Dali::Vector3 NavigationMesh::GetGravityVector() const
   return Dali::Vector3(mHeader.gravityVector);
 }
 
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm

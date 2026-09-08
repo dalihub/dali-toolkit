@@ -31,7 +31,7 @@
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-underline.h>
 #include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -140,4 +140,4 @@ void ProcessSpanTag(const Tag&                    tag,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

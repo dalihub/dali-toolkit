@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/text-view-interface.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -36,4 +36,4 @@ ViewInterface::~ViewInterface()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

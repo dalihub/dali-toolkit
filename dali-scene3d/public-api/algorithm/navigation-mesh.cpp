@@ -22,7 +22,7 @@
 
 using Dali::Vector3;
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 NavigationMesh::NavigationMesh(NavigationMeshImpl* impl)
 {
@@ -105,4 +105,4 @@ FaceIndex NavigationMesh::RayFaceIntersect(const Vector3& origin, const Vector3&
   return NULL_FACE;
 }
 
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm

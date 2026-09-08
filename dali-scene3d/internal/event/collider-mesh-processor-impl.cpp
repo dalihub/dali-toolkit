@@ -31,7 +31,7 @@
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
-namespace Dali::Scene3D::Internal
+namespace DALI_NAMESPACE::Scene3D::Internal
 {
 namespace
 {
@@ -200,4 +200,4 @@ void ColliderMeshProcessor::Process(bool /* postProcess */)
   mSceneViewsToProcess.clear();
 }
 
-} // namespace Dali::Scene3D::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Internal

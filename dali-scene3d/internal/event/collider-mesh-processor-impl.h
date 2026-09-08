@@ -29,7 +29,7 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 
-namespace Dali::Scene3D
+namespace DALI_NAMESPACE::Scene3D
 {
 namespace Internal
 {
@@ -86,4 +86,4 @@ inline const Internal::ColliderMeshProcessor& GetImpl(const ColliderMeshProcesso
   return static_cast<const Internal::ColliderMeshProcessor&>(handle);
 }
 
-} // namespace Dali::Scene3D
+} //namespace DALI_NAMESPACE::Scene3D

@@ -21,7 +21,7 @@
 // INTERNAL INCLDUES
 #include <dali-scene3d/integration-api/loader/utils.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 void ViewProjection::Update()
 {
@@ -34,4 +34,4 @@ void ViewProjection::Update()
   }
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

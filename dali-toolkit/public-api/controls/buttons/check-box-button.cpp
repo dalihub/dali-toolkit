@@ -23,7 +23,7 @@
 
 #include <dali-toolkit/internal/controls/buttons/check-box-button-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -67,4 +67,4 @@ CheckBoxButton::CheckBoxButton(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

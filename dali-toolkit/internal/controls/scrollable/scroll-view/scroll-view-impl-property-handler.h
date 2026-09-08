@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_IMPL_PROPERTY_HANDLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 class ScrollView;
 
@@ -64,6 +64,6 @@ struct ScrollViewPropertyHandler
   static void UpdatePropertyDomain(ScrollView& scrollView);
 };
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 
 #endif // DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_IMPL_PROPERTY_HANDLER_H

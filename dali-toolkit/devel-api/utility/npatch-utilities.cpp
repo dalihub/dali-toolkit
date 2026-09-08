@@ -22,7 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -353,4 +353,4 @@ Dali::Uint16Pair GetValidStrechPointFromBorder(uint32_t maxRangeSize, uint32_t r
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

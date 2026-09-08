@@ -30,7 +30,7 @@
 #include <dali-toolkit/public-api/controls/camera-view/camera-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -142,6 +142,6 @@ inline const Toolkit::Internal::CameraView& GetImpl(const Toolkit::CameraView& h
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_CAMERA_VIEW_H

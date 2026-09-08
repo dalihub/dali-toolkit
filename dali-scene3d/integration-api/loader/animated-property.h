@@ -25,10 +25,10 @@
 #include <functional>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/index.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Intermediate representation for a property that's given to a Animation to animate.
@@ -96,6 +96,6 @@ public: // DATA
   TimePeriod    mTimePeriod    = TimePeriod(0.f);
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_ANIMATED_PROPERTY_H

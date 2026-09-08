@@ -56,7 +56,7 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -232,7 +232,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                                      this,
                                                                                      preMultiplyOnLoading,
                                                                                      mReloadPolicy);
-  mReloadPolicy = TextureManager::ReloadPolicy::CACHED;
+  mReloadPolicy                           = TextureManager::ReloadPolicy::CACHED;
   if(textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))
   {
     Sampler sampler = Sampler::New();
@@ -413,4 +413,4 @@ void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformatio
 
 } //namespace Internal
 } //namespace Toolkit
-} //namespace Dali
+} //namespace DALI_NAMESPACE

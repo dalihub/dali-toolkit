@@ -21,7 +21,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-test-application.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Internal
@@ -458,4 +458,4 @@ void VideoPlayer::SetVideoFrameBuffer(Dali::NativeImagePtr source)
   Internal::Adaptor::GetImplementation(*this).SetVideoFrameBuffer(source);
 }
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

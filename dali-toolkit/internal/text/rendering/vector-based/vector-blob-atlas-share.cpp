@@ -35,7 +35,7 @@ const int VECTOR_BLOB_ATLAS_HEIGHT_QUANTUM = 8;
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -140,4 +140,4 @@ VectorBlobAtlas* VectorBlobAtlasShare::GetNewAtlas()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

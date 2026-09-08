@@ -17,7 +17,7 @@
 
 #include "radial-gradient.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -59,4 +59,4 @@ float RadialGradient::GetRadius() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

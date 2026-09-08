@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/any.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 const char* NativeImageTest::GetCustomFragmentPrefix()
@@ -143,4 +143,4 @@ NativeImage::~NativeImage()
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

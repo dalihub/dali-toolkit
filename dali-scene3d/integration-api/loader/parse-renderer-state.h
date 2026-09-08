@@ -21,7 +21,7 @@
 #include <dali-scene3d/integration-api/loader/renderer-state.h>
 #include <dali-scene3d/integration-api/loader/string-callback.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace RendererState
 {
@@ -44,6 +44,6 @@ namespace RendererState
 DALI_SCENE3D_API Type Parse(const char* string, size_t length = 0, StringCallback onError = DefaultErrorCallback);
 
 } // namespace RendererState
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERER_INTERPRET_RENDERER_STATE_H

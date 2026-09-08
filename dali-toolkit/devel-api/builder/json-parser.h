@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/tree-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -139,6 +139,6 @@ public: // Not intended for application developers
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_JSON_PARSER_H

@@ -52,7 +52,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -72,7 +72,7 @@ MockWebEngineContext*       gWebEngineContextInstance   = nullptr;
 MockWebEngineCookieManager* gMockWebEngineCookieManager = nullptr;
 
 Dali::Accessibility::ActorAccessible* gWebAccessible = nullptr;
-Dali::Devel::Accessibility::Address          gWebAccessibleActivatedAddress{};
+Dali::Devel::Accessibility::Address   gWebAccessibleActivatedAddress{};
 
 bool OnGoBack();
 bool OnGoForward();
@@ -2268,11 +2268,11 @@ public:
   float mScaleFactor;
   bool  mVisible;
 
-  Dali::Vector2                mScrollPosition;
-  Dali::Vector2                mScrollSize;
-  Dali::Vector2                mContentSize;
-  WebEngineBackForwardList*    mockWebEngineBackForwardList;
-  WebEngineSettings*           mockWebEngineSettings;
+  Dali::Vector2                       mScrollPosition;
+  Dali::Vector2                       mScrollSize;
+  Dali::Vector2                       mContentSize;
+  WebEngineBackForwardList*           mockWebEngineBackForwardList;
+  WebEngineSettings*                  mockWebEngineSettings;
   Dali::Devel::Accessibility::Address mAccessibilityAddress{};
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
@@ -3367,7 +3367,7 @@ void WebEngine::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEn
   Internal::Adaptor::GetImplementation(*this).RegisterPlaybackVideoPausedCallback(callback);
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::WebEngine
 {

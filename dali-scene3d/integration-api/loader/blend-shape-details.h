@@ -29,7 +29,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/common/blend-shape-types.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct MeshDefinition;
 struct MeshGeometry;
@@ -88,6 +88,6 @@ struct DALI_SCENE3D_API BlendShapes
   BlendShapes() = delete;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BLEND_SHAPE_DETAILS_H

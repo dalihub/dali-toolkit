@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -380,6 +380,6 @@ private:                                            // Member Variables:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXTURE_CACHE_MANAGER_H

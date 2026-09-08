@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/particle-system/particle-impl.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 
 Particle Particle::DownCast(BaseHandle handle)
@@ -46,4 +46,4 @@ uint32_t Particle::GetIndex() const
   return GetImplementation(*this).GetIndex();
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

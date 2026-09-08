@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -70,6 +70,6 @@ void SetRendererTexture(Dali::Renderer renderer, Dali::FrameBuffer frameBuffer);
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_CONTROL_RENDERERS_H

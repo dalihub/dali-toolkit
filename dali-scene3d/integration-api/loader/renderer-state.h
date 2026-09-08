@@ -23,7 +23,7 @@
 // INTERAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Contains values for comparison functions used in depth and stencil testing.
@@ -160,6 +160,6 @@ DALI_SCENE3D_API void Apply(Type rendererState, Renderer& renderer);
 
 } // namespace RendererState
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_RENDERER_STATE_H

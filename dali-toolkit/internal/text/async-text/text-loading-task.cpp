@@ -30,7 +30,7 @@
 #include <dali-toolkit/internal/text/async-text/async-text-manager-impl.h> ///< To call AsyncTextManager::ReleaseLoader
 #include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -249,4 +249,4 @@ void TextLoadingTask::ReleaseLoader()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/image-options.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -347,6 +347,6 @@ public: // Not intended for application developers
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_IMAGE_VIEW_H

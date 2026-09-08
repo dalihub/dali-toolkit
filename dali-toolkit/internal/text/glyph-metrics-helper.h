@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GLYPH_METRICS_HELPER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali-toolkit/internal/text/metrics.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -123,6 +123,6 @@ void GetGlyphMetricsFromCharacterIndex(CharacterIndex         index,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_GLYPH_METRICS_HELPER_H

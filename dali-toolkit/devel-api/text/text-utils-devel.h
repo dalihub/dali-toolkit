@@ -25,7 +25,7 @@
 #include <dali/public-api/object/property-array.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -210,6 +210,6 @@ DALI_TOOLKIT_API Dali::Property::Array GetLastCharacterIndex(RendererParameters&
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_UTILS_DEVEL_H

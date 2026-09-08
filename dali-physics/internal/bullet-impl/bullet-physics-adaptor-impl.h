@@ -22,7 +22,7 @@
 #include <dali-physics/internal/bullet-impl/bullet-physics-debug-renderer.h>
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class BulletPhysicsAdaptor : public PhysicsAdaptor
 {
@@ -116,4 +116,4 @@ private:
   UniquePtr<PhysicsDebugRenderer> mDebugRenderer;
 };
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

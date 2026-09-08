@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Loads a facial animation encoded in a json file in the given @p url.
@@ -47,6 +47,6 @@ DALI_SCENE3D_API AnimationDefinition LoadFacialAnimation(const Dali::String& url
  * @return An animation definition.
  */
 DALI_SCENE3D_API AnimationDefinition LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int rawBufferLength);
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_FACIAL_ANIMATION_LOADER_H

@@ -17,7 +17,10 @@
  * limitations under the License.
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -97,6 +100,6 @@ enum Type
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_SCROLL_VIEW_SCROLL_MODE_H

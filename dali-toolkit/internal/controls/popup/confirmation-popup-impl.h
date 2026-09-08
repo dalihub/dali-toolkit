@@ -27,7 +27,7 @@
 #include <dali-toolkit/devel-api/controls/popup/confirmation-popup.h>
 #include "popup-impl.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -157,6 +157,6 @@ inline const Toolkit::Internal::ConfirmationPopup& GetDerivedImplementation(cons
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_CONFIRMATION_POPUP_H

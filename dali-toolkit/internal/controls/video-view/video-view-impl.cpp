@@ -50,7 +50,7 @@
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -976,4 +976,4 @@ void VideoView::SetVideoFrameBuffer(Dali::NativeImagePtr source)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

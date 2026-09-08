@@ -62,7 +62,7 @@ const char* MIME_TYPE_HTML       = "application/xhtml+xml";
 
 } // namespace
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 namespace
 {
@@ -2117,4 +2117,4 @@ void Controller::Impl::ResetScrollPosition()
   }
 }
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text

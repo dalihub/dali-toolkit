@@ -24,15 +24,15 @@
 #include <dali/public-api/rendering/uniform-block.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
-#include <dali-scene3d/public-api/light/light.h>
 #include <dali-scene3d/integration-api/loader/index.h>
 #include <dali-scene3d/integration-api/loader/material-definition.h>
 #include <dali-scene3d/integration-api/loader/mesh-definition.h>
 #include <dali-scene3d/integration-api/loader/renderer-state.h>
 #include <dali-scene3d/integration-api/loader/shader-option.h>
+#include <dali-scene3d/public-api/api.h>
+#include <dali-scene3d/public-api/light/light.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct NodeDefinition;
 class ResourceBundle;
@@ -161,6 +161,6 @@ private:
   UniquePtr<Impl> mImpl;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_SHADER_MANAGER_H_

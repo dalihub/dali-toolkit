@@ -24,12 +24,12 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleList;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 /**
  * The function is a wrapper needed to retrieve data type enum through template
@@ -281,6 +281,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif

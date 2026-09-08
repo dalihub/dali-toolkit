@@ -27,7 +27,7 @@
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-index.h>
 #include <dali-scene3d/public-api/model-motion/motion-value.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -355,6 +355,6 @@ public: // Not intended for application developers
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_MOTION_MOTION_DATA_H

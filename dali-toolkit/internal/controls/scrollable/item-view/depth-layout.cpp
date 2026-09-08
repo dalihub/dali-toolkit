@@ -251,7 +251,7 @@ struct DepthVisibilityConstraint
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -669,4 +669,4 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

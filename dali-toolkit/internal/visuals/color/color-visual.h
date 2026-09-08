@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -165,6 +165,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_COLOR_VISUAL_H */

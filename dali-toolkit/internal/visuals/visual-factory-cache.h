@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/visuals/svg/svg-loader.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Texture;
 
@@ -479,6 +479,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H

@@ -24,7 +24,7 @@
 
 using namespace Dali::Toolkit;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -139,4 +139,4 @@ bool InputFilter::Filter(Toolkit::InputFilter::Property::Type type, std::string&
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

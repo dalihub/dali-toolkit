@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spanned.h>
-#include <dali/public-api/adaptor-framework/clipboard.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/adaptor-framework/clipboard.h>
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
@@ -39,7 +39,7 @@
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 class Controller;
 class ControlInterface;
@@ -2384,7 +2384,7 @@ public: // Text-input Event Queuing.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
   Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
-    InputMethodContext& inputMethodContext,
+    InputMethodContext&                                     inputMethodContext,
     const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
@@ -2532,6 +2532,6 @@ private:
   std::unique_ptr<Impl> mImpl{nullptr};
 };
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text
 
 #endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

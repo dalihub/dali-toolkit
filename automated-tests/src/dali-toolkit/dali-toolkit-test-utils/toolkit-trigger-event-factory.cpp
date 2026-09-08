@@ -3,7 +3,7 @@
 #include <dali/integration-api/adaptor-framework/trigger-event-interface.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Internal
@@ -40,7 +40,7 @@ void TriggerEvent::Trigger()
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 Dali::TriggerEventFactory::TriggerEventPtr Dali::TriggerEventFactory::CreateTriggerEvent(Dali::CallbackBase* callback)
 {

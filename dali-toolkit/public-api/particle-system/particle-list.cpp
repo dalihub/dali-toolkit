@@ -18,7 +18,7 @@
 #include <dali-toolkit/internal/particle-system/particle-list-impl.h>
 #include <dali-toolkit/public-api/particle-system/particle-list.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 template<>
 ParticleStream::StreamDataType StreamDataTypeWrapper<Vector3>::GetType()
@@ -106,4 +106,4 @@ Dali::Vector<Particle>& ParticleList::GetActiveParticles()
 
 ParticleList::ParticleList() = default;
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

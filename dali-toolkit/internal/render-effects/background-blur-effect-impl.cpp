@@ -34,8 +34,8 @@
 #include <locale>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 using Dali::Integration::ToDaliString;
@@ -74,7 +74,7 @@ inline static Dali::Sampler GetCachedLinearSampler()
 }
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -516,9 +516,9 @@ void BackgroundBlurEffectImpl::OnRefresh()
 
   DestroyFrameBuffers();
 
-  Vector2    size                      = GetTargetSize();
+  Vector2     size                      = GetTargetSize();
   bool        useIntermediateDownsample = IsIntermediateDownsampleRequired(mInternalDownscaleFactor);
-  const float sourceDownscaleFactor    = useIntermediateDownsample ? MINIMUM_SOURCE_DOWNSCALE_FACTOR : mInternalDownscaleFactor;
+  const float sourceDownscaleFactor     = useIntermediateDownsample ? MINIMUM_SOURCE_DOWNSCALE_FACTOR : mInternalDownscaleFactor;
 
   uint32_t sourceDownsampledWidth  = Max(static_cast<uint32_t>(size.width * sourceDownscaleFactor), 1u);
   uint32_t sourceDownsampledHeight = Max(static_cast<uint32_t>(size.height * sourceDownscaleFactor), 1u);
@@ -920,4 +920,4 @@ void BackgroundBlurEffectImpl::SetStopperActor(Dali::Actor stopperActor)
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

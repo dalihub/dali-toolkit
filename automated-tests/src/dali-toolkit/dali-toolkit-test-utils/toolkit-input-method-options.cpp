@@ -24,7 +24,7 @@
 
 using namespace Dali::Integration::InputMethod::Category;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -158,7 +158,7 @@ Dali::InputMethod::AutoCapitalType NormalizeAutoCapitalType(int value)
 
 Dali::InputMethod::PanelLayoutVariation ToPanelLayoutVariation(
   Dali::InputMethod::PanelLayout layout,
-  int rawVariation)
+  int                            rawVariation)
 {
   using namespace Dali::InputMethod;
 
@@ -363,4 +363,4 @@ bool InputMethodOptions::CompareAndSet(InputMethod::Category::Type type, const I
 }
 
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE

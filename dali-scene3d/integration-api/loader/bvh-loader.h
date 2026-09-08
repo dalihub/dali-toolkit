@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Loads motion capture data from bvh file format.
@@ -48,6 +48,6 @@ DALI_SCENE3D_API AnimationDefinition LoadBvh(const Dali::String& path, const Dal
  */
 DALI_SCENE3D_API AnimationDefinition LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, const Dali::String& animationName, bool useRootTranslationOnly, const Vector3& scale = Vector3::ONE);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_BVH_LOADER_H

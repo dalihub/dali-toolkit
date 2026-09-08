@@ -22,7 +22,7 @@
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 #include <dali/integration-api/string-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -75,4 +75,4 @@ ControlWrapper ControlWrapper::DownCast(BaseHandle handle)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

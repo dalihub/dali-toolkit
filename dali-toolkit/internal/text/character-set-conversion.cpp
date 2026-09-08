@@ -17,8 +17,9 @@
 
 // FILE HEADER
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -330,4 +331,4 @@ void Utf32ToUtf8(const uint32_t* const utf32, uint32_t numberOfCharacters, std::
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

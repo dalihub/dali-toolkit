@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -176,6 +176,6 @@ inline const Toolkit::Internal::TextAnchor& GetImpl(const Toolkit::TextAnchor& t
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_ANCHOR_H

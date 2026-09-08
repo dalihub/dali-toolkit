@@ -28,7 +28,7 @@
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -255,6 +255,6 @@ public: // Not intended for application developers
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /*DALI_TOOLKIT_VISUAL_BASE_H*/

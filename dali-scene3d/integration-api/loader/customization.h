@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Offers a description of an aspect of the scene that can be customized:
@@ -128,10 +128,10 @@ struct DALI_SCENE3D_API Customization
 
   static const OptionType NONE = OptionType(-1);
 
-  OptionType          numOptions = 0;
+  OptionType                 numOptions = 0;
   Dali::Vector<Dali::String> nodes; // to apply option to.
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_CUSTOMIZATION_STATE_H_

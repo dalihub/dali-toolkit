@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali-usd-loader/internal/usd-loader-impl.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 extern "C" DALI_TOOLKIT_API Dali::Scene3D::Loader::ModelLoaderImpl* CreateUsdLoader()
 {
   return new UsdLoaderImpl();
 }
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

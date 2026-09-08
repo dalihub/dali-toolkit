@@ -27,13 +27,13 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/environment-definition.h>
 #include <dali-scene3d/integration-api/loader/index.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/model-components/material.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Helper enum for encoding and decoding sampler states.
@@ -195,10 +195,10 @@ struct DALI_SCENE3D_API MaterialDefinition
 
   MaterialDefinition() = default;
 
-  MaterialDefinition(const MaterialDefinition&) = delete;
+  MaterialDefinition(const MaterialDefinition&)            = delete;
   MaterialDefinition& operator=(const MaterialDefinition&) = delete;
 
-  MaterialDefinition(MaterialDefinition&&) = default;
+  MaterialDefinition(MaterialDefinition&&)            = default;
   MaterialDefinition& operator=(MaterialDefinition&&) = default;
 
   /**
@@ -340,6 +340,6 @@ public: // DATA
   Material                   mMaterial;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_MATERIAL_DEFINITION_H

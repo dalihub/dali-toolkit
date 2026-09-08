@@ -33,12 +33,12 @@
 #include <dali-scene3d/public-api/algorithm/navigation-mesh.h>
 #include <dali-scene3d/public-api/algorithm/path-finder.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class NavigationMeshFactory;
 }
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 // Internal Navigation ray structure
 struct NavigationRay
@@ -192,6 +192,6 @@ inline const Internal::Algorithm::NavigationMesh& GetImplementation(const Dali::
   return *navigationMesh.mImpl;
 }
 
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 
 #endif // DALI_SCENE3D_INTERNAL_NAVIGATION_MESH_H

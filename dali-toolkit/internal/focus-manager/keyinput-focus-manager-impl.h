@@ -27,7 +27,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -170,6 +170,6 @@ inline const Internal::KeyInputFocusManager& GetImpl(const Dali::Toolkit::KeyInp
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_KEYINPUT_FOCUS_MANAGER_H

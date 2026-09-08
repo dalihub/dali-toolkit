@@ -147,7 +147,7 @@ AlphaFunction GetAlphaFunction(const std::string& alphaFunction)
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -390,4 +390,4 @@ Animation CreateAnimation(const TreeNode& child, Builder* const builder)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

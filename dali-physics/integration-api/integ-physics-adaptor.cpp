@@ -18,7 +18,7 @@
 
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
-namespace Dali::Toolkit::Physics::Integration
+namespace DALI_NAMESPACE::Toolkit::Physics::Integration
 {
 PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle)
 {
@@ -26,4 +26,4 @@ PhysicsWorld GetPhysicsWorld(PhysicsAdaptor adaptorHandle)
   return PhysicsWorld{worldPtr.Get()};
 }
 
-} // namespace Dali::Toolkit::Physics::Integration
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Integration

@@ -58,7 +58,7 @@ using namespace Dali::Toolkit::Text;
 Debug::Filter* gTextEditorLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1558,4 +1558,4 @@ void TextEditor::TextEditorAccessible::RequestTextRelayout()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

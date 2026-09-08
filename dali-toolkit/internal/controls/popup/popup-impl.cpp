@@ -53,7 +53,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -2060,4 +2060,4 @@ Dali::Integration::Accessibility::States Popup::PopupAccessible::CalculateStates
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

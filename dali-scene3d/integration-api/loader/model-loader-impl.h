@@ -18,15 +18,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/model-loader.h>
 #include <dali-scene3d/integration-api/loader/resource-bundle.h>
+#include <dali-scene3d/public-api/api.h>
 
 // EXTERNAL INCLUDES
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -63,6 +63,6 @@ protected:
 };
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_LOADER_MODEL_LOADER_IMPL_H

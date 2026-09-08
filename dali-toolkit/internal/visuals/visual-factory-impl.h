@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -305,6 +305,6 @@ inline Internal::VisualFactory& GetImplementation(Toolkit::VisualFactory& factor
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H */

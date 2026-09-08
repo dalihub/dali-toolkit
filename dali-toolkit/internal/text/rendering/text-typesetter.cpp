@@ -38,7 +38,7 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter-impl.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -589,4 +589,4 @@ Typesetter::~Typesetter() = default;
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

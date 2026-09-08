@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 #include <cstring> // for strlen()
 
 // FILE HEADER
+#include <dali/public-api/common/dali-namespace.h>
 #include "xhtml-entities.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -351,4 +352,4 @@ const char* const NamedEntityToUtf8(const char* const markupText, unsigned int l
 
 } // namespace  Toolkit
 
-} // namespace  Dali
+} //namespace DALI_NAMESPACE

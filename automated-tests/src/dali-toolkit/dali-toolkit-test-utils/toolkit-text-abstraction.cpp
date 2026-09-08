@@ -29,7 +29,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Adaptor;
 
@@ -1093,4 +1093,4 @@ Length Shaping::Shape(TextAbstraction::FontClient& fontClient, unsigned int cons
 }
 
 } // namespace TextAbstraction
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -31,7 +31,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -485,6 +485,6 @@ inline const Internal::KeyboardFocusManager& GetImpl(const Dali::Toolkit::Keyboa
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H

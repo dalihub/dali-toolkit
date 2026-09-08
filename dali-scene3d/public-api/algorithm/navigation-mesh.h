@@ -29,12 +29,12 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 class NavigationMesh;
 }
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class NavigationMeshFactory;
 }
@@ -44,7 +44,7 @@ constexpr auto NAVIGATION_MESH_MAX_EDGES_PER_FACE    = 3u;
 constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_3D     = 3u;
 constexpr auto NAVIGATION_MESH_MAX_COMPONENTS_2D     = 2u;
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 // Using PImpling but not usual DALi handles as this object isn't supposed to be refcounted
 using NavigationMeshImpl = Dali::Scene3D::Internal::Algorithm::NavigationMesh;
@@ -276,5 +276,5 @@ public:
 //       data structures but differ in the way they use data.
 using ColliderMesh = NavigationMesh;
 
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm
 #endif // DALI_SCENE3D_NAVIGATION_MESH_H

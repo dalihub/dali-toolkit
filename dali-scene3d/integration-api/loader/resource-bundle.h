@@ -32,7 +32,7 @@
 #include <dali-scene3d/integration-api/loader/shader-definition.h>
 #include <dali-scene3d/integration-api/loader/skeleton-definition.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief The types of resources that .dli may define.
@@ -170,6 +170,6 @@ public: // DATA
   bool mResourcesGenerated;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADERERERER_RESOURCE_BUNDLE_H_

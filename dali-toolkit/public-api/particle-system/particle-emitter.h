@@ -24,12 +24,12 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleEmitter;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 class ParticleSource;
 
@@ -337,6 +337,6 @@ private:
   ParticleEmitter(Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter* impl);
   /// @endcond
 };
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_EMITTER_H

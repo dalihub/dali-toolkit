@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_EMITTER_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_EMITTER_H
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
 #include <dali-toolkit/public-api/particle-system/particle-renderer.h>
 #include <dali-toolkit/public-api/particle-system/particle-source.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class FrameCallback;
 class ParticleEmitter : public Dali::BaseObject, public Dali::ConnectionTracker
@@ -162,9 +162,9 @@ public:
   std::unique_ptr<FrameCallback> mFrameCallback;
 };
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 // Returns thread pool shared by whole particle system
 Dali::ThreadPool& GetThreadPool();
@@ -187,5 +187,5 @@ inline const Internal::ParticleEmitter& GetImplementation(const ParticleSystem::
   return static_cast<const Internal::ParticleEmitter&>(handle);
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_EMITTER_H

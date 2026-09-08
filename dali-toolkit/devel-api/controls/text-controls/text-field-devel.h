@@ -25,7 +25,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -545,6 +545,6 @@ DALI_TOOLKIT_API Dali::Property::Index RegisterFontVariationProperty(TextField t
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_FIELD_DEVEL_H

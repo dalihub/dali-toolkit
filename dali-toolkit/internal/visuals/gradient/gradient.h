@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -173,6 +173,6 @@ protected:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_GRADIENT_RENDERER_H

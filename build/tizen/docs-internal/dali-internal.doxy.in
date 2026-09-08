@@ -1161,7 +1161,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        =
+FILTER_PATTERNS        = @DALI_DOXYGEN_CONTENT_FILTER@
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for
@@ -2303,11 +2303,25 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
+# DALI_NAMESPACE stands in for the namespace name at every namespace definition
+# in DALi, so it has to be expanded here or the documented namespace would be the
+# macro name itself.
+#
+# Both values are filled in by CMake from the installed dali-namespace.h, so the
+# documentation names the namespace DALi was actually built with. When that is
+# Tizen::Dali, FILTER_PATTERNS below rewrites the Dali:: references in the hand
+# written pages to match, since doxygen cannot follow the namespace alias.
+#
+# DALI_DOXYGEN hides the compatibility alias in dali-namespace.h, which doxygen
+# would otherwise report as a recursive namespace alias.
 PREDEFINED             = DALI_CORE_API \
                          DALI_ADAPTOR_API \
                          DALI_TOOLKIT_API \
                          DALI_SCENE3D_API \
                          DALI_INTERNAL \
+                         DALI_NAMESPACE=@DALI_DOXYGEN_NAMESPACE@ \
+                         DALI_TIZEN_NAMESPACE=@DALI_DOXYGEN_TIZEN_NAMESPACE_VALUE@ \
+                         DALI_DOXYGEN
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -35,7 +35,7 @@ using Dali::Renderer;
 using Dali::Shader;
 using Dali::TextureSet;
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace Gles
 {
@@ -116,4 +116,4 @@ private:
   Gles::DebugRenderer* mImpl{nullptr};
 };
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

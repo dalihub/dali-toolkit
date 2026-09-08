@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali-physics/internal/physics-adaptor-impl.h>
 #include <dali-physics/internal/physics-world-impl.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 struct PhysicsAdaptor::ScopedPhysicsAccessor::Impl
 {
@@ -60,4 +60,4 @@ Dali::Any PhysicsAdaptor::ScopedPhysicsAccessor::HitTest(
   return mImpl->mPhysicsWorld.HitTest(rayFromWorld, rayToWorld, nativeFilter, localPivot, distanceFromCamera);
 }
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics

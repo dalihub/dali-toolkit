@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/input-method-context.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
+#include <dali/public-api/adaptor-framework/input-method-context.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Integration
 {
@@ -34,6 +34,6 @@ void SetPreeditStyle(Dali::InputMethodContext context, PreeditStyle type);
 } // namespace Test
 } // namespace InputMethodContext
 } // namespace Integration
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H

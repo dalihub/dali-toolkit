@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 #include <dali-toolkit/internal/text/strikethrough-character-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -108,4 +108,4 @@ void OverrideNestedStrikethroughCharacterRuns(Vector<StrikethroughCharacterRun>&
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -43,7 +43,7 @@ using Dali::Integration::ToStdString;
 #include <thread>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -997,4 +997,4 @@ void VectorAnimationTask::OnLoadCompleted(uint32_t /* not used */)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,10 +23,10 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/model-loader.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class DliInputParameter : public ModelLoader::InputParameter
 {
@@ -91,6 +91,6 @@ public:
   AnimationProcessor mAnimationPropertyProcessor;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_DLI_INPUT_PARAMETER_H

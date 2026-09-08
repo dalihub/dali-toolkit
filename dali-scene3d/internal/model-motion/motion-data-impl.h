@@ -27,11 +27,11 @@
 #include <utility> ///< for std::pair
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/model-motion/motion-data-load-task.h>
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
+#include <dali-scene3d/internal/model-motion/motion-data-load-task.h>
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -187,6 +187,6 @@ inline const Internal::MotionData& GetImplementation(const Dali::Scene3D::Motion
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_MOTION_MOTION_DATA_IMPL_H

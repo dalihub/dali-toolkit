@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace TextAbstraction
 {
@@ -113,6 +113,6 @@ DALI_TOOLKIT_API void CreateBitmapFont(const BitmapFontDescription& description,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_UTILS_DEVEL_H

@@ -25,7 +25,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -270,4 +270,4 @@ Property::Value Scrollable::GetProperty(BaseObject* object, Property::Index inde
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

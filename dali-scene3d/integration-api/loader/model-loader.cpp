@@ -32,7 +32,7 @@
 #include <dali-scene3d/internal/loader/glb-loader-impl.h>
 #include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -240,4 +240,4 @@ void ModelLoader::LoadResource(Dali::Scene3D::Loader::ResourceBundle::PathProvid
     GetResources().LoadResources(pathProvider);
   }
 }
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

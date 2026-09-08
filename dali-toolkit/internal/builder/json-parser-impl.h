@@ -30,7 +30,7 @@
 
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -152,6 +152,6 @@ inline Internal::JsonParser& GetImplementation(Toolkit::JsonParser& parser)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_JSON_PARSER_IMPL_H

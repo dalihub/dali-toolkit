@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/toolkit-constraint-tag-ranges.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -565,4 +565,4 @@ void ScrollViewConstraints::SetInternalConstraints(ScrollView& scrollView)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

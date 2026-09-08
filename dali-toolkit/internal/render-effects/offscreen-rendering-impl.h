@@ -34,7 +34,7 @@
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -122,5 +122,5 @@ private:
 };
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 #endif //DALI_TOOLKIT_INTERNAL_OFFSCREEN_RENDERING_IMPL

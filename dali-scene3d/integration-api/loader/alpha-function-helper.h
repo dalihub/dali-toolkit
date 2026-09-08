@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Given a name, provides an AlphaFunction.
@@ -42,6 +42,6 @@ AlphaFunction DALI_SCENE3D_API GetAlphaFunction(const Dali::String& name, bool* 
  */
 void DALI_SCENE3D_API RegisterAlphaFunction(const Dali::String& name, AlphaFunction alphaFn) noexcept(false);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_ALPHA_FUNCTION_HELPER_H_

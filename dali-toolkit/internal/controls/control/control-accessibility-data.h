@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/controls/control/control-internal.h>
 #include <dali/public-api/common/shared-ptr.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 // private inner class
 class Control::AccessibilityData : public ConnectionTracker
@@ -146,9 +146,9 @@ public:
     std::string value{};
     std::string automationId{};
 
-    uint32_t                                                                           states{};
+    uint32_t                                                                                         states{};
     std::map<Dali::Toolkit::Accessibility::RelationType, std::set<Dali::Accessibility::Accessible*>> relations{};
-    Property::Map                                                                     extraAttributes{};
+    Property::Map                                                                                    extraAttributes{};
 
     Internal::TriStateProperty isHighlightable : 3;
     bool                       isHidden : 1;
@@ -158,7 +158,7 @@ public:
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
-  Dali::PropertyNotification                  mAccessibilityPositionNotification;
+  Dali::PropertyNotification                         mAccessibilityPositionNotification;
   Dali::Devel::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Dali::Devel::Accessibility::ScreenRelativeMoveType::OUTSIDE};
 
   Toolkit::ControlImpl& mControlImpl;
@@ -166,5 +166,5 @@ private:
   bool mIsAccessibilityPositionPropertyNotificationSet : 1;
   bool mIsAccessibilityPropertySetSignalRegistered : 1;
 };
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 #endif // DALI_TOOLKIT_CONTROL_ACCESSIBILITY_DATA_H

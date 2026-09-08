@@ -24,16 +24,16 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Texture;
 }
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleRenderer;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 /**
  * @brief Blending modes for particle renderer
@@ -99,6 +99,6 @@ private:
   ParticleRenderer(Internal::ParticleRenderer* impl);
   /// @endcond
 };
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_RENDERER_H

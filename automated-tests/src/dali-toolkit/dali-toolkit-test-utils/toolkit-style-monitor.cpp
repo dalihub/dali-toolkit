@@ -77,7 +77,7 @@ public:
 };
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -298,7 +298,7 @@ StyleMonitor::StyleMonitor(Internal::Adaptor::StyleMonitor* internal)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

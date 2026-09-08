@@ -41,7 +41,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -656,7 +656,7 @@ bool Controller::TextUpdater::RemoveText(
       {
         std::string utf8;
         Utf32ToUtf8(first, numberOfCharacters, utf8);
-        if (!isDeletingPreEdit)
+        if(!isDeletingPreEdit)
         {
           impl.mEditableControlInterface->TextDeleted(cursorIndex, numberOfCharacters, utf8);
         }
@@ -896,4 +896,4 @@ void Controller::TextUpdater::RemoveTextAnchor(Controller& controller, int curso
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

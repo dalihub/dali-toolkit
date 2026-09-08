@@ -24,14 +24,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 #include <toolkit-lifecycle-controller.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 bool ToolkitTestApplication::DECODED_IMAGES_SUPPORTED;
 bool ToolkitTestApplication::ADD_IDLE_SUCCESS                       = true;
@@ -192,7 +192,7 @@ void ToolkitTestApplication::RunIdles()
   AdaptorImpl::GetImpl(*mAdaptor.get()).RunIdles();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::ToolkitTestApplication
 {

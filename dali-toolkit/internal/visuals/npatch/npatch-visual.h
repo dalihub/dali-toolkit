@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -214,6 +214,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H

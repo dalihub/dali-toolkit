@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -171,6 +171,6 @@ public: // Not intended for application developers
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_MOTION_MOTION_INDEX_H

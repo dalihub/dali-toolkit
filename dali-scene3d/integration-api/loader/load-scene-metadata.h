@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Defines the matadata for an image.
@@ -68,6 +68,6 @@ struct SceneMetadata
  */
 DALI_SCENE3D_API void LoadSceneMetadata(const Dali::String& url, SceneMetadata& sceneMetadata);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_LOAD_SCENE_METADATA_H_

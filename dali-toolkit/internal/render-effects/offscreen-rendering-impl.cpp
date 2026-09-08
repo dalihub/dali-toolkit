@@ -31,7 +31,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -211,4 +211,4 @@ void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask task)
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

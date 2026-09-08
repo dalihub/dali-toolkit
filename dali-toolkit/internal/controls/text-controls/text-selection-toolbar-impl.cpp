@@ -34,7 +34,7 @@
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -397,4 +397,4 @@ TextSelectionToolbar::~TextSelectionToolbar()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

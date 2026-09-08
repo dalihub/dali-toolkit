@@ -28,7 +28,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -136,6 +136,6 @@ Dali::PixelData GetCachedPixelData(const std::string& url,
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_CACHE_MANAGER_H

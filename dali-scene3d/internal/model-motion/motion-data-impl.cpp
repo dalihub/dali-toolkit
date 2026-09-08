@@ -32,7 +32,7 @@
 
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -258,4 +258,4 @@ void MotionData::OnLoadCompleted(MotionDataLoadTaskPtr task)
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

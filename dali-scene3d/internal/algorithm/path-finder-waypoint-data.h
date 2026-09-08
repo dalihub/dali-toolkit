@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_PATH_FINDER_WAYPOINT_DATA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <cinttypes>
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 class NavigationMesh;
 
@@ -49,6 +49,6 @@ struct WayPointData
   // internal data needed for processing
   const NavigationMesh::Edge* edge; ///< Edge between this face and next face
 };
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 
 #endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_WAYPOINT_DATA_H

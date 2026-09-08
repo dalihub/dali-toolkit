@@ -2,7 +2,7 @@
 #define TEST_ENCODED_IMAGE_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 // util function to convert local file to EncodedImageBuffer
 EncodedImageBuffer ConvertFileToEncodedImageBuffer(const char* url, EncodedImageBuffer::ImageType imageType = EncodedImageBuffer::ImageType::DEFAULT);
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_ENCODED_IMAGE_BUFFER_H

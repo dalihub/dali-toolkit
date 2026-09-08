@@ -37,7 +37,7 @@ using Dali::Radian;
 using Dali::Vector3;
 using Dali::Vector4;
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace
 {
@@ -182,4 +182,4 @@ int PhysicsDebugRenderer::getDebugMode() const
   return true;
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

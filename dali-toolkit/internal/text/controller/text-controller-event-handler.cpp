@@ -49,7 +49,7 @@ const char* KEY_INSERT_NAME = "Insert";
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -811,20 +811,20 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
 }
 
 Dali::Integration::InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextEvent(
-  Controller& controller,
-  InputMethodContext& inputMethodContext,
+  Controller&                                             controller,
+  InputMethodContext&                                     inputMethodContext,
   const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent)
 {
   DALI_LOG_RELEASE_INFO("EventHandler eventName: [%d] predictveString: [%s]\n", inputMethodContextEvent.eventName, inputMethodContextEvent.predictiveString.CStr());
   static_cast<void>(inputMethodContext);
 
-  EventData* const eventData          = controller.mImpl->mEventData;
-  const bool       isInputTextEvent   = (Dali::Integration::InputMethodContext::COMMIT == inputMethodContextEvent.eventName) ||
-                                      (Dali::Integration::InputMethodContext::PRE_EDIT == inputMethodContextEvent.eventName);
-  const bool       inputBeforeEditing = eventData &&
-                                      isInputTextEvent &&
-                                      ((EventData::INACTIVE == eventData->mState) ||
-                                       (EventData::INTERRUPTED == eventData->mState));
+  EventData* const eventData        = controller.mImpl->mEventData;
+  const bool       isInputTextEvent = (Dali::Integration::InputMethodContext::COMMIT == inputMethodContextEvent.eventName) ||
+                                (Dali::Integration::InputMethodContext::PRE_EDIT == inputMethodContextEvent.eventName);
+  const bool inputBeforeEditing = eventData &&
+                                  isInputTextEvent &&
+                                  ((EventData::INACTIVE == eventData->mState) ||
+                                   (EventData::INTERRUPTED == eventData->mState));
 
   if(inputBeforeEditing)
   {
@@ -967,12 +967,12 @@ Dali::Integration::InputMethodContext::CallbackData Controller::EventHandler::On
 
   if(controller.mImpl->mEventData)
   {
-    EventData* const updatedEventData  = controller.mImpl->mEventData;
+    EventData* const   updatedEventData = controller.mImpl->mEventData;
     const unsigned int logicalTextCount = static_cast<unsigned int>(controller.mImpl->mModel->mLogicalModel->mText.Count());
     const bool         placeholderWithInputState(updatedEventData->mIsShowingPlaceholderText &&
-                                           ((0u != logicalTextCount) ||
-                                            (0u != updatedEventData->mPrimaryCursorPosition) ||
-                                            updatedEventData->mPreEditFlag));
+                                                 ((0u != logicalTextCount) ||
+                                          (0u != updatedEventData->mPrimaryCursorPosition) ||
+                                          updatedEventData->mPreEditFlag));
 
     if(inputBeforeEditing || placeholderWithInputState)
     {
@@ -1128,4 +1128,4 @@ void Controller::EventHandler::TextPopupButtonTouched(Controller& controller, Da
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

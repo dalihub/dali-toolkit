@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/model-components/model-node-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -173,4 +173,4 @@ bool ModelNode::IsShadowReceiving() const
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

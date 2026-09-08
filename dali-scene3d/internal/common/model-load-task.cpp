@@ -33,7 +33,7 @@ using Dali::Integration::ToDaliString;
 #include <thread>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -194,4 +194,4 @@ Dali::Scene3D::Loader::Customization::Choices& ModelLoadTask::GetResourceChoices
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

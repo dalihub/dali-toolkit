@@ -26,7 +26,7 @@
 
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -224,4 +224,4 @@ SceneView::CameraTransitionFinishedSignalType& SceneView::CameraTransitionFinish
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

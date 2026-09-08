@@ -24,7 +24,7 @@
 #include <dali-toolkit/internal/image-loader/loading-task.h>
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -123,6 +123,6 @@ private: // Member Variables:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXTURE_ASYNC_LOADING_HELPER_H

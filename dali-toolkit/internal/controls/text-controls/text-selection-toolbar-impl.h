@@ -28,7 +28,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -208,6 +208,6 @@ inline const Toolkit::Internal::TextSelectionToolbar& GetImpl(const Toolkit::Tex
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H

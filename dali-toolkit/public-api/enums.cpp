@@ -17,7 +17,7 @@
 
 #include <dali-toolkit/public-api/enums.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -35,4 +35,4 @@ bool IsHorizontal(ControlOrientation::Type orientation)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

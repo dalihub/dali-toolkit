@@ -37,7 +37,7 @@
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -661,6 +661,6 @@ inline const Toolkit::Internal::TextLabel& GetImpl(const Toolkit::TextLabel& tex
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H

@@ -24,7 +24,7 @@
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
 #include <dali-physics/internal/physics-world-impl.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class ChipmunkPhysicsWorld : public PhysicsWorld
 {
@@ -65,4 +65,4 @@ private:
   UniquePtr<PhysicsDebugRenderer> mDebugRenderer;
 };
 
-} //namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

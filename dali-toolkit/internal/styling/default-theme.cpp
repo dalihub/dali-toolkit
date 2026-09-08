@@ -20,7 +20,7 @@
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/integration-api/debug.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -63,9 +63,9 @@ void DefaultTheme::ApplyDefaultStyle(Toolkit::TextLabel textLabel)
   // Apply TextLabel style directly using Property::Index keys
   for(Property::Map::SizeType i = 0; i < mTextLabelStyle.Count(); ++i)
   {
-    const auto& keyValuePair = mTextLabelStyle.GetKeyValue(i);
-    const Property::Key& key = keyValuePair.first;
-    const Property::Value& value = keyValuePair.second;
+    const auto&            keyValuePair = mTextLabelStyle.GetKeyValue(i);
+    const Property::Key&   key          = keyValuePair.first;
+    const Property::Value& value        = keyValuePair.second;
     textLabel.SetProperty(key.indexKey, value);
   }
 }
@@ -86,9 +86,9 @@ void DefaultTheme::ApplyDefaultStyle(Toolkit::TextField textField)
   // Apply TextField style directly using Property::Index keys
   for(Property::Map::SizeType i = 0; i < mTextFieldStyle.Count(); ++i)
   {
-    const auto& keyValuePair = mTextFieldStyle.GetKeyValue(i);
-    const Property::Key& key = keyValuePair.first;
-    const Property::Value& value = keyValuePair.second;
+    const auto&            keyValuePair = mTextFieldStyle.GetKeyValue(i);
+    const Property::Key&   key          = keyValuePair.first;
+    const Property::Value& value        = keyValuePair.second;
     textField.SetProperty(key.indexKey, value);
   }
 }
@@ -109,13 +109,13 @@ void DefaultTheme::ApplyDefaultStyle(Toolkit::TextEditor textEditor)
   // Apply TextEditor style directly using Property::Index keys
   for(Property::Map::SizeType i = 0; i < mTextEditorStyle.Count(); ++i)
   {
-    const auto& keyValuePair = mTextEditorStyle.GetKeyValue(i);
-    const Property::Key& key = keyValuePair.first;
-    const Property::Value& value = keyValuePair.second;
+    const auto&            keyValuePair = mTextEditorStyle.GetKeyValue(i);
+    const Property::Key&   key          = keyValuePair.first;
+    const Property::Value& value        = keyValuePair.second;
     textEditor.SetProperty(key.indexKey, value);
   }
 }
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

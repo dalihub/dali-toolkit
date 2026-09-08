@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/json-parser-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -109,4 +109,4 @@ JsonParser::JsonParser(Internal::JsonParser* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

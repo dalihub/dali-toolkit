@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 const float AnimationDefinition::DEFAULT_DURATION_SECONDS = 1.f;
 const float AnimationDefinition::MIN_DURATION_SECONDS     = 1e-2f;
@@ -182,4 +182,4 @@ const AnimatedProperty& AnimationDefinition::GetPropertyAt(uint32_t index) const
   return mProperties[index];
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

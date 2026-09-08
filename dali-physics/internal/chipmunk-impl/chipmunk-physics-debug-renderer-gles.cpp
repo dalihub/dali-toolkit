@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 // Internal Includes
 #include <dali-physics/internal/physics-debug-renderer-gles.h>
 
-namespace Dali::Toolkit::Physics::Internal::Gles
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal::Gles
 {
 struct DebugRenderer
 {
@@ -38,7 +38,7 @@ struct DebugRenderer
   GLuint mVertexBufferId{0u};
   GLuint mProgramId{0u};
 };
-} // namespace Dali::Toolkit::Physics::Internal::Gles
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal::Gles
 
 namespace
 {

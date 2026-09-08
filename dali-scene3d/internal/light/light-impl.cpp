@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -399,4 +399,4 @@ void Light::UpdateShadowUniforms()
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

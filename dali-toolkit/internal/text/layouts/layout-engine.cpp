@@ -33,7 +33,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -405,7 +405,7 @@ struct Engine::Impl
         extendedToSecondHalf  = true; // Whether the logical index is extended to second half
         characterLogicalIndex = 0u;
         characterVisualIndex  = bidirectionalLineInfo.characterRun.characterIndex +
-                                (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
+                               (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
 
         // Keep adding the WhiteSpaces to the whiteSpaceLengthEndOfLine
         while(TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex)))
@@ -453,7 +453,7 @@ struct Engine::Impl
         // Convert the character in the logical order into the character in the visual order.
         const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex +
                                                     (bidirectionalLineInfo.visualToLogicalMapSecondHalf ? *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
-        const bool           isWhiteSpace         = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
+        const bool isWhiteSpace = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
 
         const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
 
@@ -526,7 +526,7 @@ struct Engine::Impl
       // Convert the character in the logical order into the character in the visual order.
       const CharacterIndex characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex +
                                                   (bidirectionalLineInfo.visualToLogicalMap ? *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex) : 0u);
-      const bool           isWhiteSpace         = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
+      const bool isWhiteSpace = TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex));
 
       const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
 
@@ -1237,8 +1237,8 @@ struct Engine::Impl
 
     CharacterIndex characterLogicalIndex = 0u;
     CharacterIndex characterVisualIndex  = bidiLine.characterRunForSecondHalfLine.characterIndex +
-                                           (bidiLine.visualToLogicalMapSecondHalf ? *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
-    bool           extendedToSecondHalf  = false; // Whether the logical index is extended to second half
+                                          (bidiLine.visualToLogicalMapSecondHalf ? *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex) : 0u);
+    bool extendedToSecondHalf = false; // Whether the logical index is extended to second half
 
     float penX = 0.f;
 
@@ -1259,7 +1259,7 @@ struct Engine::Impl
       extendedToSecondHalf  = true;
       characterLogicalIndex = 0u;
       characterVisualIndex  = bidiLine.characterRun.characterIndex +
-                              (bidiLine.visualToLogicalMap ? *(bidiLine.visualToLogicalMap + characterLogicalIndex) : 0u);
+                             (bidiLine.visualToLogicalMap ? *(bidiLine.visualToLogicalMap + characterLogicalIndex) : 0u);
 
       CalculateGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
                                  layoutParameters.textModel->mLogicalModel,
@@ -1366,12 +1366,8 @@ struct Engine::Impl
                     DevelText::EllipsisPosition::Type ellipsisPosition,
                     bool                              enforceEllipsisInSingleLine)
   {
-     const bool ellipsis    = enforceEllipsisInSingleLine ||
-                             (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded :
-                             (((mLayout == MULTI_LINE_BOX) &&
-                             !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) &&
-                             (penY - layout.descender + Max(0.f, GetLineSpacing(layout.ascender - layout.descender, mRelativeLineSize)) > layoutParameters.boundingBox.height)) ||
-                             ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
+    const bool ellipsis = enforceEllipsisInSingleLine ||
+                          (isAutoScrollEnabled ? isAutoScrollMaxTextureExceeded : (((mLayout == MULTI_LINE_BOX) && !((numberOfLines == 0) && (layout.length <= layoutParameters.boundingBox.width)) && (penY - layout.descender + Max(0.f, GetLineSpacing(layout.ascender - layout.descender, mRelativeLineSize)) > layoutParameters.boundingBox.height)) || ((mLayout == SINGLE_LINE_BOX) && (layout.length > layoutParameters.boundingBox.width))));
 
     const bool isMultiline = !enforceEllipsisInSingleLine && (mLayout == MULTI_LINE_BOX);
     if(ellipsis && (ellipsisPosition == DevelText::EllipsisPosition::END || !isMultiline))
@@ -2476,4 +2472,4 @@ void Engine::SetFontPixelSize(float pixelSize)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

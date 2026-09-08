@@ -31,6 +31,7 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/internal/common/model-load-task.h>
@@ -39,10 +40,9 @@
 #include <dali-scene3d/public-api/controls/model/model.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/light/light.h>
-#include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -507,6 +507,6 @@ inline const Dali::Scene3D::Internal::Model& GetImpl(const Dali::Scene3D::Model&
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_INTERNAL_MODEL_H

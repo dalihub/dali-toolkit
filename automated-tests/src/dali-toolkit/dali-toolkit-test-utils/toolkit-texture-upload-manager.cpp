@@ -28,7 +28,7 @@
 #include <test-graphics-controller.h>
 #include <toolkit-test-application.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -270,7 +270,7 @@ void TextureUploadManager::RequestUpload(ResourceId resourceId, PixelData pixelD
 
 } // namespace Devel
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

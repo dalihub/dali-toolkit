@@ -26,7 +26,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Internal
@@ -61,7 +61,7 @@ private:
   Timer(Internal::Adaptor::Timer* timer);
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

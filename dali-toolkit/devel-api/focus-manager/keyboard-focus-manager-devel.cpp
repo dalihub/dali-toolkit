@@ -19,7 +19,7 @@
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -69,4 +69,4 @@ void ResetFocusFinderRootActor(KeyboardFocusManager keyboardFocusManager)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

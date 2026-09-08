@@ -18,16 +18,16 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint>
-#include <string>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/slot-delegate.h>
+#include <cstdint>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -192,6 +192,6 @@ inline Internal::AtlasGlyphManager& GetImplementation(Toolkit::AtlasGlyphManager
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H

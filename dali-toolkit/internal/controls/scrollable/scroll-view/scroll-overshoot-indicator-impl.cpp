@@ -41,7 +41,7 @@ const float OVERSHOOT_NOTIFY_STEP       = 0.01f;                   // amount to 
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -367,4 +367,4 @@ ScrollOvershootEffectRipplePtr ScrollOvershootEffectRipple::New(bool vertical, S
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

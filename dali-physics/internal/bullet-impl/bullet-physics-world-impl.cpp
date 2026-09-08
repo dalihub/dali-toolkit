@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/update/frame-callback-interface.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 UniquePtr<PhysicsWorld> BulletPhysicsWorld::New(Dali::Actor rootActor, Dali::CallbackBase* updateCallback)
 {
@@ -143,4 +143,4 @@ Dali::Any BulletPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector3 
   return bodyPtr;
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal
