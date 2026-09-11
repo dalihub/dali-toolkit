@@ -107,6 +107,11 @@ std::string Window::GetNativeResourceId() const
   return "123";
 }
 
+WindowType Window::GetType() const
+{
+  return WindowType::NORMAL;
+}
+
 void Window::KeepRendering(float durationSeconds)
 {
   mScene.KeepRendering(durationSeconds);
