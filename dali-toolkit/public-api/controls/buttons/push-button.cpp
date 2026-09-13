@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -68,4 +68,4 @@ PushButton PushButton::DownCast(BaseHandle handle)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

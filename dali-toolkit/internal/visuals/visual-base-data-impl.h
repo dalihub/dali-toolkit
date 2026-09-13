@@ -35,7 +35,7 @@
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -572,6 +572,6 @@ struct Base::Impl
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H

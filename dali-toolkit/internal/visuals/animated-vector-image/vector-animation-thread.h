@@ -30,7 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -227,6 +227,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // #endif // DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H

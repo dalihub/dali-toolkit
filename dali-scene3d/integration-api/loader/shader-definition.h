@@ -28,7 +28,7 @@
 #include <dali-scene3d/integration-api/loader/renderer-state.h>
 #include <dali-scene3d/integration-api/loader/shader-option.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Defines a shader with paths to the files which define its
@@ -53,7 +53,7 @@ struct DALI_SCENE3D_API ShaderDefinition
   ShaderDefinition(const ShaderDefinition& other);
   ShaderDefinition& operator=(const ShaderDefinition& other) = delete;
 
-  ShaderDefinition(ShaderDefinition&&) = default;
+  ShaderDefinition(ShaderDefinition&&)            = default;
   ShaderDefinition& operator=(ShaderDefinition&&) = default;
 
   /**
@@ -90,6 +90,6 @@ public: // DATA
   bool     mUseBuiltInShader{false};
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_SHADER_DEFINITION_H

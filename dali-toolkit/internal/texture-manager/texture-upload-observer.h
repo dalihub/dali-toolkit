@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -102,6 +102,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H

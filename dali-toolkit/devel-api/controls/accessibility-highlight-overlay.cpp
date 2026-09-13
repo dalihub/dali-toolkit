@@ -40,7 +40,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali::Toolkit::DevelControl
+namespace DALI_NAMESPACE::Toolkit::DevelControl
 {
 namespace
 {
@@ -237,4 +237,4 @@ Bounds AccessibilityHighlightOverlay::GetOverlayExtents(Dali::Actor& sceneView, 
   return Bounds(x, y, actualExtent.width, actualExtent.height);
 }
 
-} // namespace Dali::Toolkit::DevelControl
+} //namespace DALI_NAMESPACE::Toolkit::DevelControl

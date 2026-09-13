@@ -18,14 +18,14 @@
  *
  */
 
-#include <dali/public-api/object/property-map.h>
-#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-field.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-field.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali/public-api/object/property-map.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -36,15 +36,15 @@ class DefaultTheme
 {
 public:
   static DefaultTheme& Get();
-  void ApplyDefaultStyle(Toolkit::TextLabel textLabel);
-  void ApplyDefaultStyle(Toolkit::TextField textField);
-  void ApplyDefaultStyle(Toolkit::TextEditor textEditor);
-  void Reset(); // Reload theme from StyleManager
+  void                 ApplyDefaultStyle(Toolkit::TextLabel textLabel);
+  void                 ApplyDefaultStyle(Toolkit::TextField textField);
+  void                 ApplyDefaultStyle(Toolkit::TextEditor textEditor);
+  void                 Reset(); // Reload theme from StyleManager
 
 private:
   DefaultTheme();
-  ~DefaultTheme() = default;
-  DefaultTheme(const DefaultTheme&) = delete;
+  ~DefaultTheme()                              = default;
+  DefaultTheme(const DefaultTheme&)            = delete;
   DefaultTheme& operator=(const DefaultTheme&) = delete;
 
 private:
@@ -55,6 +55,6 @@ private:
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_DEFAULT_THEME_H

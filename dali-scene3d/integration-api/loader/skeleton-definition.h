@@ -24,7 +24,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/matrix.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief A set of joints (stored as node indices), and an optional root node index.
@@ -47,6 +47,6 @@ struct DALI_SCENE3D_API SkeletonDefinition
   Dali::Vector<Joint> mJoints;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_SKELETON_H

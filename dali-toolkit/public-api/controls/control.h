@@ -30,7 +30,7 @@
 #include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -659,6 +659,6 @@ public: // Templates for Deriving Classes
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_CONTROL_H

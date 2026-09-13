@@ -29,7 +29,7 @@ void utc_dali_toolkit_internal_render_effect_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 namespace Internal
 {
@@ -125,7 +125,7 @@ TestRenderEffect::TestRenderEffect(Internal::TestRenderEffectImpl* testRenderEff
 : RenderEffect(testRenderEffectImpl)
 {
 }
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 using namespace Dali::Toolkit;
 

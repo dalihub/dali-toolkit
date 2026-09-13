@@ -40,7 +40,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -270,4 +270,4 @@ Dali::Shader CameraView::CreateShader(Dali::NativeImagePtr nativeImagePtr)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

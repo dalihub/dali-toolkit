@@ -19,10 +19,10 @@
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/integration-api/loader/environment-map-loader.h>
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -69,4 +69,4 @@ Dali::Scene3D::EnvironmentMapType EnvironmentMapLoadTask::GetEnvironmentMapType(
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

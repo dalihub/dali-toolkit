@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE3D_LOADER_USD_UTILS_H
 #define DALI_SCENE3D_LOADER_USD_UTILS_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 using UsdShaderContainer = std::vector<pxr::UsdShadeShader>;
 using UsdAssetBuffer     = std::vector<uint8_t>;
@@ -187,6 +187,6 @@ pxr::VtArray<T> GetTriangulatedAttribute(const pxr::VtArray<int>& countArray, co
   return returnArray;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_USD_UTILS_H

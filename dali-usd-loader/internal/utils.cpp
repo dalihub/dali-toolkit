@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 using namespace Dali;
 using namespace pxr;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -118,4 +118,4 @@ UsdAssetBuffer LoadAssetFileAsBuffer(const std::string resolvedAssetPath)
   return UsdAssetBuffer();
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

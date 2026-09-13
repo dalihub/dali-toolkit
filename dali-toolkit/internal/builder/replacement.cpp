@@ -24,7 +24,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -641,4 +641,4 @@ OptionalInsets Replacement::IsInsets(OptionalChild child) const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

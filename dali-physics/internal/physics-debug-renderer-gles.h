@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
 
 // External Includes
 #include <GLES3/gl3.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Toolkit::Physics::Internal::Gles
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal::Gles
 {
 /**
  * Given the vertex and the fragment source, compiles them and creates the program.
@@ -28,4 +29,4 @@ namespace Dali::Toolkit::Physics::Internal::Gles
  * @return The program ID.
  */
 GLuint CreateProgram(const char* vertexSource, const char* fragmentSource);
-} // namespace Dali::Toolkit::Physics::Internal::Gles
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal::Gles

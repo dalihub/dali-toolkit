@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -81,6 +81,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_REMOTE_DECODE_TASK_H

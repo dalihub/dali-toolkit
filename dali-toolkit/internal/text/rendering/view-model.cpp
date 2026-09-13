@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/line-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -387,7 +387,7 @@ const float ViewModel::GetElidedOffset() const
 const bool ViewModel::GetCharacterDirection(CharacterIndex logicalIndex) const
 {
   auto   directions = mModel->GetCharacterDirections();
-  size_t length = directions.Count();
+  size_t length     = directions.Count();
   if(length == 0u || length <= logicalIndex)
   {
     return false;
@@ -488,7 +488,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
             startIndexOfEllipsis = (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) - ((ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs) > 0u ? 1u : 0u);
           }
 
-          Length EllidedLineIndex = 0u;
+          Length EllidedLineIndex                 = 0u;
           Length numberOfActualLaidOutGlyphsCount = 0u;
           for(Length lineIndex = 0u; lineIndex < numberOfLines; lineIndex++)
           {
@@ -667,7 +667,7 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
                   }
                 }
 
-                position.x    += ellipsisGlyph.xBearing;
+                position.x += ellipsisGlyph.xBearing;
                 position.y    = penY - ellipsisGlyph.yBearing;
                 mElidedOffset = position.x + mElidedOffset < 0.0f ? -position.x : mElidedOffset;
                 inserted      = true;
@@ -867,4 +867,4 @@ const Vector<CharacterDirection>& ViewModel::GetCharacterDirections() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -46,7 +46,7 @@ constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_IMAGE_PERFORMANCE_MARKER, false);
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1540,4 +1540,4 @@ void TextureManager::UpdateExternalTextureInfo(TextureManager::TextureInfo& text
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

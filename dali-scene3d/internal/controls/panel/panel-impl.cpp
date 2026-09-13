@@ -30,6 +30,8 @@
 #include <filesystem>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/light-parameters.h>
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/controls/scene-view/scene-view-impl.h>
 #include <dali-scene3d/internal/event/collider-mesh-processor.h>
@@ -38,12 +40,10 @@
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
 #include <dali-scene3d/public-api/controls/panel/panel.h>
-#include <dali-scene3d/integration-api/loader/light-parameters.h>
-#include <dali-scene3d/integration-api/loader/shader-manager.h>
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -680,4 +680,4 @@ void Panel::UpdateRenderTask()
 
 } // namespace Internal
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

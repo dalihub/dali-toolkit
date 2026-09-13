@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/visuals/visual-shader-factory-interface.h>
 #include <string_view>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -118,6 +118,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H

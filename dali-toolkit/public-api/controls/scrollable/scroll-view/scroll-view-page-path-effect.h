@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class Path;
@@ -120,6 +120,6 @@ protected:
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_SCROLL_VIEW_PAGE_PATH_EFFECT_H

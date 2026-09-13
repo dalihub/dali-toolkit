@@ -66,7 +66,7 @@ void PrintNodes(Toolkit::Internal::FlexContainer::FlexItemNodeContainer itemNode
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -838,4 +838,4 @@ void FlexContainer::OnInitialize()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

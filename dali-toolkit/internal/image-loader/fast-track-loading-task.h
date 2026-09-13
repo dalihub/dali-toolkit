@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -154,6 +154,6 @@ public:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_FAST_TRACK_IMAGE_LOADING_TASK_H

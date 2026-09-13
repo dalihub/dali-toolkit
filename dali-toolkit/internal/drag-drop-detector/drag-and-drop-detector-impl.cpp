@@ -23,7 +23,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <algorithm>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -306,4 +306,4 @@ DragAndDropDetector::~DragAndDropDetector()
 
 } //namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

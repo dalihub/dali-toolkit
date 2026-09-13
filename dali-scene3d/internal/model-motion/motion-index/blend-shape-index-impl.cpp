@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h> ///< For BlendShapes::WEIGHTS_UNIFORM
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -126,4 +126,4 @@ Property::Index BlendShapeIndex::GetPropertyIndex(Scene3D::ModelNode node)
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -151,6 +151,6 @@ public: // Not intended for application developers
 };
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TRANSITION_DATA_H

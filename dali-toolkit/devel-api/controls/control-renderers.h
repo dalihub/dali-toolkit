@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::DevelControl
+namespace DALI_NAMESPACE::Toolkit::DevelControl
 {
 
 /**
@@ -60,6 +60,6 @@ DALI_TOOLKIT_API void SetRendererTexture(Dali::Renderer renderer, Dali::Texture 
  */
 DALI_TOOLKIT_API void SetRendererTexture(Dali::Renderer renderer, Dali::FrameBuffer frameBuffer);
 
-} // Dali::Toolkit::DevelControl
+} //namespace DALI_NAMESPACE::Toolkit::DevelControl
 
 #endif // DALI_TOOLKIT_CONTROL_RENDERERS_H

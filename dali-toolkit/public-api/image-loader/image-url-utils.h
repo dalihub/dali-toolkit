@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -103,6 +103,6 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffe
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_IMAGE_H

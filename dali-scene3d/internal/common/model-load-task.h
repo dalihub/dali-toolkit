@@ -25,13 +25,13 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/model-loader.h>
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/internal/common/model-cache-manager.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -127,6 +127,6 @@ private:
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_LOAD_TASK_H

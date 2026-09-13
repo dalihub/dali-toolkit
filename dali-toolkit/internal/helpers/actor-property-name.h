@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -84,6 +84,6 @@ inline Dali::Property::Index GetPropertyIndexWithCompatibility(const Dali::Handl
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_ACTOR_PROPERTY_NAME_H

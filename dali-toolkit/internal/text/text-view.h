@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/text-view-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -311,6 +311,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_VIEW_H

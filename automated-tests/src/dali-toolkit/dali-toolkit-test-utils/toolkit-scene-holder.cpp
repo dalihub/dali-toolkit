@@ -33,7 +33,7 @@
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -372,4 +372,4 @@ SceneHolder::FocusChangedGeneratedSignalType& SceneHolder::FocusChangedGenerated
 
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

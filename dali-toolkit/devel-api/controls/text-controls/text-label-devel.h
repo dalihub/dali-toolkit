@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -663,6 +663,6 @@ DALI_TOOLKIT_API AsyncHeightForWidthComputedSignalType& AsyncHeightForWidthCompu
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_LABEL_DEVEL_H

@@ -46,7 +46,7 @@ static void RequestLoadBrdfPixelData()
 
 } // unnamed namespace
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 EnvironmentDefinition::RawData
 EnvironmentDefinition::LoadRaw(const Dali::String& environmentsPath)
@@ -109,4 +109,4 @@ float EnvironmentDefinition::GetDefaultIntensity()
   return DEFAULT_INTENSITY;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

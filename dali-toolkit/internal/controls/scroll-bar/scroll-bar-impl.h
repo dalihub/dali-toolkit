@@ -33,7 +33,7 @@
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -387,6 +387,6 @@ inline const Toolkit::Internal::ScrollBar& GetImpl(const Toolkit::ScrollBar& scr
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H

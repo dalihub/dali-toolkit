@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace RendererState
 {
@@ -196,4 +196,4 @@ Type Parse(const char* string, size_t length, StringCallback onError)
 }
 
 } // namespace RendererState
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

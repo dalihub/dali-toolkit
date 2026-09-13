@@ -20,7 +20,7 @@
 #include <dali-toolkit/internal/particle-system/particle-source-impl.h>
 #include <memory>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 ParticleSource::ParticleSource(UniquePtr<ParticleSourceInterface>&& sourceUpdater)
 : mUpdater(std::move(sourceUpdater))
@@ -38,4 +38,4 @@ ParticleSourceInterface& ParticleSource::GetUpdater()
   return *mUpdater;
 }
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

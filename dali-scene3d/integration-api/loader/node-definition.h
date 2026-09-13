@@ -35,7 +35,7 @@
 #include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/public-api/model-components/model-node.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -195,7 +195,7 @@ public: // TYPES
     {
       auto choice = choices.Get(mTag);
       return Min(choice != Customization::NONE ? choice : 0,
-                      static_cast<Index>(node.mChildren.Size() - 1));
+                 static_cast<Index>(node.mChildren.Size() - 1));
     }
   };
 
@@ -339,6 +339,6 @@ public: // METHODS
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_LOADER_NODE_DEFINITION_H_

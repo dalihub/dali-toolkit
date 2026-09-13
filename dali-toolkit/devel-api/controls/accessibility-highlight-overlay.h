@@ -24,7 +24,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/weak-handle.h>
 
-namespace Dali::Toolkit::DevelControl
+namespace DALI_NAMESPACE::Toolkit::DevelControl
 {
 
 enum class OverlayHighlightMode : uint32_t
@@ -114,6 +114,6 @@ private:
   Dali::WeakHandle<Dali::Actor> mOverlayActor;
 };
 
-} // namespace Dali::Toolkit::DevelControl
+} //namespace DALI_NAMESPACE::Toolkit::DevelControl
 
 #endif // DALI_TOOLKIT_ACCESSIBILITY_HIGHLIGHT_OVERLAY_H

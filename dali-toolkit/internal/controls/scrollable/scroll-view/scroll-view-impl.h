@@ -32,7 +32,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1049,6 +1049,6 @@ inline const Toolkit::Internal::ScrollView& GetImpl(const Toolkit::ScrollView& s
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H

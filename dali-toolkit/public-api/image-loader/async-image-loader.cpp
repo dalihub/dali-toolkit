@@ -24,7 +24,7 @@
 
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -94,4 +94,4 @@ AsyncImageLoader::ImageLoadedSignalType& AsyncImageLoader::ImageLoadedSignal()
 }
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

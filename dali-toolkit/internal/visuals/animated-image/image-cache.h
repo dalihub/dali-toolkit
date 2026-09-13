@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -159,6 +159,6 @@ protected:
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H

@@ -37,7 +37,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_S
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -179,4 +179,4 @@ void SetWordBreakInfo(TextAbstraction::Segmentation& segmentation,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

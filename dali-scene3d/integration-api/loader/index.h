@@ -22,13 +22,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 using Index = uint32_t;
 
 constexpr Index INVALID_INDEX = static_cast<Index>(-1);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_INDEX_H_

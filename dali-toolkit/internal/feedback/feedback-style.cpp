@@ -52,7 +52,7 @@ void GetIfString(const Dali::Toolkit::TreeNode& node, const std::string& name, b
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -450,4 +450,4 @@ FeedbackPattern FeedbackStyle::GetFeedbackPattern(const std::string& pattern)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

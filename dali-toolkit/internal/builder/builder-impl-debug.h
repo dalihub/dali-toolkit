@@ -24,7 +24,7 @@
 
 #if defined(DEBUG_ENABLED)
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -57,7 +57,7 @@ std::string PropertyValueToString(const Property::Value& value);
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #else
 

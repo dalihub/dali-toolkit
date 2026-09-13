@@ -31,7 +31,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-data.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -193,6 +193,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_NPATCH_LOADER_H

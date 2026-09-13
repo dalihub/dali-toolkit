@@ -23,7 +23,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -83,4 +83,4 @@ int GetCharacterIndexAtPosition(TextEditor editor, float visualX, float visualY)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

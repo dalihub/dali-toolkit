@@ -25,7 +25,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -129,6 +129,6 @@ public: // Not intended for application developers
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_SPANNED_H

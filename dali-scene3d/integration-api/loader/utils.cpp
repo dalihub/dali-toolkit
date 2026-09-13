@@ -30,7 +30,7 @@
 #include <iostream>
 #include <locale>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -161,4 +161,4 @@ void ToUnixFileSeparators(Dali::String& path)
   path = ToDaliString(stdPath);
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

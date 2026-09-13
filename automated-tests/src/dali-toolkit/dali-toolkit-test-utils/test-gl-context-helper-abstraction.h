@@ -20,8 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-context-helper-abstraction.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /**
  * Class to emulate the GL context helper
@@ -59,6 +60,6 @@ private:
   TestGlContextHelperAbstraction& operator=(const TestGlContextHelperAbstraction&); ///< Undefined
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_GL_CONTEXT_HELPER_ABSTRACTION_H

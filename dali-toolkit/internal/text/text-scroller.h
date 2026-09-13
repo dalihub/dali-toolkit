@@ -31,7 +31,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -214,6 +214,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_SCROLLER_H

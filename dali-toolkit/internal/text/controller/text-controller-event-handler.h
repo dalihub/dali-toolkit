@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_EVENT_HANDLER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -122,8 +122,8 @@ struct Controller::EventHandler
   /// @copydoc Text::Controller::OnInputMethodContextEvent
   /// @param[in] controller A reference to the controller class
   static Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
-    Controller& controller,
-    InputMethodContext& inputMethodContext,
+    Controller&                                             controller,
+    InputMethodContext&                                     inputMethodContext,
     const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
@@ -147,6 +147,6 @@ struct Controller::EventHandler
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_CONTROLLER_EVENT_HANDLER_H

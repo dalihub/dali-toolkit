@@ -33,7 +33,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_PHYSI
 
 } // namespace
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 PhysicsAdaptor::PhysicsAdaptor()
 : mSlotDelegate(this)
@@ -127,4 +127,4 @@ UniquePtr<PhysicsWorld>& PhysicsAdaptor::GetPhysicsWorld()
   return mPhysicsWorld;
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

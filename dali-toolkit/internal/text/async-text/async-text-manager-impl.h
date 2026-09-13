@@ -30,7 +30,7 @@
 #include <dali-toolkit/internal/text/async-text/async-text-manager.h>
 #include <dali-toolkit/internal/text/async-text/text-loading-task.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -184,6 +184,6 @@ inline static const Internal::AsyncTextManager& GetImplementation(const AsyncTex
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_ASYNC_TEXT_MANAGER_IMPL_H

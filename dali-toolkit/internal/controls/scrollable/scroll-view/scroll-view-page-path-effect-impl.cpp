@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -102,4 +102,4 @@ void ScrollViewPagePathEffect::OnDetach(Toolkit::ScrollView& scrollView)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

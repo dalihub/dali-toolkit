@@ -27,7 +27,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/common/environment-map.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Stores the pixel data objects for environment map texture.
@@ -100,6 +100,6 @@ private:
   uint32_t                          mMipmapLevels{1u};
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ENVIRONMENT_MAP_DATA_H

@@ -30,7 +30,7 @@
 #include <dali/public-api/signals/callback.h>
 #include <memory> ///< for std::unique_ptr
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -178,6 +178,6 @@ private:
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_GL_SURFACE_VIEW_THREAD_H

@@ -36,7 +36,7 @@
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 #include "gl-view-interface-impl.h"
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 class GlView;
 
@@ -190,6 +190,6 @@ private:
 
 } // namespace Internal
 
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_DRAWABLE_VIEW_H

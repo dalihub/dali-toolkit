@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/scripting/enum-helper.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -201,6 +201,6 @@ extern const char* const CAP_NAME;
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H */

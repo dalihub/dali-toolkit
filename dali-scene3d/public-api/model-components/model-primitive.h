@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MODEL_PRIMITIVE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/model-components/material.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -179,6 +179,6 @@ public: // Not intended for application developers
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_COMPONENTS_MODEL_PRIMITIVE_H

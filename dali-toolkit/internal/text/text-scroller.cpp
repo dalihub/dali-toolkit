@@ -30,7 +30,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -331,4 +331,4 @@ void TextScroller::StartScrolling(Actor scrollingTextActor, float scrollAmount, 
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

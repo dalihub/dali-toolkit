@@ -28,7 +28,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -167,6 +167,6 @@ inline const Internal::TransitionSet& GetImplementation(const Dali::Toolkit::Tra
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TRANSITION_SET_H

@@ -1,11 +1,11 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/scene.h>
 #include "dbus-wrapper.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Accessibility
 {
@@ -398,4 +398,4 @@ bool Find(const std::vector<std::string>& collection, const std::string& key)
 }
 
 } // namespace Accessibility
-} // namespace Dali
+} //namespace DALI_NAMESPACE

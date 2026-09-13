@@ -20,7 +20,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -35,4 +35,4 @@ ScrollViewEffect::ScrollViewEffect(Internal::ScrollViewEffect* impl)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

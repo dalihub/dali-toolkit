@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace
 {
@@ -113,4 +113,4 @@ Dali::Quaternion PhysicsActor::GetActorRotation() const
   return mAdaptor.TranslateFromPhysicsSpace(Quaternion(q.w(), q.x(), q.y(), q.z()));
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

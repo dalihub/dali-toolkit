@@ -60,7 +60,7 @@
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -672,4 +672,4 @@ void VisualFactory::RegisterDiscardCallback()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

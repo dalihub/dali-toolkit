@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/transition/transition-set-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -56,4 +56,4 @@ void TransitionLifecycleController::RemoveTransitions(Dali::Toolkit::TransitionS
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

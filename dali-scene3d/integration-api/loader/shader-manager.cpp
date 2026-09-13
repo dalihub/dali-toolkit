@@ -28,11 +28,11 @@
 #include <locale>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/blend-shape-details.h>
+#include <dali-scene3d/integration-api/loader/node-definition.h>
 #include <dali-scene3d/internal/light/light-impl.h>
 #include <dali-scene3d/internal/loader/hash.h>
 #include <dali-scene3d/public-api/common/scene3d-constraint-tag-ranges.h>
-#include <dali-scene3d/integration-api/loader/blend-shape-details.h>
-#include <dali-scene3d/integration-api/loader/node-definition.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -49,7 +49,7 @@ using Dali::Integration::ConstraintSetInternalTag;
 using Dali::Integration::HandleRemoveConstraints;
 using Dali::Integration::ToDaliString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -500,4 +500,4 @@ void ShaderManager::SetShadowConstraintToUniformBlock()
   shadowViewProjectionConstraint.ApplyPost();
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

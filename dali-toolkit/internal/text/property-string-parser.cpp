@@ -26,7 +26,7 @@
 #include <dali-toolkit/devel-api/builder/tree-node.h>
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -80,4 +80,4 @@ void ParsePropertyString(const std::string& property, Property::Map& map)
 
 } //namespace Toolkit
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

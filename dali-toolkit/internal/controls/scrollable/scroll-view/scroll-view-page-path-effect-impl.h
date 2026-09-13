@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_PAGE_PATH_EFFECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -103,6 +103,6 @@ inline const Internal::ScrollViewPagePathEffect& GetImpl(const Dali::Toolkit::Sc
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_PAGE_PATH_EFFECT_H

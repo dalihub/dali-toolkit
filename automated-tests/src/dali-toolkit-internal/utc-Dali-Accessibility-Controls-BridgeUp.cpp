@@ -247,7 +247,7 @@ void utc_dali_toolkit_accessibility_control_bridgeup_cleanup(void)
   DBusWrapper::Install({}); // Clean up TestDBusWrapper
 }
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Devel::Accessibility
 {
@@ -257,7 +257,7 @@ std::ostream& operator<<(std::ostream& stream, const Address& address)
   return stream;
 }
 } // namespace Devel::Accessibility
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 int UtcDaliControlAccessibilityRaiseBridge(void)
 {
@@ -2642,7 +2642,7 @@ static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::
 
   Dali::Integration::Accessibility::EnumBitSet<Dali::Integration::Accessibility::Role, Dali::Integration::Accessibility::Role::MAX_COUNT> rolesRule;
   MatchType                                                                                                                               roleMatchType = MatchType::INVALID;
-  AtspiAccessibility::Collection::RoleMask                                                                                               rolesConverted{};
+  AtspiAccessibility::Collection::RoleMask                                                                                                rolesConverted{};
   if(!roles.empty())
   {
     for(auto role : roles)
@@ -2651,7 +2651,7 @@ static AtspiAccessibility::Collection::MatchRule GetMatchRule(std::vector<Dali::
     }
     const auto rolesRaw = rolesRule.GetRawData();
     std::copy(rolesRaw.begin(), rolesRaw.end(), rolesConverted.begin());
-    roleMatchType       = MatchType::ALL;
+    roleMatchType = MatchType::ALL;
   }
 
   return {

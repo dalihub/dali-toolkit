@@ -28,7 +28,7 @@
 #include <dali-physics/internal/physics-world-impl.h>
 #include <dali-physics/public-api/physics-adaptor.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class PhysicsWorld;
 class FrameCallback;
@@ -67,4 +67,4 @@ private:
   btSequentialImpulseConstraintSolver* mSolver{nullptr};
 };
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

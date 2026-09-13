@@ -23,7 +23,7 @@
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-adaptor-impl.h>
 #include <dali-physics/internal/chipmunk-impl/chipmunk-physics-debug-renderer.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace
 {
@@ -366,4 +366,4 @@ cpSpaceDebugColor PhysicsDebugRenderer::DrawColorForShape(cpShape* shape)
   }
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

@@ -73,7 +73,7 @@ using Dali::Integration::ToDaliStringView;
 //
 // Only this 2nd mode handles ActivateOnce
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -675,4 +675,4 @@ void GaussianBlurView::OnRenderTaskFinished(Dali::RenderTask renderTask)
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

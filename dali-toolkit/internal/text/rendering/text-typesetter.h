@@ -29,7 +29,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <memory> ///< for std::unique_ptr
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -252,6 +252,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_TYPESETTER_H

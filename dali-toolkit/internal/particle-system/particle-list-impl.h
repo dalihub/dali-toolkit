@@ -31,7 +31,7 @@
 #include <memory>
 #include <string>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 template<class T>
 struct StreamDataTypeWrapper
@@ -190,8 +190,8 @@ private:
   uint32_t mParticleStreamElementSize{0u};
 };
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
-namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 inline Internal::ParticleList& GetImplementation(ParticleSystem::ParticleList& source)
 {
@@ -211,6 +211,6 @@ inline const Internal::ParticleList& GetImplementation(const ParticleSystem::Par
   return static_cast<const Internal::ParticleList&>(handle);
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_LIST_H

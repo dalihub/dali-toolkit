@@ -27,7 +27,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/weak-handle.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -116,6 +116,6 @@ inline const Internal::Transition& GetImplementation(const Dali::Toolkit::Transi
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TRANSITION_H

@@ -24,7 +24,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -64,4 +64,4 @@ void WrapActorConstraint(Vector3& position, const PropertyInputContainer& inputs
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

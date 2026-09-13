@@ -26,7 +26,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Actor;
 class Layer;
@@ -118,6 +118,6 @@ KeyEventGeneratedSignalType&       KeyEventGeneratedSignal(Dali::Window window);
 WheelEventGeneratedSignalType&     WheelEventGeneratedSignal(Dali::Window window);
 } // namespace DevelWindow
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TOOLKIT_WINDOW_H

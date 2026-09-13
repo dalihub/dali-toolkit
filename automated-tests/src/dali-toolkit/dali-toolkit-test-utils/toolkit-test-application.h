@@ -23,15 +23,15 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <test-application.h>
 #include <toolkit-adaptor-impl.h>
 
 // #undef assert
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 class Adaptor;
@@ -99,7 +99,7 @@ private:
   const bool               mPreInitialized{false};
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::ToolkitTestApplication
 {

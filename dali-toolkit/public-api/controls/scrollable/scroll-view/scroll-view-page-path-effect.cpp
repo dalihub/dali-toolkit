@@ -23,7 +23,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -53,4 +53,4 @@ void ScrollViewPagePathEffect::ApplyToPage(Actor page, unsigned int pageOrder)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

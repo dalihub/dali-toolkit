@@ -29,7 +29,7 @@
 using namespace Dali;
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -87,4 +87,4 @@ GlyphyShader GlyphyShader::New(const Dali::Vector4& atlasInfo)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

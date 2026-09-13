@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/flex-container/flex-container-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -64,4 +64,4 @@ FlexContainer::FlexContainer(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

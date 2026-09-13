@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/builder/json-parser-state.h>
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -189,4 +189,4 @@ void JsonParser::DeleteRootNode() noexcept
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

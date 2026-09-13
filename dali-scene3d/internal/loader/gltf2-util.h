@@ -21,15 +21,15 @@
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/gltf2-asset.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/resource-bundle.h>
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/internal/loader/gltf2-asset.h>
 
 namespace gt = gltf2;
 namespace js = json;
 
-namespace Dali::Scene3D::Loader::Internal
+namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 {
 namespace Gltf2Util
 {
@@ -116,6 +116,6 @@ void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& 
 
 } // namespace Gltf2Util
 
-} // namespace Dali::Scene3D::Loader::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_GLTF2_UTIL_H

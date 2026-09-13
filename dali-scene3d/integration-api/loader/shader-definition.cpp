@@ -26,8 +26,8 @@
 #include <regex>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -42,7 +42,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_MOD
 #endif
 } // namespace
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -261,4 +261,4 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   return shader;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

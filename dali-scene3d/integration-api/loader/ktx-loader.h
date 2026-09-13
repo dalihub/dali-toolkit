@@ -18,10 +18,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/environment-map-data.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Loads cube map data texture from a ktx file.
@@ -33,6 +33,6 @@ namespace Dali::Scene3D::Loader
  */
 bool LoadKtxData(const Dali::String& path, EnvironmentMapData& environmentMapData);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_KTX_LOADER_H

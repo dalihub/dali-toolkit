@@ -33,7 +33,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/render-effects/render-effect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -245,5 +245,5 @@ inline const Toolkit::Internal::RenderEffectImpl& GetImplementation(const Toolki
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 #endif // DALI_TOOLKIT_INTERNAL_RENDER_EFFECT_H

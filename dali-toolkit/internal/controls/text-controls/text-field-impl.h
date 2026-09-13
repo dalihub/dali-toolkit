@@ -19,11 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
-#include <dali/integration-api/adaptor-framework/input-method-options.h>
 #include <dali/devel-api/atspi-interfaces/editable-text.h>
 #include <dali/devel-api/atspi-interfaces/hypertext.h>
 #include <dali/devel-api/atspi-interfaces/text.h>
+#include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
+#include <dali/integration-api/adaptor-framework/input-method-options.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -39,7 +39,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -463,7 +463,7 @@ private: // Implementation
    * @copydoc Dali::Toolkit::Text::Controller::OnInputMethodContextEvent()
    */
   Dali::Integration::InputMethodContext::CallbackData OnInputMethodContextEvent(
-    InputMethodContext inputMethodContext,
+    InputMethodContext                                      inputMethodContext,
     const Dali::Integration::InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
@@ -595,13 +595,13 @@ private: // Data
   // for Font Variations
   std::map<Dali::Property::Index, std::string> mVariationIndexMap; // Stores [CustomPropertyIndex, tag].
 
-  InputMethodContext               mInputMethodContext;
-  Text::ControllerPtr              mController;
-  Text::RendererPtr                mRenderer;
-  Text::DecoratorPtr               mDecorator;
-  Toolkit::Control                 mStencil;                  ///< For EXCEED_POLICY_CLIP
-  std::vector<Actor>               mClippingDecorationActors; ///< Decoration actors which need clipping.
-  std::vector<Toolkit::TextAnchor> mAnchorActors;
+  InputMethodContext                    mInputMethodContext;
+  Text::ControllerPtr                   mController;
+  Text::RendererPtr                     mRenderer;
+  Text::DecoratorPtr                    mDecorator;
+  Toolkit::Control                      mStencil;                  ///< For EXCEED_POLICY_CLIP
+  std::vector<Actor>                    mClippingDecorationActors; ///< Decoration actors which need clipping.
+  std::vector<Toolkit::TextAnchor>      mAnchorActors;
   Dali::Integration::InputMethodOptions mInputMethodOptions;
 
   Actor mRenderableActor;
@@ -695,6 +695,6 @@ inline const Toolkit::Internal::TextField& GetImpl(const Toolkit::TextField& tex
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H

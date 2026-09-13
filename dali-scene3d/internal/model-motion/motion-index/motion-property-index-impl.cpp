@@ -25,7 +25,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -100,4 +100,4 @@ Property::Index MotionPropertyIndex::GetPropertyIndex(Scene3D::ModelNode node)
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

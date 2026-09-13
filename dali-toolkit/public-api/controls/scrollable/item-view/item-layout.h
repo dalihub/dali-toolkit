@@ -31,7 +31,7 @@
 #undef min
 #undef max
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -432,6 +432,6 @@ protected:
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ITEM_LAYOUT_H

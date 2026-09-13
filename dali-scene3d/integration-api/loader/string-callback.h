@@ -23,8 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
+#include <dali/public-api/common/dali-namespace.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief A callback to post strings to.
@@ -38,6 +39,6 @@ using StringCallback = std::function<void(const std::string&)>;
  */
 DALI_SCENE3D_API void DefaultErrorCallback(const std::string& message);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_STRING_CALLBACK_H

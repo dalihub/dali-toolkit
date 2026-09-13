@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_COMPONENTS_MATERIAL_MODIFY_OBSERVER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/model-components/material.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -68,6 +68,6 @@ struct EnableBitMaskOperators<Scene3D::Internal::MaterialModifyObserver::ModifyF
   static const bool ENABLE = true;
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_COMPONENTS_MATERIAL_MODIFY_OBSERVER_H

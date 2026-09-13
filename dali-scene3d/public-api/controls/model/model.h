@@ -32,7 +32,7 @@
 #include <dali-scene3d/public-api/model-components/model-node.h>
 #include <dali-scene3d/public-api/model-motion/motion-data.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -492,6 +492,6 @@ public: // Not intended for application developers
  */
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_H

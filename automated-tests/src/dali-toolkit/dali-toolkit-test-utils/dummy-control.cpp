@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -424,4 +424,4 @@ DummyControl::DummyControl(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

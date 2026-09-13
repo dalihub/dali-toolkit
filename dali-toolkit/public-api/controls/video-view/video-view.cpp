@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -121,4 +121,4 @@ VideoView::VideoView(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

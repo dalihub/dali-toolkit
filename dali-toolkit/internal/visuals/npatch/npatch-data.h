@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -307,6 +307,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_NPATCH_DATA_H

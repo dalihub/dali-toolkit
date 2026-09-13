@@ -32,7 +32,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 namespace
 {
@@ -243,7 +243,6 @@ void Control::AccessibilityData::OnAccessibilityPropertySet(Dali::Handle handle,
       accessible->Emit(Dali::Devel::Accessibility::ObjectPropertyChangeEvent::VALUE);
       return;
     }
-
   }
 }
 
@@ -347,4 +346,4 @@ uint32_t Control::AccessibilityData::GetDefaultControlAccessibilityStates()
   return DEFAULT_DEVEL_CONTROL_ACCESSIBILITY_STATES_RAW_DATA;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

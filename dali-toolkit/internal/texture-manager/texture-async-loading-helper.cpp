@@ -31,7 +31,7 @@
 // STD INCLUDES
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -171,4 +171,4 @@ void TextureAsyncLoadingHelper::RemoteDecodeComplete(Dali::AsyncTaskPtr asyncTas
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

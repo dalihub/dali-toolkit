@@ -36,7 +36,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -517,4 +517,4 @@ bool MeshVisual::LoadTextures()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

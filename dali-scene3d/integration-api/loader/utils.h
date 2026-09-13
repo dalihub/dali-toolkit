@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Fixed size backing buffer to use with std::ostreams where control over allocations (which this does not make), is required.
@@ -216,6 +216,6 @@ DALI_SCENE3D_API Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type opt
  */
 DALI_SCENE3D_API void ToUnixFileSeparators(Dali::String& path);
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif /* DALI_SCENE3D_LOADER_UTILS_H_ */

@@ -40,7 +40,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 namespace
 {
@@ -1505,4 +1505,4 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
   }
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

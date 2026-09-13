@@ -22,20 +22,20 @@
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/dali-utility.h>
+#include <string.h>
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
-#include <string.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/integration-api/loader/ktx-loader.h>
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 
 #include <dali/integration-api/debug.h>
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -235,4 +235,4 @@ bool LoadEnvironmentMap(const std::string& environmentMapUrl, EnvironmentMapData
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

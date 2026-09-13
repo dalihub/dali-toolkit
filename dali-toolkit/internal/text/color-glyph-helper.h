@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -53,6 +53,6 @@ inline bool IsColorGlyphBuffer(const TextAbstraction::GlyphBufferData& glyphBitm
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_COLOR_GLYPH_HELPER_H

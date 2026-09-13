@@ -31,7 +31,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 using namespace Toolkit;
 
@@ -544,4 +544,4 @@ bool MaterialDefinition::CheckTextures(uint32_t flags) const
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

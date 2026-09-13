@@ -26,7 +26,7 @@
 
 #include <dali-toolkit/internal/controls/buttons/radio-button-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -77,4 +77,4 @@ RadioButton RadioButton::DownCast(BaseHandle handle)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -26,10 +26,10 @@
 #include <dali/public-api/math/quaternion.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/gltf2-asset.h> // for gltf2::UNDEFINED_FLOAT_VALUE
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/loader/gltf2-asset.h> // for gltf2::UNDEFINED_FLOAT_VALUE
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -269,4 +269,4 @@ bool CameraParameters::ConfigureCamera(CameraActor& camera, bool invertY) const
   return true;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

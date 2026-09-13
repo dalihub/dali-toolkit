@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -106,6 +109,6 @@ enum Type
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_HIDDEN_INPUT_PROPERTIES_H

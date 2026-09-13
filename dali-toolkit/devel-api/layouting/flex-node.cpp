@@ -34,7 +34,7 @@ using Dali::Integration::ToStdString;
 static Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FLEX");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -390,4 +390,4 @@ bool Node::IsDirty() const
 
 } // namespace Flex
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

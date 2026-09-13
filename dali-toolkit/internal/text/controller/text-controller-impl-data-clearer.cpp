@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/text/controller/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 
 void ControllerImplDataClearer::ClearFullModelData(Controller::Impl& impl, Controller::OperationsMask operations)
@@ -348,4 +348,4 @@ void ControllerImplDataClearer::ClearModelData(Controller::Impl& impl, Character
   model->mVisualModel->ClearCaches();
 }
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text

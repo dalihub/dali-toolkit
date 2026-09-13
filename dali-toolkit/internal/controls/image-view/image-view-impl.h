@@ -26,7 +26,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -256,6 +256,6 @@ inline const Toolkit::Internal::ImageView& GetImpl(const Toolkit::ImageView& obj
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H

@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include "array-2d.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -518,6 +518,6 @@ inline const Toolkit::Internal::TableView& GetImpl(const Toolkit::TableView& tab
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TABLE_VIEW_H

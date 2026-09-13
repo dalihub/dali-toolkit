@@ -22,7 +22,7 @@
 
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -83,6 +83,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_LINEAR_GRADIENT_H */

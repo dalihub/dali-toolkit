@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -90,6 +90,6 @@ struct Parameters
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H

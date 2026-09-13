@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch/npatch-data.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -291,4 +291,4 @@ void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* dat
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

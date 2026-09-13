@@ -43,7 +43,7 @@
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/underlined-glyph-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1418,4 +1418,4 @@ Typesetter::Impl::~Impl() = default;
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

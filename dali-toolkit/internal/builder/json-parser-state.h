@@ -26,7 +26,7 @@
 
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -444,6 +444,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_JSON_PARSE_STATE_H

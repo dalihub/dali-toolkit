@@ -18,8 +18,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/view-projection.h>
+#include <dali-scene3d/public-api/api.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
@@ -28,7 +28,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class CameraActor;
 
@@ -75,6 +75,6 @@ struct DALI_SCENE3D_API CameraParameters
 
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_LOADER_CAMERA_PARAMETERS_H

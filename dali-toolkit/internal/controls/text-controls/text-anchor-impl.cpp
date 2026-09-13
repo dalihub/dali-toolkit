@@ -38,7 +38,7 @@ using Dali::Integration::ToStdString;
 
 using namespace Dali::Toolkit::Text;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -241,4 +241,4 @@ bool TextAnchor::OnAccessibilityActivated()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

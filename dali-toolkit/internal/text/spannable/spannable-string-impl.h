@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/text/spannable/span-ranges-container-impl.h>
 #include <dali-toolkit/internal/text/spannable/spannable-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -144,6 +144,6 @@ inline const Internal::SpannableString& GetImplementation(const Dali::Toolkit::T
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_SPANNABLE_STRING_IMPL_H

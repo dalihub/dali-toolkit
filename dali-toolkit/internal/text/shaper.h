@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SHAPER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -71,6 +71,6 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_SHAPER_H

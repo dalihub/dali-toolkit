@@ -25,7 +25,7 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -269,6 +269,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_BUILDER_REPLACEMENT_H

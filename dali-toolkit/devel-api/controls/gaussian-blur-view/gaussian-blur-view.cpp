@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -137,4 +137,4 @@ GaussianBlurView::GaussianBlurViewSignal& GaussianBlurView::FinishedSignal()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

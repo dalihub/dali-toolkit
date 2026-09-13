@@ -25,7 +25,7 @@
 
 #include <dali-toolkit/internal/builder/builder-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -159,4 +159,4 @@ Builder::BuilderSignalType& Builder::QuitSignal()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

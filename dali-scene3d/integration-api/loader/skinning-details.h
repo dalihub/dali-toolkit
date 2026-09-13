@@ -23,11 +23,11 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/index.h>
+#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct DALI_SCENE3D_API Skinning
 {
@@ -56,6 +56,6 @@ public:
   Skinning() = delete;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_SKINNING_DETAILS_H_

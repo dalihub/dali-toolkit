@@ -23,7 +23,7 @@
 
 thread_local int gLocked{0};
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 /**
  * FrameCallback implementation. Will run the OnUpdate method.
@@ -181,4 +181,4 @@ Physics::PhysicsAdaptor::DebugState PhysicsWorld::GetDebugState() const
   return mPhysicsDebugState;
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

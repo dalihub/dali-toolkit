@@ -23,9 +23,9 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/rendering/shader.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 const unsigned int Skinning::MAX_JOINTS = 256;
 
 const char* Skinning::BONE_UNIFORM_NAME = "uBone";
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

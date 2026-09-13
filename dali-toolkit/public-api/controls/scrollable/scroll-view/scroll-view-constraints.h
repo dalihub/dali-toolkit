@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 struct Vector2;
 struct Vector3;
@@ -67,6 +67,6 @@ DALI_TOOLKIT_API void WrapActorConstraint(Vector3& position, const PropertyInput
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_SCROLL_VIEW_CONSTRAINTS_H

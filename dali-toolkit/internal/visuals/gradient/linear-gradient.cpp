@@ -17,7 +17,7 @@
 
 #include "linear-gradient.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -61,4 +61,4 @@ const Vector2& LinearGradient::GetEndPosition() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

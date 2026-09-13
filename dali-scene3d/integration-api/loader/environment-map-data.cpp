@@ -27,7 +27,7 @@
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/internal/graphics/builtin-shader-extern-gen.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 Texture EnvironmentMapData::GetTexture()
 {
@@ -100,4 +100,4 @@ Texture EnvironmentMapData::GetTexture()
   return mEnvironmentMapTexture;
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

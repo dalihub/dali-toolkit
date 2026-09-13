@@ -31,11 +31,11 @@
 #pragma GCC diagnostic pop
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/load-scene-metadata.h>
+#include <dali-scene3d/public-api/api.h>
 #include <dali-usd-loader/internal/utils.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class MaterialDefinition;
 
@@ -186,6 +186,6 @@ private:
    */
   bool ProcessImageBuffer(MaterialDefinition& materialDefinition, uint32_t semantic, const std::string& imagePath, UsdAssetBuffer&& imageBuffer, const ImageMetadataMap& imageMetaDataMap);
 };
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_USD_TEXTURE_CONVERTER_H

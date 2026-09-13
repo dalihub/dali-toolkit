@@ -22,7 +22,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -166,6 +166,9 @@ public:
    * @param[in] toValue End value of blur strength. Must be in range of [0.0f, 1.0f]
    * @note If toValue is smaller than fromValue, animation would show reversed(blurred->clarified) animation.
    * @note When choosing alpha function, note that gaussian curve itself is innately non-linear.
+   * @note Blur passes use full-resolution buffers while the animation is active so that low-strength output does not
+   * expose an upscaled downsampled image. If the animation finishes at strength 1, the configured downscale factor is
+   * restored. If it finishes at strength 0, blur rendering is bypassed until another strength animation is added.
    * @SINCE_2_4.15
    */
   void AddBlurStrengthAnimation(Animation& animation, AlphaFunction alphaFunction, TimePeriod timePeriod, float fromValue, float toValue);
@@ -220,5 +223,5 @@ public: // Not intended for use by Application developers
   ///@endcond
 };
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 #endif // DALI_TOOLKIT_BACKGROUND_BLUR_EFFECT_H

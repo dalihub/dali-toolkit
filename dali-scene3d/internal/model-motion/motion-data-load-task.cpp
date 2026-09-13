@@ -28,7 +28,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -137,4 +137,4 @@ MotionDataLoadTask::LoadMethod MotionDataLoadTask::GetLoadMethod() const
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

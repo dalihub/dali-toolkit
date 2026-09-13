@@ -26,7 +26,7 @@
 #include <iostream>
 #include <string>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 /**
  * Convert properties of handle into JSON output, separated into 'normal' and 'child' properties.
@@ -54,7 +54,7 @@ std::string DumpActor(Actor actor);
  */
 void DumpControlHierarchy(std::ostream& outputStream, Actor rootActor);
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 
 #endif
 

@@ -249,7 +249,7 @@ struct SpiralVisibilityConstraint
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -589,4 +589,4 @@ float SpiralLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLa
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,7 +23,7 @@
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/devel-api/common/circular-queue.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -197,16 +197,16 @@ private:
   };
   std::vector<TextureManager::TextureId> mTextureIds;
 
-  VisualUrl                  mImageUrl;
-  Dali::AnimatedImageLoading mAnimatedImageLoading;
-  uint32_t                   mFrameCount;
-  uint32_t                   mCacheSize;
-  std::vector<int32_t>       mIntervals;
-  std::vector<uint32_t>      mLoadWaitingQueue;
-  CircularQueue<ImageFrame>  mQueue;
-  Dali::WrapMode::Type       mWrapModeU : 3;
-  Dali::WrapMode::Type       mWrapModeV : 3;
-  bool                       mIsSynchronousLoading;
+  VisualUrl                    mImageUrl;
+  Dali::AnimatedImageLoading   mAnimatedImageLoading;
+  uint32_t                     mFrameCount;
+  uint32_t                     mCacheSize;
+  std::vector<int32_t>         mIntervals;
+  std::vector<uint32_t>        mLoadWaitingQueue;
+  CircularQueue<ImageFrame>    mQueue;
+  Dali::WrapMode::Type         mWrapModeU : 3;
+  Dali::WrapMode::Type         mWrapModeV : 3;
+  bool                         mIsSynchronousLoading;
   TextureManager::ReloadPolicy mReloadPolicy;
 };
 
@@ -214,6 +214,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H

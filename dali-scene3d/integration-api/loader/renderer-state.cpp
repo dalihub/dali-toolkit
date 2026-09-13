@@ -21,7 +21,7 @@
 // INTENRAL INCLUDES
 #include <dali-scene3d/integration-api/loader/utils.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -97,4 +97,4 @@ void Apply(Type rendererState, Renderer& renderer)
 
 } // namespace RendererState
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

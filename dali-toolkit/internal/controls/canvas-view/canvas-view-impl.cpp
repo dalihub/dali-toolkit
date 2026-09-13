@@ -41,7 +41,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -448,4 +448,4 @@ const bool CanvasView::IsRasterizationRequestManually() const
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

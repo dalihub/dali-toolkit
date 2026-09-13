@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class DALI_SCENE3D_API ShaderOption
 {
@@ -132,6 +132,6 @@ private:
   Dali::Vector<MacroDefinition> mMacros;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_SHADER_OPTION_H_

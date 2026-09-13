@@ -27,11 +27,11 @@
 #include <mutex>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/common/image-resource-loader.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
+#include <dali-scene3d/internal/common/image-resource-loader.h>
 
-namespace Dali::Scene3D::Internal
+namespace DALI_NAMESPACE::Scene3D::Internal
 {
 class ModelCacheManager::Impl : public Dali::BaseObject
 {
@@ -269,4 +269,4 @@ void ModelCacheManager::SetSceneLoading(std::string modelUri, bool isSceneLoadin
   impl.SetSceneLoading(modelUri, isSceneLoading);
 }
 
-} // namespace Dali::Scene3D::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Internal

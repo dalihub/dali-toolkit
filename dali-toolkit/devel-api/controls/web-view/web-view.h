@@ -26,7 +26,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-plugin.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class WebEngineContext;
 class WebEngineCookieManager;
@@ -970,6 +970,6 @@ public: // Not intended for application developers
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_WEB_VIEW_H

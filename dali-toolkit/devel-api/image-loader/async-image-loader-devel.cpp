@@ -17,7 +17,7 @@
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -58,4 +58,4 @@ PixelBufferLoadedSignalType& PixelBufferLoadedSignal(AsyncImageLoader asyncImage
 
 } // namespace DevelAsyncImageLoader
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

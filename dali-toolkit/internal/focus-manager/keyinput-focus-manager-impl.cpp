@@ -29,7 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -274,4 +274,4 @@ bool KeyInputFocusManager::DoConnectSignal(BaseObject* object, ConnectionTracker
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

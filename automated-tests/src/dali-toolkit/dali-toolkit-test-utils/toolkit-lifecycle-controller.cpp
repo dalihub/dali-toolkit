@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 /********************************************************************************
  * Stub for Dali::Internal::Adaptor::LifecycleController
@@ -130,4 +130,4 @@ LifecycleController::LifecycleController(Internal::Adaptor::LifecycleController*
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

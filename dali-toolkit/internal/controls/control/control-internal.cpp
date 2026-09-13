@@ -20,13 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
+#include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
@@ -69,7 +69,7 @@ using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 extern const Dali::Scripting::StringEnum ControlStateTable[];
 extern const unsigned int                ControlStateTableCount;
@@ -2282,4 +2282,4 @@ void Control::Process(bool postProcessor)
   mProcessorRegistered = false;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

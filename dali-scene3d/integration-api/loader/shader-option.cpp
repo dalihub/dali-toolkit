@@ -29,7 +29,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -183,4 +183,4 @@ Dali::StringView ShaderOption::GetDefineKeyword(Type shaderOptionType)
   return OPTION_KEYWORD[static_cast<uint32_t>(shaderOptionType)];
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

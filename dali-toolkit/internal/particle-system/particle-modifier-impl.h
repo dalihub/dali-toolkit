@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-modifier.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleList;
 class ParticleEmitter;
@@ -41,9 +41,9 @@ private:
   UniquePtr<ParticleModifierInterface> mUpdater;
 };
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 inline Internal::ParticleModifier& GetImplementation(ParticleSystem::ParticleModifier& source)
 {
@@ -63,6 +63,6 @@ inline const Internal::ParticleModifier& GetImplementation(const ParticleSystem:
   return static_cast<const Internal::ParticleModifier&>(handle);
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_MODIFIER_H

@@ -24,7 +24,7 @@
 
 #include <locale>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -158,4 +158,4 @@ bool NpatchShaderFactory::SavePrecompileShader(VisualFactoryCache::ShaderType sh
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

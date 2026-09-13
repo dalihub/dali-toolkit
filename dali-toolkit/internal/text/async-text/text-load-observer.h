@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_LOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-loader.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -95,6 +95,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_LOAD_OBSERVER_H

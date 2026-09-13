@@ -22,7 +22,7 @@
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class EglInterface;
 class DisplayConnection;
@@ -131,7 +131,7 @@ private:
 
 } // namespace Adaptor
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::ToolkitAdaptor
 {

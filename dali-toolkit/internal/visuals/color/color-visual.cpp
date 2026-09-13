@@ -44,7 +44,7 @@ using Dali::Integration::ToDaliStringView;
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -499,4 +499,4 @@ bool ColorVisual::IsCutoutRequired() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

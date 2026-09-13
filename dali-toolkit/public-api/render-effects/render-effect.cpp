@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -56,4 +56,4 @@ bool RenderEffect::IsActivated()
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -204,6 +204,6 @@ inline Internal::AtlasManager& GetImplementation(Toolkit::AtlasManager& manager)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_ATLAS_MANAGER_IMPL_H

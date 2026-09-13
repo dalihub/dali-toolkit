@@ -23,7 +23,7 @@
 #include <dali-toolkit/internal/controls/scrollable/item-view/grid-layout.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/spiral-layout.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -69,4 +69,4 @@ ItemLayoutPtr New(Type type)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

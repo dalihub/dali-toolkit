@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-index-ranges.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -44,6 +44,6 @@ enum DevelPropertyRanges
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_DEVEL_TOOLKIT_PROPERTY_INDEX_RANGES_H

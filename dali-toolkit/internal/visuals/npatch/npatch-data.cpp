@@ -30,7 +30,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -345,4 +345,4 @@ void NPatchData::ObserverDestroyed(TextureUploadObserver* observer)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

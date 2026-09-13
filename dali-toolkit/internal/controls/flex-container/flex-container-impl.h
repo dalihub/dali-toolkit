@@ -26,7 +26,7 @@
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
 #include <dali-toolkit/third-party/yoga/Yoga.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -260,6 +260,6 @@ inline const Toolkit::Internal::FlexContainer& GetImpl(const Toolkit::FlexContai
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H

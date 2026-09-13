@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/map-wrapper.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 struct Customization::Map::Impl
 {
@@ -111,4 +111,4 @@ void Customization::Choices::Clear()
   mImpl->mOptions.clear();
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

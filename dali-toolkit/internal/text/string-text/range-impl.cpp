@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/string-text/range-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -74,4 +74,4 @@ uint32_t Range::GetNumberOfIndices() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

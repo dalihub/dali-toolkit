@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali/integration-api/string-utils.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -154,4 +154,4 @@ bool KeyboardFocusManager::GetClearFocusOnWindowFocusLost() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

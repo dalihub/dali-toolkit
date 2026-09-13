@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Contains view and projection matrices, also caching the view-projection and inverse projection matrices.
@@ -71,6 +71,6 @@ private:
   Matrix mViewProjection;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_VIEW_PROJECTION_H_

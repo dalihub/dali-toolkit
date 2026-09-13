@@ -19,11 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-drawable.h>
 #include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer-shape.h>
 #include <dali/public-api/adaptor-framework/canvas-renderer/canvas-renderer.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
-#include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/object/weak-handle.h>
 
@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/controls/canvas-view/canvas-view-rasterize-task.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -231,6 +231,6 @@ inline const Toolkit::Internal::CanvasView& GetImpl(const Toolkit::CanvasView& o
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_CANVAS_VIEW_H

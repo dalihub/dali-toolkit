@@ -25,7 +25,7 @@
 #include <dali-toolkit/devel-api/text/range.h>
 #include <dali/public-api/object/base-object.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -126,6 +126,6 @@ inline const Internal::Range& GetImplementation(const Dali::Toolkit::Text::Range
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_RANGE_IMPL_H

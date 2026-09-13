@@ -34,7 +34,7 @@
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -161,6 +161,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_INTERNAL_TOOLTIP_H

@@ -19,7 +19,7 @@
 // INTERNAL INCLUDES
 #include <dali-physics/internal/physics-adaptor-impl.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class ChipmunkPhysicsAdaptor : public PhysicsAdaptor
 {
@@ -110,4 +110,4 @@ private:
   // Physics world owns debug renderer
 };
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

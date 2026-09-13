@@ -36,7 +36,7 @@ using Dali::Integration::ToDaliStringView;
 #include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
 #include <dali-toolkit/internal/particle-system/particle-list-impl.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 namespace
 {
@@ -448,4 +448,4 @@ void ParticleRenderer::PrepareToDie()
   }
 }
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

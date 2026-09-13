@@ -37,7 +37,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -831,6 +831,6 @@ DALI_TOOLKIT_API const Toolkit::ControlImpl& GetImplementation(const Dali::Toolk
  */
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_CONTROL_IMPL_H

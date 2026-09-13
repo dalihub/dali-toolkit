@@ -36,7 +36,7 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1739,4 +1739,4 @@ AsyncTextRenderInfo AsyncTextLoader::RenderTextFit(AsyncTextParameters& paramete
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

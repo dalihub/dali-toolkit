@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 namespace
 {
@@ -55,7 +55,7 @@ void Preload()
 }
 
 } // namespace
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 extern "C" void DaliToolkitPreInitialize(int* argc, char** argv[], void* /* not in used */)
 {

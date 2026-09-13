@@ -50,7 +50,7 @@
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -61,7 +61,7 @@ Dali::Integration::Log::Filter* gLogFilter(Dali::Integration::Log::Filter::New(D
 #endif
 } // namespace
 } // namespace Internal
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 // Local Data
 namespace
@@ -109,7 +109,7 @@ void LocalToWorldCoordinatesBoundingBox(const Dali::BoundsInteger& boundingRecta
 
 } // end of namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -2482,4 +2482,4 @@ Decorator::Decorator(ControllerInterface&                 controller,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

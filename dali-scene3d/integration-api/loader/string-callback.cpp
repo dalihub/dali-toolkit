@@ -21,11 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 void DefaultErrorCallback(const std::string& message)
 {
   DALI_LOG_ERROR("%s", message.c_str());
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

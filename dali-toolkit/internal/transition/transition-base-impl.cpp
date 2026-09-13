@@ -28,7 +28,7 @@
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -152,10 +152,10 @@ void TransitionBase::Play()
   mTarget[Dali::Actor::Property::INHERIT_SCALE]       = false;
   mTarget[Dali::Actor::Property::COLOR_MODE]          = Dali::ColorMode::USE_OWN_COLOR;
 
-  mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
-  mTarget[Dali::Actor::Property::SCALE]       = targetScale;
-  mTarget[Dali::Actor::Property::ORIENTATION] = targetOrientation;
-  mTarget[Dali::Actor::Property::COLOR_MULTIPLIER]       = targetColor;
+  mTarget[Dali::Actor::Property::POSITION]         = targetPosition;
+  mTarget[Dali::Actor::Property::SCALE]            = targetScale;
+  mTarget[Dali::Actor::Property::ORIENTATION]      = targetOrientation;
+  mTarget[Dali::Actor::Property::COLOR_MULTIPLIER] = targetColor;
 
   OnPlay();
 
@@ -248,4 +248,4 @@ void TransitionBase::TransitionFinished()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

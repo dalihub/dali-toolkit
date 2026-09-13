@@ -33,7 +33,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class NativeImage;
 
@@ -389,6 +389,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H */

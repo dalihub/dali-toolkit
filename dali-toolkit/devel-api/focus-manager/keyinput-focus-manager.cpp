@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/focus-manager/keyinput-focus-manager-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -89,4 +89,4 @@ KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyI
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <thread>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -659,4 +659,4 @@ void VectorAnimationThread::SleepThread::Run()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

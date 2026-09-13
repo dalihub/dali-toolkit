@@ -39,7 +39,7 @@
 #include <dali-scene3d/public-api/model-components/model-primitive.h>
 #include "dali-scene3d/public-api/controls/model/model.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -388,6 +388,6 @@ DALI_SCENE3D_API const Internal::ModelNode& GetImplementation(const Dali::Scene3
  */
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_COMPONENTS_MODEL_NODE_IMPL_H

@@ -24,7 +24,7 @@
 
 using Dali::Integration::ToStdString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -75,4 +75,4 @@ void RegisterAlphaFunction(const Dali::String& name, AlphaFunction alphaFn)
                      "Function with given key already exists.");
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

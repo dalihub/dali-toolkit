@@ -24,7 +24,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -135,6 +135,6 @@ public: //Methods
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_CHARACTER_SEQUENCE_H

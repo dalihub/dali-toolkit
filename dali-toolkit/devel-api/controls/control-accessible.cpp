@@ -45,7 +45,7 @@ using Dali::Integration::GetStdString;
 using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Toolkit::DevelControl
+namespace DALI_NAMESPACE::Toolkit::DevelControl
 {
 namespace
 {
@@ -814,4 +814,4 @@ void ControlAccessible::ResetCustomHighlightOverlay()
 {
   mHighlightOverlay.ResetCustomHighlight();
 }
-} // namespace Dali::Toolkit::DevelControl
+} //namespace DALI_NAMESPACE::Toolkit::DevelControl

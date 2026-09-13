@@ -17,7 +17,7 @@
 
 #include <dali-toolkit/internal/particle-system/particle-modifier-impl.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 ParticleModifier::ParticleModifier(UniquePtr<ParticleModifierInterface>&& updater)
 : mUpdater(std::move(updater))
@@ -34,4 +34,4 @@ ParticleModifierInterface& ParticleModifier::GetUpdater()
   return *mUpdater;
 }
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

@@ -22,7 +22,7 @@
 #include <memory>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 struct ClipboardData::Impl
@@ -68,7 +68,7 @@ ClipboardData& ClipboardData::operator=(const ClipboardData& rhs)
 }
 
 ClipboardData& ClipboardData::operator=(ClipboardData&& rhs) noexcept = default;
-ClipboardData::~ClipboardData() = default;
+ClipboardData::~ClipboardData()                                       = default;
 
 void ClipboardData::SetMimeType(const Dali::String& mimeType)
 {
@@ -434,4 +434,4 @@ bool IsVisible(const Dali::Clipboard& clipboard)
 } // namespace Clipboard
 } // namespace Integration
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

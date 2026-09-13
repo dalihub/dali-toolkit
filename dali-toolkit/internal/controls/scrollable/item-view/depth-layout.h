@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -233,6 +233,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_DEPTH_LAYOUT_H

@@ -19,7 +19,7 @@
 #include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -91,4 +91,4 @@ void SetVideoFrameBuffer(VideoView videoView, Dali::NativeImagePtr source)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

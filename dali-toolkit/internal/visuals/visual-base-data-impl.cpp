@@ -36,7 +36,7 @@ using Dali::Integration::ToDaliString;
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -415,4 +415,4 @@ const Property::Map& Internal::Visual::Base::Impl::Transform::GetDefaultTransfor
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

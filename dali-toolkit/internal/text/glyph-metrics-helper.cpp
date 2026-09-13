@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -158,4 +158,4 @@ float GetCalculatedAdvance(unsigned int character, float characterSpacing, float
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

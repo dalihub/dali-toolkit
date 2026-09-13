@@ -37,7 +37,7 @@ inline Dali::Vector3 toVec3(cpVect vec)
 
 } //Anonymous namespace
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 PhysicsActorPtr PhysicsActor::New(Dali::Actor actor, Dali::Any body, Dali::Toolkit::Physics::Internal::PhysicsAdaptor& adaptor)
 {
@@ -110,4 +110,4 @@ Dali::Quaternion PhysicsActor::GetActorRotation() const
   return mAdaptor.TranslateFromPhysicsSpace(Quaternion(Radian(angle), Vector3::ZAXIS));
 }
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

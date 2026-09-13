@@ -54,7 +54,7 @@ using Dali::Integration::ToStdString;
 Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1352,4 +1352,4 @@ Dali::Integration::Accessibility::States Button::ButtonAccessible::CalculateStat
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

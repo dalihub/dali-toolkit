@@ -23,7 +23,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <limits>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -199,6 +199,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_OBJ_LOADER_H

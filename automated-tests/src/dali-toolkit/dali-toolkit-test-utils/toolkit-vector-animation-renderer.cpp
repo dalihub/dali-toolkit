@@ -32,7 +32,7 @@
 #include <thread>
 #include <utility>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -473,7 +473,7 @@ VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::Upl
   return Internal::Adaptor::GetImplementation(*this).UploadCompletedSignal();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

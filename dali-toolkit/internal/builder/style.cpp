@@ -28,7 +28,7 @@ using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -173,4 +173,4 @@ Style::~Style()
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

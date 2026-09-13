@@ -51,7 +51,7 @@
 
 using Dali::Integration::ToPropertyValue;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -821,4 +821,4 @@ TextSelectionPopup::~TextSelectionPopup()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

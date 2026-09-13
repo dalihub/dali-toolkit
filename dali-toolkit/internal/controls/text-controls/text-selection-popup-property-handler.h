@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_PROPERTY_HANDLER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 /**
  * Class to manage properties for the TextSelectionPopup
@@ -45,6 +45,6 @@ struct TextSelectionPopup::PropertyHandler
   static Property::Value GetProperty(Toolkit::TextSelectionPopup selectionPopup, Property::Index index);
 };
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 
 #endif //DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_PROPERTY_HANDLER_H

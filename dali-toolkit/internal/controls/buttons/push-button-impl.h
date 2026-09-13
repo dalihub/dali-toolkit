@@ -25,7 +25,7 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include "button-impl.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -162,6 +162,6 @@ inline const Toolkit::Internal::PushButton& GetImplementation(const Toolkit::Pus
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_PUSH_BUTTON_H

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -134,6 +134,6 @@ DALI_TOOLKIT_API void ResetFocusFinderRootActor(KeyboardFocusManager keyboardFoc
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_DEVEL_H

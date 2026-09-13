@@ -27,7 +27,7 @@
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include "button-impl.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -207,6 +207,6 @@ inline const Toolkit::Internal::ToggleButton& GetImplementation(const Toolkit::T
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_TOGGLE_BUTTON_H

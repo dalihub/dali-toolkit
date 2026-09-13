@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_STRIKETHROUGH_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/strikethrough-character-run.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -69,6 +69,6 @@ void OverrideNestedStrikethroughCharacterRuns(Vector<StrikethroughCharacterRun>&
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_STRIKETHROUGH_H

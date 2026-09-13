@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -85,4 +85,4 @@ Button::Button(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

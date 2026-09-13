@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 class PhysicsAdaptor;
 
@@ -222,6 +222,6 @@ public: // Not intended for developer use
   /// @endcond
 };
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics
 
 #endif //DALI_TOOLKIT_PHYSICS_ACTOR_H

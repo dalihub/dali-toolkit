@@ -22,7 +22,7 @@
 #include <dali-physics/internal/physics-adaptor-impl.h>
 #include <dali-physics/public-api/physics-actor.h>
 
-namespace Dali::Toolkit::Physics
+namespace DALI_NAMESPACE::Toolkit::Physics
 {
 PhysicsAdaptor::PhysicsAdaptor() = default;
 
@@ -164,4 +164,4 @@ PhysicsAdaptor::PhysicsAdaptor(Internal::PhysicsAdaptor* impl)
 {
 }
 
-} // namespace Dali::Toolkit::Physics
+} //namespace DALI_NAMESPACE::Toolkit::Physics

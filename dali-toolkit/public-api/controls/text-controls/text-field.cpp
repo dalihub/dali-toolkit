@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -84,4 +84,4 @@ TextField::TextField(Dali::Internal::CustomActor* internal)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

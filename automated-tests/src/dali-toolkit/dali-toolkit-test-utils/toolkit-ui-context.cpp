@@ -23,7 +23,7 @@
 #include <dali/public-api/update/update-proxy.h>
 #include <toolkit-adaptor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -129,4 +129,4 @@ UpdateProxy::NotifySyncPoint UiContext::NotifyFrameCallback(FrameCallbackInterfa
   return UpdateProxy::INVALID_SYNC;
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

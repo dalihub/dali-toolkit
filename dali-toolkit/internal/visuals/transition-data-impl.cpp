@@ -62,7 +62,7 @@ DALI_ENUM_TO_STRING_TABLE_END(ALPHA_FUNCTION_BUILTIN)
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -434,4 +434,4 @@ Property::Map TransitionData::GetAnimatorAt(size_t index)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

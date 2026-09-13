@@ -27,7 +27,7 @@
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -91,6 +91,6 @@ void ApplyTextureAndUniforms(Renderer& renderer, const Internal::NPatchData* dat
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_NPATCH_HELPER_H

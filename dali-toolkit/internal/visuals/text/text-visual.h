@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/visuals/text/text-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -435,6 +435,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H */

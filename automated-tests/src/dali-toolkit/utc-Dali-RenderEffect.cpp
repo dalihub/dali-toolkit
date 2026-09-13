@@ -32,6 +32,9 @@ using namespace Dali::Toolkit;
 
 namespace
 {
+constexpr uint32_t DEFAULT_BLUR_RENDER_TASK_COUNT             = 3u;
+constexpr uint32_t INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT = 4u;
+
 void CheckTaskFrameBufferSize(RenderTask task, uint32_t expectedWidth, uint32_t expectedHeight)
 {
   FrameBuffer frameBuffer = task.GetFrameBuffer();
@@ -1473,7 +1476,9 @@ int UtcDaliBlurEffectBlurOnce(void)
   }
   {
     // Add render effect during scene on.
+    control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
     GaussianBlurEffect effect = GaussianBlurEffect::New(20u);
+    effect.SetBlurDownscaleFactor(0.25f);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
     effect.SetBlurOnce(true);
@@ -1494,8 +1499,22 @@ int UtcDaliBlurEffectBlurOnce(void)
 
     RenderTaskList taskList = scene.GetRenderTaskList();
 
-    // Render effect activated.
-    DALI_TEST_EQUALS(1u, taskList.GetTaskCount(), TEST_LOCATION);
+    // Only the empty source task remains as the exclusive-rendering marker.
+    DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_CHECK(!taskList.GetTask(1u).GetFrameBuffer());
+
+    effect.Refresh();
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(2u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_CHECK(!taskList.GetTask(1u).GetFrameBuffer());
 
     effect.SetBlurOnce(false);
     effect.SetBlurOnce(false);
@@ -1504,7 +1523,7 @@ int UtcDaliBlurEffectBlurOnce(void)
     effect.SetBlurOnce(false);
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
 
-    DALI_TEST_EQUALS(4u, taskList.GetTaskCount(), TEST_LOCATION);
+    DALI_TEST_EQUALS(5u, taskList.GetTaskCount(), TEST_LOCATION);
   }
 
   END_TEST;
@@ -1709,22 +1728,67 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  control.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  control.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  scene.Add(control);
+
+  uint32_t baseTaskCount = scene.GetRenderTaskList().GetTaskCount();
+  auto     taskList      = scene.GetRenderTaskList();
 
   {
     BackgroundBlurEffect effect = BackgroundBlurEffect::New();
     control.SetRenderEffect(effect);
-    scene.Add(control);
 
     float     durationSeconds = 0.05f;
     Animation animation       = Animation::New(durationSeconds);
 
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    uint32_t first = taskList.GetTaskCount() - DEFAULT_BLUR_RENDER_TASK_COUNT;
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 0u), 100u, 100u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 1u), 100u, 100u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 2u), 100u, 100u);
+
     animation.Play();
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    application.SendNotification();
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    // Strength 1 restores the configured 0.25 downscale after the animation.
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT, TEST_LOCATION);
+    first = taskList.GetTaskCount() - INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT;
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 0u), 50u, 50u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 1u), 25u, 25u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 2u), 25u, 25u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 3u), 25u, 25u);
+
+    Animation clearAnimation = Animation::New(durationSeconds);
+    effect.AddBlurStrengthAnimation(clearAnimation, AlphaFunction::BuiltinFunction::EASE_IN,
+                                    TimePeriod(0, durationSeconds), 1.0f, 0.0f);
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    clearAnimation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u);
+    application.SendNotification();
+    clearAnimation.Clear();
+
+    // Strength 0 is the original image, so the whole background-blur path is bypassed.
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount, TEST_LOCATION);
+    effect.Refresh();
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount, TEST_LOCATION);
+
+    Animation restoreAnimation = Animation::New(durationSeconds);
+    effect.AddBlurStrengthAnimation(restoreAnimation, AlphaFunction::BuiltinFunction::EASE_IN,
+                                    TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    restoreAnimation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u);
+    application.SendNotification();
+    restoreAnimation.Clear();
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT, TEST_LOCATION);
 
     effect.SetBlurOnce(true);
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
@@ -1741,17 +1805,58 @@ int UtcDaliRenderEffectBlurStrengthAnimation(void)
   {
     GaussianBlurEffect effect = GaussianBlurEffect::New();
     control.SetRenderEffect(effect);
-    scene.Add(control);
 
     float     durationSeconds = 0.05f;
     Animation animation       = Animation::New(durationSeconds);
 
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    uint32_t first = taskList.GetTaskCount() - DEFAULT_BLUR_RENDER_TASK_COUNT;
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 0u), 100u, 100u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 1u), 100u, 100u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 2u), 100u, 100u);
+
     animation.Play();
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+    application.SendNotification();
     animation.Clear();
     DALI_TEST_EQUALS(effect.GetBlurOnce(), false, TEST_LOCATION);
+
+    // Strength 1 restores the configured 0.25 downscale after the animation.
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT, TEST_LOCATION);
+    first = taskList.GetTaskCount() - INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT;
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 0u), 50u, 50u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 1u), 25u, 25u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 2u), 25u, 25u);
+    CheckTaskFrameBufferSize(taskList.GetTask(first + 3u), 25u, 25u);
+
+    Animation clearAnimation = Animation::New(durationSeconds);
+    effect.AddBlurStrengthAnimation(clearAnimation, AlphaFunction::BuiltinFunction::EASE_IN,
+                                    TimePeriod(0, durationSeconds), 1.0f, 0.0f);
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    clearAnimation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u);
+    application.SendNotification();
+    clearAnimation.Clear();
+
+    // Strength 0 is the original image, so the whole gaussian-blur path is bypassed.
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount, TEST_LOCATION);
+    effect.Refresh();
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount, TEST_LOCATION);
+
+    Animation restoreAnimation = Animation::New(durationSeconds);
+    effect.AddBlurStrengthAnimation(restoreAnimation, AlphaFunction::BuiltinFunction::EASE_IN,
+                                    TimePeriod(0, durationSeconds), 0.0f, 1.0f);
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + DEFAULT_BLUR_RENDER_TASK_COUNT, TEST_LOCATION);
+    restoreAnimation.Play();
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u);
+    application.SendNotification();
+    restoreAnimation.Clear();
+    DALI_TEST_EQUALS(taskList.GetTaskCount(), baseTaskCount + INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT, TEST_LOCATION);
 
     effect.SetBlurOnce(true);
     effect.AddBlurStrengthAnimation(animation, AlphaFunction::BuiltinFunction::EASE_IN, TimePeriod(0, durationSeconds), 0.0f, 1.0f);

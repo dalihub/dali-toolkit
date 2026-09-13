@@ -28,7 +28,7 @@
 
 using WayPointList = Dali::Scene3D::Algorithm::WayPointList;
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 PathFinderAlgorithmSPFA::PathFinderAlgorithmSPFA(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
@@ -313,4 +313,4 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFA::OptimizeWaypoints(WayP
 
   return optimizedWaypoints;
 }
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm

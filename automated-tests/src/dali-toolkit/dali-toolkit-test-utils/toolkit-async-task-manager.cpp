@@ -38,7 +38,7 @@
 #include <toolkit-test-application.h>
 #include "dali-test-suite-utils.h"
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -1252,7 +1252,7 @@ AsyncTaskManager::AsyncTaskManager(Internal::Adaptor::AsyncTaskManager* impl)
 {
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test
 {

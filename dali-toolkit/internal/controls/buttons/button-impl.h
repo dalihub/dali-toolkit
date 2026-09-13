@@ -30,7 +30,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -593,6 +593,6 @@ inline const Toolkit::Internal::Button& GetImplementation(const Toolkit::Button&
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_BUTTON_H

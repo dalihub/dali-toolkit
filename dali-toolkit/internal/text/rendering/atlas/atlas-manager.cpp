@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-manager-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -128,4 +128,4 @@ void AtlasManager::SetTextures(AtlasId atlas, TextureSet& textureSet)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

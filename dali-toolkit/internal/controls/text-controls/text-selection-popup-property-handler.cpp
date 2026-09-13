@@ -25,7 +25,7 @@ extern Debug::Filter* gLogFilter;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 void TextSelectionPopup::PropertyHandler::SetProperty(Toolkit::TextSelectionPopup selectionPopup, Property::Index index, const Property::Value& value)
 {
@@ -302,4 +302,4 @@ Property::Value TextSelectionPopup::PropertyHandler::GetProperty(Toolkit::TextSe
   return value;
 }
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal

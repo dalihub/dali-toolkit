@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -45,6 +48,6 @@ enum Type
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_SIGNALS_DEVEL_H

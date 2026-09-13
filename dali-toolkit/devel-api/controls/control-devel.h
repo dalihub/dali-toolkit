@@ -18,20 +18,20 @@
  *
  */
 // EXTERNAL INCLUDES
-#include <cstdint>
 #include <dali/devel-api/adaptor-framework/accessibility-devel.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-integ.h>
 #include <dali/public-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-accessibility-types.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -833,6 +833,6 @@ DALI_TOOLKIT_API void NotifyAccessibilityPresentationChanged(Dali::Actor actor, 
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_CONTROL_DEVEL_H

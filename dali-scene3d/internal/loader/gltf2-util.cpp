@@ -33,7 +33,7 @@
 using namespace Dali::Scene3D::Loader;
 using Dali::Integration::ToDaliString;
 
-namespace Dali::Scene3D::Loader::Internal
+namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 {
 namespace Gltf2Util
 {
@@ -1720,4 +1720,4 @@ void ConvertGltfToContext(gt::Document& document, Gltf2Util::ConversionContext& 
 
 } // namespace Gltf2Util
 
-} // namespace Dali::Scene3D::Loader::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Loader::Internal

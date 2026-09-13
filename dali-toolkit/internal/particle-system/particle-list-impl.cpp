@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/particle-system/particle-impl.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 template<>
 ParticleStream::StreamDataType StreamDataTypeWrapper<Vector3>::GetType()
@@ -234,4 +234,4 @@ Dali::Vector<ParticleSystem::Particle>& ParticleList::GetParticles()
   return mParticles;
 }
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

@@ -29,7 +29,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 const char* BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
 const char* BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
@@ -82,4 +82,4 @@ void BlendShapes::ConfigureProperties(const BlendShapeData& data, Renderer rende
   }
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

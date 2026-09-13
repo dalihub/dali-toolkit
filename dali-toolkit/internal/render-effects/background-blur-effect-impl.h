@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/render-effects/background-blur-effect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -213,10 +213,22 @@ private:
   void OnRenderFinished(Dali::RenderTask renderTask);
 
   /**
+   * @brief Reconfigures blur resources with an internal downscale factor without changing the user setting.
+   * @param[in] downscaleFactor Internal downscale factor to apply
+   */
+  void ApplyInternalDownscaleFactor(float downscaleFactor);
+
+  /**
+   * @brief Restores the appropriate resolution, or bypasses the effect, after a strength animation.
+   * @param[in] animation Finished animation
+   */
+  void OnBlurStrengthAnimationFinished(Animation animation);
+
+  /**
    * @brief Calculate valid downscale factor and blur radius by given mBlurRadius and mDownscaleFactor.
    * It will change internal values, downscaled blur radius, and skip blur
    */
-  void UpdateDownscaledBlurRadius();
+  void UpdateDownscaledBlurRadius(float downscaleFactor);
 
   BackgroundBlurEffectImpl(const BackgroundBlurEffectImpl&)            = delete;
   BackgroundBlurEffectImpl(BackgroundBlurEffectImpl&&)                 = delete;
@@ -251,6 +263,8 @@ private:
   float    mDownscaleFactor;
   uint32_t mBlurRadius;
 
+  float mBlurStrength;
+
   Dali::WeakHandle<Dali::Actor> mUserSourceActor;  ///< Weakhandle of source actor from user.
   Dali::WeakHandle<Dali::Actor> mUserStopperActor; ///< Weakhandle of stopper actor from user.
 
@@ -261,6 +275,8 @@ private:
 
   bool mSkipBlur : 1;
   bool mBlurOnce : 1;
+  bool mBlurStrengthAnimationActive : 1;
+  bool mZeroStrengthBypass : 1;
 };
 } // namespace Internal
 
@@ -277,6 +293,6 @@ inline const Toolkit::Internal::BackgroundBlurEffectImpl& GetImplementation(cons
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_BACKGROUND_BLUR_EFFECT_H

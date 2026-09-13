@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/signals/callback.h>
 #include <string>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -45,7 +45,7 @@ enum Type
   PLAY    = DevelAnimatedImageVisual::Action::PLAY,    ///< Play the animated vector image.
   PAUSE   = DevelAnimatedImageVisual::Action::PAUSE,   ///< Pause the animated vector image.
   STOP    = DevelAnimatedImageVisual::Action::STOP,    ///< Stop the animated vector image. This is also Default playback mode.
-  JUMP_TO = DevelAnimatedImageVisual::Action::JUMP_TO, ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  JUMP_TO = DevelAnimatedImageVisual::Action::JUMP_TO, ///< Jump to the specified frame, clamped to the current playback range. Property::INTEGER value should be passed.
 
   // AnimatedVectorImageVisual only actions
   SET_DYNAMIC_PROPERTY = DevelAnimatedImageVisual::Action::ANIMATED_IMAGE_VISUAL_ACTION_END_INDEX, ///< Set the dynamic property.
@@ -88,6 +88,6 @@ struct DynamicPropertyInfo
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H

@@ -33,7 +33,7 @@ using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1393,4 +1393,4 @@ Underline::Type StringToUnderlineType(const char* const underlineTypeStr)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

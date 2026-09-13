@@ -41,7 +41,7 @@
 #include <unistd.h>
 #include <cstdint>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Internal
 {
@@ -682,7 +682,7 @@ Adaptor::LocaleChangedSignalType& Adaptor::LocaleChangedSignal()
   return mImpl->LocaleChangedSignal();
 }
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 namespace Test::ToolkitAdaptor
 {

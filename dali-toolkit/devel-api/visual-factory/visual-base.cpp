@@ -21,7 +21,7 @@
 // INTERAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -131,4 +131,4 @@ Dali::VisualRenderer Visual::Base::GetRenderer() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

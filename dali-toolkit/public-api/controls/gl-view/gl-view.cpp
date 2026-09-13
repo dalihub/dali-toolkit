@@ -29,7 +29,7 @@
 #include <dlfcn.h>
 #include <memory>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 namespace
 {
@@ -184,4 +184,4 @@ GlView::GlView(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Internal::GlViewImpl>(internal);
 }
 
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit

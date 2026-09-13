@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
 #include <cstdint>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 /**
  * @brief Contains public accessibility semantic types used by Toolkit controls.
@@ -141,6 +142,6 @@ enum class RelationType : uint32_t
 };
 
 } // namespace Accessibility
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_CONTROL_ACCESSIBILITY_TYPES_H

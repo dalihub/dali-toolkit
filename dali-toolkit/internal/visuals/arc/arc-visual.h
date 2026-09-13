@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ARC_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -130,6 +130,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif /* DALI_TOOLKIT_INTERNAL_ARC_VISUAL_H */

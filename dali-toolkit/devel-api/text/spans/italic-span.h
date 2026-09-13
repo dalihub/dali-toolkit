@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ITALICSPAN_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/spans/base-span.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -105,6 +105,6 @@ public:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif //DALI_TOOLKIT_TEXT_ITALICSPAN_H

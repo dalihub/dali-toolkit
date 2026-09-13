@@ -57,7 +57,7 @@ using namespace pxr;
 using namespace Dali::Scene3D::Loader;
 using Dali::Integration::ToStdString;
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 namespace
 {
@@ -1476,4 +1476,4 @@ void UsdLoaderImpl::Impl::ConvertTransformAnimation(LoadResult& output, const Us
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n");
 }
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader

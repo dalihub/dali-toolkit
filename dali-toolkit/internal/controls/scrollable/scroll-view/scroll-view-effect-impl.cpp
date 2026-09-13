@@ -21,7 +21,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -66,4 +66,4 @@ Toolkit::ScrollView ScrollViewEffect::GetScrollView()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

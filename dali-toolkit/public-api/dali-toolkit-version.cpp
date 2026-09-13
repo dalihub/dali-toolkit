@@ -23,13 +23,13 @@
 #include <iostream>
 #endif
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
 const unsigned int TOOLKIT_MAJOR_VERSION = 2;
 const unsigned int TOOLKIT_MINOR_VERSION = 5;
-const unsigned int TOOLKIT_MICRO_VERSION = 37;
+const unsigned int TOOLKIT_MICRO_VERSION = 39;
 const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED
@@ -49,4 +49,4 @@ PrintVersion TOOLKIT_VERSION;
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

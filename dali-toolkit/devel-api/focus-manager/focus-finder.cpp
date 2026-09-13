@@ -30,7 +30,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -426,4 +426,4 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

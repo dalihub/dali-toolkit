@@ -21,13 +21,13 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
 #include <dali-scene3d/integration-api/loader/camera-parameters.h>
 #include <dali-scene3d/integration-api/loader/light-parameters.h>
 #include <dali-scene3d/integration-api/loader/load-scene-metadata.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 class ResourceBundle;
 class SceneDefinition;
@@ -81,6 +81,6 @@ struct DALI_SCENE3D_API LoadResult
   Dali::Vector<LightParameters>& mLightParameters;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif //DALI_SCENE3D_LOADER_OUTPUT_H

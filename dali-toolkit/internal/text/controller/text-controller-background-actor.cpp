@@ -32,7 +32,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 namespace
 {
@@ -257,4 +257,4 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
   return actor;
 }
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text

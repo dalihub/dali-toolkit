@@ -20,9 +20,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/unique-ptr.h>
+#include <dali/public-api/signals/callback.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
-#include <dali/public-api/signals/callback.h>
 
 #include <mutex>
 #include <queue>
@@ -30,7 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-physics/public-api/physics-adaptor.h>
 
-namespace Dali::Toolkit::Physics::Internal
+namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class PhysicsWorld;
 class FrameCallback;
@@ -185,6 +185,6 @@ protected:
   Physics::PhysicsAdaptor::DebugState       mPhysicsDebugState{Physics::PhysicsAdaptor::DebugState::OFF};
 };
 
-} // namespace Dali::Toolkit::Physics::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 
 #endif //DALI_TOOLKIT_PHYSICS_INTERNAL_PHYSICS_WORLD_H

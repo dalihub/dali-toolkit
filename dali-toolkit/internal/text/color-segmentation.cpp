@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-utility.h>
 #include <iostream>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -131,4 +131,4 @@ void SetColorSegmentationInfo(const Vector<ColorRun>&   colorRuns,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

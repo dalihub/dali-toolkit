@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <dali-toolkit/internal/particle-system/particle-renderer-impl.h>
 #include <dali-toolkit/public-api/particle-system/particle-renderer.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleRenderer ParticleRenderer::New()
 {
@@ -50,4 +50,4 @@ ParticleRenderer ParticleRenderer::DownCast(BaseHandle handle)
   return {dynamic_cast<Internal::ParticleRenderer*>(handle.GetObjectPtr())};
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem

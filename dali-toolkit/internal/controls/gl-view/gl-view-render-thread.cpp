@@ -25,7 +25,7 @@
 #include <chrono>
 #include <thread>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -305,4 +305,4 @@ GlViewRenderThread::~GlViewRenderThread()
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE

@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 using ParticleStreamTypeFlagBit = uint32_t;
 
@@ -57,5 +57,5 @@ enum class StreamDataType
 };
 
 } // namespace ParticleStream
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_PARTICLE_TYPES_H

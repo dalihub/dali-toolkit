@@ -32,7 +32,7 @@
 #include <dali-toolkit/internal/render-effects/render-effect-impl.h>
 #include <dali-toolkit/public-api/render-effects/gaussian-blur-effect.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -204,10 +204,22 @@ private:
   void OnRenderFinished(Dali::RenderTask renderTask);
 
   /**
+   * @brief Reconfigures blur resources with an internal downscale factor without changing the user setting.
+   * @param[in] downscaleFactor Internal downscale factor to apply
+   */
+  void ApplyInternalDownscaleFactor(float downscaleFactor);
+
+  /**
+   * @brief Restores the appropriate resolution, or bypasses the effect, after a strength animation.
+   * @param[in] animation Finished animation
+   */
+  void OnBlurStrengthAnimationFinished(Animation animation);
+
+  /**
    * @brief Calculate valid downscale factor and blur radius by given mBlurRadius and mDownscaleFactor.
    * It will change internal values, downscaled blur radius, and skip blur
    */
-  void UpdateDownscaledBlurRadius();
+  void UpdateDownscaledBlurRadius(float downscaleFactor);
 
   GaussianBlurEffectImpl(const GaussianBlurEffectImpl&)            = delete;
   GaussianBlurEffectImpl(GaussianBlurEffectImpl&&)                 = delete;
@@ -242,6 +254,8 @@ private:
   float    mDownscaleFactor;
   uint32_t mBlurRadius;
 
+  float mBlurStrength;
+
   float    mInternalDownscaleFactor;
   uint32_t mInternalBlurRadius;
 
@@ -249,6 +263,8 @@ private:
 
   bool mSkipBlur : 1;
   bool mBlurOnce : 1;
+  bool mBlurStrengthAnimationActive : 1;
+  bool mZeroStrengthBypass : 1;
 };
 } // namespace Internal
 
@@ -265,6 +281,6 @@ inline const Toolkit::Internal::GaussianBlurEffectImpl& GetImplementation(const 
 }
 
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_BLUR_EFFECT_H

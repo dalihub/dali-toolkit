@@ -30,7 +30,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -576,4 +576,4 @@ void AsyncTextManager::ObserverDestroyed(TextLoadObserver* observer)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

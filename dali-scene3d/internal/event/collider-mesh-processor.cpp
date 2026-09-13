@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/event/collider-mesh-processor-impl.h>
 
-namespace Dali::Scene3D
+namespace DALI_NAMESPACE::Scene3D
 {
 ColliderMeshProcessor ColliderMeshProcessor::Get()
 {
@@ -62,4 +62,4 @@ ColliderMeshProcessor::ColliderMeshProcessor(Internal::ColliderMeshProcessor* im
 {
 }
 
-} // namespace Dali::Scene3D
+} //namespace DALI_NAMESPACE::Scene3D

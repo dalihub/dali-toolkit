@@ -35,7 +35,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
-namespace Dali::Toolkit::Internal
+namespace DALI_NAMESPACE::Toolkit::Internal
 {
 class CommonTextUtils
 {
@@ -274,6 +274,6 @@ protected:
   virtual void RequestTextRelayout() = 0;
 };
 
-} // namespace Dali::Toolkit::Internal
+} //namespace DALI_NAMESPACE::Toolkit::Internal
 
 #endif //DALI_TOOLKIT_INTERNAL_TEXT_CONTROLS_COMMON_TEXT_UTILS_H

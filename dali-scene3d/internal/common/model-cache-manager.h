@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/load-result.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -157,6 +157,6 @@ private:
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_CACHE_MANAGER_H

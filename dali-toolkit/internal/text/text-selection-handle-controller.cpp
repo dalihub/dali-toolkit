@@ -54,7 +54,7 @@ const Dali::Toolkit::Text::CharacterDirection LTR       = false; ///< Left To Ri
 
 } // namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -595,4 +595,4 @@ void SelectionHandleController::Update(Controller::Impl& impl, HandleType handle
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

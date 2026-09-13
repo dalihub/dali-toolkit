@@ -32,7 +32,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -118,4 +118,4 @@ Actor CreateBouncingEffectActor(Property::Index& bouncePropertyIndex)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

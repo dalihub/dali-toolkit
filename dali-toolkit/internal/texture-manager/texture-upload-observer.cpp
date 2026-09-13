@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h> // for INVALUD_TEXTURE_ID
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -86,4 +86,4 @@ TextureUploadObserver::DestructionSignalType& TextureUploadObserver::Destruction
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

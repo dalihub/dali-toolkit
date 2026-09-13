@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -48,6 +48,6 @@ public:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H

@@ -26,7 +26,7 @@
 #include <dali-scene3d/public-api/api.h>
 #include <dali/public-api/common/unique-ptr.h>
 
-namespace Dali::Scene3D::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Algorithm
 {
 using WayPointList = Dali::Vector<Scene3D::Algorithm::WayPoint>;
 
@@ -141,6 +141,6 @@ private:
   UniquePtr<PathFinderBase> mImpl;
 };
 
-} // namespace Dali::Scene3D::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Algorithm
 
 #endif // DALI_SCENE3D_PATH_FINDER_H

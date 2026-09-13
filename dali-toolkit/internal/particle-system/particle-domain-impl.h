@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_DOMAIN_H
 #define DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_DOMAIN_H
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@
 #include <dali/public-api/object/base-object.h>
 #include <memory>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleDomain : public Dali::BaseObject
 {
 };
 
-} // namespace Dali::Toolkit::ParticleSystem::Internal
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 inline Internal::ParticleDomain& GetImplementation(ParticleSystem::ParticleDomain& source)
 {
@@ -52,6 +52,6 @@ inline const Internal::ParticleDomain& GetImplementation(const ParticleSystem::P
   return static_cast<const Internal::ParticleDomain&>(handle);
 }
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif // DALI_TOOLKIT_PARTICLE_SYSTEM_INTERNAL_PARTICLE_DOMAIN_H

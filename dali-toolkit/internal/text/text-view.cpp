@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 namespace
 {
@@ -1072,4 +1072,4 @@ bool View::IsCutoutEnabled() const
   return false;
 }
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text

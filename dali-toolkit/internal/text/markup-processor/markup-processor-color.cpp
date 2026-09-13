@@ -26,7 +26,7 @@
 #include <dali-toolkit/internal/text/markup-processor/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-tags-and-attributes.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -56,4 +56,4 @@ void ProcessColorTag(const Tag& tag, ColorRun& colorRun)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

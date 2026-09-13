@@ -31,7 +31,7 @@
 // DEVEL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -478,6 +478,6 @@ public:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_ASYNC_TEXT_LOADER_H

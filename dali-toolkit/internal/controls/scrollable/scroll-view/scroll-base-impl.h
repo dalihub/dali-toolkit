@@ -28,7 +28,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -203,6 +203,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_SCROLL_BASE_H

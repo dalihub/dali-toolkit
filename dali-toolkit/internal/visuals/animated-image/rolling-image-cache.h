@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
 #include <dali/devel-api/common/circular-queue.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -153,6 +153,6 @@ private:
 
 } // namespace Internal
 } // namespace Toolkit
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif

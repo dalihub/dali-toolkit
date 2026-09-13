@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_DATA_CLEARER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/controller/text-controller.h>
 
-namespace Dali::Toolkit::Text
+namespace DALI_NAMESPACE::Toolkit::Text
 {
 
 /// Provides methods to clear some of the model data in the Text::Controller::Impl
@@ -75,6 +75,6 @@ struct ControllerImplDataClearer
   static void ClearModelData(Controller::Impl& impl, CharacterIndex startIndex, CharacterIndex endIndex, Controller::OperationsMask operations);
 };
 
-} // namespace Dali::Toolkit::Text
+} //namespace DALI_NAMESPACE::Toolkit::Text
 
 #endif // DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_DATA_CLEARER_H

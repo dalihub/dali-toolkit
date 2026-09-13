@@ -30,7 +30,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gl-view/gl-view.h>
 
-namespace Dali::Toolkit
+namespace DALI_NAMESPACE::Toolkit
 {
 class GlView;
 
@@ -135,6 +135,6 @@ inline const Dali::Toolkit::Internal::GlViewImpl& GetImpl(const Dali::Toolkit::G
   return static_cast<const Dali::Toolkit::Internal::GlViewImpl&>(impl);
 }
 
-} // namespace Dali::Toolkit
+} //namespace DALI_NAMESPACE::Toolkit
 
 #endif // DALI_TOOLKIT_INTERNAL_GL_VIEW_IMPL_H

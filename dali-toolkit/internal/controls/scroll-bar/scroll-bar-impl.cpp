@@ -137,7 +137,7 @@ struct IndicatorPositionConstraint
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -954,4 +954,4 @@ double ScrollBar::ScrollBarAccessible::GetMinimumIncrement() const
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

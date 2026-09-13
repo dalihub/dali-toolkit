@@ -26,13 +26,13 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/internal/loader/json-reader.h>
 #include <dali-scene3d/integration-api/loader/blend-shape-details.h>
 #include <dali-scene3d/integration-api/loader/utils.h>
+#include <dali-scene3d/internal/loader/json-reader.h>
 
 namespace js = json;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace
 {
@@ -233,4 +233,4 @@ AnimationDefinition LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int 
 }
 } // namespace Loader
 } // namespace Scene3D
-} // namespace Dali
+} //namespace DALI_NAMESPACE

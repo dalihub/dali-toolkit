@@ -30,7 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -244,6 +244,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_SVG_TASK_H

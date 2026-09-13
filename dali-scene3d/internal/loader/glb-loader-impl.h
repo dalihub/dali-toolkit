@@ -22,10 +22,10 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/model-loader-impl.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader::Internal
+namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 {
 class GlbLoaderImpl : public ModelLoaderImpl
 {
@@ -36,6 +36,6 @@ public:
   bool LoadModel(const Dali::String& url, Dali::Scene3D::Loader::LoadResult& result) override;
 };
 
-} // namespace Dali::Scene3D::Loader::Internal
+} //namespace DALI_NAMESPACE::Scene3D::Loader::Internal
 
 #endif // DALI_SCENE3D_LOADER_GLB_LOADER_IMPL_H

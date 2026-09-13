@@ -28,7 +28,7 @@
 
 using Dali::Integration::ToDaliString;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -86,4 +86,4 @@ Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

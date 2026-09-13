@@ -18,7 +18,10 @@
  *
  */
 
-namespace Dali
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-namespace.h>
+
+namespace DALI_NAMESPACE
 {
 namespace NativeImageTest
 {
@@ -26,6 +29,6 @@ namespace NativeImageTest
 const char* GetCustomFragmentPrefix();
 
 }
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // TEST_NATIVE_IMAGE_SOURCE_H

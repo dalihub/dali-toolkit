@@ -37,7 +37,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -659,6 +659,6 @@ inline Internal::Visual::Base& GetImplementation(Toolkit::Visual::Base& visualBa
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_VISUAL_H

@@ -25,10 +25,10 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-scene3d/public-api/api.h>
 #include <dali-scene3d/integration-api/loader/environment-map-data.h>
+#include <dali-scene3d/public-api/api.h>
 
-namespace Dali::Scene3D::Loader
+namespace DALI_NAMESPACE::Scene3D::Loader
 {
 /**
  * @brief Defines an environment map with either or both of radiance and irradiance maps.
@@ -61,10 +61,10 @@ struct DALI_SCENE3D_API EnvironmentDefinition
 
   EnvironmentDefinition() = default;
 
-  EnvironmentDefinition(const EnvironmentDefinition&) = delete;
+  EnvironmentDefinition(const EnvironmentDefinition&)            = delete;
   EnvironmentDefinition& operator=(const EnvironmentDefinition&) = delete;
 
-  EnvironmentDefinition(EnvironmentDefinition&&) = default;
+  EnvironmentDefinition(EnvironmentDefinition&&)            = default;
   EnvironmentDefinition& operator=(EnvironmentDefinition&&) = default;
 
   /**
@@ -139,6 +139,6 @@ public: // DATA
   bool               mUseBrdfTexture  = false;
 };
 
-} // namespace Dali::Scene3D::Loader
+} //namespace DALI_NAMESPACE::Scene3D::Loader
 
 #endif // DALI_SCENE3D_LOADER_ENVIRONMENT_DEFINITION_H

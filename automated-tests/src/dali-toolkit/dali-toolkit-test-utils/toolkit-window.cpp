@@ -31,7 +31,7 @@
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Window;
 
@@ -318,4 +318,4 @@ WheelEventGeneratedSignalType& WheelEventGeneratedSignal(Window window)
 
 } // namespace DevelWindow
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

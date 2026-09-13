@@ -33,7 +33,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -191,4 +191,4 @@ void ControlWrapper::EmitKeyInputFocusSignal(bool focusGained)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

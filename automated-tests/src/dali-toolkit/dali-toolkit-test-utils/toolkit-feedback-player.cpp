@@ -20,7 +20,7 @@
 
 using namespace Dali;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 class Adaptor;
 
@@ -198,4 +198,4 @@ void SetLoadFileReturnValue(Dali::FeedbackPlayer feedbackPlayer, bool returnValu
 } //namespace Adaptor
 } //namespace Internal
 
-} //namespace Dali
+} //namespace DALI_NAMESPACE

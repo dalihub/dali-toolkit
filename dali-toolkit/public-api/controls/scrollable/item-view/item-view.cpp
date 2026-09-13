@@ -19,7 +19,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -242,4 +242,4 @@ ItemView::LayoutActivatedSignalType& ItemView::LayoutActivatedSignal()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

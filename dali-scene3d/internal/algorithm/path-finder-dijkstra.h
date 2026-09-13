@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_INTERNAL_PATH_FINDER_DIJKSTRA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include <dali-scene3d/internal/algorithm/navigation-mesh-impl.h>
 #include <dali-scene3d/public-api/algorithm/path-finder.h>
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 class PathFinderAlgorithmDijkstra : public Dali::Scene3D::Algorithm::PathFinderBase
 {
@@ -84,5 +84,5 @@ public:
   NavigationMesh*       mNavigationMesh; ///< Pointer to a valid NavigationMesh
   std::vector<FaceNode> mNodes;          ///< List of nodes
 };
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 #endif // DALI_SCENE3D_INTERNAL_PATH_FINDER_DIJKSTRA_H

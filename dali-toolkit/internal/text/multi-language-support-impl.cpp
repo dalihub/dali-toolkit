@@ -29,7 +29,7 @@
 #include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1368,4 +1368,4 @@ bool MultilanguageSupport::IsICULineBreakNeededForLocale()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

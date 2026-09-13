@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -79,6 +79,6 @@ DALI_TOOLKIT_API Uint16Pair GetValidStrechPointFromBorder(uint32_t maxRangeSize,
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_NPATCH_UTILITIES_H

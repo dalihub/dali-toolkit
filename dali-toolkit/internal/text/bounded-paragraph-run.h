@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BOUNDED_PARAGRAPH_RUN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali-toolkit/internal/text/abstract-style-character-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -74,6 +74,6 @@ struct TypeTraits<Dali::Toolkit::Text::BoundedParagraphRun> : public Dali::Basic
   };
 };
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_BOUNDED_PARAGRAPH_RUN_H

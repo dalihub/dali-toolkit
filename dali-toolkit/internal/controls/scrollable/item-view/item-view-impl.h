@@ -33,7 +33,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -680,6 +680,6 @@ inline const Toolkit::Internal::ItemView& GetImpl(const Toolkit::ItemView& itemV
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H

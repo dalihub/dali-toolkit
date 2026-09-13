@@ -86,7 +86,7 @@ void ComponentsCombine(std::vector<FaceNodeIndex>& components, std::vector<FaceN
 }
 } // namespace
 
-namespace Dali::Scene3D::Internal::Algorithm
+namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm
 {
 PathFinderAlgorithmSPFADoubleWay::PathFinderAlgorithmSPFADoubleWay(Dali::Scene3D::Algorithm::NavigationMesh& navMesh)
 : mNavigationMesh(&GetImplementation(navMesh))
@@ -481,4 +481,4 @@ Scene3D::Algorithm::WayPointList PathFinderAlgorithmSPFADoubleWay::OptimizeWaypo
 
   return optimizedWaypoints;
 }
-} // namespace Dali::Scene3D::Internal::Algorithm
+} //namespace DALI_NAMESPACE::Scene3D::Internal::Algorithm

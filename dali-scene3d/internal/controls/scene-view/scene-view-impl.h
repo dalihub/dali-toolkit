@@ -35,12 +35,12 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
+#include <dali-scene3d/integration-api/loader/shader-manager.h>
 #include <dali-scene3d/internal/common/environment-map-load-task.h>
 #include <dali-scene3d/internal/common/light-observer.h>
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
-#include <dali-scene3d/integration-api/loader/shader-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -669,6 +669,6 @@ inline const Dali::Scene3D::Internal::SceneView& GetImpl(const Dali::Scene3D::Sc
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_INTERNAL_SCENE_VIEW_H

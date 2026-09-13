@@ -2,7 +2,7 @@
 #define DALI_SCENE3D_MODEL_MOTION_MOTION_TRANSFORM_INDEX_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include <dali-scene3d/internal/model-motion/motion-index/motion-index-impl.h>
 #include <dali-scene3d/public-api/model-motion/motion-index/motion-transform-index.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -113,6 +113,6 @@ inline const Internal::MotionTransformIndex& GetImplementation(const Dali::Scene
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_MODEL_MOTION_MOTION_TRANSFORM_INDEX_IMPL_H

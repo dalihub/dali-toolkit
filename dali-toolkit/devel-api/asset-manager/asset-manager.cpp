@@ -27,7 +27,7 @@ namespace
 
 } // unnamed namespace
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -83,4 +83,4 @@ const std::string AssetManager::GetDaliDataReadOnlyPath()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

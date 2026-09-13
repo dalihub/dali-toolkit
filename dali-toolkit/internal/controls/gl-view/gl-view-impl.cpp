@@ -36,7 +36,7 @@
 
 using Dali::Integration::ToDaliStringView;
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -312,4 +312,4 @@ Dali::NativeImageQueue::ColorFormat GlView::GetColorFormat(Dali::Toolkit::GlView
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

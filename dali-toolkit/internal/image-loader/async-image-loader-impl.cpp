@@ -22,7 +22,7 @@
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -174,4 +174,4 @@ void AsyncImageLoader::ProcessLoadedImage(LoadingTaskPtr task)
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

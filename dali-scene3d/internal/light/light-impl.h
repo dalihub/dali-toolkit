@@ -29,7 +29,7 @@
 #include <dali-scene3d/public-api/controls/scene-view/scene-view.h>
 #include <dali-scene3d/public-api/light/light.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Scene3D
 {
@@ -340,6 +340,6 @@ DALI_SCENE3D_API const Internal::Light& GetImplementation(const Dali::Scene3D::L
  */
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_SCENE3D_LIGHT_IMPL_H

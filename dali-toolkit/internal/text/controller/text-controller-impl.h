@@ -33,7 +33,7 @@
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -1175,6 +1175,6 @@ private:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

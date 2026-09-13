@@ -1,6 +1,6 @@
 #include <dali-scene3d/internal/model-components/model-node-tree-utility.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 
 namespace Scene3D
@@ -139,4 +139,4 @@ void UpdateImageBasedLightScaleFactorRecursively(Scene3D::ModelNode node, float 
 
 } // namespace Scene3D
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

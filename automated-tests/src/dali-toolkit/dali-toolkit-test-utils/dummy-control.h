@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <functional>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -219,6 +219,6 @@ public:
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
 
 #endif // DALI_TOOLKIT_TEST_DUMMY_CONTROL_H

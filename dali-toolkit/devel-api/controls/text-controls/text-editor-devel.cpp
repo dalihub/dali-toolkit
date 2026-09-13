@@ -19,7 +19,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -144,4 +144,4 @@ Dali::Property::Index RegisterFontVariationProperty(TextEditor textEditor, std::
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE

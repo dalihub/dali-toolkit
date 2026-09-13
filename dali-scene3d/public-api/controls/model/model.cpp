@@ -28,7 +28,7 @@
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;
 
-namespace Dali::Scene3D
+namespace DALI_NAMESPACE::Scene3D
 {
 Model::Model() = default;
 
@@ -209,4 +209,4 @@ Model::ResourceStatus Model::GetModelResourceStatus() const
   return GetImpl(*this).GetModelResourceStatus();
 }
 
-} // namespace Dali::Scene3D
+} //namespace DALI_NAMESPACE::Scene3D

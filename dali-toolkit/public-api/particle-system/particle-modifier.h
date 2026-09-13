@@ -25,12 +25,12 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/callback.h>
 
-namespace Dali::Toolkit::ParticleSystem::Internal
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleModifier;
 }
 
-namespace Dali::Toolkit::ParticleSystem
+namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 class ParticleEmitter;
 
@@ -142,6 +142,6 @@ private:
   /// @endcond
 };
 
-} // namespace Dali::Toolkit::ParticleSystem
+} //namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 #endif

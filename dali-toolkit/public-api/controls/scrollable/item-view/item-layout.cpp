@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 
-namespace Dali
+namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
@@ -161,4 +161,4 @@ Property::Map ItemLayout::GetLayoutProperties()
 
 } // namespace Toolkit
 
-} // namespace Dali
+} //namespace DALI_NAMESPACE
