@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -163,7 +164,7 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
   Property::Value* borderValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER, BORDER);
   if(borderValue)
   {
-    if(!borderValue->Get(mBorder)) // If value exists and is Extents (or Vector4), just set mBorder
+    if(!GetExtents(*borderValue, mBorder)) // If value exists and is Extents (or Vector4), just set mBorder
     {
       // Not a extents so try rect
       Rect<int32_t> rect;

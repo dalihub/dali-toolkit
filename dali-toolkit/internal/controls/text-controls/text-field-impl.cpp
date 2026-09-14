@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/debug.h>
@@ -588,7 +589,7 @@ void TextField::OnApplyDefaultStyle()
 Vector3 TextField::GetNaturalSize()
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   Vector3 naturalSize = mController->GetNaturalSize();
   naturalSize.width += (padding.start + padding.end);
@@ -600,7 +601,7 @@ Vector3 TextField::GetNaturalSize()
 float TextField::GetHeightForWidth(float width)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   return mController->GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
@@ -658,7 +659,7 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Actor self = Self();
 
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
@@ -833,7 +834,7 @@ void TextField::OnTap(const TapGesture& gesture)
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
-  padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
@@ -866,7 +867,7 @@ void TextField::OnLongPress(const LongPressGesture& gesture)
     Dali::Integration::InputMethodContext::Activate(mInputMethodContext);
   }
   Extents padding;
-  padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->LongPressEvent(gesture.GetState(), localPoint.x - padding.start, localPoint.y - padding.top);
 

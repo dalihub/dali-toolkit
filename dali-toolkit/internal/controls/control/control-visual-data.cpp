@@ -19,6 +19,7 @@
 #include "control-visual-data.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/constraint-integ.h>
 #include <dali/integration-api/debug.h>
@@ -1350,7 +1351,9 @@ void Control::VisualData::ApplyFittingMode(const Vector2& size)
         self = mOuter.mControlImpl.Self();
       }
 
-      Extents padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+      Extents padding;
+
+      GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
       bool zeroPadding = (padding == Extents());
 

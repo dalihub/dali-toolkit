@@ -571,6 +571,25 @@ int UtcDaliModelGetNaturalSize(void)
   END_TEST;
 }
 
+int UtcDaliModelSizeForSizeWithPadding(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::Model model = Scene3D::Model::New();
+  application.GetScene().Add(model);
+
+  const float heightForWidth = DevelActor::GetHeightForWidth(model, 100.0f);
+  const float widthForHeight = DevelActor::GetWidthForHeight(model, 100.0f);
+
+  // Padding is start, end, top, bottom.
+  model.SetProperty(Toolkit::Control::Property::PADDING, Extents(1, 2, 3, 4));
+
+  DALI_TEST_EQUALS(DevelActor::GetHeightForWidth(model, 100.0f), heightForWidth + 3.0f + 4.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetWidthForHeight(model, 100.0f), widthForHeight + 1.0f + 2.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliModelSetImageBasedLightSource01(void)
 {
   ToolkitTestApplication application;

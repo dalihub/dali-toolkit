@@ -19,8 +19,9 @@
 #include <dali-scene3d/internal/loader/json-util.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/extents.h>
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/public-api/common/extents.h>
+#include <dali/devel-api/object/property-devel.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
@@ -412,6 +413,17 @@ bool ReadStringVector(const TreeNode* node, std::vector<std::string>& strvector)
 
 Property::Value ReadPropertyValue(const Property::Type& propType, const TreeNode& tn)
 {
+  // DevelProperty::EXTENTS cannot be a case label of a Property::Type switch.
+  if(propType == DevelProperty::EXTENTS)
+  {
+    Extents value;
+    if(ReadQuadHelper<int16_t>(&tn, {&value.start, &value.end, &value.top, &value.bottom}))
+    {
+      return Property::Value(value);
+    }
+    return Property::Value();
+  }
+
   switch(propType)
   {
     case Property::BOOLEAN:
@@ -450,16 +462,6 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const TreeNode
 
     case Property::ROTATION:
       return ReadRotationHelper(&tn);
-
-    case Property::EXTENTS:
-    {
-      Extents value;
-      if(ReadQuadHelper<int16_t>(&tn, {&value.start, &value.end, &value.top, &value.bottom}))
-      {
-        return Property::Value(value);
-      }
-      break;
-    }
 
     case Property::NONE: // fall
     default:

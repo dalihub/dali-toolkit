@@ -21,10 +21,10 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/animation/animation-data.h>
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/common/extents.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-accessible.h>
