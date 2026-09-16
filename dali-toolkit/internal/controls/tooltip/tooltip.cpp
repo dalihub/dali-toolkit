@@ -23,6 +23,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/timer.h>
@@ -319,7 +320,7 @@ void Tooltip::SetBackground(const Property::Value& value)
         }
         else if(key == Toolkit::Tooltip::Background::Property::BORDER || key == PROPERTY_BACKGROUND_BORDER)
         {
-          if(!value.Get(mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
+          if(!GetExtents(value, mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
           {
             // Not a extents so try rect
             Rect<int32_t> rect;

@@ -18,6 +18,7 @@
 #include "style-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/application.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -26,7 +27,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/adaptor-framework/application.h>
 
 #include <locale>
 

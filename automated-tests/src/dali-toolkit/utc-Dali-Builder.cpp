@@ -532,6 +532,34 @@ int UtcDaliBuilderConstantsP(void)
   END_TEST;
 }
 
+int UtcDaliBuilderExtentsConstantP(void)
+{
+  ToolkitTestApplication application;
+
+  // An Extents constant replaces the whole value of an Extents property.
+  std::string json(
+    "{"
+    "\"stage\":"
+    "[{"
+    "  \"type\": \"ImageView\","
+    "  \"name\": \"image\","
+    "  \"padding\": \"{PADDING}\""
+    "}]"
+    "}");
+
+  Builder builder = Builder::New();
+  builder.LoadFromString(json);
+  builder.AddConstant("PADDING", Extents(1, 2, 3, 4));
+
+  builder.AddActors(application.GetScene().GetRootLayer());
+
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("image");
+  DALI_TEST_CHECK(actor);
+  DALI_TEST_EQUALS(ToExtents(actor.GetProperty(Control::Property::PADDING)), Extents(1, 2, 3, 4), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliBuilderTemplatesAndStylesP(void)
 {
   ToolkitTestApplication application;
@@ -1863,7 +1891,7 @@ int UtcDaliBuilderInsetsTypeCastP(void)
   ToolkitTestApplication application;
 
   // "insets" typeCast registers a custom property of type Property::INSETS,
-  // mirroring how "extents" registers one of type Property::EXTENTS.
+  // mirroring how "extents" registers one of type DevelProperty::EXTENTS.
   std::string json(
     "{"
     "\"stage\":"

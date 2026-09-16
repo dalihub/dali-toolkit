@@ -23,6 +23,7 @@
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -1284,7 +1285,7 @@ bool TextLabel::OnInterceptTouched(Actor actor, TouchEvent touch)
          distanceDelta.y < 20)
       {
         Extents padding;
-        padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+        GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
         const Vector2& localPoint = touch.GetLocalPosition(0);
         mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
       }
@@ -1345,7 +1346,7 @@ void TextLabel::EmitAnchorClickedSignal(const std::string& href)
 Vector3 TextLabel::GetNaturalSize()
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   Vector3 naturalSize = mController->GetNaturalSize();
   naturalSize.width += (padding.start + padding.end);
@@ -1357,7 +1358,7 @@ Vector3 TextLabel::GetNaturalSize()
 float TextLabel::GetHeightForWidth(float width)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   return mController->GetHeightForWidth(width) + padding.top + padding.bottom;
 }
@@ -1547,7 +1548,7 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Actor self = Self();
 
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   float   width  = Max(size.x - (padding.start + padding.end), 0.0f);
   float   height = Max(size.y - (padding.top + padding.bottom), 0.0f);
@@ -2132,7 +2133,7 @@ void TextLabel::AsyncLoadComplete(Text::AsyncTextRenderInfo renderInfo)
   Actor self = Self();
 
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   if(mIsManualRender)
   {
@@ -2209,7 +2210,7 @@ void TextLabel::EmitAsyncNaturalSizeComputedSignal(float width, float height)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
   Extents                  padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   mAsyncNaturalSizeComputedSignal.Emit(handle, width + (padding.start + padding.end), height + (padding.top + padding.bottom));
 }
 
@@ -2217,7 +2218,7 @@ void TextLabel::EmitAsyncHeightForWidthComputedSignal(float width, float height)
 {
   Dali::Toolkit::TextLabel handle(GetOwner());
   Extents                  padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   mAsyncHeightForWidthComputedSignal.Emit(handle, width, height + (padding.top + padding.bottom));
 }
 
@@ -2391,7 +2392,7 @@ void TextLabel::RequestAsyncRenderWithFixedSize(float width, float height)
 
   Actor   self = Self();
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   float contentWidth  = Max(width - (padding.start + padding.end), 0.0f);
   float contentHeight = Max(height - (padding.top + padding.bottom), 0.0f);
@@ -2423,7 +2424,7 @@ void TextLabel::RequestAsyncRenderWithFixedWidth(float width, float heightConstr
 
   Actor   self = Self();
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   float contentWidth            = Max(width - (padding.start + padding.end), 0.0f);
   float contentHeightConstraint = Max(heightConstraint - (padding.top + padding.bottom), 0.0f);
@@ -2455,7 +2456,7 @@ void TextLabel::RequestAsyncRenderWithFixedHeight(float widthConstraint, float h
 
   Actor   self = Self();
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   float contentWidthConstraint = Max(widthConstraint - (padding.start + padding.end), 0.0f);
   float contentHeight          = Max(height - (padding.top + padding.bottom), 0.0f);
@@ -2487,7 +2488,7 @@ void TextLabel::RequestAsyncRenderWithConstraint(float widthConstraint, float he
 
   Actor   self = Self();
   Extents padding;
-  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(self.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   float contentWidthConstraint  = Max(widthConstraint - (padding.start + padding.end), 0.0f);
   float contentHeightConstraint = Max(heightConstraint - (padding.top + padding.bottom), 0.0f);

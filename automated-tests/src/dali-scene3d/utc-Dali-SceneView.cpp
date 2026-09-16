@@ -1636,3 +1636,22 @@ int UtcDaliSceneViewRenderTaskOrdering(void)
 
   END_TEST;
 }
+
+int UtcDaliSceneViewSizeForSizeWithPadding(void)
+{
+  ToolkitTestApplication application;
+
+  Scene3D::SceneView view = Scene3D::SceneView::New();
+  application.GetScene().Add(view);
+
+  const float heightForWidth = DevelActor::GetHeightForWidth(view, 100.0f);
+  const float widthForHeight = DevelActor::GetWidthForHeight(view, 100.0f);
+
+  // Padding is start, end, top, bottom.
+  view.SetProperty(Toolkit::Control::Property::PADDING, Extents(1, 2, 3, 4));
+
+  DALI_TEST_EQUALS(DevelActor::GetHeightForWidth(view, 100.0f), heightForWidth + 3.0f + 4.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetWidthForHeight(view, 100.0f), widthForHeight + 1.0f + 2.0f, TEST_LOCATION);
+
+  END_TEST;
+}

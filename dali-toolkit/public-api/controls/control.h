@@ -119,7 +119,7 @@ public:
 
       /**
        * @brief The outer space around the control.
-       * @details Name "margin", type Property::EXTENTS.
+       * @details Name "margin", type DevelProperty::EXTENTS.
        * @SINCE_1_2.62
        * @note Margin property is to be supported by Layout algorithms and containers in future.
        */
@@ -127,7 +127,7 @@ public:
 
       /**
        * @brief The inner space of the control.
-       * @details Name "padding", type Property::EXTENTS.
+       * @details Name "padding", type DevelProperty::EXTENTS.
        * @SINCE_1_2.62
        */
       PADDING

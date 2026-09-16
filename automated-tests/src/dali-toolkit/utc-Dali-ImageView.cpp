@@ -1624,7 +1624,7 @@ int UtcDaliImageViewPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(imageView.GetProperty(Control::Property::PADDING)), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   ImageView childImage = ImageView::New();
   childImage.SetBackgroundColor(Color::BLACK);
@@ -1674,7 +1674,7 @@ int UtcDaliImageViewPaddingProperty02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(imageView.GetProperty(Control::Property::PADDING)), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   // Check whether Image Visual transforms on ImageView::OnRelayout()
   Toolkit::ControlImpl& controlImpl = Toolkit::GetImplementation(imageView);
@@ -1715,7 +1715,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(imageView.GetProperty(Control::Property::PADDING)), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   tet_infoline("Remove Padding and test Visual is position correctly");
 
@@ -1763,7 +1763,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(imageView.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(imageView.GetProperty(Control::Property::PADDING)), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   tet_infoline("Remove Padding and test Visual is position correctly");
 

@@ -3706,7 +3706,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(editor.GetProperty<Extents>(Toolkit::Control::Property::PADDING), Extents(10, 10, 10, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(editor.GetProperty(Toolkit::Control::Property::PADDING)), Extents(10, 10, 10, 10), TEST_LOCATION);
 
   Vector3 paddingAddedSize = DevelActor::GetNaturalSize(editor);
 

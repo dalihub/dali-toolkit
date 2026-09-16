@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/public-api/adaptor-framework/window-definitions.h>
 #include <dali/public-api/signals/slot-delegate.h>
 #include <string>
 
@@ -44,6 +45,7 @@ public:
 
   PositionSize GetPositionSize() const;
   std::string  GetNativeResourceId() const;
+  WindowType   GetType() const;
   void         KeepRendering(float durationSeconds);
 
   void SetPositionSize(PositionSize positionSize);

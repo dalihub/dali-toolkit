@@ -22,6 +22,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -931,14 +932,14 @@ Vector3 Model::GetNaturalSize()
 float Model::GetHeightForWidth(float width)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
 float Model::GetWidthForHeight(float height)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
 }
 

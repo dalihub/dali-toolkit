@@ -399,7 +399,7 @@ int UtcDaliTooltipCreateWithBackgroundMap(void)
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
   DALI_TEST_CHECK(borderValue);
-  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(10, 20, 30, 40), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(*borderValue), Extents(10, 20, 30, 40), TEST_LOCATION);
 
   END_TEST;
 }
@@ -434,7 +434,7 @@ int UtcDaliTooltipCreateWithBackgroundMapRectInt(void)
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
   DALI_TEST_CHECK(borderValue);
-  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(10, 20, 30, 40), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(*borderValue), Extents(10, 20, 30, 40), TEST_LOCATION);
 
   END_TEST;
 }
@@ -469,7 +469,7 @@ int UtcDaliTooltipCreateWithBackgroundMapVector4(void)
   tet_infoline("Check border");
   Property::Value* borderValue = backgroundMap->Find(Tooltip::Background::Property::BORDER);
   DALI_TEST_CHECK(borderValue);
-  DALI_TEST_EQUALS(borderValue->Get<Extents>(), Extents(40, 30, 20, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(*borderValue), Extents(40, 30, 20, 10), TEST_LOCATION);
 
   END_TEST;
 }

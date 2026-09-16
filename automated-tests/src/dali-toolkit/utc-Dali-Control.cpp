@@ -1188,7 +1188,7 @@ int UtcDaliControlMarginProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<Extents>(Control::Property::MARGIN), Extents(20, 10, 0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(control.GetProperty(Control::Property::MARGIN)), Extents(20, 10, 0, 0), TEST_LOCATION);
 
   // Parent control has one ImageView as a Child.
   ImageView image = ImageView::New();
@@ -1200,7 +1200,7 @@ int UtcDaliControlMarginProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(image.GetProperty<Extents>(Control::Property::PADDING), Extents(10, 10, 10, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(image.GetProperty(Control::Property::PADDING)), Extents(10, 10, 10, 10), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1219,7 +1219,7 @@ int UtcDaliControlPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(control.GetProperty<Extents>(Control::Property::PADDING), Extents(15, 10, 5, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(control.GetProperty(Control::Property::PADDING)), Extents(15, 10, 5, 10), TEST_LOCATION);
 
   Control child = Control::New();
   control.Add(child);

@@ -15,6 +15,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/integration-api/adaptor-framework/accessibility/accessibility-bridge.h>
 #include <dali/integration-api/string-utils.h>
@@ -171,7 +172,7 @@ void CommonTextUtils::RenderText(
     else
     {
       Extents padding;
-      padding = textActor.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+      GetExtents(textActor.GetProperty(Toolkit::Control::Property::PADDING), padding);
 
       // Support Right-To-Left of padding
       Dali::LayoutDirection::Type layoutDirection = textActor.GetEffectiveLayoutDirection();

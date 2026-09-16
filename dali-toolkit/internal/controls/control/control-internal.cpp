@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/property-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -477,8 +479,8 @@ DALI_TYPE_REGISTRATION_END()
 const PropertyRegistration Control::PROPERTY_1(typeRegistration,  "styleName",                        Toolkit::Control::Property::STYLE_NAME,                                Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_4(typeRegistration,  "keyInputFocus",                    Toolkit::Control::Property::KEY_INPUT_FOCUS,                           Property::BOOLEAN, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_5(typeRegistration,  "background",                       Toolkit::Control::Property::BACKGROUND,                                Property::MAP,     &Control::SetProperty, &Control::GetProperty);
-const PropertyRegistration Control::PROPERTY_6(typeRegistration,  "margin",                           Toolkit::Control::Property::MARGIN,                                    Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
-const PropertyRegistration Control::PROPERTY_7(typeRegistration,  "padding",                          Toolkit::Control::Property::PADDING,                                   Property::EXTENTS, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_6(typeRegistration,  "margin",                           Toolkit::Control::Property::MARGIN,                                    DevelProperty::EXTENTS, &Control::SetProperty, &Control::GetProperty);
+const PropertyRegistration Control::PROPERTY_7(typeRegistration,  "padding",                          Toolkit::Control::Property::PADDING,                                   DevelProperty::EXTENTS, &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_8(typeRegistration,  "tooltip",                          Toolkit::DevelControl::Property::TOOLTIP,                              Property::MAP,     &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_9(typeRegistration,  "state",                            Toolkit::DevelControl::Property::STATE,                                Property::STRING,  &Control::SetProperty, &Control::GetProperty);
 const PropertyRegistration Control::PROPERTY_10(typeRegistration, "subState",                         Toolkit::DevelControl::Property::SUB_STATE,                            Property::STRING,  &Control::SetProperty, &Control::GetProperty);
@@ -1008,7 +1010,7 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::Control::Property::MARGIN:
       {
         Extents margin;
-        if(value.Get(margin))
+        if(GetExtents(value, margin))
         {
           controlImpl.mInternal->SetMargin(margin);
         }
@@ -1018,7 +1020,7 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
       case Toolkit::Control::Property::PADDING:
       {
         Extents padding;
-        if(value.Get(padding))
+        if(GetExtents(value, padding))
         {
           controlImpl.mInternal->SetPadding(padding);
         }

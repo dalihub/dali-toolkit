@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -388,7 +389,7 @@ Vector3 ImageView::GetNaturalSize()
     mVisual.GetNaturalSize(rendererNaturalSize);
 
     Extents padding;
-    padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+    GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
     rendererNaturalSize.width += (padding.start + padding.end);
     rendererNaturalSize.height += (padding.top + padding.bottom);
@@ -402,7 +403,7 @@ Vector3 ImageView::GetNaturalSize()
 float ImageView::GetHeightForWidth(float width)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   if(mVisual)
   {
@@ -417,7 +418,7 @@ float ImageView::GetHeightForWidth(float width)
 float ImageView::GetWidthForHeight(float height)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
 
   if(mVisual)
   {

@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>

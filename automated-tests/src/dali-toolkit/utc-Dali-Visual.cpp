@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <dali/devel-api/object/property-devel.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
@@ -1015,9 +1016,9 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>());
 
-  value = resultMap.Find(ImageVisual::Property::BORDER, Property::EXTENTS);
+  value = resultMap.Find(ImageVisual::Property::BORDER, DevelProperty::EXTENTS);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Extents>() == border);
+  DALI_TEST_CHECK(ToExtents(*value) == border);
 
   value = resultMap.Find(DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING);
   DALI_TEST_CHECK(value);
@@ -1056,9 +1057,9 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>());
 
-  value = resultMap.Find(ImageVisual::Property::BORDER, Property::EXTENTS);
+  value = resultMap.Find(ImageVisual::Property::BORDER, DevelProperty::EXTENTS);
   DALI_TEST_CHECK(value);
-  DALI_TEST_CHECK(value->Get<Extents>() == border);
+  DALI_TEST_CHECK(ToExtents(*value) == border);
 
   END_TEST;
 }
