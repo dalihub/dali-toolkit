@@ -28,7 +28,20 @@ std::ostream& operator<<(std::ostream& ostream, Dali::Toolkit::Visual::ResourceS
 // INTERNAL INCLUDES
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include "toolkit-input-method-context.h"
 #include "toolkit-test-application.h"
+
+/**
+ * @brief Retrieves Extents from a property value, as Property::Value::Get<T>() cannot for a devel type.
+ * @param[in] value The property value
+ * @return The extents, or zero extents if the value is not convertible
+ */
+inline Dali::Extents ToExtents(const Dali::Property::Value& value)
+{
+  Dali::Extents extents;
+  Dali::GetExtents(value, extents);
+  return extents;
+}
 
 #endif // DALI_TOOLKIT_TEST_SUITE_UTILS_H

@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/extents.h>
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>

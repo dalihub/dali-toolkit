@@ -22,6 +22,8 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
+#include <dali/devel-api/object/property-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -138,7 +140,9 @@ DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "autoHideDelay",         INTEGER,   A
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "backingEnabled",        BOOLEAN,   BACKING_ENABLED        )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "backingColor",          VECTOR4,   BACKING_COLOR          )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "popupBackgroundImage",  STRING,    POPUP_BACKGROUND_IMAGE )
-DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "popupBackgroundBorder", EXTENTS, POPUP_BACKGROUND_BORDER)
+// DALI_PROPERTY_REGISTRATION prefixes the type with Dali::Property::, so DevelProperty::EXTENTS is registered by hand with the same counter check.
+Dali::PropertyRegistration popupBackgroundBorderRegistration(typeRegistration, "popupBackgroundBorder", Toolkit::Popup::Property::POPUP_BACKGROUND_BORDER, DevelProperty::EXTENTS, &Popup::SetProperty, &Popup::GetProperty);
+static_assert((static_cast<int>(Toolkit::Popup::Property::POPUP_BACKGROUND_BORDER) - static_cast<int>(Toolkit::Popup::PROPERTY_START_INDEX)) == __COUNTER__);
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailUpImage",           STRING,    TAIL_UP_IMAGE          )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailDownImage",         STRING,    TAIL_DOWN_IMAGE        )
 DALI_PROPERTY_REGISTRATION(Toolkit, Popup, "tailLeftImage",         STRING,    TAIL_LEFT_IMAGE        )
@@ -1311,7 +1315,7 @@ void Popup::SetProperty(BaseObject* object, Property::Index propertyIndex, const
       {
         bool valueUpdated = false;
 
-        if(value.Get(popupImpl.mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
+        if(GetExtents(value, popupImpl.mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
         {
           valueUpdated = true;
         }

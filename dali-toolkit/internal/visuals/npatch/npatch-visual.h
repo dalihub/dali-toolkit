@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/extents.h>
+#include <dali/devel-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>

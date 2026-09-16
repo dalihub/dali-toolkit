@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #define DEBUG_ENABLED 1
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <string>
 #include "dali-scene3d/internal/loader/json-util.h"
 #include "dali-toolkit/devel-api/builder/json-parser.h"
@@ -366,6 +368,16 @@ void CheckEqualityAs(Property::Value lhs, Property::Value rhs)
   DALI_TEST_EQUAL(lhs.Get<T>(), rhs.Get<T>());
 }
 
+template<>
+void CheckEqualityAs<Extents>(Property::Value lhs, Property::Value rhs)
+{
+  Extents lhsExtents;
+  Extents rhsExtents;
+  GetExtents(lhs, lhsExtents);
+  GetExtents(rhs, rhsExtents);
+  DALI_TEST_EQUAL(lhsExtents, rhsExtents);
+}
+
 } //namespace
 
 int UtcDaliJsonUtilReadPropertyValue(void)
@@ -392,7 +404,7 @@ int UtcDaliJsonUtilReadPropertyValue(void)
      CheckEqualityAs<Matrix3>},
     {Property::MATRIX, "matrix", Matrix(floats), CheckEqualityAs<Matrix>},
     {Property::RECTANGLE, "intArray", Rect<int>(1, 2, 3, 5), CheckEqualityAs<Rect<int>>},
-    {Property::EXTENTS, "intArray", Extents(1, 2, 3, 5), CheckEqualityAs<Extents>},
+    {DevelProperty::EXTENTS, "intArray", Extents(1, 2, 3, 5), CheckEqualityAs<Extents>},
   };
   for(auto& i : typeNameValues)
   {

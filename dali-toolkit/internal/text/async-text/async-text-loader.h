@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/extents.h>
 #include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/object/base-handle.h>

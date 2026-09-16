@@ -142,7 +142,7 @@ enum
 
   /**
    * @brief The size of the borders in the order: left, right, top, bottom.
-   * @details Name "border", type Property::EXTENTS.
+   * @details Name "border", type DevelProperty::EXTENTS.
    *          This is different from the nPatch border as the it will place the content within the bounds specified.
    *          For example, there could be some round corners in the image used and we may not want the content going over the rounded corners.
    * @note Optional.

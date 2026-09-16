@@ -4030,7 +4030,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(field.GetProperty<Extents>(Toolkit::Control::Property::PADDING), Extents(10, 10, 10, 10), TEST_LOCATION);
+  DALI_TEST_EQUALS(ToExtents(field.GetProperty(Toolkit::Control::Property::PADDING)), Extents(10, 10, 10, 10), TEST_LOCATION);
 
   Vector3 paddingAddedSize = DevelActor::GetNaturalSize(field);
 

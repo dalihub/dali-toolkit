@@ -150,7 +150,7 @@ enum
 
   /**
    * @brief The border of the image.
-   * @details Name "border", type Property::EXTENTS, Property::RECTANGLE or Property::VECTOR4.
+   * @details Name "border", type DevelProperty::EXTENTS, Property::RECTANGLE or Property::VECTOR4.
    *          The border of the image in the order: left, right, top, bottom.
    * @SINCE_1_2.60
    * @note Optional.

@@ -16,6 +16,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/object/property-devel.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <sstream>
@@ -99,7 +100,7 @@ bool Disambiguated(const TreeNode&        child,
     }
     else if(*childType == "extents")
     {
-      return DeterminePropertyFromNode(*childValue, Dali::Property::EXTENTS, value, replacement);
+      return DeterminePropertyFromNode(*childValue, DevelProperty::EXTENTS, value, replacement);
     }
     else if(*childType == "insets")
     {
@@ -120,6 +121,17 @@ bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Proper
 bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacer)
 {
   bool done = false;
+
+  // DevelProperty::EXTENTS cannot be a case label of a Property::Type switch.
+  if(type == DevelProperty::EXTENTS)
+  {
+    if(OptionalExtents v = replacer.IsExtents(node))
+    {
+      value = *v;
+      done  = true;
+    }
+    return done;
+  }
 
   switch(type)
   {
@@ -320,15 +332,6 @@ bool DeterminePropertyFromNode(const TreeNode& node, Property::Type type, Proper
 
           done = (map->Count() == node.Size());
         }
-      }
-      break;
-    }
-    case Property::EXTENTS:
-    {
-      if(OptionalExtents v = replacer.IsExtents(node))
-      {
-        value = *v;
-        done  = true;
       }
       break;
     }

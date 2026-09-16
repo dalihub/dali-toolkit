@@ -30,6 +30,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
@@ -1352,14 +1353,14 @@ void SceneView::OnChildRemove(Actor& child)
 float SceneView::GetHeightForWidth(float width)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   return ControlImpl::GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
 float SceneView::GetWidthForHeight(float height)
 {
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
   return ControlImpl::GetWidthForHeight(height) + padding.start + padding.end;
 }
 
