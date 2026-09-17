@@ -284,7 +284,7 @@ void TextSelectionPopup::OnInitialize()
 
   // Accessibility
   self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Toolkit::Accessibility::Role::DIALOG);
+  self.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::DIALOG);
 }
 
 void TextSelectionPopup::HideAnimationFinished(Animation animation)
