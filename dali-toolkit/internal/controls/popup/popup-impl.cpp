@@ -311,7 +311,7 @@ void Popup::OnInitialize()
   mLayer.SetProperty(Actor::Property::VISIBLE, false);
 
   // Add the layer to the hierarchy.
-  self.Add(mLayer);
+  DevelActor::Add(self, mLayer);
 
   // Add Backing (Dimmed effect).
   mBacking = CreateBacking();

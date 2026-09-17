@@ -313,7 +313,7 @@ void Panel::OnInitialize()
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_POSITION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_ORIENTATION, false);
   mRootLayer.SetProperty(Dali::Actor::Property::INHERIT_SCALE, false);
-  self.Add(mRootLayer);
+  DevelActor::Add(self, mRootLayer);
 
   mPanelNode = Scene3D::ModelNode::New();
   mPanelNode.SetProperty(Dali::Actor::Property::NAME, "PanelNode");

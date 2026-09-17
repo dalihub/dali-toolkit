@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-info.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -459,7 +460,7 @@ void Builder::AddActors(const std::string& sectionName, Actor toActor)
       Actor      actor      = Actor::DownCast(baseHandle);
       if(actor)
       {
-        toActor.Add(actor);
+        DevelActor::Add(toActor, actor);
       }
     }
 
@@ -1092,7 +1093,7 @@ BaseHandle Builder::DoCreate(const TreeNode& root, const TreeNode& node, Actor p
         // then add to parent
         if(parent)
         {
-          parent.Add(actor);
+          DevelActor::Add(parent, actor);
         }
       }
       else
