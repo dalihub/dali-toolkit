@@ -180,7 +180,11 @@ VisualFactoryCache::ShaderType FeatureBuilder::GetShaderType() const
 
 ChangeFragmentShader::Type FeatureBuilder::NeedToChangeFragmentShader() const
 {
-  return (mTexture && DevelTexture::IsNative(mTexture))
+  // Asked of the texture rather than of the platform: a backend can have native
+  // image types that need a custom sampler and others that do not - a buffer
+  // used as a render target cannot be an external texture, for instance - so
+  // being a native image is not on its own enough to need a different shader.
+  return (mTexture && DevelTexture::NeedsCustomSampler(mTexture))
            ? ChangeFragmentShader::NEED_CHANGE
            : ChangeFragmentShader::DONT_CHANGE;
 }
