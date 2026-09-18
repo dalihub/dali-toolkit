@@ -202,6 +202,12 @@ struct DBusWrapper
   };
   virtual void        add_interface_impl(bool fallback, const std::string& pathName, const ConnectionPtr& connection, std::vector<std::function<void()>>& destructors, const std::string& interfaceName, std::vector<MethodInfo>& dscrMethods, std::vector<PropertyInfo>& dscrProperties, std::vector<SignalInfo>& dscrSignals) = 0;
   virtual void        add_property_changed_event_listener_impl(const ProxyPtr& proxy, const std::string& interface, const std::string& name, std::function<void(const _Eina_Value*)> cb)                                                                                                                                        = 0;
+  // Keep virtual method order in sync with the adaptor's DBusWrapper.
+  // The test wrapper requires explicit reads for initial property values.
+  virtual bool property_changed_events_include_initial_value_impl() const
+  {
+    return false;
+  }
   virtual bool        get_from_value_impl(const void* v, void* dst)                                                                                                                                                                                                                                                             = 0;
   static DBusWrapper* Installed();
   static void         Install(std::unique_ptr<DBusWrapper>);
