@@ -92,7 +92,7 @@ Layer ChipmunkPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
 
   UniquePtr<PhysicsDebugRenderer> debugRenderer = PhysicsDebugRenderer::New(posSize.width, posSize.height, renderTask.GetCameraActor(), this);
 
-  mDebugActor = DrawableActor::New(*(debugRenderer->GetCallback().Get()));
+  mDebugActor = DrawableActor::New(debugRenderer->GetCallback());
   world->SetDebugRenderer(debugRenderer.Release());
 
   mDebugActor[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;

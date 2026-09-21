@@ -101,6 +101,12 @@ DrawableView::DrawableView(GlView::BackendMode backendMode)
 
 DrawableView::~DrawableView()
 {
+  // The render side holds a reference of its own, so the callback outlives this object -
+  // and the terminate invocation DALi still owes may run once it is gone. Detaching here
+  // is what keeps that invocation from reaching a destroyed view, and releases the bound
+  // textures on this thread.
+  mRenderCallback->Invalidate();
+
   // Ensure to unregister frame callback
   OnTerminateCompleted();
 }
@@ -179,7 +185,7 @@ void DrawableView::Terminate()
     Actor self = Self();
 
     // Make render callback execute forcibly next frame.
-    DevelRenderer::TerminateRenderCallback(mRenderer, true);
+    DevelRenderer::TerminateRenderCallback(mRenderer);
     self.RemoveRenderer(mRenderer);
 
     if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
@@ -219,8 +225,10 @@ void DrawableView::OnInitialize()
 {
   Actor self = Self();
 
-  // Initialize Renderer
-  mRenderer = DevelRenderer::New(*mRenderCallback);
+  // Initialize Renderer. The render side takes a reference, so the callback outlives this
+  // object where there is still queued work that refers to it - the terminate invocation
+  // DALi delivers exactly once, among others.
+  mRenderer = DevelRenderer::New(mRenderCallback);
   self.AddRenderer(mRenderer);
 
   // Adding VisibilityChange Signal.

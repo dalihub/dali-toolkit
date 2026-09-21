@@ -157,7 +157,8 @@ private:
   bool mStencil;
   int  mMSAA;
 
-  UniquePtr<RenderCallback> mRenderCallback;
+  /// Shared with the render side, which invokes it until it is done with it.
+  RenderCallbackPtr mRenderCallback;
 
   /*
    * Used within RenderCallback to handle the current render state

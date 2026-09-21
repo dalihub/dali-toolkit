@@ -92,7 +92,7 @@ Layer BulletPhysicsAdaptor::CreateDebugLayer(Dali::Window window)
   sizeConstraint.Apply();
 
   mDebugRenderer                              = PhysicsDebugRenderer::New(posSize.width, posSize.height, renderTask.GetCameraActor(), this);
-  mDebugActor                                 = DrawableActor::New(*(mDebugRenderer->GetCallback().Get()));
+  mDebugActor                                 = DrawableActor::New(mDebugRenderer->GetCallback());
   mDebugActor[Actor::Property::PIVOT]         = Dali::Pivot::CENTER;
   mDebugActor[Actor::Property::PARENT_ORIGIN] = Dali::ParentOrigin::CENTER;
 

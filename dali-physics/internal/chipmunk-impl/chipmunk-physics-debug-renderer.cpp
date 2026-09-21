@@ -132,6 +132,12 @@ PhysicsDebugRenderer::PhysicsDebugRenderer(uint32_t width, uint32_t height, Dali
 
 PhysicsDebugRenderer::~PhysicsDebugRenderer()
 {
+  // The render side holds a reference of its own, so the callback outlives this object.
+  if(mRenderCallback)
+  {
+    mRenderCallback->Invalidate();
+  }
+
   if(gPhysicsChipmunkGlesAddOn && gPhysicsChipmunkGlesAddOn->DeleteGlesPhysicsDebugRenderer)
   {
     gPhysicsChipmunkGlesAddOn->DeleteGlesPhysicsDebugRenderer(mImpl);
