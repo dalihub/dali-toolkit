@@ -36,7 +36,7 @@ Dali::VirtualKeyboard::StatusSignalType gKeyboardStatusSignal;
 } //namespace Adaptor
 } //namespace Internal
 
-bool IsKey(const Dali::KeyEvent& keyEvent, Dali::KEY daliKey)
+bool IsKey(const Dali::KeyEvent& keyEvent, Dali::Key daliKey)
 {
   return true;
 }
