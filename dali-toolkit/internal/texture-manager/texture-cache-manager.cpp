@@ -516,7 +516,7 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
 {
   std::vector<std::uint8_t> hashTarget;
   const uint16_t            width  = size.GetWidth();
-  const uint16_t            height = size.GetWidth();
+  const uint16_t            height = size.GetHeight();
 
   // If either the width or height has been specified, include the resizing options in the hash
   if(width != 0 || height != 0)

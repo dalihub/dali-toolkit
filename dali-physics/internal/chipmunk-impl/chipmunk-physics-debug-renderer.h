@@ -55,7 +55,7 @@ public:
    * Get the callback (for actor creation)
    */
 
-  UniquePtr<Dali::RenderCallback>& GetCallback()
+  Dali::RenderCallbackPtr GetCallback()
   {
     return mRenderCallback;
   }
@@ -109,10 +109,10 @@ private:
   Vertex  MakeVertex(cpVect pos, float u, float v, float r, Vector4 fill, Vector4 outline);
 
 private:
-  CameraActor                     mCamera;
-  cpSpaceDebugDrawOptions         mDebugDrawOptions;
-  Renderer                        mDebugRenderer;
-  UniquePtr<Dali::RenderCallback> mRenderCallback;
+  CameraActor             mCamera;
+  cpSpaceDebugDrawOptions mDebugDrawOptions;
+  Renderer                mDebugRenderer;
+  Dali::RenderCallbackPtr mRenderCallback;
 
   enum class State
   {

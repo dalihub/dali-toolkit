@@ -53,7 +53,7 @@ public:
   /**
    * Get the callback (for actor creation)
    */
-  UniquePtr<Dali::RenderCallback>& GetCallback()
+  Dali::RenderCallbackPtr GetCallback()
   {
     return mRenderCallback;
   }
@@ -88,9 +88,9 @@ private:
   void Render(const Dali::RenderCallbackInput& input);
 
 private:
-  CameraActor                     mCamera;
-  Renderer                        mDebugRenderer;
-  UniquePtr<Dali::RenderCallback> mRenderCallback;
+  CameraActor             mCamera;
+  Renderer                mDebugRenderer;
+  Dali::RenderCallbackPtr mRenderCallback;
 
   enum class State
   {

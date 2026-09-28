@@ -338,7 +338,7 @@ void WebView::OnInitialize()
     mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>(new WebBackForwardList(mWebEngine.GetBackForwardList()));
   }
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CONTAINER);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::FILLER);
 }
 
 DevelControl::ControlAccessible* WebView::CreateAccessibleObject()
