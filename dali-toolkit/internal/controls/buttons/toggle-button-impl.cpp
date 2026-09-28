@@ -111,7 +111,7 @@ void ToggleButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::TOGGLE_BUTTON);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::TOGGLE_BUTTON);
 }
 
 DevelControl::ControlAccessible* ToggleButton::CreateAccessibleObject()
