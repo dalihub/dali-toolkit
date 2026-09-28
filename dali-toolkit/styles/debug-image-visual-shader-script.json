@@ -62,7 +62,7 @@
   },
 
   // Logic for blue. (It show when we use GPU masking)
-  // Note that we can seperate each line as array.
+  // Note that we can separate each line as array.
   "blueChannelCodes":
   {
     "triggerCode":
