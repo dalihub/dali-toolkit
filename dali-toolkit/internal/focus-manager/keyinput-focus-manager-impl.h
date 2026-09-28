@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/object-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
