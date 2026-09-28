@@ -218,7 +218,7 @@ void ScrollBar::OnInitialize()
   CreateDefaultIndicatorActor();
   self.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::SCROLL_BAR);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::SCROLL_BAR);
 }
 
 DevelControl::ControlAccessible* ScrollBar::CreateAccessibleObject()

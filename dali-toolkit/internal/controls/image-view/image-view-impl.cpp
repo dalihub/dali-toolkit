@@ -132,7 +132,7 @@ void ImageView::OnInitialize()
   Dali::Toolkit::Control handle(GetOwner());
   handle.ResourceReadySignal().Connect(this, &ImageView::OnResourceReady);
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::IMAGE);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::IMAGE);
 }
 
 void ImageView::SetImage(const Property::Map& map)

@@ -77,7 +77,7 @@ void CheckBoxButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::CHECK_BOX);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::CHECK_BOX);
 }
 
 DevelControl::ControlAccessible* CheckBoxButton::CreateAccessibleObject()

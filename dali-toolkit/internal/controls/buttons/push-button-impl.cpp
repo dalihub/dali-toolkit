@@ -95,7 +95,7 @@ void PushButton::OnInitialize()
   Actor self = Self();
   self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::PUSH_BUTTON);
+  self.SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::BUTTON);
 }
 
 DevelControl::ControlAccessible* PushButton::CreateAccessibleObject()

@@ -71,7 +71,7 @@ void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Integration::Accessibility::Role::RADIO_BUTTON);
+  Self().SetProperty(DevelControl::Property::ACCESSIBILITY_ROLE, Accessibility::Role::RADIO_BUTTON);
 }
 
 DevelControl::ControlAccessible* RadioButton::CreateAccessibleObject()
