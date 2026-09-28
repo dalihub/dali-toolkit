@@ -48,7 +48,7 @@ namespace Internal
       }                                                                                            \
     }                                                                                              \
     oss << "}" << std::endl;                                                                       \
-    DALI_LOG_INFO(gFilterScript, Debug::Verbose, oss.str().c_str());                               \
+    DALI_LOG_INFO(gFilterScript, Debug::Verbose, "%s", oss.str().c_str());                         \
   }
 
 void LogTree(const Toolkit::JsonParser& mParser);
