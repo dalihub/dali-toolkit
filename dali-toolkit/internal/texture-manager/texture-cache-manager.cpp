@@ -23,7 +23,6 @@
 #include <dali/integration-api/debug.h>
 #include <algorithm>
 #include <string_view>
-#include <unordered_map>
 
 // INTERNAL HEADERS
 
@@ -35,24 +34,24 @@ namespace Internal
 {
 namespace
 {
-const std::string_view& GetEncodedImageBufferExtensions(Dali::EncodedImageBuffer::ImageType imageType)
+std::string_view GetEncodedImageBufferExtensions(Dali::EncodedImageBuffer::ImageType imageType)
 {
-  static constexpr std::string_view                                                            emptyString = "";
-  static const std::unordered_map<Dali::EncodedImageBuffer::ImageType, const std::string_view> gEncodedImageBufferExtensionMap =
-    {
-      {Dali::EncodedImageBuffer::ImageType::REGULAR_IMAGE, emptyString},
-      {Dali::EncodedImageBuffer::ImageType::VECTOR_IMAGE, ".svg"},
-      {Dali::EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE, ".json"},
-    };
-
-  const auto iter = gEncodedImageBufferExtensionMap.find(imageType);
-
-  if(DALI_LIKELY(iter != gEncodedImageBufferExtensionMap.end()))
+  switch(imageType)
   {
-    return iter->second;
+    case Dali::EncodedImageBuffer::ImageType::SVG:
+    {
+      return ".svg";
+    }
+    case Dali::EncodedImageBuffer::ImageType::LOTTIE:
+    {
+      return ".json";
+    }
+    case Dali::EncodedImageBuffer::ImageType::REGULAR_IMAGE:
+    default:
+    {
+      return "";
+    }
   }
-
-  return emptyString;
 }
 } // namespace
 #ifdef DEBUG_ENABLED
