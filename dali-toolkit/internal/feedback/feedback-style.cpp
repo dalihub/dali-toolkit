@@ -23,7 +23,6 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/object/object-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>

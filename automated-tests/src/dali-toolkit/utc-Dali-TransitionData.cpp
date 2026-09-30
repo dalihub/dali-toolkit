@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/debug.h>
 
 #include <stdlib.h>
 #include <iostream>
@@ -943,6 +944,62 @@ int UtcDaliTransitionDataArrayP(void)
   application.Render(500); // End of map1 anim
   application.SendNotification();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTransitionDataLogVisualBase(void)
+{
+  ToolkitTestApplication application;
+
+  tet_printf("Testing that animating a visual property logs it when the filter is on\n");
+
+  // Visual::Base::AnimateProperty() dumps the animator through gVisualBaseLogFilter,
+  // which is off by default. Turn every filter up so that path runs.
+  Debug::Filter::SetGlobalLogLevel(Debug::Verbose);
+
+  Property::Map map;
+  map["target"]       = "visual1";
+  map["property"]     = ColorVisual::Property::MIX_COLOR;
+  map["initialValue"] = Color::MAGENTA;
+  map["targetValue"]  = Color::RED;
+  map["animator"]     = Property::Map()
+                      .Add("alphaFunction", "LINEAR")
+                      .Add("timePeriod", Property::Map().Add("delay", 0.5f).Add("duration", 1.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New(map);
+
+  DummyControl actor = DummyControl::New();
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  actor.SetProperty(Dali::Actor::Property::NAME, "Actor1");
+  application.GetScene().Add(actor);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
+  Property::Map visualMap;
+  visualMap[Visual::Property::TYPE]           = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  Visual::Base visual                         = VisualFactory::Get().CreateVisual(visualMap);
+  visual.SetName("visual1");
+
+  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
+  dummyImpl.RegisterVisual(visualIndex, visual);
+
+  Animation anim = dummyImpl.CreateTransition(transition);
+  DALI_TEST_CHECK(anim);
+
+  anim.Play();
+  application.SendNotification();
+  application.Render(0);
+  application.Render(500);  // Delay over, animation starts
+  application.Render(1000); // Animation done
+  application.SendNotification();
+
+  Renderer renderer = actor.GetRendererAt(0);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(DevelRenderer::Property::MIX_COLOR), Vector3(Color::RED), TEST_LOCATION);
+
+  // Leave the filters as they were, or every test after this one logs.
+  Debug::Filter::SetGlobalLogLevel(Debug::NoLogging);
 
   END_TEST;
 }

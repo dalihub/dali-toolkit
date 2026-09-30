@@ -38,7 +38,6 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/object/object-registry.h>
 #include <cstring>
 #include <limits>
 

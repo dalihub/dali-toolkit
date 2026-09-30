@@ -56,21 +56,9 @@ user interface functionality.
 ##############################
 # resource
 ##############################
-%package resources_360x360
-Summary:    default resource files for 360x360
-Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_480x800
-Conflicts:  %{name}-resources_720x1280
-Conflicts:  %{name}-resources_1920x1080
-Conflicts:  %{name}-resources_1920x1080_rpi
-%description resources_360x360
-dali-toolkit default resource files for 360x360
-Contain po / sounds / common images / style / style images
-
 %package resources_480x800
 Summary:    default resource files for 480x800
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -81,7 +69,6 @@ Contain po / sounds / common images / style / style images
 %package resources_720x1280
 Summary:    default resource files for 720x1280
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -92,7 +79,6 @@ Contain po / sounds / common images / style / style images
 %package resources_1920x1080
 Summary:    default resource files for 1920x1080
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -103,7 +89,6 @@ Contain po / sounds / common images / style / style images
 %package resources_1920x1080_rpi
 Summary:    default resource files for 1920x1080 on Raspberry Pi 4
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
@@ -332,8 +317,6 @@ rm -rf %{buildroot}%{dali_toolkit_style_files}/*
 # Make folder to contain style and style images
 # After making folder, copy local style and style images to new folder
 pushd %{_builddir}/%{name}-%{version}
-mkdir -p %{buildroot}%{dali_toolkit_style_files}/360x360
-cp -r dali-toolkit/styles/360x360/* %{buildroot}%{dali_toolkit_style_files}/360x360
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/480x800
 cp -r dali-toolkit/styles/480x800/* %{buildroot}%{dali_toolkit_style_files}/480x800
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/720x1280
@@ -353,15 +336,6 @@ popd
 ##############################
 # Pre Install
 ##############################
-
-%pre resources_360x360
-case "$1" in
-  2)
-    pushd %{dali_toolkit_style_files}
-    rm -rf ./*
-    popd
-  ;;
-esac
 
 %pre resources_480x800
 case "$1" in
@@ -406,11 +380,6 @@ esac
 /sbin/ldconfig
 exit 0
 
-%post resources_360x360
-pushd %{dali_toolkit_style_files}/360x360
-for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
-
 %post resources_480x800
 pushd %{dali_toolkit_style_files}/480x800
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
@@ -440,17 +409,6 @@ exit 0
 ##############################
 # Pre Uninstall
 ##############################
-
-%preun resources_360x360
-case "$1" in
-  0)
-    %preun resources_360x360
-    pushd %{dali_toolkit_style_files}
-    mv images ./360x360
-    mv dali-toolkit-default-theme.json ./360x360
-    popd
-  ;;
-esac
 
 %preun resources_480x800
 case "$1" in
@@ -502,15 +460,6 @@ esac
 %postun
 /sbin/ldconfig
 exit 0
-
-%postun resources_360x360
-case "$1" in
-  0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
-  ;;
-esac
 
 %postun resources_480x800
 case "$1" in
@@ -580,16 +529,6 @@ exit 0
 %files integration-devel
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/devel-api/*
-
-%files resources_360x360
-%manifest dali-toolkit-resources.manifest
-%defattr(-,root,root,-)
-%{dali_toolkit_image_files}/*
-%{dali_toolkit_sound_files}/*
-%{dali_toolkit_style_files}/360x360/*
-%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
-%{dali_toolkit_style_files}/default-feedback-theme.json
-%{_datadir}/locale/*/LC_MESSAGES/*
 
 %files resources_480x800
 %manifest dali-toolkit-resources.manifest

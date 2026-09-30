@@ -1363,7 +1363,7 @@ void Visual::Base::AnimateProperty(
     std::ostringstream oss;
     oss.imbue(std::locale::classic());
     oss << "Visual::Base::AnimateProperty(Visual:" << mImpl->mName << " Property:" << animator.propertyKey << " Target: " << animator.targetValue << std::endl;
-    DALI_LOG_INFO(gVisualBaseLogFilter, Debug::General, oss.str().c_str());
+    DALI_LOG_INFO(gVisualBaseLogFilter, Debug::General, "%s", oss.str().c_str());
   }
 #endif
 
