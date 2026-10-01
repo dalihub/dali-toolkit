@@ -56,21 +56,9 @@ user interface functionality.
 ##############################
 # resource
 ##############################
-%package resources_360x360
-Summary:    default resource files for 360x360
-Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_480x800
-Conflicts:  %{name}-resources_720x1280
-Conflicts:  %{name}-resources_1920x1080
-Conflicts:  %{name}-resources_1920x1080_rpi
-%description resources_360x360
-dali-toolkit default resource files for 360x360
-Contain po / sounds / common images / style / style images
-
 %package resources_480x800
 Summary:    default resource files for 480x800
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -81,7 +69,6 @@ Contain po / sounds / common images / style / style images
 %package resources_720x1280
 Summary:    default resource files for 720x1280
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -92,7 +79,6 @@ Contain po / sounds / common images / style / style images
 %package resources_1920x1080
 Summary:    default resource files for 1920x1080
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080_rpi
@@ -103,7 +89,6 @@ Contain po / sounds / common images / style / style images
 %package resources_1920x1080_rpi
 Summary:    default resource files for 1920x1080 on Raspberry Pi 4
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
@@ -260,25 +245,25 @@ do
   language=${language%.po}
   msgfmt -o ${language}.mo ${language}.po
 done
-} &> /dev/null
+} > /dev/null 2>&1
 
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
+CXXFLAGS="$CXXFLAGS -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+LDFLAGS="$LDFLAGS -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
 
 %if 0%{?enable_coverage}
-CXXFLAGS+=" --coverage "
-LDFLAGS+=" --coverage "
+CXXFLAGS="$CXXFLAGS --coverage "
+LDFLAGS="$LDFLAGS --coverage "
 %endif
 
 %ifarch %{arm}
-CXXFLAGS+=" -D_ARCH_ARM_"
+CXXFLAGS="$CXXFLAGS -D_ARCH_ARM_"
 %endif
 
 %if "%{vd_asan}" == "1" || "%{asan}" == "1"
-CFLAGS+=" -fsanitize=address"
-CXXFLAGS+=" -fsanitize=address"
-LDFLAGS+=" -fsanitize=address"
+CFLAGS="$CFLAGS -fsanitize=address"
+CXXFLAGS="$CXXFLAGS -fsanitize=address"
+LDFLAGS="$LDFLAGS -fsanitize=address"
 %endif
 
 libtoolize --force
@@ -311,7 +296,8 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 cd build/tizen
 
-pushd %{_builddir}/%{name}-%{version}/build/tizen
+_saved_dir=$(pwd)
+cd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install
 
 # PO
@@ -323,17 +309,16 @@ do
   mkdir -p %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/
   cp ${language}.mo %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/dali-toolkit.mo
 done
-} &> /dev/null
-popd
+} > /dev/null 2>&1
+cd "$_saved_dir"
 
 # Remove default style and style images which are for Linux build
 rm -rf %{buildroot}%{dali_toolkit_style_files}/*
 
 # Make folder to contain style and style images
 # After making folder, copy local style and style images to new folder
-pushd %{_builddir}/%{name}-%{version}
-mkdir -p %{buildroot}%{dali_toolkit_style_files}/360x360
-cp -r dali-toolkit/styles/360x360/* %{buildroot}%{dali_toolkit_style_files}/360x360
+_saved_dir=$(pwd)
+cd %{_builddir}/%{name}-%{version}
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/480x800
 cp -r dali-toolkit/styles/480x800/* %{buildroot}%{dali_toolkit_style_files}/480x800
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/720x1280
@@ -348,54 +333,49 @@ cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_st
 
 # Copy default debug image visual shader script
 cp dali-toolkit/styles/debug-image-visual-shader-script.json %{buildroot}%{dali_toolkit_style_files}
-popd
+cd "$_saved_dir"
 
 ##############################
 # Pre Install
 ##############################
 
-%pre resources_360x360
-case "$1" in
-  2)
-    pushd %{dali_toolkit_style_files}
-    rm -rf ./*
-    popd
-  ;;
-esac
-
 %pre resources_480x800
 case "$1" in
   2)
-    pushd %{dali_toolkit_style_files}
+    _saved_dir=$(pwd)
+    cd %{dali_toolkit_style_files} || exit 0
     rm -rf ./*
-    popd
+    cd "$_saved_dir"
   ;;
 esac
 
 %pre resources_720x1280
 case "$1" in
   2)
-    pushd %{dali_toolkit_style_files}
+    _saved_dir=$(pwd)
+    cd %{dali_toolkit_style_files} || exit 0
     rm -rf ./*
-    popd
+    cd "$_saved_dir"
   ;;
 esac
 
 %pre resources_1920x1080
 case "$1" in
   2)
-    pushd %{dali_toolkit_style_files}
+    _saved_dir=$(pwd)
+    cd %{dali_toolkit_style_files} || exit 0
     rm -rf ./*
-    popd
+    cd "$_saved_dir"
   ;;
 esac
 
 %pre resources_1920x1080_rpi
 case "$1" in
   2)
-    pushd %{dali_toolkit_style_files}
+    _saved_dir=$(pwd)
+    cd %{dali_toolkit_style_files} || exit 0
     rm -rf ./*
-    popd
+    cd "$_saved_dir"
   ;;
 esac
 
@@ -406,30 +386,21 @@ esac
 /sbin/ldconfig
 exit 0
 
-%post resources_360x360
-pushd %{dali_toolkit_style_files}/360x360
-for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
-
 %post resources_480x800
-pushd %{dali_toolkit_style_files}/480x800
+cd %{dali_toolkit_style_files}/480x800 || exit 0
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
 
 %post resources_720x1280
-pushd %{dali_toolkit_style_files}/720x1280
+cd %{dali_toolkit_style_files}/720x1280 || exit 0
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
 
 %post resources_1920x1080
-pushd %{dali_toolkit_style_files}/1920x1080
+cd %{dali_toolkit_style_files}/1920x1080 || exit 0
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
 
 %post resources_1920x1080_rpi
-pushd %{dali_toolkit_style_files}/1920x1080_rpi
+cd %{dali_toolkit_style_files}/1920x1080_rpi || exit 0
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
 
 %if 0%{?enable_usd_loader}
 %post -n %{dali2_usdloader}
@@ -441,25 +412,13 @@ exit 0
 # Pre Uninstall
 ##############################
 
-%preun resources_360x360
-case "$1" in
-  0)
-    %preun resources_360x360
-    pushd %{dali_toolkit_style_files}
-    mv images ./360x360
-    mv dali-toolkit-default-theme.json ./360x360
-    popd
-  ;;
-esac
-
 %preun resources_480x800
 case "$1" in
   0)
     %preun resources_480x800
-    pushd %{dali_toolkit_style_files}
+    cd %{dali_toolkit_style_files} || exit 0
     mv images ./480x800
     mv dali-toolkit-default-theme.json ./480x800
-    popd
   ;;
 esac
 
@@ -467,10 +426,9 @@ esac
 case "$1" in
   0)
     %preun resources_720x1280
-    pushd %{dali_toolkit_style_files}
+    cd %{dali_toolkit_style_files} || exit 0
     mv images ./720x1280
     mv dali-toolkit-default-theme.json ./720x1280
-    popd
   ;;
 esac
 
@@ -478,10 +436,9 @@ esac
 case "$1" in
   0)
     %preun resources_1920x1080
-    pushd %{dali_toolkit_style_files}
+    cd %{dali_toolkit_style_files} || exit 0
     mv images ./1920x1080
     mv dali-toolkit-default-theme.json ./1920x1080
-    popd
   ;;
 esac
 
@@ -489,10 +446,9 @@ esac
 case "$1" in
   0)
     %preun resources_1920x1080_rpi
-    pushd %{dali_toolkit_style_files}
+    cd %{dali_toolkit_style_files} || exit 0
     mv images ./1920x1080_rpi
     mv dali-toolkit-default-theme.json ./1920x1080_rpi
-    popd
   ;;
 esac
 
@@ -503,48 +459,35 @@ esac
 /sbin/ldconfig
 exit 0
 
-%postun resources_360x360
-case "$1" in
-  0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
-  ;;
-esac
-
 %postun resources_480x800
 case "$1" in
   0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
+    cd %{dali_toolkit_style_files} || exit 0
+    rm -rf ./*
   ;;
 esac
 
 %postun resources_720x1280
 case "$1" in
   0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
+    cd %{dali_toolkit_style_files} || exit 0
+    rm -rf ./*
   ;;
 esac
 
 %postun resources_1920x1080
 case "$1" in
   0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
+    cd %{dali_toolkit_style_files} || exit 0
+    rm -rf ./*
   ;;
 esac
 
 %postun resources_1920x1080_rpi
 case "$1" in
   0)
-    pushd %{dali_toolkit_style_files}
-    rm -rf *
-    popd
+    cd %{dali_toolkit_style_files} || exit 0
+    rm -rf ./*
   ;;
 esac
 
@@ -580,16 +523,6 @@ exit 0
 %files integration-devel
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/devel-api/*
-
-%files resources_360x360
-%manifest dali-toolkit-resources.manifest
-%defattr(-,root,root,-)
-%{dali_toolkit_image_files}/*
-%{dali_toolkit_sound_files}/*
-%{dali_toolkit_style_files}/360x360/*
-%{dali_toolkit_style_files}/debug-image-visual-shader-script.json
-%{dali_toolkit_style_files}/default-feedback-theme.json
-%{_datadir}/locale/*/LC_MESSAGES/*
 
 %files resources_480x800
 %manifest dali-toolkit-resources.manifest

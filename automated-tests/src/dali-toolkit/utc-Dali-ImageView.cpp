@@ -863,7 +863,7 @@ int UtcDaliImageViewEncodedBufferWithSvg(void)
   size_t                     numTextures = textures.size();
 
   // Get encoded raw-buffer svg image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
+  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::SVG);
   ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading
@@ -903,7 +903,7 @@ int UtcDaliImageViewEncodedBufferWithAnimatedVectorImage(void)
   size_t                     numTextures = textures.size();
 
   // Get encoded raw-buffer lottie image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
+  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME, EncodedImageBuffer::ImageType::LOTTIE);
   ImageUrl           url    = Toolkit::ImageUrlUtils::GenerateUrl(buffer);
 
   // Async loading

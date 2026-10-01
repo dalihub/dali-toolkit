@@ -185,7 +185,7 @@ int UtcSvgLoaderBasicLoadAndRasterize(void)
 
   ToolkitTestApplication application;
 
-  EncodedImageBuffer svgBuffer = Dali::ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::VECTOR_IMAGE);
+  EncodedImageBuffer svgBuffer = Dali::ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME, EncodedImageBuffer::ImageType::SVG);
 
   auto       visualFactory = Toolkit::VisualFactory::Get();
   SvgLoader& svgLoader     = GetImplementation(visualFactory).GetSvgLoader(); // Use VisualFactory's svg loader

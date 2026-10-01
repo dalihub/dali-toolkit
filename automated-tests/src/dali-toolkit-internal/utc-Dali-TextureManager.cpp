@@ -563,8 +563,8 @@ int UtcTextureManagerEncodedImageBufferWithImageType(void)
   // Check if difference EncodedImageBuffer get difference url
   DALI_TEST_CHECK(url1 != url2);
 
-  buffer1.SetImageType(EncodedImageBuffer::ImageType::VECTOR_IMAGE);
-  buffer2.SetImageType(EncodedImageBuffer::ImageType::ANIMATED_VECTOR_IMAGE);
+  buffer1.SetImageType(EncodedImageBuffer::ImageType::SVG);
+  buffer2.SetImageType(EncodedImageBuffer::ImageType::LOTTIE);
 
   std::string url1AfterType = textureManager.AddEncodedImageBuffer(buffer1);
   std::string url2AfterType = textureManager.AddEncodedImageBuffer(buffer2);
@@ -599,6 +599,49 @@ int UtcTextureManagerEncodedImageBufferWithImageType(void)
   textureManager.RemoveEncodedImageBuffer(url2);
   // Check whethere url2 is invalid
   DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url2));
+
+  END_TEST;
+}
+
+int UtcTextureManagerEncodedImageBufferUrlExtension(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcTextureManagerEncodedImageBufferUrlExtension");
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  // The generated buffer url carries the extension matching the buffer's ImageType,
+  // so that the loader picks the decoder from the url.
+  EncodedImageBuffer regularBuffer = ConvertFileToEncodedImageBuffer(TEST_IMAGE_FILE_NAME);
+  EncodedImageBuffer svgBuffer     = ConvertFileToEncodedImageBuffer(TEST_SVG_FILE_NAME);
+  EncodedImageBuffer lottieBuffer  = ConvertFileToEncodedImageBuffer(TEST_ANIMATED_VECTOR_IMAGE_FILE_NAME);
+
+  svgBuffer.SetImageType(EncodedImageBuffer::ImageType::SVG);
+  lottieBuffer.SetImageType(EncodedImageBuffer::ImageType::LOTTIE);
+
+  std::string regularUrl = textureManager.AddEncodedImageBuffer(regularBuffer);
+  std::string svgUrl     = textureManager.AddEncodedImageBuffer(svgBuffer);
+  std::string lottieUrl  = textureManager.AddEncodedImageBuffer(lottieBuffer);
+
+  auto endsWith = [](const std::string& url, const std::string& extension)
+  {
+    return url.size() >= extension.size() && url.compare(url.size() - extension.size(), extension.size(), extension) == 0;
+  };
+
+  DALI_TEST_CHECK(endsWith(svgUrl, ".svg"));
+  DALI_TEST_CHECK(endsWith(lottieUrl, ".json"));
+
+  // REGULAR_IMAGE, the default, appends no extension.
+  DALI_TEST_CHECK(regularUrl.find('.') == std::string::npos);
+
+  // GetVisualUrl by buffer id regenerates the same extension.
+  int bufferId = std::atoi(VisualUrl::GetLocationWithoutExtension(svgUrl).c_str());
+  DALI_TEST_CHECK(endsWith(textureManager.GetVisualUrl(bufferId).GetUrl(), ".svg"));
+
+  textureManager.RemoveEncodedImageBuffer(regularUrl);
+  textureManager.RemoveEncodedImageBuffer(svgUrl);
+  textureManager.RemoveEncodedImageBuffer(lottieUrl);
 
   END_TEST;
 }
