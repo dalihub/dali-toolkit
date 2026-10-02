@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/actors/layer-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
@@ -1314,7 +1315,7 @@ void SceneView::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, b
 void SceneView::OnInitialize()
 {
   Actor self = Self();
-  mRootLayer = Layer::New();
+  mRootLayer = DevelLayer::New();
   mRootLayer.SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   mRootLayer.SetProperty(Layer::Property::DEPTH_TEST, true);
   // The models in the SceneView should be have independent coordinate with DALi default coordinate.
