@@ -20,7 +20,12 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+
+// Hijack private members of FeedbackStyle to improve coverage
+#define private public
 #include <dali-toolkit/internal/feedback/feedback-style.h>
+#undef private
+
 #include <dali/devel-api/adaptor-framework/feedback-player.h>
 
 using namespace Dali;
@@ -51,12 +56,12 @@ void SetLoadFileReturnValue(Dali::FeedbackPlayer feedbackPlayer, bool returnValu
 
 } //namespace DALI_NAMESPACE
 
-int UtcDaliFeedbackStyle(void)
+int UtcDaliFeedbackStyleP(void)
 {
   // Not too much to test. Just to improve coverage.
 
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliFeedbackStyle");
+  tet_infoline(" UtcDaliFeedbackStyleP");
 
   try
   {
@@ -75,5 +80,49 @@ int UtcDaliFeedbackStyle(void)
   }
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliFeedbackStyleThemeAndPatternP(void)
+{
+  ToolkitTestApplication           application;
+  Toolkit::Internal::FeedbackStyle style;
+  const std::string                theme = R"JSON({
+    "style": {
+      "Actor": {
+        "signals": {
+          "first": {
+            "type": "onScene",
+            "hapticFeedbackPattern": "FEEDBACK_PATTERN_TAP",
+            "soundFeedbackPattern": "FEEDBACK_PATTERN_MESSAGE"
+          },
+          "replacement": {
+            "type": "onScene",
+            "hapticFeedbackFile": "/tmp/haptic-feedback"
+          },
+          "file": {
+            "type": "offScene",
+            "hapticFeedbackFile": "/tmp/combined-feedback"
+          },
+          "ignored": {
+            "type": "touched",
+            "hapticFeedbackPattern": 12
+          }
+        }
+      }
+    }
+  })JSON";
+
+  DALI_TEST_CHECK(style.LoadTheme(theme));
+  DALI_TEST_CHECK(!style.mStyleInfoLut.empty());
+  DALI_TEST_EQUALS(style.GetFeedbackPattern("FEEDBACK_PATTERN_TAP"), FEEDBACK_PATTERN_TAP, TEST_LOCATION);
+  DALI_TEST_EQUALS(style.GetFeedbackPattern("FEEDBACK_PATTERN_SLIDER_SWEEP"), FEEDBACK_PATTERN_SLIDER_SWEEP, TEST_LOCATION);
+  DALI_TEST_EQUALS(style.GetFeedbackPattern("unknown"), FEEDBACK_PATTERN_NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(style.GetFeedbackPattern("FEEDBACK_PATTERN_KEY5"), FEEDBACK_PATTERN_KEY5, TEST_LOCATION);
+
+  style.PlayFeedback("Actor", "onScene");
+  style.PlayFeedback("Actor", "offScene");
+  style.PlayFeedback("Actor", "missing");
+  style.PlayFeedback("MissingType", "onScene");
   END_TEST;
 }

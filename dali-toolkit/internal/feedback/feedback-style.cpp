@@ -440,7 +440,7 @@ FeedbackPattern FeedbackStyle::GetFeedbackPattern(const std::string& pattern)
   }
   else
   {
-    DALI_LOG_ERROR("Unknown feedback pattern type: %s, So Defaulting to FEEDBACK_PATTERN_NONE!\n");
+    DALI_LOG_ERROR("Unknown feedback pattern type: %s, So Defaulting to FEEDBACK_PATTERN_NONE!\n", pattern.c_str());
     return Dali::FEEDBACK_PATTERN_NONE;
   }
 }
