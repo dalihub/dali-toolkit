@@ -26,6 +26,7 @@
 #include <atomic>
 #include <cstring>
 #include <memory>
+#include <set>
 
 namespace
 {
@@ -42,7 +43,7 @@ class CanvasRenderer : public Dali::BaseObject
 {
 public:
   CanvasRenderer(const Vector2& size)
-  : mDrawable(nullptr),
+  : mDrawableSet(),
     mTexture(Dali::Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height)),
     mSize(size),
     mViewBox(size)
@@ -80,7 +81,11 @@ public:
     {
       return false;
     }
-    mDrawable = &drawable;
+    if(mDrawableSet.find(drawable) != mDrawableSet.end())
+    {
+      return false;
+    }
+    mDrawableSet.insert(drawable);
     return true;
   }
 
@@ -90,21 +95,23 @@ public:
     {
       return false;
     }
-    if(mDrawable == &drawable)
+    auto iter = mDrawableSet.find(drawable);
+    if(iter == mDrawableSet.end())
     {
-      mDrawable = nullptr;
-      return true;
+      return false;
     }
-    return false;
+    mDrawableSet.erase(iter);
+    return true;
   }
 
   bool RemoveAllDrawables()
   {
-    if(mDrawable)
+    if(mDrawableSet.empty())
     {
-      return true;
+      return false;
     }
-    return false;
+    mDrawableSet.clear();
+    return true;
   }
 
   bool SetSize(Vector2 size)
@@ -140,10 +147,10 @@ public:
   }
 
 public:
-  Dali::CanvasRenderer::Drawable* mDrawable;
-  Dali::Texture                   mTexture;
-  Vector2                         mSize;
-  Vector2                         mViewBox;
+  std::set<Dali::CanvasRenderer::Drawable> mDrawableSet;
+  Dali::Texture                            mTexture;
+  Vector2                                  mSize;
+  Vector2                                  mViewBox;
 };
 
 inline CanvasRenderer& GetImplementation(Dali::CanvasRenderer& renderer)
