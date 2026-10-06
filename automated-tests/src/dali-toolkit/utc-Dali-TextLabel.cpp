@@ -34,6 +34,7 @@
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include "test-text-geometry-utils.h"
 
 using namespace Dali;
@@ -4385,4 +4386,108 @@ int utcDaliTextLabelNaturalSize(void)
   DALI_TEST_EQUALS(Vector3(0.f, 0.f, 0.f), DevelActor::GetNaturalSize(label), Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   END_TEST;
+}
+
+namespace
+{
+int CheckAnchorTouchOwnership(bool geometry)
+{
+  ToolkitTestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(geometry);
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 100.0f));
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(parent);
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='first'>TIZEN</a> plain");
+  label.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 100.0f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  parent.Add(label);
+
+  int clicks = 0;
+  int parentDowns = 0;
+  bool interceptMotion = false;
+  DevelTextLabel::AnchorClickedSignal(label).Connect(&application, [&](TextLabel, const char*, unsigned int) { ++clicks; });
+  parent.TouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& event)
+  {
+    if(event.GetState(0) == PointState::DOWN)
+    {
+      ++parentDowns;
+    }
+    return true;
+  });
+  parent.InterceptTouchEventSignal().Connect(&application, [&](Actor, const TouchEvent& event)
+  {
+    return interceptMotion && event.GetState(0) == PointState::MOTION;
+  });
+  application.SendNotification();
+  application.Render();
+
+  uint32_t time = 100u;
+  auto touch = [&](PointState::Type state, float x, float y)
+  {
+    Dali::Integration::TouchEvent event;
+    Dali::Integration::Point point;
+    point.SetDeviceId(4);
+    point.SetState(state);
+    point.SetScreenPosition(Vector2(x, y));
+    event.points.push_back(point);
+    event.time = time;
+    time += 20u;
+    application.ProcessEvent(event);
+  };
+
+  // Anchor DOWN belongs to the label even if its parent consumes touches.
+  touch(PointState::DOWN, 5.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentDowns, 0, TEST_LOCATION);
+  touch(PointState::UP, 5.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 1, TEST_LOCATION);
+
+  // Empty label area must still fall through to the parent.
+  touch(PointState::DOWN, 280.0f, 25.0f);
+  touch(PointState::UP, 280.0f, 25.0f);
+  DALI_TEST_EQUALS(parentDowns, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(clicks, 1, TEST_LOCATION);
+
+  // A parent can take over a child-owned touch to start scrolling.
+  interceptMotion = true;
+  touch(PointState::DOWN, 5.0f, 25.0f);
+  touch(PointState::MOTION, 6.0f, 25.0f);
+  touch(PointState::UP, 6.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 1, TEST_LOCATION);
+
+  // Returning to the original point after moving must not revive a click.
+  interceptMotion = false;
+  touch(PointState::DOWN, 5.0f, 25.0f);
+  touch(PointState::MOTION, 50.0f, 25.0f);
+  touch(PointState::UP, 5.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 1, TEST_LOCATION);
+
+  // Replacing the text invalidates the pending anchor activation.
+  touch(PointState::DOWN, 5.0f, 25.0f);
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='replacement'>TIZEN</a>");
+  application.SendNotification();
+  application.Render();
+  touch(PointState::UP, 5.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 1, TEST_LOCATION);
+  touch(PointState::DOWN, 5.0f, 25.0f);
+  touch(PointState::UP, 5.0f, 25.0f);
+  DALI_TEST_EQUALS(clicks, 2, TEST_LOCATION);
+  END_TEST;
+}
+}
+
+int UtcDaliTextLabelAnchorOwnsGeometryTouch(void)
+{
+  return CheckAnchorTouchOwnership(true);
+}
+
+int UtcDaliTextLabelAnchorOwnsParentTouch(void)
+{
+  return CheckAnchorTouchOwnership(false);
 }

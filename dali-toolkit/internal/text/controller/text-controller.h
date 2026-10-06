@@ -2248,6 +2248,9 @@ public: // Text-input Event Queuing.
    */
   void AnchorEvent(float x, float y);
 
+  /** @brief Tests rendered anchor bounds without activating or recoloring the anchor. */
+  bool HitTestAnchor(float x, float y, uint32_t& anchorStart);
+
   /**
    * @brief Called by editable UI controls when a tap gesture occurs.
    * @param[in] tapCount The number of taps.
