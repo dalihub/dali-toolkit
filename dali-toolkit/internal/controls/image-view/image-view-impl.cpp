@@ -29,6 +29,9 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/math-utils.h>
 
+#include <algorithm>
+#include <cmath>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -61,6 +64,27 @@ constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 constexpr int PLACEHOLDER_DEPTH_INDEX     = -2;
 constexpr int PREVIOUS_VISUAL_DEPTH_INDEX = -1;
 constexpr int CURRENT_VISUAL_DEPTH_INDEX  = 0;
+
+Vector2 GetInitialImageSize(Actor& actor)
+{
+  if(DevelActor::GetResizePolicy(actor, Dimension::WIDTH) != ResizePolicy::FIXED ||
+     DevelActor::GetResizePolicy(actor, Dimension::HEIGHT) != ResizePolicy::FIXED)
+  {
+    return Vector2::ZERO;
+  }
+  Vector2 size = actor.GetProperty<Vector3>(Actor::Property::SIZE).GetVectorXY();
+  if(!std::isfinite(size.width) || !std::isfinite(size.height) || size.width <= 0.0f || size.height <= 0.0f)
+  {
+    return Vector2::ZERO;
+  }
+  const Vector2 minimum = actor.GetProperty<Vector2>(DevelActor::Property::MINIMUM_SIZE);
+  const Vector2 maximum = actor.GetProperty<Vector2>(DevelActor::Property::MAXIMUM_SIZE);
+  size.width            = std::max(minimum.width, std::min(size.width, maximum.width));
+  size.height           = std::max(minimum.height, std::min(size.height, maximum.height));
+  Extents padding;
+  GetExtents(actor.GetProperty(Toolkit::Control::Property::PADDING), padding);
+  return size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
+}
 
 BaseHandle Create()
 {
@@ -206,6 +230,7 @@ void ImageView::SetImage(const Property::Map& map)
 
     // Ignore corner radius for offscreen case.
     visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
+    visualImpl.SetInitialLoadingSizeProvider(GetInitialImageSize);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Control& internalControl = Control::Get(*this);
@@ -283,6 +308,7 @@ void ImageView::SetImage(const Dali::String& url, ImageDimensions size)
 
     // Ignore corner radius for offscreen case.
     visualImpl.CornerRadiusIgnoredAtOffscreenRendering(true);
+    visualImpl.SetInitialLoadingSizeProvider(GetInitialImageSize);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Control& internalControl = Control::Get(*this);
