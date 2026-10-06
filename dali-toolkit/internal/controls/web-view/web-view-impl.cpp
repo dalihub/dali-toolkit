@@ -1141,9 +1141,7 @@ void WebView::OnFrameRendered()
   // Reset flag
   mVisualChangeRequired = false;
 
-  // A plugin rendering through a native image queue hands the queue over here,
-  // so the visual acquires and releases its buffers on the render thread.
-  auto nativeImagePtr = mWebEngine.GetNativeImageInterface();
+  auto nativeImagePtr = mWebEngine.GetNativeImage();
 
   mLastRenderedNativeImageWidth  = nativeImagePtr->GetWidth();
   mLastRenderedNativeImageHeight = nativeImagePtr->GetHeight();

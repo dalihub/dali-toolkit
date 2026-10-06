@@ -2829,11 +2829,6 @@ NativeImagePtr WebEngine::GetNativeImage()
   return sourcePtr;
 }
 
-NativeImageInterfacePtr WebEngine::GetNativeImageInterface()
-{
-  return GetNativeImage();
-}
-
 bool WebEngine::IsIncognito() const
 {
   return false;
