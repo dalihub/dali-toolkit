@@ -47,6 +47,7 @@ enum Type
   NOT_IN_USE_1          = ANIMATED_IMAGE + 1,
   ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2, ///< Renders an animated vector image.
   ARC                   = ANIMATED_IMAGE + 3, ///< Renders an arc.
+  STREAMED_IMAGE        = ANIMATED_IMAGE + 4, ///< Renders an image whose frames are streamed by an external producer. It cannot be created from a property map.
 };
 
 /**
