@@ -24,6 +24,8 @@
 
 namespace
 {
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(VectorBlobAtlasShare);
+
 const int INITIAL_VECTOR_BLOB_ATLAS_WIDTH  = 512;
 const int INITIAL_VECTOR_BLOB_ATLAS_HEIGHT = 512;
 
@@ -99,7 +101,7 @@ VectorBlobAtlasShare VectorBlobAtlasShare::Get()
   SingletonService singletonService(SingletonService::Get());
   if(singletonService)
   {
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(VectorBlobAtlasShare));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton to VectorBlobAtlasShare
@@ -110,7 +112,7 @@ VectorBlobAtlasShare VectorBlobAtlasShare::Get()
     {
       // If not, create the VectorBlobAtlasShare and register it as a singleton
       manager = VectorBlobAtlasShare(new VectorBlobAtlasShare::Impl());
-      singletonService.Register(typeid(manager), manager);
+      singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }
 

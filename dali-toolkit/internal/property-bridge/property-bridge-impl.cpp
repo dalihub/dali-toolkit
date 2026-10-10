@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+
 namespace DALI_NAMESPACE
 {
 namespace Toolkit
@@ -35,6 +36,7 @@ StringGetterDelegate gStringGetter = nullptr;
 
 namespace
 {
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Dali::Toolkit::PropertyBridge);
 
 } // namespace
 
@@ -55,7 +57,7 @@ Dali::Toolkit::PropertyBridge PropertyBridge::Get()
   if(service)
   {
     // Check whether the singleton is already created
-    Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::Toolkit::PropertyBridge));
+    Dali::BaseHandle handle = service.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle
@@ -65,7 +67,7 @@ Dali::Toolkit::PropertyBridge PropertyBridge::Get()
     else // create and register the object
     {
       bridgeHandle = Dali::Toolkit::PropertyBridge(new PropertyBridge);
-      service.Register(typeid(bridgeHandle), bridgeHandle);
+      service.Register(gSingletonTypeInfoId, bridgeHandle);
     }
   }
 

@@ -20,6 +20,11 @@
 
 using namespace Dali;
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Dali::FeedbackPlayer);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE
 {
 class Adaptor;
@@ -45,7 +50,7 @@ public:
     if(service)
     {
       // Check whether the singleton is already created
-      Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::FeedbackPlayer));
+      Dali::BaseHandle handle = service.GetSingleton(gSingletonTypeInfoId);
       if(handle)
       {
         player = Dali::FeedbackPlayer(static_cast<FeedbackPlayer*>(handle.GetObjectPtr()));
@@ -53,7 +58,7 @@ public:
       else
       {
         player = Dali::FeedbackPlayer(New());
-        service.Register(typeid(player), player);
+        service.Register(gSingletonTypeInfoId, player);
       }
     }
     return player;

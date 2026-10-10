@@ -31,6 +31,11 @@
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-scene3d/internal/common/image-resource-loader.h>
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(ModelCacheManager);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE::Scene3D::Internal
 {
 class ModelCacheManager::Impl : public Dali::BaseObject
@@ -186,7 +191,7 @@ ModelCacheManager ModelCacheManager::Get()
   SingletonService singletonService(SingletonService::Get());
   if(singletonService)
   {
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(ModelCacheManager));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton to ModelCacheManager
@@ -197,7 +202,7 @@ ModelCacheManager ModelCacheManager::Get()
     {
       // If not, create the ModelCacheManager and register it as a singleton
       manager = ModelCacheManager(new ModelCacheManager::Impl());
-      singletonService.Register(typeid(manager), manager);
+      singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }
 
