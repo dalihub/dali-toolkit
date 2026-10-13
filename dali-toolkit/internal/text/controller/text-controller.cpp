@@ -1817,6 +1817,35 @@ bool Controller::AnchorClickEvent(uint32_t cursorPosition, std::string& href)
   return EventHandler::AnchorClickEvent(*this, cursorPosition, href);
 }
 
+bool Controller::HitTestAnchor(float x, float y, uint32_t& anchorStart)
+{
+  if(!mImpl->IsShowingRealText())
+  {
+    return false;
+  }
+
+  const float textY = y - mImpl->mModel->mLayoutAlignmentOffset.y;
+  for(const auto& anchor : mImpl->mModel->mLogicalModel->mAnchors)
+  {
+    if(anchor.endIndex <= anchor.startIndex)
+    {
+      continue;
+    }
+    const auto positions = GetTextPosition(anchor.startIndex, anchor.endIndex - 1u);
+    const auto sizes = GetTextSize(anchor.startIndex, anchor.endIndex - 1u);
+    for(uint32_t i = 0u; i < positions.Count() && i < sizes.Count(); ++i)
+    {
+      if(x >= positions[i].x && x < positions[i].x + sizes[i].x &&
+         textY >= positions[i].y && textY < positions[i].y + sizes[i].y)
+      {
+        anchorStart = anchor.startIndex;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void Controller::AnchorEvent(float x, float y)
 {
   EventHandler::AnchorEvent(*this, x, y);
