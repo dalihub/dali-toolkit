@@ -26,6 +26,8 @@ namespace Test
 {
 namespace WebEngine
 {
+// Configure the first live mock engine; nullptr restores the NativeImage fallback.
+void SetNativeImageInterface(Dali::NativeImageInterfacePtr nativeImage);
 void SetWebViewAccessible(Dali::Accessibility::Accessible* webAccessible);
 void SetWebAccessibleActivatedAddress(Dali::Devel::Accessibility::Address address);
 } // namespace WebEngine
