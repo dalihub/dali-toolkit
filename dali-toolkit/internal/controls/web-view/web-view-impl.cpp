@@ -306,7 +306,7 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::FOCUSABLE, true);
-  Dali::DevelActor::OnSceneVisibilityChangedSignal(self).Connect(this, &WebView::OnEffectiveVisibilityChanged);
+  self.OnSceneVisibilityChangedSignal().Connect(this, &WebView::OnEffectiveVisibilityChanged);
   self.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
@@ -1141,7 +1141,9 @@ void WebView::OnFrameRendered()
   // Reset flag
   mVisualChangeRequired = false;
 
-  auto nativeImagePtr = mWebEngine.GetNativeImage();
+  // A plugin rendering through a native image queue hands the queue over here,
+  // so the visual acquires and releases its buffers on the render thread.
+  auto nativeImagePtr = mWebEngine.GetNativeImageInterface();
 
   mLastRenderedNativeImageWidth  = nativeImagePtr->GetWidth();
   mLastRenderedNativeImageHeight = nativeImagePtr->GetHeight();

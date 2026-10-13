@@ -19,6 +19,11 @@
 #include <iostream>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <test-native-image.h>
+#include <toolkit-web-engine.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali/integration-api/string-utils.h>
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
@@ -2964,5 +2969,60 @@ int UtcDaliWebViewRegisterPlaybackVideoPausedCallback(void)
   view.LoadUrl(TEST_URL1);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS(gPlaybackVideoPausedCalled, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewNativeImageInterfaceRendering(void)
+{
+  ToolkitTestApplication application;
+  WebView view = WebView::New();
+  view.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 90.0f));
+  application.GetScene().Add(view);
+  application.SendNotification();
+  application.Render();
+
+  // This interface is not a NativeImage, just like a native image queue.
+  auto nativeImage = TestNativeImage::New(160u, 90u);
+  Test::WebEngine::SetNativeImageInterface(nativeImage);
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  auto& controlImpl = Toolkit::GetImplementation(view);
+  auto visual = DevelControl::GetVisual(controlImpl, WebView::Property::URL);
+  DALI_TEST_CHECK(visual);
+  Vector2 naturalSize;
+  visual.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS(naturalSize, Vector2(160.0f, 90.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(nativeImage->mExtensionCreateCalls > 0);
+  DALI_TEST_CHECK(nativeImage->mTargetTextureCalls > 0);
+
+  // Further frames reuse the visual until the display area changes.
+  view.LoadUrl(TEST_URL2);
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(DevelControl::GetVisual(controlImpl, WebView::Property::URL) == visual);
+
+  auto resizedImage = TestNativeImage::New(320u, 180u);
+  Test::WebEngine::SetNativeImageInterface(resizedImage);
+  view.SetProperty(Actor::Property::SIZE, Vector2(320.0f, 180.0f));
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render();
+
+  auto resizedVisual = DevelControl::GetVisual(controlImpl, WebView::Property::URL);
+  DALI_TEST_CHECK(resizedVisual);
+  DALI_TEST_CHECK(resizedVisual != visual);
+  resizedVisual.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS(naturalSize, Vector2(320.0f, 180.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(resizedImage->mExtensionCreateCalls > 0);
   END_TEST;
 }
