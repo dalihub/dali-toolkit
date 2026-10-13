@@ -547,12 +547,12 @@ private:
   void OnVariationPropertyNotify(PropertyNotification source);
 
   /**
-   * @brief Handles touches that start on an anchor
+   * @brief Callback when TextLabel is intercept touched
    *
    * @param[in] actor TextLabel touched
    * @param[in] touch Touch information
    */
-  bool OnAnchorTouched(Actor actor, TouchEvent touch);
+  bool OnInterceptTouched(Actor actor, TouchEvent touch);
 
   /**
    * @brief Returns the cached effective visibility of the TextLabel.
@@ -562,7 +562,6 @@ private:
   bool IsVisible();
 
 private: // Data
-  uint32_t mPressedAnchorStart{0u};
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
 
@@ -601,7 +600,7 @@ private: // Data
   bool mIsManualRender : 1;      // whether an async manual render has been requested, returns false when completed.
   bool mIsManualRendered : 1;    // whether an async manual render has been completed, returns false on the next relayout.
   bool mManualRendered : 1;
-  bool mAnchorPressed : 1;        // whether a touch started on an anchor.
+  bool mIsIntercepted : 1;        // whether the touch event is intercepted or not.
   bool mIsHasAnchors : 1;         // whether the text has anchors or not.
   bool mIsVisible : 1;            // cached result of IsOnSceneVisible().
   bool mIsVisibleInitialized : 1; // whether mIsVisible has been initialized.

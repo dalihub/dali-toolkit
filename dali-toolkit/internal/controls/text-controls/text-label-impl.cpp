@@ -385,19 +385,18 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::TextLabel::Property::ENABLE_MARKUP:
       {
-        impl.mAnchorPressed = false;
         const bool enableMarkup = value.Get<bool>();
         impl.mController->SetMarkupProcessorEnabled(enableMarkup);
 
         if(impl.mController->HasAnchors())
         {
           impl.mIsHasAnchors = true;
-          impl.Self().TouchEventSignal().Connect(&impl, &TextLabel::OnAnchorTouched);
+          impl.Self().InterceptTouchEventSignal().Connect(&impl, &TextLabel::OnInterceptTouched);
         }
         else
         {
           impl.mIsHasAnchors = false;
-          impl.Self().TouchEventSignal().Disconnect(&impl, &TextLabel::OnAnchorTouched);
+          impl.Self().InterceptTouchEventSignal().Disconnect(&impl, &TextLabel::OnInterceptTouched);
         }
         break;
       }
@@ -1268,58 +1267,32 @@ DevelControl::ControlAccessible* TextLabel::CreateAccessibleObject()
   return new TextLabelAccessible(Self());
 }
 
-bool TextLabel::OnAnchorTouched(Actor actor, TouchEvent touch)
+bool TextLabel::OnInterceptTouched(Actor actor, TouchEvent touch)
 {
-  const bool wasPressed = mAnchorPressed;
-  if(touch.GetPointCount() != 1u)
+  if(touch.GetState(0) == PointState::STARTED)
   {
-    mAnchorPressed = false;
-    return wasPressed;
-  }
-
-  const auto state = touch.GetState(0);
-  if(state == PointState::INTERRUPTED || state == PointState::LEAVE)
-  {
-    mAnchorPressed = false;
-    return wasPressed;
-  }
-
-  Extents padding;
-  GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
-  if(mController->GetLayoutDirection(actor) == Dali::LayoutDirection::RIGHT_TO_LEFT)
-  {
-    std::swap(padding.start, padding.end);
-  }
-  const Vector2 local = touch.GetLocalPosition(0);
-  uint32_t anchorStart = 0u;
-  const bool hit = mIsHasAnchors && mController->HitTestAnchor(local.x - padding.start, local.y - padding.top, anchorStart);
-  if(state == PointState::STARTED)
-  {
-    mAnchorPressed = hit;
-    mPressedAnchorStart = anchorStart;
+    mIsIntercepted = true;
     mTouchPosition = touch.GetScreenPosition(0);
-    return hit;
   }
-
-  const Vector2 delta = touch.GetScreenPosition(0) - mTouchPosition;
-  if(!hit || anchorStart != mPressedAnchorStart || std::abs(delta.x) >= 20.0f || std::abs(delta.y) >= 20.0f)
+  else if(touch.GetState(0) == PointState::FINISHED)
   {
-    mAnchorPressed = false;
-  }
-  if(state == PointState::FINISHED)
-  {
-    const bool activate = mAnchorPressed;
-    mAnchorPressed = false;
-    if(activate)
+    if(mIsIntercepted && mIsHasAnchors)
     {
-      std::string href;
-      if(mController->AnchorClickEvent(anchorStart, href))
+      const Vector2& screen(touch.GetScreenPosition(0));
+      Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
+                                   std::abs(mTouchPosition.y - screen.y));
+      if(distanceDelta.x < 20 &&
+         distanceDelta.y < 20)
       {
-        EmitAnchorClickedSignal(href);
+        Extents padding;
+        GetExtents(Self().GetProperty(Toolkit::Control::Property::PADDING), padding);
+        const Vector2& localPoint = touch.GetLocalPosition(0);
+        mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
       }
     }
+    mIsIntercepted = false;
   }
-  return wasPressed;
+  return false;
 }
 
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
@@ -1850,19 +1823,18 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
 
 void TextLabel::UpdateText(const std::string& text)
 {
-  mAnchorPressed = false;
   mController->SetText(text);
   mTextUpdateNeeded = true;
 
   if(mController->HasAnchors())
   {
     mIsHasAnchors = true;
-    Self().TouchEventSignal().Connect(this, &TextLabel::OnAnchorTouched);
+    Self().InterceptTouchEventSignal().Connect(this, &TextLabel::OnInterceptTouched);
   }
   else
   {
     mIsHasAnchors = false;
-    Self().TouchEventSignal().Disconnect(this, &TextLabel::OnAnchorTouched);
+    Self().InterceptTouchEventSignal().Disconnect(this, &TextLabel::OnInterceptTouched);
   }
 }
 
@@ -2272,7 +2244,7 @@ TextLabel::TextLabel(ControlBehaviour additionalBehaviour)
   mIsManualRender(false),
   mIsManualRendered(false),
   mManualRendered(false),
-  mAnchorPressed(false),
+  mIsIntercepted(false),
   mIsHasAnchors(false),
   mIsVisible(false),
   mIsVisibleInitialized(false)
