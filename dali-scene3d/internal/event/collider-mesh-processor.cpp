@@ -24,6 +24,11 @@
 // INTERNAL INCLUDES
 #include <dali-scene3d/internal/event/collider-mesh-processor-impl.h>
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(ColliderMeshProcessor);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE::Scene3D
 {
 ColliderMeshProcessor ColliderMeshProcessor::Get()
@@ -34,7 +39,7 @@ ColliderMeshProcessor ColliderMeshProcessor::Get()
   SingletonService singletonService(SingletonService::Get());
   if(singletonService)
   {
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(ColliderMeshProcessor));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton to focus manager
@@ -45,7 +50,7 @@ ColliderMeshProcessor ColliderMeshProcessor::Get()
     {
       // If not, create the focus manager and register it as a singleton
       processor = ColliderMeshProcessor(new Internal::ColliderMeshProcessor());
-      singletonService.Register(typeid(processor), processor);
+      singletonService.Register(gSingletonTypeInfoId, processor);
     }
   }
 

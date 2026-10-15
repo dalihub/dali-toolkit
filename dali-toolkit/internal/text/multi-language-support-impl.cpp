@@ -35,6 +35,8 @@ namespace Toolkit
 {
 namespace
 {
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Text::MultilanguageSupport);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULTI_LANGUAGE_SUPPORT");
 #endif
@@ -613,7 +615,7 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
   if(service)
   {
     // Check whether the singleton is already created
-    Dali::BaseHandle handle = service.GetSingleton(typeid(Text::MultilanguageSupport));
+    Dali::BaseHandle handle = service.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle
@@ -623,7 +625,7 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
     else // create and register the object
     {
       multilanguageSupportHandle = Text::MultilanguageSupport(new MultilanguageSupport);
-      service.Register(typeid(multilanguageSupportHandle), multilanguageSupportHandle);
+      service.Register(gSingletonTypeInfoId, multilanguageSupportHandle);
     }
   }
 

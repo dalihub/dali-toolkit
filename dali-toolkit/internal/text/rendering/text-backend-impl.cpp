@@ -29,6 +29,11 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-based-renderer.h>
 #endif
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Dali::Toolkit::Text::Backend);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE
 {
 namespace Toolkit
@@ -61,7 +66,7 @@ Dali::Toolkit::Text::Backend Backend::Get()
   if(service)
   {
     // Check whether the singleton is already created
-    Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::Toolkit::Text::Backend));
+    Dali::BaseHandle handle = service.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle
@@ -71,7 +76,7 @@ Dali::Toolkit::Text::Backend Backend::Get()
     else // create and register the object
     {
       backendHandle = Dali::Toolkit::Text::Backend(new Backend);
-      service.Register(typeid(backendHandle), backendHandle);
+      service.Register(gSingletonTypeInfoId, backendHandle);
     }
   }
 

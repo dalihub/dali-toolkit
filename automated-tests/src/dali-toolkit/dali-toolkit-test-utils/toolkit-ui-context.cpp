@@ -23,6 +23,11 @@
 #include <dali/public-api/update/update-proxy.h>
 #include <toolkit-adaptor-impl.h>
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Dali::UiContext);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE
 {
 namespace Internal
@@ -41,7 +46,7 @@ public:
     Dali::SingletonService service(Dali::SingletonService::Get());
     if(service)
     {
-      Dali::BaseHandle handle = service.GetSingleton(typeid(Dali::UiContext));
+      Dali::BaseHandle handle = service.GetSingleton(gSingletonTypeInfoId);
       if(handle)
       {
         uiContext = Dali::UiContext(static_cast<UiContext*>(handle.GetObjectPtr()));
@@ -50,7 +55,7 @@ public:
       {
         auto* impl = new UiContext();
         uiContext  = Dali::UiContext(impl);
-        service.Register(typeid(uiContext), uiContext);
+        service.Register(gSingletonTypeInfoId, uiContext);
       }
     }
     return uiContext;

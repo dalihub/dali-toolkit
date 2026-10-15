@@ -24,6 +24,11 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.h>
 
+namespace
+{
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(AtlasGlyphManager);
+} // unnamed namespace
+
 namespace DALI_NAMESPACE
 {
 namespace Toolkit
@@ -44,7 +49,7 @@ AtlasGlyphManager AtlasGlyphManager::Get()
   SingletonService singletonService(SingletonService::Get());
   if(singletonService)
   {
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(AtlasGlyphManager));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton to AtlasGlyphManager
@@ -55,7 +60,7 @@ AtlasGlyphManager AtlasGlyphManager::Get()
     {
       // If not, create the AtlasGlyphManager and register it as a singleton
       manager = AtlasGlyphManager(new Internal::AtlasGlyphManager());
-      singletonService.Register(typeid(manager), manager);
+      singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }
 
