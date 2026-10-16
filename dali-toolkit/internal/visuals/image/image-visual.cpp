@@ -30,6 +30,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/rendering/decorated-visual-renderer.h>
+#include <cmath>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -196,6 +197,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mPlacementActor(),
   mImageUrl(imageUrl),
   mMaskingData(),
+  mInitialLoadingSizeProvider(nullptr),
   mDesiredSize(size),
   mLastRequiredSize(size),
   mTextureId(TextureManager::INVALID_TEXTURE_ID),
@@ -220,7 +222,8 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
   mUseFastTrackUploading(false),
   mRendererAdded(false),
   mUseBrokenImageRenderer(false),
-  mUseSynchronousSizing(false)
+  mUseSynchronousSizing(false),
+  mReloadOnSizeChange(false)
 {
   EnablePreMultipliedAlpha(mFactoryCache.GetPreMultiplyOnLoad());
 }
@@ -941,10 +944,68 @@ void ImageVisual::InitializeRenderer()
   }
 }
 
+void ImageVisual::CompleteSynchronousLoad()
+{
+  if(mTextures && mImpl->mRenderer)
+  {
+    InitializeRenderer();
+  }
+
+  // A synchronous load has no LoadComplete callback. Do not report completion
+  // while an asynchronous image or mask load is still pending.
+  if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
+  {
+    Actor actor = mPlacementActor.GetHandle();
+    if(actor && mImpl->mRenderer)
+    {
+      actor.AddRenderer(mImpl->mRenderer);
+      mRendererAdded = true;
+      mPlacementActor.Reset();
+    }
+    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+  }
+  else if(mLoadState == TextureManager::LoadState::LOAD_FAILED)
+  {
+    if(mImpl->mRenderer && !mUseBrokenImageRenderer)
+    {
+      ShowBrokenImage();
+    }
+    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+  }
+}
+
+void ImageVisual::SetInitialLoadingSizeProvider(InitialLoadingSizeProvider provider)
+{
+  mInitialLoadingSizeProvider = provider;
+}
+
+void ImageVisual::SetInitialLoadingSize(Actor& actor)
+{
+  // CENTER needs the image's natural dimensions; custom transforms own their size.
+  if(!mInitialLoadingSizeProvider || !mUseSynchronousSizing ||
+     mLoadState != TextureManager::LoadState::NOT_STARTED ||
+     GetFittingMode() == Visual::FittingMode::CENTER || !mImpl->mTransformMapUsingDefault ||
+     mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+  {
+    return;
+  }
+
+  const Vector2 size   = mInitialLoadingSizeProvider(actor);
+  const float   width  = std::round(size.width);
+  const float   height = std::round(size.height);
+  if(std::isfinite(width) && std::isfinite(height) && width > 0.0f && height > 0.0f)
+  {
+    const float maximum = std::numeric_limits<uint16_t>::max();
+    mLastRequiredSize   = ImageDimensions(static_cast<uint16_t>(std::min(width, maximum)),
+                                          static_cast<uint16_t>(std::min(height, maximum)));
+  }
+}
+
 void ImageVisual::DoSetOnScene(Actor& actor)
 {
   if(mImageUrl.IsValid())
   {
+    SetInitialLoadingSize(actor);
     InitializeRenderer();
   }
 
@@ -1096,7 +1157,19 @@ void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::P
       UpdateNativeTextureInfomation(Dali::TextureSet());
 
       Dali::ImageDimensions size = mUseSynchronousSizing ? mLastRequiredSize : mDesiredSize;
+      // Reload before layout must also refresh this visual's first valid size.
+      mReloadOnSizeChange = mUseSynchronousSizing && (size.GetWidth() == 0u || size.GetHeight() == 0u);
+      const bool synchronousLoading = IsSynchronousLoadingRequired() && mImageUrl.GetProtocolType() != VisualUrl::REMOTE;
       LoadTexture(attemptAtlasing, mAtlasRect, mTextures, size, TextureManager::ReloadPolicy::FORCED);
+      if(synchronousLoading)
+      {
+        CompleteSynchronousLoad();
+      }
+      else if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
+      {
+        // A cached asynchronous load has already applied its textures in LoadComplete.
+        mTextures.Reset();
+      }
       break;
     }
   }
@@ -1111,14 +1184,18 @@ void ImageVisual::OnSetTransform()
 
   if(mUseSynchronousSizing)
   {
-    // Get current visual size
-    Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
-    uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
-    uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
-    sizeWidth                        = std::min(sizeWidth, maximumNumber);
-    uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
-    sizeHeight                       = std::min(sizeHeight, maximumNumber);
-    Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
+    const Vector2 size   = mImpl->GetTransformVisualSize(mImpl->mControlSize);
+    const float   width  = std::round(size.width);
+    const float   height = std::round(size.height);
+    // Layout/scale updates can arrive before the view has a usable content size.
+    // Keep the existing texture instead of requesting the original (or an overflowed size).
+    if(!std::isfinite(width) || !std::isfinite(height) || width <= 0.0f || height <= 0.0f)
+    {
+      return;
+    }
+    const float                 maximum = std::numeric_limits<uint16_t>::max();
+    const Dali::ImageDimensions visualSize(static_cast<uint16_t>(std::min(width, maximum)),
+                                           static_cast<uint16_t>(std::min(height, maximum)));
 
     // Reload if visual size is updated
     if(mLastRequiredSize != visualSize)
@@ -1130,8 +1207,20 @@ void ImageVisual::OnSetTransform()
       mTextures.Reset();
       UpdateNativeTextureInfomation(Dali::TextureSet());
 
+      auto reloadPolicy    = mReloadOnSizeChange ? TextureManager::ReloadPolicy::FORCED : TextureManager::ReloadPolicy::CACHED;
+      mReloadOnSizeChange  = false;
       bool attemptAtlasing = AttemptAtlasing();
-      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
+      const bool synchronousLoading = IsSynchronousLoadingRequired() && mImageUrl.GetProtocolType() != VisualUrl::REMOTE;
+      LoadTexture(attemptAtlasing, mAtlasRect, mTextures, visualSize, reloadPolicy);
+      if(synchronousLoading)
+      {
+        CompleteSynchronousLoad();
+      }
+      else if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
+      {
+        // A cached asynchronous load has already applied its textures in LoadComplete.
+        mTextures.Reset();
+      }
     }
   }
 }
@@ -1148,12 +1237,22 @@ void ImageVisual::UpdateShader()
 // From existing atlas manager
 void ImageVisual::UploadCompleted()
 {
+  // A resize can return an atlas texture before its new region is uploaded.
+  // Apply that texture and region only when the upload has completed.
+  if(mTextures && mImpl->mRenderer)
+  {
+    InitializeRenderer();
+  }
+  if(mImpl->mRenderer)
+  {
+    mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
+  }
+
   // Texture has been uploaded. If weak handle is holding a placement actor,
   // it is the time to add the renderer to actor.
   Actor actor = mPlacementActor.GetHandle();
   if(actor)
   {
-    mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
     actor.AddRenderer(mImpl->mRenderer);
     mRendererAdded = true;
     // reset the weak handle so that the renderer only get added to actor once
@@ -1161,8 +1260,8 @@ void ImageVisual::UploadCompleted()
   }
 
   // Image loaded
-  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
   mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
 }
 
 // From FastTrackLoadingTask
@@ -1326,6 +1425,10 @@ void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureIn
     mTextures = textureInformation.textureSet;
 
     UpdateNativeTextureInfomation(mTextures);
+  }
+  else
+  {
+    mTextures.Reset(); // The renderer now owns the completed texture set.
   }
 
   // Image loaded, set status regardless of staged status.

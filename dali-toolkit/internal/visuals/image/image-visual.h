@@ -156,6 +156,11 @@ public:
                             FittingMode::Type         fittingMode  = FittingMode::VISUAL_FITTING,
                             Dali::SamplingMode::Type  samplingMode = SamplingMode::BOX_THEN_LINEAR);
 
+  /**
+   * @copydoc Visual::Base::SetInitialLoadingSizeProvider
+   */
+  void SetInitialLoadingSizeProvider(InitialLoadingSizeProvider provider) override;
+
 public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
@@ -273,6 +278,11 @@ public:
 
 private:
   /**
+   * @brief Resolves the initial load size from the current placement actor.
+   */
+  void SetInitialLoadingSize(Actor& actor);
+
+  /**
    * Allocate the mask data when a masking property is defined in the property map
    */
   void AllocateMaskData();
@@ -297,6 +307,11 @@ private:
    * @brief Initializes the Dali::Renderer from the image url
    */
   void InitializeRenderer();
+
+  /**
+   * @brief Applies textures and reports success or failure after synchronous loading without a LoadComplete callback.
+   */
+  void CompleteSynchronousLoad();
 
   /**
    * Creates the texture set and adds the texture to it
@@ -382,6 +397,8 @@ private:
   VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;
 
+  InitialLoadingSizeProvider mInitialLoadingSizeProvider;
+
   Dali::ImageDimensions     mDesiredSize;
   Dali::ImageDimensions     mLastRequiredSize;
   TextureManager::TextureId mTextureId;
@@ -414,6 +431,7 @@ private:
   bool mRendererAdded : 1;          ///< True if renderer added into actor.
   bool mUseBrokenImageRenderer : 1; ///< True if renderer changed as broken image.
   bool mUseSynchronousSizing : 1;   ///< True if we need to synchronize image texture size to visual size, otherwise use mDesiredSize.
+  bool mReloadOnSizeChange : 1;     ///< Keep a Reload requested before layout for the first load at a valid visual size.
 };
 
 } // namespace Internal

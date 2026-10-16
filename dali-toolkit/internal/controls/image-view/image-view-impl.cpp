@@ -26,6 +26,9 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 
+#include <algorithm>
+#include <cmath>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -53,6 +56,26 @@ constexpr float TRANSITION_EFFECT_SPEED = 0.3f;
 constexpr int PLACEHOLDER_DEPTH_INDEX     = -2;
 constexpr int PREVIOUS_VISUAL_DEPTH_INDEX = -1;
 constexpr int CURRENT_VISUAL_DEPTH_INDEX  = 0;
+
+Vector2 GetInitialImageSize(Actor& actor)
+{
+  if(actor.GetResizePolicy(Dimension::WIDTH) != ResizePolicy::FIXED ||
+     actor.GetResizePolicy(Dimension::HEIGHT) != ResizePolicy::FIXED)
+  {
+    return Vector2::ZERO;
+  }
+  Vector2 size = actor.GetProperty<Vector3>(Actor::Property::SIZE).GetVectorXY();
+  if(!std::isfinite(size.width) || !std::isfinite(size.height) || size.width <= 0.0f || size.height <= 0.0f)
+  {
+    return Vector2::ZERO;
+  }
+  const Vector2 minimum = actor.GetProperty<Vector2>(Actor::Property::MINIMUM_SIZE);
+  const Vector2 maximum = actor.GetProperty<Vector2>(Actor::Property::MAXIMUM_SIZE);
+  size.width            = std::max(minimum.width, std::min(size.width, maximum.width));
+  size.height           = std::max(minimum.height, std::min(size.height, maximum.height));
+  const Extents padding = actor.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  return size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
+}
 
 BaseHandle Create()
 {
@@ -196,6 +219,7 @@ void ImageView::SetImage(const Property::Map& map)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    visualImpl.SetInitialLoadingSizeProvider(GetInitialImageSize);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
@@ -271,6 +295,7 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
       visualImpl.SetCustomShader(mShaderMap);
     }
 
+    visualImpl.SetInitialLoadingSizeProvider(GetInitialImageSize);
     DevelControl::RegisterVisual(*this, Toolkit::ImageView::Property::IMAGE, visual, DepthIndex::CONTENT);
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
