@@ -1216,6 +1216,15 @@ public:
   void Create(uint32_t width, uint32_t height, uint32_t argc, char** argv) override
   {
   }
+  bool InitializeNativeImageRendering(uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId) override
+  {
+    Create(width, height, locale, timezoneId);
+    return true;
+  }
+  Dali::WebEngineDirectRenderingSessionPtr InitializeDirectRendering(uint32_t, uint32_t, const std::string&, const std::string&) override
+  {
+    return {};
+  }
   void Destroy() override
   {
   }
