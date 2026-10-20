@@ -100,6 +100,8 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
   dali-toolkit-test-utils/toolkit-input-method-options.cpp
   dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
+  dali-toolkit-test-utils/toolkit-native-image.cpp
+  dali-toolkit-test-utils/toolkit-native-image-queue.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
   dali-toolkit-test-utils/toolkit-test-application.cpp
@@ -107,7 +109,6 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/toolkit-tts-player.cpp
-  dali-toolkit-test-utils/toolkit-native-image.cpp
   dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
   dali-toolkit-test-utils/toolkit-vector-image-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp

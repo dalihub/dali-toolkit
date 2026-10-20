@@ -45,6 +45,8 @@ using Dali::Integration::ToStdString;
 
 namespace
 {
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Toolkit::StyleManager);
+
 // const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "fontsize";
@@ -82,7 +84,7 @@ BaseHandle Create()
     if(singletonService)
     {
       Toolkit::StyleManager manager = Toolkit::StyleManager(new Internal::StyleManager());
-      singletonService.Register(typeid(manager), manager);
+      singletonService.Register(gSingletonTypeInfoId, manager);
       handle = manager;
     }
   }
@@ -103,7 +105,7 @@ Toolkit::StyleManager StyleManager::Get()
   if(singletonService)
   {
     // Check whether the style manager is already created
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(Toolkit::StyleManager));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton

@@ -59,6 +59,8 @@ namespace Internal
 {
 namespace // Unnamed namespace
 {
+static constexpr Dali::TypeInfoId gSingletonTypeInfoId = DALI_TYPE_ID(Toolkit::KeyboardFocusManager);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
@@ -100,7 +102,7 @@ BaseHandle Create()
     if(singletonService)
     {
       Toolkit::KeyboardFocusManager manager = Toolkit::KeyboardFocusManager(new Internal::KeyboardFocusManager());
-      singletonService.Register(typeid(manager), manager);
+      singletonService.Register(gSingletonTypeInfoId, manager);
       handle = manager;
     }
   }
@@ -152,7 +154,7 @@ Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
   if(singletonService)
   {
     // Check whether the keyboard focus manager is already created
-    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(Toolkit::KeyboardFocusManager));
+    Dali::BaseHandle handle = singletonService.GetSingleton(gSingletonTypeInfoId);
     if(handle)
     {
       // If so, downcast the handle of singleton to keyboard focus manager
