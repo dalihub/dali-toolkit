@@ -43,7 +43,7 @@ Dali::Toolkit::ImageUrl GenerateUrl(Dali::FrameBuffer frameBuffer, Pixel::Format
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index)
+Dali::Toolkit::ImageUrl GenerateUrl(Dali::FrameBuffer frameBuffer, uint8_t index)
 {
   Texture texture = Dali::DevelFrameBuffer::GetColorTexture(frameBuffer, index);
   // TODO : Need to check frameBuffer result use preMultiplied color or not. By default, we use premultiplied
@@ -51,7 +51,7 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMultiplied)
+Dali::Toolkit::ImageUrl GenerateUrl(Dali::PixelData pixelData, bool preMultiplied)
 {
   Texture                 texture  = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
@@ -63,19 +63,19 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData, bool preMul
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageInterfacePtr nativeImageInterface, bool preMultiplied)
+Dali::Toolkit::ImageUrl GenerateUrl(Dali::NativeImageInterfacePtr nativeImageInterface, bool preMultiplied)
 {
   Texture                 texture  = Dali::Texture::New(*nativeImageInterface);
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
   return imageUrl;
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageBuffer)
+Dali::Toolkit::ImageUrl GenerateUrl(Dali::EncodedImageBuffer encodedImageBuffer)
 {
   return Dali::Toolkit::ImageUrl::New(encodedImageBuffer);
 }
 
-Dali::Toolkit::ImageUrl GenerateDepthUrl(const Dali::FrameBuffer frameBuffer)
+Dali::Toolkit::ImageUrl GenerateDepthUrl(Dali::FrameBuffer frameBuffer)
 {
   Texture                 texture  = Dali::DevelFrameBuffer::GetDepthTexture(frameBuffer);
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, false);
