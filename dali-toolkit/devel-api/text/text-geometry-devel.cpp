@@ -32,32 +32,32 @@ namespace Text
 namespace TextGeometry
 {
 
-Bounds GetLineBoundingRectangle(TextEditor editor, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextEditor editor, uint32_t lineIndex)
 {
   return GetImpl(editor).GetLineBoundingRectangle(lineIndex);
 }
 
-Bounds GetLineBoundingRectangle(TextLabel label, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextLabel label, uint32_t lineIndex)
 {
   return GetImpl(label).GetLineBoundingRectangle(lineIndex);
 }
 
-Bounds GetLineBoundingRectangle(TextField field, const uint32_t lineIndex)
+Bounds GetLineBoundingRectangle(TextField field, uint32_t lineIndex)
 {
   return GetImpl(field).GetLineBoundingRectangle(lineIndex);
 }
 
-Bounds GetCharacterBoundingRectangle(TextLabel label, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextLabel label, uint32_t charIndex)
 {
   return GetImpl(label).GetCharacterBoundingRectangle(charIndex);
 }
 
-Bounds GetCharacterBoundingRectangle(TextEditor editor, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextEditor editor, uint32_t charIndex)
 {
   return GetImpl(editor).GetCharacterBoundingRectangle(charIndex);
 }
 
-Bounds GetCharacterBoundingRectangle(TextField field, const uint32_t charIndex)
+Bounds GetCharacterBoundingRectangle(TextField field, uint32_t charIndex)
 {
   return GetImpl(field).GetCharacterBoundingRectangle(charIndex);
 }

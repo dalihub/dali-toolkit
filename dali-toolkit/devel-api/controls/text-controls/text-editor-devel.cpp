@@ -75,7 +75,7 @@ void SelectNone(TextEditor textEditor)
   GetImpl(textEditor).SelectNone();
 }
 
-void SelectText(TextEditor textEditor, const uint32_t start, const uint32_t end)
+void SelectText(TextEditor textEditor, uint32_t start, uint32_t end)
 {
   GetImpl(textEditor).SelectText(start, end);
 }
@@ -85,12 +85,12 @@ void ScrollBy(TextEditor textEditor, Vector2 scroll)
   GetImpl(textEditor).ScrollBy(scroll);
 }
 
-Vector<Vector2> GetTextSize(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextSize(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textEditor).GetTextSize(startIndex, endIndex);
 }
 
-Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextPosition(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textEditor).GetTextPosition(startIndex, endIndex);
 }
@@ -115,7 +115,7 @@ void PasteText(TextEditor textEditor)
   GetImpl(textEditor).PasteText();
 }
 
-void SetRemoveFrontInset(TextEditor textEditor, const bool remove)
+void SetRemoveFrontInset(TextEditor textEditor, bool remove)
 {
   GetImpl(textEditor).SetRemoveFrontInset(remove);
 }
@@ -125,7 +125,7 @@ bool IsRemoveFrontInset(TextEditor textEditor)
   return GetImpl(textEditor).IsRemoveFrontInset();
 }
 
-void SetRemoveBackInset(TextEditor textEditor, const bool remove)
+void SetRemoveBackInset(TextEditor textEditor, bool remove)
 {
   GetImpl(textEditor).SetRemoveBackInset(remove);
 }

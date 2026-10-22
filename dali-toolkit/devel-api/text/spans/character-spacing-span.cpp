@@ -27,7 +27,7 @@ namespace Toolkit
 {
 namespace Text
 {
-CharacterSpacingSpan CharacterSpacingSpan::New(const float value)
+CharacterSpacingSpan CharacterSpacingSpan::New(float value)
 {
   return Internal::CharacterSpacingSpan::New(value);
 }
