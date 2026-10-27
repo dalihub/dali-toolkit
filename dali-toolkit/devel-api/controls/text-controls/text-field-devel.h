@@ -424,7 +424,7 @@ DALI_TOOLKIT_API SelectionStartedSignalType& SelectionStartedSignal(TextField te
  * @param[in] endIndex end index(included) of the text requested to calculate size for.
  * @return list of sizes of the reuested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextField textField, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextField textField, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Get the top/left rendered position of a specific text range.
@@ -436,7 +436,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextField textField, const uint32_t
  * @param[in] endIndex end index(included) of the text requested to get position to.
  * @return list of positions of the requested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextField textField, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Gets the bounding box of a specific text range.
@@ -475,7 +475,7 @@ DALI_TOOLKIT_API void SelectNone(TextField textField);
  * @param[in] start The start index of the text to select. (The starting point of start index is 0.)
  * @param[in] end The end index of the text to select. (If end index > text's length, the end index is set to the length of the text.)
  */
-DALI_TOOLKIT_API void SelectText(TextField textField, const uint32_t start, const uint32_t end);
+DALI_TOOLKIT_API void SelectText(TextField textField, uint32_t start, uint32_t end);
 
 /**
  * @brief Copy and return the selected text of TextField.
@@ -506,7 +506,7 @@ DALI_TOOLKIT_API void PasteText(TextField textField);
  * @param[in] textField The instance of TextField.
  * @param[in] remove Whether front inset of TextField has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveFrontInset(TextField textField, const bool remove);
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextField textField, bool remove);
 
 /**
  * @brief Whether front inset of TextField is removed or not.
@@ -522,7 +522,7 @@ DALI_TOOLKIT_API bool IsRemoveFrontInset(TextField textField);
  * @param[in] textField The instance of TextField.
  * @param[in] remove Whether back inset of TextField has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveBackInset(TextField textField, const bool remove);
+DALI_TOOLKIT_API void SetRemoveBackInset(TextField textField, bool remove);
 
 /**
  * @brief Whether back inset of TextField is removed or not.

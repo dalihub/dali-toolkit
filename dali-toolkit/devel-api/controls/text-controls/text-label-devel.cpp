@@ -50,12 +50,12 @@ AsyncHeightForWidthComputedSignalType& AsyncHeightForWidthComputedSignal(TextLab
   return GetImpl(textLabel).AsyncHeightForWidthComputedSignal();
 }
 
-Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextSize(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textLabel).GetTextSize(startIndex, endIndex);
 }
 
-Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextPosition(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textLabel).GetTextPosition(startIndex, endIndex);
 }
@@ -65,7 +65,7 @@ Bounds GetTextBoundingRectangle(TextLabel textLabel, uint32_t startIndex, uint32
   return GetImpl(textLabel).GetTextBoundingRectangle(startIndex, endIndex);
 }
 
-void SetTextFitArray(TextLabel textLabel, const bool enable, std::vector<FitOption>& fitOptions)
+void SetTextFitArray(TextLabel textLabel, bool enable, std::vector<FitOption>& fitOptions)
 {
   GetImpl(textLabel).SetTextFitArray(enable, fitOptions);
 }
@@ -80,7 +80,7 @@ bool IsTextFitArrayEnabled(TextLabel textLabel)
   return GetImpl(textLabel).IsTextFitArrayEnabled();
 }
 
-void SetRemoveFrontInset(TextLabel textLabel, const bool remove)
+void SetRemoveFrontInset(TextLabel textLabel, bool remove)
 {
   GetImpl(textLabel).SetRemoveFrontInset(remove);
 }
@@ -90,7 +90,7 @@ bool IsRemoveFrontInset(TextLabel textLabel)
   return GetImpl(textLabel).IsRemoveFrontInset();
 }
 
-void SetRemoveBackInset(TextLabel textLabel, const bool remove)
+void SetRemoveBackInset(TextLabel textLabel, bool remove)
 {
   GetImpl(textLabel).SetRemoveBackInset(remove);
 }

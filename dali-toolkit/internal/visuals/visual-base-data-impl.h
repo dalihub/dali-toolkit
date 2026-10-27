@@ -49,13 +49,30 @@ struct Base::Impl
    * Constructor
    * @param [in] fittingMode that the derived class prefers
    * @param [in] type The type of the this visual
+   * @param [in] decorationCapabilities The bitwise OR of the DecorationCapability values the visual supports
    */
-  Impl(FittingMode fittingMode, Toolkit::Visual::Type type);
+  Impl(FittingMode fittingMode, Toolkit::Visual::Type type, DecorationCapabilities decorationCapabilities);
 
   /**
    * Destructor
    */
   ~Impl();
+
+  /**
+   * Whether the visual declared the corner radius / squareness decoration.
+   */
+  bool IsCornerRadiusSupported() const
+  {
+    return mDecorationCapabilities & DECORATION_CORNER_RADIUS;
+  }
+
+  /**
+   * Whether the visual declared the borderline decoration.
+   */
+  bool IsBorderlineSupported() const
+  {
+    return mDecorationCapabilities & DECORATION_BORDERLINE;
+  }
 
   enum Flags
   {
@@ -552,6 +569,7 @@ struct Base::Impl
   int                                        mFlags;
   Toolkit::Visual::ResourceStatus            mResourceStatus;
   const Toolkit::Visual::Type                mType;
+  const DecorationCapabilities               mDecorationCapabilities;
 
   bool mAlwaysUsingBorderline : 1;         ///< Whether we need the borderline in shader always.
   bool mAlwaysUsingCornerRadius : 1;       ///< Whether we need the corner radius in shader always.

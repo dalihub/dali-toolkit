@@ -120,7 +120,7 @@ bool GetPolicyFromValue(const Property::Value& value, Vector2& policy)
 
 } // unnamed namespace
 
-Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Type type)
+Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Type type, DecorationCapabilities decorationCapabilities)
 : mEventObserver(nullptr),
   mConstraintFeatureList{},
   mTransform(nullptr),
@@ -132,6 +132,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mFlags(0),
   mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mType(type),
+  mDecorationCapabilities(decorationCapabilities),
   mAlwaysUsingBorderline(false),
   mAlwaysUsingCornerRadius(false),
   mAlwaysUsingCornerSquareness(false),

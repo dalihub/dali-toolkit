@@ -377,7 +377,7 @@ private:
  * @param[in] endIndex end index(included) of the text requested to calculate size for.
  * @return list of sizes of the reuested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Get the top/left rendered position of a specific text range.
@@ -389,7 +389,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t
  * @param[in] endIndex end index(included) of the text requested to get position to.
  * @return list of positions of the requested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextLabel textLabel, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Gets the bounding box of a specific text range.
@@ -408,7 +408,7 @@ DALI_TOOLKIT_API Bounds GetTextBoundingRectangle(TextLabel textLabel, uint32_t s
  * @param[in] enable Whether the text fit array is enabled or not.
  * @param[in] fitOptions list of the fit options.
  */
-DALI_TOOLKIT_API void SetTextFitArray(TextLabel textLabel, const bool enable, std::vector<FitOption>& fitOptions);
+DALI_TOOLKIT_API void SetTextFitArray(TextLabel textLabel, bool enable, std::vector<FitOption>& fitOptions);
 
 /**
  * @brief Get the text fit array of text label.
@@ -431,7 +431,7 @@ DALI_TOOLKIT_API bool IsTextFitArrayEnabled(TextLabel textLabel);
  * @param[in] textLabel The instance of TextLabel.
  * @param[in] remove Whether front inset of text label has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveFrontInset(TextLabel textLabel, const bool remove);
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextLabel textLabel, bool remove);
 
 /**
  * @brief Whether front inset of text label is removed or not.
@@ -447,7 +447,7 @@ DALI_TOOLKIT_API bool IsRemoveFrontInset(TextLabel textLabel);
  * @param[in] textLabel The instance of TextLabel.
  * @param[in] remove Whether back inset of text label has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveBackInset(TextLabel textLabel, const bool remove);
+DALI_TOOLKIT_API void SetRemoveBackInset(TextLabel textLabel, bool remove);
 
 /**
  * @brief Whether back inset of text label is removed or not.

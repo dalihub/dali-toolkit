@@ -420,7 +420,7 @@ Degree SpiralLayout::GetScrollDirection() const
   return scrollDirection;
 }
 
-void SpiralLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
+void SpiralLayout::ApplyConstraints(Actor& actor, int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
 {
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.

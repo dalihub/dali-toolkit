@@ -702,7 +702,7 @@ DALI_TOOLKIT_API void ClearAccessibilityAttributes(Toolkit::Control control);
  * @param control object to append attribute to
  * @param types Reading information types
  */
-DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Integration::Accessibility::ReadingInfoTypes types);
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, Dali::Integration::Accessibility::ReadingInfoTypes types);
 
 /**
  * @brief The method inserts reading information of an accessible object into attributes.

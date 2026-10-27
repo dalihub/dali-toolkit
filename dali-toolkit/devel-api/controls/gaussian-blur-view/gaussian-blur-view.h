@@ -180,7 +180,7 @@ public:
    * SetUserImageAndOutputRenderTarget().
    * @return A handle to a newly allocated Dali resource
    */
-  static GaussianBlurView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage = false);
+  static GaussianBlurView New(unsigned int numSamples, float blurBellCurveWidth, Pixel::Format renderTargetPixelFormat, float downsampleWidthScale, float downsampleHeightScale, bool blurUserImage = false);
 
   /**
    * @brief Start rendering the GaussianBlurView. Must be called after you Add() it to the window.

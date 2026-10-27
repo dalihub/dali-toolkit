@@ -52,11 +52,11 @@ public:
    *
    * @return A handle to a newly allocated Dali resource
    */
-  static FontSpan New(const std::string                             familyName,
-                      const float                                   sizeInPoints,
-                      const Dali::TextAbstraction::FontWeight::Type weight,
-                      const Dali::TextAbstraction::FontWidth::Type  width,
-                      const Dali::TextAbstraction::FontSlant::Type  slant);
+  static FontSpan New(std::string                             familyName,
+                      float                                   sizeInPoints,
+                      Dali::TextAbstraction::FontWeight::Type weight,
+                      Dali::TextAbstraction::FontWidth::Type  width,
+                      Dali::TextAbstraction::FontSlant::Type  slant);
 
   /**
    * @brief Creates an uninitialized FontSpan handle.
