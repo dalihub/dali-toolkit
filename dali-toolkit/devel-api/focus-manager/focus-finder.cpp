@@ -25,7 +25,6 @@
 #include "focus-finder.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-utility.h>
@@ -328,7 +327,7 @@ bool IsFocusable(Actor& actor)
   return (actor.GetProperty<bool>(Actor::Property::FOCUSABLE) &&
           actor.GetProperty<bool>(Actor::Property::ENABLED) &&
           actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
-          !actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED) &&
+          !actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED) &&
           actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER).a > FULLY_TRANSPARENT);
 }
 
@@ -337,7 +336,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Bounds& focusedRect, Boun
   Actor nearestActor;
   if(actor &&
      actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
-     !actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED) &&
+     !actor.GetCurrentProperty<bool>(Actor::Property::WORLD_IGNORED) &&
      actor.GetProperty<bool>(Actor::Property::ALLOW_DESCENDANT_FOCUS))
   {
     // Recursively children
@@ -347,7 +346,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Bounds& focusedRect, Boun
       Dali::Actor child = actor.GetChildAt(i - 1);
       if(child && child != focusedActor && IsFocusable(child))
       {
-        Bounds candidateRect = DevelActor::CalculateCurrentScreenExtents(child);
+        Bounds candidateRect = child.CalculateCurrentScreenBounds();
 
         if(IsBetterCandidate(direction, focusedRect, candidateRect, bestCandidateRect))
         {
@@ -379,12 +378,12 @@ Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Con
   if(!focusedActor)
   {
     // If there is no currently focused actor, it is searched based on the upper left corner of the current window.
-    Bounds rootRect = DevelActor::CalculateCurrentScreenExtents(rootActor);
+    Bounds rootRect = rootActor.CalculateCurrentScreenBounds();
     focusedRect     = Bounds(rootRect.x, rootRect.y, 0.f, 0.f);
   }
   else
   {
-    focusedRect = DevelActor::CalculateCurrentScreenExtents(focusedActor);
+    focusedRect = focusedActor.CalculateCurrentScreenBounds();
   }
 
   // initialize the best candidate to something impossible

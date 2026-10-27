@@ -50,6 +50,21 @@ class EventObserver;
 using FittingMode = DevelVisual::FittingMode;
 
 /**
+ * @brief Renderer decorations a visual can apply.
+ *
+ * Each visual declares the decorations it supports when constructing its base,
+ * so decoration availability is a capability of the implementation and is not
+ * derived from the reported visual type.
+ */
+enum DecorationCapability
+{
+  NO_DECORATION            = 0,      ///< No renderer decoration is supported.
+  DECORATION_CORNER_RADIUS = 1 << 0, ///< The visual supports cornerRadius and cornerSquareness.
+  DECORATION_BORDERLINE    = 1 << 1, ///< The visual supports borderline width, color and offset.
+};
+using DecorationCapabilities = int; ///< Bitwise OR of DecorationCapability values.
+
+/**
  * Base class for all Control rendering logic. A control may have multiple visuals.
  *
  * Note: The visual responds to the the Actor::COLOR by blending it with the 'Multiply' operator.
@@ -355,6 +370,13 @@ public:
   Toolkit::Visual::Type GetType() const;
 
   /**
+   * @brief Get the renderer decorations this visual supports.
+   *
+   * @return The bitwise OR of the DecorationCapability values declared by this visual
+   */
+  DecorationCapabilities GetDecorationCapabilities() const;
+
+  /**
    * @brief Retrieve the property object associated with the property key.
    *
    * @param[in] key The Property key of the visual.
@@ -432,8 +454,9 @@ protected:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] fittingMode The value that determines how the visual should be fit to the view
    * @param[in] type The type of the this visual
+   * @param[in] decorationCapabilities The bitwise OR of the DecorationCapability values this visual supports
    */
-  Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type);
+  Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type, DecorationCapabilities decorationCapabilities);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().

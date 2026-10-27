@@ -540,7 +540,7 @@ DALI_TOOLKIT_API void SelectNone(TextEditor textEditor);
  * @param[in] start The start index of the text to select. (The starting point of start index is 0.)
  * @param[in] end The end index of the text to select. (If end index > text's length, the end index is set to the length of the text.)
  */
-DALI_TOOLKIT_API void SelectText(TextEditor textEditor, const uint32_t start, const uint32_t end);
+DALI_TOOLKIT_API void SelectText(TextEditor textEditor, uint32_t start, uint32_t end);
 
 /**
  * @brief Scroll the TextEditor by specific amount.
@@ -560,7 +560,7 @@ DALI_TOOLKIT_API void ScrollBy(TextEditor textEditor, Vector2 scroll);
  * @param[in] endIndex end index(included) of the text requested to calculate size for.
  * @return list of sizes of the reuested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Get the top/left rendered position of a specific text range.
@@ -572,7 +572,7 @@ DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextEditor textEditor, const uint32
  * @param[in] endIndex end index(included) of the text requested to get position to.
  * @return list of positions of the requested text.
  */
-DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex);
+DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextEditor textEditor, uint32_t startIndex, uint32_t endIndex);
 
 /**
  * @brief Gets the bounding box of a specific text range.
@@ -613,7 +613,7 @@ DALI_TOOLKIT_API void PasteText(TextEditor textEditor);
  * @param[in] textEditor The instance of TextLabel.
  * @param[in] remove Whether front inset of text label has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveFrontInset(TextEditor textEditor, const bool remove);
+DALI_TOOLKIT_API void SetRemoveFrontInset(TextEditor textEditor, bool remove);
 
 /**
  * @brief Whether front inset of text label is removed or not.
@@ -629,7 +629,7 @@ DALI_TOOLKIT_API bool IsRemoveFrontInset(TextEditor textEditor);
  * @param[in] textEditor The instance of TextLabel.
  * @param[in] remove Whether back inset of text label has to be removed or not.
  */
-DALI_TOOLKIT_API void SetRemoveBackInset(TextEditor textEditor, const bool remove);
+DALI_TOOLKIT_API void SetRemoveBackInset(TextEditor textEditor, bool remove);
 
 /**
  * @brief Whether back inset of text label is removed or not.

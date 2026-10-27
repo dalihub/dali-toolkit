@@ -284,7 +284,7 @@ void ClearAccessibilityAttributes(Toolkit::Control control)
   GetControlImplementation(control).ClearAccessibilityAttributes();
 }
 
-void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Integration::Accessibility::ReadingInfoTypes types)
+void SetAccessibilityReadingInfoType(Toolkit::Control control, Dali::Integration::Accessibility::ReadingInfoTypes types)
 {
   GetControlImplementation(control).SetAccessibilityReadingInfoType(types);
 }

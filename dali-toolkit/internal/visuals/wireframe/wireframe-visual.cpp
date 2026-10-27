@@ -67,7 +67,7 @@ WireframeVisualPtr WireframeVisual::New(VisualFactoryCache& factoryCache, Visual
 }
 
 WireframeVisual::WireframeVisual(VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, actualVisual ? actualVisual->GetType() : Toolkit::Visual::WIREFRAME),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, actualVisual ? actualVisual->GetType() : Toolkit::Visual::WIREFRAME, actualVisual ? actualVisual->GetDecorationCapabilities() : Visual::NO_DECORATION),
   mActualVisual(actualVisual)
 {
 }

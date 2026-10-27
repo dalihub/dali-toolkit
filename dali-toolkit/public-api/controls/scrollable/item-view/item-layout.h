@@ -367,7 +367,7 @@ public:
    * @param[in] layoutSize The current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  virtual void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) = 0;
+  virtual void ApplyConstraints(Actor& actor, int itemId, const Vector3& layoutSize, const Actor& itemViewActor) = 0;
 
   /**
    * @brief Gets the position of a given item

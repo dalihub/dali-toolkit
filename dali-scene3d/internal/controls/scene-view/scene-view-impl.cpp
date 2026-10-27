@@ -1431,7 +1431,8 @@ void SceneView::UpdateRenderTask()
       {
         mRootLayer.SetProperty(Dali::Actor::Property::COLOR_MODE, ColorMode::USE_OWN_COLOR);
         mRenderTask.ResetViewportGuideActor();
-        mRenderTask.SetViewport(Dali::Viewport(Vector4::ZERO));
+        mRenderTask.SetViewportPosition(Vector2::ZERO);
+        mRenderTask.SetViewportSize(Vector2::ZERO);
 
         // create offscreen buffer of new size to render our child actors to
         mTexture     = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);

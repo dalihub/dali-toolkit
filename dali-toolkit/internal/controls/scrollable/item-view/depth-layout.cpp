@@ -440,7 +440,7 @@ Degree DepthLayout::GetScrollDirection() const
   return scrollDirection;
 }
 
-void DepthLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
+void DepthLayout::ApplyConstraints(Actor& actor, int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
 {
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(itemViewActor);
   if(itemView)

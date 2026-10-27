@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/integration-api/locale-numeric-guard.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/animation/constraints.h>
 #include <stdarg.h>
@@ -68,6 +69,9 @@ char* ExceptionFlinger::GetMessageBuffer() noexcept(true)
 Dali::String FormatString(const char* format, ...)
 {
   using Dali::Integration::ToDaliString;
+
+  // TODO: Replace vsnprintf with locale-independent formatting.
+  Dali::LocaleNumericGuard localeGuard;
 
   va_list vl;
   va_start(vl, format);

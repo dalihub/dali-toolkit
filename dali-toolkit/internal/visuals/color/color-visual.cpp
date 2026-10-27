@@ -165,7 +165,7 @@ ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, ColorVisualSha
 }
 
 ColorVisual::ColorVisual(VisualFactoryCache& factoryCache, ColorVisualShaderFactory& shaderFactory)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::COLOR, Visual::DECORATION_CORNER_RADIUS | Visual::DECORATION_BORDERLINE),
   mBlurRadius(0.0f),
   mCutoutCornerContext(nullptr),
   mCutoutPolicy(DevelColorVisual::CutoutPolicy::NONE),

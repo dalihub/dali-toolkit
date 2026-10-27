@@ -447,7 +447,7 @@ public:
    * @param[in] index The Property index of the visual
    * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
    */
-  Visual::ResourceStatus GetVisualResourceStatus(const Dali::Property::Index index);
+  Visual::ResourceStatus GetVisualResourceStatus(Dali::Property::Index index);
 
   /**
    * @brief Adds the given accessibility state to this control.

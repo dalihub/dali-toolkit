@@ -54,7 +54,7 @@ GaussianBlurView GaussianBlurView::New()
   return Internal::GaussianBlurView::New();
 }
 
-GaussianBlurView GaussianBlurView::New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage)
+GaussianBlurView GaussianBlurView::New(unsigned int numSamples, float blurBellCurveWidth, Pixel::Format renderTargetPixelFormat, float downsampleWidthScale, float downsampleHeightScale, bool blurUserImage)
 {
   return Internal::GaussianBlurView::New(numSamples, blurBellCurveWidth, renderTargetPixelFormat, downsampleWidthScale, downsampleHeightScale, blurUserImage);
 }

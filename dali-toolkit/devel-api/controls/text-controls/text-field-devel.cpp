@@ -70,17 +70,17 @@ void SelectNone(TextField textField)
   GetImpl(textField).SelectNone();
 }
 
-void SelectText(TextField textField, const uint32_t start, const uint32_t end)
+void SelectText(TextField textField, uint32_t start, uint32_t end)
 {
   GetImpl(textField).SelectText(start, end);
 }
 
-Vector<Vector2> GetTextSize(TextField textField, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextSize(TextField textField, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textField).GetTextSize(startIndex, endIndex);
 }
 
-Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, const uint32_t endIndex)
+Vector<Vector2> GetTextPosition(TextField textField, uint32_t startIndex, uint32_t endIndex)
 {
   return GetImpl(textField).GetTextPosition(startIndex, endIndex);
 }
@@ -105,7 +105,7 @@ void PasteText(TextField textField)
   GetImpl(textField).PasteText();
 }
 
-void SetRemoveFrontInset(TextField textField, const bool remove)
+void SetRemoveFrontInset(TextField textField, bool remove)
 {
   GetImpl(textField).SetRemoveFrontInset(remove);
 }
@@ -115,7 +115,7 @@ bool IsRemoveFrontInset(TextField textField)
   return GetImpl(textField).IsRemoveFrontInset();
 }
 
-void SetRemoveBackInset(TextField textField, const bool remove)
+void SetRemoveBackInset(TextField textField, bool remove)
 {
   GetImpl(textField).SetRemoveBackInset(remove);
 }

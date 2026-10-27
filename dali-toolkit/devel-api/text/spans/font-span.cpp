@@ -27,11 +27,11 @@ namespace Toolkit
 {
 namespace Text
 {
-FontSpan FontSpan::New(const std::string                             familyName,
-                       const float                                   sizeInPoints,
-                       const Dali::TextAbstraction::FontWeight::Type weight,
-                       const Dali::TextAbstraction::FontWidth::Type  width,
-                       const Dali::TextAbstraction::FontSlant::Type  slant)
+FontSpan FontSpan::New(std::string                             familyName,
+                       float                                   sizeInPoints,
+                       Dali::TextAbstraction::FontWeight::Type weight,
+                       Dali::TextAbstraction::FontWidth::Type  width,
+                       Dali::TextAbstraction::FontSlant::Type  slant)
 {
   return Internal::FontSpan::New(familyName, sizeInPoints, weight, width, slant);
 }

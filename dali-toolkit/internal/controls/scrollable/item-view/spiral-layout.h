@@ -172,7 +172,7 @@ private:
   /**
    * @copydoc ItemLayout::ApplyConstraints()
    */
-  void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) override;
+  void ApplyConstraints(Actor& actor, int itemId, const Vector3& layoutSize, const Actor& itemViewActor) override;
 
   /**
    * @copydoc ItemLayout::GetItemPosition()

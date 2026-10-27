@@ -45,7 +45,7 @@ public:
    *
    * @return A handle to a newly allocated Dali resource
    */
-  static CharacterSpacingSpan New(const float value);
+  static CharacterSpacingSpan New(float value);
 
   /**
    * @brief Creates an uninitialized CharacterSpacingSpan handle.
