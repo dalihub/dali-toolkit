@@ -178,7 +178,7 @@ ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
                          const VisualUrl&          imageUrl,
                          ImageDimensions           size,
                          Dali::SamplingMode::Type  samplingMode)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::IMAGE, Visual::DECORATION_CORNER_RADIUS | Visual::DECORATION_BORDERLINE),
   mPixelArea(FULL_TEXTURE_RECT),
   mPixelAreaIndex(Property::INVALID_INDEX),
   mPreMultipliedAlphaIndex(Property::INVALID_INDEX),

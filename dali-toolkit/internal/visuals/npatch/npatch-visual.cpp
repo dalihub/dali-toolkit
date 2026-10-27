@@ -324,7 +324,7 @@ void NPatchVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 }
 
 NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::N_PATCH),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::N_PATCH, Visual::NO_DECORATION),
   mPlacementActor(),
   mLoader(factoryCache.GetNPatchLoader()),
   mImageVisualShaderFactory(shaderFactory),

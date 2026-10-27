@@ -305,7 +305,7 @@ void AnimatedImageVisual::CreateImageCache(TextureManager::ReloadPolicy reloadPo
 }
 
 AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, ImageDimensions desiredSize)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::ANIMATED_IMAGE),
+: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Toolkit::Visual::ANIMATED_IMAGE, Visual::DECORATION_CORNER_RADIUS | Visual::DECORATION_BORDERLINE),
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
