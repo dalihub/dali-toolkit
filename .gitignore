@@ -70,7 +70,7 @@ compile_commands.json
 .idea/
 dali.node
 dali.doxy
-libdali2-toolkit.so*
+libdali*-toolkit.so*
 build/tizen/CMakeDoxyfile.in
 build/tizen/CMakeDoxygenDefaults.cmake
 .vscode/

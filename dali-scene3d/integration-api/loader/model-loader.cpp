@@ -45,7 +45,7 @@ constexpr std::string_view USDA_EXTENSION     = ".usda";
 constexpr std::string_view USDC_EXTENSION     = ".usdc";
 constexpr std::string_view METADATA_EXTENSION = "metadata";
 
-const char* USD_LOADER_SO("libdali2-usd-loader.so");
+const char* USD_LOADER_SO(DALI_LIBRARY_PREFIX "usd-loader.so");
 const char* CREATE_USD_LOADER_SYMBOL("CreateUsdLoader");
 
 // Custom deleter for dlopen handles

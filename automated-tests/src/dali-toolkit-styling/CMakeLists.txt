@@ -64,9 +64,9 @@ SET(TEST_HARNESS_SOURCES
 
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-  dali2-core
-  dali2-adaptor
-  dali2-toolkit
+  dali3-core
+  dali3-adaptor
+  dali3-toolkit
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
