@@ -254,6 +254,11 @@ NPatchLoader& VisualFactoryCache::GetNPatchLoader()
   return mNPatchLoader;
 }
 
+GradientTextureCache& VisualFactoryCache::GetGradientTextureCache()
+{
+  return mGradientTextureCache;
+}
+
 SvgLoader& VisualFactoryCache::GetSvgLoader()
 {
   return mSvgLoader;
@@ -295,7 +300,7 @@ void VisualFactoryCache::FinalizeVectorAnimationManager()
 
 Geometry VisualFactoryCache::CreateGridGeometry(Uint16Pair gridSize, bool normalized)
 {
-  if(Dali::Adaptor::IsAvailable())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     auto factory = Dali::Toolkit::VisualFactory::Get();
     if(factory)
@@ -329,7 +334,7 @@ Geometry VisualFactoryCache::CreateGridGeometry(Uint16Pair gridSize, bool normal
 
 Geometry VisualFactoryCache::CreateBorderGeometry(Uint16Pair gridSize)
 {
-  if(Dali::Adaptor::IsAvailable())
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
   {
     auto factory = Dali::Toolkit::VisualFactory::Get();
     if(factory)

@@ -16,6 +16,7 @@ SET(TC_SOURCES
  utc-Dali-DebugRendering.cpp
  utc-Dali-Dictionary.cpp
  utc-Dali-FeedbackStyle.cpp
+ utc-Dali-GradientTextureCache.cpp
  utc-Dali-ImageView-internal.cpp
  utc-Dali-ImageVisualShaderFeatureBuilder.cpp
  utc-Dali-ItemView-internal.cpp
