@@ -4,7 +4,15 @@ IF(POLICY CMP0177)
   CMAKE_POLICY(SET CMP0177 NEW) # install() DESTINATION paths are normalized.
 ENDIF()
 
-SET(name "dali2-toolkit")
+# API major version (Not DALi release version). It also names the libraries,
+# the pkg-config files and the CMake packages (dali<major>-toolkit, -scene3d,
+# ...), and selects dali<major>-core and dali<major>-adaptor.
+IF(NOT DALI_API_MAJOR)
+  SET(DALI_API_MAJOR 3)
+ENDIF()
+SET(name "dali${DALI_API_MAJOR}-toolkit")
+SET(core_name "dali${DALI_API_MAJOR}-core")
+SET(adaptor_name "dali${DALI_API_MAJOR}-adaptor")
 
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_CXX_STANDARD 17)
@@ -19,12 +27,15 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # API VERSION (Not DALi release version)
-SET(${name}_VERSION_MAJOR 2)
+SET(${name}_VERSION_MAJOR ${DALI_API_MAJOR})
 SET(${name}_VERSION_MINOR 0)
 SET(${name}_VERSION_PATCH 0)
 SET(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH} )
 
 SET(DALI_TOOLKIT_VERSION ${${name}_VERSION} )
+
+# Prefix of the DALi libraries loaded at runtime
+ADD_DEFINITIONS(-DDALI_LIBRARY_PREFIX="libdali${DALI_API_MAJOR}-")
 
 # Define options to CMake
 OPTION(ENABLE_EXPORTALL          "Enable Export all symbols" OFF)
@@ -67,8 +78,8 @@ endif()
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
 
-  PKG_CHECK_MODULES(DALICORE REQUIRED dali2-core)
-  PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali2-adaptor)
+  PKG_CHECK_MODULES(DALICORE REQUIRED ${core_name})
+  PKG_CHECK_MODULES(DALIADAPTOR REQUIRED ${adaptor_name})
 ENDIF()
 
 IF( INSTALL_DOXYGEN_DOC )
@@ -77,13 +88,13 @@ ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   FIND_PACKAGE( dali-windows-dependencies REQUIRED)
-  FIND_PACKAGE( dali2-core REQUIRED)
-  FIND_PACKAGE( dali2-adaptor REQUIRED)
+  FIND_PACKAGE( ${core_name} REQUIRED)
+  FIND_PACKAGE( ${adaptor_name} REQUIRED)
 ENDIF()
 
 IF ( APPLE )
-  FIND_PACKAGE( dali2-core REQUIRED)
-  FIND_PACKAGE( dali2-adaptor REQUIRED)
+  FIND_PACKAGE( ${core_name} REQUIRED)
+  FIND_PACKAGE( ${adaptor_name} REQUIRED)
 ENDIF()
 
 SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
@@ -241,8 +252,8 @@ IF( ENABLE_PKG_CONFIGURE )
   # Requires the following variables to be setup:
   # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
   SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
-  SET( CORE_PKG_CFG_FILE dali2-toolkit.pc )
-  CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
+  SET( CORE_PKG_CFG_FILE ${name}.pc )
+  CONFIGURE_FILE( dali-toolkit.pc.in ${CORE_PKG_CFG_FILE} @ONLY )
 ENDIF()
 
 IF( WIN32 )
@@ -458,7 +469,7 @@ ENDIF()
 IF( WIN32 OR APPLE )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
-        dali2-core::dali2-core )
+        ${core_name}::${core_name} )
 
   FIND_PACKAGE( curl REQUIRED )
   FIND_LIBRARY( GETOPT_LIBRARY NAMES getopt )
@@ -486,7 +497,7 @@ IF( WIN32 OR APPLE )
 
   SET( DALIADAPTOR_LDFLAGS
        "${DALIADAPTOR_LDFLAGS}"
-       dali2-adaptor::dali2-adaptor )
+       ${adaptor_name}::${adaptor_name} )
 ENDIF()
 
 IF ( WIN32 )
@@ -783,7 +794,7 @@ IF( DOXYGEN_FOUND )
 
   IF ( BUILD_SCENE3D )
     ADD_CUSTOM_TARGET( doc_doxygen ALL
-      DEPENDS ${name} dali2-scene3d
+      DEPENDS ${name} dali${DALI_API_MAJOR}-scene3d
       COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_SRC_DIR}/dali.doxy
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_SRC_DIR}/dali.doxy
       COMMAND ${CMAKE_COMMAND} -P ${DOXYGEN_SRC_DIR}/check_for_errors.cmake
@@ -817,7 +828,7 @@ IF( CONFIGURE_AUTOMATED_TESTS )
                   ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt @ONLY )
 ENDIF()
 
-SET(TOOLKIT_GLES_NAME "dali2-toolkit-gles")
+SET(TOOLKIT_GLES_NAME "${name}-gles")
 PKG_CHECK_MODULES(OPENGLES glesv2 egl)
 ADD_LIBRARY(${TOOLKIT_GLES_NAME}
             ${LIBTYPE}

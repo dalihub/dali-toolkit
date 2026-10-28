@@ -70,7 +70,7 @@ extern "C" void* DlopenProxy(const char* filename, int flag)
   }
   else
   {
-    return dlopen("libdali2-scene3d.so", RTLD_LAZY);
+    return dlopen("libdali3-scene3d.so", RTLD_LAZY);
   }
 }
 

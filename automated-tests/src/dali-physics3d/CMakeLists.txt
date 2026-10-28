@@ -59,10 +59,10 @@ SET(TEST_HARNESS_SOURCES
 )
 
 PKG_CHECK_MODULES(${PKG_NAME} REQUIRED
-  dali2-core
-  dali2-adaptor
-  dali2-toolkit
-  dali2-physics-3d
+  dali3-core
+  dali3-adaptor
+  dali3-toolkit
+  dali3-physics-3d
   bullet3
 )
 

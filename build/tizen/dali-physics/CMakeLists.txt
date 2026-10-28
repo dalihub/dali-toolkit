@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
-set(name "dali2-physics")
+set(name "dali${DALI_API_MAJOR}-physics")
 
 project(${name} CXX)
 
@@ -54,8 +54,8 @@ ENDIF()
 if (ENABLE_PKG_CONFIGURE)
     find_package(PkgConfig REQUIRED)
 
-    pkg_check_modules(DALICORE REQUIRED dali2-core)
-    pkg_check_modules(DALIADAPTOR REQUIRED dali2-adaptor)
+    pkg_check_modules(DALICORE REQUIRED ${core_name})
+    pkg_check_modules(DALIADAPTOR REQUIRED ${adaptor_name})
 
     # Configure the pkg-config file
     # Requires the following variables to be setup:
@@ -72,11 +72,11 @@ if (ENABLE_PKG_CONFIGURE)
     set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
     set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
 
-    set(core_pkg_cfg_file_2d dali2-physics-2d.pc)
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file_2d}.in ${core_pkg_cfg_file_2d} @ONLY)
+    set(core_pkg_cfg_file_2d ${name}-2d.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-physics-2d.pc.in ${core_pkg_cfg_file_2d} @ONLY)
 
-    set(core_pkg_cfg_file_3d dali2-physics-3d.pc)
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file_3d}.in ${core_pkg_cfg_file_3d} @ONLY)
+    set(core_pkg_cfg_file_3d ${name}-3d.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-physics-3d.pc.in ${core_pkg_cfg_file_3d} @ONLY)
 endif()
 
 add_subdirectory("${physics_dir}/third-party/chipmunk2d" chipmunk2d)
@@ -109,7 +109,7 @@ PKG_CHECK_MODULES(OPENGLES glesv2 egl)
 ADD_LIBRARY("${name}-2d" SHARED ${physics2d_src_files})
 TARGET_LINK_LIBRARIES("${name}-2d"
   ${DALICORE_LDFLAGS}
-  dali2-toolkit
+  dali${DALI_API_MAJOR}-toolkit
   chipmunk
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-2d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
@@ -119,7 +119,7 @@ TARGET_LINK_LIBRARIES("${name}-2d-gles"
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
   ${OPENGLES_LDFLAGS}
-  dali2-toolkit
+  dali${DALI_API_MAJOR}-toolkit
   chipmunk
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-2d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
@@ -128,7 +128,7 @@ ADD_LIBRARY("${name}-3d" SHARED ${physics3d_src_files})
 TARGET_LINK_LIBRARIES("${name}-3d"
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
-  dali2-toolkit
+  dali${DALI_API_MAJOR}-toolkit
   bullet3
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-3d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
@@ -138,7 +138,7 @@ TARGET_LINK_LIBRARIES("${name}-3d-gles"
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
   ${OPENGLES_LDFLAGS}
-  dali2-toolkit
+  dali${DALI_API_MAJOR}-toolkit
   bullet3
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}-3d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
