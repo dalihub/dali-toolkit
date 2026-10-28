@@ -41,7 +41,7 @@ namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace
 {
-const char* const DALI_PHYSICS_BULLET_GLES_SO("libdali2-physics-3d-gles.so");
+const char* const DALI_PHYSICS_BULLET_GLES_SO(DALI_LIBRARY_PREFIX "physics-3d-gles.so");
 const char* const DALI_PHYSICS_BULLET_GLES_ADDON_NAME("PhysicsBulletGlesAddOn");
 
 struct PhysicsBulletGlesAddOn : public Dali::AddOn::AddOnBinder

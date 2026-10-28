@@ -99,9 +99,9 @@ UiContext::UiContext(Internal::Adaptor::UiContext* uiContext)
 {
 }
 
-// Override public UiContext methods so that calls from dali2-physics-3d.so
+// Override public UiContext methods so that calls from dali3-physics-3d.so
 // (or any other DSO) are dispatched to our stub via the main executable's PLT.
-// Without these overrides, DSOs would resolve the symbols to dali2-adaptor.so
+// Without these overrides, DSOs would resolve the symbols to dali3-adaptor.so
 // and crash because the stub's mAdaptor is not a real adaptor.
 
 UiContext UiContext::Get()

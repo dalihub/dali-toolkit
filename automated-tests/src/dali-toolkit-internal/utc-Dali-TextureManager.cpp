@@ -233,7 +233,7 @@ int UtcTextureManagerRemoteAsyncDownloadLoad(void)
   ToolkitTestApplication application;
   tet_infoline("UtcTextureManagerRemoteAsyncDownloadLoad");
 
-  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali2-file-download-plugin-test.so");
+  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali3-file-download-plugin-test.so");
   setenv("DALI_TEST_REMOTE_FILE_DOWNLOAD_PATH", TEST_IMAGE_FILE_NAME, 1);
 
   TextureManager textureManager;
@@ -273,7 +273,7 @@ int UtcTextureManagerRemoteAsyncDownloadFailure(void)
   ToolkitTestApplication application;
   tet_infoline("UtcTextureManagerRemoteAsyncDownloadFailure");
 
-  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali2-file-download-plugin-test.so");
+  Dali::EnvironmentVariable::SetTestEnvironmentVariable("DALI_FILE_DOWNLOAD_PLUGIN_NAME", ADDON_LIBS_PATH "/libdali3-file-download-plugin-test.so");
   unsetenv("DALI_TEST_REMOTE_FILE_DOWNLOAD_PATH");
 
   TextureManager textureManager;

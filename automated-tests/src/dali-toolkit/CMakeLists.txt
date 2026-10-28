@@ -152,9 +152,9 @@ SET(TEST_HARNESS_SOURCES
 # As the GLES backend is dynamically loaded, if we don't link directly then the GLES backend uses the REAL function
 # rather than the overloaded one in the test suite
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-  dali2-core
-  dali2-adaptor
-  dali2-toolkit
+  dali3-core
+  dali3-adaptor
+  dali3-toolkit
   glesv2
   egl
 )
