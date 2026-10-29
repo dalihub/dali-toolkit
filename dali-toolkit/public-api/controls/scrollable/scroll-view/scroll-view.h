@@ -94,7 +94,12 @@ public:
    * @param[in] max Maximum extent (point cannot traverse greater than this)
    * @param[in] enabled Whether domain has been enabled or not
    */
-  explicit RulerDomain(float min, float max, bool enabled = true);
+  explicit constexpr RulerDomain(float min, float max, bool enabled = true)
+  : min(min),
+    max(max),
+    enabled(enabled)
+  {
+  }
 
 public:
   float min;     ///< Minimum extent (point cannot traverse less than this)
@@ -113,7 +118,12 @@ public:
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations
    * @return The clamped value
    */
-  float Clamp(float x, float length = 0.0f, float scale = 1.0f) const;
+  constexpr float Clamp(float x, float length = 0.0f, float scale = 1.0f) const
+  {
+    ClampState clamped = NOT_CLAMPED;
+
+    return Clamp(x, length, scale, clamped);
+  }
 
   /**
    * @brief Clamps value (x) from (min) to (max).
@@ -128,7 +138,30 @@ public:
    * @param[out] clamped Whether clamping occurred and which size (None, Min or Max)
    * @return The clamped value
    */
-  float Clamp(float x, float length, float scale, ClampState& clamped) const;
+  constexpr float Clamp(float x, float length, float scale, ClampState& clamped) const
+  {
+    if(!enabled)
+    {
+      clamped = NOT_CLAMPED;
+      return x;
+    }
+
+    const float minExtent = min * scale;
+    const float maxExtent = max * scale - length;
+    if(x < minExtent)
+    {
+      clamped = CLAMPED_TO_MIN;
+      return minExtent;
+    }
+    else if(x > maxExtent)
+    {
+      clamped = CLAMPED_TO_MAX;
+      return maxExtent;
+    }
+
+    clamped = NOT_CLAMPED;
+    return x;
+  }
 
   /**
    * @brief Returns (max-min) size of ruler.
@@ -136,7 +169,10 @@ public:
    * @SINCE_1_0.0
    * @return The size of the ruler from min to max
    */
-  float GetSize() const;
+  constexpr float GetSize() const
+  {
+    return max - min;
+  }
 };
 
 // Forward declare future extension interface

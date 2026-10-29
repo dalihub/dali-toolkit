@@ -93,6 +93,13 @@ MESSAGE(STATUS "USD Loader sources: ${usd_loader_src_files}")
 
 ADD_LIBRARY("${name}" SHARED ${usd_loader_src_files} )
 
+# USD 24 headers instantiate a unique_ptr destructor with an incomplete
+# UsdPrimDefinition when Clang uses the C++23+ libstdc++ type traits.
+# Keep this external SDK boundary on its supported C++17 dialect.
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_STANDARD GREATER 20)
+  SET_TARGET_PROPERTIES(${name} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+ENDIF()
+
 TARGET_LINK_LIBRARIES("${name}" ${DALICORE_LDFLAGS} "-L${USD_ROOT_DIR}/lib"
   dali${DALI_API_MAJOR}-toolkit
   dali${DALI_API_MAJOR}-scene3d

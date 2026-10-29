@@ -57,7 +57,7 @@ struct ItemRange
    * @param[in] beginItem The first item within the range
    * @param[in] endItem The past-the-end item
    */
-  ItemRange(unsigned int beginItem, unsigned int endItem)
+  constexpr ItemRange(unsigned int beginItem, unsigned int endItem)
   : begin(beginItem),
     end(endItem)
   {
@@ -69,7 +69,7 @@ struct ItemRange
    * @SINCE_1_0.0
    * @param[in] copy ItemRange we should copy from
    */
-  ItemRange(const ItemRange& copy)
+  constexpr ItemRange(const ItemRange& copy)
   : begin(copy.begin),
     end(copy.end)
   {
@@ -82,7 +82,7 @@ struct ItemRange
    * @param[in] range The Range to assign from
    * @return The updated range
    */
-  ItemRange& operator=(const ItemRange& range)
+  constexpr ItemRange& operator=(const ItemRange& range)
   {
     if(this != &range)
     {
@@ -99,7 +99,7 @@ struct ItemRange
    * @param[in] itemId The item identifier
    * @return true if the item is within the range
    */
-  bool Within(unsigned int itemId)
+  constexpr bool Within(unsigned int itemId)
   {
     return itemId >= begin &&
            itemId < end;
@@ -112,7 +112,7 @@ struct ItemRange
    * @param[in] second The second range
    * @return The intersection
    */
-  ItemRange Intersection(const ItemRange& second)
+  constexpr ItemRange Intersection(const ItemRange& second)
   {
     ItemRange intersection(0u, 0u);
 
