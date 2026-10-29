@@ -20,7 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/extents.h>
 #include <dali/integration-api/processor-interface.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <string>
 #include <utility> // for std::pair
