@@ -28,7 +28,6 @@
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
-#include <dali/integration-api/trace.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <string.h>
 
@@ -42,6 +41,7 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
+#include <dali-toolkit/internal/text/text-trace.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -62,8 +62,7 @@ namespace Internal
 {
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
-DALI_INIT_TRACE_FILTER(gTraceFilter2, DALI_TRACE_TEXT_ASYNC, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 const int CUSTOM_PROPERTY_COUNT(3); // uTextColorAnimatable, uHasMultipleTextColors, requireRender
 
@@ -76,17 +75,6 @@ const float VERTICAL_ALIGNMENT_TABLE[Text::VerticalAlignment::BOTTOM + 1] =
     0.5f, // VerticalAlignment::CENTER
     1.0f  // VerticalAlignment::BOTTOM
 };
-
-#ifdef TRACE_ENABLED
-const char* GetRequestTypeName(Text::Async::RequestType type)
-{
-  if(type < Text::Async::RENDER_FIXED_SIZE || type > Text::Async::COMPUTE_HEIGHT_FOR_WIDTH)
-  {
-    return "INVALID_REQUEST_TYPE";
-  }
-  return Text::Async::RequestTypeName[type];
-}
-#endif
 
 /**
  * Return Property index for the given string key
@@ -794,13 +782,6 @@ void TextVisual::LoadComplete(bool loadingSuccess, const TextInformation& textIn
 {
   Text::AsyncTextParameters parameters = textInformation.parameters;
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("LoadComplete, success:%d, type:%s\n", loadingSuccess, GetRequestTypeName(parameters.requestType));
-  }
-#endif
-
   switch(parameters.requestType)
   {
     case Text::Async::RENDER_FIXED_SIZE:
@@ -1170,13 +1151,6 @@ void TextVisual::SetConstraintApplyAlways(bool applyAlways, bool notifyToConstra
 
 void TextVisual::RequestAsyncSizeComputation(Text::AsyncTextParameters& parameters)
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("Request size computation, type:%s\n", GetRequestTypeName(parameters.requestType));
-  }
-#endif
-
   switch(parameters.requestType)
   {
     case Text::Async::COMPUTE_NATURAL_SIZE:
@@ -1279,13 +1253,6 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
     Text::AsyncTextManager::Get().RequestCancel(mTextLoadingTaskId);
   }
 
-#ifdef TRACE_ENABLED
-  if(gTraceFilter2 && gTraceFilter2->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("Request render, type:%s\n", GetRequestTypeName(parameters.requestType));
-  }
-#endif
-
   mIsTextLoadingTaskRunning          = true;
   TextLoadObserver* textLoadObserver = this;
   mTextLoadingTaskId                 = Text::AsyncTextManager::Get().RequestLoad(parameters, textLoadObserver);
@@ -1295,13 +1262,13 @@ bool TextVisual::UpdateAsyncRenderer(Text::AsyncTextParameters& parameters)
 
 void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle, bool embossEnabled)
 {
-  Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle).EnableEmboss(embossEnabled));
-  mImpl->mRenderer.SetShader(shader);
-
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_VISUAL_UPDATE_RENDERER");
-
   // Get the maximum size.
   const int maxTextureSize = Dali::GetMaxTextureSize();
+
+  DALI_TEXT_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDER");
+
+  Shader shader = GetTextShader(mFactoryCache, TextVisualShaderFeature::FeatureBuilder().EnableMultiColor(hasMultipleTextColors).EnableEmoji(containsColorGlyph).EnableStyle(styleEnabled).EnableOverlay(isOverlayStyle).EnableEmboss(embossEnabled));
+  mImpl->mRenderer.SetShader(shader);
 
   // No tiling required. Use the default renderer.
   if(size.height < maxTextureSize)

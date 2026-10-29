@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/trace.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
@@ -37,6 +36,7 @@
 #include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter-impl.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
+#include <dali-toolkit/internal/text/text-trace.h>
 
 namespace DALI_NAMESPACE
 {
@@ -222,7 +222,8 @@ PixelData Typesetter::RenderWithCutout(const Vector2& size, Toolkit::DevelText::
 
 PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, const Vector2& originSize)
 {
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RENDERING_TYPESETTER");
+  DALI_TEXT_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_RASTERIZE");
+
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
   // Use l-value to make ensure it is not nullptr, so compiler happy.

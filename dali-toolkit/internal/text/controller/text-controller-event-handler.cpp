@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
-#include <dali/integration-api/trace.h>
 #include <dali/public-api/adaptor-framework/key.h>
 
 // INTERNAL INCLUDES
@@ -38,8 +37,6 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
-
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
 
 const char* KEY_C_NAME      = "c";
 const char* KEY_V_NAME      = "v";
@@ -647,8 +644,6 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
     // Nothing to do.
     return;
   }
-
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_MODIFY_EVENTS");
 
   for(Vector<ModifyEvent>::ConstIterator it    = events.Begin(),
                                          endIt = events.End();
