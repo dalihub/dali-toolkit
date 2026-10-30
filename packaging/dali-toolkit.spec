@@ -383,6 +383,8 @@ Development components for dali-usd-loader.
 # Build
 ##############################
 %build
+# TODO: temporary fix => will remove after included in gcc_warning_sr_pkgs list in build.conf
+%{?gcc_unforce_options:%gcc_unforce_options}
 # PO
 {
 cd %{_builddir}/%{name}-%{version}/dali-toolkit/po
