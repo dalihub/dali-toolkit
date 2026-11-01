@@ -1227,15 +1227,15 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
     unsigned int index(0);
     for(unsigned int i = 0, count = map->Count(); i < count; ++i)
     {
-      Property::Value& item     = map->GetValue(i);
-      Property::Map*   childMap = item.GetMap();
+      const Property::Value& item     = map->GetValue(i);
+      const Property::Map*   childMap = item.GetMap();
 
       auto iss = std::istringstream(ToStdString(map->GetKeyAt(i).stringKey));
       iss.imbue(std::locale::classic());
       iss >> index;
       if(childMap)
       {
-        Property::Value* policy = childMap->Find("policy");
+        const Property::Value* policy = childMap->Find("policy");
         if(policy)
         {
           std::string policyValue;
@@ -1252,8 +1252,8 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                 case Toolkit::TableView::FIXED:
                 case Toolkit::TableView::RELATIVE:
                 {
-                  Property::Value* childMapValue = childMap->Find("value");
-                  float            childValue    = 0.0f;
+                  const Property::Value* childMapValue = childMap->Find("value");
+                  float                  childValue    = 0.0f;
                   if(DALI_LIKELY(childMapValue && childMapValue->Get(childValue)))
                   {
                     if(layoutPolicy == Toolkit::TableView::FIXED)

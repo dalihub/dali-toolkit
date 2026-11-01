@@ -234,7 +234,7 @@ void Tooltip::SetContent(Toolkit::Control& control, const Property::Value& value
     {
       mContentTextVisual.Merge(*map);
 
-      Property::Value* typeValue = map->Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
+      const Property::Value* typeValue = map->Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
       if(typeValue)
       {
         // Set to an invalid value so it definitely changes if set in Scripting::GetEnumerationProperty

@@ -487,7 +487,7 @@ Property::Map NativeImageStrategy::CreateShader()
 
   if(!videoView->GetEffectPropertyMap().Empty())
   {
-    Property::Value* vertexShaderValue = videoView->GetEffectPropertyMap().Find(CUSTOM_VERTEX_SHADER);
+    const Property::Value* vertexShaderValue = videoView->GetEffectPropertyMap().Find(CUSTOM_VERTEX_SHADER);
     if(vertexShaderValue)
     {
       checkShader = GetStringFromProperty(*vertexShaderValue, vertexShader);
@@ -498,7 +498,7 @@ Property::Map NativeImageStrategy::CreateShader()
       vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
     }
 
-    Property::Value* fragmentShaderValue = videoView->GetEffectPropertyMap().Find(CUSTOM_FRAGMENT_SHADER);
+    const Property::Value* fragmentShaderValue = videoView->GetEffectPropertyMap().Find(CUSTOM_FRAGMENT_SHADER);
     if(fragmentShaderValue)
     {
       checkShader = GetStringFromProperty(*fragmentShaderValue, customFragmentShader);

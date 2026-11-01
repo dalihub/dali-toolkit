@@ -117,7 +117,7 @@ PrimitiveVisual::~PrimitiveVisual()
 void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // Find out which shape to renderer.
-  Property::Value* primitiveTypeValue = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SHAPE, PRIMITIVE_SHAPE);
+  const Property::Value* primitiveTypeValue = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SHAPE, PRIMITIVE_SHAPE);
   if(primitiveTypeValue)
   {
     Scripting::GetEnumerationProperty(*primitiveTypeValue, SHAPE_TYPE_TABLE, SHAPE_TYPE_TABLE_COUNT, mPrimitiveType);
@@ -129,7 +129,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
 
   // By virtue of DoSetProperties being called last, this will override
   // anything set by Toolkit::Visual::Property::MIX_COLOR
-  Property::Value* colorValue = propertyMap.Find(Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR);
+  const Property::Value* colorValue = propertyMap.Find(Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR);
   if(colorValue)
   {
     Vector4 color;
@@ -148,7 +148,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* slices = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SLICES, SLICES);
+  const Property::Value* slices = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SLICES, SLICES);
   if(slices)
   {
     if(slices->Get(mSlices))
@@ -171,7 +171,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* stacks = propertyMap.Find(Toolkit::PrimitiveVisual::Property::STACKS, STACKS);
+  const Property::Value* stacks = propertyMap.Find(Toolkit::PrimitiveVisual::Property::STACKS, STACKS);
   if(stacks)
   {
     if(stacks->Get(mStacks))
@@ -194,31 +194,31 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* scaleTop = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS, SCALE_TOP_RADIUS);
+  const Property::Value* scaleTop = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS, SCALE_TOP_RADIUS);
   if(scaleTop && !scaleTop->Get(mScaleTopRadius))
   {
     DALI_LOG_ERROR("Invalid type for scale top radius in PrimitiveVisual.\n");
   }
 
-  Property::Value* scaleBottom = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, SCALE_BOTTOM_RADIUS);
+  const Property::Value* scaleBottom = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, SCALE_BOTTOM_RADIUS);
   if(scaleBottom && !scaleBottom->Get(mScaleBottomRadius))
   {
     DALI_LOG_ERROR("Invalid type for scale bottom radius in PrimitiveVisual.\n");
   }
 
-  Property::Value* scaleHeight = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_HEIGHT, SCALE_HEIGHT);
+  const Property::Value* scaleHeight = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_HEIGHT, SCALE_HEIGHT);
   if(scaleHeight && !scaleHeight->Get(mScaleHeight))
   {
     DALI_LOG_ERROR("Invalid type for scale height in PrimitiveVisual.\n");
   }
 
-  Property::Value* scaleRadius = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_RADIUS, SCALE_RADIUS);
+  const Property::Value* scaleRadius = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_RADIUS, SCALE_RADIUS);
   if(scaleRadius && !scaleRadius->Get(mScaleRadius))
   {
     DALI_LOG_ERROR("Invalid type for scale radius in PrimitiveVisual.\n");
   }
 
-  Property::Value* dimensions = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_DIMENSIONS, SCALE_DIMENSIONS);
+  const Property::Value* dimensions = propertyMap.Find(Toolkit::PrimitiveVisual::Property::SCALE_DIMENSIONS, SCALE_DIMENSIONS);
   if(dimensions)
   {
     if(dimensions->Get(mScaleDimensions))
@@ -246,7 +246,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* bevel = propertyMap.Find(Toolkit::PrimitiveVisual::Property::BEVEL_PERCENTAGE, BEVEL_PERCENTAGE);
+  const Property::Value* bevel = propertyMap.Find(Toolkit::PrimitiveVisual::Property::BEVEL_PERCENTAGE, BEVEL_PERCENTAGE);
   if(bevel)
   {
     if(bevel->Get(mBevelPercentage))
@@ -269,7 +269,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* smoothness = propertyMap.Find(Toolkit::PrimitiveVisual::Property::BEVEL_SMOOTHNESS, BEVEL_SMOOTHNESS);
+  const Property::Value* smoothness = propertyMap.Find(Toolkit::PrimitiveVisual::Property::BEVEL_SMOOTHNESS, BEVEL_SMOOTHNESS);
   if(smoothness)
   {
     if(smoothness->Get(mBevelSmoothness))
@@ -293,7 +293,7 @@ void PrimitiveVisual::DoSetProperties(const Property::Map& propertyMap)
   }
 
   // Read in light position.
-  Property::Value* lightPosition = propertyMap.Find(Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, LIGHT_POSITION_UNIFORM_NAME);
+  const Property::Value* lightPosition = propertyMap.Find(Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, LIGHT_POSITION_UNIFORM_NAME);
   if(lightPosition)
   {
     if(!lightPosition->Get(mLightPosition))

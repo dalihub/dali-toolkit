@@ -109,8 +109,8 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
   Toolkit::RulerPtr rulerX, rulerY;
 
   // Check the scroll mode in the X axis
-  bool             xAxisScrollEnabled = true;
-  Property::Value* valuePtr           = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SCROLL_ENABLED, "xAxisScrollEnabled");
+  bool                   xAxisScrollEnabled = true;
+  const Property::Value* valuePtr           = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SCROLL_ENABLED, "xAxisScrollEnabled");
   if(valuePtr && valuePtr->GetType() == Property::BOOLEAN)
   {
     valuePtr->Get(xAxisScrollEnabled);

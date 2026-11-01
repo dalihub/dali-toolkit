@@ -195,8 +195,8 @@ void ImageView::SetImage(const Property::Map& map)
   // keep alpha for transition effect
   if(mTransitionEffect)
   {
-    float            alpha      = FULL_OPACITY;
-    Property::Value* alphaValue = map.Find(Toolkit::Visual::Property::OPACITY);
+    float                  alpha      = FULL_OPACITY;
+    const Property::Value* alphaValue = map.Find(Toolkit::Visual::Property::OPACITY);
     if(alphaValue && alphaValue->Get(alpha))
     {
       mTransitionTargetAlpha = alpha;
@@ -710,7 +710,7 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
             }
             else
             {
-              Property::Value* shaderValue = map->Find(Toolkit::Visual::Property::SHADER, CUSTOM_SHADER);
+              const Property::Value* shaderValue = map->Find(Toolkit::Visual::Property::SHADER, CUSTOM_SHADER);
               // set image only if property map contains image information other than custom shader
               if(map->Count() > 1u || !shaderValue)
               {
@@ -719,7 +719,7 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
               // the property map contains only the custom shader
               else if((map->Count() == 1u) && (shaderValue))
               {
-                Property::Map* shaderMap = shaderValue->GetMap();
+                const Property::Map* shaderMap = shaderValue->GetMap();
                 if(shaderMap)
                 {
                   impl.mShaderMap = *shaderMap;

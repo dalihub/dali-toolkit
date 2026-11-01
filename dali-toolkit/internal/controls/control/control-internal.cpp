@@ -888,7 +888,7 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
         const Property::Map*   map             = value.GetMap();
         if(map)
         {
-          Property::Value* value2 = map->Find("withTransitions");
+          const Property::Value* value2 = map->Find("withTransitions");
           if(value2)
           {
             withTransitions = value2->Get<bool>();

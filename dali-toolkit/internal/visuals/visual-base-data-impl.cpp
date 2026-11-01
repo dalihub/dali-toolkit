@@ -171,7 +171,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
   mHints    = Shader::Hint::NONE;
   mName     = "";
 
-  Property::Value* vertexShaderValue = shaderMap.Find(Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER);
+  const Property::Value* vertexShaderValue = shaderMap.Find(Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER);
   if(vertexShaderValue)
   {
     if(!GetStringFromProperty(*vertexShaderValue, mVertexShader))
@@ -180,7 +180,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* fragmentShaderValue = shaderMap.Find(Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, CUSTOM_FRAGMENT_SHADER);
+  const Property::Value* fragmentShaderValue = shaderMap.Find(Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, CUSTOM_FRAGMENT_SHADER);
   if(fragmentShaderValue)
   {
     if(!GetStringFromProperty(*fragmentShaderValue, mFragmentShader))
@@ -189,7 +189,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* subdivideXValue = shaderMap.Find(Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X, CUSTOM_SUBDIVIDE_GRID_X);
+  const Property::Value* subdivideXValue = shaderMap.Find(Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X, CUSTOM_SUBDIVIDE_GRID_X);
   if(subdivideXValue)
   {
     int subdivideX;
@@ -203,7 +203,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* subdivideYValue = shaderMap.Find(Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y, CUSTOM_SUBDIVIDE_GRID_Y);
+  const Property::Value* subdivideYValue = shaderMap.Find(Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y, CUSTOM_SUBDIVIDE_GRID_Y);
   if(subdivideYValue)
   {
     int subdivideY;
@@ -217,7 +217,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* renderPassTagValue = shaderMap.Find(Toolkit::Visual::Shader::Property::RENDER_PASS_TAG, CUSTOM_RENDER_PASS_TAG);
+  const Property::Value* renderPassTagValue = shaderMap.Find(Toolkit::Visual::Shader::Property::RENDER_PASS_TAG, CUSTOM_RENDER_PASS_TAG);
   if(renderPassTagValue)
   {
     if(!renderPassTagValue->Get(mRenderPassTag) || mRenderPassTag < 0)
@@ -226,7 +226,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* hintsValue = shaderMap.Find(Toolkit::Visual::Shader::Property::HINTS, CUSTOM_SHADER_HINTS);
+  const Property::Value* hintsValue = shaderMap.Find(Toolkit::Visual::Shader::Property::HINTS, CUSTOM_SHADER_HINTS);
   if(hintsValue)
   {
     if(!Scripting::GetBitmaskEnumerationProperty(*hintsValue, SHADER_HINT_TABLE, SHADER_HINT_TABLE_COUNT, mHints))
@@ -235,7 +235,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap(const Property::
     }
   }
 
-  Property::Value* nameValue = shaderMap.Find(Toolkit::Visual::Shader::Property::NAME, CUSTOM_SHADER_NAME);
+  const Property::Value* nameValue = shaderMap.Find(Toolkit::Visual::Shader::Property::NAME, CUSTOM_SHADER_NAME);
   if(nameValue)
   {
     if(!GetStringFromProperty(*nameValue, mName))
