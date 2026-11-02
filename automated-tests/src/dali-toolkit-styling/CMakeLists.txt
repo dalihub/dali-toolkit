@@ -29,7 +29,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-sound-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-application.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-text-abstraction.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-font-client.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-video-player.cpp

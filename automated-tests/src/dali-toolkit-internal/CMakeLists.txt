@@ -33,6 +33,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Cursor.cpp
  utc-Dali-Text-Layout.cpp
  utc-Dali-Text-Markup.cpp
+ utc-Dali-Text-PortableCoverage.cpp
  utc-Dali-Text-MultiLanguage.cpp
  utc-Dali-Text-Segmentation.cpp
  utc-Dali-Text-Shaping.cpp
@@ -77,6 +78,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-application.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-font-client.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp

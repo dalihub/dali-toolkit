@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
@@ -17,704 +15,281 @@
  *
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
-
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
-#include <dali-toolkit/devel-api/text/bitmap-font.h>
-#include <dali-toolkit/devel-api/text/rendering-backend.h>
-#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
-#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
-#include <dali-toolkit/devel-api/text/text-utils-devel.h>
-#include "test-text-geometry-utils.h"
+#include <dali-toolkit/internal/text/text-geometry.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include "../dali-toolkit-internal/dali-toolkit-test-utils/text-model-fixture.h"
 
 using namespace Dali;
-using namespace Toolkit;
-using namespace Text;
+using namespace Dali::Toolkit;
+using namespace Dali::Toolkit::Text;
 
-void dali_textgeometry_startup(void)
+namespace
 {
-  test_return_value = TET_UNDEF;
+void CheckBounds(const Bounds& actual, const Bounds& expected)
+{
+  DALI_TEST_EQUALS(actual.x, expected.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actual.y, expected.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actual.width, expected.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(actual.height, expected.height, TEST_LOCATION);
+}
 }
 
-void dali_textgeometry_cleanup(void)
+int UtcDaliTextGeometrySyntheticLineBounds(void)
 {
-  test_return_value = TET_PASS;
-}
-
-int UtcDaliTextGeometryGetLineBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  float lineSpacing = -20.f;
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 16, 418, 16};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  CheckBounds(GetLineBoundingRect(model, 0u), {0.f, 0.f, 40.f, 20.f});
+  CheckBounds(GetLineBoundingRect(model, 1u), {0.f, 20.f, 40.f, 20.f});
+  CheckBounds(GetLineBoundingRect(model, 2u), {});
+  model->mScrollPosition = Vector2(-3.f, 7.f);
+  model->mVisualModel->mLines[1].alignmentOffset = 5.f;
+  CheckBounds(GetLineBoundingRect(model, 1u), {2.f, 27.f, 40.f, 20.f});
+  model->mVisualModel = nullptr;
+  CheckBounds(GetLineBoundingRect(model, 0u), {});
   END_TEST;
 }
 
-int UtcDaliTextGeometryGetLineBoundingRectangleEditor(void)
+int UtcDaliTextGeometrySyntheticCharacterBounds(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetLineBoundingRectangleEditor");
-
-  TextEditor editor = TextEditor::New();
-  DALI_TEST_CHECK(editor);
-
-  application.GetScene().Add(editor);
-
-  editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
-  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
-  editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(editor, 0);
-
-  Rect<> expectedLineGeometry         = {0, 0, 91, 36};
-  Rect<> optionalExpectedLineGeometry = {0, 0, 92, 36}; ///< For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry, optionalExpectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  CheckBounds(GetCharacterBoundingRect(model, 0u), {0.f, 15.f, 10.f, 20.f});
+  CheckBounds(GetCharacterBoundingRect(model, 5u), {10.f, 35.f, 10.f, 20.f});
+  model->mScrollPosition = Vector2(3.f, -4.f);
+  model->mVisualModel->mLines[1].alignmentOffset = 7.f;
+  CheckBounds(GetCharacterBoundingRect(model, 5u), {20.f, 31.f, 10.f, 20.f});
+  CheckBounds(GetCharacterBoundingRect(model, 8u), {});
+  model->mVisualModel->mLines.Clear();
+  CheckBounds(GetCharacterBoundingRect(model, 0u), {});
+  model->mVisualModel = nullptr;
+  CheckBounds(GetCharacterBoundingRect(model, 0u), {});
   END_TEST;
 }
 
-int UtcDaliTextGeometryGetLineBoundingRectangleField(void)
+int UtcDaliTextGeometrySyntheticHitTest(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetLineBoundingRectangleField");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  application.GetScene().Add(field);
-
-  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
-  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
-  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
-  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
-  field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(field, 0);
-
-  Rect<> expectedLineGeometry = {0, 0, 162, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 3.f, 1.f), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 13.f, 21.f), 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 33.f, 1.f), 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, -1.f, 1.f), -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 43.f, 1.f), -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 3.f, 41.f), -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(ModelPtr(), 3.f, 1.f), -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(TextTest::MakeModel(U""), 3.f, 1.f), -1, TEST_LOCATION);
+  model->mVisualModel->mLines[0].alignmentOffset = 10.f;
+  DALI_TEST_EQUALS(GetCharIndexAtPosition(model, 13.f, 1.f), 0, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliTextGeometryEmptyTextGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticRanges(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryEmptyTextGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::TEXT, "");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 0);
-
-  Rect<> expectedLineGeometry = {0, 0, 0, 0};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  Vector<Vector2> sizes, positions;
+  GetTextGeometry(model, 1u, 6u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(positions.Count(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(positions[0], Vector2(10.f, 0.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(positions[1], Vector2(0.f, 20.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0], Vector2(30.f, 20.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[1], Vector2(30.f, 20.f), TEST_LOCATION);
+  Vector<Vector2> reversedSizes, reversedPositions;
+  GetTextGeometry(model, 6u, 1u, reversedSizes, reversedPositions);
+  DALI_TEST_EQUALS(reversedSizes.Count(), sizes.Count(), TEST_LOCATION);
+  for(unsigned int i = 0u; i < sizes.Count(); ++i)
+  {
+    DALI_TEST_EQUALS(reversedSizes[i], sizes[i], TEST_LOCATION);
+    DALI_TEST_EQUALS(reversedPositions[i], positions[i], TEST_LOCATION);
+  }
+  GetTextGeometry(model, 100u, 200u, sizes, positions);
+  DALI_TEST_CHECK(sizes.Empty() && positions.Empty());
+  GetTextGeometry(model, 0u, 100u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 2u, TEST_LOCATION);
+  GetTextGeometry(model, 100u, 0u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 2u, TEST_LOCATION);
+  auto empty = TextTest::MakeModel(U"");
+  GetTextGeometry(empty, 0u, 0u, sizes, positions);
+  DALI_TEST_CHECK(sizes.Empty() && positions.Empty());
   END_TEST;
 }
 
-int UtcDaliTextGeometryLineSpacingPositiveGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticRangeUnion(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryLineSpacingPositiveGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  float lineSpacing = 20.f;
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 56, 418, 56};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  CheckBounds(Dali::Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(model, 1u, 6u), {0.f, 0.f, 40.f, 40.f});
+  CheckBounds(Dali::Toolkit::Internal::CommonTextUtils::GetTextBoundingRectangle(model, 100u, 200u), {});
   END_TEST;
 }
 
-int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticLineSpacing(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithVerticalLineAlignmentTopGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "TOP");
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 36, 418, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  for(float spacing : {-10.f, 0.f, 10.f})
+  {
+    auto model = TextTest::MakeModel(U"abcdefgh");
+    model->mVisualModel->mLines[0].lineSpacing = spacing;
+    model->mVisualModel->mLines[1].lineSpacing = spacing;
+    CheckBounds(GetLineBoundingRect(model, 0u), {0.f, 0.f, 40.f, 20.f + spacing});
+    CheckBounds(GetLineBoundingRect(model, 1u), {0.f, 20.f + spacing, 40.f, 20.f + std::max(0.f, spacing)});
+  }
   END_TEST;
 }
 
-int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticDirectionBlocks(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "BOTTOM");
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 36, 418, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
-  END_TEST;
-}
-int UtcDaliTextGeometryWithEllipsisMiddleGetLineBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithEllipsisMiddleGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
-  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::MIDDLE);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 36, 418, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"abcdefgh");
+  model->mLogicalModel->mCharacterDirections.Resize(8u, false);
+  for(unsigned int i = 2u; i < 4u; ++i) model->mLogicalModel->mCharacterDirections[i] = true;
+  Vector<Vector2> sizes, positions;
+  GetTextGeometry(model, 0u, 7u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), positions.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes.Count(), 3u, TEST_LOCATION);
+  for(const auto& size : sizes) DALI_TEST_CHECK(size.x >= 0.f && size.y == 20.f);
   END_TEST;
 }
 
-int UtcDaliTextGeometryWithEllipsisStartGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticLigatureRange(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithEllipsisStartGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
-  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 36, 418, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  auto model = TextTest::MakeModel(U"fi");
+  auto& visual = *model->mVisualModel;
+  visual.mGlyphs.Resize(1u);
+  visual.mGlyphPositions.Resize(1u);
+  visual.mGlyphs[0].advance = 20.f;
+  visual.mGlyphs[0].width = 17.f;
+  visual.mCharactersToGlyph[1] = 0u;
+  visual.mGlyphsPerCharacter[0] = 0u;
+  visual.mGlyphsPerCharacter[1] = 1u;
+  visual.mCharactersPerGlyph[0] = 2u;
+  visual.mLines[0].glyphRun.numberOfGlyphs = 1u;
+  Vector<Vector2> sizes, positions;
+  GetTextGeometry(model, 1u, 1u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].x, 10.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(positions[0].x, 10.f, TEST_LOCATION);
+  GetTextGeometry(model, 0u, 0u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].x, 10.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(positions[0].x, 0.f, TEST_LOCATION);
+  auto ending = TextTest::MakeModel(U"afi");
+  auto& endingVisual = *ending->mVisualModel;
+  endingVisual.mGlyphs.Resize(2u);
+  endingVisual.mGlyphPositions.Resize(2u);
+  endingVisual.mGlyphs[1].advance = 20.f;
+  endingVisual.mGlyphs[1].width = 17.f;
+  endingVisual.mCharactersToGlyph[2] = 1u;
+  endingVisual.mGlyphsPerCharacter[1] = 0u;
+  endingVisual.mGlyphsPerCharacter[2] = 1u;
+  endingVisual.mCharactersPerGlyph[1] = 2u;
+  endingVisual.mLines[0].glyphRun.numberOfGlyphs = 2u;
+  GetTextGeometry(ending, 0u, 1u, sizes, positions);
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0], Vector2(20.f, 20.f), TEST_LOCATION);
+  DALI_TEST_EQUALS(positions[0], Vector2::ZERO, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliTextGeometryWithEllipsisEndGetLineBoundingRectangleLabel(void)
+int UtcDaliTextGeometrySyntheticEllipsisRanges(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithEllipsisEndGetLineBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(TextLabel::Property::ELLIPSIS, true);
-  label.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> lineGeometry = TextGeometry::GetLineBoundingRectangle(label, 1);
-
-  Rect<> expectedLineGeometry = {0, 36, 418, 36};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(lineGeometry, expectedLineGeometry);
-
+  for(auto position : {DevelText::EllipsisPosition::START, DevelText::EllipsisPosition::MIDDLE, DevelText::EllipsisPosition::END})
+  {
+    auto model = TextTest::MakeModel(U"abcdefgh", 8u);
+    model->mElideEnabled = true;
+    model->mEllipsisPosition = position;
+    auto& visual = *model->mVisualModel;
+    visual.SetEllipsisPosition(position);
+    visual.SetStartIndexOfElidedGlyphs(2u);
+    visual.SetEndIndexOfElidedGlyphs(5u);
+    visual.SetFirstMiddleIndexOfElidedGlyphs(2u);
+    visual.SetSecondMiddleIndexOfElidedGlyphs(5u);
+    Vector<Vector2> sizes, positions;
+    GetTextGeometry(model, 0u, 7u, sizes, positions);
+    DALI_TEST_CHECK(!sizes.Empty());
+    DALI_TEST_EQUALS(sizes.Count(), positions.Count(), TEST_LOCATION);
+    DALI_TEST_CHECK(sizes[0].x < 80.f);
+  }
   END_TEST;
 }
 
-int UtcDaliTextGeometryGetCharacterBoundingRectangleLabel(void)
+int UtcDaliTextGeometryDeterministicLabelApi(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  float lineSpacing = -20.f;
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto control = TextLabel::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  control.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
+  control.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
+  control.SetProperty(TextLabel::Property::TEXT, "abcd");
+  application.GetScene().Add(control);
   application.SendNotification();
   application.Render();
-
-  Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
-
-  Rect<> expectedCharacterGeometry         = {13.0f, 16.0f, 19.0f, 16.0f};
-  Rect<> optionalExpectedCharacterGeometry = {14.0f, 16.0f, 19.0f, 16.0f}; // For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry, optionalExpectedCharacterGeometry);
-
+  auto line = TextGeometry::GetLineBoundingRectangle(control, 0u);
+  auto character = TextGeometry::GetCharacterBoundingRectangle(control, 1u);
+  DALI_TEST_CHECK(line.width > 0.f);
+  DALI_TEST_EQUALS(character.width, 8.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(character.height, 16.f, TEST_LOCATION);
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 100u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 100u), {});
+  control.SetProperty(TextLabel::Property::TEXT, "");
+  application.SendNotification();
+  application.Render();
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 0u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 0u), {});
+  DALI_TEST_EQUALS(TextGeometry::GetCharacterIndexAtPosition(control, 0.f, 0.f), -1, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliTextGeometryGetCharacterBoundingRectangleEditor(void)
+int UtcDaliTextGeometryDeterministicEditorApi(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterBoundingRectangleEditor");
-
-  TextEditor editor = TextEditor::New();
-  DALI_TEST_CHECK(editor);
-
-  application.GetScene().Add(editor);
-
-  editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
-  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
-  editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto control = TextEditor::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  control.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
+  control.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
+  control.SetProperty(TextEditor::Property::TEXT, "abcd");
+  application.GetScene().Add(control);
   application.SendNotification();
   application.Render();
-
-  Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(editor, 1);
-
-  Rect<> expectedCharacterGeometry         = {13.0f, 16.0f, 19.0f, 16.0f};
-  Rect<> optionalExpectedCharacterGeometry = {14.0f, 16.0f, 19.0f, 16.0f}; // For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry, optionalExpectedCharacterGeometry);
-
+  auto line = TextGeometry::GetLineBoundingRectangle(control, 0u);
+  auto character = TextGeometry::GetCharacterBoundingRectangle(control, 1u);
+  DALI_TEST_CHECK(line.width > 0.f);
+  DALI_TEST_EQUALS(character.width, 8.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(character.height, 16.f, TEST_LOCATION);
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 100u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 100u), {});
+  control.SetProperty(TextEditor::Property::TEXT, "");
+  application.SendNotification();
+  application.Render();
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 0u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 0u), {});
+  DALI_TEST_EQUALS(TextGeometry::GetCharacterIndexAtPosition(control, 0.f, 0.f), -1, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliTextGeometryGetCharacterBoundingRectangleField(void)
+int UtcDaliTextGeometryDeterministicFieldApi(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterBoundingRectangleField");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  application.GetScene().Add(field);
-
-  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
-  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
-  field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto control = TextField::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  control.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  control.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
+  control.SetProperty(TextField::Property::TEXT, "abcd");
+  application.GetScene().Add(control);
   application.SendNotification();
   application.Render();
-
-  Rect<> characterGeometry = TextGeometry::GetCharacterBoundingRectangle(field, 0);
-
-  Rect<> expectedCharacterGeometry = {142.0f, 10.0f, 16.0f, 11.0f};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(characterGeometry, expectedCharacterGeometry);
-
-  END_TEST;
-}
-// char tc
-
-int UtcDaliTextGeometryEmptyTextGetCharacterBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryEmptyTextGetCharacterBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::TEXT, "");
-
+  auto line = TextGeometry::GetLineBoundingRectangle(control, 0u);
+  auto character = TextGeometry::GetCharacterBoundingRectangle(control, 1u);
+  DALI_TEST_CHECK(line.width > 0.f);
+  DALI_TEST_EQUALS(character.width, 8.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(character.height, 16.f, TEST_LOCATION);
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 100u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 100u), {});
+  control.SetProperty(TextField::Property::TEXT, "");
   application.SendNotification();
   application.Render();
-
-  Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 0);
-
-  Rect<> expectedCharGeometry = {0.0f, 0.0f, 0.0f, 0.0f};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryLineSpacingPositiveGetCharacterBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryLineSpacingPositiveGetCharacterBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  float lineSpacing = 20.f;
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
-
-  Rect<> expectedCharGeometry         = {13.0f, 16.0f, 19.0f, 16.0f};
-  Rect<> optionalExpectedCharGeometry = {14.0f, 16.0f, 19.0f, 16.0f}; ///< For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry, optionalExpectedCharGeometry);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryWithVerticalLineAlignmentTopGetCharacterBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithVerticalLineAlignmentTopGetCharacterBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "TOP");
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
-
-  Rect<> expectedCharGeometry         = {13.0, 16.0f, 19.0f, 16.0f};
-  Rect<> optionalExpectedCharGeometry = {14.0f, 16.0f, 19.0f, 16.0f}; ///< For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry, optionalExpectedCharGeometry);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetCharacterBoundingRectangleLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryWithVerticalLineAlignmentBottomGetCharacterBoundingRectangleLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "BOTTOM");
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-
-  application.SendNotification();
-  application.Render();
-
-  Rect<> charGeometry = TextGeometry::GetCharacterBoundingRectangle(label, 1);
-
-  Rect<> expectedCharGeometry         = {13.0, 16.0f, 19.0f, 16.0f};
-  Rect<> optionalExpectedCharGeometry = {14.0f, 16.0f, 19.0f, 16.0f}; ///< For Ubuntu24
-
-  TestTextGeometryUtils::CheckRectGeometryResult(charGeometry, expectedCharGeometry, optionalExpectedCharGeometry);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabel(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabel");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::TEXT, "sara سارة");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 1, 1);
-
-  int expectedCharacterIndex = 0;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionTextEditor(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextEditor");
-
-  TextEditor editor = TextEditor::New();
-  DALI_TEST_CHECK(editor);
-
-  application.GetScene().Add(editor);
-
-  editor.SetProperty(Actor::Property::SIZE, Vector2(160.0f, 250.f));
-  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_FRONT_INSET, true);
-  editor.SetProperty(DevelTextEditor::Property::REMOVE_BACK_INSET, true);
-  editor.SetProperty(TextEditor::Property::TEXT, "Hello everyone.");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(editor, 2, 2);
-
-  int expectedCharacterIndex = 0;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionTextField(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextField");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  application.GetScene().Add(field);
-
-  field.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  field.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 350.f));
-  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
-  field.SetProperty(TextField::Property::TEXT, "مرحبا بالعالم");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(field, 18.6, 6);
-
-  int expectedCharacterIndex = 12;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabelEmptyText(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionTextLabelEmptyText");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::TEXT, "");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 1, 0);
-
-  int expectedCharacterIndex = -1;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionLastCharacter(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionLastCharacter");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
-  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 57, 2);
-
-  int expectedCharacterIndex = 4;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
-  END_TEST;
-}
-
-int UtcDaliTextGeometryGetCharacterIndexAtPositionXExceedsTextWidth(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextGeometryGetCharacterIndexAtPositionXExceedsTextWidth");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello");
-
-  application.SendNotification();
-  application.Render();
-
-  int characterIndex = TextGeometry::GetCharacterIndexAtPosition(label, 150, 1);
-
-  int expectedCharacterIndex = -1;
-
-  DALI_TEST_EQUALS(characterIndex, expectedCharacterIndex, TEST_LOCATION);
-
+  CheckBounds(TextGeometry::GetLineBoundingRectangle(control, 0u), {});
+  CheckBounds(TextGeometry::GetCharacterBoundingRectangle(control, 0u), {});
+  DALI_TEST_EQUALS(TextGeometry::GetCharacterIndexAtPosition(control, 0.f, 0.f), -1, TEST_LOCATION);
   END_TEST;
 }

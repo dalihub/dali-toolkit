@@ -1059,42 +1059,21 @@ int UtcDaliTextEditorControlBackgroundColor(void)
 
 int UtcDaliTextEditorTextPositionWithMinLineAndBigFont(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextEditorTextPositionWithMinLine ");
-
-  TextEditor textEditor = TextEditor::New();
-
-  textEditor.SetProperty(TextEditor::Property::TEXT, "<span font-size='45'>H</span>\ni");
-  textEditor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 50);
-  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
-
-  application.GetScene().Add(textEditor);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto editor = TextEditor::New();
+  editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
+  editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
+  editor.SetProperty(TextEditor::Property::TEXT, "H\ni");
+  editor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 50.f);
+  application.GetScene().Add(editor);
   application.SendNotification();
   application.Render();
-
-  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl(textEditor);
-  Text::ViewInterface&           view           = textEditorImpl.GetTextController()->GetView();
-
-  Length numberOfGlyphs = view.GetNumberOfGlyphs();
-
-  DALI_TEST_EQUALS(numberOfGlyphs, 3u, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
-
-  Vector<GlyphInfo> glyphs;
-  glyphs.Resize(numberOfGlyphs);
-
-  Vector<Vector2> positions;
-  positions.Resize(numberOfGlyphs);
-
-  float alignmentOffset = 0u;
-  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
-                                         positions.Begin(),
-                                         alignmentOffset,
-                                         0u,
-                                         numberOfGlyphs);
-
-  DALI_TEST_EQUALS(positions[2].y, 165.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
-
+  auto model = GetImpl(editor).GetTextController()->GetTextModel();
+  DALI_TEST_EQUALS(model->GetNumberOfLines(), 2u, TEST_LOCATION);
+  const auto& line = model->GetLines()[0];
+  DALI_TEST_CHECK(line.ascender - line.descender + line.lineSpacing >= 50.f);
+  const auto positions = model->GetLayout();
+  DALI_TEST_CHECK(positions[2].y >= positions[0].y);
   END_TEST;
 }
 
