@@ -35,8 +35,8 @@
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/image-loading.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/images/pixel-buffer.h>
 
 #include "dummy-control.h"
 #include "test-encoded-image-buffer.h"

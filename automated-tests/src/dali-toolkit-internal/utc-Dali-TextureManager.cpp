@@ -33,7 +33,7 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 
 #include <dali/integration-api/string-utils.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 
 #include <test-encoded-image-buffer.h>
 

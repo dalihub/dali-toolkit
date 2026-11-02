@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/math/int-pair.h>
 #include <string>
 

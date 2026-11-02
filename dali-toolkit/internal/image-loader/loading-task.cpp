@@ -20,8 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -262,7 +263,7 @@ void LoadingTask::ApplyMask()
 {
   if(!pixelBuffers.empty())
   {
-    DevelPixelBuffer::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
+    DevelPixelBufferOperations::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
   }
 }
 
@@ -272,7 +273,7 @@ void LoadingTask::MultiplyAlpha()
   {
     if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {
-      DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffers[0]);
+      DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffers[0]);
     }
   }
 }
