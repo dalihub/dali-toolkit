@@ -139,13 +139,17 @@ vec4 ComputeVertexPosition()
 #endif
                                                 );
 #endif
-  vTexCoord = finalPixelArea.xy + finalPixelArea.zw * (vec2(0.5) + aPosition.xy
+  highp vec2 textureCoordinate = (vec2(0.5) + aPosition.xy
 #ifdef IS_REQUIRED_BORDERLINE
-                                                        * (1.0 + (outerBorderlineSize + vertexMargin) / visualSize)
+                                                * (1.0 + (outerBorderlineSize + vertexMargin) / visualSize)
 #elif defined(IS_REQUIRED_ROUNDED_CORNER)
-                                                        * (1.0 + vertexMargin / visualSize)
+                                                * (1.0 + vertexMargin / visualSize)
 #endif
-                                                      );
+                                              );
+#ifdef IS_REQUIRED_SWAP_UV
+  textureCoordinate = textureCoordinate.yx;
+#endif
+  vTexCoord = finalPixelArea.xy + finalPixelArea.zw * textureCoordinate;
 
   return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }

@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-loader.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
@@ -202,6 +203,23 @@ int UtcDaliVisualFactoryCopyAndAssignment(void)
   // self assignment
   factory = factory;
   DALI_TEST_CHECK(factory = factoryCopy);
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetStreamedImageVisualN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVisualFactoryGetStreamedImageVisualN: STREAMED_IMAGE cannot be created from a property map");
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK(factory);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, DevelVisual::STREAMED_IMAGE);
+
+  Visual::Base visual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK(!visual);
 
   END_TEST;
 }

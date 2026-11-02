@@ -75,6 +75,7 @@ SET(TC_SOURCES
   utc-Dali-ToolkitPreInitialize.cpp
   utc-Dali-Visual.cpp
   utc-Dali-VisualFactory.cpp
+  utc-Dali-MediaView.cpp
   utc-Dali-VideoView.cpp
   utc-Dali-WebView.cpp
   utc-Dali-AsyncImageLoader.cpp
@@ -200,3 +201,13 @@ TARGET_LINK_LIBRARIES(${EXEC_NAME}
 INSTALL(PROGRAMS ${EXEC_NAME}
     DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )
+
+# Host-only source plugin. Load by SONAME after the test opens this exact fixture.
+ADD_LIBRARY(media-frame-source-test-plugin SHARED dali-toolkit-test-utils/test-media-frame-source-plugin.cpp)
+SET_TARGET_PROPERTIES(media-frame-source-test-plugin PROPERTIES
+    OUTPUT_NAME dali3-media-frame-source-plugin
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/media-frame-source)
+TARGET_LINK_LIBRARIES(media-frame-source-test-plugin ${${CAPI_LIB}_LDFLAGS} --coverage)
+ADD_DEPENDENCIES(${EXEC_NAME} media-frame-source-test-plugin)
+TARGET_COMPILE_DEFINITIONS(${EXEC_NAME} PRIVATE
+    TEST_MEDIA_FRAME_SOURCE_PLUGIN_PATH="$<TARGET_FILE:media-frame-source-test-plugin>")

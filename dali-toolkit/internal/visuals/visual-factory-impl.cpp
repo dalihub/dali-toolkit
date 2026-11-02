@@ -301,6 +301,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
       break;
     }
 
+    case Toolkit::DevelVisual::STREAMED_IMAGE:
+    {
+      // Presents frames pushed by the control that owns it, so it cannot be created from a property map.
+      break;
+    }
+
     default:
     {
       break;
