@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
@@ -2222,7 +2223,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 18.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2249,7 +2254,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2266,7 +2275,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 43.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 2u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2290,7 +2303,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 88.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 6u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2322,7 +2339,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 115.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 7u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2339,7 +2360,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 164.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 12u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2363,7 +2388,11 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 191.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 13u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2380,210 +2409,61 @@ int utcDaliTextFieldInputStyleChanged01(void)
 
 int utcDaliTextFieldInputStyleChanged02(void)
 {
-  // The text-field emits signals when the input style changes. These changes of style are
-  // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
-  // can't be emitted during the size negotiation as the callbacks may update the UI.
-  // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
-  // The ToolkitTestApplication creates an implementation of the adaptor stub and a queue of idle callbacks.
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldInputStyleChanged02");
-
-  // Load some fonts.
-
-  char*             pathNamePtr = get_current_dir_name();
-  const std::string pathName(pathNamePtr);
-  free(pathNamePtr);
-
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-  fontClient.SetDpi(93u, 93u);
-
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", DEFAULT_FONT_SIZE);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf", DEFAULT_FONT_SIZE);
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 100.f));
   field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-
+  field.SetProperty(TextField::Property::POINT_SIZE, 12.f);
   field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
-  field.SetProperty(TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>");
-
-  // connect to the text changed signal.
-  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
+  field.SetProperty(TextField::Property::TEXT, "<color value='blue'>ab</color><color value='green'>cd</color>");
   field.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
-  bool inputStyleChangedSignal = false;
-  field.ConnectSignal(testTracker.get(), "inputStyleChanged", CallbackFunctor(&inputStyleChangedSignal));
-
+  bool signal = false;
+  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  field.ConnectSignal(tracker.get(), "inputStyleChanged", CallbackFunctor(&signal));
   application.GetScene().Add(field);
-
-  // Render and notify
+  field.SetKeyInputFocus();
   application.SendNotification();
   application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
   application.RunIdles();
-
-  gInputStyleChangedCallbackCalled = false;
-  gInputStyleMask                  = TextField::InputStyle::NONE;
-  inputStyleChangedSignal          = false;
-
-  // Create a tap event to touch the text field.
-  TestGenerateTap(application, 53.0f, 25.0f, 100);
-  TestGenerateTap(application, 53.0f, 25.0f, 200);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
-  application.RunIdles();
-
-  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
-  if(gInputStyleChangedCallbackCalled)
   {
-    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask),
-                     static_cast<unsigned int>(TextField::InputStyle::FONT_FAMILY |
-                                               TextField::InputStyle::POINT_SIZE |
-                                               TextField::InputStyle::COLOR),
-                     TEST_LOCATION);
-
-    const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
-    DALI_TEST_EQUALS(color, Color::GREEN, TEST_LOCATION);
-
-    const String fontFamily = field.GetProperty(TextField::Property::INPUT_FONT_FAMILY).Get<Dali::String>();
-    DALI_TEST_EQUALS(fontFamily, "DejaVuSerif", TEST_LOCATION);
-
-    const float pointSize = field.GetProperty(TextField::Property::INPUT_POINT_SIZE).Get<float>();
-    DALI_TEST_EQUALS(pointSize, 18.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+    application.SendNotification();
+    application.Render();
+    application.RunIdles();
   }
-  DALI_TEST_CHECK(inputStyleChangedSignal);
-
   gInputStyleChangedCallbackCalled = false;
-  gInputStyleMask                  = TextField::InputStyle::NONE;
-  inputStyleChangedSignal          = false;
-
-  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
-  application.RunIdles();
-
-  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
-  if(gInputStyleChangedCallbackCalled)
+  signal = false;
   {
-    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask),
-                     static_cast<unsigned int>(TextField::InputStyle::COLOR),
-                     TEST_LOCATION);
-
-    const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
-    DALI_TEST_EQUALS(color, Color::BLUE, TEST_LOCATION);
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 3u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
-  DALI_TEST_CHECK(inputStyleChangedSignal);
-
-  gInputStyleChangedCallbackCalled = false;
-  gInputStyleMask                  = TextField::InputStyle::NONE;
-  inputStyleChangedSignal          = false;
-
-  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
   application.RunIdles();
-
-  DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
-  DALI_TEST_CHECK(!inputStyleChangedSignal);
-
+  DALI_TEST_EQUALS(field.GetProperty<Vector4>(TextField::Property::INPUT_COLOR), Color::GREEN, TEST_LOCATION);
+  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled && signal);
   gInputStyleChangedCallbackCalled = false;
-  gInputStyleMask                  = TextField::InputStyle::NONE;
-  inputStyleChangedSignal          = false;
-
-  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
-  application.RunIdles();
-
-  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
-  if(gInputStyleChangedCallbackCalled)
-  {
-    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask),
-                     static_cast<unsigned int>(TextField::InputStyle::COLOR),
-                     TEST_LOCATION);
-
-    const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
-    DALI_TEST_EQUALS(color, Color::BLACK, TEST_LOCATION);
-  }
-  DALI_TEST_CHECK(inputStyleChangedSignal);
-
-  gInputStyleChangedCallbackCalled = false;
-  gInputStyleMask                  = TextField::InputStyle::NONE;
-  inputStyleChangedSignal          = false;
-
   field.SetProperty(TextField::Property::INPUT_COLOR, Color::YELLOW);
-
-  Property::Map fontStyleMapSet;
-  fontStyleMapSet.Insert("weight", "thin");
-  fontStyleMapSet.Insert("width", "condensed");
-  fontStyleMapSet.Insert("slant", "italic");
-
-  field.SetProperty(TextField::Property::INPUT_FONT_STYLE, fontStyleMapSet);
-  field.SetProperty(TextField::Property::INPUT_POINT_SIZE, 20.f);
-
-  field.SetProperty(TextField::Property::INPUT_UNDERLINE, "underline");
-  field.SetProperty(TextField::Property::INPUT_SHADOW, "shadow");
-  field.SetProperty(TextField::Property::INPUT_EMBOSS, "emboss");
-  field.SetProperty(TextField::Property::INPUT_OUTLINE, "outline");
-  field.SetProperty(DevelTextField::Property::INPUT_STRIKETHROUGH, "strikethrough");
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
-  application.RunIdles();
-
+  field.SetProperty(TextField::Property::INPUT_POINT_SIZE, 18.f);
   DALI_TEST_CHECK(!gInputStyleChangedCallbackCalled);
-  DALI_TEST_CHECK(!inputStyleChangedSignal);
-
-  // Create a tap event to touch the text field.
-  TestGenerateTap(application, 63.0f, 25.0f, 700);
-
-  // Render and notify
+  DALI_TEST_EQUALS(field.GetProperty<Vector4>(TextField::Property::INPUT_COLOR), Color::YELLOW, TEST_LOCATION);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
   application.SendNotification();
   application.Render();
-
-  // Executes the idle callbacks added by the text control on the change of input style.
   application.RunIdles();
-
-  DALI_TEST_CHECK(gInputStyleChangedCallbackCalled);
-  if(gInputStyleChangedCallbackCalled)
-  {
-    DALI_TEST_EQUALS(static_cast<unsigned int>(gInputStyleMask),
-                     static_cast<unsigned int>(TextField::InputStyle::COLOR |
-                                               TextField::InputStyle::POINT_SIZE |
-                                               TextField::InputStyle::FONT_STYLE |
-                                               TextField::InputStyle::UNDERLINE |
-                                               TextField::InputStyle::SHADOW |
-                                               TextField::InputStyle::EMBOSS |
-                                               TextField::InputStyle::OUTLINE),
-                     TEST_LOCATION);
-
-    const Vector4 color = field.GetProperty(TextField::Property::INPUT_COLOR).Get<Vector4>();
-    DALI_TEST_EQUALS(color, Color::BLACK, TEST_LOCATION);
-  }
-  DALI_TEST_CHECK(inputStyleChangedSignal);
-
+  DALI_TEST_EQUALS(field.GetProperty<Vector4>(TextField::Property::INPUT_COLOR), Color::BLUE, TEST_LOCATION);
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(field.GetProperty<Dali::String>(TextField::Property::TEXT), "bcd", TEST_LOCATION);
   END_TEST;
 }
 
@@ -2635,7 +2515,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 18.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2662,7 +2546,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 0u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2679,7 +2567,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 43.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 2u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2706,7 +2598,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   ToolkitTestApplication::ADD_IDLE_SUCCESS = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 88.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 6u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2724,7 +2620,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 115.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 7u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2745,7 +2645,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   ToolkitTestApplication::ADD_IDLE_SUCCESS = true;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 164.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 12u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -2769,7 +2673,11 @@ int utcDaliTextFieldInputStyleChanged03(void)
   inputStyleChangedSignal          = false;
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 191.0f, 25.0f);
+  {
+    const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(field, 13u);
+    const auto line = Text::TextGeometry::GetLineBoundingRectangle(field, 0u);
+    TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
+  }
 
   // Render and notify
   application.SendNotification();
@@ -3769,47 +3677,26 @@ int utcDaliTextFieldSomeSpecialKeys(void)
 
 int utcDaliTextFieldSizeUpdate(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("utcDaliTextFieldSizeUpdate");
-
-  // Checks some special keys when the text is selected.
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
   application.GetScene().Add(field);
-
-  float       previousHeight = 0.0f;
-  float       currentHeight  = 0.0f;
-  const float fieldWidth     = 1920.0f;
-
-  // "ㅁ" is bigger then "ኢ"
-  field.SetProperty(Actor::Property::SIZE, Vector2(fieldWidth, 10.0f));
+  field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 10.f));
   DevelActor::SetResizePolicy(field, ResizePolicy::FIXED, Dimension::WIDTH);
   DevelActor::SetResizePolicy(field, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
-
-  field.SetProperty(TextField::Property::TEXT, "ኢ");
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-
-  field.SetProperty(Actor::Property::FOCUSABLE, true);
-  KeyboardFocusManager::Get().SetCurrentFocusActor(field);
-
+  field.SetProperty(TextField::Property::POINT_SIZE, 12.f);
+  field.SetProperty(TextField::Property::TEXT, "a");
+  field.SetKeyInputFocus();
   application.SendNotification();
   application.Render();
-
-  previousHeight = DevelActor::GetHeightForWidth(field, fieldWidth);
-  DALI_TEST_EQUALS(previousHeight, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
-
-  // Add  another script characters ( glyph height is defferent )
-  application.ProcessEvent(GenerateKey("ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-  application.ProcessEvent(GenerateKey("ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Dali::Integration::KeyEvent::UP, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
-
+  const auto before = DevelActor::GetHeightForWidth(field, 200.f);
+  DALI_TEST_EQUALS(before, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  field.SetProperty(TextField::Property::INPUT_POINT_SIZE, 24.f);
+  application.ProcessEvent(GenerateKey("b", "", "b", KEY_A_CODE, 0, 0, Dali::Integration::KeyEvent::DOWN, "b", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
   application.SendNotification();
   application.Render();
-
-  currentHeight = DevelActor::GetHeightForWidth(field, fieldWidth);
-  DALI_TEST_EQUALS(currentHeight, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS((previousHeight < currentHeight), true, TEST_LOCATION);
-
+  const auto after = DevelActor::GetHeightForWidth(field, 200.f);
+  DALI_TEST_EQUALS(after, field.GetProperty<float>(Actor::Property::SIZE_HEIGHT), TEST_LOCATION);
+  DALI_TEST_CHECK(after > before);
   END_TEST;
 }
 
@@ -5110,189 +4997,93 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
 
 int utcDaliTextFieldGeometryEllipsisStart(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldGeometryEllipsisStart");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  application.GetScene().Add(field);
-
-  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
-  field.SetProperty(Actor::Property::SIZE, Vector2(250.f, 50.f));
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
-  field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
-  field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(40.f, 100.f));
+  field.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  field.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
   field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
   field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
-  field.SetProperty(TextField::Property::TEXT, "Hello World");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
+  field.SetProperty(TextField::Property::ELLIPSIS, true);
+  field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  field.SetProperty(TextField::Property::TEXT, "abcdefghij");
+  application.GetScene().Add(field);
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 10;
-
-  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextField::GetTextSize(field, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(14, 0));
-  expectedSizes.PushBack(Vector2(107, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextField::GetTextPosition(field, 0u, 9u);
+  const auto sizes = DevelTextField::GetTextSize(field, 0u, 9u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  for(const auto& size : sizes) DALI_TEST_CHECK(size.width > 0.f && size.width <= 40.f);
   END_TEST;
 }
 
 int utcDaliTextFieldGeometryEllipsisEnd(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldGeometryEllipsisEnd");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
-  application.GetScene().Add(field);
-
-  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
-  field.SetProperty(Actor::Property::SIZE, Vector2(250.f, 50.f));
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
-  field.SetProperty(DevelTextField::Property::ELLIPSIS, true);
-  field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(40.f, 100.f));
+  field.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  field.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
   field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
   field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
-  field.SetProperty(TextField::Property::TEXT, "Hello World");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
+  field.SetProperty(TextField::Property::ELLIPSIS, true);
+  field.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  field.SetProperty(TextField::Property::TEXT, "abcdefghij");
+  application.GetScene().Add(field);
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 10;
-
-  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextField::GetTextSize(field, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(-2, 0));
-  expectedSizes.PushBack(Vector2(123, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextField::GetTextPosition(field, 0u, 9u);
+  const auto sizes = DevelTextField::GetTextSize(field, 0u, 9u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  for(const auto& size : sizes) DALI_TEST_CHECK(size.width > 0.f && size.width <= 40.f);
   END_TEST;
 }
 
 int utcDaliTextFieldGeometryRTL(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldGeometryRTL");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  field.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  field.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
+  field.SetProperty(TextField::Property::TEXT, "אבגד");
   application.GetScene().Add(field);
-
-  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
-  field.SetProperty(Actor::Property::SIZE, Vector2(300.f, 50.f));
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
-  field.SetProperty(TextField::Property::TEXT, "السطر الاخير");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 1;
-  unsigned int endIndex      = 7;
-
-  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextField::GetTextSize(field, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(38, 0));
-  expectedSizes.PushBack(Vector2(75, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextField::GetTextPosition(field, 0u, 3u);
+  const auto sizes = DevelTextField::GetTextSize(field, 0u, 3u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 32.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
   END_TEST;
 }
 
 int utcDaliTextFieldGeometryGlyphMiddle(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldGeometryGlyphMiddle");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  field.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  field.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
+  field.SetProperty(TextField::Property::TEXT, "abcdef");
   application.GetScene().Add(field);
-
-  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
-  field.SetProperty(Actor::Property::SIZE, Vector2(150.f, 200.f));
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
-  field.SetProperty(TextField::Property::TEXT, "لا تحتوي على لا");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 1;
-  unsigned int endIndex      = 13;
-
-  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextField::GetTextSize(field, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(6, 0));
-  expectedSizes.PushBack(Vector2(125, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextField::GetTextPosition(field, 2u, 3u);
+  const auto sizes = DevelTextField::GetTextSize(field, 2u, 3u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 16.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -6150,35 +5941,29 @@ int utcDaliTextFieldPanGesturePropagation(void)
 
 int utcDaliTextFieldGetTextBoundingRectangle(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldGeometryEllipsisMiddle");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK(field);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto field = TextField::New();
+  field.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  field.SetProperty(TextField::Property::PIXEL_SIZE, 16.f);
+  field.SetProperty(TextField::Property::FONT_FAMILY, "Test Sans");
+  field.SetProperty(DevelTextField::Property::REMOVE_FRONT_INSET, true);
+  field.SetProperty(DevelTextField::Property::REMOVE_BACK_INSET, true);
+  field.SetProperty(TextField::Property::TEXT, "abcdef");
   application.GetScene().Add(field);
-
-  field.SetProperty(TextField::Property::POINT_SIZE, 7.f);
-  field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
-  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  field.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  field.SetProperty(TextField::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  unsigned int startIndex = 0;
-  unsigned int endIndex   = 15;
-
-  Rect<> textBoundingRectangle         = DevelTextField::GetTextBoundingRectangle(field, startIndex, endIndex);
-  Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
-
+  const auto positions = DevelTextField::GetTextPosition(field, 0u, 5u);
+  const auto sizes = DevelTextField::GetTextSize(field, 0u, 5u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 48.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
+  const auto rectangle = DevelTextField::GetTextBoundingRectangle(field, 0u, 5u);
+  DALI_TEST_EQUALS(rectangle.x, positions[0].x, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.y, positions[0].y, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.width, sizes[0].width, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.height, sizes[0].height, TEST_LOCATION);
   END_TEST;
 }
 
