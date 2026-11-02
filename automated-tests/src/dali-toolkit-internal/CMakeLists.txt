@@ -141,6 +141,20 @@ MESSAGE("Libraries to link with:>${${CAPI_LIB}_LIBRARIES}")
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED -fPIC )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
+# Ignore some warning options
+# TODO : Why it is not be ignored at root CMakeLists.txt?
+INCLUDE(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG(-Wno-self-assign-overloaded HAVE_NO_SELF_ASSIGN_OVERLOADED)
+IF (HAVE_NO_SELF_ASSIGN_OVERLOADED)
+  ADD_COMPILE_OPTIONS( -Wno-self-assign-overloaded )
+ENDIF()
+
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-const-variable HAVE_NO_UNUSED_CONST_VARIABLE)
+IF(HAVE_NO_UNUSED_CONST_VARIABLE)
+  ADD_COMPILE_OPTIONS( -Wno-unused-const-variable)
+ENDIF()
+
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 ADD_DEFINITIONS(-DADDON_LIBS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\")
 
