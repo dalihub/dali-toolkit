@@ -53,8 +53,8 @@ bool StringToInteger(const char* first, const char* last, int& out)
     }
   }
 
-  // json error for int starting with zero
-  if(0 == (*first - '0') && (first + 1 != last))
+  // json error for int without digit or starting with zero
+  if(first == last || (0 == (*first - '0') && (first + 1 != last)))
   {
     return false;
   }
@@ -161,14 +161,17 @@ bool StringToFloat(const char* first, const char* last, float& out)
   {
     ++first;
 
-    if(*first == '-')
+    if(first != last)
     {
-      exponent_negative = true;
-      ++first;
-    }
-    else if(*first == '+')
-    {
-      ++first;
+      if(*first == '-')
+      {
+        exponent_negative = true;
+        ++first;
+      }
+      else if(*first == '+')
+      {
+        ++first;
+      }
     }
 
     if(first == last || !IsDigit(*first))
@@ -509,10 +512,14 @@ bool JsonParserState::ParseNumber()
     c = Char();
   }
 
+  // mIter can be the end of the buffer, so don't dereference it
+  const char* numberBegin = &(*first);
+  const char* numberEnd   = numberBegin + (mIter - first);
+
   if(mCurrent.GetType() == TreeNode::INTEGER)
   {
     int i = 0;
-    if(StringToInteger(&(*first), &(*mIter), i))
+    if(StringToInteger(numberBegin, numberEnd, i))
     {
       mCurrent.SetInteger(i);
     }
@@ -525,7 +532,7 @@ bool JsonParserState::ParseNumber()
   if(mCurrent.GetType() == TreeNode::FLOAT)
   {
     float f = 0.f;
-    if(StringToFloat(&(*first), &(*mIter), f))
+    if(StringToFloat(numberBegin, numberEnd, f))
     {
       mCurrent.SetFloat(f);
     }
