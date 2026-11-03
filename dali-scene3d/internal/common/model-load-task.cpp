@@ -85,11 +85,11 @@ ModelLoadTask::~ModelLoadTask()
 void ModelLoadTask::Process()
 {
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = 0;
+  uint64_t endTimeNanoSeconds   = 0;
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
-    mStartTimeNanoSceonds = GetNanoseconds();
+    startTimeNanoSeconds = GetNanoseconds();
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
     { oss << "[u:" << mModelUrl << ",dir:" << mResourceDirectoryUrl << "]"; });
   }
@@ -139,12 +139,12 @@ void ModelLoadTask::Process()
 #ifdef TRACE_ENABLED
   if(gTraceFilter && gTraceFilter->IsTraceEnabled())
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOADING_TASK", [&](std::ostringstream& oss)
     {
       oss << std::fixed << std::setprecision(3);
       oss << "[";
-      oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+      oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
       oss << "c?" << useCachedModel << " ";
       oss << "s?" << loadSucceeded << " ";
       oss << "dir:" << mResourceDirectoryUrl << " ";

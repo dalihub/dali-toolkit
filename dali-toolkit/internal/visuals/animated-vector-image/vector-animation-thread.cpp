@@ -253,9 +253,6 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
 
   if(DALI_LIKELY(!mDestroyThread))
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
-    { oss << "[" << mAnimationTasks.size() << "," << useCurrentTime << "]"; });
-
     // Find if the task is already in the list except loading task
     auto iter = std::find_if(mAnimationTasks.begin(), mAnimationTasks.end(), [task, useCurrentTime](VectorAnimationTaskPtr& element)
     {
@@ -286,12 +283,8 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
         mAnimationTasks.push_back(task);
       }
 
-      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
-      { oss << "[" << mAnimationTasks.size() << "]"; });
-
       return true;
     }
-    DALI_TRACE_END(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK");
   }
   return false;
 }
@@ -301,8 +294,6 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
 {
   // DevNote : We need to consume task queue, and notify even if mDestroyThread is true.
   // Since we should make ensure that all working tasks are completed before destroying the thread.
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
-  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",i:" << completedTasksQueue.size() << "]"; });
   bool needRasterize = false;
 
   for(auto&& taskPair : completedTasksQueue)
@@ -348,9 +339,6 @@ void VectorAnimationThread::MoveTasksToCompleted(CompletedTasksContainer&& compl
   {
     mNeedToSleep = false;
   }
-
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_COMPLETED_TASK", [&](std::ostringstream& oss)
-  { oss << "[w:" << mWorkingTasks.size() << ",c:" << mCompletedTasks.size() << ",d:" << mDiscardedTasksQueue.size() << ",r?" << needRasterize << ",s?" << mNeedToSleep << "]"; });
 }
 
 /// VectorAnimationThread called
@@ -398,15 +386,23 @@ void VectorAnimationThread::Rasterize()
     {
       if(mAnimationTasks.size() > 0u)
       {
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
-        { oss << "[" << mAnimationTasks.size() << "]"; });
+        const auto currentTime = std::chrono::steady_clock::now();
+#ifdef TRACE_ENABLED
+        // mAnimationTasks is ordered by next frame time, so if even the front task is not ready yet,
+        // this pass dispatches nothing. Skip tracing then to reduce the trace log.
+        const bool dispatchRequired = (mAnimationTasks.front()->GetNextFrameTime() <= currentTime);
+        if(dispatchRequired)
+        {
+          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
+          { oss << "[" << mAnimationTasks.size() << "]"; });
+        }
+#endif
 
         // pop out the next task from the queue
         for(auto it = mAnimationTasks.begin(); it != mAnimationTasks.end();)
         {
           VectorAnimationTaskPtr nextTask = *it;
 
-          auto currentTime   = std::chrono::steady_clock::now();
           auto nextFrameTime = nextTask->GetNextFrameTime();
 
           if(nextFrameTime <= currentTime)
@@ -432,8 +428,13 @@ void VectorAnimationThread::Rasterize()
             break;
           }
         }
-        DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK2", [&](std::ostringstream& oss)
-        { oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]"; });
+#ifdef TRACE_ENABLED
+        if(dispatchRequired)
+        {
+          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_THREAD_ANIMATION_TASK", [&](std::ostringstream& oss)
+          { oss << "[a:" << mAnimationTasks.size() << ",w:" << mWorkingTasks.size() << "]"; });
+        }
+#endif
       }
     }
   }
@@ -616,20 +617,6 @@ void VectorAnimationThread::SleepThread::Run()
 
       if(DALI_LIKELY(!mDestroyThread))
       {
-        DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD", [&](std::ostringstream& oss)
-        {
-          oss << "[";
-          if(needToSleep)
-          {
-            auto currentTime = std::chrono::steady_clock::now();
-            auto duration    = std::chrono::duration_cast<std::chrono::milliseconds>(sleepTimePoint - currentTime);
-            oss << duration.count() << " ms]";
-          }
-          else
-          {
-            oss << "until notify]";
-          } });
-
         if(needToSleep)
         {
           mConditionalWait.WaitUntil(lock, sleepTimePoint);
@@ -638,8 +625,6 @@ void VectorAnimationThread::SleepThread::Run()
         {
           mConditionalWait.Wait(lock);
         }
-
-        DALI_TRACE_END(gTraceFilter, "VECTOR_ANIMATION_SLEEP_THREAD");
       }
     }
 
