@@ -164,26 +164,39 @@ void Adaptor::RemoveIdle(CallbackBase* callback)
 void Adaptor::RunIdles()
 {
   Dali::Vector<CallbackBase*> reusedCallbacks;
-  for(auto& callback : mReturnCallbacks)
+
+  // Process one callback at a time, removing it from the container before
+  // executing - the same pattern the platform main loops behind the real
+  // adaptors use. A callback being executed can queue new callbacks
+  // re-entrantly (e.g. a visual discard idle destroying more controls, which
+  // queues another discard idle); those land in mCallbacks/mReturnCallbacks
+  // and are picked up by the loop. Taking the pointer out before executing
+  // also keeps a re-entrant AddIdle from invalidating anything we hold, and
+  // guarantees every taken callback is deleted or re-armed, so nothing leaks.
+  while(!mCallbacks.Empty() || !mReturnCallbacks.Empty())
   {
-    bool retValue = CallbackBase::ExecuteReturn<bool>(*callback);
-    if(retValue)
+    if(!mReturnCallbacks.Empty())
     {
-      reusedCallbacks.PushBack(callback);
+      CallbackBase* callback = *(mReturnCallbacks.Begin());
+      mReturnCallbacks.Erase(mReturnCallbacks.Begin());
+      if(CallbackBase::ExecuteReturn<bool>(*callback))
+      {
+        reusedCallbacks.PushBack(callback);
+      }
+      else
+      {
+        delete callback;
+      }
     }
     else
     {
+      CallbackBase* callback = *(mCallbacks.Begin());
+      mCallbacks.Erase(mCallbacks.Begin());
+      CallbackBase::Execute(*callback);
       delete callback;
     }
   }
-  for(auto& callback : mCallbacks)
-  {
-    CallbackBase::Execute(*callback);
-    delete callback;
-  }
 
-  mCallbacks.Clear();
-  mReturnCallbacks.Clear();
   mReturnCallbacks.Swap(reusedCallbacks);
 }
 
