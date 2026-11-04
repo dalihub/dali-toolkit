@@ -23,12 +23,12 @@
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/trace.h>
 #include <dali/public-api/signals/callback.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/async-text/async-text-manager-impl.h> ///< To call AsyncTextManager::ReleaseLoader
 #include <dali-toolkit/internal/text/async-text/async-text-manager.h>
+#include <dali-toolkit/internal/text/text-trace.h>
 
 namespace DALI_NAMESPACE
 {
@@ -38,7 +38,7 @@ namespace Internal
 {
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC_PERFORMANCE_MARKER, false);
 } // namespace
 
 TextLoadingTask::TextLoadingTask(const uint32_t id, const Text::AsyncTextParameters& parameters, CallbackBase* callback)
@@ -87,7 +87,7 @@ void TextLoadingTask::Process()
 {
   if(DALI_LIKELY(mId != 0u))
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_PROCESS");
+    DALI_TEXT_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_PROCESS");
     Load();
   }
   ReleaseLoader();
@@ -114,12 +114,6 @@ void TextLoadingTask::Load()
 
       if(mParameters.renderScale > 1.0f)
       {
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("SetupRenderScale : %f\n", mParameters.renderScale);
-        }
-#endif
         naturalSize = mLoader.SetupRenderScale(mParameters, cachedNaturalSize);
       }
 
@@ -141,12 +135,6 @@ void TextLoadingTask::Load()
             }
             if(mParameters.textWidth < naturalSize.width)
             {
-#ifdef TRACE_ENABLED
-              if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-              {
-                DALI_LOG_RELEASE_INFO("RenderAutoScroll, Ellipsize::AUTO_SCROLL\n");
-              }
-#endif
               mParameters.isAutoScrollEnabled = true;
               mRenderInfo                     = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
             }
@@ -174,55 +162,25 @@ void TextLoadingTask::Load()
               ((!mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::HORIZONTAL) ||
                (mParameters.isMultiLine && mParameters.autoScrollDirection == DevelText::AutoScroll::VERTICAL)))
       {
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("RenderAutoScroll\n");
-        }
-#endif
         mRenderInfo = mLoader.RenderAutoScroll(mParameters, cachedNaturalSize, naturalSize);
       }
       else if(mParameters.isTextFitEnabled || mParameters.isTextFitArrayEnabled)
       {
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("RenderTextFit\n");
-        }
-#endif
         mRenderInfo = mLoader.RenderTextFit(mParameters, cachedNaturalSize, naturalSize);
       }
       else
       {
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("RenderText\n");
-        }
-#endif
         mRenderInfo = mLoader.RenderText(mParameters, cachedNaturalSize, naturalSize);
       }
       break;
     }
     case Text::Async::COMPUTE_NATURAL_SIZE:
     {
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        DALI_LOG_RELEASE_INFO("GetNaturalSize\n");
-      }
-#endif
       mRenderInfo = mLoader.GetNaturalSize(mParameters);
       break;
     }
     case Text::Async::COMPUTE_HEIGHT_FOR_WIDTH:
     {
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        DALI_LOG_RELEASE_INFO("GetHeightForWidth\n");
-      }
-#endif
       mRenderInfo = mLoader.GetHeightForWidth(mParameters);
       break;
     }
@@ -239,7 +197,6 @@ void TextLoadingTask::ReleaseLoader()
   // Release all local varaibles before execute callback.
   if(DALI_LIKELY(mLoader))
   {
-    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_ASYNC_LOADING_TASK_RELEASE");
     auto loader = std::move(mLoader);
     Text::Internal::AsyncTextManager::ReleaseLoaderToManager(this, loader);
   }

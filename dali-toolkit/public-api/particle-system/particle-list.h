@@ -22,6 +22,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/base-handle.h>
 
 namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
@@ -37,11 +40,35 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 template<class T>
 struct StreamDataTypeWrapper
 {
-  static ParticleStream::StreamDataType GetType()
+  static constexpr ParticleStream::StreamDataType GetType()
   {
     return {};
   }
 };
+
+template<>
+constexpr ParticleStream::StreamDataType StreamDataTypeWrapper<Vector3>::GetType()
+{
+  return ParticleStream::StreamDataType::FLOAT3;
+}
+
+template<>
+constexpr ParticleStream::StreamDataType StreamDataTypeWrapper<Vector4>::GetType()
+{
+  return ParticleStream::StreamDataType::FLOAT4;
+}
+
+template<>
+constexpr ParticleStream::StreamDataType StreamDataTypeWrapper<Vector2>::GetType()
+{
+  return ParticleStream::StreamDataType::FLOAT2;
+}
+
+template<>
+constexpr ParticleStream::StreamDataType StreamDataTypeWrapper<float>::GetType()
+{
+  return ParticleStream::StreamDataType::FLOAT;
+}
 
 /**
  * @class ParticleList
@@ -85,33 +112,33 @@ public:
    */
   struct ParticleStreamTypeFlags
   {
-    ParticleStreamTypeFlags(const ParticleStreamTypeFlags& flags)
+    constexpr ParticleStreamTypeFlags(const ParticleStreamTypeFlags& flags)
+    : value(flags.value)
     {
-      value = flags.value;
     }
 
-    ParticleStreamTypeFlags(const ParticleStreamTypeFlagBit& bit)
+    constexpr ParticleStreamTypeFlags(const ParticleStreamTypeFlagBit& bit)
     : value(bit)
     {
     }
 
-    ParticleStreamTypeFlags& operator|=(ParticleStreamTypeFlagBit flagBit)
+    constexpr ParticleStreamTypeFlags& operator|=(ParticleStreamTypeFlagBit flagBit)
     {
       value |= flagBit;
       return *this;
     }
 
-    ParticleStreamTypeFlags operator&(ParticleStreamTypeFlagBit flagBit)
+    constexpr ParticleStreamTypeFlags operator&(ParticleStreamTypeFlagBit flagBit)
     {
       return (value & flagBit);
     }
 
-    explicit operator uint32_t() const
+    constexpr explicit operator uint32_t() const
     {
       return value;
     }
 
-    explicit operator bool() const
+    constexpr explicit operator bool() const
     {
       return value;
     }

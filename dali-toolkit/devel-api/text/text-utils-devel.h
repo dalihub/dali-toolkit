@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/common/extents.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/object/property-array.h>
 #include <string>
 

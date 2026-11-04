@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector4.h>
 

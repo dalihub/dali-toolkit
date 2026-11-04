@@ -15,214 +15,65 @@
  *
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
-
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/internal/text/controller/text-controller.h>
 #include <dali-toolkit/internal/text/line-helper-functions.h>
-#include <dali-toolkit/internal/text/rendering/text-typesetter.h>
-#include <dali-toolkit/internal/text/rendering/view-model.h>
-#include <toolkit-text-utils.h>
+#include <dali-toolkit/internal/text/line-run.h>
 
-using namespace Dali;
-using namespace Toolkit;
-using namespace Text;
+using namespace Dali::Toolkit;
+using namespace Dali::Toolkit::Text;
 
 int UtcDaliGetPreOffsetVerticalLineAlignmentWithNegativeLineSpacing(void)
 {
-  tet_infoline(" UtcDaliGetPreOffsetVerticalLineAlignmentWithNegativeLineSpacing ");
-  ToolkitTestApplication application;
-
-  uint32_t expectedNumberOfLines = 2u;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  // Configures the text controller similarly to the text-label.
-  ConfigureTextLabel(controller);
-
-  // Sets the text.
-  controller->SetMarkupProcessorEnabled(true);
-  controller->SetTextElideEnabled(false);
-  controller->SetText("<p rel-line-height=0.5>Line one Line two</p>");
-
-  // Creates the text's model and relais-out the text.
-  const Size relayoutSize(120.f, 100.f);
-  controller->Relayout(relayoutSize);
-
-  // Tests the rendering controller has been created.
-  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
-  DALI_TEST_CHECK(typesetter);
-
-  // Tests the view model has been created.
-  ViewModel* model = typesetter->GetViewModel();
-  DALI_TEST_CHECK(model);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(model->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
-  DALI_TEST_CHECK(model->GetLines());
-
-  const LineRun& lineOne = *(model->GetLines() + 0u);
-  const LineRun& lineTwo = *(model->GetLines() + 1u);
-
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
+  LineRun line{};
+  line.lineSpacing = -20.f;
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
+  line.lineSpacing = 0.f;
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliGetPreOffsetVerticalLineAlignmentWithPositiveLineSpacing(void)
 {
-  tet_infoline(" UtcDaliGetPreOffsetVerticalLineAlignmentWithPositiveLineSpacing ");
-  ToolkitTestApplication application;
-
-  uint32_t expectedNumberOfLines = 2u;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  // Configures the text controller similarly to the text-label.
-  ConfigureTextLabel(controller);
-
-  // Sets the text.
-  controller->SetMarkupProcessorEnabled(true);
-  controller->SetTextElideEnabled(false);
-  controller->SetText("<p rel-line-height=2.0>Line one Line two</p>");
-
-  // Creates the text's model and relais-out the text.
-  const Size relayoutSize(120.f, 100.f);
-  controller->Relayout(relayoutSize);
-
-  // Tests the rendering controller has been created.
-  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
-  DALI_TEST_CHECK(typesetter);
-
-  // Tests the view model has been created.
-  ViewModel* model = typesetter->GetViewModel();
-  DALI_TEST_CHECK(model);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(model->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
-  DALI_TEST_CHECK(model->GetLines());
-
-  const LineRun& lineOne = *(model->GetLines() + 0u);
-  const LineRun& lineTwo = *(model->GetLines() + 1u);
-
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 9.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 19.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
+  LineRun line{};
+  line.lineSpacing = 20.f;
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 10.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 20.f, TEST_LOCATION);
+  line.lineSpacing = 0.f;
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPreOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliGetPostOffsetVerticalLineAlignmentWithNegativeLineSpacing(void)
 {
-  tet_infoline(" UtcDaliGetPostOffsetVerticalLineAlignmentWithNegativeLineSpacing ");
-  ToolkitTestApplication application;
-
-  uint32_t expectedNumberOfLines = 2u;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  // Configures the text controller similarly to the text-label.
-  ConfigureTextLabel(controller);
-
-  // Sets the text.
-  controller->SetMarkupProcessorEnabled(true);
-  controller->SetTextElideEnabled(false);
-  controller->SetText("<p rel-line-height=0.5>Line one Line two</p>");
-
-  // Creates the text's model and relais-out the text.
-  const Size relayoutSize(120.f, 100.f);
-  controller->Relayout(relayoutSize);
-
-  // Tests the rendering controller has been created.
-  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
-  DALI_TEST_CHECK(typesetter);
-
-  // Tests the view model has been created.
-  ViewModel* model = typesetter->GetViewModel();
-  DALI_TEST_CHECK(model);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(model->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
-  DALI_TEST_CHECK(model->GetLines());
-
-  const LineRun& lineOne = *(model->GetLines() + 0u);
-  const LineRun& lineTwo = *(model->GetLines() + 1u);
-
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), -9.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), -9.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), -9.5f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
+  LineRun line{};
+  line.lineSpacing = -20.f;
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), -20.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), -20.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), -20.f, TEST_LOCATION);
+  line.lineSpacing = 0.f;
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
   END_TEST;
 }
 
 int UtcDaliGetPostOffsetVerticalLineAlignmentWithPositiveLineSpacing(void)
 {
-  tet_infoline(" UtcDaliGetPostOffsetVerticalLineAlignmentWithPositiveLineSpacing ");
-  ToolkitTestApplication application;
-
-  uint32_t expectedNumberOfLines = 2u;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  // Configures the text controller similarly to the text-label.
-  ConfigureTextLabel(controller);
-
-  // Sets the text.
-  controller->SetMarkupProcessorEnabled(true);
-  controller->SetTextElideEnabled(false);
-  controller->SetText("<p rel-line-height=2.0>Line one Line two</p>");
-
-  // Creates the text's model and relais-out the text.
-  const Size relayoutSize(120.f, 100.f);
-  controller->Relayout(relayoutSize);
-
-  // Tests the rendering controller has been created.
-  TypesetterPtr typesetter = Typesetter::New(controller->GetTextModel());
-  DALI_TEST_CHECK(typesetter);
-
-  // Tests the view model has been created.
-  ViewModel* model = typesetter->GetViewModel();
-  DALI_TEST_CHECK(model);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(model->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
-  DALI_TEST_CHECK(model->GetLines());
-
-  const LineRun& lineOne = *(model->GetLines() + 0u);
-  const LineRun& lineTwo = *(model->GetLines() + 1u);
-
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 19.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 9.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineOne, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::TOP), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(lineTwo, Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM), 0.0f, TEST_LOCATION);
+  LineRun line{};
+  line.lineSpacing = 20.f;
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 20.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 10.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
+  line.lineSpacing = 0.f;
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::TOP), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::MIDDLE), 0.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetPostOffsetVerticalLineAlignment(line, DevelText::VerticalLineAlignment::BOTTOM), 0.f, TEST_LOCATION);
   END_TEST;
 }

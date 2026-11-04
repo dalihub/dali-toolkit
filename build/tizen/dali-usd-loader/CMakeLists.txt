@@ -1,9 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
-set(name "dali2-usd-loader")
+set(name "dali${DALI_API_MAJOR}-usd-loader")
 
 project(${name} CXX)
 
-set(${name}_VERSION_MAJOR 2)
+set(${name}_VERSION_MAJOR ${DALI_API_MAJOR})
 set(${name}_VERSION_MINOR 0)
 set(${name}_VERSION_PATCH 0)
 set(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH} )
@@ -41,11 +41,22 @@ set(usd_loader_dir "${repo_root_dir}/dali-usd-loader")
 option(ENABLE_PKG_CONFIGURE "Use pkgconfig" ON)
 option(ENABLE_COVERAGE "Coverage" OFF)
 
+IF( WIN32 )
+ELSE()
+  INCLUDE(CheckCXXCompilerFlag)
+
+  # Set up compiler flags and warnings
+  CHECK_CXX_COMPILER_FLAG(-Wno-changes-meaning HAVE_NO_CHANGES_MEANING)
+  IF (HAVE_NO_CHANGES_MEANING)
+    ADD_COMPILE_OPTIONS(-Wno-changes-meaning)
+  ENDIF()
+ENDIF()
+
 if (ENABLE_PKG_CONFIGURE)
     find_package(PkgConfig REQUIRED)
 
-    pkg_check_modules(DALICORE REQUIRED dali2-core)
-    pkg_check_modules(DALIADAPTOR REQUIRED dali2-adaptor)
+    pkg_check_modules(DALICORE REQUIRED ${core_name})
+    pkg_check_modules(DALIADAPTOR REQUIRED ${adaptor_name})
 
     # Configure the pkg-config file
     # Requires the following variables to be setup:
@@ -62,8 +73,8 @@ if (ENABLE_PKG_CONFIGURE)
     set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
     set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
 
-    set(core_pkg_cfg_file dali2-usd-loader.pc)
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file}.in ${core_pkg_cfg_file} @ONLY)
+    set(core_pkg_cfg_file ${name}.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-usd-loader.pc.in ${core_pkg_cfg_file} @ONLY)
 endif()
 
 set(usd_loader_src_files "")
@@ -82,9 +93,16 @@ MESSAGE(STATUS "USD Loader sources: ${usd_loader_src_files}")
 
 ADD_LIBRARY("${name}" SHARED ${usd_loader_src_files} )
 
+# USD 24 headers instantiate a unique_ptr destructor with an incomplete
+# UsdPrimDefinition when Clang uses the C++23+ libstdc++ type traits.
+# Keep this external SDK boundary on its supported C++17 dialect.
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_STANDARD GREATER 20)
+  SET_TARGET_PROPERTIES(${name} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+ENDIF()
+
 TARGET_LINK_LIBRARIES("${name}" ${DALICORE_LDFLAGS} "-L${USD_ROOT_DIR}/lib"
-  dali2-toolkit
-  dali2-scene3d
+  dali${DALI_API_MAJOR}-toolkit
+  dali${DALI_API_MAJOR}-scene3d
   -lusd_usd -lusd_sdf -lusd_tf -lusd_usdGeom -lusd_usdShade -lusd_usdSkel -lusd_gf -lusd_vt
   ${COVERAGE})
 TARGET_COMPILE_OPTIONS("${name}" PUBLIC "-I${repo_root_dir}/dali-usd-loader/include")

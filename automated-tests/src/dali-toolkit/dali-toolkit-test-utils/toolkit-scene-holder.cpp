@@ -232,6 +232,26 @@ int32_t SceneHolder::GetNativeId() const
   return mScene.GetNativeId();
 }
 
+void SceneHolder::SetGeometryHittestEnabled(bool enabled)
+{
+  mScene.SetGeometryHittestEnabled(enabled);
+}
+
+bool SceneHolder::IsGeometryHittestEnabled()
+{
+  return mScene.IsGeometryHittestEnabled();
+}
+
+Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::InterceptKeyEventSignal()
+{
+  return mSceneHolderInterceptKeyEventSignal;
+}
+
+Dali::Integration::SceneHolder::KeyEventSignalType& SceneHolder::KeyEventDelayedSignal()
+{
+  return mSceneHolderKeyEventDelayedSignal;
+}
+
 Dali::Integration::SceneHolder::FocusChangedGeneratedSignalType& SceneHolder::FocusChangedGeneratedSignal()
 {
   return mFocusChangedGeneratedSignal;
@@ -320,6 +340,27 @@ Vector4 SceneHolder::GetBackgroundColor() const
   return GetImplementation(*this).GetBackgroundColor();
 }
 
+Dali::Any SceneHolder::GetNativeHandle() const
+{
+  // Desktop UTCs have no native window. Falling through to the real adaptor
+  // would access a mock with a different ABI (see GetNativeId below).
+  return Dali::Any(0u);
+}
+
+Dali::Any SceneHolder::GetNativeRawHandle() const
+{
+  // Same ABI trap as GetNativeHandle above.
+  return Dali::Any(0u);
+}
+
+int32_t SceneHolder::GetNativeId() const
+{
+  // ABI trap: the real adaptor's out-of-line implementation reads mScene at a
+  // different offset of this mock object. Route to the internal stub, which
+  // uses the mock's own layout.
+  return GetImplementation(*this).GetNativeId();
+}
+
 void SceneHolder::FeedTouchPoint(Dali::TouchPoint& point, int timeStamp)
 {
   GetImplementation(*this).FeedTouchPoint(point, timeStamp);
@@ -335,9 +376,27 @@ void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
   GetImplementation(*this).FeedKeyEvent(keyEvent);
 }
 
+void SceneHolder::FeedHoverEvent(Dali::TouchPoint& point)
+{
+  // Same ABI trap as GetNativeHandle above. The mock has no hover event
+  // combiner and no current toolkit UTC injects hover this way, so the
+  // event is dropped instead of falling through to the real adaptor.
+  (void)point;
+}
+
 RenderTaskList SceneHolder::GetRenderTaskList()
 {
   return GetImplementation(*this).GetRenderTaskList();
+}
+
+void SceneHolder::SetGeometryHittestEnabled(bool enabled)
+{
+  GetImplementation(*this).SetGeometryHittestEnabled(enabled);
+}
+
+bool SceneHolder::IsGeometryHittestEnabled()
+{
+  return GetImplementation(*this).IsGeometryHittestEnabled();
 }
 
 SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
@@ -348,6 +407,20 @@ SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
 SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
 {
   return GetImplementation(*this).KeyEventGeneratedSignal();
+}
+
+SceneHolder::KeyEventGeneratedSignalType& SceneHolder::InterceptKeyEventSignal()
+{
+  // Same ABI trap as GetNativeHandle above: this signal lives at a different
+  // offset in the real adaptor's SceneHolder layout.
+  return GetImplementation(*this).InterceptKeyEventSignal();
+}
+
+SceneHolder::KeyEventSignalType& SceneHolder::KeyEventDelayedSignal()
+{
+  // Same ABI trap as GetNativeHandle above: this signal lives at a different
+  // offset in the real adaptor's SceneHolder layout.
+  return GetImplementation(*this).KeyEventDelayedSignal();
 }
 
 SceneHolder::TouchEventSignalType& SceneHolder::TouchEventSignal()

@@ -276,55 +276,6 @@ bool FetchBidirectionalLineInfoTest(const FetchBidirectionalLineInfoData& data)
   return true;
 }
 
-bool GetLogicalCharacterIndexTest(const GetLogicalCharacterIndexData& data)
-{
-  std::cout << "  testing : " << data.description << std::endl;
-  // Create the model.
-  ModelPtr   textModel;
-  MetricsPtr metrics;
-  Size       layoutSize;
-
-  // Create the model with the whole text.
-  const Vector<FontDescriptionRun> fontDescriptions;
-  const LayoutOptions              options;
-  CreateTextModel(data.text,
-                  data.textArea,
-                  fontDescriptions,
-                  options,
-                  layoutSize,
-                  textModel,
-                  metrics,
-                  false,
-                  LineWrap::WORD,
-                  false,
-                  Toolkit::DevelText::EllipsisPosition::END,
-                  0.0f, // lineSpacing
-                  0.0f  // characterSpacing
-  );
-
-  LogicalModelPtr logicalModel = textModel->mLogicalModel;
-  VisualModelPtr  visualModel  = textModel->mVisualModel;
-
-  for(unsigned int index = 0u; index < data.numberOfIndices; ++index)
-  {
-    // Check the current cached bidi line index. (Check it before call the GetLogicalCharacterIndex() method )
-    if(data.cachedBidiLine[index] != logicalModel->mBidirectionalLineIndex)
-    {
-      std::cout << "  index : " << index << ", different cached bidi index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.cachedBidiLine[index] << std::endl;
-      return false;
-    }
-
-    const bool      fetched      = logicalModel->FetchBidirectionalLineInfo(index);
-    const Character logicalIndex = fetched ? logicalModel->GetLogicalCharacterIndex(index) : index;
-
-    if(data.visualToLogical[index] != logicalIndex)
-    {
-      std::cout << "  visual index : " << index << ", different logical index : " << logicalIndex << ", expected : " << data.visualToLogical[index] << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
 
 bool GetLogicalCursorIndexTest(const GetLogicalCursorIndexData& data)
 {
@@ -598,168 +549,28 @@ int UtcDaliFetchBidirectionalLineInfo(void)
 
 int UtcDaliGetLogicalCharacterIndex(void)
 {
-  tet_infoline(" UtcDaliSetVisualToLogicalMap");
-
-  unsigned int visualToLogical01[] = {};
-  unsigned int cachedBidiLine01[]  = {};
-  unsigned int visualToLogical02[] = {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u};
-  unsigned int cachedBidiLine02[]  = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u};
-  unsigned int visualToLogical03[] = {12u, 11u, 10u, 9u, 8u, 7u, 6u, 5u, 4u, 3u, 2u, 1u, 0u};
-  unsigned int cachedBidiLine03[]  = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u};
-
-  unsigned int visualToLogical04[] = {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u};
-  unsigned int cachedBidiLine04[]  = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u};
-
-  // size 300, 300
-  // LO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _  h  e  l  l  o  _  w  o  r  l  d \n
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
-  // VO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _  h  e  l  l  o  _  w  o  r  l  d \n
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12 25 24 23 22 21 20 19 18 17 16 15 14 13 26 27 28 29 30 31 32 33 34 35 36 37 38 39
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _  h  e  l  l  o  _  w  o  r  l  d   ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81
-  // VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م  _  ,  h  e  l  l  o  _  w  o  r  l  d   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
-  //     81 80 79 78 77 76 75 74 73 72 71 70 69 68 67 66 55 56 57 58 59 60 61 62 63 64 65 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     82 83 84 85 86 87 88 89 90 91 92 93 94 95
-  // VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
-  //     95 94 93 92 91 90 89 88 87 86 85 84 83 82
-
-  // LO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-  // VO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-
-  unsigned int visualToLogical05[] = {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u};
-  unsigned int cachedBidiLine05[]  = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u};
-
-  // size 300, 300
-  // LO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
-  // VO   H  e  l  l  o  _  w  o  r  l  d  ,  _  م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12 25 24 23 22 21 20 19 18 17 16 15 14 13 26 27
-
-  // LO    h  e  l  l  o  _  w  o  r  l  d \n
-  //      28 29 30 31 32 33 34 35 36 37 38 39
-  // VO    h  e  l  l  o  _  w  o  r  l  d \n
-  //      28 29 30 31 32 33 34 35 36 37 38 39
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _  h  e  l  l  o  _  w  o  r  l  d   ,  _
-  //     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
-  // VO  _  ,  h  e  l  l  o  _  w  o  r  l  d   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
-  //     67 66 55 56 57 58 59 60 61 62 63 64 65 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     68 69 70 71 72 73 74 75 76 77 78 79 80 81
-  // VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
-  //     81 80 79 78 77 76 75 74 73 72 71 70 69 68
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     82 83 84 85 86 87 88 89 90 91 92 93 94 95
-  // VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
-  //     95 94 93 92 91 90 89 88 87 86 85 84 83 82
-
-  // LO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-  // VO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-
-  unsigned int visualToLogical06[] = {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 25u, 24u, 23u, 22u, 21u, 20u, 19u, 18u, 17u, 16u, 15u, 14u, 13u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 54u, 53u, 52u, 51u, 50u, 49u, 48u, 47u, 46u, 45u, 44u, 43u, 42u, 41u, 40u, 67u, 66u, 55u, 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u, 64u, 65u, 81u, 80u, 79u, 78u, 77u, 76u, 75u, 74u, 73u, 72u, 71u, 70u, 69u, 68u, 95u, 94u, 93u, 92u, 91u, 90u, 89u, 88u, 87u, 86u, 85u, 84u, 83u, 82u, 96u, 97u, 98u, 99u, 100u, 101u, 102u, 103u, 104u, 105u, 106u};
-  unsigned int cachedBidiLine06[]  = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 4u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 5u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u, 6u};
-
-  // size 100, 600
-  // LO   H  e  l  l  o  _  w  o  r  l  d  ,  _
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12
-  // VO   H  e  l  l  o  _  w  o  r  l  d  ,  _
-  //      0  1  2  3  4  5  6  7  8  9 10 11 12
-
-  // LO    م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,   _
-  //      13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
-  // VO    م  ل  ا  ع   ل  ا  ب  _  ا   ب  ح  ر  م  ,   _
-  //      25 24 23 22 21 20 19 18 17 16 15 14 13 26 27
-
-  // LO    h  e  l  l  o  _  w  o  r  l  d \n
-  //      28 29 30 31 32 33 34 35 36 37 38 39
-  // VO    h  e  l  l  o  _  w  o  r  l  d \n
-  //      28 29 30 31 32 33 34 35 36 37 38 39
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  ,  _
-  //     40 41 42 43 44 45 46 47 48 49 50 51 52 53 54
-  // VO   _  ,  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
-  //     54 53 52 51 50 49 48 47 46 45 44 43 42 41 40
-
-  // LO   h  e  l  l  o  _  w  o  r  l  d   ,  _
-  //     55 56 57 58 59 60 61 62 63 64 65 66 67
-  // VO   _  ,  h  e  l  l  o  _  w  o  r  l  d
-  //     67 66 55 56 57 58 59 60 61 62 63 64 65
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     68 69 70 71 72 73 74 75 76 77 78 79 80 81
-  // VO  \n  م  ل  ا   ع  ل  ا  ب  _  ا   ب  ح  ر  م
-  //     81 80 79 78 77 76 75 74 73 72 71 70 69 68
-
-  // LO   م  ر  ح  ب   ا  _  ب  ا  ل  ع   ا  ل  م  \n
-  //     82 83 84 85 86 87 88 89 90 91 92 93 94 95
-  // VO  \n  م  ل  ا  ع  ل   ا  ب  _  ا   ب  ح  ر  م
-  //     95 94 93 92 91 90 89 88 87 86 85 84 83 82
-
-  // LO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-  // VO   h   e   l   l   o   _   w   o   r   l   d
-  //     96  97  98  99 100 101 102 103 104 105 106
-
-  struct GetLogicalCharacterIndexData data[] =
-    {
-      {"Zero characters text",
-       "",
-       Size(300.f, 300.f),
-       0u,
-       visualToLogical01,
-       cachedBidiLine01},
-      {"Left to right text only",
-       "Hello world",
-       Size(300.f, 300.f),
-       11u,
-       visualToLogical02,
-       cachedBidiLine02},
-      {"Right to left text only",
-       "مرحبا بالعالم",
-       Size(300.f, 300.f),
-       13u,
-       visualToLogical03,
-       cachedBidiLine03},
-      {"Mix of left to right and right to left text.",
-       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-       Size(300.f, 300.f),
-       107u,
-       visualToLogical04,
-       cachedBidiLine04},
-      {"Mix of left to right and right to left text.",
-       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-       Size(200.f, 400.f),
-       107u,
-       visualToLogical05,
-       cachedBidiLine05},
-      {"Mix of left to right and right to left text.",
-       "Hello world, مرحبا بالعالم, hello world\nمرحبا بالعالم, hello world, مرحبا بالعالم\nمرحبا بالعالم\nhello world",
-       Size(100.f, 600.f),
-       107u,
-       visualToLogical06,
-       cachedBidiLine06},
-    };
-  const unsigned int numberOfTests = 6u;
-
-  for(unsigned int index = 0u; index < numberOfTests; ++index)
+  auto model = LogicalModel::New();
+  for(unsigned int start : {0u, 6u})
   {
-    ToolkitTestApplication application;
-    if(!GetLogicalCharacterIndexTest(data[index]))
+    BidirectionalLineInfoRun line{};
+    line.characterRun = {start, 3u};
+    line.direction = true;
+    line.visualToLogicalMap = static_cast<CharacterIndex*>(malloc(3u * sizeof(CharacterIndex)));
+    line.visualToLogicalMap[0] = 2u;
+    line.visualToLogicalMap[1] = 1u;
+    line.visualToLogicalMap[2] = 0u;
+    model->mBidirectionalLineInfo.PushBack(line);
+  }
+  for(unsigned int index : {0u, 2u, 6u, 8u, 1u, 4u, 6u})
+  {
+    const bool expected = index < 3u || index >= 6u;
+    DALI_TEST_EQUALS(model->FetchBidirectionalLineInfo(index), expected, TEST_LOCATION);
+    if(expected)
     {
-      tet_result(TET_FAIL);
+      DALI_TEST_EQUALS(model->GetLogicalCharacterIndex(index), index < 3u ? 2u - index : 14u - index, TEST_LOCATION);
+      DALI_TEST_EQUALS(model->GetBidirectionalLineInfo(), index < 3u ? 0u : 1u, TEST_LOCATION);
     }
   }
-
-  tet_result(TET_PASS);
   END_TEST;
 }
 

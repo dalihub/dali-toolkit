@@ -33,7 +33,7 @@ namespace DALI_NAMESPACE::Toolkit
 {
 namespace
 {
-const char* const DALI_TOOLKIT_GLES_SO("libdali2-toolkit-gles.so");
+const char* const DALI_TOOLKIT_GLES_SO(DALI_LIBRARY_PREFIX "toolkit-gles.so");
 const char* const DALI_TOOLKIT_GLES_ADDON_NAME("ToolkitGlesAddOn");
 
 struct ToolkitGlesAddOn : public Dali::AddOn::AddOnBinder

@@ -32,6 +32,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-engine-helper-functions.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
+#include <dali-toolkit/internal/text/text-trace.h>
 
 namespace DALI_NAMESPACE
 {
@@ -57,6 +58,8 @@ namespace Layout
 {
 namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_LAYOUT");
 #endif
@@ -1774,6 +1777,8 @@ struct Engine::Impl
       // Nothing else do if there are no glyphs to layout.
       return false;
     }
+
+    DALI_TEXT_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_LAYOUT");
 
     const GlyphIndex lastGlyphPlusOne    = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs;
     const Length     totalNumberOfGlyphs = layoutParameters.textModel->mVisualModel->mGlyphs.Count();

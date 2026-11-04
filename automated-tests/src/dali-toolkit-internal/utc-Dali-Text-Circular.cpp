@@ -22,7 +22,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <toolkit-text-utils.h>
 
 // EXTERNAL INCLUDES
@@ -31,6 +31,7 @@
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/image-loading.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer-operations.h>
 
 using namespace std;
 using namespace Dali;
@@ -73,8 +74,8 @@ bool CircularRenderTest(const CircularTextData& data)
     int y      = static_cast<int>(itemLayout.position.y);
 
     Dali::PixelBuffer itemPixelBuffer = Dali::LoadImageFromFile(Dali::Integration::ToDaliStringView(data.embeddedItems[index++]));
-    itemPixelBuffer.Resize(width, height);
-    DevelPixelBuffer::Rotate(itemPixelBuffer, itemLayout.angle);
+    PixelBufferOperations::Resize(itemPixelBuffer, width, height);
+    DevelPixelBufferOperations::Rotate(itemPixelBuffer, itemLayout.angle);
 
     width  = static_cast<int>(itemPixelBuffer.GetWidth());
     height = static_cast<int>(itemPixelBuffer.GetHeight());
@@ -139,7 +140,7 @@ bool CircularRenderTest(const CircularTextData& data)
 
     if(crop)
     {
-      DevelPixelBuffer::Crop(itemPixelBuffer, uiCropX, uiCropY, uiNewWidth, uiNewHeight);
+      DevelPixelBufferOperations::Crop(itemPixelBuffer, uiCropX, uiCropY, uiNewWidth, uiNewHeight);
     }
 
     // Blend the item pixel buffer with the text's color according its blending mode.

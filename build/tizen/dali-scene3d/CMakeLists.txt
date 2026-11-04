@@ -1,9 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
-set(name "dali2-scene3d")
+set(name "dali${DALI_API_MAJOR}-scene3d")
 
 project(${name} CXX)
 
-set(${name}_VERSION_MAJOR 2)
+set(${name}_VERSION_MAJOR ${DALI_API_MAJOR})
 set(${name}_VERSION_MINOR 0)
 set(${name}_VERSION_PATCH 0)
 set(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH} )
@@ -52,8 +52,8 @@ ENDIF()
 if (ENABLE_PKG_CONFIGURE)
 	find_package(PkgConfig REQUIRED)
 
-	pkg_check_modules(DALICORE REQUIRED dali2-core)
-	pkg_check_modules(DALIADAPTOR REQUIRED dali2-adaptor)
+	pkg_check_modules(DALICORE REQUIRED ${core_name})
+	pkg_check_modules(DALIADAPTOR REQUIRED ${adaptor_name})
 
 	# Configure the pkg-config file
 	# Requires the following variables to be setup:
@@ -70,10 +70,10 @@ if (ENABLE_PKG_CONFIGURE)
 	set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
 	set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
 
-	set(core_pkg_cfg_file dali2-scene3d.pc)
-	configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file}.in ${core_pkg_cfg_file} @ONLY)
-	set(integration_pkg_cfg_file dali2-scene3d-integration.pc)
-	configure_file(${CMAKE_CURRENT_LIST_DIR}/${integration_pkg_cfg_file}.in ${integration_pkg_cfg_file} @ONLY)
+	set(core_pkg_cfg_file ${name}.pc)
+	configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-scene3d.pc.in ${core_pkg_cfg_file} @ONLY)
+	set(integration_pkg_cfg_file ${name}-integration.pc)
+	configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-scene3d-integration.pc.in ${integration_pkg_cfg_file} @ONLY)
 endif()
 
 set(scene3d_src_files "")
@@ -117,7 +117,7 @@ SET( scene3d_src_files ${scene3d_src_files} ${BUILT_IN_SHADER_GEN_CPP} )
 add_library(${name} SHARED ${scene3d_src_files})
 
 target_link_libraries(${name} ${DALICORE_LDFLAGS} ${DALIADAPTOR_LDFLAGS}
-	dali2-toolkit
+	dali${DALI_API_MAJOR}-toolkit
 	${COVERAGE})
 
 if( ANDROID )

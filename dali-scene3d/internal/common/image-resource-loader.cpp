@@ -22,10 +22,10 @@
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>

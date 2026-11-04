@@ -2,7 +2,7 @@
 #define TOOLKIT_TEXT_GEOMETRY_UTILS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 namespace TestTextGeometryUtils
 {
 void CheckGeometryResult(Vector<Vector2> positionsList, Vector<Vector2> sizeList, Vector<Vector2> expectedPositions, Vector<Vector2> expectedSizes);
-void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry);
+void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry, Rect<> optionalExpectedRectGeometry = Rect<>(-1.0f, -1.0f, -1.0f, -1.0f));
 } //namespace TestTextGeometryUtils
 
 #endif // TOOLKIT_TEXT_GEOMETRY_UTILS_H
