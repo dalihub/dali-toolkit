@@ -56,26 +56,26 @@ struct UnderlineStyleProperties
   {
   }
 
-  UnderlineStyleProperties(Text::Underline::Type type,
-                           Vector4               color,
-                           float                 height,
-                           float                 dashGap,
-                           float                 dashWidth,
-                           bool                  typeDefined,
-                           bool                  colorDefined,
-                           bool                  heightDefined,
-                           bool                  dashGapDefined,
-                           bool                  dashWidthDefined)
-  : type{type},
-    color{color},
-    height{height},
-    dashGap{dashGap},
-    dashWidth{dashWidth},
-    typeDefined{typeDefined},
-    colorDefined{colorDefined},
-    heightDefined{heightDefined},
-    dashGapDefined{dashGapDefined},
-    dashWidthDefined{dashWidthDefined}
+  UnderlineStyleProperties(Text::Underline::Type initType,
+                           Vector4               initColor,
+                           float                 initHeight,
+                           float                 initDashGap,
+                           float                 initDashWidth,
+                           bool                  initTypeDefined,
+                           bool                  initColorDefined,
+                           bool                  initHeightDefined,
+                           bool                  initDashGapDefined,
+                           bool                  initDashWidthDefined)
+  : type{initType},
+    color{initColor},
+    height{initHeight},
+    dashGap{initDashGap},
+    dashWidth{initDashWidth},
+    typeDefined{initTypeDefined},
+    colorDefined{initColorDefined},
+    heightDefined{initHeightDefined},
+    dashGapDefined{initDashGapDefined},
+    dashWidthDefined{initDashWidthDefined}
   {
   }
 

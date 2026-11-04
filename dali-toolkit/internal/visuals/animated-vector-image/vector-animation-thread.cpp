@@ -267,12 +267,12 @@ bool VectorAnimationThread::MoveTasksToAnimation(VectorAnimationTaskPtr task, bo
       auto nextFrameTime = task->CalculateNextFrameTime(useCurrentTime);
 
       bool inserted = false;
-      for(auto iter = mAnimationTasks.begin(); iter != mAnimationTasks.end(); ++iter)
+      for(auto taskIter = mAnimationTasks.begin(); taskIter != mAnimationTasks.end(); ++taskIter)
       {
-        auto nextTime = (*iter)->GetNextFrameTime();
+        auto nextTime = (*taskIter)->GetNextFrameTime();
         if(nextTime > nextFrameTime)
         {
-          mAnimationTasks.insert(iter, task);
+          mAnimationTasks.insert(taskIter, task);
           inserted = true;
           break;
         }

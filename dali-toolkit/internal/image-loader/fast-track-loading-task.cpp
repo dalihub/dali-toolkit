@@ -226,9 +226,9 @@ void FastTrackLoadingTask::Load()
     mLoadSuccess = true;
     MultiplyAlpha(pixelBuffers[0]);
     uint32_t index = 0u;
-    for(auto&& pixelBuffer : pixelBuffers)
+    for(auto&& planeBuffer : pixelBuffers)
     {
-      mPixelData[index++] = Dali::PixelBuffer::Convert(pixelBuffer);
+      mPixelData[index++] = Dali::PixelBuffer::Convert(planeBuffer);
     }
 
     if(pixelBuffers.size() > 1u)

@@ -1241,13 +1241,13 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
           std::string policyValue;
           if(DALI_LIKELY(GetStdString(*policy, policyValue)))
           {
-            Toolkit::TableView::LayoutPolicy policy;
+            Toolkit::TableView::LayoutPolicy layoutPolicy;
             if(Scripting::GetEnumeration<Toolkit::TableView::LayoutPolicy>(policyValue.c_str(),
                                                                            LAYOUT_POLICY_STRING_TABLE,
                                                                            LAYOUT_POLICY_STRING_TABLE_COUNT,
-                                                                           policy))
+                                                                           layoutPolicy))
             {
-              switch(policy)
+              switch(layoutPolicy)
               {
                 case Toolkit::TableView::FIXED:
                 case Toolkit::TableView::RELATIVE:
@@ -1256,7 +1256,7 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                   float            childValue    = 0.0f;
                   if(DALI_LIKELY(childMapValue && childMapValue->Get(childValue)))
                   {
-                    if(policy == Toolkit::TableView::FIXED)
+                    if(layoutPolicy == Toolkit::TableView::FIXED)
                     {
                       (tableViewImpl.*funcFixed)(index, childValue);
                     }
@@ -1488,8 +1488,8 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
       }
 
       // Check whether the previous focused actor is a layout container and also a child of this TableView
-      Toolkit::TableView::CellPosition position;
-      if(wasFocusedOnLayoutContainer && FindChildPosition(previousFocusedActor, position))
+      Toolkit::TableView::CellPosition cellPosition;
+      if(wasFocusedOnLayoutContainer && FindChildPosition(previousFocusedActor, cellPosition))
       {
         nextFocusableActor = GetNextKeyboardFocusableActor(previousFocusedActor, direction, loopEnabled);
       }

@@ -508,41 +508,41 @@ void DliLoaderImpl::Impl::ParseScene(LoadParams& params)
 
 void DliLoaderImpl::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes, const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene)
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index sceneIndex)
   {
-    auto tn = GetNthChild(tnScenes, iScene); // now a "scene" object
+    auto tn = GetNthChild(tnScenes, sceneIndex); // now a "scene" object
     if(!tn)
     {
-      ExceptionFlinger(ASSERT_LOCATION) << iScene << " is out of bounds access into " << SCENES << ".";
+      ExceptionFlinger(ASSERT_LOCATION) << sceneIndex << " is out of bounds access into " << SCENES << ".";
     }
 
     tn = RequireChild(tn, NODES); // now a "nodes" array
     if(tn->GetType() != TreeNode::ARRAY)
     {
-      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << iScene << "]." << NODES << " has an invalid type; array required.";
+      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << sceneIndex << "]." << NODES << " has an invalid type; array required.";
     }
 
     if(tn->Size() < 1)
     {
-      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << iScene << "]." << NODES << " must define a node id.";
+      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << sceneIndex << "]." << NODES << " must define a node id.";
     }
 
     tn = GetNthChild(tn, 0); // now the first element of the array
     Index iRootNode;
     if(!ReadIndex(tn, iRootNode))
     {
-      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << iScene << "]." << NODES << " has an invalid value for root node index: '" << iRootNode << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << SCENES << "[" << sceneIndex << "]." << NODES << " has an invalid value for root node index: '" << iRootNode << "'.";
     }
 
     if(iRootNode >= tnNodes->Size())
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Root node index << " << iRootNode << " of scene " << iScene << " is out of bounds.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Root node index << " << iRootNode << " of scene " << sceneIndex << " is out of bounds.";
     }
 
     tn = GetNthChild(tnNodes, iRootNode); // now a "node" object
     if(tn->GetType() != TreeNode::OBJECT)
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Root node of scene " << iScene << " is of invalid JSON type; object required";
+      ExceptionFlinger(ASSERT_LOCATION) << "Root node of scene " << sceneIndex << " is of invalid JSON type; object required";
     }
 
     return iRootNode;
@@ -556,18 +556,18 @@ void DliLoaderImpl::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNo
 
   for(Index i = 0; i < iScene; ++i)
   {
-    Index       iRootNode = getSceneRootIdx(i);
-    const Index iRoot     = scene.GetNodeCount();
-    ParseNodes(tnNodes, iRootNode, params);
+    Index       iSceneRootNode = getSceneRootIdx(i);
+    const Index iRoot          = scene.GetNodeCount();
+    ParseNodes(tnNodes, iSceneRootNode, params);
     scene.AddRootNode(iRoot);
   }
 
   auto numScenes = tnScenes->Size();
   for(Index i = iScene + 1; i < numScenes; ++i)
   {
-    Index       iRootNode = getSceneRootIdx(i);
-    const Index iRoot     = scene.GetNodeCount();
-    ParseNodes(tnNodes, iRootNode, params);
+    Index       iSceneRootNode = getSceneRootIdx(i);
+    const Index iRoot          = scene.GetNodeCount();
+    ParseNodes(tnNodes, iSceneRootNode, params);
     scene.AddRootNode(iRoot);
   }
 }
@@ -594,10 +594,10 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
         auto&                      ibms = mInverseBindMatrices;
         visitFn                         = [&](Index id)
         {
-          auto node = scene.GetNode(id);
+          auto sceneNode = scene.GetNode(id);
           jointCount += ibms.find(id) != ibms.end();
 
-          for(auto i : node->mChildren)
+          for(auto i : sceneNode->mChildren)
           {
             visitFn(i);
           }
@@ -620,8 +620,8 @@ void DliLoaderImpl::Impl::ParseSkeletons(const TreeNode* skeletons, Dali::Scene3
             skeleton.mJoints.PushBack({id, iFind->second});
           }
 
-          auto node = scene.GetNode(id);
-          for(auto i : node->mChildren)
+          auto sceneNode = scene.GetNode(id);
+          for(auto i : sceneNode->mChildren)
           {
             visitFn(i);
           }
@@ -747,10 +747,10 @@ void DliLoaderImpl::Impl::ParseShaders(const TreeNode* shaders, Dali::Scene3D::L
           else if(value.GetType() == TreeNode::BOOLEAN)
           {
             DALI_LOG_DEBUG_INFO("\"bool\" uniforms are handled as floats in shader");
-            bool value = false;
-            if(ReadBool(&keyValue.second, value))
+            bool boolValue = false;
+            if(ReadBool(&keyValue.second, boolValue))
             {
-              uniformValue = value ? 1.0f : 0.0f;
+              uniformValue = boolValue ? 1.0f : 0.0f;
             }
           }
           else
@@ -1205,8 +1205,8 @@ void DliLoaderImpl::Impl::ParseNodes(const TreeNode* const nodes, Index index, L
 
     virtual unsigned int Resolve(Index iDli) override
     {
-      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index iDli)
-      { return idx.iDli < iDli; });
+      auto iFind = std::lower_bound(mIndices.begin(), mIndices.end(), iDli, [](const Entry& idx, Index target)
+      { return idx.iDli < target; });
       DALI_ASSERT_ALWAYS(iFind != mIndices.end());
       return iFind->iScene;
     }

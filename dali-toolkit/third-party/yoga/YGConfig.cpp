@@ -10,10 +10,10 @@
 const std::array<bool, YGExperimentalFeatureCount>
     kYGDefaultExperimentalFeatures = {{false}};
 
-YGConfig::YGConfig(YGLogger logger)
+YGConfig::YGConfig(YGLogger initLogger)
     : experimentalFeatures(kYGDefaultExperimentalFeatures),
       useWebDefaults(false),
       useLegacyStretchBehaviour(false),
       shouldDiffLayoutWithoutLegacyStretchBehaviour(false),
-      pointScaleFactor(1.0f), logger(logger), cloneNodeCallback(nullptr),
+      pointScaleFactor(1.0f), logger(initLogger), cloneNodeCallback(nullptr),
       context(nullptr) {}

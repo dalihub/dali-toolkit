@@ -503,7 +503,7 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
         bool                  heightDefined = false;
         float                 height        = 0.f;
         bool                  typeDefined   = false;
-        Text::Underline::Type type;
+        Text::Underline::Type underlineType;
         bool                  dashWidthDefined = false;
         float                 dashWidth        = 2.0f;
         bool                  dashGapDefined   = false;
@@ -528,7 +528,7 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
                                              heightDefined,
                                              height,
                                              typeDefined,
-                                             type,
+                                             underlineType,
                                              dashWidthDefined,
                                              dashWidth,
                                              dashGapDefined,
@@ -546,7 +546,7 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
                                            heightDefined,
                                            height,
                                            typeDefined,
-                                           type,
+                                           underlineType,
                                            dashWidthDefined,
                                            dashWidth,
                                            dashGapDefined,
@@ -576,9 +576,9 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
             update = true;
           }
 
-          if(typeDefined && (controller->GetUnderlineType() != type))
+          if(typeDefined && (controller->GetUnderlineType() != underlineType))
           {
-            controller->SetUnderlineType(type);
+            controller->SetUnderlineType(underlineType);
             update = true;
           }
 
@@ -628,12 +628,12 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
     {
       case EffectStyle::DEFAULT:
       {
-        const bool                  enabled   = controller->IsUnderlineEnabled();
-        const Vector4&              color     = controller->GetUnderlineColor();
-        const float                 height    = controller->GetUnderlineHeight();
-        const Text::Underline::Type type      = controller->GetUnderlineType();
-        const float                 dashWidth = controller->GetDashedUnderlineWidth();
-        const float                 dashGap   = controller->GetDashedUnderlineGap();
+        const bool                  enabled       = controller->IsUnderlineEnabled();
+        const Vector4&              color         = controller->GetUnderlineColor();
+        const float                 height        = controller->GetUnderlineHeight();
+        const Text::Underline::Type underlineType = controller->GetUnderlineType();
+        const float                 dashWidth     = controller->GetDashedUnderlineWidth();
+        const float                 dashGap       = controller->GetDashedUnderlineGap();
 
         if(controller->IsUnderlineSetByString())
         {
@@ -650,7 +650,7 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
           underlineProperties += "\"height\":\"" + heightStr + "\",";
 
           std::string typeStr;
-          typeStr = GetUnderlineTypeToString(type);
+          typeStr = GetUnderlineTypeToString(underlineType);
           underlineProperties += "\"type\":\"" + typeStr + "\",";
 
           std::string dashWidthStr;
@@ -670,7 +670,7 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
           map.Insert(ENABLE_KEY, enabled);
           map.Insert(COLOR_KEY, color);
           map.Insert(HEIGHT_KEY, height);
-          map.Insert(TYPE_KEY, type);
+          map.Insert(TYPE_KEY, underlineType);
           map.Insert(DASH_WIDTH_KEY, dashWidth);
           map.Insert(DASH_GAP_KEY, dashGap);
 

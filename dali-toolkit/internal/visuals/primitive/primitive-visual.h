@@ -163,9 +163,9 @@ private:
     {
     }
 
-    Vertex(const Vector3& position, const Vector3& normal, const Vector2& textureCoord)
-    : position(position),
-      normal(normal)
+    Vertex(const Vector3& initPosition, const Vector3& initNormal, const Vector2& textureCoord)
+    : position(initPosition),
+      normal(initNormal)
     {
     }
 

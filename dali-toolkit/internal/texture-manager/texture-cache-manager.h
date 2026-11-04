@@ -289,12 +289,12 @@ private:
    */
   struct EncodedImageBufferInfo
   {
-    EncodedImageBufferInfo(const TextureCacheManager::TextureId   bufferId,
-                           const TextureCacheManager::TextureHash bufferHash,
-                           const EncodedImageBuffer&              encodedImageBuffer)
-    : bufferId(bufferId),
-      bufferHash(bufferHash),
-      encodedImageBuffer(encodedImageBuffer),
+    EncodedImageBufferInfo(const TextureCacheManager::TextureId   initBufferId,
+                           const TextureCacheManager::TextureHash initBufferHash,
+                           const EncodedImageBuffer&              initEncodedImageBuffer)
+    : bufferId(initBufferId),
+      bufferHash(initBufferHash),
+      encodedImageBuffer(initEncodedImageBuffer),
       referenceCount(1)
     {
     }

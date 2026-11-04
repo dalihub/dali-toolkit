@@ -899,9 +899,9 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
 
       if(mesh.first.HasBlendShapes())
       {
-        Actor              actor = rootActor.FindChildByName(node->mName);
-        Scene3D::ModelNode node  = Scene3D::ModelNode::DownCast(actor);
-        if(!node)
+        Actor              actor     = rootActor.FindChildByName(node->mName);
+        Scene3D::ModelNode modelNode = Scene3D::ModelNode::DownCast(actor);
+        if(!modelNode)
         {
           continue;
         }
@@ -921,7 +921,7 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&          
         data.version      = mesh.first.mBlendShapeVersion;
         data.bufferOffset = mesh.second.blendShapeBufferOffset;
         data.mActor       = actor;
-        Internal::GetImplementation(node).SetBlendShapeData(std::move(data), request.mPrimitive);
+        Internal::GetImplementation(modelNode).SetBlendShapeData(std::move(data), request.mPrimitive);
       }
     }
   }

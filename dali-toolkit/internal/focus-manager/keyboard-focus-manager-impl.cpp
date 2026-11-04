@@ -660,8 +660,8 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       if(IsLayoutControl(nextFocusableActor))
       {
         // If so, move the focus inside it.
-        Toolkit::Control layoutControl = Toolkit::Control::DownCast(nextFocusableActor);
-        succeed                        = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction, context);
+        Toolkit::Control nextLayoutControl = Toolkit::Control::DownCast(nextFocusableActor);
+        succeed                            = DoMoveFocusWithinLayoutControl(nextLayoutControl, currentFocusActor, direction, context);
       }
       if(!succeed)
       {

@@ -45,9 +45,9 @@ public:
     {
     }
 
-    Vertex(const Vector3& position, const Vector3& normal, const Vector2& textureCoord)
-    : position(position),
-      normal(normal)
+    Vertex(const Vector3& initPosition, const Vector3& initNormal, const Vector2& textureCoord)
+    : position(initPosition),
+      normal(initNormal)
     {
     }
 
@@ -61,8 +61,8 @@ public:
     {
     }
 
-    VertexExt(const Vector3& tangent, const Vector3& binormal)
-    : tangent(tangent),
+    VertexExt(const Vector3& initTangent, const Vector3& binormal)
+    : tangent(initTangent),
       bitangent(binormal)
     {
     }

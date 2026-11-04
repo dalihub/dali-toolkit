@@ -71,14 +71,14 @@ void Style::ApplyVisualsAndPropertiesRecursively(
         statePtr->ApplyProperties(handle);
 
         // Apply substate visuals
-        Property::Value value = control.GetProperty(DevelControl::Property::SUB_STATE);
+        Property::Value subStateValue = control.GetProperty(DevelControl::Property::SUB_STATE);
         Dali::String    subStateName;
-        if(value.Get(subStateName) && !subStateName.Empty())
+        if(subStateValue.Get(subStateName) && !subStateName.Empty())
         {
-          const StylePtr* stylePtr = statePtr->subStates.FindConst(ToStdStringView(subStateName));
-          if(stylePtr)
+          const StylePtr* subStateStylePtr = statePtr->subStates.FindConst(ToStdStringView(subStateName));
+          if(subStateStylePtr)
           {
-            const StylePtr subStatePtr(*stylePtr);
+            const StylePtr subStatePtr(*subStateStylePtr);
             // We have a sub-state match.
             subStatePtr->ApplyVisuals(handle, instancedProperties);
             subStatePtr->ApplyProperties(handle);

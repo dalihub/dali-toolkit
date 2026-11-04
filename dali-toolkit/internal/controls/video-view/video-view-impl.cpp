@@ -678,32 +678,32 @@ void VideoView::OnChildOrderChanged(Actor parent, Actor child)
   int   currentSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);
   if(currentSiblingOrder != mSiblingOrder)
   {
-    Actor parent = self.GetParent();
-    Actor child;
+    Actor selfParent = self.GetParent();
+    Actor sibling;
     Actor upper;
     Actor lower;
 
-    int numChildren = static_cast<int>(parent.GetChildCount());
+    int numChildren = static_cast<int>(selfParent.GetChildCount());
     for(int i = 0; i < numChildren; i++)
     {
-      child = parent.GetChildAt(i);
-      if(!IsVideoView(child))
+      sibling = selfParent.GetChildAt(i);
+      if(!IsVideoView(sibling))
       {
         continue;
       }
 
-      if(child == self)
+      if(sibling == self)
       {
         continue;
       }
 
       if(i < currentSiblingOrder)
       {
-        lower = child;
+        lower = sibling;
       }
       else if(i > currentSiblingOrder)
       {
-        upper = child;
+        upper = sibling;
         break;
       }
     }
@@ -774,9 +774,9 @@ void VideoView::SetUnderlay(bool isUnderlay)
     {
       if(!mIsUnderlay)
       {
-        mIsUnderlay                        = true;
-        Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(Self());
-        mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+        mIsUnderlay                   = true;
+        Toolkit::VideoView selfHandle = Toolkit::VideoView::DownCast(Self());
+        mRenderingStrategy            = std::make_unique<WindowSurfaceStrategy>(selfHandle);
         mRenderingStrategy->Initialize();
       }
     }

@@ -84,7 +84,7 @@ void ClearCharacterRuns(CharacterIndex startIndex,
 
   // Update the character index of the next runs.
   run = runsBuffer;
-  for(Length index = 0u; index < length; ++index)
+  for(Length runIndex = 0u; runIndex < length; ++runIndex)
   {
     if(run->characterRun.characterIndex > startIndex)
     {
@@ -318,7 +318,7 @@ void ClearGlyphRuns(GlyphIndex startIndex,
 
   // Update the glyph index of the next runs.
   run = runsBuffer;
-  for(Length index = 0u; index < length; ++index)
+  for(Length runIndex = 0u; runIndex < length; ++runIndex)
   {
     if(run->glyphRun.glyphIndex > startIndex)
     {

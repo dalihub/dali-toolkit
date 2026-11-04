@@ -455,9 +455,9 @@ bool IsTag(const char*&      markupStringBuffer,
 
       for(; (!isTag) && (markupStringBuffer < markupStringEndBuffer); ++markupStringBuffer)
       {
-        const char character = *markupStringBuffer;
+        const char tagCharacter = *markupStringBuffer;
 
-        if(!isQuotationOpen && (SLASH == character)) // '/'
+        if(!isQuotationOpen && (SLASH == tagCharacter)) // '/'
         {
           if(isPreviousLessThan)
           {
@@ -477,7 +477,7 @@ bool IsTag(const char*&      markupStringBuffer,
             --markupStringBuffer;
           }
         }
-        else if(GREATER_THAN == character) // '>'
+        else if(GREATER_THAN == tagCharacter) // '>'
         {
           isTag = true;
           if(isPreviousSlash)
@@ -488,7 +488,7 @@ bool IsTag(const char*&      markupStringBuffer,
           isPreviousSlash    = false;
           isPreviousLessThan = false;
         }
-        else if(QUOTATION_MARK == character)
+        else if(QUOTATION_MARK == tagCharacter)
         {
           isQuotationOpen = !isQuotationOpen;
           ++tag.length;
@@ -496,7 +496,7 @@ bool IsTag(const char*&      markupStringBuffer,
           isPreviousSlash    = false;
           isPreviousLessThan = false;
         }
-        else if(WHITE_SPACE >= character) // ' '
+        else if(WHITE_SPACE >= tagCharacter) // ' '
         {
           // If the tag contains white spaces then it may have attributes.
           if(!isQuotationOpen)
@@ -1190,8 +1190,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& ma
       if(TokenComparison(MARKUP::TAG::COLOR, tag.buffer, tag.length))
       {
         ProcessTagForRun<ColorRun>(
-          markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference, [](const Tag& tag, ColorRun& run)
-        { ProcessColorTag(tag, run); });
+          markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference, [](const Tag& runTag, ColorRun& run)
+        { ProcessColorTag(runTag, run); });
       } // <color></color>
       else if(TokenComparison(MARKUP::TAG::ITALIC, tag.buffer, tag.length))
       {
@@ -1205,8 +1205,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& ma
       else if(TokenComparison(MARKUP::TAG::UNDERLINE, tag.buffer, tag.length))
       {
         ProcessTagForRun<UnderlinedCharacterRun>(
-          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run)
-        { ProcessUnderlineTag(tag, run); });
+          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& runTag, UnderlinedCharacterRun& run)
+        { ProcessUnderlineTag(runTag, run); });
       } // <u></u>
       else if(TokenComparison(MARKUP::TAG::BOLD, tag.buffer, tag.length))
       {
@@ -1220,8 +1220,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& ma
       else if(TokenComparison(MARKUP::TAG::FONT, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
-          markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, fontTagReference, [](const Tag& tag, FontDescriptionRun& fontRun)
-        { ProcessFontTag(tag, fontRun); });
+          markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, fontTagReference, [](const Tag& runTag, FontDescriptionRun& fontRun)
+        { ProcessFontTag(runTag, fontRun); });
       } // <font></font>
       else if(TokenComparison(MARKUP::TAG::ANCHOR, tag.buffer, tag.length))
       {
@@ -1258,8 +1258,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& ma
       else if(TokenComparison(MARKUP::TAG::BACKGROUND, tag.buffer, tag.length))
       {
         ProcessTagForRun<ColorRun>(
-          markupProcessData.backgroundColorRuns, styleStack, tag, characterIndex, backgroundRunIndex, backgroundTagReference, [](const Tag& tag, ColorRun& run)
-        { ProcessBackground(tag, run); });
+          markupProcessData.backgroundColorRuns, styleStack, tag, characterIndex, backgroundRunIndex, backgroundTagReference, [](const Tag& runTag, ColorRun& run)
+        { ProcessBackground(runTag, run); });
       }
       else if(TokenComparison(MARKUP::TAG::SPAN, tag.buffer, tag.length))
       {
@@ -1283,21 +1283,21 @@ void ProcessMarkupString(const std::string& markupString, MarkupPropertyData& ma
       else if(TokenComparison(MARKUP::TAG::STRIKETHROUGH, tag.buffer, tag.length))
       {
         ProcessTagForRun<StrikethroughCharacterRun>(
-          markupProcessData.strikethroughCharacterRuns, styleStack, tag, characterIndex, strikethroughCharacterRunIndex, sTagReference, [](const Tag& tag, StrikethroughCharacterRun& run)
-        { ProcessStrikethroughTag(tag, run); });
+          markupProcessData.strikethroughCharacterRuns, styleStack, tag, characterIndex, strikethroughCharacterRunIndex, sTagReference, [](const Tag& runTag, StrikethroughCharacterRun& run)
+        { ProcessStrikethroughTag(runTag, run); });
       } // <s></s>
       else if(TokenComparison(MARKUP::TAG::PARAGRAPH, tag.buffer, tag.length))
       {
         ProcessParagraphTag(markupProcessData, tag, (markupStringBuffer == markupStringEndBuffer), characterIndex);
         ProcessTagForRun<BoundedParagraphRun>(
-          markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& tag, BoundedParagraphRun& run)
-        { ProcessAttributesOfParagraphTag(tag, run); });
+          markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& runTag, BoundedParagraphRun& run)
+        { ProcessAttributesOfParagraphTag(runTag, run); });
       } // <p></p>
       else if(TokenComparison(MARKUP::TAG::CHARACTER_SPACING, tag.buffer, tag.length))
       {
         ProcessTagForRun<CharacterSpacingCharacterRun>(
-          markupProcessData.characterSpacingCharacterRuns, styleStack, tag, characterIndex, characterSpacingCharacterRunIndex, characterSpacingTagReference, [](const Tag& tag, CharacterSpacingCharacterRun& run)
-        { ProcessCharacterSpacingTag(tag, run); });
+          markupProcessData.characterSpacingCharacterRuns, styleStack, tag, characterIndex, characterSpacingCharacterRunIndex, characterSpacingTagReference, [](const Tag& runTag, CharacterSpacingCharacterRun& run)
+        { ProcessCharacterSpacingTag(runTag, run); });
       } // <char-spacing></char-spacing>
     } // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)

@@ -630,14 +630,14 @@ void ImageView::TransitionImageWithEffect()
         float destinationAlpha = (mTransitionTargetAlpha > LOW_OPACITY) ? mTransitionTargetAlpha : LOW_OPACITY;
 
         // Transition current image
-        Toolkit::Visual::Base imageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
-        if(imageVisual)
+        Toolkit::Visual::Base currentImageVisual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+        if(currentImageVisual)
         {
           Dali::KeyFrames fadeinKeyFrames = Dali::KeyFrames::New();
           fadeinKeyFrames.Add(0.0f, LOW_OPACITY);
           fadeinKeyFrames.Add(1.0f, destinationAlpha);
           mTransitionAnimation.AnimateBetween(DevelControl::GetVisualProperty(handle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), fadeinKeyFrames, AlphaFunction::EASE_IN_OUT);
-          imageVisual.SetDepthIndex(imageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
+          currentImageVisual.SetDepthIndex(currentImageVisual.GetDepthIndex() + CURRENT_VISUAL_DEPTH_INDEX);
         }
 
         // Play transition animation

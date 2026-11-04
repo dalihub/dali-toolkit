@@ -138,8 +138,8 @@ bool WindowSurfaceStrategy::Initialize()
     videoView->SetOverlayVisual(overlayVisual);
     if(videoView->GetOverlayVisual())
     {
-      Dali::Toolkit::Visual::Base overlayVisual = videoView->GetOverlayVisual();
-      Internal::Visual::Base&     visualImpl    = Toolkit::GetImplementation(overlayVisual);
+      Dali::Toolkit::Visual::Base currentOverlayVisual = videoView->GetOverlayVisual();
+      Internal::Visual::Base&     visualImpl           = Toolkit::GetImplementation(currentOverlayVisual);
 
       Renderer renderer = visualImpl.GetRenderer();
 
@@ -161,11 +161,11 @@ bool WindowSurfaceStrategy::Initialize()
       renderer.SetProperty(Renderer::Property::BLEND_EQUATION_ALPHA, BlendEquation::REVERSE_SUBTRACT);
 
       // Ignore corner radius for offscreen case.
-      Toolkit::GetImplementation(overlayVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
-      Dali::Toolkit::DevelControl::RegisterVisual(controlImpl, Dali::Toolkit::VideoView::Property::OVERLAY, overlayVisual);
+      Toolkit::GetImplementation(currentOverlayVisual).CornerRadiusIgnoredAtOffscreenRendering(true);
+      Dali::Toolkit::DevelControl::RegisterVisual(controlImpl, Dali::Toolkit::VideoView::Property::OVERLAY, currentOverlayVisual);
 
       // Sync corner values to Control
-      Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, overlayVisual, true);
+      Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, currentOverlayVisual, true);
     }
 
     // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)

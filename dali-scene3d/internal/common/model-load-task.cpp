@@ -68,8 +68,8 @@ ModelLoadTask::ModelLoadTask(const std::string& modelUrl, const std::string& res
 
   if(mResourceDirectoryUrl.empty())
   {
-    std::filesystem::path modelUrl(mModelUrl);
-    mResourceDirectoryUrl = std::string(modelUrl.parent_path()) + "/";
+    std::filesystem::path modelPath(mModelUrl);
+    mResourceDirectoryUrl = std::string(modelPath.parent_path()) + "/";
   }
 
   mModelLoader = std::make_unique<Dali::Scene3D::Loader::ModelLoader>(ToDaliString(mModelUrl), ToDaliString(mResourceDirectoryUrl), mLoadResult);

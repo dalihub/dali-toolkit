@@ -100,7 +100,7 @@ AsyncTextManager::~AsyncTextManager()
   {
     Mutex::ScopedLock lock(mTasksMutex);
     {
-      Mutex::ScopedLock lock(mLoaderMutex);
+      Mutex::ScopedLock loaderLock(mLoaderMutex);
       mAvailableLoaders.clear();
       mLocaleChangedLoaders.clear();
       mRunningLoaders.clear();
@@ -289,14 +289,14 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
     }
     else
     {
-      auto it = mRunningTasks.find(taskId);
-      if(it != mRunningTasks.end())
+      auto runningTaskIt = mRunningTasks.find(taskId);
+      if(runningTaskIt != mRunningTasks.end())
       {
-        if(it->second.mObserver)
+        if(runningTaskIt->second.mObserver)
         {
-          cancelledObserver = it->second.mObserver;
+          cancelledObserver = runningTaskIt->second.mObserver;
         }
-        mRunningTasks.erase(it);
+        mRunningTasks.erase(runningTaskIt);
       }
       return;
     }

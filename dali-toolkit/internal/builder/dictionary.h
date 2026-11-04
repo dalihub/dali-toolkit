@@ -64,9 +64,9 @@ private:
   {
     std::string key;
     EntryType   entry;
-    Element(std::string name, EntryType entry)
+    Element(std::string name, EntryType initEntry)
     : key(std::move(name)),
-      entry(std::move(entry))
+      entry(std::move(initEntry))
     {
     }
   };

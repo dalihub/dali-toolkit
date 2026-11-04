@@ -36,9 +36,9 @@ using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
 
 struct AsyncImageLoadingInfo
 {
-  AsyncImageLoadingInfo(LoadingTaskPtr loadingTask, std::uint32_t loadId)
-  : loadingTask(loadingTask),
-    loadId(loadId)
+  AsyncImageLoadingInfo(LoadingTaskPtr initLoadingTask, std::uint32_t initLoadId)
+  : loadingTask(initLoadingTask),
+    loadId(initLoadId)
   {
   }
 
