@@ -21,7 +21,7 @@
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-array.h>
 #include <toolkit-event-thread-callback.h>

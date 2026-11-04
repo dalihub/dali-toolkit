@@ -253,70 +253,6 @@ void ValidateFontsForCharacters(MultilanguageSupport&                         mu
   DALI_TEST_EQUALS(lastRun.characterRun.characterIndex + lastRun.characterRun.numberOfCharacters, text.Count(), TEST_LOCATION);
 }
 
-bool MergeFontDescriptionsTest(const MergeFontDescriptionsData& data)
-{
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-
-  Vector<FontId> fontIds;
-  fontIds.Resize(data.startIndex + data.numberOfCharacters, 0u);
-  Vector<bool> isDefaultFont;
-  isDefaultFont.Resize(data.startIndex + data.numberOfCharacters, true);
-
-  for(unsigned int index = data.startIndex; index < data.startIndex + data.numberOfCharacters; ++index)
-  {
-    TextAbstraction::FontDescription fontDescription;
-    TextAbstraction::PointSize26Dot6 fontPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
-
-    MergeFontDescriptions(data.fontDescriptionRuns,
-                          data.defaultFontDescription,
-                          data.defaultPointSize,
-                          data.fontSizeScale,
-                          index,
-                          fontDescription,
-                          fontPointSize,
-                          isDefaultFont[index]);
-
-    if(!isDefaultFont[index])
-    {
-      fontIds[index] = fontClient.GetFontId(fontDescription, fontPointSize);
-    }
-  }
-
-  if(fontIds.Count() != data.expectedFontIds.Count())
-  {
-    std::cout << data.description << " Different number of font ids : " << fontIds.Count() << ", expected : " << data.expectedFontIds.Count() << std::endl;
-    return false;
-  }
-
-  for(unsigned int index = 0u; index < fontIds.Count(); ++index)
-  {
-    if(fontIds[index] != data.expectedFontIds[index])
-    {
-      std::cout << data.description << " Different font id at index : " << index << ", font id : " << fontIds[index] << ", expected : " << data.expectedFontIds[index] << std::endl;
-      std::cout << "           font ids : ";
-      for(unsigned int i = 0; i < fontIds.Count(); ++i)
-      {
-        std::cout << fontIds[i] << " ";
-      }
-      std::cout << std::endl;
-      std::cout << "  expected font ids : ";
-      for(unsigned int i = 0; i < data.expectedFontIds.Count(); ++i)
-      {
-        std::cout << data.expectedFontIds[i] << " ";
-      }
-      std::cout << std::endl;
-      return false;
-    }
-
-    if(isDefaultFont[index] != data.expectedIsDefault[index])
-    {
-      std::cout << data.description << " Different 'is font default' at index : " << index << ", is font default : " << isDefaultFont[index] << ", expected : " << data.expectedIsDefault[index] << std::endl;
-      return false;
-    }
-  }
-
-  return true;
-}
 
 bool ScriptsTest(const ScriptsData& data)
 {
@@ -393,102 +329,6 @@ bool ScriptsTest(const ScriptsData& data)
   return true;
 }
 
-bool ValidateFontTest(const ValidateFontsData& data)
-{
-  MultilanguageSupport        multilanguageSupport = MultilanguageSupport::Get();
-  TextAbstraction::FontClient fontClient           = TextAbstraction::FontClient::Get();
-
-  // 1) Convert to utf32
-  Vector<Character> utf32;
-  utf32.Resize(data.text.size());
-
-  const uint32_t numberOfCharacters = (data.text.size() == 0) ? 0 : Utf8ToUtf32(reinterpret_cast<const uint8_t* const>(data.text.c_str()), data.text.size(), &utf32[0u]);
-  utf32.Resize(numberOfCharacters);
-
-  // 2) Set the script info.
-  Vector<ScriptRun> scripts;
-  multilanguageSupport.SetScripts(utf32,
-                                  0u,
-                                  numberOfCharacters,
-                                  scripts);
-
-  char*             pathNamePtr = get_current_dir_name();
-  const std::string pathName(pathNamePtr);
-  free(pathNamePtr);
-
-  // Get the default font id.
-  const FontId                     defaultFontId = fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + data.defaultFont,
-                                                                        data.defaultFontSize);
-  TextAbstraction::FontDescription defaultFontDescription;
-  fontClient.GetDescription(defaultFontId, defaultFontDescription);
-
-  const TextAbstraction::PointSize26Dot6 defaultPointSize = fontClient.GetPointSize(defaultFontId);
-
-  Vector<FontRun> fontRuns;
-
-  // 3) Validate the fonts.
-  multilanguageSupport.ValidateFonts(fontClient,
-                                     utf32,
-                                     scripts,
-                                     data.fontDescriptionRuns,
-                                     defaultFontDescription,
-                                     defaultPointSize,
-                                     data.fontSizeScale,
-                                     0u,
-                                     numberOfCharacters,
-                                     fontRuns);
-
-  if((0u != data.index) ||
-     (numberOfCharacters != data.numberOfCharacters))
-  {
-    // 4) Clear the fonts.
-    ClearCharacterRuns(data.index,
-                       data.index + data.numberOfCharacters - 1u,
-                       fontRuns);
-
-    multilanguageSupport.ValidateFonts(fontClient,
-                                       utf32,
-                                       scripts,
-                                       data.fontDescriptionRuns,
-                                       defaultFontDescription,
-                                       defaultPointSize,
-                                       data.fontSizeScale,
-                                       data.index,
-                                       data.numberOfCharacters,
-                                       fontRuns);
-  }
-
-  // 5) Compare the results.
-  if(data.fontRuns.Count() != fontRuns.Count())
-  {
-    std::cout << "  Different number of font runs : " << fontRuns.Count() << ", expected : " << data.fontRuns.Count() << std::endl;
-    return false;
-  }
-
-  for(unsigned int index = 0; index < data.fontRuns.Count(); ++index)
-  {
-    const FontRun& run         = fontRuns[index];
-    const FontRun& expectedRun = data.fontRuns[index];
-
-    if(run.characterRun.characterIndex != expectedRun.characterRun.characterIndex)
-    {
-      std::cout << "  character run : " << index << ", index : " << run.characterRun.characterIndex << ", expected : " << expectedRun.characterRun.characterIndex << std::endl;
-      return false;
-    }
-    if(run.characterRun.numberOfCharacters != expectedRun.characterRun.numberOfCharacters)
-    {
-      std::cout << "  character run : " << index << ", num chars : " << run.characterRun.numberOfCharacters << ", expected : " << expectedRun.characterRun.numberOfCharacters << std::endl;
-      return false;
-    }
-    if(run.fontId != expectedRun.fontId)
-    {
-      std::cout << "  character run : " << index << ", font : " << run.fontId << ", expected : " << expectedRun.fontId << std::endl;
-      return false;
-    }
-  }
-
-  return true;
-}
 
 } // namespace
 
@@ -563,196 +403,40 @@ int UtcDaliTextGetScript(void)
 
 int UtcDaliTextMergeFontDescriptions(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextMergeFontDescriptions");
-
-  // Load some fonts.
-
-  char*             pathNamePtr = get_current_dir_name();
-  const std::string pathName(pathNamePtr);
-  free(pathNamePtr);
-
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSans.ttf");
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf");
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif.ttf", NON_DEFAULT_FONT_SIZE);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Bold.ttf");
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSerif-Italic.ttf");
-
-  // To test the font width as GetFontId() with the font file path can't cache the width property.
-  TextAbstraction::FontDescription widthDescription;
-  widthDescription.path   = "";
-  widthDescription.family = "DejaVu Serif";
-  widthDescription.weight = TextAbstraction::FontWeight::NORMAL;
-  widthDescription.width  = TextAbstraction::FontWidth::EXPANDED;
-  widthDescription.slant  = TextAbstraction::FontSlant::NORMAL;
-  fontClient.GetFontId(widthDescription);
-
-  // Test.
-
-  TextAbstraction::FontDescription defaultFontDescription01;
-  Vector<FontDescriptionRun>       fontDescriptionRuns01;
-  Vector<FontId>                   expectedFontIds01;
-  Vector<bool>                     expectedIsFontDefault01;
-
-  TextAbstraction::FontDescription defaultFontDescription02;
-  Vector<FontDescriptionRun>       fontDescriptionRuns02;
-  Vector<FontId>                   expectedFontIds02;
-  expectedFontIds02.PushBack(0u);
-  expectedFontIds02.PushBack(0u);
-  Vector<bool> expectedIsFontDefault02;
-  expectedIsFontDefault02.PushBack(true);
-  expectedIsFontDefault02.PushBack(true);
-
-  TextAbstraction::FontDescription defaultFontDescription03;
-  defaultFontDescription03.family = "DejaVu Serif";
-  Vector<FontDescriptionRun> fontDescriptionRuns03;
-
-  FontDescriptionRun fontDescription0301 =
-    {
-      {0u,
-       2u},
-      const_cast<char*>("DejaVu Sans"),
-      11u,
-      TextAbstraction::FontWeight::NONE,
-      TextAbstraction::FontWidth::NONE,
-      TextAbstraction::FontSlant::NONE,
-      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-      true,
-      false,
-      false,
-      false,
-      false};
-  FontDescriptionRun fontDescription0302 =
-    {
-      {2u,
-       2u},
-      NULL,
-      0u,
-      TextAbstraction::FontWeight::NONE,
-      TextAbstraction::FontWidth::NONE,
-      TextAbstraction::FontSlant::ITALIC,
-      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-      false,
-      false,
-      false,
-      true,
-      false};
-  FontDescriptionRun fontDescription0303 =
-    {
-      {4u,
-       2u},
-      NULL,
-      0u,
-      TextAbstraction::FontWeight::BOLD,
-      TextAbstraction::FontWidth::NONE,
-      TextAbstraction::FontSlant::NONE,
-      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-      false,
-      true,
-      false,
-      false,
-      false};
-  FontDescriptionRun fontDescription0304 =
-    {
-      {6u,
-       2u},
-      NULL,
-      0u,
-      TextAbstraction::FontWeight::NONE,
-      TextAbstraction::FontWidth::NONE,
-      TextAbstraction::FontSlant::NONE,
-      NON_DEFAULT_FONT_SIZE,
-      false,
-      false,
-      false,
-      false,
-      true};
-  FontDescriptionRun fontDescription0305 =
-    {
-      {8u,
-       2u},
-      NULL,
-      0u,
-      TextAbstraction::FontWeight::NONE,
-      TextAbstraction::FontWidth::EXPANDED,
-      TextAbstraction::FontSlant::NONE,
-      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-      false,
-      false,
-      true,
-      false,
-      false};
-
-  fontDescriptionRuns03.PushBack(fontDescription0301);
-  fontDescriptionRuns03.PushBack(fontDescription0302);
-  fontDescriptionRuns03.PushBack(fontDescription0303);
-  fontDescriptionRuns03.PushBack(fontDescription0304);
-  fontDescriptionRuns03.PushBack(fontDescription0305);
-
-  Vector<FontId> expectedFontIds03;
-  expectedFontIds03.PushBack(1u);
-  expectedFontIds03.PushBack(1u);
-  expectedFontIds03.PushBack(5u);
-  expectedFontIds03.PushBack(5u);
-  expectedFontIds03.PushBack(4u);
-  expectedFontIds03.PushBack(4u);
-  expectedFontIds03.PushBack(3u);
-  expectedFontIds03.PushBack(3u);
-  expectedFontIds03.PushBack(6u);
-  expectedFontIds03.PushBack(6u);
-  Vector<bool> expectedIsFontDefault03;
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-  expectedIsFontDefault03.PushBack(false);
-
-  const MergeFontDescriptionsData data[] =
-    {
-      {"void text.",
-       fontDescriptionRuns01,
-       defaultFontDescription01,
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       0u,
-       expectedFontIds01,
-       expectedIsFontDefault01},
-      {"No description runs.",
-       fontDescriptionRuns02,
-       defaultFontDescription02,
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       2u,
-       expectedFontIds02,
-       expectedIsFontDefault02},
-      {"Some description runs.",
-       fontDescriptionRuns03,
-       defaultFontDescription03,
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       10u,
-       expectedFontIds03,
-       expectedIsFontDefault03}};
-  const unsigned int numberOfTests = 3u;
-
-  for(unsigned int index = 0u; index < numberOfTests; ++index)
+  Vector<FontDescriptionRun> runs;
+  FontDescriptionRun run;
+  run.characterRun = {2u, 2u};
+  run.familyName = const_cast<char*>("Test Serif");
+  run.familyLength = 10u;
+  run.familyDefined = true;
+  run.weight = TextAbstraction::FontWeight::BOLD;
+  run.weightDefined = true;
+  run.width = TextAbstraction::FontWidth::EXPANDED;
+  run.widthDefined = true;
+  run.slant = TextAbstraction::FontSlant::ITALIC;
+  run.slantDefined = true;
+  run.size = 20u * 64u;
+  run.sizeDefined = true;
+  runs.PushBack(run);
+  TextAbstraction::FontDescription defaults;
+  defaults.family = "Test Sans";
+  for(unsigned int index = 0u; index < 6u; ++index)
   {
-    if(!MergeFontDescriptionsTest(data[index]))
+    TextAbstraction::FontDescription description;
+    PointSize26Dot6 size = 0u;
+    bool isDefault = true;
+    MergeFontDescriptions(runs, defaults, 12u * 64u, 2.f, index, description, size, isDefault);
+    const bool overridden = index >= 2u && index < 4u;
+    DALI_TEST_EQUALS(isDefault, !overridden, TEST_LOCATION);
+    DALI_TEST_EQUALS(description.family, std::string(overridden ? "Test Serif" : "Test Sans"), TEST_LOCATION);
+    DALI_TEST_EQUALS(size, (overridden ? 40u : 12u) * 64u, TEST_LOCATION);
+    if(overridden)
     {
-      tet_result(TET_FAIL);
+      DALI_TEST_EQUALS(description.weight, TextAbstraction::FontWeight::BOLD, TEST_LOCATION);
+      DALI_TEST_EQUALS(description.width, TextAbstraction::FontWidth::EXPANDED, TEST_LOCATION);
+      DALI_TEST_EQUALS(description.slant, TextAbstraction::FontSlant::ITALIC, TEST_LOCATION);
     }
   }
-
-  tet_result(TET_PASS);
   END_TEST;
 }
 
@@ -1825,486 +1509,40 @@ int UtcDaliTextMultiLanguageSetScripts(void)
 int UtcDaliTextMultiLanguageValidateFonts01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextMultiLanguageValidateFonts");
-
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-
-  char*             pathNamePtr = get_current_dir_name();
-  const std::string pathName(pathNamePtr);
-  free(pathNamePtr);
-
-  const PointSize26Dot6 pointSize01 = static_cast<PointSize26Dot6>(21.f * 64.f);
-  const PointSize26Dot6 pointSize02 = static_cast<PointSize26Dot6>(35.f * 64.f);
-
-  // Load some fonts.
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf");
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf");
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf", EMOJI_FONT_SIZE);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize01);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize02);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf", pointSize01);
-  fontClient.GetFontId(pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf", pointSize02);
-
-  // Font id 1 --> TizenSansArabicRegular.ttf
-  // Font id 2 --> TizenSansHebrewRegular.ttf
-  // Font id 3 --> BreezeColorEmoji.ttf
-  // Font id 4 --> TizenSansRegular.ttf, size 8
-  // Font id 5 --> TizenSansRegular.ttf, size 16
-  // Font id 6 --> TizenSansHebrewRegular.ttf, size 8
-  // Font id 7 --> TizenSansHebrewRegular.ttf, size 16
-  // Font id 8 --> (default)
-
-  Vector<FontRun>            fontRuns01;
-  Vector<FontDescriptionRun> fontDescriptions01;
-
-  FontRun fontRun0201 =
-    {
-      {0u,
-       11u},
-      8u};
-  Vector<FontRun> fontRuns02;
-  fontRuns02.PushBack(fontRun0201);
-
-  FontDescriptionRun fontDescription0201 =
-    {
-      {0u,
-       11u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  Vector<FontDescriptionRun> fontDescriptions02;
-  fontDescriptions02.PushBack(fontDescription0201);
-
-  FontRun fontRun0301 =
-    {
-      {0u,
-       12u},
-      8u};
-  FontRun fontRun0302 =
-    {
-      {12u,
-       12u},
-      8u};
-  FontRun fontRun0303 =
-    {
-      {24u,
-       4u},
-      8u};
-  Vector<FontRun> fontRuns03;
-  fontRuns03.PushBack(fontRun0301);
-  fontRuns03.PushBack(fontRun0302);
-  fontRuns03.PushBack(fontRun0303);
-
-  Vector<FontDescriptionRun> fontDescriptions03;
-
-  FontRun fontRun0701 =
-    {
-      {0u,
-       4u},
-      2u};
-  FontRun fontRun0702 =
-    {
-      {4u,
-       1u},
-      8u};
-  FontRun fontRun0703 =
-    {
-      {5u,
-       4u},
-      2u};
-  Vector<FontRun> fontRuns07;
-  fontRuns07.PushBack(fontRun0701);
-  fontRuns07.PushBack(fontRun0702);
-  fontRuns07.PushBack(fontRun0703);
-
-  FontDescriptionRun fontDescription0701 =
-    {
-      {0u,
-       4u},
-      const_cast<char*>("TizenSansHebrew"),
-      15u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  FontDescriptionRun fontDescription0702 =
-    {
-      {5u,
-       4u},
-      const_cast<char*>("TizenSansHebrew"),
-      15u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  Vector<FontDescriptionRun> fontDescriptions07;
-  fontDescriptions07.PushBack(fontDescription0701);
-  fontDescriptions07.PushBack(fontDescription0702);
-
-  FontRun fontRun0801 =
-    {
-      {0u,
-       9u},
-      2u};
-  Vector<FontRun> fontRuns08;
-  fontRuns08.PushBack(fontRun0801);
-
-  Vector<FontDescriptionRun> fontDescriptions08;
-
-  FontRun fontRun0901 =
-    {
-      {0u,
-       4u},
-      3u};
-  Vector<FontRun> fontRuns09;
-  fontRuns09.PushBack(fontRun0901);
-
-  Vector<FontDescriptionRun> fontDescriptions09;
-  FontDescriptionRun         fontDescription0901 =
-    {
-      {0u,
-       4u},
-      const_cast<char*>("BreezeColorEmoji"),
-      16u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      EMOJI_FONT_SIZE,
-      true,
-      false,
-      false,
-      false,
-      true};
-  fontDescriptions09.PushBack(fontDescription0901);
-
-  FontRun fontRun1001 =
-    {
-      {0u,
-       13u},
-      4u};
-  FontRun fontRun1002 =
-    {
-      {13u,
-       9u},
-      6u};
-  FontRun fontRun1003 =
-    {
-      {22u,
-       15u},
-      5u};
-  FontRun fontRun1004 =
-    {
-      {37u,
-       9u},
-      7u};
-  Vector<FontRun> fontRuns10;
-  fontRuns10.PushBack(fontRun1001);
-  fontRuns10.PushBack(fontRun1002);
-  fontRuns10.PushBack(fontRun1003);
-  fontRuns10.PushBack(fontRun1004);
-
-  FontDescriptionRun fontDescription1001 =
-    {
-      {0u,
-       13u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      pointSize01,
-      true,
-      false,
-      false,
-      false,
-      true};
-  FontDescriptionRun fontDescription1002 =
-    {
-      {13u,
-       9u},
-      const_cast<char*>("TizenSansHebrew"),
-      15u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      pointSize01,
-      true,
-      false,
-      false,
-      false,
-      true};
-  FontDescriptionRun fontDescription1003 =
-    {
-      {22u,
-       15u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      pointSize02,
-      true,
-      false,
-      false,
-      false,
-      true};
-  FontDescriptionRun fontDescription1004 =
-    {
-      {37u,
-       9u},
-      const_cast<char*>("TizenSansHebrew"),
-      15u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      pointSize02,
-      true,
-      false,
-      false,
-      false,
-      true};
-  Vector<FontDescriptionRun> fontDescriptions10;
-  fontDescriptions10.PushBack(fontDescription1001);
-  fontDescriptions10.PushBack(fontDescription1002);
-  fontDescriptions10.PushBack(fontDescription1003);
-  fontDescriptions10.PushBack(fontDescription1004);
-
-  FontRun fontRun1101 =
-    {
-      {0u,
-       22u},
-      5u};
-  Vector<FontRun> fontRuns11;
-  fontRuns11.PushBack(fontRun1101);
-
-  FontDescriptionRun fontDescription1101 =
-    {
-      {0,
-       22u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      pointSize02,
-      true,
-      false,
-      false,
-      false,
-      true};
-  Vector<FontDescriptionRun> fontDescriptions11;
-  fontDescriptions11.PushBack(fontDescription1101);
-
-  FontRun fontRun1201 =
-    {
-      {0u,
-       6u},
-      8u};
-  FontRun fontRun1202 =
-    {
-      {6u,
-       1u},
-      9u};
-  FontRun fontRun1203 =
-    {
-      {7u,
-       5u},
-      8u};
-  Vector<FontRun> fontRuns12;
-  fontRuns12.PushBack(fontRun1201);
-  fontRuns12.PushBack(fontRun1202);
-  fontRuns12.PushBack(fontRun1203);
-
-  FontDescriptionRun fontDescription1201 =
-    {
-      {0u,
-       6u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  FontDescriptionRun fontDescription1202 =
-    {
-      {6u,
-       1u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  FontDescriptionRun fontDescription1203 =
-    {
-      {7u,
-       5u},
-      const_cast<char*>("TizenSans"),
-      9u,
-      TextAbstraction::FontWeight::NORMAL,
-      TextAbstraction::FontWidth::NORMAL,
-      TextAbstraction::FontSlant::NORMAL,
-      0u,
-      true,
-      false,
-      false,
-      false,
-      false};
-  Vector<FontDescriptionRun> fontDescriptions12;
-  fontDescriptions12.PushBack(fontDescription1201);
-  fontDescriptions12.PushBack(fontDescription1202);
-  fontDescriptions12.PushBack(fontDescription1203);
-
-  const ValidateFontsData data[] =
-    {
-      {"void text.",
-       "",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       0u,
-       fontDescriptions01,
-       fontRuns01},
-      {"Easy latin script.",
-       "Hello world",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       11u,
-       fontDescriptions02,
-       fontRuns02},
-      {"Different paragraphs.",
-       "Hello world\nhello world\ndemo",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       28u,
-       fontDescriptions03,
-       fontRuns03},
-      {"Different paragraphs. Update the initial paragraph.",
-       "Hello world\nhello world\ndemo",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       12u,
-       fontDescriptions03,
-       fontRuns03},
-      {"Different paragraphs. Update the middle paragraph.",
-       "Hello world\nhello world\ndemo",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       12u,
-       12u,
-       fontDescriptions03,
-       fontRuns03},
-      {"Different paragraphs. Update the final paragraph.",
-       "Hello world\nhello world\ndemo",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       24u,
-       4u,
-       fontDescriptions03,
-       fontRuns03},
-      {"Hebrew text. Default font: latin",
-       "שלום עולם",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       9u,
-       fontDescriptions07,
-       fontRuns07},
-      {"Hebrew text. Default font: hebrew",
-       "שלום עולם",
-       "/tizen/TizenSansHebrewRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       9u,
-       fontDescriptions08,
-       fontRuns08},
-      {"Emojis",
-       "\xF0\x9F\x98\x81\xF0\x9F\x98\x82\xF0\x9F\x98\x83\xF0\x9F\x98\x84",
-       "/tizen/BreezeColorEmoji.ttf",
-       EMOJI_FONT_SIZE,
-       1.0f,
-       0u,
-       4u,
-       fontDescriptions09,
-       fontRuns09},
-      {"Mix text. Default font: latin. Different font sizes",
-       "Hello world, שלום עולם, hello world, שלום עולם",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       46u,
-       fontDescriptions10,
-       fontRuns10},
-      {"Unknown script -> changed to LATIN",
-       "WRC – The Official App",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       22u,
-       fontDescriptions11,
-       fontRuns11},
-      {"Common script.",
-       "Hello \tworld",
-       "/tizen/TizenSansRegular.ttf",
-       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-       1.0f,
-       0u,
-       12u,
-       fontDescriptions12,
-       fontRuns12},
-    };
-  const unsigned int numberOfTests = 12u;
-
-  for(unsigned int index = 0u; index < numberOfTests; ++index)
+  auto support = MultilanguageSupport::Get();
+  auto client = TextAbstraction::FontClient::Get();
+  TextAbstraction::FontDescription description;
+  description.family = "Test Latin";
+  for(const auto& text : {std::initializer_list<Character>{'a','b','c'},
+                         std::initializer_list<Character>{'a',0x627u,'b'},
+                         std::initializer_list<Character>{0x1f600u,0xfe0fu,'a'},
+                         std::initializer_list<Character>{0x10ffffu}})
   {
-    if(!ValidateFontTest(data[index]))
+    for(float scale : {1.f, 2.f})
     {
-      tet_result(TET_FAIL);
+      Vector<ScriptRun> scripts;
+      Vector<FontRun> fonts;
+      auto characters = MakeEmojiTestText(text);
+      support.SetScripts(characters, 0u, characters.Count(), scripts);
+      Vector<FontDescriptionRun> descriptions;
+      support.ValidateFonts(client, characters, scripts, descriptions, description, static_cast<PointSize26Dot6>(12u * 64u * scale), scale, 0u, characters.Count(), fonts);
+      Length covered = 0u;
+      for(const auto& font : fonts)
+      {
+        DALI_TEST_EQUALS(font.characterRun.characterIndex, covered, TEST_LOCATION);
+        covered += font.characterRun.numberOfCharacters;
+      }
+      DALI_TEST_EQUALS(covered, characters.Count(), TEST_LOCATION);
+      if(text.size() == 3u && *text.begin() == 'a')
+      {
+        FontId first = 0u;
+        DALI_TEST_CHECK(GetFontAtCharacter(fonts, 0u, first));
+        DALI_TEST_CHECK(first != 0u);
+        DALI_TEST_EQUALS(client.GetPointSize(first), static_cast<PointSize26Dot6>(12u * 64u * scale), TEST_LOCATION);
+      }
+      support.ClearCache();
     }
   }
-
-  tet_result(TET_PASS);
   END_TEST;
 }
 

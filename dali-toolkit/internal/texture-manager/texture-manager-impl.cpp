@@ -20,7 +20,8 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
+#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -85,7 +86,7 @@ void PreMultiply(PixelBuffer pixelBuffer, TextureManager::MultiplyOnLoad& preMul
 {
   if(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
   {
-    DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffer);
+    DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffer);
 
     if(!DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer))
     {
@@ -230,7 +231,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
               else
               {
                 DALI_ASSERT_DEBUG(pixelBuffers.size() == 1u && "Always has a single pixel buffer");
-                DevelPixelBuffer::ApplyMask(pixelBuffers[0], maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
+                DevelPixelBufferOperations::ApplyMask(pixelBuffers[0], maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
                 maskApplied = true;
 #endif
@@ -632,7 +633,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
                 PixelBuffer maskPixelBuffer = mTextureCacheManager[maskCacheIndex].pixelBuffer;
                 if(maskPixelBuffer)
                 {
-                  DevelPixelBuffer::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
+                  DevelPixelBufferOperations::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
                 }
                 else
                 {

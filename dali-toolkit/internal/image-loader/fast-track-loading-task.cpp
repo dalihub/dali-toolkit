@@ -20,9 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
@@ -180,13 +181,13 @@ void FastTrackLoadingTask::Process()
 void FastTrackLoadingTask::Load()
 {
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = 0;
+  uint64_t endTimeNanoSeconds   = 0;
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
   {
-    mStartTimeNanoSceonds = GetNanoseconds();
+    startTimeNanoSeconds = GetNanoseconds();
     oss << "[u:" << mUrl.GetEllipsedUrl() << "]"; });
 
   PixelBuffer              pixelBuffer;
@@ -263,10 +264,10 @@ void FastTrackLoadingTask::Load()
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_FAST_TRACK_UPLOADING_TASK", [&](std::ostringstream& oss)
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
     oss << "b:" << pixelBuffers.size() << " ";
     if(!mPixelData.empty())
     {
@@ -280,7 +281,7 @@ void FastTrackLoadingTask::MultiplyAlpha(Dali::PixelBuffer pixelBuffer)
 {
   if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
-    DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffer);
+    DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffer);
     mPremultiplied = DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer);
   }
 }

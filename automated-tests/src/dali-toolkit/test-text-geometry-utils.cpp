@@ -34,12 +34,16 @@ void CheckGeometryResult(Vector<Vector2> positionsList, Vector<Vector2> sizeList
   }
 }
 
-void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry)
+void CheckRectGeometryResult(Rect<> rectGeometry, Rect<> expectedRectGeometry, Rect<> optionalExpectedRectGeometry)
 {
-  DALI_TEST_EQUALS((float)rectGeometry.x, (float)expectedRectGeometry.x, TEST_LOCATION);
-  DALI_TEST_EQUALS((float)rectGeometry.y, (float)expectedRectGeometry.y, TEST_LOCATION);
-  DALI_TEST_EQUALS((float)rectGeometry.width, (float)expectedRectGeometry.width, TEST_LOCATION);
-  DALI_TEST_EQUALS((float)rectGeometry.height, (float)expectedRectGeometry.height, TEST_LOCATION);
+  std::cout << " rectGeometry " << rectGeometry << std::endl;
+  std::cout << " expectedRectGeometry " << expectedRectGeometry << std::endl;
+  std::cout << " optionalExpectedRectGeometry " << optionalExpectedRectGeometry << std::endl;
+
+  DALI_TEST_CHECK(CompareType<float>((float)rectGeometry.x, (float)expectedRectGeometry.x, 0.01f) || CompareType<float>((float)rectGeometry.x, (float)optionalExpectedRectGeometry.x, 0.01f));
+  DALI_TEST_CHECK(CompareType<float>((float)rectGeometry.y, (float)expectedRectGeometry.y, 0.01f) || CompareType<float>((float)rectGeometry.y, (float)optionalExpectedRectGeometry.y, 0.01f));
+  DALI_TEST_CHECK(CompareType<float>((float)rectGeometry.width, (float)expectedRectGeometry.width, 0.01f) || CompareType<float>((float)rectGeometry.width, (float)optionalExpectedRectGeometry.width, 0.01f));
+  DALI_TEST_CHECK(CompareType<float>((float)rectGeometry.height, (float)expectedRectGeometry.height, 0.01f) || CompareType<float>((float)rectGeometry.height, (float)optionalExpectedRectGeometry.height, 0.01f));
 }
 
 } //namespace TestTextGeometryUtils

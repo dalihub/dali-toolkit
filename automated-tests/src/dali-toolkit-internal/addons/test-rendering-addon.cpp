@@ -16,7 +16,7 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/addons/addon-base.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 

@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
@@ -2762,102 +2763,78 @@ int ConvertPointToPixel(float point)
 
 int UtcDaliToolkitTextlabelTextFit(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextlabelTextFit");
-  TextLabel label = TextLabel::New();
-  Vector2   size(460.0f, 100.0f);
-  label.SetProperty(Actor::Property::SIZE, size);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello world");
-
-  // connect to the text git changed signal.
-  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
-  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
-  bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
-  gTextFitChangedCallBackCalled = false;
-
-  // check point size
-  Property::Map textFitMapSet;
-  textFitMapSet["enable"]       = true;
-  textFitMapSet["minSize"]      = 10.f;
-  textFitMapSet["maxSize"]      = 100.f;
-  textFitMapSet["stepSize"]     = -1.f;
-  textFitMapSet["fontSizeType"] = "pointSize";
-
-  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
-
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  Property::Map fit;
+  fit["enable"] = true;
+  fit["minSize"] = 5.f;
+  fit["maxSize"] = 50.f;
+  fit["stepSize"] = 5.f;
+  fit["fontSizeType"] = "pointSize";
+  label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
+  bool signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
-
+  for(unsigned int iteration = 0u; iteration < 2u; ++iteration)
+  {
+    label.SetProperty(TextLabel::Property::TEXT, (iteration % 2u ? "abcdefgh" : "abcd"));
+    application.SendNotification();
+    application.Render();
+    const auto map = label.GetProperty<Property::Map>(DevelTextLabel::Property::TEXT_FIT);
+    DALI_TEST_EQUALS(map["fontSize"].Get<float>(), (iteration % 2u ? 15.f : 30.f), TEST_LOCATION);
+    const auto size = DevelActor::GetNaturalSize(label);
+    DALI_TEST_CHECK(size.x > 0.f && size.y > 0.f && size.x <= 80.f && size.y <= 40.f);
+  }
+  DALI_TEST_CHECK(signaled);
+  fit["fontSizeType"] = "pixelSize";
+  fit["minSize"] = 8.f;
+  fit["maxSize"] = 64.f;
+  fit["stepSize"] = 4.f;
+  label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
   application.SendNotification();
   application.Render();
-
-  const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
-  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
-  DALI_TEST_CHECK(textFitChangedSignal);
-
-  // check pixel size
-  textFitMapSet.Clear();
-  textFitMapSet["enable"]       = true;
-  textFitMapSet["minSize"]      = ConvertPointToPixel(10.f);
-  textFitMapSet["maxSize"]      = ConvertPointToPixel(100.f);
-  textFitMapSet["stepSize"]     = ConvertPointToPixel(1.f);
-  textFitMapSet["fontSizeType"] = "pixelSize";
-
-  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
+  const auto size = DevelActor::GetNaturalSize(label);
+  DALI_TEST_CHECK(size.width <= 80.f && size.height <= 40.f);
   END_TEST;
 }
 
 int UtcDaliToolkitTextlabelTextFitStressTest(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextlabelTextFitStressTest");
-  TextLabel label = TextLabel::New();
-  Vector2   size(460.0f, 100.0f);
-  label.SetProperty(Actor::Property::SIZE, size);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello world");
-
-  // connect to the text git changed signal.
-  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
-  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
-  bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
-  gTextFitChangedCallBackCalled = false;
-
-  // check point size with veryvery big range
-  Property::Map textFitMapSet;
-  textFitMapSet["enable"]       = true;
-  textFitMapSet["minSize"]      = 10.f;
-  textFitMapSet["maxSize"]      = 10000.f;
-  textFitMapSet["stepSize"]     = -1.0f;
-  textFitMapSet["fontSizeType"] = "pointSize";
-
-  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
-
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  Property::Map fit;
+  fit["enable"] = true;
+  fit["minSize"] = 5.f;
+  fit["maxSize"] = 50.f;
+  fit["stepSize"] = 5.f;
+  fit["fontSizeType"] = "pointSize";
+  label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
+  bool signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
-
-  application.SendNotification();
-  application.Render();
-
-  const Vector3 EXPECTED_NATURAL_SIZE(448.0f, 96.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
-  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
-  DALI_TEST_CHECK(textFitChangedSignal);
-
+  for(unsigned int iteration = 0u; iteration < 40u; ++iteration)
+  {
+    label.SetProperty(TextLabel::Property::TEXT, (iteration % 2u ? "abcdefgh" : "abcd"));
+    application.SendNotification();
+    application.Render();
+    const auto map = label.GetProperty<Property::Map>(DevelTextLabel::Property::TEXT_FIT);
+    DALI_TEST_EQUALS(map["fontSize"].Get<float>(), (iteration % 2u ? 15.f : 30.f), TEST_LOCATION);
+    const auto size = DevelActor::GetNaturalSize(label);
+    DALI_TEST_CHECK(size.x > 0.f && size.y > 0.f && size.x <= 80.f && size.y <= 40.f);
+  }
+  DALI_TEST_CHECK(signaled);
   END_TEST;
 }
 
@@ -2906,110 +2883,66 @@ int UtcDaliToolkitTextlabelFastTextFitStressTest(void)
 
 int UtcDaliToolkitTextlabelTextFitMultiLine(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextlabelTextFitMultiLine");
-  TextLabel label = TextLabel::New();
-  Vector2   size(500.0f, 100.0f);
-  label.SetProperty(Actor::Property::SIZE, size);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello world\nHello world");
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-
-  // connect to the text git changed signal.
-  std::unique_ptr<ConnectionTracker> testTracker = std::make_unique<ConnectionTracker>();
-  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
-  bool textFitChangedSignal = false;
-  label.ConnectSignal(testTracker.get(), "textFitChanged", CallbackFunctor(&textFitChangedSignal));
-  gTextFitChangedCallBackCalled = false;
-
-  Property::Map textFitMapSet;
-  textFitMapSet["enable"]       = true;
-  textFitMapSet["minSize"]      = 10.f;
-  textFitMapSet["maxSize"]      = 100.f;
-  textFitMapSet["stepSize"]     = -1.0f;
-  textFitMapSet["fontSizeType"] = "pointSize";
-
-  label.SetProperty(Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet);
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 120.f);
-
+  Property::Map fit;
+  fit["enable"] = true;
+  fit["minSize"] = 5.f;
+  fit["maxSize"] = 50.f;
+  fit["stepSize"] = 5.f;
+  fit["fontSizeType"] = "pointSize";
+  label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
+  bool signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
-
-  application.SendNotification();
-  application.Render();
-
-  float textFitFontSize = (label.GetProperty(Dali::Toolkit::DevelTextLabel::Property::TEXT_FIT).Get<Property::Map>())["fontSize"].Get<float>();
-  DALI_TEST_EQUALS(textFitFontSize, 14.f, TEST_LOCATION);
-
-  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
-  DALI_TEST_CHECK(textFitChangedSignal);
-
+  for(unsigned int iteration = 0u; iteration < 2u; ++iteration)
+  {
+    label.SetProperty(TextLabel::Property::TEXT, "abcd\nabcd");
+    application.SendNotification();
+    application.Render();
+    const auto map = label.GetProperty<Property::Map>(DevelTextLabel::Property::TEXT_FIT);
+    DALI_TEST_EQUALS(map["fontSize"].Get<float>(), 15.f, TEST_LOCATION);
+    const auto size = DevelActor::GetNaturalSize(label);
+    DALI_TEST_CHECK(size.x > 0.f && size.y > 0.f && size.x <= 80.f && size.y <= 40.f);
+  }
+  DALI_TEST_CHECK(signaled);
   END_TEST;
 }
 
 int UtcDaliToolkitTextlabelTextFitArray(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextlabelTextFitArray");
-  TextLabel label = TextLabel::New();
-  Vector2   size(300.0f, 80.0f);
-  label.SetProperty(Actor::Property::SIZE, size);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
+  label.SetProperty(TextLabel::Property::TEXT, "abcd");
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "A Quick Brown Fox Jumps Over The Lazy Dog");
-  label.SetProperty(DevelTextLabel::Property::MIN_LINE_SIZE, 80.f);
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  std::vector<DevelTextLabel::FitOption> options;
+  options.emplace_back(10.f, 16.f);
+  options.emplace_back(20.f, 28.f);
+  options.emplace_back(30.f, 40.f);
+  DevelTextLabel::SetTextFitArray(label, true, options);
+  const bool enabled = DevelTextLabel::IsTextFitArrayEnabled(label);
+  const auto retrieved = DevelTextLabel::GetTextFitArray(label);
+  DALI_TEST_CHECK(enabled);
+  DALI_TEST_EQUALS(retrieved.size(), 3u, TEST_LOCATION);
   application.GetScene().Add(label);
-
-  // make sorted options.
-  std::vector<DevelTextLabel::FitOption> fitOptions;
-  fitOptions.push_back(DevelTextLabel::FitOption(10, 12));
-  fitOptions.push_back(DevelTextLabel::FitOption(8, 10));
-  fitOptions.push_back(DevelTextLabel::FitOption(6, 8));
-  fitOptions.push_back(DevelTextLabel::FitOption(4, 6));
-  fitOptions.push_back(DevelTextLabel::FitOption(20, 22));
-  fitOptions.push_back(DevelTextLabel::FitOption(22, 24));
-  fitOptions.push_back(DevelTextLabel::FitOption(12, 14));
-
-  DevelTextLabel::SetTextFitArray(label, true, fitOptions);
-
   application.SendNotification();
   application.Render();
-
-  bool enable = Dali::Toolkit::DevelTextLabel::IsTextFitArrayEnabled(label);
-  DALI_TEST_EQUALS(true, enable, TEST_LOCATION);
-
-  std::vector<Dali::Toolkit::DevelTextLabel::FitOption> getFitOptions      = Dali::Toolkit::DevelTextLabel::GetTextFitArray(label);
-  size_t                                                numberOfFitOptions = getFitOptions.size();
-  DALI_TEST_EQUALS(7u, numberOfFitOptions, TEST_LOCATION);
-
-  const Vector3 EXPECTED_NATURAL_SIZE(276.0f, 16.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
-  std::vector<DevelTextLabel::FitOption> emptyFitOptions;
-  DevelTextLabel::SetTextFitArray(label, false, emptyFitOptions);
-
+  const auto fitted = DevelActor::GetNaturalSize(label);
+  DALI_TEST_CHECK(fitted.width <= 80.f && fitted.height <= 40.f);
+  DevelTextLabel::SetTextFitArray(label, false, options);
   application.SendNotification();
   application.Render();
-
-  enable = Dali::Toolkit::DevelTextLabel::IsTextFitArrayEnabled(label);
-  DALI_TEST_EQUALS(false, enable, TEST_LOCATION);
-
-  const Vector3 EXPECTED_NATURAL_SIZE_DISABLE(690.0f, 80.0f, 0.0f);
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE_DISABLE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
-  // make unsorted options.
-  std::vector<DevelTextLabel::FitOption> unorderedFitOptions;
-  unorderedFitOptions.push_back(DevelTextLabel::FitOption(4, 6));
-  unorderedFitOptions.push_back(DevelTextLabel::FitOption(6, 8));
-  unorderedFitOptions.push_back(DevelTextLabel::FitOption(8, 10));
-  unorderedFitOptions.push_back(DevelTextLabel::FitOption(10, 8));
-
-  DevelTextLabel::SetTextFitArray(label, true, unorderedFitOptions);
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, DevelActor::GetNaturalSize(label), TEST_LOCATION);
-
+  const auto original = DevelActor::GetNaturalSize(label);
+  DALI_TEST_EQUALS(original, Vector3(32.f, 16.f, 0.f), TEST_LOCATION);
   END_TEST;
 }
 
@@ -3564,160 +3497,73 @@ int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
 
 int utcDaliTextLabelGeometryRTL(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextLabelGeometryRTL");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
-  label.SetProperty(Actor::Property::SIZE, Vector2(150.f, 100.f));
-  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "line1 \nline2\nline 3\nالاخيرالسطر");
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(TextLabel::Property::TEXT, "אבגד");
+  application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 4;
-  unsigned int startIndex    = 3;
-  unsigned int endIndex      = 24;
-
-  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(25, 0));
-  expectedSizes.PushBack(Vector2(34, 25));
-
-  expectedPositions.PushBack(Vector2(-1, 25));
-  expectedSizes.PushBack(Vector2(53, 25));
-
-  expectedPositions.PushBack(Vector2(-1, 50));
-  expectedSizes.PushBack(Vector2(60, 25));
-
-  expectedPositions.PushBack(Vector2(75, 75));
-  expectedSizes.PushBack(Vector2(37, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 3u);
+  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 3u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 32.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
   END_TEST;
 }
 
 int utcDaliTextLabelGeometryGlyphMiddle(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextLabelGeometryGlyphMiddle");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(TextLabel::Property::TEXT, "abcdef");
   application.GetScene().Add(label);
-
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
-  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
-  label.SetProperty(TextLabel::Property::TEXT, "لا تحتوي على لا");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 1;
-  unsigned int endIndex      = 13;
-
-  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(6, 0));
-  expectedSizes.PushBack(Vector2(125, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextLabel::GetTextPosition(label, 2u, 3u);
+  const auto sizes = DevelTextLabel::GetTextSize(label, 2u, 3u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 16.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
   END_TEST;
 }
 
 int utcDaliTextLabelGeometryOneGlyph(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextLabelGeometryOneGlyph ");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
-  application.GetScene().Add(label);
-
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
-  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 200.f));
-  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
-  label.SetProperty(TextLabel::Property::TEXT, "H");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(TextLabel::Property::TEXT, "A");
+  application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
-
-  unsigned int expectedCount = 1;
-  unsigned int startIndex    = 0;
-  unsigned int endIndex      = 0;
-
-  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
-  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
-
-  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
-  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
-
-  Vector<Vector2> expectedSizes;
-  Vector<Vector2> expectedPositions;
-
-  expectedPositions.PushBack(Vector2(-2, 0));
-  expectedSizes.PushBack(Vector2(16, 25));
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
-  positionsList.Clear();
-  sizeList.Clear();
-
-  startIndex = 2;
-  endIndex   = 0;
-
-  positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
-  sizeList      = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
-
-  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
-
+  const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 0u);
+  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 0u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 8.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -3859,12 +3705,12 @@ int UtcDaliToolkitTextLabelStrikethroughGeneration(void)
 
 int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
   tet_infoline(" UtcDaliToolkitTextLabelMarkupRelativeLineHeight");
 
   TextLabel label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   label.SetProperty(TextLabel::Property::TEXT, "line 1\nline 2\nline 3\nline 4\nline 5");
   label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
@@ -3873,7 +3719,7 @@ int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
 
   TextLabel labelSingleLineParagraph = TextLabel::New();
   labelSingleLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
-  labelSingleLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  labelSingleLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 12);
   labelSingleLineParagraph.SetProperty(TextLabel::Property::MULTI_LINE, true);
   labelSingleLineParagraph.SetProperty(TextLabel::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line 2</p>line 3<p rel-line-height=3>line 4</p>line 5");
   labelSingleLineParagraph.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
@@ -3882,7 +3728,7 @@ int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
 
   TextLabel labelMultiLineParagraph = TextLabel::New();
   labelMultiLineParagraph.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
-  labelMultiLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  labelMultiLineParagraph.SetProperty(TextLabel::Property::POINT_SIZE, 12);
   labelMultiLineParagraph.SetProperty(TextLabel::Property::MULTI_LINE, true);
   labelMultiLineParagraph.SetProperty(TextLabel::Property::TEXT, "<p>line 1</p><p rel-line-height=0.5>line\n2</p>line 3<p rel-line-height=3>line\n4</p>line 5");
   labelMultiLineParagraph.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 1.0f);
@@ -3911,12 +3757,12 @@ int UtcDaliToolkitTextLabelMarkupRelativeLineHeight(void)
 
 int UtcDaliToolkitTextLabelRelativeLineHeight(void)
 {
-  ToolkitTestApplication application;
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
   tet_infoline(" UtcDaliToolkitTextLabelRelativeLineHeight");
 
   TextLabel label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12);
   label.SetProperty(TextLabel::Property::TEXT, "Hello\nWorld");
 
   application.GetScene().Add(label);
@@ -4059,32 +3905,25 @@ int UtcDaliTextTextLabelSizeNegativeLineSpacing(void)
 
 int UtcDaliTextLabelNegativeLineSpacingWithEllipsis(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextLabelNegativeLineSpacingWithEllipsis");
-
-  TextLabel label = TextLabel::New();
-
-  float lineSpacing = -20.f;
-
-  label.SetProperty(Actor::Property::SIZE, Vector2(480.0f, 100.f));
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 11.0f);
-  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
-  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
-  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 40.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
+  label.SetProperty(TextLabel::Property::TEXT, "a\nb\nc\nd\ne");
+  label.SetProperty(TextLabel::Property::LINE_SPACING, -4.f);
   label.SetProperty(TextLabel::Property::ELLIPSIS, true);
-
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  DevelActor::SetResizePolicy(label, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(label);
   application.SendNotification();
   application.Render();
-
-  Vector<Vector2> sizeList = DevelTextLabel::GetTextSize(label, 0, 123);
-
-  int lineCount = sizeList.Size();
-  DALI_TEST_EQUALS(4, lineCount, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
+  const auto lines = label.GetProperty<int>(TextLabel::Property::LINE_COUNT);
+  DALI_TEST_CHECK(lines > 0 && lines <= 5);
+  for(int i = 0; i < lines; ++i)
+  {
+    const auto rectangle = Text::TextGeometry::GetLineBoundingRectangle(label, i);
+    DALI_TEST_CHECK(rectangle.width >= 0.f && rectangle.height > 0.f);
+  }
   END_TEST;
 }
 
@@ -4133,35 +3972,30 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
 
 int utcDaliTextLabelGetTextBoundingRectangle(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextLabelGeometryEllipsisMiddle");
-
-  TextLabel label = TextLabel::New();
-  DALI_TEST_CHECK(label);
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
+  label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
+  label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
+  label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
+  label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, false);
+  label.SetProperty(TextLabel::Property::TEXT, "abcdef");
   application.GetScene().Add(label);
-
-  label.SetProperty(TextLabel::Property::POINT_SIZE, 7.f);
-  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
-  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  label.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  label.SetProperty(TextLabel::Property::TEXT, "Hello this is the Text Bounding Rectangle TC");
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
-
-  // Render and notify
   application.SendNotification();
   application.Render();
-
-  unsigned int startIndex = 0;
-  unsigned int endIndex   = 15;
-
-  Rect<> textBoundingRectangle         = DevelTextLabel::GetTextBoundingRectangle(label, startIndex, endIndex);
-  Rect<> expectedTextBoundingRectangle = {0, 0, 100, 25};
-
-  TestTextGeometryUtils::CheckRectGeometryResult(textBoundingRectangle, expectedTextBoundingRectangle);
-
+  const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 5u);
+  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 5u);
+  DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
+  DALI_TEST_CHECK(!sizes.Empty());
+  DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].width, 48.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizes[0].height, 16.f, TEST_LOCATION);
+  const auto rectangle = DevelTextLabel::GetTextBoundingRectangle(label, 0u, 5u);
+  DALI_TEST_EQUALS(rectangle.x, positions[0].x, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.y, positions[0].y, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.width, sizes[0].width, TEST_LOCATION);
+  DALI_TEST_EQUALS(rectangle.height, sizes[0].height, TEST_LOCATION);
   END_TEST;
 }
 

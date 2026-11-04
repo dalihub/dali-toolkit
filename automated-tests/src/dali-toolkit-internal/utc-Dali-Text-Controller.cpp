@@ -754,123 +754,27 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
 
 int UtcDaliTextControllerSetGetLineSpacingProperty(void)
 {
-  tet_infoline(" UtcDaliTextControllerSetGetLineSpacingProperty");
-  ToolkitTestApplication application;
-
-  const Size size(application.GetScene().GetSize());
-
-  // single line text
-  const std::string textSingle("A Quick Brown Fox Jumps Over The Lazy Dog");
-
-  // multi-line text
-  const std::string textMulti("A Quick Brown\nFox Jumps Over\nThe Lazy Dog");
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
+  ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
+  auto controller = Controller::New();
   ConfigureTextLabel(controller);
-  controller->SetRemoveFrontInset(true);
-  controller->SetRemoveBackInset(true);
-
-  // single line, line spacing = 0px
-  {
-    const float   EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE(350.0f, 19.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE(350.0f, 20.0f, 0.0f);
-
-    controller->SetText(textSingle);
-    controller->Relayout(size);
-    controller->SetMultiLineEnabled(false);
-
-    Vector3 naturalSize  = controller->GetNaturalSize();
-    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
-    float   lineSpacing0 = controller->GetDefaultLineSpacing();
-
-    DALI_TEST_EQUALS(EXPECTED_SPACING, lineSpacing0, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION);
-  }
-
-  // single line, line spacing = 20px
-  {
-    const float   EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE(350.0f, 19.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE(350.0f, 40.0f, 0.0f);
-
-    controller->SetText(textSingle);
-    controller->Relayout(size);
-    controller->SetDefaultLineSpacing(20);
-    controller->SetMultiLineEnabled(false);
-
-    Vector3 naturalSize  = controller->GetNaturalSize();
-    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
-    float   lineSpacing0 = controller->GetDefaultLineSpacing();
-
-    DALI_TEST_EQUALS(EXPECTED_SPACING, lineSpacing0, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION);
-  }
-
-  // multi-line, line spacing = 0px
-  {
-    const float   EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE(340.0f, 39.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE(122.0f, 58.0f, 0.0f);
-
-    controller->SetText(textMulti);
-    controller->Relayout(size);
-    controller->SetMultiLineEnabled(true);
-    controller->SetDefaultLineSpacing(0);
-
-    Vector3 naturalSize  = controller->GetNaturalSize();
-    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
-    float   lineSpacing0 = controller->GetDefaultLineSpacing();
-
-    DALI_TEST_EQUALS(EXPECTED_SPACING, lineSpacing0, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION);
-  }
-
-  // multi-line, line spacing = 20px
-  {
-    const float   EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE(121.0f, 57.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE(122.0f, 118.0f, 0.0f);
-
-    controller->SetText(textMulti);
-    controller->Relayout(size);
-    controller->SetMultiLineEnabled(true);
-    controller->SetDefaultLineSpacing(20);
-
-    Vector3 naturalSize  = controller->GetNaturalSize();
-    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
-    float   lineSpacing0 = controller->GetDefaultLineSpacing();
-
-    DALI_TEST_EQUALS(EXPECTED_SPACING, lineSpacing0, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION);
-  }
-
-  // multi-line, line spacing = 30px
-  {
-    const float   EXPECTED_SPACING = 30.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE(121.0f, 117.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE(122.0f, 148.0f, 0.0f);
-
-    controller->SetText(textMulti);
-    controller->Relayout(size);
-    controller->SetMultiLineEnabled(true);
-    controller->SetDefaultLineSpacing(30);
-
-    Vector3 naturalSize  = controller->GetNaturalSize();
-    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
-    float   lineSpacing0 = controller->GetDefaultLineSpacing();
-
-    DALI_TEST_EQUALS(EXPECTED_SPACING, lineSpacing0, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION);
-    DALI_TEST_EQUALS(EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION);
-  }
-
+  TextAbstraction::FontClient::Get().SetDpi(96u, 96u);
+  controller->SetDefaultFontSize(12.f, Controller::POINT_SIZE);
+  controller->SetMultiLineEnabled(true);
+  controller->SetTextElideEnabled(false);
+  controller->SetText("A\nB\nC");
+  controller->Relayout(Size(100.f, 200.f));
+  const auto original = controller->GetNaturalSize();
+  DALI_TEST_EQUALS(controller->GetTextModel()->GetNumberOfLines(), 3u, TEST_LOCATION);
+  controller->SetDefaultLineSpacing(10.f);
+  controller->Relayout(Size(100.f, 200.f));
+  const auto spaced = controller->GetNaturalSize();
+  DALI_TEST_EQUALS(controller->GetDefaultLineSpacing(), 10.f, TEST_LOCATION);
+  DALI_TEST_EQUALS(spaced.width, original.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(spaced.height, original.height + 30.f, TEST_LOCATION);
+  controller->SetDefaultLineSpacing(-4.f);
+  controller->Relayout(Size(100.f, 200.f));
+  DALI_TEST_EQUALS(controller->GetDefaultLineSpacing(), -4.f, TEST_LOCATION);
+  DALI_TEST_CHECK(controller->GetNaturalSize().height > 0.f);
   END_TEST;
 }
 

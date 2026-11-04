@@ -84,6 +84,14 @@ public:
 
   int32_t GetNativeId() const;
 
+  void SetGeometryHittestEnabled(bool enabled);
+
+  bool IsGeometryHittestEnabled();
+
+  Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& InterceptKeyEventSignal();
+
+  Dali::Integration::SceneHolder::KeyEventSignalType& KeyEventDelayedSignal();
+
   void FocusChanged(bool focusIn);
 
   class SceneHolderLifeCycleObserver;
@@ -100,6 +108,8 @@ public:
 
   Dali::Integration::SceneHolder::KeyEventSignalType            mSceneHolderKeyEventSignal;
   Dali::Integration::SceneHolder::KeyEventGeneratedSignalType   mSceneHolderKeyEventGeneratedSignal;
+  Dali::Integration::SceneHolder::KeyEventSignalType            mSceneHolderKeyEventDelayedSignal;
+  Dali::Integration::SceneHolder::KeyEventGeneratedSignalType   mSceneHolderInterceptKeyEventSignal;
   Dali::Integration::SceneHolder::TouchEventSignalType          mSceneHolderTouchEventSignal;
   Dali::Integration::SceneHolder::WheelEventSignalType          mSceneHolderWheelEventSignal;
   Dali::Integration::SceneHolder::WheelEventGeneratedSignalType mSceneHolderWheelEventGeneratedSignal;

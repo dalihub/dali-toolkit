@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <memory>
+#include <chrono>
 
 #include <toolkit-async-task-manager.h>
 #include <toolkit-event-thread-callback.h>
@@ -58,6 +59,21 @@ namespace
 const std::string DEFAULT_FONT_DIR("/resources/fonts");
 
 static int ASYNC_TEXT_THREAD_TIMEOUT = 5;
+
+// Completion notifications may include a cancelled task, and worker completion
+// order is not fixed. Wait for the requested control's observable result.
+template<typename Predicate>
+void WaitForTextResult(ToolkitTestApplication& application, const Predicate& ready)
+{
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(ASYNC_TEXT_THREAD_TIMEOUT);
+  while(!ready() && std::chrono::steady_clock::now() < deadline)
+  {
+    Test::WaitForEventThreadTrigger(1, 1);
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_CHECK(ready());
+}
 
 static bool  gAsyncTextRenderedCalled;
 static float gAsyncTextRenderedWidth;
@@ -2555,7 +2571,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
 
-  // Request size computation, due to dummy's requests, text manager's loader queue is full.
+  // Queue competing requests; their completion order may vary.
   DevelTextLabel::RequestAsyncNaturalSize(dummy1);
   DevelTextLabel::RequestAsyncHeightForWidth(dummy1, dummySize);
   DevelTextLabel::RequestAsyncNaturalSize(dummy2);
@@ -2568,7 +2584,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation01(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncRenderWithFixedSize(label, expectedWidth, expectedHeight);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  WaitForTextResult(application, [&] { return gAsyncTextRenderedCalled && asyncTextRendered; });
 
   application.SendNotification();
   application.Render();
@@ -2642,7 +2658,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
 
-  // Request size computation, due to dummy's requests, text manager's loader queue is full.
+  // Queue competing requests; their completion order may vary.
   DevelTextLabel::RequestAsyncNaturalSize(dummy1);
   DevelTextLabel::RequestAsyncHeightForWidth(dummy1, dummySize);
   DevelTextLabel::RequestAsyncNaturalSize(dummy2);
@@ -2655,7 +2671,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation02(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncNaturalSize(label);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  WaitForTextResult(application, [&] { return gAsyncSizeComputedCalled && asyncSizeComputed; });
 
   application.SendNotification();
   application.Render();
@@ -2734,7 +2750,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   dummy2.SetProperty(TextLabel::Property::TEXT, text);
   label.SetProperty(TextLabel::Property::TEXT, text);
 
-  // Request size computation, due to dummy's requests, text manager's loader queue is full.
+  // Queue competing requests; their completion order may vary.
   DevelTextLabel::RequestAsyncNaturalSize(dummy1);
   DevelTextLabel::RequestAsyncHeightForWidth(dummy1, dummySize);
   DevelTextLabel::RequestAsyncNaturalSize(dummy2);
@@ -2747,7 +2763,7 @@ int UtcDaliToolkitTextLabelRequestAsyncComputation03(void)
   // The unfinished [Task 1] will be canceled.
   DevelTextLabel::RequestAsyncHeightForWidth(label, 300.0f);
 
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(5, ASYNC_TEXT_THREAD_TIMEOUT), true, TEST_LOCATION);
+  WaitForTextResult(application, [&] { return gAsyncSizeComputedCalled && asyncSizeComputed; });
 
   application.SendNotification();
   application.Render();

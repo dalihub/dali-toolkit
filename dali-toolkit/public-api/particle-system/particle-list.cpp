@@ -15,35 +15,14 @@
  *
  */
 
-#include <dali-toolkit/internal/particle-system/particle-list-impl.h>
+// CLASS HEADER
 #include <dali-toolkit/public-api/particle-system/particle-list.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/particle-system/particle-list-impl.h>
 
 namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
-template<>
-ParticleStream::StreamDataType StreamDataTypeWrapper<Vector3>::GetType()
-{
-  return ParticleStream::StreamDataType::FLOAT3;
-}
-
-template<>
-ParticleStream::StreamDataType StreamDataTypeWrapper<Vector4>::GetType()
-{
-  return ParticleStream::StreamDataType::FLOAT4;
-}
-
-template<>
-ParticleStream::StreamDataType StreamDataTypeWrapper<Vector2>::GetType()
-{
-  return ParticleStream::StreamDataType::FLOAT2;
-}
-
-template<>
-ParticleStream::StreamDataType StreamDataTypeWrapper<float>::GetType()
-{
-  return ParticleStream::StreamDataType::FLOAT;
-}
-
 ParticleList ParticleList::New(uint32_t capacity, const ParticleStreamTypeFlags& defaultStreams)
 {
   return {new ParticleSystem::Internal::ParticleList(capacity, defaultStreams)};

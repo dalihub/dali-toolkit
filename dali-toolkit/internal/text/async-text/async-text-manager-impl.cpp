@@ -23,7 +23,6 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/trace.h>
 #include <dali/public-api/math/math-utils.h>
 
 #include <mutex>
@@ -43,8 +42,6 @@ const int      DEFAULT_NUMBER_OF_LOADER = 4;
 const int      MINIMUM_NUMBER_OF_LOADER = 1;
 const int      MAXIMUM_NUMBER_OF_LOADER = 16;
 const uint32_t EMPTY_TASK_ID            = 0u;
-
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_ASYNC, false);
 } // namespace
 
 namespace Text
@@ -158,12 +155,6 @@ void AsyncTextManager::OnLocaleChanged(std::string locale)
 
     {
       Mutex::ScopedLock lock(mLoaderMutex);
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        DALI_LOG_RELEASE_INFO("OnLocaleChanged (%s) -> available loaders : %zu, locale changed loaders : %zu, running loaders : %zu\n", mLocale.c_str(), mAvailableLoaders.size(), mLocaleChangedLoaders.size(), mRunningLoaders.size());
-      }
-#endif
       // Move available loaders to locale changed loaders first.
       while(!mAvailableLoaders.empty())
       {
@@ -250,12 +241,6 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
 
   if(observer)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      DALI_LOG_RELEASE_INFO("RequestLoad -> connect DestructionSignal to observer : %p, task : %u\n", observer, mTaskId);
-    }
-#endif
     observer->ConnectDestructionSignal();
     observer->DestructionSignal().Connect(this, &AsyncTextManager::ObserverDestroyed);
   }
@@ -271,24 +256,11 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
 
       // Loader move available list -> running list.
       task->SetLoader(loader);
-
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        DALI_LOG_RELEASE_INFO("RequestLoad -> ob : %p, add task : %u\n", element.mObserver, mTaskId);
-      }
-#endif
     }
     else
     {
       // There is no available loader, add element to waiting queue.
       mWaitingTasks[mTaskId] = element;
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        DALI_LOG_RELEASE_INFO("RequestLoad -> ob : %p, add waiting task : %u\n", element.mObserver, mTaskId);
-      }
-#endif
     }
   }
 
@@ -311,12 +283,6 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
       if(it->second.mObserver)
       {
         cancelledObserver = it->second.mObserver;
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("RequestCancel -> ob : %p, remove wating task : %u\n", cancelledObserver, taskId);
-        }
-#endif
       }
       cancelledTask = std::move(it->second.mTask);
       mWaitingTasks.erase(it);
@@ -329,24 +295,9 @@ void AsyncTextManager::RequestCancel(uint32_t taskId)
         if(it->second.mObserver)
         {
           cancelledObserver = it->second.mObserver;
-#ifdef TRACE_ENABLED
-          if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-          {
-            DALI_LOG_RELEASE_INFO("RequestCancel -> ob : %p, remove running task : %u\n", cancelledObserver, taskId);
-          }
-#endif
         }
         mRunningTasks.erase(it);
       }
-#ifdef TRACE_ENABLED
-      else
-      {
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_ERROR("There is no task in the Running queue : %u\n", taskId);
-        }
-      }
-#endif
       return;
     }
   }
@@ -384,15 +335,6 @@ void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
       {
         completedObserver = it->second.mObserver;
       }
-      else
-      {
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("LoadComplete -> observer destroyed -> remove task : %u\n", taskId);
-        }
-#endif
-      }
       // If a task has completed, we souhld to remove the element from running map.
       mRunningTasks.erase(it);
     }
@@ -404,12 +346,6 @@ void AsyncTextManager::LoadComplete(Toolkit::Internal::TextLoadingTaskPtr task)
 
   if(completedObserver)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      DALI_LOG_RELEASE_INFO("LoadComplete -> ob : %p, remove task : %u\n", completedObserver, taskId);
-    }
-#endif
     // TODO : If it fails for any reason, false should be sent.
     bool success = true;
     if(completedObserver->DisconnectDestructionSignal())
@@ -440,16 +376,6 @@ void AsyncTextManager::ReleaseLoaderToManager(Toolkit::Internal::TextLoadingTask
 /// Worker thread called
 void AsyncTextManager::ReleaseLoader(Toolkit::Internal::TextLoadingTaskPtr task, Text::AsyncTextLoader loader)
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    // task could be nullptr for error case.
-    uint32_t taskId = DALI_LIKELY(task) ? task->GetId() : EMPTY_TASK_ID;
-
-    DALI_LOG_RELEASE_INFO("ReleaseLoader task : %u\n", taskId);
-  }
-#endif
-
   bool setLoaderAvailable = false;
   {
     Mutex::ScopedLock lock(mLoaderMutex);
@@ -481,13 +407,6 @@ void AsyncTextManager::ReleaseLoader(Toolkit::Internal::TextLoadingTaskPtr task,
 /// Main + Worker thread called
 void AsyncTextManager::SetLoaderToWaitingTask()
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("SetLoaderToWaitingTask\n");
-  }
-#endif
-
   Mutex::ScopedLock lock(mTasksMutex);
   if(!mWaitingTasks.empty())
   {
@@ -507,34 +426,13 @@ void AsyncTextManager::SetLoaderToWaitingTask()
 
         // Set loader and ready to process.
         element.mTask->SetLoader(loader);
-
-#ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          DALI_LOG_RELEASE_INFO("SetLoaderToWaitingTask new task -> ob : %p, add task : %u, waiting tasks : %zu\n", element.mObserver, watingTaskId, mWaitingTasks.size());
-        }
-#endif
       }
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-      {
-        Mutex::ScopedLock lock(mLoaderMutex);
-        DALI_LOG_RELEASE_INFO("SetLoaderToWaitingTask -> available loaders : %zu, locale changed loaders : %zu, running loaders : %zu, waiting tasks : %zu, running tasks : %zu\n", mAvailableLoaders.size(), mLocaleChangedLoaders.size(), mRunningLoaders.size(), mWaitingTasks.size(), mRunningTasks.size());
-      }
-#endif
     }
   }
 }
 
 void AsyncTextManager::ObserverDestroyed(TextLoadObserver* observer)
 {
-#ifdef TRACE_ENABLED
-  if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-  {
-    DALI_LOG_RELEASE_INFO("ObserverDestroyed observer : %p\n", observer);
-  }
-#endif
-
   // TODO : Optimize here if possible.
   static std::vector<Toolkit::Internal::TextLoadingTaskPtr> cancelledTasks;
   {

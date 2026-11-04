@@ -23,6 +23,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/controls/text-controls/text-editor.cpp
   ${public_api_src_dir}/controls/text-controls/text-label.cpp
   ${public_api_src_dir}/controls/text-controls/text-field.cpp
+  ${public_api_src_dir}/controls/media-view/media-view.cpp
   ${public_api_src_dir}/controls/video-view/video-view.cpp
   ${public_api_src_dir}/controls/camera-view/camera-view.cpp
   ${public_api_src_dir}/image-loader/image-url-utils.cpp
@@ -140,6 +141,7 @@ SET( public_api_text_header_files
 )
 
 SET( public_api_video_view_header_files
+  ${public_api_src_dir}/controls/media-view/media-view.h
   ${public_api_src_dir}/controls/video-view/video-view.h
 )
 

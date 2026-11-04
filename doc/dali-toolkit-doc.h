@@ -209,6 +209,9 @@
  *     @defgroup dali_toolkit_controls_video_view Video View
  *     @brief VideoView is a control for video playback and display.
 
+ *     @defgroup dali_toolkit_controls_media_view Media View
+ *     @brief MediaView displays an external media frame source.
+
  *     @defgroup dali_toolkit_controls_camera_view Camera View
  *     @brief CameraView is a control for camera display.
 

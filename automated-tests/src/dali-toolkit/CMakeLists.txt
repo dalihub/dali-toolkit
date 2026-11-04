@@ -15,6 +15,7 @@ SET(TC_SOURCES
   utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
   utc-Dali-ConfirmationPopup.cpp
+  utc-Dali-Constexpr.cpp
   utc-Dali-FadeTransition.cpp
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
@@ -75,6 +76,7 @@ SET(TC_SOURCES
   utc-Dali-ToolkitPreInitialize.cpp
   utc-Dali-Visual.cpp
   utc-Dali-VisualFactory.cpp
+  utc-Dali-MediaView.cpp
   utc-Dali-VideoView.cpp
   utc-Dali-WebView.cpp
   utc-Dali-AsyncImageLoader.cpp
@@ -105,6 +107,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
   dali-toolkit-test-utils/toolkit-test-application.cpp
+  dali-toolkit-test-utils/toolkit-test-font-client.cpp
   dali-toolkit-test-utils/toolkit-texture-upload-manager.cpp
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
@@ -152,9 +155,9 @@ SET(TEST_HARNESS_SOURCES
 # As the GLES backend is dynamically loaded, if we don't link directly then the GLES backend uses the REAL function
 # rather than the overloaded one in the test suite
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-  dali2-core
-  dali2-adaptor
-  dali2-toolkit
+  dali3-core
+  dali3-adaptor
+  dali3-toolkit
   glesv2
   egl
 )
@@ -169,6 +172,11 @@ INCLUDE(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG(-Wno-self-assign-overloaded HAVE_NO_SELF_ASSIGN_OVERLOADED)
 IF (HAVE_NO_SELF_ASSIGN_OVERLOADED)
   ADD_COMPILE_OPTIONS( -Wno-self-assign-overloaded )
+ENDIF()
+
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-const-variable HAVE_NO_UNUSED_CONST_VARIABLE)
+IF(HAVE_NO_UNUSED_CONST_VARIABLE)
+  ADD_COMPILE_OPTIONS( -Wno-unused-const-variable)
 ENDIF()
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
@@ -200,3 +208,13 @@ TARGET_LINK_LIBRARIES(${EXEC_NAME}
 INSTALL(PROGRAMS ${EXEC_NAME}
     DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )
+
+# Host-only source plugin. Load by SONAME after the test opens this exact fixture.
+ADD_LIBRARY(media-frame-source-test-plugin SHARED dali-toolkit-test-utils/test-media-frame-source-plugin.cpp)
+SET_TARGET_PROPERTIES(media-frame-source-test-plugin PROPERTIES
+    OUTPUT_NAME dali3-media-frame-source-plugin
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/media-frame-source)
+TARGET_LINK_LIBRARIES(media-frame-source-test-plugin ${${CAPI_LIB}_LDFLAGS} --coverage)
+ADD_DEPENDENCIES(${EXEC_NAME} media-frame-source-test-plugin)
+TARGET_COMPILE_DEFINITIONS(${EXEC_NAME} PRIVATE
+    TEST_MEDIA_FRAME_SOURCE_PLUGIN_PATH="$<TARGET_FILE:media-frame-source-test-plugin>")

@@ -21,8 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/trace.h>
-#include <chrono>
 
 namespace DALI_NAMESPACE
 {
@@ -30,25 +28,11 @@ namespace Toolkit
 {
 namespace Text
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_TEXT_PERFORMANCE_MARKER, false);
-
 CharacterIndex min(CharacterIndex index0,
                    CharacterIndex index1)
 {
   return (index0 < index1) ? index0 : index1;
 }
-
-#if defined(TRACE_ENABLED)
-uint32_t GetMilliSeconds()
-{
-  // Get the time of a monotonic clock since its epoch.
-  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
-
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
-
-  return static_cast<uint32_t>(duration.count());
-}
-#endif
 
 void ShapeText(TextAbstraction::Shaping&    shaping,
                TextAbstraction::FontClient& fontClient,
@@ -69,15 +53,6 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
     // Nothing to do if there are no characters.
     return;
   }
-
-  DALI_TRACE_SCOPE(gTraceFilter, "DALI_TEXT_SHAPE_TEXT");
-
-#if defined(TRACE_ENABLED)
-  uint32_t sumPre = 0, sumShape = 0, sumPost = 0;
-
-  uint32_t logThreshold = TextAbstraction::FontClient::GetPerformanceLogThresholdTime();
-  bool     logEnabled   = TextAbstraction::FontClient::IsPerformanceLogEnabled();
-#endif
 
 #ifdef DEBUG_ENABLED
   const Length numberOfFontRuns        = fonts.Count();
@@ -158,16 +133,6 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
   const CharacterIndex lastCharacter = startCharacterIndex + numberOfCharacters;
   for(previousIndex = startCharacterIndex; previousIndex < lastCharacter;)
   {
-#if defined(TRACE_ENABLED)
-    uint32_t timeStamps[4];
-    uint32_t timeStampIndex = 0;
-
-    if(logEnabled)
-    {
-      timeStamps[timeStampIndex++] = GetMilliSeconds();
-    }
-#endif
-
     // Get the font id and the script.
     const FontRun&   fontRun   = *fontRunIt;
     const ScriptRun& scriptRun = *scriptRunIt;
@@ -200,26 +165,12 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
       }
     }
 
-#if defined(TRACE_ENABLED)
-    if(logEnabled)
-    {
-      timeStamps[timeStampIndex++] = GetMilliSeconds();
-    }
-#endif
-
     // Shape the text for the current chunk.
     const Length numberOfGlyphs = shaping.Shape(fontClient,
                                                 textBuffer + previousIndex,
                                                 (currentIndex - previousIndex), // The number of characters to shape.
                                                 currentFontId,
                                                 currentScript);
-
-#if defined(TRACE_ENABLED)
-    if(logEnabled)
-    {
-      timeStamps[timeStampIndex++] = GetMilliSeconds();
-    }
-#endif
 
     // Retrieve the glyphs and the glyph to character conversion map.
     Vector<GlyphInfo>      tmpGlyphs;
@@ -277,16 +228,6 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
 
     // Update the previous index.
     previousIndex = currentIndex;
-
-#if defined(TRACE_ENABLED)
-    if(logEnabled)
-    {
-      timeStamps[timeStampIndex++] = GetMilliSeconds();
-      sumPre += timeStamps[1] - timeStamps[0];
-      sumShape += timeStamps[2] - timeStamps[1];
-      sumPost += timeStamps[3] - timeStamps[2];
-    }
-#endif
   }
 
   // Update indices.
@@ -315,16 +256,6 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
   // Resize the vectors to set the right number of items.
   glyphs.Resize(totalNumberOfGlyphs);
   glyphToCharacterMap.Resize(totalNumberOfGlyphs);
-
-#if defined(TRACE_ENABLED)
-  if(logEnabled)
-  {
-    if(sumPre + sumShape + sumPost > logThreshold)
-    {
-      DALI_LOG_DEBUG_INFO("DALI_TEXT_SHAPE_TEXT updated:%u/%u, pre:%u ms, shape:%u ms, post:%u ms\n", numberOfNewGlyphs, totalNumberOfGlyphs, sumPre, sumShape, sumPost);
-    }
-  }
-#endif
 }
 
 } // namespace Text

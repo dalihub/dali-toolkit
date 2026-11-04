@@ -55,14 +55,6 @@ enum RequestType
   COMPUTE_NATURAL_SIZE,
   COMPUTE_HEIGHT_FOR_WIDTH,
 };
-const char* const RequestTypeName[] =
-  {
-    "RENDER_FIXED_SIZE",
-    "RENDER_FIXED_WIDTH",
-    "RENDER_FIXED_HEIGHT",
-    "RENDER_CONSTRAINT",
-    "COMPUTE_NATURAL_SIZE",
-    "COMPUTE_HEIGHT_FOR_WIDTH"};
 } // namespace Async
 
 struct AsyncTextParameters

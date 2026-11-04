@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 
@@ -76,7 +76,7 @@ void RemoteDecodeTask::Process()
 
   if(!pixelBuffers.empty() && mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
-    DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffers[0]);
+    DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffers[0]);
   }
 
   if(pixelBuffers.empty())

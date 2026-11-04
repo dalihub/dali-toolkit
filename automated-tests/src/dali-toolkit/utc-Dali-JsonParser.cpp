@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -681,6 +681,36 @@ int UtcDaliJsonParserMethod10(void)
   parser.Parse(s1);
 
   DALI_TEST_CHECK(parser.ParseError());
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliJsonParserTruncatedNumber(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("JSON number truncated at the end of data");
+
+  // Numbers at the end of the data, so that parsing must stop at the end of the buffer
+  const char* sources[] = {
+    "[-",
+    "[+",
+    "[1e",
+    "[1E",
+    "[1e-",
+    "[1e+",
+    "[1.5e",
+  };
+
+  for(const char* source : sources)
+  {
+    JsonParser parser = JsonParser::New();
+
+    parser.Parse(source);
+
+    DALI_TEST_CHECK(parser.ParseError());
+  }
 
   tet_result(TET_PASS);
   END_TEST;

@@ -23,8 +23,8 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-utility.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/math/compile-time-math.h>
 
 #include <algorithm>

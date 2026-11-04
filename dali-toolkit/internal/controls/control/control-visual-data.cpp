@@ -773,12 +773,12 @@ void Control::VisualData::EnableCornerPropertiesOverridden(Toolkit::Visual::Base
           for(uint32_t i = 0; i < sourceCount; ++i)
           {
             auto source = cornerRadiusConstraint.GetSourceAt(i);
-            if(source.sourceType == Dali::SourceType::OBJECT_PROPERTY)
+            if(source.GetSourceType() == Dali::SourceType::OBJECT_PROPERTY)
             {
-              relativeProperties.insert(source.propertyIndex);
+              relativeProperties.insert(source.GetPropertyIndex());
 
               // Special case for Actor::Property::SIZE.
-              if(source.propertyIndex == Actor::Property::SIZE)
+              if(source.GetPropertyIndex() == Actor::Property::SIZE)
               {
                 relativeProperties.insert(Actor::Property::SIZE_WIDTH);
                 relativeProperties.insert(Actor::Property::SIZE_HEIGHT);

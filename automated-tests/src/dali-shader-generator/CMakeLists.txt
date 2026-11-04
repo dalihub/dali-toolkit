@@ -6,9 +6,9 @@ SET(EXEC_NAME "tct-${PKG_NAME}-core")
 SET(CAPI_LIB "dali-shader-generator")
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-  dali2-core
-  dali2-adaptor
-  dali2-toolkit
+  dali3-core
+  dali3-adaptor
+  dali3-toolkit
 )
 
 SET(TC_SOURCES

@@ -3438,7 +3438,8 @@ int UtcDaliImageViewTVGLoading(void)
 
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+    // Wait for loading and rasterization callbacks, which may complete in either order.
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render(16);

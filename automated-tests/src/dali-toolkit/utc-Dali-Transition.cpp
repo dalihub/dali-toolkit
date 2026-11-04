@@ -1074,9 +1074,6 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutOrientationInheritance(voi
   control3.SetProperty(Actor::Property::INHERIT_ORIENTATION, false);
   control3.SetProperty(Actor::Property::INHERIT_SCALE, true);
 
-  Vector3 currentAxis;
-  Radian  currentRadian;
-
   application.GetScene().Add(control1);
   application.GetScene().Add(control2);
   control2.Add(control3);

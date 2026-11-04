@@ -23,6 +23,7 @@ SET(TC_SOURCES
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
  utc-Dali-RenderEffect-internal.cpp
+ utc-Dali-StreamedImageVisual.cpp
  utc-Dali-SvgLoader.cpp
  utc-Dali-Text-AbstractStyleCharacterRun.cpp
  utc-Dali-Text-Characters.cpp
@@ -32,6 +33,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Cursor.cpp
  utc-Dali-Text-Layout.cpp
  utc-Dali-Text-Markup.cpp
+ utc-Dali-Text-PortableCoverage.cpp
  utc-Dali-Text-MultiLanguage.cpp
  utc-Dali-Text-Segmentation.cpp
  utc-Dali-Text-Shaping.cpp
@@ -76,6 +78,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-application.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-font-client.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
@@ -125,9 +128,9 @@ ENDIF()
 
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-    dali2-core
-    dali2-adaptor
-    dali2-toolkit
+    dali3-core
+    dali3-adaptor
+    dali3-toolkit
     eldbus
     ecore-input
     eina
@@ -137,6 +140,20 @@ MESSAGE("Libraries to link with:>${${CAPI_LIB}_LIBRARIES}")
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED -fPIC )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
+
+# Ignore some warning options
+# TODO : Why it is not be ignored at root CMakeLists.txt?
+INCLUDE(CheckCXXCompilerFlag)
+
+CHECK_CXX_COMPILER_FLAG(-Wno-self-assign-overloaded HAVE_NO_SELF_ASSIGN_OVERLOADED)
+IF (HAVE_NO_SELF_ASSIGN_OVERLOADED)
+  ADD_COMPILE_OPTIONS( -Wno-self-assign-overloaded )
+ENDIF()
+
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-const-variable HAVE_NO_UNUSED_CONST_VARIABLE)
+IF(HAVE_NO_UNUSED_CONST_VARIABLE)
+  ADD_COMPILE_OPTIONS( -Wno-unused-const-variable)
+ENDIF()
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 ADD_DEFINITIONS(-DADDON_LIBS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\")
@@ -173,16 +190,16 @@ TARGET_LINK_LIBRARIES(${EXEC_NAME}
     -lpthread --coverage -ldl -rdynamic
 )
 
-ADD_LIBRARY(dali2-file-download-plugin-test SHARED
+ADD_LIBRARY(dali3-file-download-plugin-test SHARED
   file-download-plugin/test-file-download-plugin.cpp
 )
 
-TARGET_INCLUDE_DIRECTORIES(dali2-file-download-plugin-test PUBLIC
+TARGET_INCLUDE_DIRECTORIES(dali3-file-download-plugin-test PUBLIC
   ../../../
   ${${CAPI_LIB}_INCLUDE_DIRS}
 )
 
-TARGET_LINK_LIBRARIES(dali2-file-download-plugin-test
+TARGET_LINK_LIBRARIES(dali3-file-download-plugin-test
   ${CMAKE_CXX_LINK_FLAGS}
   ${${CAPI_LIB}_LIBRARIES}
   -lpthread -ldl --coverage

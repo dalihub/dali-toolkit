@@ -21,7 +21,7 @@
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/images/pixel-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>

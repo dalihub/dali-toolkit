@@ -37,7 +37,7 @@ namespace Internal
 {
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_VECTOR_ANIMATION_PERFORMANCE_MARKER, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_CANVAS_VIEW_PERFORMANCE_MARKER, false);
 
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()
@@ -74,21 +74,21 @@ bool CanvasRendererRasterizingTask::IsRasterized()
 bool CanvasRendererRasterizingTask::Rasterize()
 {
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = 0;
+  uint64_t endTimeNanoSeconds   = 0;
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_RASTERIZE_TASK", [&](std::ostringstream& oss)
-  { mStartTimeNanoSceonds = GetNanoseconds(); });
+  { startTimeNanoSeconds = GetNanoseconds(); });
 
   bool rasterized = DALI_LIKELY(mCanvasRenderer) && mCanvasRenderer.Rasterize();
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CANVAS_VIEW_RASTERIZE_TASK", [&](std::ostringstream& oss)
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
     oss << "r:" << rasterized << "]"; });
 
   return rasterized;

@@ -77,8 +77,12 @@ Dali::PixelBuffer CreateEmptyPixelBuffer(uint32_t width, uint32_t height, Pixel:
 {
   Dali::PixelBuffer pixelBuffer = Dali::PixelBuffer::New(width, height, pixelFormat);
 
+  // Too big a size allocates no buffer
   unsigned char* buffer = pixelBuffer.GetBuffer();
-  memset(buffer, 0, width * height * Dali::Pixel::GetBytesPerPixel(pixelFormat));
+  if(buffer)
+  {
+    memset(buffer, 0, pixelBuffer.GetBufferSize());
+  }
 
   return pixelBuffer;
 }

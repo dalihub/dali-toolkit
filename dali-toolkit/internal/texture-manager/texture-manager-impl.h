@@ -21,8 +21,8 @@
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
-#include <dali/public-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <memory>
 

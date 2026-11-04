@@ -27,7 +27,7 @@ namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 namespace
 {
-const char* const DALI_PHYSICS_CHIPMUNK_GLES_SO("libdali2-physics-2d-gles.so");
+const char* const DALI_PHYSICS_CHIPMUNK_GLES_SO(DALI_LIBRARY_PREFIX "physics-2d-gles.so");
 const char* const DALI_PHYSICS_CHIPMUNK_GLES_ADDON_NAME("PhysicsChipmunkGlesAddOn");
 
 struct PhysicsChipmunkGlesAddOn : public Dali::AddOn::AddOnBinder

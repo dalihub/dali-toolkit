@@ -195,14 +195,11 @@ bool VectorAnimationTask::IsAnimating()
 bool VectorAnimationTask::Load(bool synchronousLoading)
 {
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = GetNanoseconds();
+  uint64_t endTimeNanoSeconds   = 0;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
-  {
-    mStartTimeNanoSceonds = GetNanoseconds();
-    oss << "[u:" << mImageUrl.GetEllipsedUrl() << "]"; });
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_LOTTIE_LOADING_TASK");
 
   if(mEncodedImageBuffer)
   {
@@ -245,11 +242,11 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
     {
-      mEndTimeNanoSceonds = GetNanoseconds();
+      endTimeNanoSeconds = GetNanoseconds();
       oss << std::fixed << std::setprecision(3);
       oss << "[";
-      oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
-      oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
+      oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
+      oss << "r:0 u:" << mImageUrl.GetEllipsedUrl() << "]"; });
     return false;
   }
 
@@ -274,11 +271,11 @@ bool VectorAnimationTask::Load(bool synchronousLoading)
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_LOADING_TASK", [&](std::ostringstream& oss)
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
+    oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
+    oss << "r:1 u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
   return true;
 }
@@ -634,12 +631,12 @@ bool VectorAnimationTask::Rasterize()
   }
 
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = 0;
+  uint64_t endTimeNanoSeconds   = 0;
 #endif
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
   {
-    mStartTimeNanoSceonds = GetNanoseconds();
+    startTimeNanoSeconds = GetNanoseconds();
     oss << "[s:" << mWidth << "x" << mHeight << " ";
     oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
 
@@ -771,11 +768,10 @@ bool VectorAnimationTask::Rasterize()
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_LOTTIE_RASTERIZE_TASK", [&](std::ostringstream& oss)
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
-    oss << "s:" << mWidth << "x" << mHeight << " ";
+    oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
     oss << "f:" << mCurrentFrame;
     if(mDroppedFrames > 0)
     {
@@ -786,8 +782,7 @@ bool VectorAnimationTask::Rasterize()
     oss << "p:" << mPlayState << " ";
     oss << "r:" << renderSuccess << " ";
     oss << "s:" << stopped << " ";
-    oss << "k:" << mKeepAnimation << " ";
-    oss << "u:" << mImageUrl.GetEllipsedUrl() << "]"; });
+    oss << "k:" << mKeepAnimation << "]"; });
 
   return true;
 }

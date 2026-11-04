@@ -20,8 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -164,13 +165,13 @@ LoadingTask::~LoadingTask()
 void LoadingTask::Process()
 {
 #ifdef TRACE_ENABLED
-  uint64_t mStartTimeNanoSceonds = 0;
-  uint64_t mEndTimeNanoSceonds   = 0;
+  uint64_t startTimeNanoSeconds = 0;
+  uint64_t endTimeNanoSeconds   = 0;
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
   {
-    mStartTimeNanoSceonds = GetNanoseconds();
+    startTimeNanoSeconds = GetNanoseconds();
     oss << "[";
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {
@@ -190,10 +191,10 @@ void LoadingTask::Process()
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_IMAGE_LOADING_TASK", [&](std::ostringstream& oss)
   {
-    mEndTimeNanoSceonds = GetNanoseconds();
+    endTimeNanoSeconds = GetNanoseconds();
     oss << std::fixed << std::setprecision(3);
     oss << "[";
-    oss << "d:" << static_cast<float>(mEndTimeNanoSceonds - mStartTimeNanoSceonds) / 1000000.0f << "ms ";
+    oss << "d:" << static_cast<float>(endTimeNanoSeconds - startTimeNanoSeconds) / 1000000.0f << "ms ";
     oss << "m:" << isMaskTask << " ";
     oss << "i:" << frameIndex << " ";
     oss << "b:" << pixelBuffers.size() << " ";
@@ -262,7 +263,7 @@ void LoadingTask::ApplyMask()
 {
   if(!pixelBuffers.empty())
   {
-    DevelPixelBuffer::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
+    DevelPixelBufferOperations::ApplyMask(pixelBuffers[0], maskPixelBuffer, contentScale, cropToMask);
   }
 }
 
@@ -272,7 +273,7 @@ void LoadingTask::MultiplyAlpha()
   {
     if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {
-      DevelPixelBuffer::MultiplyColorByAlpha(pixelBuffers[0]);
+      DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffers[0]);
     }
   }
 }

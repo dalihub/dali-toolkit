@@ -36,50 +36,6 @@ namespace Toolkit
 // RulerDomain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-RulerDomain::RulerDomain(float min, float max, bool enabled)
-: min(min),
-  max(max),
-  enabled(enabled)
-{
-}
-
-float RulerDomain::Clamp(float x, float length, float scale) const
-{
-  ClampState clamped;
-
-  return Clamp(x, length, scale, clamped);
-}
-
-float RulerDomain::Clamp(float x, float length, float scale, ClampState& clamped) const
-{
-  if(!enabled)
-  {
-    clamped = NOT_CLAMPED;
-    return x;
-  }
-
-  const float minExtent = min * scale;
-  const float maxExtent = max * scale - length;
-  if(x < minExtent)
-  {
-    clamped = CLAMPED_TO_MIN;
-    return minExtent;
-  }
-  else if(x > maxExtent)
-  {
-    clamped = CLAMPED_TO_MAX;
-    return maxExtent;
-  }
-
-  clamped = NOT_CLAMPED;
-  return x;
-}
-
-float RulerDomain::GetSize() const
-{
-  return max - min;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Ruler
 ///////////////////////////////////////////////////////////////////////////////////////////////////

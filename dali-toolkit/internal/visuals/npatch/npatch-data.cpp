@@ -22,7 +22,7 @@
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 // EXTERNAL HEADERS
-#include <dali/devel-api/adaptor-framework/pixel-buffer-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
@@ -220,7 +220,7 @@ void NPatchData::SetLoadedNPatchData(PixelBuffer& pixelBuffer, bool preMultiplie
   if(mBorder == Extents() && NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY))
   {
     // Crop the image
-    DevelPixelBuffer::Crop(pixelBuffer, 1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2);
+    DevelPixelBufferOperations::Crop(pixelBuffer, 1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2);
   }
   else
   {
