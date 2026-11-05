@@ -66,63 +66,67 @@ user interface functionality.
 ##############################
 # resource
 ##############################
-%package resources_480x800
+%package -n dali2-toolkit-resources_480x800
 Summary:    default resource files for 480x800
 Requires:   %{name} = %{version}-%{release}
+Conflicts:  dali2-toolkit-resources_720x1280
 Conflicts:  %{name}-resources_720x1280
+Conflicts:  dali2-toolkit-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080
+Conflicts:  dali2-toolkit-resources_1920x1080_rpi
 Conflicts:  %{name}-resources_1920x1080_rpi
-%if %{with dali2}
-# Both toolkits read the same resource files, so dali3 takes over the dali2 resources.
-Provides:   dali2-toolkit-resources_480x800 = %{version}-%{release}
-Obsoletes:  dali2-toolkit-resources_480x800 < %{version}-%{release}
-%endif
-%description resources_480x800
+# Both toolkits use these shared resources; keep the dali3 package alias.
+Provides:   %{name}-resources_480x800 = %{version}-%{release}
+Obsoletes:  %{name}-resources_480x800 <= %{version}-%{release}
+%description -n dali2-toolkit-resources_480x800
 dali-toolkit default resource files for 480x800
 Contain po / sounds / common images / style / style images
 
-%package resources_720x1280
+%package -n dali2-toolkit-resources_720x1280
 Summary:    default resource files for 720x1280
 Requires:   %{name} = %{version}-%{release}
+Conflicts:  dali2-toolkit-resources_480x800
 Conflicts:  %{name}-resources_480x800
+Conflicts:  dali2-toolkit-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080
+Conflicts:  dali2-toolkit-resources_1920x1080_rpi
 Conflicts:  %{name}-resources_1920x1080_rpi
-%if %{with dali2}
-# Both toolkits read the same resource files, so dali3 takes over the dali2 resources.
-Provides:   dali2-toolkit-resources_720x1280 = %{version}-%{release}
-Obsoletes:  dali2-toolkit-resources_720x1280 < %{version}-%{release}
-%endif
-%description resources_720x1280
+# Both toolkits use these shared resources; keep the dali3 package alias.
+Provides:   %{name}-resources_720x1280 = %{version}-%{release}
+Obsoletes:  %{name}-resources_720x1280 <= %{version}-%{release}
+%description -n dali2-toolkit-resources_720x1280
 dali-toolkit default resource files for 720x1280
 Contain po / sounds / common images / style / style images
 
-%package resources_1920x1080
+%package -n dali2-toolkit-resources_1920x1080
 Summary:    default resource files for 1920x1080
 Requires:   %{name} = %{version}-%{release}
+Conflicts:  dali2-toolkit-resources_480x800
 Conflicts:  %{name}-resources_480x800
+Conflicts:  dali2-toolkit-resources_720x1280
 Conflicts:  %{name}-resources_720x1280
+Conflicts:  dali2-toolkit-resources_1920x1080_rpi
 Conflicts:  %{name}-resources_1920x1080_rpi
-%if %{with dali2}
-# Both toolkits read the same resource files, so dali3 takes over the dali2 resources.
-Provides:   dali2-toolkit-resources_1920x1080 = %{version}-%{release}
-Obsoletes:  dali2-toolkit-resources_1920x1080 < %{version}-%{release}
-%endif
-%description resources_1920x1080
+# Both toolkits use these shared resources; keep the dali3 package alias.
+Provides:   %{name}-resources_1920x1080 = %{version}-%{release}
+Obsoletes:  %{name}-resources_1920x1080 <= %{version}-%{release}
+%description -n dali2-toolkit-resources_1920x1080
 dali-toolkit default resource files for 1920x1080
 Contain po / sounds / common images / style / style images
 
-%package resources_1920x1080_rpi
+%package -n dali2-toolkit-resources_1920x1080_rpi
 Summary:    default resource files for 1920x1080 on Raspberry Pi 4
 Requires:   %{name} = %{version}-%{release}
+Conflicts:  dali2-toolkit-resources_480x800
 Conflicts:  %{name}-resources_480x800
+Conflicts:  dali2-toolkit-resources_720x1280
 Conflicts:  %{name}-resources_720x1280
+Conflicts:  dali2-toolkit-resources_1920x1080
 Conflicts:  %{name}-resources_1920x1080
-%if %{with dali2}
-# Both toolkits read the same resource files, so dali3 takes over the dali2 resources.
-Provides:   dali2-toolkit-resources_1920x1080_rpi = %{version}-%{release}
-Obsoletes:  dali2-toolkit-resources_1920x1080_rpi < %{version}-%{release}
-%endif
-%description resources_1920x1080_rpi
+# Both toolkits use these shared resources; keep the dali3 package alias.
+Provides:   %{name}-resources_1920x1080_rpi = %{version}-%{release}
+Obsoletes:  %{name}-resources_1920x1080_rpi <= %{version}-%{release}
+%description -n dali2-toolkit-resources_1920x1080_rpi
 dali-toolkit default resource files for 1920x1080 on Raspberry Pi 4
 Contain po / sounds / common images / style / style images
 
@@ -517,7 +521,7 @@ cd "$_saved_dir"
 # Pre Install
 ##############################
 
-%pre resources_480x800
+%pre -n dali2-toolkit-resources_480x800
 case "$1" in
   2)
     _saved_dir=$(pwd)
@@ -527,7 +531,7 @@ case "$1" in
   ;;
 esac
 
-%pre resources_720x1280
+%pre -n dali2-toolkit-resources_720x1280
 case "$1" in
   2)
     _saved_dir=$(pwd)
@@ -537,7 +541,7 @@ case "$1" in
   ;;
 esac
 
-%pre resources_1920x1080
+%pre -n dali2-toolkit-resources_1920x1080
 case "$1" in
   2)
     _saved_dir=$(pwd)
@@ -547,7 +551,7 @@ case "$1" in
   ;;
 esac
 
-%pre resources_1920x1080_rpi
+%pre -n dali2-toolkit-resources_1920x1080_rpi
 case "$1" in
   2)
     _saved_dir=$(pwd)
@@ -564,19 +568,19 @@ esac
 /sbin/ldconfig
 exit 0
 
-%post resources_480x800
+%post -n dali2-toolkit-resources_480x800
 cd %{dali_toolkit_style_files}/480x800 || exit 0
 for FILE in *; do rm -rf ../"${FILE}"; mv ./"${FILE}" ../"${FILE}"; done
 
-%post resources_720x1280
+%post -n dali2-toolkit-resources_720x1280
 cd %{dali_toolkit_style_files}/720x1280 || exit 0
 for FILE in *; do rm -rf ../"${FILE}"; mv ./"${FILE}" ../"${FILE}"; done
 
-%post resources_1920x1080
+%post -n dali2-toolkit-resources_1920x1080
 cd %{dali_toolkit_style_files}/1920x1080 || exit 0
 for FILE in *; do rm -rf ../"${FILE}"; mv ./"${FILE}" ../"${FILE}"; done
 
-%post resources_1920x1080_rpi
+%post -n dali2-toolkit-resources_1920x1080_rpi
 cd %{dali_toolkit_style_files}/1920x1080_rpi || exit 0
 for FILE in *; do rm -rf ../"${FILE}"; mv ./"${FILE}" ../"${FILE}"; done
 
@@ -602,40 +606,40 @@ exit 0
 # Pre Uninstall
 ##############################
 
-%preun resources_480x800
+%preun -n dali2-toolkit-resources_480x800
 case "$1" in
   0)
-    %preun resources_480x800
+    %preun -n dali2-toolkit-resources_480x800
     cd %{dali_toolkit_style_files} || exit 0
     mv images ./480x800
     mv dali-toolkit-default-theme.json ./480x800
   ;;
 esac
 
-%preun resources_720x1280
+%preun -n dali2-toolkit-resources_720x1280
 case "$1" in
   0)
-    %preun resources_720x1280
+    %preun -n dali2-toolkit-resources_720x1280
     cd %{dali_toolkit_style_files} || exit 0
     mv images ./720x1280
     mv dali-toolkit-default-theme.json ./720x1280
   ;;
 esac
 
-%preun resources_1920x1080
+%preun -n dali2-toolkit-resources_1920x1080
 case "$1" in
   0)
-    %preun resources_1920x1080
+    %preun -n dali2-toolkit-resources_1920x1080
     cd %{dali_toolkit_style_files} || exit 0
     mv images ./1920x1080
     mv dali-toolkit-default-theme.json ./1920x1080
   ;;
 esac
 
-%preun resources_1920x1080_rpi
+%preun -n dali2-toolkit-resources_1920x1080_rpi
 case "$1" in
   0)
-    %preun resources_1920x1080_rpi
+    %preun -n dali2-toolkit-resources_1920x1080_rpi
     cd %{dali_toolkit_style_files} || exit 0
     mv images ./1920x1080_rpi
     mv dali-toolkit-default-theme.json ./1920x1080_rpi
@@ -649,7 +653,7 @@ esac
 /sbin/ldconfig
 exit 0
 
-%postun resources_480x800
+%postun -n dali2-toolkit-resources_480x800
 case "$1" in
   0)
     cd %{dali_toolkit_style_files} || exit 0
@@ -657,7 +661,7 @@ case "$1" in
   ;;
 esac
 
-%postun resources_720x1280
+%postun -n dali2-toolkit-resources_720x1280
 case "$1" in
   0)
     cd %{dali_toolkit_style_files} || exit 0
@@ -665,7 +669,7 @@ case "$1" in
   ;;
 esac
 
-%postun resources_1920x1080
+%postun -n dali2-toolkit-resources_1920x1080
 case "$1" in
   0)
     cd %{dali_toolkit_style_files} || exit 0
@@ -673,7 +677,7 @@ case "$1" in
   ;;
 esac
 
-%postun resources_1920x1080_rpi
+%postun -n dali2-toolkit-resources_1920x1080_rpi
 case "$1" in
   0)
     cd %{dali_toolkit_style_files} || exit 0
@@ -681,61 +685,59 @@ case "$1" in
   ;;
 esac
 
-%if %{with dali2}
 ##############################
-# Replacing the dali2 resources
+# Replacing the dali3 resources
 ##############################
-# A dali2 resource package erased because this package replaces it runs its
+# A dali3 resource package erased because this package replaces it runs its
 # uninstall scripts, which clear the style folder. Keep the folder aside while
 # it is erased.
-%triggerun resources_480x800 -- dali2-toolkit-resources_480x800
+%triggerun -n dali2-toolkit-resources_480x800 -- %{name}-resources_480x800
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali3-keep"; fi
+if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali2-keep"; fi
 exit 0
 
-%triggerpostun resources_480x800 -- dali2-toolkit-resources_480x800
+%triggerpostun -n dali2-toolkit-resources_480x800 -- %{name}-resources_480x800
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles.dali3-keep" ]; then rm -rf "$styles"; mv "$styles.dali3-keep" "$styles"; fi
+if [ "$2" = 0 ] && [ -d "$styles.dali2-keep" ]; then rm -rf "$styles"; mv "$styles.dali2-keep" "$styles"; fi
 exit 0
 
-%triggerun resources_720x1280 -- dali2-toolkit-resources_720x1280
+%triggerun -n dali2-toolkit-resources_720x1280 -- %{name}-resources_720x1280
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali3-keep"; fi
+if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali2-keep"; fi
 exit 0
 
-%triggerpostun resources_720x1280 -- dali2-toolkit-resources_720x1280
+%triggerpostun -n dali2-toolkit-resources_720x1280 -- %{name}-resources_720x1280
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles.dali3-keep" ]; then rm -rf "$styles"; mv "$styles.dali3-keep" "$styles"; fi
+if [ "$2" = 0 ] && [ -d "$styles.dali2-keep" ]; then rm -rf "$styles"; mv "$styles.dali2-keep" "$styles"; fi
 exit 0
 
-%triggerun resources_1920x1080 -- dali2-toolkit-resources_1920x1080
+%triggerun -n dali2-toolkit-resources_1920x1080 -- %{name}-resources_1920x1080
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali3-keep"; fi
+if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali2-keep"; fi
 exit 0
 
-%triggerpostun resources_1920x1080 -- dali2-toolkit-resources_1920x1080
+%triggerpostun -n dali2-toolkit-resources_1920x1080 -- %{name}-resources_1920x1080
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles.dali3-keep" ]; then rm -rf "$styles"; mv "$styles.dali3-keep" "$styles"; fi
+if [ "$2" = 0 ] && [ -d "$styles.dali2-keep" ]; then rm -rf "$styles"; mv "$styles.dali2-keep" "$styles"; fi
 exit 0
 
-%triggerun resources_1920x1080_rpi -- dali2-toolkit-resources_1920x1080_rpi
+%triggerun -n dali2-toolkit-resources_1920x1080_rpi -- %{name}-resources_1920x1080_rpi
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali3-keep"; fi
+if [ "$2" = 0 ] && [ -d "$styles" ]; then mv "$styles" "$styles.dali2-keep"; fi
 exit 0
 
-%triggerpostun resources_1920x1080_rpi -- dali2-toolkit-resources_1920x1080_rpi
+%triggerpostun -n dali2-toolkit-resources_1920x1080_rpi -- %{name}-resources_1920x1080_rpi
 styles=%{dali_toolkit_style_files}
 styles=${styles%/}
-if [ "$2" = 0 ] && [ -d "$styles.dali3-keep" ]; then rm -rf "$styles"; mv "$styles.dali3-keep" "$styles"; fi
+if [ "$2" = 0 ] && [ -d "$styles.dali2-keep" ]; then rm -rf "$styles"; mv "$styles.dali2-keep" "$styles"; fi
 exit 0
-%endif
 
 %if 0%{?enable_usd_loader}
 %postun -n %{dali3_usdloader}
@@ -782,7 +784,7 @@ exit 0
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/devel-api/*
 
-%files resources_480x800
+%files -n dali2-toolkit-resources_480x800
 %manifest dali-toolkit-resources.manifest
 %defattr(-,root,root,-)
 %{dali_toolkit_image_files}/*
@@ -792,7 +794,7 @@ exit 0
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
-%files resources_720x1280
+%files -n dali2-toolkit-resources_720x1280
 %manifest dali-toolkit-resources.manifest
 %defattr(-,root,root,-)
 %{dali_toolkit_image_files}/*
@@ -802,7 +804,7 @@ exit 0
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
-%files resources_1920x1080
+%files -n dali2-toolkit-resources_1920x1080
 %manifest dali-toolkit-resources.manifest
 %defattr(-,root,root,-)
 %{dali_toolkit_image_files}/*
@@ -812,7 +814,7 @@ exit 0
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 
-%files resources_1920x1080_rpi
+%files -n dali2-toolkit-resources_1920x1080_rpi
 %manifest dali-toolkit-resources.manifest
 %defattr(-,root,root,-)
 %{dali_toolkit_image_files}/*
