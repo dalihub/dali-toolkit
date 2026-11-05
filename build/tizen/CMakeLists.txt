@@ -8,7 +8,13 @@ ENDIF()
 # the pkg-config files and the CMake packages (dali<major>-toolkit, -scene3d,
 # ...), and selects dali<major>-core and dali<major>-adaptor.
 IF(NOT DALI_API_MAJOR)
-  SET(DALI_API_MAJOR 3)
+  # Select the native Windows default before PROJECT initializes WIN32.
+  IF(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR
+     (CMAKE_HOST_WIN32 AND NOT CMAKE_SYSTEM_NAME))
+    SET(DALI_API_MAJOR 2)
+  ELSE()
+    SET(DALI_API_MAJOR 3)
+  ENDIF()
 ENDIF()
 SET(name "dali${DALI_API_MAJOR}-toolkit")
 SET(core_name "dali${DALI_API_MAJOR}-core")
