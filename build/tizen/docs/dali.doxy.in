@@ -411,6 +411,7 @@ ALIASES += SINCE_2_2="@since 2.2"
 ALIASES += SINCE_2_3="@since 2.3"
 ALIASES += SINCE_2_4="@since 2.4"
 ALIASES += SINCE_2_5="@since 2.5"
+ALIASES += SINCE_3_0="@since 3.0"
 
 # Extra tags for Tizen 3.0
 ALIASES += SINCE_1_2_2="@since 1.2.2"
@@ -444,6 +445,7 @@ ALIASES += DEPRECATED_2_2="@deprecated Deprecated since 2.2"
 ALIASES += DEPRECATED_2_3="@deprecated Deprecated since 2.3"
 ALIASES += DEPRECATED_2_4="@deprecated Deprecated since 2.4"
 ALIASES += DEPRECATED_2_5="@deprecated Deprecated since 2.5"
+ALIASES += DEPRECATED_3_0="@deprecated Deprecated since 3.0"
 
 ALIASES += PLATFORM=""
 ALIASES += PRIVLEVEL_PLATFORM=""
