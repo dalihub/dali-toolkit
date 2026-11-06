@@ -22,7 +22,6 @@
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
-#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -201,7 +200,7 @@ void LoadingTask::Process()
     if(!pixelBuffers.empty())
     {
       oss << "s:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
-      oss << "p:" << DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffers[0]) << " ";
+      oss << "p:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
     }
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {

@@ -23,7 +23,6 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/texture-integ.h>
@@ -282,7 +281,7 @@ void FastTrackLoadingTask::MultiplyAlpha(Dali::PixelBuffer pixelBuffer)
   if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
     DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffer);
-    mPremultiplied = DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer);
+    mPremultiplied = pixelBuffer.IsAlphaPreMultiplied();
   }
 }
 
