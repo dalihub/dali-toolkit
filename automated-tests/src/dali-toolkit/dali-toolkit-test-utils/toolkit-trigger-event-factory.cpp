@@ -1,6 +1,7 @@
 
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-interface.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace DALI_NAMESPACE
@@ -16,14 +17,13 @@ class TriggerEvent : public Dali::TriggerEventInterface
 {
 public:
   TriggerEvent(Dali::CallbackBase* callback);
-  ~TriggerEvent()
-  {
-  }
+  ~TriggerEvent() = default;
 
   void Trigger();
 
 private:
-  Dali::CallbackBase* mCallback;
+  // The ownership of the callback is taken by this class (same contract as the real Internal::Adaptor::TriggerEvent).
+  Dali::UniquePtr<Dali::CallbackBase> mCallback;
 };
 
 TriggerEvent::TriggerEvent(Dali::CallbackBase* callback)
