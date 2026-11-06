@@ -4174,6 +4174,195 @@ int UtcDaliImageVisualLoadFastTrackImageResourceReady(void)
   END_TEST;
 }
 
+namespace
+{
+int TestImageVisualReloadFromLoadComplete(bool sharedTexture)
+{
+  ToolkitTestApplication application;
+  ConnectionTracker      tracker;
+  ImageView              view = ImageView::New();
+  ImageView              otherView;
+  Texture                firstTexture;
+  unsigned int           readyCount           = 0u;
+  unsigned int           otherReadyCount      = 0u;
+  bool                   preparingAfterReload = false;
+
+  Property::Map imageMap;
+  imageMap.Add(Visual::Property::TYPE, Visual::IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
+    .Add(DevelImageVisual::Property::FAST_TRACK_UPLOADING, false);
+  view.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  view.SetProperty(ImageView::Property::IMAGE, imageMap);
+  view.ResourceReadySignal().Connect(&tracker, [&](Control control)
+  {
+    ++readyCount;
+    if(readyCount == 1u)
+    {
+      firstTexture = view.GetRendererAt(0u).GetTextures().GetTexture(0u);
+      // ResourceReady is emitted inside ImageVisual::LoadComplete, while
+      // TextureManager::NotifyObservers is still walking its observer list.
+      DevelControl::DoAction(control, ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, Property::Map());
+      preparingAfterReload = view.GetVisualResourceStatus(ImageView::Property::IMAGE) == Visual::ResourceStatus::PREPARING;
+    }
+  });
+  application.GetScene().Add(view);
+
+  if(sharedTexture)
+  {
+    otherView = ImageView::New();
+    otherView.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+    otherView.SetProperty(ImageView::Property::IMAGE, imageMap);
+    otherView.ResourceReadySignal().Connect(&tracker, [&](Control)
+    {
+      ++otherReadyCount;
+    });
+    application.GetScene().Add(otherView);
+  }
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(Test::WaitForEventThreadTrigger(1));
+  DALI_TEST_EQUALS(readyCount, 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(firstTexture);
+  DALI_TEST_CHECK(preparingAfterReload);
+  DALI_TEST_EQUALS(view.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::PREPARING, TEST_LOCATION);
+  if(sharedTexture)
+  {
+    DALI_TEST_EQUALS(otherReadyCount, 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(otherView.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+    DALI_TEST_EQUALS(otherView.GetRendererAt(0u).GetTextures().GetTexture(0u), firstTexture, TEST_LOCATION);
+  }
+
+  // A forced reload must perform another asynchronous load and notify again.
+  DALI_TEST_CHECK(Test::WaitForEventThreadTrigger(1));
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(readyCount, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(view.GetRendererAt(0u).GetTextures().GetTexture(0u) != firstTexture);
+  if(sharedTexture)
+  {
+    DALI_TEST_EQUALS(otherReadyCount, 1u, TEST_LOCATION);
+  }
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(readyCount, 2u, TEST_LOCATION);
+  END_TEST;
+}
+} // namespace
+
+int UtcDaliImageVisualReloadFromLoadComplete(void)
+{
+  return TestImageVisualReloadFromLoadComplete(false);
+}
+
+int UtcDaliImageVisualReloadFromLoadCompleteSharedTexture(void)
+{
+  return TestImageVisualReloadFromLoadComplete(true);
+}
+
+namespace
+{
+int TestImageVisualReloadPendingObserverFromLoadComplete(unsigned int reloadCount)
+{
+  ToolkitTestApplication application;
+  ConnectionTracker      tracker;
+  ImageView              views[3];
+  Texture                completedTextures[3];
+  Texture                reloadedTexture;
+  unsigned int           readyCounts[3] = {0u, 0u, 0u};
+  std::string            callbackOrder;
+
+  Property::Map imageMap;
+  imageMap.Add(Visual::Property::TYPE, Visual::IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME)
+    .Add(ImageVisual::Property::SYNCHRONOUS_LOADING, false)
+    .Add(DevelImageVisual::Property::FAST_TRACK_UPLOADING, false);
+
+  for(unsigned int index = 0u; index < 3u; ++index)
+  {
+    views[index] = ImageView::New();
+    views[index].SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+    views[index].SetProperty(ImageView::Property::IMAGE, imageMap);
+    views[index].ResourceReadySignal().Connect(&tracker, [&, index](Control)
+    {
+      ++readyCounts[index];
+      callbackOrder += static_cast<char>('A' + index);
+      const auto texture = views[index].GetRendererAt(0u).GetTextures().GetTexture(0u);
+      if(index != 1u)
+      {
+        completedTextures[index] = texture;
+      }
+      else
+      {
+        reloadedTexture = texture;
+      }
+      if(index == 0u && readyCounts[index] == 1u)
+      {
+        callbackOrder += '[';
+        // The first request removes B from the current observer list; later
+        // requests must reuse its pending reload instead of duplicating it.
+        for(unsigned int request = 0u; request < reloadCount; ++request)
+        {
+          DevelControl::DoAction(views[1], ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, Property::Map());
+        }
+        callbackOrder += ']';
+      }
+    });
+    application.GetScene().Add(views[index]);
+  }
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(Test::WaitForEventThreadTrigger(1));
+  tet_printf("After original load: callbacks=%s, counts=%u/%u/%u\n", callbackOrder.c_str(), readyCounts[0], readyCounts[1], readyCounts[2]);
+  DALI_TEST_EQUALS(callbackOrder, std::string("A[]C"), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCounts[1], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(views[1].GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::PREPARING, TEST_LOCATION);
+  for(unsigned int index = 0u; index < 3u; index += 2u)
+  {
+    DALI_TEST_EQUALS(readyCounts[index], 1u, TEST_LOCATION);
+    DALI_TEST_CHECK(completedTextures[index]);
+    DALI_TEST_EQUALS(completedTextures[index], completedTextures[0], TEST_LOCATION);
+  }
+
+  DALI_TEST_CHECK(Test::WaitForEventThreadTrigger(1));
+  application.SendNotification();
+  application.Render();
+  tet_printf("After reload: callbacks=%s, counts=%u/%u/%u\n", callbackOrder.c_str(), readyCounts[0], readyCounts[1], readyCounts[2]);
+  tet_printf("B renderer has a replacement texture: %s\n", views[1].GetRendererAt(0u).GetTextures().GetTexture(0u) != completedTextures[0] ? "yes" : "no");
+  DALI_TEST_EQUALS(callbackOrder, std::string("A[]CB"), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCounts[0], 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCounts[1], 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCounts[2], 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(reloadedTexture);
+  DALI_TEST_CHECK(reloadedTexture != completedTextures[0]);
+  for(unsigned int index = 0u; index < 3u; ++index)
+  {
+    DALI_TEST_EQUALS(views[index].GetVisualResourceStatus(ImageView::Property::IMAGE), Visual::ResourceStatus::READY, TEST_LOCATION);
+    DALI_TEST_EQUALS(views[index].GetRendererCount(), 1u, TEST_LOCATION);
+  }
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(callbackOrder, std::string("A[]CB"), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCounts[1], 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+} // namespace
+
+int UtcDaliImageVisualReloadPendingObserverFromLoadComplete(void)
+{
+  return TestImageVisualReloadPendingObserverFromLoadComplete(1u);
+}
+
+int UtcDaliImageVisualReloadPendingObserverMultipleTimesFromLoadComplete(void)
+{
+  return TestImageVisualReloadPendingObserverFromLoadComplete(3u);
+}
+
 int UtcDaliImageVisualLoadFastTrackImageReload(void)
 {
   tet_infoline("Test worker thread uploading with Local URL");
