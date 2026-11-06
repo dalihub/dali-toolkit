@@ -399,6 +399,11 @@ public:
   VideoPlayer GetVideoPlayer();
 
   /**
+   * @brief Checks whether the view wraps an externally created player session.
+   */
+  bool HasExternalSource() const;
+
+  /**
    * @brief Sets auto rotation feature. If enabled, video will rotate automatically according to the video orientation.
    * @param[in] enable Whether to enable auto rotation feature. Default is false.
    */
@@ -563,6 +568,7 @@ private:
   bool mIsPlay;
   bool mIsUnderlay;
   bool mSettingUnderlay;
+  bool mHasExternalSource{false};
 
   Dali::VideoSyncMode mSyncMode;
   int                 mSiblingOrder;

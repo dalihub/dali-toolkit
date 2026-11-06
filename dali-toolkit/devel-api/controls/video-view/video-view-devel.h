@@ -56,6 +56,15 @@ DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
  *
  * The descriptor describes an externally created native player/session. The video plugin
  * interprets it (providerId / nativeSession); the toolkit forwards it without interpreting.
+ * For an MMPlayer underlay source, add the view to its Window while the player is
+ * IDLE, before preparing it. Once a target is set, changing UNDERLAY or moving an
+ * underlay to another Window is rejected. Return the player to IDLE and create
+ * a new view when either change is required. The view does not reset the external
+ * player's playback state on scene reconnection.
+ * For an external MMPlayer NativeImage source, stop the player and wait for
+ * READY before destroying the view. Destroy the view to release its callbacks
+ * and decoded packets before unpreparing or destroying the player. Keep the
+ * player valid until the view is destroyed; an unused IDLE player is also valid.
  *
  * @param[in] source The video source descriptor.
  * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer.
