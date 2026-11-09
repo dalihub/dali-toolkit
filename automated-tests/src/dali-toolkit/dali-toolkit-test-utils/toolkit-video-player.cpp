@@ -19,10 +19,17 @@
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
+#include <test-trace-call-stack.h>
 #include <toolkit-test-application.h>
 
 namespace DALI_NAMESPACE
 {
+TraceCallStack& GetVideoPlayerTrace()
+{
+  static TraceCallStack trace(false, "VideoPlayer::");
+  trace.Enable(true);
+  return trace;
+}
 
 namespace Internal
 {
@@ -276,19 +283,23 @@ bool VideoPlayer::IsLooping()
 
 void VideoPlayer::Play()
 {
+  GetVideoPlayerTrace().PushCall("Play", "");
 }
 
 void VideoPlayer::Pause()
 {
+  GetVideoPlayerTrace().PushCall("Pause", "");
 }
 
 void VideoPlayer::Stop()
 {
+  GetVideoPlayerTrace().PushCall("Stop", "");
   Internal::Adaptor::GetImplementation(*this).Stop();
 }
 
 void VideoPlayer::SetMute(bool mute)
 {
+  GetVideoPlayerTrace().PushCall("SetMute", "");
   Internal::Adaptor::GetImplementation(*this).SetMuted(mute);
 }
 
@@ -311,10 +322,12 @@ void VideoPlayer::GetVolume(float& left, float& right)
 
 void VideoPlayer::SetRenderingTarget(Any target)
 {
+  GetVideoPlayerTrace().PushCall("SetRenderingTarget", "");
 }
 
 void VideoPlayer::SetPlayPosition(int millisecond)
 {
+  GetVideoPlayerTrace().PushCall("SetPlayPosition", "");
   Internal::Adaptor::GetImplementation(*this).SetPlayPosition(millisecond);
 }
 
@@ -325,6 +338,7 @@ int VideoPlayer::GetPlayPosition()
 
 void VideoPlayer::SetDisplayArea(DisplayArea area)
 {
+  GetVideoPlayerTrace().PushCall("SetDisplayArea", "");
 }
 
 void VideoPlayer::SetDisplayRotation(Dali::VideoPlayerPlugin::DisplayRotation rotation)
@@ -415,6 +429,7 @@ void VideoPlayer::LowerToBottom()
 
 void VideoPlayer::SceneConnection()
 {
+  GetVideoPlayerTrace().PushCall("SceneConnection", "");
   Internal::Adaptor::GetImplementation(*this).SceneConnection();
 }
 

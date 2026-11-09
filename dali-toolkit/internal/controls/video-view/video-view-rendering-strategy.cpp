@@ -78,6 +78,10 @@ WindowSurfaceStrategy::~WindowSurfaceStrategy()
   {
     VideoView* videoView = GetVideoViewImpl();
     Actor      self      = videoView->Self();
+    if(Dali::Window window = mTargetWindow.GetHandle())
+    {
+      window.ResizedSignal().Disconnect(videoView, &VideoView::OnWindowResized);
+    }
     if(self)
     {
       self.RemovePropertyNotification(mPositionUpdateNotification);
@@ -114,19 +118,32 @@ bool WindowSurfaceStrategy::Initialize()
     return true;
   }
 
-  Dali::Window window = Window::Get(self);
-  window.ResizedSignal().Connect(videoView, &VideoView::OnWindowResized);
-
-  mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
-  mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
-  mScaleUpdateNotification    = self.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
-  mPositionUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
-  mSizeUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
-  mScaleUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
-
   Toolkit::VideoView    videoViewHandle = GetVideoView();
   Toolkit::Control      control         = Toolkit::Control::DownCast(videoViewHandle);
   Toolkit::ControlImpl& controlImpl     = GetImplementation(control);
+
+  Dali::Window window = Window::Get(self);
+  if(!window)
+  {
+    return false;
+  }
+  Dali::Window previousWindow = mTargetWindow.GetHandle();
+  if(HasRenderingTarget() && previousWindow != window && videoView->HasExternalSource())
+  {
+    DALI_LOG_ERROR("VideoView: create a new view with an IDLE external player before moving underlay video to another Window\n");
+    DevelControl::EnableVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY, false);
+    return false;
+  }
+
+  if(!mPositionUpdateNotification)
+  {
+    mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
+    mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
+    mScaleUpdateNotification    = self.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
+    mPositionUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
+    mSizeUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
+    mScaleUpdateNotification.NotifySignal().Connect(this, &WindowSurfaceStrategy::UpdateDisplayArea);
+  }
 
   if(!videoView->GetOverlayVisual())
   {
@@ -167,9 +184,26 @@ bool WindowSurfaceStrategy::Initialize()
       // Sync corner values to Control
       Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, currentOverlayVisual, true);
     }
+  }
 
-    // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
+  if(!videoView->GetOverlayVisual())
+  {
+    return false;
+  }
+  DevelControl::EnableVisual(controlImpl, Toolkit::VideoView::Property::OVERLAY, true);
+
+  if(!HasRenderingTarget() || previousWindow != window)
+  {
+    if(previousWindow)
+    {
+      previousWindow.ResizedSignal().Disconnect(videoView, &VideoView::OnWindowResized);
+    }
+    window.ResizedSignal().Connect(videoView, &VideoView::OnWindowResized);
+
+    // A new target recreates an internally owned player; external targets are set once.
     videoView->GetVideoPlayer().SetRenderingTarget(Dali::Adaptor::Get().GetNativeWindowHandle(self));
+    mTargetWindow = window;
+    MarkRenderingTargetSet();
   }
 
   if(!mOverlayTextureVisual && videoView->IsUsingOverlayTexture())
@@ -185,6 +219,12 @@ void WindowSurfaceStrategy::UpdateDisplayArea(Dali::PropertyNotification source)
   VideoView* videoView = GetVideoViewImpl();
 
   Actor self(videoView->Self());
+
+  if(!HasRenderingTarget() || !self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) ||
+     mTargetWindow.GetHandle() != Window::Get(self))
+  {
+    return;
+  }
 
   bool    positionUsesPivot = self.GetProperty(Actor::Property::POSITION_USES_PIVOT).Get<bool>();
   Vector3 actorSize         = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::SCALE);
@@ -381,6 +421,11 @@ NativeImageStrategy::~NativeImageStrategy()
 
 bool NativeImageStrategy::Initialize()
 {
+  if(HasRenderingTarget())
+  {
+    return true;
+  }
+
   VideoView* videoView = GetVideoViewImpl();
 
   if(videoView->GetVideoPlayer().IsVideoTextureSupported() == false)
@@ -397,6 +442,10 @@ bool NativeImageStrategy::Initialize()
 
   Any                  source;
   Dali::NativeImagePtr nativeImagePtr = Dali::NativeImage::New(source);
+  if(!nativeImagePtr)
+  {
+    return false;
+  }
   videoView->SetNativeTexture(Dali::Texture::New(*nativeImagePtr));
 
   if(!videoView->GetTextureVisual())
@@ -421,7 +470,12 @@ bool NativeImageStrategy::Initialize()
       Dali::Toolkit::DevelControl::EnableCornerPropertiesOverridden(controlImpl, textureVisual, true);
     }
 
+    if(!textureVisual)
+    {
+      return false;
+    }
     videoView->GetVideoPlayer().SetRenderingTarget(nativeImagePtr);
+    MarkRenderingTargetSet();
   }
 
   return true;

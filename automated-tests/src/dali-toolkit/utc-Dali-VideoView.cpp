@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <stdlib.h>
+#include <test-trace-call-stack.h>
 #include <iostream>
 
 using namespace Dali;
@@ -34,8 +35,23 @@ using namespace Dali::Toolkit;
 
 using Dali::Integration::GetStdString;
 using Dali::Integration::ToStdString;
+
+namespace DALI_NAMESPACE
+{
+TraceCallStack& GetVideoPlayerTrace();
+}
+
 namespace
 {
+VideoPlayerPlugin::VideoSourceDescriptor CreateExternalVideoSource()
+{
+  static int                               session = 0;
+  VideoPlayerPlugin::VideoSourceDescriptor source;
+  source.SetProviderId("tizen.mmplayer");
+  source.SetNativeSession(Any(static_cast<void*>(&session)));
+  source.SetRenderingMode(VideoRenderingMode::UNDERLAY);
+  return source;
+}
 const char* const TEST_FILE("test.mp4");
 const char* const VOLUME_LEFT("volumeLeft");
 const char* const VOLUME_RIGHT("volumeRight");
@@ -1089,3 +1105,117 @@ int UtcDaliVideoViewWithVideoSource(void)
   END_TEST;
 }
 
+int UtcDaliVideoViewExternalSameWindowPreservesTarget(void)
+{
+  ToolkitTestApplication application;
+  Window                 window = application.GetWindow();
+  VideoView              view   = DevelVideoView::New(CreateExternalVideoSource());
+  GetVideoPlayerTrace().Reset();
+  window.Add(view);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 1, TEST_LOCATION);
+  const auto connections = window.ResizedSignal().GetConnectionCount();
+  view.SetProperty(VideoView::Property::PLAY_POSITION, 123);
+  view.SetProperty(VideoView::Property::MUTED, true);
+  view.Play();
+  GetVideoPlayerTrace().Reset();
+
+  for(uint32_t i = 0u; i < 3u; ++i)
+  {
+    window.Remove(view);
+    window.Add(view);
+    application.SendNotification();
+    application.Render();
+  }
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Pause"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Play"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetPlayPosition"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetMute"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<int>(VideoView::Property::PLAY_POSITION), 123, TEST_LOCATION);
+  DALI_TEST_CHECK(view.GetProperty<bool>(VideoView::Property::MUTED));
+  DALI_TEST_EQUALS(window.ResizedSignal().GetConnectionCount(), connections, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVideoViewExternalUnderlayChangeRejected(void)
+{
+  ToolkitTestApplication application;
+  VideoView              view = DevelVideoView::New(CreateExternalVideoSource());
+  application.GetWindow().Add(view);
+  view.Play();
+  GetVideoPlayerTrace().Reset();
+  view.SetProperty(VideoView::Property::UNDERLAY, false);
+  DALI_TEST_CHECK(view.GetProperty<bool>(VideoView::Property::UNDERLAY));
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Pause"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Play"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetPlayPosition"), 0, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVideoViewExternalDifferentWindowRejected(void)
+{
+  ToolkitTestApplication application;
+  Window                 first  = application.GetWindow();
+  Window                 second = Window::New(PositionSize(0, 0, 100, 100), "video-second", false);
+  VideoView              view   = DevelVideoView::New(CreateExternalVideoSource());
+  first.Add(view);
+  view.Play();
+  first.Remove(view);
+  GetVideoPlayerTrace().Reset();
+  second.Add(view);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SceneConnection"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Pause"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Play"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetPlayPosition"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetDisplayArea"), 0, TEST_LOCATION);
+
+  second.Remove(view);
+  first.Add(view);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SceneConnection"), 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVideoViewExternalNativeImageInitialModeAndReconnection(void)
+{
+  ToolkitTestApplication application;
+  ToolkitTestApplication::DECODED_IMAGES_SUPPORTED = true;
+  Window    first                                  = application.GetWindow();
+  Window    second                                 = Window::New(PositionSize(0, 0, 100, 100), "native-second", false);
+  VideoView view                                   = DevelVideoView::New(CreateExternalVideoSource());
+  GetVideoPlayerTrace().Reset();
+  view.SetProperty(VideoView::Property::UNDERLAY, false);
+  DALI_TEST_CHECK(!view.GetProperty<bool>(VideoView::Property::UNDERLAY));
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 1, TEST_LOCATION);
+  first.Add(view);
+  first.Remove(view);
+  second.Add(view);
+  view.SetProperty(VideoView::Property::UNDERLAY, true);
+  DALI_TEST_CHECK(!view.GetProperty<bool>(VideoView::Property::UNDERLAY));
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Pause"), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("Play"), 0, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVideoViewOwnedDifferentWindowRebinds(void)
+{
+  ToolkitTestApplication application;
+  Window                 first  = application.GetWindow();
+  Window                 second = Window::New(PositionSize(0, 0, 100, 100), "owned-second", false);
+  VideoView              view   = VideoView::New();
+  view.SetProperty(VideoView::Property::VIDEO, TEST_FILE);
+  GetVideoPlayerTrace().Reset();
+  first.Add(view);
+  first.Remove(view);
+  second.Add(view);
+  DALI_TEST_EQUALS(GetVideoPlayerTrace().CountMethod("SetRenderingTarget"), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetProperty<String>(VideoView::Property::VIDEO), String(TEST_FILE), TEST_LOCATION);
+  END_TEST;
+}
