@@ -20,6 +20,7 @@
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <toolkit-text-utils.h>
+#include <text-model-fixture.h>
 #include <algorithm>
 #include <cmath>
 
@@ -144,6 +145,105 @@ int UtcDaliTextEllipsisPreservesBothMiddleSegments(void)
       DALI_TEST_EQUALS(glyphs[0].index, static_cast<GlyphIndex>('a'), TEST_LOCATION);
       DALI_TEST_EQUALS(glyphs[count - 1u].index, static_cast<GlyphIndex>('j'), TEST_LOCATION);
     }
+  }
+  END_TEST;
+}
+
+int UtcDaliTextEllipsisLineAdvance(void)
+{
+  ToolkitTestApplication           application;
+  auto                             fontClient = TextAbstraction::FontClient::New(96u, 96u);
+  TextAbstraction::FontDescription description;
+  description.family            = "Test Sans";
+  const FontId    fontId        = fontClient.GetFontId(description, 12u * 64u);
+  const GlyphInfo ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(fontId));
+
+  // Deliberately non-contiguous runs isolate advance line selection. With 15
+  // glyphs the wrong sum stays in bounds but changes the result; with 13 it
+  // also reads beyond the glyph buffer. Geometry comes from the local fixture.
+  for(Length sourceCount : {15u, 13u})
+  {
+    auto  model              = TextTest::MakeModel(std::u32string(sourceCount, U'a'));
+    auto& visual             = *model->mVisualModel;
+    model->mElideEnabled     = true;
+    model->mEllipsisPosition = DevelText::EllipsisPosition::END;
+    visual.mControlSize      = Size(40.f, 32.f);
+    visual.SetLayoutSize(Size(40.f, 32.f));
+    for(GlyphIndex index = 0u; index < sourceCount; ++index)
+    {
+      visual.mGlyphs[index].fontId  = fontId;
+      visual.mGlyphs[index].advance = index < 10u ? 1.f : 100.f;
+    }
+    LineRun lines[3]{};
+    lines[0].glyphRun = {0u, 2u};
+    lines[1].glyphRun = {5u, 5u};
+    lines[2].glyphRun = {10u, 3u};
+    lines[1].ellipsis = true;
+    visual.mLines.Clear();
+    for(const auto& line : lines)
+    {
+      visual.mLines.PushBack(line);
+    }
+
+    const GlyphInfo sourceGlyph    = visual.mGlyphs[9u];
+    const Vector2   sourcePosition = visual.mGlyphPositions[9u];
+    ViewModel       view(model.Get());
+    for(unsigned int repeat = 0u; repeat < 2u; ++repeat)
+    {
+      view.ElideGlyphs(fontClient);
+      DALI_TEST_EQUALS(view.GetNumberOfGlyphs(), 10u, TEST_LOCATION);
+      DALI_TEST_EQUALS(view.GetEndIndexOfElidedGlyphs(), 9u, TEST_LOCATION);
+      DALI_TEST_CHECK(view.GetEndIndexOfElidedGlyphs() < view.GetNumberOfGlyphs());
+      DALI_TEST_EQUALS(view.GetGlyphs()[9u].fontId, ellipsisGlyph.fontId, TEST_LOCATION);
+      DALI_TEST_EQUALS(view.GetGlyphs()[9u].index, ellipsisGlyph.index, TEST_LOCATION);
+      DALI_TEST_EQUALS(visual.mGlyphs.Count(), sourceCount, TEST_LOCATION);
+      DALI_TEST_EQUALS(visual.mGlyphs[9u].index, sourceGlyph.index, TEST_LOCATION);
+      DALI_TEST_EQUALS(visual.mGlyphs[9u].advance, sourceGlyph.advance, TEST_LOCATION);
+      DALI_TEST_EQUALS(visual.mGlyphPositions[9u], sourcePosition, TEST_LOCATION);
+      for(LineIndex index = 0u; index < 3u; ++index)
+      {
+        DALI_TEST_EQUALS(visual.mLines[index].glyphRun.glyphIndex, lines[index].glyphRun.glyphIndex, TEST_LOCATION);
+        DALI_TEST_EQUALS(visual.mLines[index].glyphRun.numberOfGlyphs, lines[index].glyphRun.numberOfGlyphs, TEST_LOCATION);
+      }
+    }
+  }
+  END_TEST;
+}
+
+int UtcDaliTextEllipsisStartAdvanceCompatibility(void)
+{
+  ToolkitTestApplication application;
+  auto                   controller = Controller::New();
+  ConfigureTextLabel(controller);
+  auto fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi(96u, 96u);
+  controller->SetDefaultFontFamily("Test Sans");
+  controller->SetDefaultFontSize(12.f, Controller::POINT_SIZE);
+  controller->SetMultiLineEnabled(true);
+  controller->SetTextElideEnabled(true);
+  controller->SetEllipsisPosition(DevelText::EllipsisPosition::START);
+  controller->SetHorizontalAlignment(HorizontalAlignment::CENTER);
+  controller->SetLineWrapMode(LineWrap::CHARACTER);
+  controller->SetText("a\nbb\nccc\ndddd\neeeee");
+  controller->Relayout(Size(60.f, 32.f), Dali::LayoutDirection::RIGHT_TO_LEFT);
+
+  const auto model = controller->GetTextModel();
+  DALI_TEST_EQUALS(model->GetNumberOfLines(), 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(model->GetLines()[0u].ellipsis);
+  DALI_TEST_EQUALS(model->GetLines()[0u].glyphRun.glyphIndex, 9u, TEST_LOCATION);
+  DALI_TEST_EQUALS(model->GetLines()[0u].glyphRun.numberOfGlyphs, 5u, TEST_LOCATION);
+
+  // START layout retains a source suffix. Its legacy advance lookup differs
+  // from END; changing it also changes the existing centered output.
+  ViewModel view(model);
+  for(unsigned int repeat = 0u; repeat < 2u; ++repeat)
+  {
+    view.ElideGlyphs(fontClient);
+    DALI_TEST_EQUALS(view.GetNumberOfGlyphs(), 10u, TEST_LOCATION);
+    DALI_TEST_EQUALS(view.GetStartIndexOfElidedGlyphs(), 9u, TEST_LOCATION);
+    DALI_TEST_EQUALS(view.GetElidedOffset(), 10.f, TEST_LOCATION);
+    DALI_TEST_EQUALS(view.GetGlyphs()[0u].index, 0x2026u, TEST_LOCATION);
+    DALI_TEST_EQUALS(view.GetGlyphs()[9u].index, static_cast<GlyphIndex>('e'), TEST_LOCATION);
   }
   END_TEST;
 }

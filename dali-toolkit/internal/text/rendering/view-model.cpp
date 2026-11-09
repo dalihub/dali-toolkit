@@ -511,9 +511,12 @@ void ViewModel::ElideGlyphs(TextAbstraction::FontClient& fontClient)
           Length     numberOfRemovedGlyphs = 0u;
           GlyphIndex indexOfEllipsis       = startIndexOfEllipsis;
           float      actualAdvance         = 0.f;
+          const GlyphIndex advanceStart = ellipsisPosition == DevelText::EllipsisPosition::END
+                                            ? ellipsisLine->glyphRun.glyphIndex
+                                            : lines[EllidedLineIndex].glyphRun.glyphIndex;
           for(Length i = 0; i < ellipsisLine->glyphRun.numberOfGlyphs; i++)
           {
-            const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + lines[EllidedLineIndex].glyphRun.glyphIndex + i);
+            const GlyphInfo& currentGlyph   = *(elidedGlyphsBuffer + advanceStart + i);
             float            currentAdvance = currentGlyph.advance;
             actualAdvance += currentAdvance;
           }
